@@ -1,3 +1,21 @@
+2002-01-11  Damon J. Courtney <damon@unreality.com>
+
+	* src/make.tcl
+	    Updated some of the make nodes.
+
+	    librivet.so now gets copied into the rivet package directory.
+
+
+	* src/mod_rivet.c
+	    Changed Rivet_Init to Rivet_InitCore to fix bug.
+
+	    All Script directives now append to each other instead of
+	    overwriting the last directive.  Directory directives still
+	    override in standard fashion though.
+
+	* rivet/packages/rivet
+	    Added as the default package of Rivet commands in C.
+
 2002-01-10  Damon J. Courtney <damon@unreality.com>
 	* src/rivet.h
 	    Added macro 'TCL_CMD_HEADER'.  Prints the default command header
