@@ -8,6 +8,7 @@
 # system.
 
 set scripts {
+    helpers.tcl
     graph.tcl
     aardvark.tcl
     parsetclConfig.tcl
@@ -65,17 +66,20 @@ set TCL_LIBS "$TCL_LIBS -lcrypt"
 
 AddNode apache_cookie.o {
     depends "apache_cookie.c apache_cookie.h"
-    command {$COMPILE apache_cookie.c}
+    set COMP [lremove $COMPILE -Wconversion]
+    command {$COMP apache_cookie.c}
 }
 
 AddNode apache_multipart_buffer.o {
     depends "apache_multipart_buffer.c apache_multipart_buffer.h"
-    command {$COMPILE apache_multipart_buffer.c}
+    set COMP [lremove $COMPILE -Wconversion]
+    command {$COMP apache_multipart_buffer.c}
 }
 
 AddNode apache_request.o {
     depends "apache_request.c apache_request.h"
-    command {$COMPILE apache_request.c}
+    set COMP [lremove $COMPILE -Wconversion]
+    command {$COMP apache_request.c}
 }
 
 AddNode channel.o {
@@ -178,7 +182,7 @@ AddNode install {
     depends "$MOD_SHLIB $LIB_SHLIB"
     tclcommand "file copy -force $MOD_SHLIB $LIBEXECDIR"
     tclcommand "file copy -force [file join .. rivet] $PREFIX"
-    tclcommand "file copy -force $LIB_SHLIB [file join .. rivet packages rivet]"
+    tclcommand "file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]"
 }
 
 Run

@@ -458,7 +458,7 @@ int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
     {
 	/* create and return a file channel */
 	*chan = Tcl_MakeFileChannel(
-	    (ClientData)fileno(ApacheUpload_FILE(req->upload)),
+	    (ClientData)(int)fileno(ApacheUpload_FILE(req->upload)),
 	    TCL_READABLE);
 	Tcl_RegisterChannel(req->interp, *chan);
 	return TCL_OK;
@@ -484,7 +484,7 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
     }
 
     chan = Tcl_MakeFileChannel(
-	(ClientData)fileno(ApacheUpload_FILE(req->upload)),
+	(ClientData)(int)fileno(ApacheUpload_FILE(req->upload)),
 	TCL_READABLE);
     Tcl_SetChannelOption(req->interp, chan, "-translation", "binary");
 
@@ -519,7 +519,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
 
 	bytes = Tcl_Alloc((unsigned)ApacheUpload_size(req->upload));
 	chan = Tcl_MakeFileChannel(
-	    (ClientData)fileno(ApacheUpload_FILE(req->upload)),
+	    (ClientData)(int)fileno(ApacheUpload_FILE(req->upload)),
 	    TCL_READABLE);
 	Tcl_SetChannelOption(req->interp, chan,
 			     "-translation", "binary");
@@ -544,7 +544,7 @@ int TclWeb_UploadType(Tcl_Obj *type, TclWebRequest *req)
 {
    /* If there is a type, return it, if not, return blank. */
    Tcl_SetStringObj(type, ApacheUpload_type(req->upload)
-		    ? ApacheUpload_type(req->upload) : "", -1);
+		    ? (char *)ApacheUpload_type(req->upload) : (char *)"", -1);
    return TCL_OK;
 }
 

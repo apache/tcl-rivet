@@ -181,21 +181,17 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     time_t ctime;
     time_t mtime;
 
-    rivet_server_conf *rsc = NULL;
+    rivet_server_conf *rsc;
     Tcl_Interp *interp = req->interp;
 
-    /* rsc = RIVET_SERVER_CONF( req->req->server->module_config ); */
     rsc = Rivet_GetConf( req->req );
 
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
     if (toplevel == 0)
     {
-	int ret = 0;
 	struct stat stat;
-	ret = Tcl_Stat(filename, &stat);
-	if (ret < 0)
-	    return TCL_ERROR;
+	if( Tcl_Stat(filename, &stat) < 0 ) return TCL_ERROR;
 	ctime = stat.st_ctime;
 	mtime = stat.st_mtime;
     } else {
@@ -203,7 +199,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	mtime = req->req->finfo.st_mtime;
     }
 
-    /* Look for the script's compiled version.  * If it's not found,
+    /* Look for the script's compiled version.  If it's not found,
      * create it.
      */
     if (*(rsc->cache_size))
