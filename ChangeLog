@@ -1,3 +1,10 @@
+2003-04-07  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Use package require to load aardvark.
+
+	* src/buildscripts/graph.tcl: This file should provide the
+	  'struct' package.
+
 2003-03-30  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Fixed example configuration directive.

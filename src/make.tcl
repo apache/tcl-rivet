@@ -6,10 +6,12 @@
 #
 # This file is responsible for the top-level "make" style processing.
 
+set auto_path "$auto_path [file join [file dirname [info script]] buildscripts]"
+package require aardvark
+
 foreach script {
     helpers.tcl
     graph.tcl
-    aardvark.tcl
     parsetclConfig.tcl
     findapxs.tcl
 } {
