@@ -921,13 +921,13 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
     } else if( STREQU( var, "UploadMaxSize" ) ) {
 	rsc->upload_max = strtol( val, NULL, 10 );
     } else if( STREQU( var, "UploadFilesToVar" ) ) {
-	if( STREQU( val, "on" ) ) {
+	if( STREQU( val, "on" ) || STREQU( val, "yes" ) || STREQU( val, "1" ) ) {
 	    rsc->upload_files_to_var = 1;
 	} else {
 	    rsc->upload_files_to_var = 0;
 	}
     } else if( STREQU( var, "SeparateVirtualInterps" ) ) {
-	if( STREQU( val, "on" ) ) {
+	if( STREQU( val, "on" ) || STREQU( val, "yes" ) || STREQU( val, "1" ) ) {
 	    rsc->separate_virtual_interps = 1;
 	} else {
 	    rsc->separate_virtual_interps = 0;

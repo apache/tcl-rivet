@@ -1,3 +1,8 @@
+2004-11-03  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_ServerConf): Instead of just "on", accept
+	"yes" and "1" as well.
+
 2004-10-29  Karl Lehenbauer  <karl-rivet@sc.com>
 
         * rivet/packages/dio/dio_Mysql.tcl: The "DIO handle" method, which
