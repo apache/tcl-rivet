@@ -87,6 +87,10 @@ proc handle {interface args} {
 			regsub -all {\*} $elem {%} elem
 			if {[::string first {%} $elem] != -1} {
 			    append req " $field LIKE '[quote $elem]'"
+		        } elseif {[regexp {^([<=>]) *([0-9.]*)$} $elem _ fn val]} {
+			    append req " $field$fn$val"
+		        } elseif {[regexp {^([<>]=) *([0-9.]*)$} $elem _ fn val]} {
+			    append req " $field$fn$val"
 			} else {
 			    append req " $field='[quote $elem]'"
 			}

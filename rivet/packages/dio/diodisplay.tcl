@@ -40,9 +40,9 @@ catch { ::itcl::delete class DIODisplay }
 
 	set document [env DOCUMENT_NAME]
 
-	if {[info exists response(numResults)] \
-	    && ![lempty $response(numResults)]} {
-	    set pagesize $response(numResults)
+	if {[info exists response(num)] \
+	    && ![lempty $response(num)]} {
+	    set pagesize $response(num)
 	}
 
 	read_css_file
@@ -129,6 +129,19 @@ catch { ::itcl::delete class DIODisplay }
 	return $array(image-src)
     }
 
+    # return a list of name-value pairs that represents the current
+    # state of the query, which can be used to properly populate links
+    # outside DIOdisplay.
+    method state {} {
+	set state {}
+	foreach fld {mode query by how sort num page} {
+	    if [info exists response($fld)] {
+		lappend state $fld $response($fld)
+	    }
+	}
+	return $state
+    }
+
     method show {} {
 	set mode Main
 	if {[info exists response(mode)]} { set mode $response(mode) }
@@ -161,8 +174,10 @@ catch { ::itcl::delete class DIODisplay }
 
     method showview {} {
 	puts {<TABLE CLASS="DIOView">}
+	set row 0
 	foreach field $fields {
-	    $field showview
+	    $field showview [lindex {"" "Alt"} $row]
+	    set row [expr 1 - $row]
 	}
 	puts "</TABLE>"
     }
@@ -170,7 +185,7 @@ catch { ::itcl::delete class DIODisplay }
     #
     # showform - emit a form for inserting a new record
     #
-    # response(searchBy) will contain whatever was in the "where" field
+    # response(by) will contain whatever was in the "where" field
     # response(query) will contain whatever was in the "is" field
     #
     method showform {} {
@@ -193,7 +208,7 @@ catch { ::itcl::delete class DIODisplay }
 	# search field and it matches one of the fields in the
 	# record (and it should), put that in as the default
 	foreach field $fields {
-	    if {[info exists response(searchBy)] && $response(searchBy) == [$field text]} {
+	    if {[info exists response(by)] && $response(by) == [$field text]} {
 		if {![$field readonly] && $response(query) != ""} {
 		    $field value $response(query)
 		}
@@ -224,85 +239,118 @@ catch { ::itcl::delete class DIODisplay }
 	$form end
     }
 
-    method page_buttons {side} {
+    method page_buttons {end {count 0}} {
 	if {$pagesize <= 0} { return }
 
 	if {![info exists response(page)]} { set response(page) 1 }
 
-	set pref DIO$side
-	set count [$DIOResult numrows]
+	set pref DIO$end
+	if {!$count} {
+	  set count [$DIOResult numrows]
+	}
 
+	set pages [expr ($count + $pagesize - 1) / $pagesize]
+
+	if {$pages <= 1} {
+	  return
+	}
+
+	set first [expr $response(page) - 4]
+	if {$first > $pages - 9} {
+	  set first [expr $pages - 9]
+	}
+        if {$first > 1} {
+	  lappend pagelist 1 1
+	  if {$first > 3} {
+	    lappend pagelist ".." 0
+	  } elseif {$first > 2} {
+	    lappend pagelist 2 2
+	  }
+	} else {
+	  set first 1
+	}
+	set last [expr $response(page) + 4]
+	if {$last < 9} {
+	  set last 9
+	}
+	if {$last > $pages} {
+	  set last $pages
+	}
+	for {set i $first} {$i <= $last} {incr i} {
+	  lappend pagelist $i $i
+	}
+	if {$last < $pages} {
+	  if {$last < $pages - 2} {
+	    lappend pagelist ".." 0
+	  } elseif {$last < $pages - 1} {
+	    incr last
+	    lappend pagelist $last $last
+	  }
+	  lappend pagelist $pages $pages
+	}
+
+	foreach {n p} $pagelist {
+	  if {$p == 0 || $p == $response(page)} {
+	    lappend navbar $n
+	  } else {
+	    set html {<A HREF="}
+	    append html "$document?mode=$response(mode)"
+	    foreach var {query by how sort num} {
+	      if {[info exists response($var)]} {
+	      append html "&$var=$response($var)"
+	      }
+	    }
+	    foreach fld [array names hidden] {
+	      append html "&$fld=$hidden($fld)"
+            }
+	    append html "&page=$p\">$n</A>"
+	    lappend navbar $html 
+	  }
+	}
+
+	if {"$end" == "Bottom"} {
+	  puts "<BR/>"
+	}
 	set class [get_css_class TABLE DIONavButtons ${pref}NavButtons]
 	puts "<TABLE WIDTH=\"100%\" CLASS=\"$class\">"
 	puts "<TR>"
-	set class [get_css_class TD DIOBackButton ${pref}BackButton]
-	if {$response(page) != 1} {
-	    set back [button_image_src $class]
-
-	    puts "<TD ALIGN=LEFT CLASS=\"$class\">"
-	    set f [::form #auto -defaults response]
-	    $f start
-	    foreach fld [array names hidden] {
-	        $f hidden $fld -value $hidden($fld)
-            }
-	    $f hidden mode
-	    $f hidden query
-	    $f hidden searchBy
-	    $f hidden sortBy
-	    $f hidden numResults
-	    $f hidden page -value [expr $response(page) - 1]
-	    set class [get_css_class INPUT DIOBackButton ${pref}BackButton]
-	    if {![lempty $back]} {
-		$f image back -src $back -class $class
-	    } else {
-		$f submit back -value "Back" -class $class
-	    }
-	    $f end
-	    $f destroy
-	    puts "</TD>"
+        puts "<TD>"
+	if {"$end" == "Top"} {
+	  puts "$count rows, go to page"
 	} else {
-	    puts "<TD CLASS=\"$class\">&nbsp;</TD>"
+	  puts "Go to page"
 	}
-
-	## As long as count == pagesize, we fetched exactly the limit of
-	## records.  This may sometimes lead to a next button when there
-	## are actually no more records if the number of records is a clean
-	## divisible of pagesize.
-
-	set class [get_css_class TD DIONextButton ${pref}NextButton]
-	if {$count == $pagesize} {
-	    set next [button_image_src $class]
-
-	    puts "<TD ALIGN=RIGHT CLASS=\"$class\">"
-	    set f [::form #auto -defaults response]
-	    $f start
-	    foreach fld [array names hidden] {
-	        $f hidden $fld -value $hidden($fld)
-            }
-	    $f hidden mode
-	    $f hidden query
-	    $f hidden searchBy
-	    $f hidden sortBy
-	    $f hidden numResults
-	    $f hidden page -value [expr $response(page) + 1]
-	    set class [get_css_class INPUT DIONextButton ${pref}NextButton]
-	    if {![lempty $next]} {
-		$f image next -src $next -class $class
-	    } else {
-		$f submit next -value "Next" -class $class
+	foreach link $navbar {
+	  puts "$link&nbsp;"
+	}
+	puts "</TD>"
+	if {"$end" == "Top" && $pages>10} {
+	  set f [::form #auto]
+	  $f start
+	  foreach fld [array names hidden] {
+	      $f hidden $fld -value $hidden($fld)
+          }
+	  foreach fld {mode query by how sort num} {
+	    if [info exists response($fld)] {
+	      $f hidden $fld -value $response($fld)
 	    }
-	    $f end
-	    $f destroy
-	    puts "</TD>"
-	} else {
-	    puts "<TD CLASS=\"$class\">&nbsp;</TD>"
+	  }
+	  puts "<TD ALIGN=RIGHT>"
+	  puts "Jump directly to"
+	  $f text page -size 4 -value $response(page)
+	  $f submit submit -value "Go"
+	  puts "</TD>"
+	  $f end
 	}
 	puts "</TR>"
 	puts "</TABLE>"
+	if {"$end" == "Top"} {
+	  puts "<BR/>"
+	}
     }
 
 
-    method rowheader {} {
+    method rowheader {{total 0}} {
 	set fieldList $fields
 	if {![lempty $rowfields]} { set fieldList $rowfields }
 
@@ -310,21 +358,32 @@ catch { ::itcl::delete class DIODisplay }
 
 	puts <P>
 
-	if {$topnav} { page_buttons Top }
+	if {$topnav} { page_buttons Top $total }
 
 	puts {<TABLE BORDER WIDTH="100%" CLASS="DIORowHeader">}
 	puts "<TR CLASS=DIORowHeader>"
 	foreach field $fieldList {
 	    set text [$field text]
+	    set sorting $allowsort
 	    ## If sorting is turned off, or this field is not in the
 	    ## sortfields, we don't display the sort option.
-	    if {!$allowsort || \
-		(![lempty $sortfields] && [lsearch $sortfields $field] < 0)} {
+	    if {$sorting && ![lempty $sortfields]} {
+		if {[lsearch $sortfields $field] < 0} {
+		    set sorting 0
+	        }
+	    }
+	    if {$sorting && [info exists response(sort)]} {
+		if {"$response(sort)" == "$field"} {
+		    set sorting 0
+	        }
+	    }
+
+	    if {!$sorting} {
 		set html $text
 	    } else {
 		set html {<A HREF="}
 		append html "$document?mode=$response(mode)"
-		foreach var {query searchBy numResults} {
+		foreach var {query by how num} {
 		    if {[info exists response($var)]} {
 			append html "&$var=$response($var)"
 		    }
@@ -332,13 +391,15 @@ catch { ::itcl::delete class DIODisplay }
 	        foreach fld [array names hidden] {
 	            append html "&$fld=$hidden($fld)"
                 }
-		append html "&sortBy=$field\">$text</A>"
+		append html "&sort=$field\">$text</A>"
 	    }
 	    set class [get_css_class TH DIORowHeader DIORowHeader-$field]
 	    puts "<TH CLASS=\"$class\">$html</TH>"
 	}
 
-	puts {<TH CLASS="DIORowHeaderFunctions">Functions</TH>}
+	if {![lempty $rowfunctions] && "$rowfunctions" != "-"} {
+	  puts {<TH CLASS="DIORowHeaderFunctions">Functions</TH>}
+        }
 	puts "</TR>"
     }
 
@@ -368,27 +429,33 @@ catch { ::itcl::delete class DIODisplay }
 	    puts "<TD CLASS=\"$class\">$text</TD>"
 	}
 
-	if {![lempty $rowfunctions]} {
-	    puts "<TD NOWRAP CLASS=\"DIORowFunctions$alt\">"
+	if {![lempty $rowfunctions] && "$rowfunctions" != "-"} {
 	    set f [::form #auto]
+	    puts "<TD NOWRAP CLASS=\"DIORowFunctions$alt\">"
 	    $f start
 	    foreach fld [array names hidden] {
 	        $f hidden $fld -value $hidden($fld)
             }
 	    $f hidden query -value [$DIO makekey a]
-	    $f select mode -values $rowfunctions -class DIORowFunctionSelect$alt
-	    $f submit submit -value "Go" -class DIORowFunctionButton$alt
-	    $f end
+	    if {[llength $rowfunctions] > 1} {
+	      $f select mode -values $rowfunctions -class DIORowFunctionSelect$alt
+	      $f submit submit -value "Go" -class DIORowFunctionButton$alt
+	    } else {
+	      set func [lindex $rowfunctions 0]
+	      $f hidden mode -value $func
+	      $f submit submit -value $func -class DIORowFunctionButton$alt
+	    }
 	    puts "</TD>"
+	    $f end
 	}
 
 	puts "</TR>"
     }
 
-    method rowfooter {} {
+    method rowfooter {{total 0}} {
 	puts "</TABLE>"
 
-	if {$bottomnav} { page_buttons Bottom }
+	if {$bottomnav} { page_buttons Bottom $total }
     }
 
     ## Define a new function.
@@ -471,20 +538,34 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method DisplayRequest {query} {
+	set DIOResult [eval $DIO search -select "count(*)" $query]
+	if [$DIOResult numrows] {
+	  $DIOResult next -array a
+	  set total $a(count)
+	} else {
+	  set total 0
+	}
+	$DIOResult destroy
+	set DIOResult ""
+
+	append query [sql_order_by_syntax]
+	append query [sql_limit_syntax]
 	set DIOResult [eval $DIO search $query]
 
 	if {[$DIOResult numrows] <= 0} {
 	    puts "Could not find any matching records."
+	    $DIOResult destroy
+	    set DIOResult ""
 	    return
 	}
 
-	rowheader
+	rowheader $total
 
 	$DIOResult forall -array a {
 	    showrow a
 	}
 
-	rowfooter
+	rowfooter $total
 
 	$DIOResult destroy
 	set DIOResult ""
@@ -493,8 +574,6 @@ catch { ::itcl::delete class DIODisplay }
     method Main {} {
 	puts "<TABLE BORDER=0 WIDTH=100% CLASS=DIOForm><TR>"
 
-	puts "<TD CLASS=DIOForm ALIGN=CENTER VALIGN=MIDDLE>"
-	puts "<BR/>"
 	set selfunctions {}
 	foreach f $functions {
 	    if {"$f" != "List"} {
@@ -507,35 +586,57 @@ catch { ::itcl::delete class DIODisplay }
             	}
 	    	$f hidden mode -value "List"
 	    	$f hidden query -value ""
-	    	$f submit submit -value "List All" -class DIORowFunctionButton
+	        puts "<TD CLASS=DIOForm ALIGN=CENTER VALIGN=MIDDLE WIDTH=0%>"
+	    	$f submit submit -value "Show All" -class DIORowFunctionButton
+		puts "</TD>"
 	    	$f end
 	    }
 	}
-	puts "</TD>"
 
-	puts "<TD CLASS=DIOForm VALIGN=MIDDLE>"
+	puts "<TD CLASS=DIOForm VALIGN=MIDDLE WIDTH=100%>"
 	$form start
+	puts "&nbsp;"
 
 	foreach fld [array names hidden] {
 	    $form hidden $fld -value $hidden($fld)
         }
 
-	$form select mode -values $selfunctions -class DIOMainFunctionsSelect
+        if {[llength $selfunctions] > 1} {
+	  $form select mode -values $selfunctions -class DIOMainFunctionsSelect
+          puts "where"
+	} else {
+	  puts "Where"
+	}
 
 	set useFields $fields
 	if {![lempty $searchfields]} { set useFields $searchfields }
 
-        puts "where"
-	$form select searchBy -values [pretty_fields $useFields] \
+	$form select by -values [pretty_fields $useFields] \
 	    -class DIOMainSearchBy
-        puts "is"
-	$form text query -value "" -class DIOMainQuery
-	$form submit submit -value "GO" -class DIOMainSubmitButton
+
+	if [string match {[Ss]earch} $selfunctions] {
+	  $form select how -values {"=" "<" "<=" ">" ">="}
+	} else {
+          puts "is"
+	}
+
+        if [info exists response(query)] {
+	  $form text query -value $response(query) -class DIOMainQuery
+	} else {
+	  $form text query -value "" -class DIOMainQuery
+	}
+
+        if {[llength $selfunctions] > 1} {
+	  $form submit submit -value "GO" -class DIOMainSubmitButton
+	} else {
+	  $form hidden mode -value $selfunctions
+	  $form submit submit -value $selfunctions -class DIOMainSubmitButton
+	}
 	puts "</TD></TR>"
 
 	if {![lempty $numresults]} {
 	    puts "<TR><TD CLASS=DIOForm>Results per page: "
-	    $form select numResults -values $numresults -class DIOMainNumResults
+	    $form select num -values $numresults -class DIOMainNumResults
 	    puts "</TD></TR>"
 	}
 
@@ -544,8 +645,8 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method sql_order_by_syntax {} {
-	if {[info exists response(sortBy)] && ![lempty $response(sortBy)]} {
-	    return " ORDER BY $response(sortBy)"
+	if {[info exists response(sort)] && ![lempty $response(sort)]} {
+	    return " ORDER BY $response(sort)"
 	}
 
 	if {![lempty $defaultsortfield]} {
@@ -565,21 +666,18 @@ catch { ::itcl::delete class DIODisplay }
 	
 
     method Search {} {
-	set searchField $FieldTextMap($response(searchBy))	
+	set searchField $FieldTextMap($response(by))	
 
-	set query "-$searchField $response(query)"
+	set what $response(query)
+	if {[info exists response(how)] && [string length $response(how)]} {
+	  set what "$response(how)$what"
+	}
 
-	append query [sql_order_by_syntax]
-	append query [sql_limit_syntax]
-
-	DisplayRequest $query
+	DisplayRequest "-$searchField $what"
     }
 
     method List {} {
-	set query [sql_order_by_syntax]
-	append query [sql_limit_syntax]
-
-	DisplayRequest $query
+	DisplayRequest ""
     }
 
     method Add {} {
@@ -905,8 +1003,9 @@ catch { ::itcl::delete class ::DIODisplayField }
 	configure -$varName $string
     }
 
-    method showview {} {
-	puts "<TR>"
+    method showview {{alt ""}} {
+	set class [get_css_class TR DIOViewRow$alt DIOViewViewRow$alt-$name]
+	puts "<TR CLASS=\"$class\">"
 
 	set class [get_css_class TD DIOViewHeader DIOViewHeader-$name]
 	puts "<TD CLASS=\"$class\">$text:</TD>"
@@ -932,7 +1031,6 @@ catch { ::itcl::delete class ::DIODisplayField }
 	    set class [get_css_class $tag DIOFormField DIOFormField-$name]
 
 	    if {$type == "select"} {
-		$form default_value $name $value
 		$form select $name -values $values -class $class
 	    } else {
 		eval $form $type $name -value [list $value] $formargs -class $class
@@ -1019,8 +1117,9 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	puts "</TR>"
     }
 
-    method showview {} {
-	puts "<TR>"
+    method showview {{alt ""}} {
+	set class [get_css_class TR DIOViewRow$alt DIOViewRow$alt-$name]
+	puts "<TR CLASS=\"$class\">"
 
 	set class [get_css_class TD DIOViewHeader DIOViewHeader-$name]
 	puts "<TD CLASS=\"$class\">$text:</TD>"
