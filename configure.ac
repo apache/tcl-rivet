@@ -171,7 +171,7 @@ TEA_ENABLE_SYMBOLS
 # link against the non-stubbed Tcl library.  Add Tk too if necessary.
 #--------------------------------------------------------------------
 
-AC_DEFINE(USE_TCL_STUBS)
+#AC_DEFINE(USE_TCL_STUBS)
 #AC_DEFINE(USE_TK_STUBS)
 
 #--------------------------------------------------------------------
