@@ -86,7 +86,7 @@ Rivet_Parse(
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
 	return TCL_ERROR;
     }
-    if (Rivet_ParseExecFile(globals->r, rsc, filename, 0) == TCL_OK)
+    if (Rivet_ParseExecFile(globals->req, rsc, filename, 0) == TCL_OK)
 	return TCL_OK;
     else
 	return TCL_ERROR;

@@ -39,7 +39,7 @@ set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING 
 
 set MOD_STLIB mod_rivet.a
 set MOD_SHLIB mod_rivet[info sharedlibextension]
-set MOD_OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o mod_rivet.o TclWebapache.o"
+set MOD_OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o rivetParser.o rivetCore.o mod_rivet.o TclWebapache.o"
 
 set LIB_STLIB librivet.a
 set LIB_SHLIB librivet[info sharedlibextension]
@@ -75,9 +75,9 @@ AddNode channel.o {
     command {$COMPILE channel.c}
 }
 
-AddNode parser.o {
-    depends "parser.c parser.h mod_rivet.h"
-    command {$COMPILE parser.c}
+AddNode rivetParser.o {
+    depends "rivetParser.c rivetParser.h mod_rivet.h"
+    command {$COMPILE rivetParser.c}
 }
 
 AddNode rivetCore.o {

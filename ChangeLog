@@ -1,5 +1,16 @@
 2002-01-27  David N. Welton  <davidw@dedasys.com>
 
+	* src/mod_rivet.c (Rivet_ParseExecFile): Moved the addition of
+	before and after scripts to this file, so that GetRivetFile is
+	independant of any Apache specific code.
+
+	* src/rivetParser.c, src/rivetParser.h: New files, which replace
+	parser.c and parser.h.
+	(Rivet_GetRivetFile): Moved from mod_rivet.c.  Now capable of
+	operating independantly of mod_rivet.  Use Tcl file functions
+	instead of Apache functions.
+	(Rivet_Parser): Parser now operates on a Tcl_Obj input buffer.
+
 	* src/mod_rivet.h: Moved content_sent to TclWebRequest in TclWeb.h
 
 2002-01-26  David N. Welton  <davidw@dedasys.com>

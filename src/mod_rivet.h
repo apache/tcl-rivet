@@ -72,7 +72,8 @@ typedef struct {
     TclWebRequest *req;         /* TclWeb API request */
 } rivet_interp_globals;
 
-int Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc, char *filename, int toplevel);
+int Rivet_ParseExecFile(TclWebRequest *req, rivet_server_conf *rsc,
+			char *filename, int toplevel);
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)

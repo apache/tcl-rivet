@@ -80,11 +80,12 @@
 #include <string.h>
 
 /* Rivet includes */
-#include "parser.h"
 #include "channel.h"
 #include "apache_request.h"
 #include "mod_rivet.h"
 #include "rivet.h"
+#include "rivetParser.h"
+
 
 module MODULE_VAR_EXPORT rivet_module;
 
@@ -94,9 +95,6 @@ module MODULE_VAR_EXPORT rivet_module;
 static void Rivet_InitTclStuff(server_rec *s, pool *p);
 static void Rivet_CopyConfig( rivet_server_conf *oldrsc,
 				rivet_server_conf *newrsc);
-static int Rivet_GetRivetFile(request_rec *r, rivet_server_conf *rsc,
-			 Tcl_Interp *interp, char *filename, int toplevel,
-			 Tcl_Obj *outbuf);
 static int Rivet_SendContent(request_rec *);
 static int Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf,
 				request_rec *r);
@@ -120,111 +118,6 @@ Rivet_UploadHook(void *ptr, char *buf, int len, ApacheUpload *upload)
 }
 #endif /* 0 */
 
-/* Load, cache and eval a Tcl file  */
-
-static int
-Rivet_GetTclFile(request_rec *r, Tcl_Interp *interp,
-		char *filename, Tcl_Obj *outbuf)
-{
-    int result = 0;
-
-    /* Taken, in part, from tclIOUtil.c out of the Tcl distribution,
-     * and modified.
-     */
-
-    /* Basically, what we are doing here is a Tcl_EvalFile but with the
-     * addition of caching code.
-     */
-    Tcl_Channel chan = Tcl_OpenFileChannel(interp, r->filename, "r", 0644);
-    if (chan == (Tcl_Channel) NULL)
-    {
-	Tcl_ResetResult(interp);
-	Tcl_AppendResult(interp, "couldn't read file \"", r->filename,
-			 "\": ", Tcl_PosixError(interp), (char *) NULL);
-	return TCL_ERROR;
-    }
-    result = Tcl_ReadChars(chan, outbuf, (signed)r->finfo.st_size, 1);
-    if (result < 0)
-    {
-	Tcl_Close(interp, chan);
-	Tcl_AppendResult(interp, "couldn't read file \"", r->filename,
-			 "\": ", Tcl_PosixError(interp), (char *) NULL);
-	return TCL_ERROR;
-    }
-
-    if (Tcl_Close(interp, chan) != TCL_OK)
-	return TCL_ERROR;
-
-    return TCL_OK;
-}
-
-/* Parse and execute a Rivet file */
-
-static int
-Rivet_GetRivetFile(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
-			 char *filename, int toplevel, Tcl_Obj *outbuf)
-{
-    /* BEGIN PARSER  */
-    int inside = 0;	/* are we inside the starting/ending delimiters  */
-
-
-    FILE *f = NULL;
-
-    if (!(f = ap_pfopen(r->pool, filename, "r")))
-    {
-	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
-		     "file permissions deny server access: %s", filename);
-	return HTTP_FORBIDDEN;
-    }
-
-    if (toplevel)
-    {
-	Tcl_SetStringObj(outbuf, "namespace eval request {\n", -1);
-	if (rsc->rivet_before_script)
-	{
-	    Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
-	    ap_log_error( APLOG_MARK, APLOG_ERR, r->server,
-			  Tcl_GetStringFromObj( rsc->rivet_before_script, NULL ) );
-	}
-	Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
-    }
-    else
-	Tcl_SetStringObj(outbuf, "puts -nonewline \"\n", -1);
-
-    /* if inside < 0, it's an error  */
-    inside = Rivet_Parser(outbuf, f);
-    if (inside < 0)
-    {
-	if (ferror(f))
-	{
-	    ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
-			 "Encountered error in mod_rivet getchar routine "
-			 "while reading %s",
-			 r->uri);
-	    ap_pfclose( r->pool, f);
-	}
-    }
-
-    ap_pfclose(r->pool, f);
-
-    if (inside == 0)
-    {
-	Tcl_AppendToObj(outbuf, "\"\n", 2);
-    }
-
-    if (toplevel)
-    {
-	if (rsc->rivet_after_script)
-	    Tcl_AppendObjToObj(outbuf, rsc->rivet_after_script);
-
-	Tcl_AppendToObj(outbuf, "\n}\n", -1);
-    }
-    else
-	Tcl_AppendToObj(outbuf, "\n", -1);
-
-    /* END PARSER  */
-    return TCL_OK;
-}
 
 /* Calls Tcl_EvalObj() and checks for errors
  * Prints the error buffer if any.
@@ -261,12 +154,12 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
         TclWeb_PrintHeaders(globals->req);
 	Tcl_Flush(*(conf->outchannel));
     }
-    return OK;
+    return TCL_OK;
 }
 
 /* This is a seperate function so that it may be called from 'Parse' */
 int
-Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
+Rivet_ParseExecFile(TclWebRequest *req, rivet_server_conf *rsc,
 			char *filename, int toplevel)
 {
     char *hashKey = NULL;
@@ -275,10 +168,11 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
 
     Tcl_Obj *outbuf = NULL;
     Tcl_HashEntry *entry = NULL;
-    Tcl_Interp *interp = rsc->server_interp;
 
     time_t ctime;
     time_t mtime;
+
+    Tcl_Interp *interp = rsc->server_interp;
 
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
@@ -292,8 +186,8 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
 	ctime = stat.st_ctime;
 	mtime = stat.st_mtime;
     } else {
-	ctime = r->finfo.st_ctime;
-	mtime = r->finfo.st_mtime;
+	ctime = req->req->finfo.st_ctime;
+	mtime = req->req->finfo.st_mtime;
     }
 
     /* Look for the script's compiled version.  * If it's not found,
@@ -301,7 +195,7 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
      */
     if (*(rsc->cache_size))
     {
-	hashKey = ap_psprintf(r->pool, "%s%lx%lx%d", filename,
+	hashKey = ap_psprintf(req->req->pool, "%s%lx%lx%d", filename,
 			      mtime, ctime, toplevel);
 	entry = Tcl_CreateHashEntry(rsc->objCache, hashKey, &isNew);
     }
@@ -311,29 +205,38 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
     {
 	outbuf = Tcl_NewObj();
 	Tcl_IncrRefCount(outbuf);
-
-	if( STREQU( r->content_type, "application/x-httpd-rivet") || !toplevel )
+	if (toplevel && rsc->rivet_before_script) {
+	    Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
+	}
+	if( STREQU( req->req->content_type, "application/x-httpd-rivet") || !toplevel )
 	{
 	    /* It's a Rivet file - which we always are if toplevel is 0,
 	     * meaning we are in the Parse command.
 	     */
-	    result = Rivet_GetRivetFile(r,rsc,interp,filename,toplevel,outbuf);
+	    result = Rivet_GetRivetFile(filename, toplevel, outbuf, req);
 	} else {
 	    /* It's a plain Tcl file */
-	    result = Rivet_GetTclFile(r, interp, filename, outbuf);
+	    result = Rivet_GetTclFile(filename, outbuf, req);
 	}
 	if (result != TCL_OK)
+	{
 	    return result;
+	}
+	if (toplevel && rsc->rivet_after_script) {
+	    Tcl_AppendObjToObj(outbuf, rsc->rivet_after_script);
+	}
 
-	if (*(rsc->cache_size))
+	if (*(rsc->cache_size)) {
 	    Tcl_SetHashValue(entry, (ClientData)outbuf);
+	}
 
 	if (*(rsc->cache_free)) {
 	    rsc->objCacheList[-- *(rsc->cache_free) ] = strdup(hashKey);
 	} else if (*(rsc->cache_size)) { /* If it's zero, we just skip this. */
 	    Tcl_HashEntry *delEntry;
-	    delEntry = Tcl_FindHashEntry(rsc->objCache,
-				     rsc->objCacheList[*(rsc->cache_size)-1]);
+	    delEntry =
+		Tcl_FindHashEntry(rsc->objCache,
+				  rsc->objCacheList[*(rsc->cache_size)-1]);
 	    Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
 	    Tcl_DeleteHashEntry(delEntry);
 	    free(rsc->objCacheList[*(rsc->cache_size) - 1]);
@@ -346,9 +249,7 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
 	outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
     }
 
-    Rivet_ExecuteAndCheck(interp, outbuf, r);
-
-    return TCL_OK;
+    return Rivet_ExecuteAndCheck(interp, outbuf, req->req);
 }
 
 static void
@@ -476,9 +377,14 @@ Rivet_SendContent(request_rec *r)
 	TclWeb_PrintHeaders(globals->req);
 	return OK;
     }
-    Rivet_ParseExecFile(r, rsc, r->filename, 1);
 
-    if( Tcl_EvalObj( interp, rsc->request_cleanup ) == TCL_ERROR ) {
+    if (Rivet_ParseExecFile(globals->req, rsc, r->filename, 1) != TCL_OK)
+    {
+	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
+		     Tcl_GetVar(interp, "errorInfo", 0));
+    }
+
+    if(Tcl_EvalObj(interp, rsc->request_cleanup) == TCL_ERROR) {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
