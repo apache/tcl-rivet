@@ -601,7 +601,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     server_rec *sr;
 
     /* Initialize TCL stuff  */
-    Tcl_FindExecutable(NULL);
+    Tcl_FindExecutable(NAMEOFEXECUTABLE);
     interp = Tcl_CreateInterp();
 
     if (interp == NULL)

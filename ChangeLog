@@ -1,3 +1,14 @@
+2003-05-13  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Pass [info nameofexecutable] to mod_rivet.c
+	compilation, in order to make Rivet aware of the location of
+	tclsh.
+
+	* src/mod_rivet.c (Rivet_InitTclStuff): Use name of tclsh
+	executable passed in via the build script.  This isn't really the
+	name of the executable Rivet is part of (Apache), but I think this
+	is more useful.
+
 2003-05-11  David N. Welton  <davidw@dedasys.com>
 
 	* src/apache_request.c: Updated to the latest from the httpd-apreq

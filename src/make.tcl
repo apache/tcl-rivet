@@ -132,7 +132,7 @@ AddNode rivetPkgInit.o {
 
 AddNode mod_rivet.o {
     depends mod_rivet.c mod_rivet.h apache_request.h parser.h
-    sh {$COMPILE mod_rivet.c}
+    sh {$COMPILE -DNAMEOFEXECUTABLE="[info nameofexecutable]" mod_rivet.c}
 }
 
 AddNode TclWebapache.o {

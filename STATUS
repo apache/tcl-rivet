@@ -13,6 +13,6 @@ Windows patches by Holger have yet to be applied.
 
 Apache 2.0:
 
- * Waiting on apr 2.0
+ * Waiting on apreq 2.0.
 
  * Need a good thread strategy.
