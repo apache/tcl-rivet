@@ -1,3 +1,7 @@
+2002-10-23  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xsl: Use <pre> tag for source code examples.
+
 2002-10-22  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c (TclWeb_StringToUtf): One more CONST84 - now

@@ -10,16 +10,16 @@
 	Assuming you have Apache configured correctly, create a file
 	called <tt>hello.rvt</tt> where Apache can find
 	it, with the following content:
-      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 puts &quot;Hello World&quot;
 ?&gt;
-</div><p style="width:90%">
+</pre><p style="width:90%">
 	If you then access it with your browser, you should see a
 	blank page with the text &quot;Hello World&quot; (without the quotes) on
 	it.
       </p></div><div class="example"><a name="table"></a><p class="title"><b>Example 2. Generate a Table</b></p><p style="width:90%">
 	In another simple example, we dynamically generate a table:
-      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;? puts &quot;&lt;table&gt;\n&quot;
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;? puts &quot;&lt;table&gt;\n&quot;
 for {set i 1} { $i &lt;= 8 } {incr i} {
     puts &quot;&lt;tr&gt;\n&quot;
     for {set j 1} {$j &lt;= 8} {incr j} {
@@ -30,7 +30,7 @@ for {set i 1} { $i &lt;= 8 } {incr i} {
     puts &quot;&lt;/tr&gt;\n&quot;
 }
 puts &quot;&lt;/table&gt;\n&quot; ?&gt;
-</div><p style="width:90%">
+</pre><p style="width:90%">
 	If you read the code, you can see that this is pure Tcl.  We
 	could take the same code, run it outside of Rivet, and it
 	would generate the same HTML!
@@ -41,7 +41,7 @@ puts &quot;&lt;/table&gt;\n&quot; ?&gt;
 	POST operations.
       </p><p style="width:90%">
 	Given an HTML form like the following:
-      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;vars.rvt&quot;&gt;
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;vars.rvt&quot;&gt;
   &lt;p&gt;
     &lt;input name=&quot;title&quot;&gt;
     &lt;input name=&quot;salary&quot;&gt;
@@ -54,9 +54,9 @@ puts &quot;&lt;/table&gt;\n&quot; ?&gt;
     &lt;/select&gt;
   &lt;/p&gt;
 &lt;/form&gt;
-</div><p style="width:90%">
+</pre><p style="width:90%">
 	We can use this Rivet script to get the variable values:
-      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 set errlist {}
 if { [var exists title] } {
     set salary [var get title]
@@ -92,7 +92,7 @@ if { [llength $errlist] != 0 } {
 } else {
     puts &quot;Thanks for the information!&quot;
 }
-?&gt;</div><p style="width:90%">
+?&gt;</pre><p style="width:90%">
 	The first statement checks to make sure that the
 	<tt>boss</tt> variable has been passed to the
 	script, and then does something with that information.  If
@@ -118,15 +118,15 @@ if { [llength $errlist] != 0 } {
       </p></div><div class="example"><a name="upload"></a><p class="title"><b>Example 4. File Upload</b></p><p style="width:90%">
 	The following HTML in one file, say,
 	<tt>upload.html</tt>
-      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;foo.ttml&quot; enctype=&quot;multipart/form-data&quot;
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;foo.ttml&quot; enctype=&quot;multipart/form-data&quot;
 method=&quot;post&quot;&gt;
 &lt;input type=&quot;file&quot; name=&quot;MyUpload&quot;&gt;&lt;/input&gt;
-&lt;/form&gt;</div><p style="width:90%">
+&lt;/form&gt;</pre><p style="width:90%">
 	Can be used with the following Tcl code, in a second file
 	(<tt>upload.rvt</tt> for instance)
 	in order to create a file upload form.
-      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 upload save MyUpload /tmp/uploadfiles/file1
 puts &quot;Saved file [upload filename MyUpload] \
 	([upload size MyUpload] bytes) to server&quot;
-?&gt;</div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Rivet Tcl Commands and Variables </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Resources - How to Get Help</td></tr></table></div></body></html>
+?&gt;</pre></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Rivet Tcl Commands and Variables </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Resources - How to Get Help</td></tr></table></div></body></html>

@@ -21,8 +21,8 @@
 	  You must uncompress the Rivet sources in the directory where you
 	  wish to compile them.
 
-	  </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">gunzip tcl-rivet-X.X.X.tar.gz
-	    tar -xvf tcl-rivet-X.X.X.tar.gz</div><p style="width:90%">
+	  <pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">gunzip tcl-rivet-X.X.X.tar.gz
+tar -xvf tcl-rivet-X.X.X.tar.gz</pre>
 
 	</p></li><li><p class="title"><b>Building Rivet</b></p><p style="width:90%">
 	  Rivet uses a unique build system which we created especially
@@ -36,8 +36,8 @@
 	      set certain options.  Try the next step first, and see
 	      if it's successful.
 	    </p></li><li><p style="width:90%">At this point, you are ready to run the build
-	      system:</p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
-./make.tcl <i><tt>option</tt></i></div><p style="width:90%">where <i><tt>option</tt></i> can be
+	      system:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
+./make.tcl <i><tt>option</tt></i></pre><p style="width:90%">where <i><tt>option</tt></i> can be
 	      either <tt><span style="text-decoration:underline">shared</span></tt> or
 	      <tt><span style="text-decoration:underline">static</span></tt>.
 	    </p></li><li><p class="title"><b>Install</b></p><p style="width:90%">
@@ -51,13 +51,13 @@
 	    </p></li></ol></li><li><p class="title"><b>Apache Configuration Files</b></p><p style="width:90%">
 	  Rivet is relatively easy to configure - we start off by
 	  adding the module itself:
-	</p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">LoadModule rivet_module	<i><tt>/usr/lib/apache/1.3/mod_rivet.so</tt></i></div><p style="width:90%">
+	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">LoadModule rivet_module	<i><tt>/usr/lib/apache/1.3/mod_rivet.so</tt></i></pre><p style="width:90%">
 	  This tells Apache to load the Rivet shared object, wherever
 	  it happens to reside on your file system.  Now we have to
 	  tell Apache what kind of files are &quot;Rivet&quot; files and how to
 	  process them:
-	</p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">AddType application/x-httpd-rivet .rvt
-	  AddType application/x-rivet-tcl .tcl</div><p style="width:90%">
+	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">AddType application/x-httpd-rivet .rvt
+	  AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 	  These tell Apache to process files with the
 	  <tt>.rvt</tt> and <tt>.tcl</tt>
 	  extensions as Rivet files.

@@ -286,11 +286,11 @@
 	  </pre>
 	</xsl:when>
 	<xsl:otherwise>
-	  <div style="background:#bbffbb ; width:90ex ; margin: 2ex ;
+	  <pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;
 	    padding: 1ex; border: solid black 1px ; white-space: pre;
 	    font-family:monospace ; " class="{name(.)}">
 	    <xsl:apply-templates/>
-	  </div>
+	  </pre>
 	</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
