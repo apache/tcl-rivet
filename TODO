@@ -1,6 +1,9 @@
 BUGS
 ====
 
+* Using user conf variables eats up memory.  Find a better way to create and
+  destroy them.
+
 TODO
 ====
 
@@ -26,6 +29,7 @@ TODO
   the TclWebapache.c file.  Compatible file, for CGI only operating,
   TclWebcgi.c needs to be created.
 
+* Need to add a local.tcl for local procs and setup.
 
 MAYBE
 =====

@@ -19,6 +19,11 @@ namespace eval ::Rivet {
 	}
     }
 
+    ###
+    ## The default error handler for Rivet.  Any time a page runs into an
+    ## error, this routine will be called to handle the error information.
+    ## If an ErrorScript has been specified, this routine will not be called.
+    ###
     proc handle_error {} {
 	global errorInfo
 	global errorOutbuf

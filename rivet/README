@@ -11,3 +11,5 @@ packages - Contains packages for use with Rivet.  Place any new packages or
 
 rivet-tcl - Contains .tcl files for procedures in Rivet.  Place new commands
             to Rivet in this directory.
+
+packages-local - If it exists, a directory of local packages.

@@ -105,7 +105,16 @@ TclWeb_PrintError(char *errstr, int htmlflag, TclWebRequest *req)
 INLINE int
 TclWeb_HeaderSet(char *header, char *val, TclWebRequest *req)
 {
-    ap_table_set(req->req->headers_out, header, val);
+    /*
+     * Since we can have multiple cookies, we want to check and see if
+     * the header is a Set-Cookie.  If it is, do a table add, which
+     * doesn't check to see if a key exists before adding it to the table.
+     */
+    if( !strcasecmp( header, "set-cookie" ) ) {
+	ap_table_add(req->req->headers_out, header, val);
+    } else {
+	ap_table_set(req->req->headers_out, header, val);
+    }
     return TCL_OK;
 }
 
