@@ -1,5 +1,14 @@
 2004-05-05  Karl Lehenbauer  <karl@sc.com>
 
+	* /rivet/packages/dio/diodisplay.tcl: Got "-type boolean"
+	working.  There's some problem with using a method that
+	uses configvar to set a var as a method in a class where
+	the class is being inherited by a subclass that redefines
+	the variable.  I had to substitute "cget -varName" style
+	to get it to work.
+
+2004-05-05  Karl Lehenbauer  <karl@sc.com>
+
 	* /rivet/packages/dio/diodisplay.tcl: Added "-type select"
 	option to DIOdisplay fields, and a new option, "-values $list"
 	which takes a list of values to be made available with a form

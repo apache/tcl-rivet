@@ -29,7 +29,6 @@ catch { ::itcl::delete class DIODisplay }
     constructor {args} {
 	eval configure $args
 	load_response
-#parray response
 
 	if {[lempty $DIO]} {
 	    return -code error "You must specify a DIO object"
@@ -425,8 +424,6 @@ catch { ::itcl::delete class DIODisplay }
 
     method store {arrayName} {
 	upvar 1 $arrayName array
-#puts "storing"
-#parray array
 	set result [$DIO store array]
 	set error  [$DIO errorinfo]
 	if {![lempty $error]} { return -code error $error }
@@ -450,10 +447,12 @@ catch { ::itcl::delete class DIODisplay }
     method set_field_values {arrayName} {
 	upvar 1 $arrayName array
 
+	# for all the elements in the specified array, try to invoke
+	# the element as an object, invoking the method "value" to
+	# set the value to the specified value
 	foreach var [array names array] {
-#puts "set_field_values: $var value $array($var)<br>"
-	    if {[catch { $var value $array($var) } result] == 1} {
-#puts "error: $result<br>"
+	    #if {[catch { $var value $array($var) } result] == 1} {}
+	    if {[catch { $var configure -value $array($var) } result] == 1} {
 	    }
 	}
     }
@@ -462,8 +461,12 @@ catch { ::itcl::delete class DIODisplay }
 	upvar 1 $arrayName array
 
 	foreach field $allfields {
-#puts "set array($field) [$field value]<br>"
-	    set array($field) [$field value]
+
+            # for some reason the method for getting the value doesn't
+	    # work for boolean values, which inherit DIODisplayField,
+	    # something to do with configvar
+	    #set array($field) [$field value]
+	    set array($field) [$field cget -value]
 	}
     }
 
@@ -1038,7 +1041,9 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	if {[lsearch -exact $values $val] > -1} { return 1 }
 	return 0
     }
-    
+
+    method value {{string ""}} { configvar value $string }
+
     public variable true	"Yes"
     public variable false	"No"
     public variable values	"1 y yes t true on"
