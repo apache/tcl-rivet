@@ -22,14 +22,14 @@
 
   <!-- ==================================================================== -->
 
-<!--
+  <!--
   <xsl:import
   href="http://docbook.sourceforge.net/release/xsl/1.48/html/docbook.xsl"/>
--->
+  -->
 
   <xsl:import
     href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/docbook.xsl"
-  />
+    />
 
 
   <xsl:variable name="arg.choice.opt.open.str">?</xsl:variable>
@@ -66,6 +66,37 @@
 
   <xsl:template match="option">
     <xsl:call-template name="inline.underlineseq"/>
+  </xsl:template>
+
+  <xsl:template match="cmdsynopsis">
+    <div class="{name(.)}">
+      <span style="background:#bbbbff">
+	<xsl:call-template name="anchor"/>
+	<xsl:apply-templates/>
+      </span>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="cmdsynopsis/command">
+    <br/>
+    <span style="font-weight:bold">
+      <xsl:call-template name="inline.monoseq"/>
+    </span>
+    <xsl:text> </xsl:text>
+  </xsl:template>
+
+  <xsl:template match="varlistentry">
+    <dt>
+      <xsl:call-template name="anchor"/>
+      <span style="background:#bbbbff">
+	<xsl:apply-templates select="term"/>
+      </span>
+    </dt>
+    <dd>
+      <div style="background:#dddddd">
+	<xsl:apply-templates select="listitem"/>
+      </div>
+    </dd>
   </xsl:template>
 
   <xsl:template match="arg">

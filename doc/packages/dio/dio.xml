@@ -31,9 +31,9 @@
 	  <arg choice="opt">objectName</arg>
 	  <group choice="opt">
 	    <arg>-option</arg>
-	    <arg>option</arg>
+	    <arg><replaceable>option</replaceable></arg>
 	    <arg>-option</arg>
-	    <arg>option</arg>
+	    <arg><replaceable>option</replaceable></arg>
 	    <arg>...</arg>
 	  </group>
 	</cmdsynopsis>
@@ -109,7 +109,7 @@
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-autokey</option> <option>[ 0 | 1 ]</option></term>
+	    <term><option>-autokey</option> <option>boolean</option></term>
 	    <listitem>
 	      If this option is set to 1, DIO will attempt to
 	      determine an automatic key for <option>keyField</option>
@@ -138,7 +138,7 @@
 	      <cmdsynopsis>
 		<arg>objectName</arg>
 		<arg>array</arg>
-		<arg>request</arg>
+		<arg><replaceable>request</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Execute <option>request</option> as a SQL query and
@@ -157,15 +157,16 @@
 		  <arg>boolean</arg>
 		</group>
 	      </cmdsynopsis>
-	      <para>	      Return the current autokey value.  If
-		<option>value</option> is specified, it sets a new value
-		for the autokey option.</para>
+	      <para>
+		Return the current autokey value.  If
+		<option>value</option> is specified, it sets a new
+		value for the autokey option.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>close</arg>
 	      </cmdsynopsis>
 	      <para>	      Close the current database connection.  This command is
@@ -175,45 +176,50 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>db</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
-	      <para>	      Return the current database.  If <option>value</option> is
-		specified, it sets a new value for the database.  In
-		most cases, the DIO object will automatically connect to
-		the new database when this option is changed.</para>
+	      <para>
+		Return the current database.  If
+		<option>value</option> is specified, it sets a new
+		value for the database.  In most cases, the DIO object
+		will automatically connect to the new database when
+		this option is changed.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>delete</arg>
-		<arg>key</arg>
+		<arg><replaceable>key</replaceable></arg>
 		<group choice="opt">
 		  <arg>-option</arg>
-		  <arg>option</arg>
+		  <arg><replaceable>option</replaceable></arg>
 		  <arg>...</arg>
 		</group>
 	      </cmdsynopsis>
-	      <para>	      Delete a record from the database where the primary key
-		matches <option>key</option>.</para>
+	      <para>
+		Delete a record from the database where the primary
+		key matches <option>key</option>.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>destroy</arg>
 	      </cmdsynopsis>
-	      <para>	      Destroy the DIO object.</para>
+	      <para>
+		Destroy the DIO object.
+	      </para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>errorinfo</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
@@ -227,9 +233,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>exec</arg>
-		<arg>request</arg>
+		<arg><replaceable>request</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Execute <option>request</option> as an SQL query.
@@ -245,13 +251,13 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>fetch</arg>
-		<arg>key</arg>
-		<arg>arrayName</arg>
+		<arg><replaceable>key</replaceable></arg>
+		<arg><replaceable>arrayName</replaceable></arg>
 		<group choice="opt">
 		  <arg>-option</arg>
-		  <arg>option</arg>
+		  <arg><replaceable>option</replaceable></arg>
 		  <arg>...</arg>
 		</group>
 	      </cmdsynopsis>
@@ -265,9 +271,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>host</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current host value.  If
@@ -279,9 +285,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>keyfield</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current keyfield.  If
@@ -293,12 +299,12 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>keys</arg>
-		<arg choice="opt">pattern</arg>
+		<arg choice="opt"><replaceable>pattern</replaceable></arg>
 		<group choice="opt">
 		  <arg>-option</arg>
-		  <arg>option</arg>
+		  <arg><replaceable>option</replaceable></arg>
 		  <arg>...</arg>
 		</group>
 	      </cmdsynopsis>
@@ -312,7 +318,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>lastkey</arg>
 	      </cmdsynopsis>
 	      <para>
@@ -325,7 +331,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>list</arg>
 		<arg>request</arg>
 	      </cmdsynopsis>
@@ -339,7 +345,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>nextkey</arg>
 	      </cmdsynopsis>
 	      <para>Increment <option>sequence</option> and return the
@@ -351,30 +357,34 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>open</arg>
 	      </cmdsynopsis>
 	      <para>Open the connection to the current database.  This
 		command is automatically called from any command which
 		accesses the database.</para>
 	    </listitem>
-	  </varlistentry>	  <varlistentry>
+	  </varlistentry>
+	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>pass</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
-	      <para>Return the current pass value.  If
+	      <para>
+		Return the current pass value.  If
 		<option>value</option> is specified, it sets a new
-		value for the password.</para>
+		value for the password.
+	      </para>
 	    </listitem>
-	  </varlistentry>	  <varlistentry>
+	  </varlistentry>
+	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>port</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>Return the current port value.  If <option>value</option> is
 		specified, it sets a new value for the port.</para>
@@ -382,9 +392,9 @@
 	  </varlistentry>	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>sequence</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current sequence value.  If <option>value</option> is
@@ -394,12 +404,12 @@
 	  </varlistentry>	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>store</arg>
-		<arg>arrayName</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
 		<group choice="opt">
 		  <arg>-option</arg>
-		  <arg>option</arg>
+		  <arg><replaceable>option</replaceable></arg>
 		  <arg>...</arg>
 		</group>
 	      </cmdsynopsis>
@@ -411,9 +421,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>string</arg>
-		<arg>request</arg>
+		<arg><replaceable>request</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Execute <option>request</option> as a SQL query and
@@ -424,9 +434,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>table</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>Return the current table.  If
 		<option>value</option> is specified, it sets a new
@@ -436,9 +446,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>user</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current user value.  If
@@ -455,9 +465,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>autocache</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current autocache value.  If
@@ -477,7 +487,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>cache</arg>
 	      </cmdsynopsis>
 	      <para>
@@ -492,9 +502,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>errorcode</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current errorcode value.  If <option>value</option>
@@ -512,9 +522,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>errorinfo</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current errorinfo value.  If <option>value</option>
@@ -530,9 +540,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>fields</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current fields value.  If <option>value</option> is specified, it sets
@@ -548,11 +558,11 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>forall</arg>
 		<arg>-type</arg>
-		<arg>varName</arg>
-		<arg>body</arg>
+		<arg><replaceable>varName</replaceable></arg>
+		<arg><replaceable>body</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Execute <option>body</option> over each record in the
@@ -601,10 +611,10 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>next</arg>
 		<arg>-type</arg>
-		<arg choice="opt">varName</arg>
+		<arg choice="opt"><replaceable>varName</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Retrieve the next record in the result object.
@@ -652,9 +662,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>numrows</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current numrows value.  If <option>value</option> is
@@ -668,9 +678,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>resultid</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current resultid value.  If <option>value</option> is
@@ -687,9 +697,9 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>resultObj</arg>
+		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>rowid</arg>
-		<arg choice="opt">value</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
 		Return the current rowid value.  If <option>value</option> is
