@@ -116,7 +116,7 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
 {
 #ifdef crypt
     char *key, *salt;
-    char *resultBuffer;
+    const char *resultBuffer;
 
     if( objc != 3 ) {
 	Tcl_WrongNumArgs( interp, 1, objv, "key salt" );
