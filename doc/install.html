@@ -8,10 +8,10 @@
 
     <!-- $Id$ -->
     <h2 align="center">Rivet Installation</h2>
-    
+
     <ol>
       <li><b>Check dependencies</b><br>
-	
+
 	To install Rivet, you will need <b>Tcl 8.2</b> or greater
 	and <b>Apache 1.3.xx</b>.  It is known to run on Linux,
 	FreeBSD, OpenBSD, and Solaris and HPUX.  NT is also possible -
@@ -21,10 +21,10 @@
       <li><b>Get Rivet</b><br>
 	If you are running a Debian or FreeBSD system, there
 	are pre-built packages available at:
-	<a target="_top" href="http://www.debian.org/Packages/unstable/web/libapache-mod-rivet.html">http://www.debian.org/Packages/unstable/web/libapache-mod-rivet.html</a> 
+	<a target="_top" href="http://www.debian.org/Packages/unstable/web/libapache-mod-rivet.html">http://www.debian.org/Packages/unstable/web/libapache-mod-rivet.html</a>
 
 	or
-	
+
 	<a
 	  target="_top" href="http://www.freebsd.org/cgi/ports.cgi?query=Rivet">http://www.freebsd.org/cgi/ports.cgi?query=Rivet</a>.<br>
 
@@ -47,7 +47,7 @@
 	</code>
       </li>
 
-      <li><b>Configuring, buildrivet.sh, etc...</b><br> 
+      <li><b>Configuring, buildrivet.sh, etc...</b><br>
 
 	Do you want to build Rivet as a shared object (such as a
 	.so file on Linux, or a .dll on windows), or compile it
@@ -58,10 +58,10 @@
 
 	<ul>
 	  <li><b>For shared objects</b><br>
-	    
+
 	    <code>cd ../Rivet/<br></code>
 	    Edit the <code>buildrivet.sh</code> script.  The 3
-	    variables you may need to change are: 
+	    variables you may need to change are:
 	    <ul>
 	      <li><code>TCLSH</code><br>
 		Name of the tclsh program on your computer.
@@ -89,7 +89,7 @@
 	    <code>/usr/lib/apache/1.3/</code>.
 
 	  </li>
-	  
+
 	  <li><b>For static builds</b><br>
 	    <code>
 	      cd apache-1.3.X/<br>
@@ -98,7 +98,7 @@
 
 	    <code>cd ../Rivet/<br></code>
 	    Edit the <code>buildrivet.sh</code> script.  The 3
-	    variables you may need to change are: 
+	    variables you may need to change are:
 	    <ul>
 	      <li><code>TCLSH</code><br>
 		Name of the tclsh program on your computer.
@@ -127,24 +127,24 @@
 	    <code>export EXTRA_LIBS="-ltcl8.X -lm"</code><br>
 	    <code>make -e<br></code>
 	    <code>make install<br></code>
-	    
+
 	  </li>
 	</ul>
       </li>
-      <li><b>Configure Apache<br></b>		
+      <li><b>Configure Apache<br></b>
 	<ul>
 	  <li>
 	    <b>http.conf</b><br> <code>LoadModule rivet_module
-	      /usr/lib/apache/1.3/Rivet.so</code><br> 
+	      /usr/lib/apache/1.3/Rivet.so</code><br>
 	    This points Apache to the shared object if
 	    Rivet is being used as a loadable module.
 	  </li>
 	  <li>
-	    <b>srm.conf</b><br> 
-	    <code>AddType application/x-httpd-tcl .ttml</code><br>
+	    <b>srm.conf</b><br>
+	    <code>AddType application/x-httpd-rivet .rvt</code><br>
 	    <code>AddType application/x-rivet-tcl .tcl</code>
 	    (optional)<br>
-	    These add the .ttml and .tcl (if desired) types to
+	    These add the .rvt and .tcl (if desired) types to
 	    Apache, so that they are processed by Rivet.
 	  </li>
 	</ul>

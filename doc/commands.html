@@ -12,7 +12,7 @@
     <ul>
       <li><code><b>var</b></code><br> These commands retrieve or
 	retrieve information about "CGI" variables that are passed to
-	the rivet script via GET or POST operations.  
+	the rivet script via GET or POST operations.
       </li>
       <li>
 	<code><b>var get <i>varname</i></b></code><br> Returns the
@@ -79,23 +79,23 @@
       <li>
 	<code><b>hgetvars</b></code><br> Get environmental, and Cookie
 	variables. This is in a seperate command so as not to make the
-	server do this every time you load a .ttml file. <code>ENVS</code> and
+	server do this every time you load an .rvt file. <code>ENVS</code> and
 	<code>COOKIES</code> are the associative arrays created.  <code>ENVS</code> contains
 	environmental variables, and <code>COOKIES</code> contains any cookies
 	recieved from the client.
       </li>
       <li>
-	<code><b>include <i>filename</i></b></code><br>	      
+	<code><b>include <i>filename</i></b></code><br>
 	Include a file without parsing it.  This is the best
 	way to include an HTML file or any other static content.
       </li>
       <li>
-	<code><b>parse <i>filename</i></b></code><br>	      
-	"Source" a .ttml file.  This is the way to include
-	other .ttml files.
+	<code><b>parse <i>filename</i></b></code><br>
+	"Source" an .rvt file.  This is the way to include
+	other .rvt files.
       </li>
       <li>
-	<code><b>headers redirect <i>uri</i></b></code><br>	      
+	<code><b>headers redirect <i>uri</i></b></code><br>
 
 	Redirect from the current page to a new
 	URI. <b>Must</b> be done in the first block of TCL code.
@@ -137,7 +137,7 @@
       </li>
 
       <li>
-	<code><b>rivet_info</b></code><br>	      
+	<code><b>rivet_info</b></code><br>
 
 	Prints information on the internals of the module in
 	HTML.  Currently, only the PID and size of the object

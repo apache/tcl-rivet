@@ -1,6 +1,6 @@
 # $Id$
 
-set testfilename1 post.ttml
+set testfilename1 post.rvt
 
 ::tcltest::test postvariables-1.1 {POST variables} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -query foobar=goober ]

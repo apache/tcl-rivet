@@ -1,5 +1,5 @@
 # we have complete access to the interpreter here, so it is best to
-# run per-page code in a namespace, just like we do with .ttml pages.
+# run per-page code in a namespace, just like we do with .rvt pages.
 
 proc getcode { filename } {
     set fl [ open $filename r ]
@@ -17,7 +17,7 @@ if { ! [ info exists header ] } {
 	<html>
 	<head>
 	<title>.tcl example</title>
-	</head>	
+	</head>
 	<body bgcolor="#ffffff">
     }
 }

@@ -1,6 +1,6 @@
 # $Id$
 
-set testfilename1 cookies.ttml
+set testfilename1 cookies.rvt
 
 ::tcltest::test cookies-1.1 {Cookies} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "foo=bar"} ]

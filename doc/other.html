@@ -6,13 +6,13 @@
   </head>
   <body>
     <h2>Other Rivet Documentation</h2>
-        
+
     <h3>Internals</h3>
     <ul>
       <li><b>Read the code!</b></li>
-      <li>		
+      <li>
 	<b>Initialization</b><br>
-		
+
 	When Apache is started, (or when child Apache
 	processes are started if a threaded Tcl is used),
 	<code>tcl_init_stuff</code> is called, which creates
@@ -23,17 +23,16 @@
       </li>
       <li><b>Achan/apache_channel</b><br>
 
-	The "Apache Channel" system was created so that it is
-	possible to have an actual Tcl channel that we could
-	redirect standard output to.  This lets us use, for
-	instance, the regular "puts" command in .ttml pages.
-	It works by creating commands that write to memory
-	that is slated to be sent to the client.
+	The "Apache Channel" system was created so that it is possible
+	to have an actual Tcl channel that we could redirect standard
+	output to.  This lets us use, for instance, the regular "puts"
+	command in .rvt pages.  It works by creating commands that
+	write to memory that is slated to be sent to the client.
       </li>
 
       <li><b>Page parsing/execution</b><br>
 
-	In <code>send_parsed_file</code> Each .ttml file is loaded and
+	In <code>send_parsed_file</code> Each .rvt file is loaded and
 	run within its own namespace.  No new interpreter is created
 	for each page.  This lets you share variables, and most
 	importantly, loaded modules, from a common parent (such as one
@@ -51,22 +50,10 @@
       </li>
     </ul>
 
-    <h3>Upgrading From Older (< 0.9.3) Versions</h3>
+    <h3>Upgrading From mod_dtcl and NeoWebScript</h3>
     <ul>
-      <li><b>New tags</b><br> As of version 0.9.4, Rivet uses
-	&lt;? and ?&gt; instead of &lt;+ and +&gt; to delimit
-	sections of Tcl code.  By default, rivet is still compiled
-	with code to parse the &lt;?  ?&gt; tags, but it will run
-	faster if <code>USE_OLD_TAGS</code> is set to 0 in
-	<code>Rivet.h</code>.  You can automatically change your
-	.ttml files to the new format by using the
-	<code>newtags.sh</code> script in the contrib/ directory.
-	Run it at the top level of your DocumentRoot.
-      </li>
-      <li><b>headers setcookie</b><br>
-	The <code>headers setcookie</code> command now uses the
-	<code>-name</code> and <code>-value</code> flags for those
-	arguments, whereas this was not necessary in the past.
+      <li>
+	<b>TO BE WRITTEN</b>
       </li>
     </ul>
  </body>

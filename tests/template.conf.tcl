@@ -29,7 +29,7 @@ ServerName localhost
 DocumentRoot "$CWD"
 
 <Directory "$CWD">
-Options All MultiViews 
+Options All MultiViews
 AllowOverride All
 Order allow,deny
 Allow from all
@@ -51,9 +51,11 @@ LogFormat "%h %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" c
 CustomLog "$CWD/access_log" combined
 
 <IfModule mod_mime.c>
+TypesConfig $CWD/mime.types
+
 AddLanguage en .en
 AddLanguage it .it
 AddLanguage es .es
-AddType application/x-httpd-tcl .ttml
+AddType application/x-httpd-rivet .rvt
 AddType application/x-rivet-tcl .tcl
 </IfModule>

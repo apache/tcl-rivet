@@ -1,6 +1,6 @@
 # $Id$
 
-set testfilename1 hello.ttml
+set testfilename1 hello.rvt
 
 ::tcltest::test hello-1.1 {hello world test} {
     set page [ ::http::geturl "${urlbase}$testfilename1" ]

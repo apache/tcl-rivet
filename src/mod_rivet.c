@@ -62,7 +62,7 @@
  * Originally based off code from mod_include.
  */
 
-/* See http://tcl.apache.org/mod_rivet/credits.ttml for additional credits. */
+/* See http://tcl.apache.org/mod_rivet/credits.rvt for additional credits. */
 
 /* Apache includes */
 #include "httpd.h"
@@ -94,7 +94,7 @@ module MODULE_VAR_EXPORT rivet_module;
 static void Rivet_InitTclStuff(server_rec *s, pool *p);
 static void Rivet_CopyConfig( rivet_server_conf *oldrsc,
 				rivet_server_conf *newrsc);
-static int get_ttml_file(request_rec *r, rivet_server_conf *rsc,
+static int get_rvt_file(request_rec *r, rivet_server_conf *rsc,
 			 Tcl_Interp *interp, char *filename, int toplevel,
 			 Tcl_Obj *outbuf);
 static int Rivet_SendContent(request_rec *);
@@ -219,7 +219,6 @@ get_tcl_file(request_rec *r, Tcl_Interp *interp,
 			 "\": ", Tcl_PosixError(interp), (char *) NULL);
 	return TCL_ERROR;
     }
-
     result = Tcl_ReadChars(chan, outbuf, (signed)r->finfo.st_size, 1);
     if (result < 0)
     {
@@ -238,10 +237,10 @@ get_tcl_file(request_rec *r, Tcl_Interp *interp,
 #endif /* 1 */
 }
 
-/* Parse and execute a ttml file */
+/* Parse and execute an rvt file */
 
 static int
-get_ttml_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
+get_rvt_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 			 char *filename, int toplevel, Tcl_Obj *outbuf)
 {
     /* BEGIN PARSER  */
@@ -341,7 +340,7 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 }
 
 /* This is a seperate function so that it may be called from 'Parse' */
-int 
+int
 get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
 			char *filename, int toplevel)
 {
@@ -358,7 +357,7 @@ get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
 
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
-    if (toplevel == 0) 
+    if (toplevel == 0)
     {
 	int ret = 0;
 	struct stat stat;
@@ -389,7 +388,7 @@ get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
 	{
 	    /* It's a TTML file - which we always are if toplevel is
                0, meaning we are in the Parse command */
-	    result = get_ttml_file(r, rsc, interp, filename, toplevel, outbuf);
+	    result = get_rvt_file(r, rsc, interp, filename, toplevel, outbuf);
 	} else {
 	    /* It's a plain Tcl file */
 	    result = get_tcl_file(r, interp, filename, outbuf);
@@ -426,7 +425,7 @@ Rivet_SendContent(request_rec *r)
 {
     char error[MAX_STRING_LEN];
     char timefmt[MAX_STRING_LEN];
-
+    struct stat foo;
     int errstatus;
 
     Tcl_Interp *interp;
@@ -943,7 +942,7 @@ Rivet_CreateDirConfig(pool *p, char *dir)
 void *
 Rivet_MergeConfig(pool *p, void *basev, void *overridesv)
 {
-    rivet_server_conf *rsc = 
+    rivet_server_conf *rsc =
 	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
     rivet_server_conf *base = (rivet_server_conf *) basev;
     rivet_server_conf *overrides = (rivet_server_conf *) overridesv;
@@ -1029,7 +1028,7 @@ Rivet_InitHandler(server_rec *s, pool *p)
 
 const handler_rec rivet_handlers[] =
 {
-    {"application/x-httpd-tcl", Rivet_SendContent},
+    {"application/x-httpd-rivet", Rivet_SendContent},
     {"application/x-rivet-tcl", Rivet_SendContent},
     {NULL}
 };

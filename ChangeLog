@@ -1,3 +1,9 @@
+2002-01-06  David N. Welton  <davidw@dedasys.com>
+
+	* General: Changed .ttml to .rvt.  Also changed mime type to
+	x-httpd-rivet.  Changed all references in documentation to .rvt
+	from .ttml.
+
 2002-01-05  David N. Welton  <davidw@dedasys.com>
 
 	* src/parser.c (Rivet_Parser): A few, mostly cosmetic, cleanups in
@@ -8,7 +14,7 @@
 	* src/channel.c (outputproc): Change printheaders to
 	Rivet_PrintHeaders.
 
-	* General whitespace cleanups.
+	* General: whitespace cleanups.
 
 2001-11-21  David N. Welton  <davidw@dedasys.com>
 

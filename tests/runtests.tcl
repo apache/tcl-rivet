@@ -38,9 +38,13 @@ switch -exact [lindex $argv 1] {
 	    puts $oput
 	    exec kill $apachepid
 	}
-    } 
+    }
     startserver {
-	set apachepid [exec $binname -X -f "[file join [pwd] server.conf]" &]
+	if { [catch {
+	    exec $binname -X -f "[file join [pwd] server.conf]"
+	} err] } {
+	    puts "$errorInfo"
+	}
     }
     default {
 	set apachepid [exec $binname -X -f "[file join [pwd] server.conf]" &]

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    
+
     <h2 align="center">Rivet Apache directives</h2>
 
     <ul>
@@ -19,36 +19,36 @@
       </li>
 
       <li>
-	<code><b>Rivet_Script ChildInitScript <i>"script"</i></b></code><br>		
+	<code><b>Rivet_Script ChildInitScript <i>"script"</i></b></code><br>
 	Script to be evaluated when each apache child is
 	initialized. This is the best place to load modules.
       </li>
 
       <li>
-	<code><b>Rivet_Script ChildExitScript <i>"script"</i></b></code><br>	      
+	<code><b>Rivet_Script ChildExitScript <i>"script"</i></b></code><br>
 	Script to be evaluated when each apache child exits.
       </li>
 
       <li>
-	<code><b>Rivet_Script BeforeScript <i>"script"</i></b></code><br>		
-	Script to be evaluated before each .ttml page.
+	<code><b>Rivet_Script BeforeScript <i>"script"</i></b></code><br>
+	Script to be evaluated before each .rvt page.
       </li>
 
       <li>
-	<code><b>Rivet_Script AfterScript <i>"script"</i></b></code><br>	      
-	Script to be called after each .ttml page.
+	<code><b>Rivet_Script AfterScript <i>"script"</i></b></code><br>
+	Script to be called after each .rvt page.
       </li>
 
       <li>
-	<code><b>Rivet_Script ErrorScript <i>"script"</i></b></code><br>	      
+	<code><b>Rivet_Script ErrorScript <i>"script"</i></b></code><br>
 	This code is called in place of the standard 'error' pages
 	generated for Rivet.  This directive may be useful if you
 	have sensitive logic that you wish to protect.
       </li>
-      
+
       <li>
-	<code><b>Rivet_CacheSize <i>cachesize</i></b></code><br> 
-	Number of ttml scripts to cache as Tcl Objects.
+	<code><b>Rivet_CacheSize <i>cachesize</i></b></code><br>
+	Number of rvt scripts to cache as Tcl Objects.
 	Default is MaxRequestsPerChild / 2, or 50, if
 	MaxRequestsPerChild is 0.
       </li>

@@ -2,7 +2,15 @@
 /* $Id$ */
 
 #include <tcl.h>
-#include <sys/gmon.h>
+#include "httpd.h"
+
+
+
+
+
+
+
+
 
 int
 Rivet_Parser_Test
@@ -40,8 +48,9 @@ Cleanup
     int objc,
     Tcl_Obj *CONST objv[])
 {
+    struct stat foo;
+    printf("size of stat __pad1 is %d\n", sizeof(foo.__pad1));
     printf("cleaning up\n");
-    _mcleanup();
     return TCL_OK;
 }
 
@@ -50,7 +59,6 @@ Cleanup
 int
 Testing_Init(Tcl_Interp *interp)
 {
-//    monstartup(_init, etext);
     Tcl_CreateObjCommand(interp, "parsertest", Rivet_Parser_Test,
 			 (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
     Tcl_CreateObjCommand(interp, "cleanup", Cleanup,

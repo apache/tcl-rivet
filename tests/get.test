@@ -1,19 +1,19 @@
 # $Id$
 
 ::tcltest::test getvariables-1.1 {GET variables} {
-    set page [ ::http::geturl "${urlbase}get.ttml?foobar=goober" ]
+    set page [ ::http::geturl "${urlbase}get.rvt?foobar=goober" ]
     regexp -line {\[var get foobar\] = goober$} [ ::http::data $page ] match
     set match
 } {[var get foobar] = goober}
 
 ::tcltest::test getvariables-1.2 {GET variables + I18N} {
-    set page [ ::http::geturl "${urlbase}get.ttml?Más=Tú" ]
+    set page [ ::http::geturl "${urlbase}get.rvt?Más=Tú" ]
     regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
     set match
 } {[var get Más] = Tú}
 
 ::tcltest::test getvariables-1.3 {GET variables + I18N + encoding} {
-    set page [ ::http::geturl [ format "${urlbase}get.ttml?%s" [ ::http::formatQuery Más Tú ] ] ]
+    set page [ ::http::geturl [ format "${urlbase}get.rvt?%s" [ ::http::formatQuery Más Tú ] ] ]
     regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
     set match
 } {[var get Más] = Tú}
