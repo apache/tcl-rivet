@@ -57,6 +57,7 @@ namespace eval ::Rivet {
 	## (IE: packages8.3, packages8.4) append that as well.
 	set pkgpath [file join $server(RIVET_DIR) packages]
 	lappend auto_path $pkgpath
+	lappend auto_path ${pkgpath}-local
 
 	if {[file exists ${pkgpath}$::tcl_version]} {
 	    lappend auto_path ${pkgpath}$::tcl_version

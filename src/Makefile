@@ -71,4 +71,4 @@ install: static
 
 .SILENT: builddtcl_test
 builddtcl_test:
-	if [ "$(BUILDDTCL)" != "YES" ] ; then echo "You should use builddtcl.sh to build mod_rivet"; exit 1 ; fi
+	if [ "$(BUILDDTCL)" != "YES" ] ; then echo; echo "You should use make.tcl to build mod_rivet"; echo; exit 1 ; fi
