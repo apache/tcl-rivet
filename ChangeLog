@@ -1,5 +1,10 @@
 2003-09-30  David N. Welton  <davidw@dedasys.com>
 
+	* src/rivetCore.c (Rivet_Include): More ref count management.
+
+	* src/mod_rivet.c (Rivet_PropagatePerDirConfArrays): Added more
+	ref count management.
+
 	* src/rivetParser.c (Rivet_GetRivetFile): Add ref counting for
 	'inbuf'.
 

@@ -152,10 +152,12 @@ Rivet_Include(
     Tcl_SetChannelOption(interp, fd, "-translation", "binary");
 
     outobj = Tcl_NewObj();
+    Tcl_IncrRefCount(outobj);
     sz = Tcl_ReadChars(fd, outobj, -1, 0);
     if (sz == -1)
     {
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
+	Tcl_DecrRefCount(outobj);
 	return TCL_ERROR;
     }
 
@@ -173,6 +175,7 @@ Rivet_Include(
     Tcl_SetChannelOption(interp, tclstdout, "-encoding", Tcl_DStringValue(&encoptions));
     Tcl_DStringFree(&transoptions);
     Tcl_DStringFree(&encoptions);
+    Tcl_DecrRefCount(outobj);
     return Tcl_Close(interp, fd);
 }
 

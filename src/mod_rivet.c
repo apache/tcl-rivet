@@ -373,6 +373,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     elts  = (table_entry *)arr->elts;
     nelts = arr->nelts;
     arrayName = Tcl_NewStringObj( "RivetDirConf", -1 );
+    Tcl_IncrRefCount(arrayName);
 
     for( i = 0; i < nelts; ++i )
     {
@@ -399,6 +400,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     elts  = (table_entry *)arr->elts;
     nelts = arr->nelts;
     arrayName = Tcl_NewStringObj( "RivetUserConf", -1 );
+    Tcl_IncrRefCount(arrayName);
 
     for( i = 0; i < nelts; ++i )
     {
@@ -477,13 +479,16 @@ Rivet_SendContent(request_rec *r)
     Rivet_PropagatePerDirConfArrays( interp, rdc );
 
     request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+    Tcl_IncrRefCount(request_init);
     if (Tcl_EvalObjEx(interp, request_init, TCL_EVAL_DIRECT) == TCL_ERROR)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
 			"Could not create request namespace\n");
 	retval = HTTP_BAD_REQUEST;
+	Tcl_DecrRefCount(request_init);
 	goto sendcleanup;
     }
+    Tcl_DecrRefCount(request_init);
 
     {
 	Tcl_Obj *infoscript = Tcl_NewStringObj("info script ", -1);
