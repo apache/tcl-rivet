@@ -90,7 +90,7 @@ module MODULE_VAR_EXPORT rivet_module;
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
 #define NESTED_INCLUDE_MAGIC	(&rivet_module)
 
-static Tcl_Condition *sendMutex;
+TCL_DECLARE_MUTEX(sendMutex);
 
 static void Rivet_InitTclStuff(server_rec *s, pool *p);
 static void Rivet_CopyConfig( rivet_server_conf *oldrsc,
@@ -384,7 +384,7 @@ Rivet_SendContent(request_rec *r)
     rivet_server_conf *rsc = NULL;
     rivet_server_conf *rdc;
 
-    Tcl_MutexLock(sendMutex);
+    Tcl_MutexLock(&sendMutex);
 
     rsc = Rivet_GetConf(r);
     interp = rsc->server_interp;
@@ -491,7 +491,7 @@ Rivet_SendContent(request_rec *r)
 sendcleanup:
     globals->req->content_sent = 0;
 
-    Tcl_MutexUnlock(sendMutex);
+    Tcl_MutexUnlock(&sendMutex);
 
     return retval;
 }
@@ -595,16 +595,6 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
     server_rec *sr;
 
-    /* Apache actually loads all the modules twice, just to see if it
-     * can. This is a pain, because things don't seem to get
-     * completely cleaned up on the Tcl side. So this little hack
-     * should make us *really* load only the second time around. */
-
-    if (getenv("RIVET_INIT") == NULL) {
-	setenv("RIVET_INIT", "1", 0);
-	return;
-    }
-
     /* Initialize TCL stuff  */
     Tcl_FindExecutable(NULL);
     interp = Tcl_CreateInterp();
@@ -646,7 +636,9 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
     if( Tcl_EvalFile( interp, ap_server_root_relative(p, RIVET_INIT) )
 	== TCL_ERROR ) {
-	ap_log_error( APLOG_MARK, APLOG_ERR, s, "init.tcl must be installed correctly for Apache Rivet to function: %s", Tcl_GetStringResult(interp) );
+	ap_log_error( APLOG_MARK, APLOG_ERR, s,
+		      "init.tcl must be installed correctly for Apache Rivet to function: %s",
+		      Tcl_GetStringResult(interp) );
 	exit(1);
     }
 
@@ -1090,9 +1082,7 @@ Rivet_ChildInit(server_rec *s, pool *p)
     server_rec *sr;
     rivet_server_conf *rsc;
 
-#if THREADED_TCL == 1
     Rivet_InitTclStuff(s, p);
-#endif
 
     sr = s;
     while(sr)
@@ -1134,10 +1124,6 @@ Rivet_ChildExit(server_rec *s, pool *p)
 MODULE_VAR_EXPORT void
 Rivet_InitHandler(server_rec *s, pool *p)
 {
-#if THREADED_TCL == 0
-    Rivet_InitTclStuff(s, p);
-#endif
-
 #ifndef HIDE_RIVET_VERSION
     ap_add_version_component("Rivet / "RIVET_VERSION);
 #else

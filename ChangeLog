@@ -1,3 +1,14 @@
+2003-02-12  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c: Mirror Craig Huckabee's mod_dtcl.c changes:
+
+	- Use TCL_DECLARE_MUTEX to create the mutex, and change the mutex
+	  lock/unlock calls.
+
+	- Remove the 'load only once' stuff from TclInitStuff.
+
+	- InitTclStuff can now only be called from Child Init.
+
 2003-01-17  David N. Welton  <davidw@dedasys.com>
 
 	* Added logos.
