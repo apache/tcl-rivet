@@ -582,6 +582,7 @@ static int send_content(request_rec *r)
 static void tcl_create_commands(rivet_server_conf *rsc)
 {
     Tcl_Interp *interp = rsc->server_interp;
+    Tcl_CreateObjCommand(interp, "makeurl", MakeURL, NULL, (Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp, "hputs", Hputs, NULL, (Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp, "buffer_add", Buffer_Add, NULL, (Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp, "buffered", Buffered, NULL, (Tcl_CmdDeleteProc *)NULL);

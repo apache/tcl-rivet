@@ -78,6 +78,9 @@ namespace eval aardvark {
 			set result [ eval exec $cmd ]
 			puts "$result"
 		    } err
+		    if { [ info exists errorCode ] } {
+			puts "ERROR: $errorCode"
+		    }
                     if { $err != "" } {
 			puts $err
 		    }

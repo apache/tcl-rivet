@@ -24,6 +24,21 @@ extern Tcl_Obj *uploadstorage[];
 
 #define POOL (globals->r->pool)
 
+/* Make a self-referencing URL  */
+
+int MakeURL(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    
+    if (objc != 2)
+    {
+	Tcl_WrongNumArgs(interp, 1, objv, "filename");
+	return TCL_ERROR;	
+    }
+    Tcl_SetResult(interp, ap_construct_url(POOL, Tcl_GetString(objv[1]), globals->r), NULL);
+    return TCL_OK;
+}
+
 /* Include and parse a file */
 
 int Parse(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])

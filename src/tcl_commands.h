@@ -1,3 +1,4 @@
+int MakeURL(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]);
 
 int Parse(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]);
 
