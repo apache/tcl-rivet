@@ -5,10 +5,11 @@ set testfilename1 config.rvt
 ::tcltest::test config-1.1 {ErrorScript config test} {
     apachetest::start {
 	-c "RivetUserConf ErrorScript 'puts \"Page broken\"'"
-    } {
+    } {} {
 	catch {
 	    set page [::http::geturl "${urlbase}$testfilename1?brokenpage"]
 	    set match [string trim [::http::data $page]]
+	    ::http::cleanup $page
 	}
     }
     set match
@@ -17,7 +18,7 @@ set testfilename1 config.rvt
 ::tcltest::test config-1.2 {ErrorScript config test} {
     apachetest::start {
 	-c "RivetUserConf ErrorScript 'puts \"Page broken\"'" -c "AccessFileName test-htaccess"
-    } {
+    } {} {
 	catch {
 	    set page [::http::geturl "${urlbase}$testfilename1?brokenpage"]
 	    set match [string trim [::http::data $page]]
@@ -32,7 +33,7 @@ this page is BROKEN}
     set fl [open htaccess2 w]
     puts $fl {RivetUserConf BeforeScript 'puts "Local Page Header"'}
     close $fl
-    apachetest::start { -c "AccessFileName htaccess2" } {
+    apachetest::start { -c "AccessFileName htaccess2" } {} {
 	catch {
 	    set page [::http::geturl "${urlbase}$testfilename1?goodpage"]
 	    set match [string trim [::http::data $page]]
@@ -109,11 +110,12 @@ Page Body
 Local Page Footer}
 }
 
+
 set i 0
 foreach Config $ConfigList {
     incr i
     ::tcltest::test config-auto-${i}.1 {config test} {
-	apachetest::start $Config {
+	apachetest::start $Config {} {
 	    catch {
 		set page [::http::geturl "${urlbase}$testfilename1?goodpage"]
 		set match [string trim [::http::data $page]]

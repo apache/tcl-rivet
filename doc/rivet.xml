@@ -315,7 +315,9 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</term>
 	<listitem>
 	  <para><command>RivetServerConf</command> specifies a global
-	    option that is valid for the whole server.
+	    option that is valid for the whole server.  If you have a
+	    virtual host, in some cases, the option specified in the
+	    virtualhost takes precedence over the 'global' version.
 	  </para>
 	</listitem>
 	<listitem>
@@ -336,6 +338,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		  <command>MaxRequestsPerChild</command> / 5, or 50,
 		  if <command>MaxRequestsPerChild</command> is 0.
 		</para>
+		<para>
+		  This option is completely global, even when using
+		  separate, per-virtual host interpreters.
+		</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -355,6 +361,9 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
 		  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
 		</para>
+		<para>
+		  This option is ignored in virtual hosts.
+		</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -373,6 +382,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		  connections to other facilities (such as databases)
 		  and so on.
 		</para>
+		<para>
+		  In virtual hosts, this script is run in addition to
+		  any global childinitscript.
+		</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -388,7 +401,11 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		  Script to be evaluated when each Apache child
 		  process exits.  This is the logical place to clean
 		  up resources created in
-		  <option>ChildInitScript</option>.
+		  <option>ChildInitScript</option>, if necessary.
+		</para>
+		<para>
+		  In virtual hosts, this script is run in addition to
+		  any global childexitscript.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -415,6 +432,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		    evaluated.
 		  </note>
 		</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -428,6 +449,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <listitem>
 		<para>
 		  Script to be called after each server parsed (.rvt) page.
+		</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
 		</para>
 	      </listitem>
 	    </varlistentry>
@@ -449,6 +474,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		  pages.  This may be useful if you want to make sure
 		  that users never view your source code.
 		</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -461,6 +490,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </term>
 	      <listitem>
 		<para>Directory to place uploaded files.</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -473,6 +506,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </term>
 	      <listitem>
 		<para>Maximum size for uploaded files.</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -512,6 +549,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		  clients into separate interpreters, so that they
 		  don't accidentally interfere with one another.
 		</para>
+		<para>This option is, by nature, only available at the
+		global level.</para>
 	      </listitem>
 	    </varlistentry>
 	  </variablelist>

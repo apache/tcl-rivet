@@ -1,0 +1,15 @@
+Virtual Host2 Test
+
+<?
+set ::vhost2 2
+puts "vhost2 hello world"
+
+foreach var {
+    childinit1 childinit2 vhost1 vhost2
+} {
+    if { [info exists ::$var] } {
+	puts "$var exists<br>"
+    }
+}
+
+?>

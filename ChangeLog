@@ -1,3 +1,40 @@
+2004-04-05  David N. Welton  <davidw@dedasys.com>
+
+	* tests/docroot1/ tests/docroot2/: Files used to test virtual
+	hosts with.
+
+	* tests/virtualhost.test: New file: tests for virtual hosts.
+
+	* tests/apachetest/apachetest.tcl: Require our own version of
+	http.tcl, due to Tcl feature request #928154 (it's impossible to
+	set the Host header).
+	(apachetest::start): We now take 3 arguments.  The new one is
+	'conftext', which is used to write to the test.conf file before
+	running the test.
+
+	* tests/runtests.tcl: Changed test config to add an "Include
+	test.conf" directive.  We can write out our own configs for each
+	test with that.
+
+	* src/mod_rivet.c (Rivet_PerInterpInit): New function that groups
+	together everything that has to happen when a new interpreter is
+	created - either the main one, or for virtual hosts.
+	(Rivet_InitTclStuff): Redid the way virtual hosts are treated
+	here: make sure there is a unique rivet_server_conf for each one,
+	either because MergeConfig has been called, or we create one
+	ourselves.
+	(Rivet_CreateConfig): We don't initialize objCache and outchannel
+	members of rivet_server_conf here anymore.  They are now taken
+	care of in Rivet_InitTclStuff.
+	(Rivet_MergeConfig): Either take care of all members of
+	rivet_server_conf struct, or include a comment explaining why it's
+	not there.
+	(Rivet_ChildHandlers): New function - takes care of either child
+	init or exit scripts, depending on how it's called.
+
+	* doc/rivet.xml: Describe how each RivetServerConf directive
+	interacts with virtual hosts.
+
 2004-02-26  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Added DIODisplay section.

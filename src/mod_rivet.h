@@ -49,6 +49,10 @@
 #define MULTIPART_FORM_DATA 1
 /* #define RIVET_VERSION "X.X.X" */
 
+/* IMPORTANT: If you make any changes to the rivet_server_conf struct,
+ * you need to make the appropriate modifications to Rivet_CopyConfig,
+ * Rivet_CreateConfig, Rivet_MergeConfig and so on. */
+
 typedef struct {
     Tcl_Interp *server_interp;           /* per server Tcl interpreter */
     Tcl_Obj *rivet_global_init_script;   /* run once when apache is started */

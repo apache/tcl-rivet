@@ -18,7 +18,8 @@
 
 # $Id$
 
-source [file join apachetest apachetest.tcl]
+set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] apachetest]]
+package require apachetest
 
 apachetest::getbinname $argv
 
@@ -56,6 +57,10 @@ apachetest::makeconf server.conf {
     RivetDirConf AfterScript 'puts "Page Footer"'
     </Directory>
     </IfDefine>
+
+    # We can use this to include our own stuff for each test.
+    Include test.conf
+
 }
 
 # Copy the rivet init files.

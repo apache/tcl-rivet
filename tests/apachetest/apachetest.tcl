@@ -21,7 +21,9 @@
 # the name of the Apache executable, which must, however, be compiled
 # with the right options.
 
+set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 package require Tclx
+package require http 2.4.5
 package provide apachetest 0.1
 
 namespace eval apachetest {
@@ -88,6 +90,7 @@ proc apachetest::connect { } {
 #
 # Arguments:
 #	options - command line options to pass to the web server.
+#	conftext - text to insert into test.conf.
 #	code - code to run.
 #
 # Side Effects:
@@ -96,10 +99,16 @@ proc apachetest::connect { } {
 # Results:
 #	None.
 
-proc apachetest::start { options code } {
+proc apachetest::start { options conftext code } {
     variable serverpid 0
     variable binname
     variable debug
+
+    set fn [file join [pwd] test.conf]
+    catch {file delete -force $fn}
+    set fl [open $fn w]
+    puts $fl [uplevel [list subst $conftext]]
+    close $fl
 
     # There has got to be a better way to do this, aside from waiting.
     set serverpid [eval exec  $binname -X -f \

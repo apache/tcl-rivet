@@ -3,7 +3,7 @@
 # Try setting LANG environmental variable.
 
 set env(LANG) "ja_JP.eucJP"
-apachetest::start {} {
+apachetest::start {} {} {
     set testfilename1 include.rvt
 
     ::tcltest::test lang-1.1 {"include" with LANG} {

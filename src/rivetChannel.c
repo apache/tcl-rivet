@@ -36,7 +36,8 @@ inputproc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
    Channel that we create to divert stdout to. */
 
 static int
-outputproc(ClientData instancedata, CONST84 char *buf, int toWrite, int *errorCodePtr)
+outputproc(ClientData instancedata, CONST84 char *buf,
+	   int toWrite, int *errorCodePtr)
 {
     rivet_server_conf *rsc = (rivet_server_conf *)instancedata;
     rivet_interp_globals *globals =

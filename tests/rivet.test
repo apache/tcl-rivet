@@ -9,9 +9,8 @@
 # $Id$
 
 package require tcltest
-package require http
 
-lappend auto_path [file join [pwd] rivet]
+set auto_path [linsert $auto_path 0 [file join [pwd] rivet]]
 set urlbase "http://localhost:8081/"
 
 # Use this to start and stop the server:
@@ -32,7 +31,7 @@ set testgroup3 1
 if { $testgroup1 } {
     puts -nonewline "Running all tests against one server process."
     flush stdout
-    apachetest::start {} {
+    apachetest::start {} {} {
 	foreach Test $TestList {
 	    puts -nonewline "."
 	    flush stdout
@@ -46,7 +45,7 @@ if { $testgroup1 } {
 
 if { $testgroup2 } {
     foreach Test $TestList {
-	apachetest::start {} {
+	apachetest::start {} {} {
 	    puts "Running $Test"
 	    source $Test
 	}
@@ -58,7 +57,13 @@ if { $testgroup2 } {
 # at all.
 
 if { $testgroup3 } {
-    foreach Test {broken.test config.test lang.test parsepackage.test} {
+    foreach Test {
+	broken.test
+	config.test
+	lang.test
+	parsepackage.test
+	virtualhost.test
+    } {
 	puts "Running $Test"
 	source $Test
     }

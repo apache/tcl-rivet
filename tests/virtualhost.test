@@ -1,0 +1,233 @@
+# virtualhost.test -- test virtual host setups.
+
+# $Id$
+
+set docroot1 [file join [pwd] docroot1]
+set docroot2 [file join [pwd] docroot2]
+
+set vhostconf {
+    NameVirtualHost 127.0.0.1
+    <VirtualHost 127.0.0.1>
+    DocumentRoot $docroot1
+    ServerName vhost1
+    </VirtualHost>
+
+    <VirtualHost 127.0.0.1>
+    DocumentRoot $docroot2
+    ServerName vhost2
+    </VirtualHost>
+}
+
+# Make sure virtual hosts work.
+
+::tcltest::test vhost-1.1 {basic virtual host} {
+    apachetest::start {} $vhostconf {
+	set page1 [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
+	set page2 [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
+	set match1 [::http::data $page1]
+	set match2 [::http::data $page2]
+	::http::cleanup $page1
+	::http::cleanup $page2
+    }
+    list [string match {Virtual Host1 Test*} $match1] \
+	[string match {Virtual Host2 Test*} $match2]
+} {1 1}
+
+# Try virtual hosts with and without a childinitscript.
+
+::tcltest::test vhost-2.1 {virtual host w/ ChildInitScript} {
+    set data {}
+    apachetest::start {} {
+	RivetServerConf ChildInitScript "source [file join $docroot1 childinit.tcl]"
+	NameVirtualHost 127.0.0.1
+	<VirtualHost 127.0.0.1>
+	DocumentRoot $docroot1
+	ServerName vhost1
+	</VirtualHost>
+
+	<VirtualHost 127.0.0.1>
+	RivetServerConf ChildInitScript "source [file join $docroot2 childinit.tcl]"
+	DocumentRoot $docroot2
+	ServerName vhost2
+	</VirtualHost>
+    } {
+	set page {}
+	lappend page [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
+	lappend page [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
+	foreach p $page {
+	    lappend data [::http::data $p]
+	    ::http::cleanup $p
+	}
+    }
+    regexp "childinit1 exists.*childinit2 exists" $data match
+} 1
+
+# Test out a ChildInitScript that is only in a vhost.
+
+::tcltest::test vhost-2.2 {virtual host w/ ChildInitScript in vhost} {
+    set data {}
+    apachetest::start {} {
+	NameVirtualHost 127.0.0.1
+	<VirtualHost 127.0.0.1>
+	DocumentRoot $docroot1
+	ServerName vhost1
+	</VirtualHost>
+
+	<VirtualHost 127.0.0.1>
+	RivetServerConf ChildInitScript "source [file join $docroot2 childinit.tcl]"
+	DocumentRoot $docroot2
+	ServerName vhost2
+	</VirtualHost>
+    } {
+	set page {}
+	lappend page [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
+	lappend page [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
+	foreach p $page {
+	    lappend data [::http::data $p]
+	    ::http::cleanup $p
+	}
+    }
+    regexp "vhost2 hello world\nchildinit2 exists" $data match
+#    set data
+} 1
+
+# Test out a beforescript in a virtual host.
+
+::tcltest::test vhost-3.1 {virtual host w/ BeforeScript} {
+    set data {}
+    apachetest::start {} {
+	RivetServerConf BeforeScript "source [file join $docroot1 beforescript.tcl]"
+	NameVirtualHost 127.0.0.1
+	<VirtualHost 127.0.0.1>
+	DocumentRoot $docroot1
+	ServerName vhost1
+	</VirtualHost>
+
+	<VirtualHost 127.0.0.1>
+	RivetServerConf BeforeScript "source [file join $docroot2 beforescript.tcl]"
+	DocumentRoot $docroot2
+	ServerName vhost2
+	</VirtualHost>
+    } {
+	set page1 [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
+	set page2 [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
+	set data1 [::http::data $page1]
+	set data2 [::http::data $page2]
+	::http::cleanup $page1
+	::http::cleanup $page2
+    }
+    list \
+	[regexp "^beforescript2\nVirtual Host2 Test" $data1 match] \
+	[regexp "^beforescript1\nVirtual Host1 Test" $data2 match]
+#    list $data1 $data2
+} {1 1}
+
+
+# Turn on separate interpreters per virtual host.
+
+::tcltest::test vhost-4.1 {virtual host w/ separate interps} {
+    set data {}
+    apachetest::start {} {
+	RivetServerConf SeparateVirtualInterps on
+	NameVirtualHost 127.0.0.1
+	<VirtualHost 127.0.0.1>
+	DocumentRoot $docroot1
+	ServerName vhost1
+	</VirtualHost>
+
+	<VirtualHost 127.0.0.1>
+	DocumentRoot $docroot2
+	ServerName vhost2
+	</VirtualHost>
+    } {
+	set page1 [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
+	set page2 [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
+	set data1 [::http::data $page1]
+	set data2 [::http::data $page2]
+	::http::cleanup $page1
+	::http::cleanup $page2
+    }
+    list \
+	[regexp "vhost2 hello world\nvhost2 exists<br>" $data1 match] \
+	[regexp "vhost1 hello world<br>\nvhost1 exists<br>" $data2 match]
+#    list $data1 $data2
+} {1 1}
+
+# Run through a list of config options, the files they use and the
+# regexps that match the results.
+
+# Format: directive, file, 2 regexps to match
+set configs {
+    ChildInitScript childinit.tcl "childinit1 exists<br>\nchildinit2 exists<br>" "childinit1 exists<br>\nchildinit2 exists<br>"
+    BeforeScript beforescript.tcl "^beforescript2\nVirtual Host2 Test" "^beforescript1\nVirtual Host1 Test"
+    AfterScript afterscript.tcl "afterscript2" "afterscript1"
+}
+
+set i 1
+foreach {conf file re1 re2} $configs {
+    ::tcltest::test vhost-5.$i [list vhost with $conf] {
+	apachetest::start {} "
+RivetServerConf $conf \"source [file join $docroot1 $file]\"
+NameVirtualHost 127.0.0.1
+<VirtualHost 127.0.0.1>
+DocumentRoot $docroot1
+ServerName vhost1
+</VirtualHost>
+
+<VirtualHost 127.0.0.1>
+RivetServerConf $conf \"source [file join $docroot2 $file]\"
+DocumentRoot $docroot2
+ServerName vhost2
+</VirtualHost>
+" {
+	set page1 [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
+	set page2 [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
+	set data1 [::http::data $page1]
+	set data2 [::http::data $page2]
+	::http::cleanup $page1
+	::http::cleanup $page2
+}
+list [regexp $re1 $data1 match] [regexp $re1 $data1 match]
+#list $data1 $data2
+    } {1 1}
+}
+
+set configs {
+    ChildInitScript childinit.tcl "vhost2 hello world\nchildinit2 exists<br>\nvhost2 exists<br>" "vhost1 hello world<br>\nvhost1 exists<br>"
+    BeforeScript beforescript.tcl "^beforescript2\nVirtual Host2 Test" "^beforescript1\nVirtual Host1 Test"
+    AfterScript afterscript.tcl "afterscript2" "afterscript1"
+}
+
+# Now run through a similar list, using per vhost interps.
+
+set i 1
+foreach {conf file re1 re2} $configs {
+    ::tcltest::test vhost-6.$i [list vhost with $conf and SeparateVirtualInterps] {
+	apachetest::start {} "
+RivetServerConf SeparateVirtualInterps on
+RivetServerConf $conf \"source [file join $docroot1 $file]\"
+NameVirtualHost 127.0.0.1
+<VirtualHost 127.0.0.1>
+DocumentRoot $docroot1
+ServerName vhost1
+</VirtualHost>
+
+<VirtualHost 127.0.0.1>
+RivetServerConf $conf \"source [file join $docroot2 $file]\"
+DocumentRoot $docroot2
+ServerName vhost2
+</VirtualHost>
+" {
+	set page1 [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
+	set page2 [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
+	set data1 [::http::data $page1]
+	set data2 [::http::data $page2]
+	::http::cleanup $page1
+	::http::cleanup $page2
+}
+list [regexp $re1 $data1 match] [regexp $re1 $data1 match]
+#list $data1 $data2
+    } {1 1}
+
+incr i
+}
