@@ -1,6 +1,16 @@
+2004-12-02  David N. Welton  <davidw@dedasys.com>
+
+	* Removed libtool - it appears to be under the GPL!
+
+	* Removed aclocal.m4 configure Makefile.in src/Makefile.in to avoid
+	CVS churn.
+
+	* configure.ac: Commented out AC_DEFINE(USE_TCL_STUBS), as it was
+	  causing some problems for mod_rivet.so.
+
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
 
-        * The configure scirpt is building the .so files but they are
+        * The configure script is building the .so files but they are
 	  causing a segmentation violation upon an apachectl configtest, it
 	  appears.  Orhters parts of the install aren't quite right yet.  
 
