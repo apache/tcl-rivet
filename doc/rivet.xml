@@ -93,6 +93,15 @@
 	  binaries.
 	</para>
       </step>
+      <step performance="required">
+	<title>Install Tcl</title>
+	<para>
+	  If you don't have Tcl already, you need it!  If you already
+	  have it, you should just be able to use your system Tcl as
+	  long as it is recent.  You can tell Rivet where Tcl is via
+	  the <option>-with-tclconfig</option> option to
+	  <command>configure.tcl</command> (see below).</para>
+      </step>
       <step performance="optional">
 	<title>Get and Install Apache Sources</title>
 	<para>
@@ -104,7 +113,13 @@
 	  to build Rivet statically (compiled into the Apache web
 	  server instead of loaded dynamically), you definitely need
 	  the sources.  We recommend that you build Rivet as a
-	  loadable shared library, for maximum flexibility.</para>
+	  loadable shared library, for maximum flexibility, meaning
+	  that you also build Apache to be able to load modules.
+	  Other than that, the default Apache install is fine.  We
+	  will tell Rivet where it is located via the
+	  <option>-with-apxs</option> option to
+	  <command>configure.tcl</command> (see below).
+	</para>
 	<para>
           The source code for the Apache web server may be found by
           following the links here: <ulink
@@ -172,10 +187,12 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 		</listitem>
 	      </varlistentry>
 	      <varlistentry>
-		<term>-with-tclconfig <replaceable>file</replaceable></term>
+		<term>-with-tclconfig <replaceable>path/to/tcl/tclConfig.sh</replaceable></term>
 		<listitem>
 		  <para>
-		    Specify <replaceable>file</replaceable> as tclConfig.sh.
+		    Specify <replaceable>file</replaceable> as the
+		    tclConfig.sh of the Tcl installation that you want
+		    to use with Rivet.
 		  </para>
 		</listitem>
 	      </varlistentry>

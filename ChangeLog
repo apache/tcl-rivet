@@ -1,3 +1,8 @@
+2004-02-19  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added some additional comments regarding the
+	installation.  Thanks to Tom Krehbiel for the suggestions.
+
 2004-02-17  David N. Welton  <davidw@dedasys.com>
 
 	* src/make.tcl: Created better dependency system for DocBook docs.
