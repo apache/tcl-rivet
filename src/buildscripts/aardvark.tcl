@@ -64,25 +64,30 @@ namespace eval aardvark {
 	if { $rebuild == 1} {
 	    if { $buildinfo(cmd) != "" } {
 		foreach cmd $buildinfo(cmd) {
+		    set result ""
 		    puts -nonewline "$node :"
 		    catch {
-			set cmd [uplevel #0 "subst {$cmd}"]
-			puts "$cmd"
+			set cmd [uplevel #0 "subst {$cmd}" ]
+			puts ""
+			puts "\tCommand: $cmd"
 		    } err
                     if { $err != "" } {
-			puts $cmd
-			puts $err
+			puts "Command was supposed to be: $cmd"
+			puts "This error occured: $err"
 			continue
 		    }
 		    catch {
 			set result [ eval exec $cmd ]
-			puts "$result"
 		    } err
-		    if { [ info exists errorCode ] } {
-			puts "ERROR: $errorCode"
+		    if { [ info exists errorInfo ] } {
+			puts "\tERROR: $errorInfo"
+			break
+		    } elseif { $err != "" } {
+			puts "\tError: $err"
+			break
 		    }
-                    if { $err != "" } {
-			puts $err
+		    if { $result != "" } {
+			puts "\tResult: $result"
 		    }
 		}
 	    } 
@@ -90,7 +95,8 @@ namespace eval aardvark {
 		foreach tclcommand $buildinfo(tclcommand) {
 		    catch {
 			puts -nonewline "$node :"
-			puts -nonewline "$tclcommand"
+			puts ""
+			puts "\tTcl Command: $tclcommand"
 			uplevel #0 $tclcommand
 		    } err
                     if { $err != "" } {
