@@ -1,4 +1,19 @@
+2002-03-16  David N. Welton  <davidw@dedasys.com>
+
+	* tests/runtests.tcl: Updated to run with apachetest, eliminating
+	makeconf.tcl, and moving template.conf.tcl to the apachetest
+	directory.
+
+	* tests/apachetest/apachetest.tcl: New file, grouping together
+	the test functions in one place, and in a namespace.
+
 2002-03-15  David N. Welton  <davidw@dedasys.com>
+
+	* tests/config.test: Added some new, automatically generated
+	tests.
+
+	* src/mod_rivet.c (Rivet_MergeDirConfigVars): Make sure that both
+	arguments to overlay_tables exist!
 
 	* src/mod_rivet.h: Add a default error script.
 
