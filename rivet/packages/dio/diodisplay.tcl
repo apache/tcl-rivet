@@ -253,9 +253,6 @@ catch { ::itcl::delete class DIODisplay }
     method showform_prolog {} {
 	get_field_values array
 
-	set save [button_image_src DIOFormSaveButton]
-	set cancel [button_image_src DIOFormCancelButton]
-
 	$form start
 	foreach fld [array names hidden] {
 	    $form hidden $fld -value $hidden($fld)
@@ -267,6 +264,9 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method showform_epilog {} {
+	set save [button_image_src DIOFormSaveButton]
+	set cancel [button_image_src DIOFormCancelButton]
+
 	puts "</TABLE>"
 
 	puts "<TABLE>"
@@ -298,19 +298,7 @@ catch { ::itcl::delete class DIODisplay }
     # response(query) will contain whatever was in the "is" field
     #
     method showform {} {
-	get_field_values array
-
-	set save [button_image_src DIOFormSaveButton]
-	set cancel [button_image_src DIOFormCancelButton]
-
-	$form start
-	foreach fld [array names hidden] {
-	    $form hidden $fld -value $hidden($fld)
-        }
-	$form hidden mode -value Save
-	$form hidden DIODfromMode -value $response(mode)
-	$form hidden DIODkey -value [$DIO makekey array]
-	puts {<TABLE CLASS="DIOForm">}
+	showform_prolog
 
 	# emit the fields for each field using the showform method
 	# of the field.  if they've typed something into the
@@ -324,28 +312,8 @@ catch { ::itcl::delete class DIODisplay }
 	    }
 	    $field showform
 	}
-	puts "</TABLE>"
 
-	puts "<TABLE>"
-	puts "<TR>"
-	puts "<TD>"
-	if {![lempty $save]} {
-	    $form image save -src $save -class DIOFormSaveButton
-	} else {
-	    $form submit save.x -value "Save" -class DIOFormSaveButton
-	}
-	puts "</TD>"
-	puts "<TD>"
-	if {![lempty $cancel]} {
-	    $form image cancel -src $cancel -class DIOFormSaveButton
-	} else {
-	    $form submit cancel.x -value "Cancel" -class DIOFormCancelButton
-	}
-	puts "</TD>"
-	puts "</TR>"
-	puts "</TABLE>"
-
-	$form end
+	showform_epilog
     }
 
     method page_buttons {end {count 0}} {
