@@ -118,10 +118,10 @@ dioObject - the name of the DIO object we'll use to access the database
 (default DIO)
 
 gcProbability - the probability that garbage collection will occur in percent.
-(default 1%, 1) (not coded yet)
+(default 1%, i.e. 1)
 
 gcMaxLifetime - the number of seconds after which data will be seen as 
-"garbage" and cleaned up -- defaults to 1 day (86400) (not coded yet)
+"garbage" and cleaned up -- defaults to 1 day (86400)
 
 refererCheck - the substring you want to check each HTTP referer for.  If 
 the referer was sent by the browser and the substring is not found, the 

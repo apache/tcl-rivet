@@ -139,6 +139,29 @@ package require Itcl
     }
 
     #
+    # do_garbage_collection - delete dead sessions from the session table.
+    #    corresponding session table cache entries will automatically be
+    #    deleted as well (assuming they've been defined with ON DELETE CASCADE)
+    #
+    method do_garbage_collection {} {
+	debug "do_garbage_collection: performing garbage collection"
+	set result [DIO exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
+	$result destroy
+    }
+
+    #
+    # consider_garbage_collection - perform a garbage collection gcProbability
+    #   percent of the time.  For example, if gcProbability is 1, about 1 in
+    #   every 100 times this routine is called, garbage collection will be
+    #   performed.
+    #
+    method consider_garbage_collection {} {
+	if {rand() <= $gcProbability / 100.0} {
+	    do_garbage_collection
+	}
+    }
+
+    #
     # set_session_cookie - set a session cookie to the specified value --
     #  other cookie attributes are controlled by variables defined in the
     #  object
@@ -355,6 +378,10 @@ package require Itcl
 	::request::global sessionInfo
 
 	debug "activate: checking out the situation"
+
+	# a small percentage of the time, try to delete stale session data
+	consider_garbage_collection
+
 	set id [id]
 	if {$id != ""} {
 	    debug "activate: returning session id '$id'"
