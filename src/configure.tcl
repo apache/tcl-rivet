@@ -321,14 +321,23 @@ proc configure::parsetclconfig { config } {
     while { ! [eof $fl] } {
 	gets $fl line
 	if { [string index $line 0] != "#" } {
-	    set line [ split $line = ]
-	    if { [llength $line] == 2 } {
+	    set firstEquals [string first "=" $line]
+	    if {$firstEquals > 0} {
+	        set var [string range $line 0 [expr $firstEquals - 1]]
+		set rawval [string range $line [expr $firstEquals + 1] end]
 		set val ""
-		set var [lindex $line 0]
-		catch {
+		if {[catch {
 		    set val [namespace eval ::configs \
-				 [list subst [string trim [lindex $line 1] ']]]
-		} err
+		        [list subst [string trim $rawval ']]]
+		} err] == 1} {
+		    puts "error: $err"
+		    puts "  line was: $line"
+		    puts "  emitting empty variable for: $var"
+		    puts "  please make it right in configs.tcl or figure out the bug"
+		    puts ""
+		}
+# uncomment to see all the config variables with their inferred values
+#puts "set ::configs::[set var] $val"
 		set ::configs::[set var] $val
 	    }
 	}

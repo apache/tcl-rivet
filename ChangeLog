@@ -1,3 +1,19 @@
+2004-09-16  Karl Lehenbauer  <karl@sc.com>
+
+	* src/configure.tcl: If a configuration variable in
+	  tclConfig.sh ever had an equal sign in the "value"
+	  portion of the key=value pair, configure.tcl would
+	  malfunction.
+
+	  A missing variable caused a variable referencing that
+	  missing variable to be silently dropped.  We now
+	  complain, although the right answer is probably to
+	  substitute an empty string for all missing variables.
+	  Still, this way at least gives a hint as to the problem.
+
+	* src/Makefile: Add simple rules for "clean", "distclean",
+	and "install" that simply invoke make.tcl appropriately.
+
 2004-08-07  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/packages/dtcl/dtcl.tcl (hgetvars): Added code from Arnulf
