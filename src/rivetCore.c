@@ -111,7 +111,7 @@ Rivet_Include(
 {
     int sz;
     Tcl_Channel fd;
-    Tcl_Channel stdout;
+    Tcl_Channel tclstdout;
     Tcl_Obj *outobj;
     char *filename;
     Tcl_DString transoptions;
@@ -157,13 +157,13 @@ Rivet_Include(
      * previous settings. */
     Tcl_DStringInit(&transoptions);
     Tcl_DStringInit(&encoptions);
-    stdout = Tcl_GetChannel(interp, "stdout", NULL);
-    Tcl_GetChannelOption(interp, stdout, "-translation", &transoptions);
-    Tcl_GetChannelOption(interp, stdout, "-encoding", &encoptions);
-    Tcl_SetChannelOption(interp, stdout, "-translation", "binary");
-    Tcl_WriteObj(stdout, outobj);
-    Tcl_SetChannelOption(interp, stdout, "-translation", Tcl_DStringValue(&transoptions));
-    Tcl_SetChannelOption(interp, stdout, "-encoding", Tcl_DStringValue(&encoptions));
+    tclstdout = Tcl_GetChannel(interp, "stdout", NULL);
+    Tcl_GetChannelOption(interp, tclstdout, "-translation", &transoptions);
+    Tcl_GetChannelOption(interp, tclstdout, "-encoding", &encoptions);
+    Tcl_SetChannelOption(interp, tclstdout, "-translation", "binary");
+    Tcl_WriteObj(tclstdout, outobj);
+    Tcl_SetChannelOption(interp, tclstdout, "-translation", Tcl_DStringValue(&transoptions));
+    Tcl_SetChannelOption(interp, tclstdout, "-encoding", Tcl_DStringValue(&encoptions));
     Tcl_DStringFree(&transoptions);
     Tcl_DStringFree(&encoptions);
     return Tcl_Close(interp, fd);
@@ -346,7 +346,7 @@ Rivet_Var(
 	key = Tcl_GetStringFromObj(objv[2], NULL);
 	if (objc == 4)
 	{
-	    deflt = Tcl_GetStringFromObj(objv[3], NULL);
+	    deflt = Tcl_GetString(objv[3]);
 	}
 
 	if (TclWeb_GetVar(result, key, globals->req) != TCL_OK)

@@ -1,3 +1,8 @@
+2002-10-28  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_Include): Changed Tcl_Channel name to
+	tclstdout to avoid any conflicts with the real stdout.
+
 2002-10-23  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xsl: Use <pre> tag for source code examples.
