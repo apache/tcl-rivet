@@ -4,10 +4,14 @@
 #	Microsoft Visual C++ makefile include for decoding the commandline
 #	macros.  This file does not need editing to build Tcl.
 #
+#	This version is modified from the Tcl source version to support
+#	building extensions using nmake.
+#
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 # 
 # Copyright (c) 2001-2002 David Gravereaux.
+# Copyright (c) 2003 Patrick Thoyts
 #
 #------------------------------------------------------------------------------
 # RCS: @(#) $Id$
@@ -310,9 +314,11 @@ OPTDEFINES	= $(OPTDEFINES) -DTCL_CFG_DO64BIT
 !if exist("$(_INSTALLDIR)\include\tcl.h")
 TCLINSTALL	= 1
 _TCLDIR		= $(_INSTALLDIR)
+_TCL_H          = $(_INSTALLDIR)\include\tcl.h
+TCLDIR          = $(_INSTALLDIR)
 !else
 MSG=^
-Don't know where tcl.h is.  Set the TCLDIR macro.
+Failed to find tcl.h.  Set the TCLDIR macro.
 !error $(MSG)
 !endif
 !else
@@ -323,23 +329,18 @@ TCLINSTALL	= 1
 TCLINSTALL	= 0
 !else
 MSG =^
-Don't know where tcl.h is.  The TCLDIR macro doesn't appear correct.
+Failed to find tcl.h.  The TCLDIR macro does not appear correct.
 !error $(MSG)
 !endif
+_TCL_H          = $(_TCLDIR)\generic\tcl.h
 !endif
 
-### TODO: add a command to nmakehlp.c to grep for Tcl's version from tcl.h.
-### Because nmake can't return a string, we'll need to play games with return
-### codes.  It might look something like this:
-#!if [nmakehlp -g $(TCL.H)] == 81
-#TCL_DOTVERSION	= 8.1
-#!elseif [nmakehlp -g $(TCL.H)] == 82
-#TCL_DOTVERSION	= 8.2
-#...
-#!endif
-
-TCL_DOTVERSION	= 8.4
+!if [nmakehlp -v $(_TCL_H) ""] == 0
+!include version.vc
+!else
+TCL_DOTVERSION  = 8.5
 TCL_VERSION	= $(TCL_DOTVERSION:.=)
+!endif
 
 !if $(TCLINSTALL)
 TCLSH		= "$(_INSTALLDIR)\bin\tclsh$(TCL_VERSION)$(SUFX).exe"
@@ -350,6 +351,7 @@ TCLREGLIB	= "$(_INSTALLDIR)\lib\tclreg11$(SUFX:t=).lib"
 TCLDDELIB	= "$(_INSTALLDIR)\lib\tcldde12$(SUFX:t=).lib"
 COFFBASE	= \must\have\tcl\sources\to\build\this\target
 TCLTOOLSDIR	= \must\have\tcl\sources\to\build\this\target
+TCL_INCLUDES    = -I"$(_INSTALLDIR)\include"
 !else
 TCLSH		= "$(_TCLDIR)\win\$(BUILDDIRTOP)\tclsh$(TCL_VERSION)$(SUFX).exe"
 TCLSTUBLIB	= "$(_TCLDIR)\win\$(BUILDDIRTOP)\tclstub$(TCL_VERSION).lib"
@@ -359,9 +361,63 @@ TCLREGLIB	= "$(_TCLDIR)\win\$(BUILDDIRTOP)\tclreg11$(SUFX:t=).lib"
 TCLDDELIB	= "$(_TCLDIR)\win\$(BUILDDIRTOP)\tcldde12$(SUFX:t=).lib"
 COFFBASE	= "$(_TCLDIR)\win\coffbase.txt"
 TCLTOOLSDIR	= $(_TCLDIR)\tools
+TCL_INCLUDES	= -I"$(_TCLDIR)\generic" -I"$(_TCLDIR)\win"
 !endif
 
 !endif
+
+#----------------------------------------------------------
+# Get Tk info for building extensions.
+#----------------------------------------------------------
+
+!if "$(PROJECT)" != "tcl" && "$(PROJECT)" != "tk"
+
+!if !defined(TKDIR)
+!if exist("$(_INSTALLDIR)\include\tk.h")
+TKINSTALL      = 1
+_TKDIR         = $(_INSTALLDIR)
+_TK_H          = $(_INSTALLDIR)\include\tk.h
+TKDIR          = $(_INSTALLDIR)
+!else
+MSG =^
+Failed to find tk.h. Set the TKDIR macro.
+!error $(MSG)
+!endif
+!else
+_TKDIR = $(TKDIR:/=\)
+!if exist("$(_TKDIR)\include\tk.h")
+TKINSTALL      = 1
+!elseif exist("$(_TKDIR)\generic\tk.h")
+TKINSTALL      = 0
+!else
+MSG =^
+Failed to find tk.h. The TKDIR macro does not appear correct.
+!error $(MSG)
+!endif
+_TK_H          = $(_TKDIR)\generic\tk.h
+!endif
+
+!if [nmakehlp -v $(_TCL_H) $(_TK_H)] == 0
+!include version.vc
+!else
+TK_DOTVERSION	= 8.5
+TK_VERSION	= $(TK_DOTVERSION:.=)
+!endif
+
+!if $(TKINSTALL)
+WISH		= "$(_INSTALLDIR)\bin\wish$(TK_VERSION)$(SUFX).exe"
+TKSTUBLIB	= "$(_INSTALLDIR)\lib\tkstub$(TK_VERSION).lib"
+TKIMPLIB	= "$(_INSTALLDIR)\lib\tk$(TK_VERSION)$(SUFX).lib"
+TK_INCLUDES     = -I"$(_INSTALLDIR)\include"
+!else
+WISH		= "$(_TKDIR)\win\$(BUILDDIRTOP)\wish$(TCL_VERSION)$(SUFX).exe"
+TKSTUBLIB	= "$(_TKDIR)\win\$(BUILDDIRTOP)\tkstub$(TCL_VERSION).lib"
+TKIMPLIB	= "$(_TKDIR)\win\$(BUILDDIRTOP)\tk$(TCL_VERSION)$(SUFX).lib"
+TK_INCLUDES     = -I"$(_TKDIR)\generic" -I"$(_TKDIR)\win" -I"$(_TKDIR)\xlib"
+!endif
+
+!endif
+
 
 
 #----------------------------------------------------------

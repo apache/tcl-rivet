@@ -4,6 +4,7 @@
  *	This is used to fix limitations within nmake and the environment.
  *
  * Copyright (c) 2002 by David Gravereaux.
+ * Copyright (c) 2003 by Patrick Thoyts
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -13,6 +14,7 @@
  * ----------------------------------------------------------------------------
  */
 #include <windows.h>
+#include <stdio.h>
 #pragma comment (lib, "user32.lib")
 #pragma comment (lib, "kernel32.lib")
 
@@ -21,6 +23,7 @@ int CheckForCompilerFeature (const char *option);
 int CheckForLinkerFeature (const char *option);
 int IsIn (const char *string, const char *substring);
 DWORD WINAPI ReadFromPipe (LPVOID args);
+int GetVersionFromHeader(const char *tclh, const char *tkh);
 
 /* globals */
 typedef struct {
@@ -74,6 +77,15 @@ main (int argc, char *argv[])
 	    } else {
 		return IsIn(argv[2], argv[3]);
 	    }
+	case 'v':
+	    if (argc != 4) {
+		chars = wsprintf(msg, "usage: %s -v <tcl.h> <tk.h>\n"
+		    "Search for versions from the tcl and tk headers.",
+		    argv[0]);
+		WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg, chars, &dwWritten, NULL);
+		return 0;
+	    }
+	    return GetVersionFromHeader(argv[2], argv[3]);
 	}
     }
     chars = wsprintf(msg, "usage: %s -c|-l|-f ...\n"
@@ -294,4 +306,50 @@ int
 IsIn (const char *string, const char *substring)
 {
     return (strstr(string, substring) != NULL);
+}
+
+	
+static double
+ReadVersionFromHeader(const char *file, const char *macro)
+{
+    double d = 0.0;
+    CHAR szBuffer[100];
+    LPSTR p;
+    DWORD cbBuffer = 100;
+    FILE *fp = fopen(file, "r");
+    if (fp != NULL) {
+	while (fgets(szBuffer, cbBuffer, fp) != NULL) {
+	    if ((p = strstr(szBuffer, macro)) != NULL) {
+		while (*p && !isdigit(*p)) ++p;
+		d = strtod(p, NULL);
+		break;
+	    }
+	}
+	fclose(fp);
+    }
+    return d;
+}
+
+int
+GetVersionFromHeader(const char *tclh, const char *tkh)
+{
+    double dTcl = 0.0, dTk = 0.0;
+    
+    if (tclh != NULL)
+	dTcl = ReadVersionFromHeader(tclh, "TCL_VERSION");
+    if (tkh != NULL)
+	dTk = ReadVersionFromHeader(tkh, "TK_VERSION");
+
+    if (dTcl > 0 || dTk > 0) {
+	FILE *ofp = fopen("version.vc", "w");
+	if (dTcl > 0)
+	    fprintf(ofp, "TCL_DOTVERSION\t= %0.1f\nTCL_VERSION\t= %u\n",
+		    dTcl, (int)(dTcl * 10.0));
+	if (dTk > 0)
+	    fprintf(ofp, "TK_DOTVERSION\t= %0.1f\nTK_VERSION\t= %u\n",
+		    dTk, (int)(dTk * 10.0));
+	fclose(ofp);
+	return 0;
+    }
+    return 1;
 }
