@@ -7,6 +7,16 @@
 	* src/TclWebapache.c
 	    Cleaned up a lot of memory leaks.  Still working on finding more.
 
+2002-03-12  David N. Welton  <davidw@dedasys.com>
+
+	* tests/makeurl.test: New test.
+
+	* src/TclWebapache.c (TclWeb_MakeURL): Use Tcl_SetStringObj
+	instead of creating a new object.
+
+	* src/rivetCore.c (Rivet_MakeURL): Pass already created object to
+	TclWeb_MakeURL.
+
 2002-03-11  Damon J. Courtney <damon@unreality.com>
 
 	* src/TclWeb.h
@@ -39,6 +49,8 @@
 	    Fixed a bug where Rivet_GetRivetFile was stomping the BeforeScript.
 
 2002-02-23  David N. Welton  <davidw@dedasys.com>
+
+	* tests/upload.test: Added upload test.
 
 	* src/TclWebapache.c: Added functions: TclWeb_PrepareUpload,
 	TclWeb_UploadChannel, TclWeb_UploadSave, TclWeb_UploadData,
