@@ -22,12 +22,19 @@ namespace import ::aardvark::*
 
 ##
 ## Set this variable to the location of your apxs script if it cannot be
-## found by make.tcl
+## found by make.tcl, or use the environmental variable 'APXS_LOCATION'.
 ##
+
 set APXS "apxs"
 
-## Try to find the Apache apxs script.
-set APXS [FindAPXS $APXS]
+if { [info exists env(APXS_LOCATION)] } {
+    set APXS $env(APXS_LOCATION)
+} else {
+    ## Try to find the Apache apxs script.
+    set APXS [FindAPXS $APXS]
+}
+
+# set APXS "path/to/apxs"
 
 if { ![string length $APXS] } {
     puts stderr "Could not find Apache apxs script."
@@ -66,7 +73,7 @@ set XSLCHUNK [file join .. doc rivet-chunk.xsl]
 set XSL [file join .. doc rivet.xsl]
 set XML [file join .. doc rivet.xml]
 # Existing translations.
-set TRANSLATIONS ru_UTF
+set TRANSLATIONS ru
 set PKGINDEX [file join .. rivet pkgIndex.tcl]
 
 # ------------
@@ -268,9 +275,9 @@ AddNode distclean {
 
 AddNode distdoc {
     depends $XML $XSL
-    sh xsltproc --stringparam html.stylesheet rivet.css --nonet -o $HTML $XSLCHUNK $XML
+    sh xsltproc --stringparam html.stylesheet rivet.css --stringparam html.ext ".html.en" --nonet -o $HTML $XSLCHUNK $XML
     foreach tr $TRANSLATIONS {
-	sh xsltproc --stringparam html.stylesheet rivet.css  --stringparam html.ext ".${tr}.html" --nonet -o $HTML $XSLCHUNK [string map [list .xml ".${tr}.xml"] $XML]
+	sh xsltproc --stringparam html.stylesheet rivet.css  --stringparam html.ext ".html.${tr}" --nonet -o $HTML $XSLCHUNK [string map [list .xml ".${tr}.xml"] $XML]
     }
 }
 

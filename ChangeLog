@@ -1,3 +1,20 @@
+2003-07-01  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_Upload): Pass the correct element of objv
+	to TclWeb_UploadSave.
+
+	* tests/uploadsave.rvt: New file to test 'upload save'.
+
+	* tests/upload.test: New test for 'upload save'.
+
+2003-06-30  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_ParseExecFile): Use Tcl_FSStat instead of
+	Tcl_Stat.
+
+	* src/rivetCore.c (Rivet_Parse): Use Tcl_FSStat instead of
+	Tcl_Stat.
+
 2003-06-29  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Add IRC reference to the help section of the

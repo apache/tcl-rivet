@@ -15,6 +15,26 @@ set testfilename1 upload.rvt
 		  -type "multipart/form-data; boundary=$bound" -query $outputData]
 
     set ret [string trim [::http::data $page]]
+    ::http::cleanup $page
     set ret
 } {uploadtest 1 42747  AngeloFish.jpg}
 
+set testfilename1 uploadsave.rvt
+
+::tcltest::test upload-1.2 {upload save} {
+    file delete uploadedjpeg.jpg
+    set bound "-----NEXT_PART_[clock seconds].[pid]"
+    set fl [open AngeloFish.jpg r]
+    fconfigure $fl -translation binary
+    set data [read $fl]
+    close $fl
+
+    set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n${bound}--"
+
+    set page [::http::geturl "${urlbase}$testfilename1" \
+		  -type "multipart/form-data; boundary=$bound" -query $outputData]
+
+    set ret [string trim [::http::data $page]]
+    ::http::cleanup $page
+    file size uploadedjpeg.jpg
+} {42747}

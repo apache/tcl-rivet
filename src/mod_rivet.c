@@ -214,10 +214,15 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
        we need to get the information about the file ourselves. */
     if (toplevel == 0)
     {
-	struct stat stat;
-	if( Tcl_Stat(filename, &stat) < 0 ) return TCL_ERROR;
-	ctime = stat.st_ctime;
-	mtime = stat.st_mtime;
+	Tcl_Obj *fnobj;
+	Tcl_StatBuf buf;
+
+	fnobj = Tcl_NewStringObj(filename, -1);
+	Tcl_IncrRefCount(fnobj);
+	if( Tcl_FSStat(fnobj, &buf) < 0 ) return TCL_ERROR;
+	Tcl_DecrRefCount(fnobj);
+	ctime = buf.st_ctime;
+	mtime = buf.st_mtime;
     } else {
 	ctime = req->req->finfo.st_ctime;
 	mtime = req->req->finfo.st_mtime;

@@ -62,7 +62,9 @@ Rivet_Parse(
     Tcl_Obj *CONST objv[])
 {
     char *filename;
-    struct stat finfo;
+    Tcl_StatBuf buf;
+    Tcl_Obj *fnobj;
+    int retval = 0;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( objc < 2 || objc > 3 )
@@ -88,11 +90,16 @@ Rivet_Parse(
 	return TCL_ERROR;
     }
 
-    if (stat(filename, &finfo))
+    fnobj = Tcl_NewStringObj(filename, -1);
+    Tcl_IncrRefCount(fnobj);
+    retval = Tcl_FSStat(fnobj, &buf);
+    Tcl_DecrRefCount(fnobj);
+    if (retval != 0)
     {
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
 	return TCL_ERROR;
     }
+
     if (Rivet_ParseExecFile(globals->req, filename, 0) == TCL_OK) {
 	return TCL_OK;
     } else {
@@ -534,7 +541,7 @@ Rivet_Upload(
 	    return TCL_ERROR;
 	}
 
-	if (TclWeb_UploadSave(varname, objv[4], globals->req) != TCL_OK)
+	if (TclWeb_UploadSave(varname, objv[3], globals->req) != TCL_OK)
 	{
 	    return TCL_ERROR;
 	}

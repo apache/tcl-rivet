@@ -58,6 +58,7 @@
 
 #include "apache_request.h"
 #include "apache_multipart_buffer.h"
+
 int fill_buffer(multipart_buffer *self); /* needed for mozilla hack */
 
 static void req_plustospace(char *str)
@@ -356,7 +357,7 @@ static int ap_unescape_url_u(char *url)
 	return OK;
 }
 
-static int urlword_dlm[] = {'&', ';', 0};
+/* static int urlword_dlm[] = {'&', ';', 0}; */
 
 static char *my_urlword(pool *p, const char **line)
 {
@@ -428,7 +429,6 @@ int ApacheRequest___parse(ApacheRequest *req)
 
     req->parsed = 1;
     return result;
-
 }
 
 int ApacheRequest_parse_urlencoded(ApacheRequest *req)

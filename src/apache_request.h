@@ -88,6 +88,8 @@ struct ApacheUpload {
 #endif 
 
 ApacheRequest *ApacheRequest_new(request_rec *r);
+/* int ApacheRequest_save_post_data(request_rec *r, int flag);
+char *ApacheRequest_fetch_post_data(request_rec *r);  */
 int ApacheRequest_parse_multipart(ApacheRequest *req);
 int ApacheRequest_parse_urlencoded(ApacheRequest *req);
 char *ApacheRequest_script_name(ApacheRequest *req);
