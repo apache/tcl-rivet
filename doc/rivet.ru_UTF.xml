@@ -15,6 +15,7 @@
     <title>Apache Rivet</title>
     <copyright>
       <year>2002</year>
+      <year>2003</year>
       <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
@@ -41,11 +42,15 @@
       <surname>Zuryanovich</surname>
       <contrib>Russian Translation</contrib>
       <affiliation>
-	<address>dtz@xepb.ru</address>
+	<address><email>dtz@xepb.ru</email></address>
       </affiliation>
     </othercredit>
   </articleinfo>
 
+  <para>
+    This document is also available in the following languages: <ulink
+    url="index.html">English</ulink>
+  </para>
 
   <section>
     <title>Введение в  Apache Rivet</title>

@@ -65,6 +65,8 @@ set XSLNOCHUNK [file join .. doc rivet-nochunk.xsl]
 set XSLCHUNK [file join .. doc rivet-chunk.xsl]
 set XSL [file join .. doc rivet.xsl]
 set XML [file join .. doc rivet.xml]
+# Existing translations.
+set TRANSLATIONS ru_UTF
 set PKGINDEX [file join .. rivet pkgIndex.tcl]
 
 # ------------
@@ -265,8 +267,11 @@ AddNode distclean {
 # Create the HTML documentation from the XML document.
 
 AddNode distdoc {
-    depends $XML $XSL $HTML_DOCS
+    depends $XML $XSL
     sh xsltproc --stringparam html.stylesheet rivet.css --nonet -o $HTML $XSLCHUNK $XML
+    foreach tr $TRANSLATIONS {
+	sh xsltproc --stringparam html.stylesheet rivet.css  --stringparam html.ext ".${tr}.html" --nonet -o $HTML $XSLCHUNK [string map [list .xml ".${tr}.xml"] $XML]
+    }
 }
 
 # Create the distribution.  This is a bit unix-specific for the

@@ -10,12 +10,17 @@
 	  have a FreeBSD port, Debian package, RPM's, and windows
 	  binaries.
 	</p></li><li><p class="title"><b>Get and Install Apache Sources</b></p><p style="width:90%">
-	  If you don't have them, or if you want to build Rivet as a
-	  static (built in) part of the Apache web server, you need
-	  the source code to Apache, which is available from <a href="http://httpd.apache.org/" target="_top">http://httpd.apache.org/</a>.  Otherwise, you don't need
-	  to perform this step.  Infact, we recommend that you build
-	  Rivet as a shared object, and therefore, build it seperately
-	  from Apache.
+          Rivet needs some Apache include (.h) files in order to
+	  build.  The easiest way to get them is to download the
+	  source code of the Apache web server, although some systems
+	  (Debian GNU/Linux for example) make it possible to install
+	  only the headers and other development files.  If you intend
+	  to build Rivet statically (compiled into the Apache web
+	  server instead of loaded dynamically), you definitely need
+	  the sources.  We recommend that you build Rivet as a
+	  loadable shared library, for maximum flexibility.</p><p style="width:90%">
+          The source code for the Apache web server may be found by
+          following the links here: <a href="http://httpd.apache.org/" target="_top">http://httpd.apache.org/</a>.
 	</p></li><li><p class="title"><b>Uncompress Sources</b></p><p style="width:90%">
 	  We will assume that you have Apache installed at this point.
 	  You must uncompress the Rivet sources in the directory where you

@@ -397,7 +397,7 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 	val = TclWeb_StringToUtfToObj(env[i].val, req);
 	Tcl_IncrRefCount(key);
 	Tcl_IncrRefCount(val);
-	Tcl_ObjSetVar2(req->interp, envvar, key, val, 0);
+	Tcl_ObjSetVar2(req->interp, envvar, key, val, TCL_NAMESPACE_ONLY);
  	Tcl_DecrRefCount(key);
 	Tcl_DecrRefCount(val);
     }
@@ -425,7 +425,8 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar, TclWebRequest *req)
 
 	Tcl_ObjSetVar2(req->interp, headersvar,
 		       TclWeb_StringToUtfToObj(hdrs[i].key, req),
-		       TclWeb_StringToUtfToObj(hdrs[i].val, req), 0);
+		       TclWeb_StringToUtfToObj(hdrs[i].val, req),
+		       TCL_NAMESPACE_ONLY);
     }
 
     /* Transfer Apache internal CGI variables to TCL request namespace. */
