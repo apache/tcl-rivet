@@ -509,11 +509,17 @@ catch { ::itcl::delete class DIODisplay }
 
 
     method Search {} {
-	set query "-$searchField $response(query)"
-
+	set searchField $response(searchBy)
+    
+	if {[string length $response(query)]} {
+	    set query "-$searchField $response(query)"
+	} else {
+	    set query ""
+	}
+	
 	append query [sql_order_by_syntax]
 	append query [sql_limit_syntax]
-
+	puts QUERY=$query
 	DisplayRequest $query
     }
 
