@@ -153,8 +153,9 @@ if { [llength $errlist] != 0 } {
 	list, so that at some point, we could iterate over them.
       </p><p style="width:90%">
 	The script then checks to make sure that
-	<tt class="varname">errlist</tt> is empty (printing an error if it
-	is) and outputting a thankyou message.
+	<tt class="varname">errlist</tt> is empty and outputting a thankyou
+	message.  If <tt class="varname">errlist</tt> is not empty, the list
+	of errors it contains is printed.
       </p></div><div class="example"><a name="upload"></a><p class="title"><b>Example 4. File Upload</b></p><p style="width:90%">
 	The following HTML in one file, say,
 	<tt class="filename">upload.html</tt>

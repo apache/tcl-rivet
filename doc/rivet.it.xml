@@ -1,0 +1,1318 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd"[
+      <!ENTITY hello.rvt SYSTEM "examples/hello.rvt" >
+      <!ENTITY table.rvt SYSTEM "examples/table.rvt" >
+      <!ENTITY vars.html SYSTEM "examples/vars.html" >
+      <!ENTITY vars.rvt SYSTEM "examples/vars.rvt" >
+      <!ENTITY upload.html SYSTEM "examples/upload.html" >
+      <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
+]>
+
+<article lang="it">
+  <articleinfo>
+    <title>Apache Rivet</title>
+    <copyright>
+      <year>2002</year>
+      <year>2003</year>
+      <holder>Apache Software Foundation</holder>
+    </copyright>
+    <author>
+      <firstname>David</firstname>
+      <surname>Welton</surname>
+      <affiliation>
+	<address>
+	  <email>davidw@apache.org</email>
+	</address>
+      </affiliation>
+    </author>
+    <author>
+      <firstname>Damon</firstname>
+      <surname>Courtney</surname>
+      <affiliation>
+	<address>
+	  <email>damonc@apache.org</email>
+	</address>
+      </affiliation>
+    </author>
+    <othercredit>
+      <firstname>Fabio</firstname>
+      <surname>Zanotti</surname>
+      <contrib>Italian Translation</contrib>
+      <affiliation>
+	<orgname>Italian Linux Documentation Project</orgname>
+	<address><email>zendune@virgilio.it</email></address>
+      </affiliation>
+    </othercredit>
+  </articleinfo>
+
+  <para>
+    Questo documento è anche disponibile nelle seguenti lingue: <ulink
+    url="index.html.en">Inglese</ulink>, <ulink
+    url="index.html.ru">Russo</ulink>
+  </para>
+
+  <!-- IMPORTANT: update the number below whenever you update this
+  document! -->
+  <para>Questo documento e` basato sulla versione 1.27 dell'originale
+  in inglese.</para>
+
+  <section>
+    <title>Introduzione ad Apache Rivet</title>
+    <para>
+      Apache Rivet è un sistema per la creazione di contenuti web
+      dinamici mediante un linguaggio di programmazione integrato con
+      il Web Server Apache . È progettato per essere veloce, 
+      potente ed estensibile, utilizza poche risorse, è facile da 
+      imparare e fornisce all'utente una piattaforma che può pure 
+      essere utilizzata con altri programmi per lavori da eseguire 
+      fuori dal web (GUI, compiti di amministrazione di sistema, 
+      elaboratori di testo, gestori di database, XML e così via). 
+      Per ottenere questi risultati, è stato scelto il linguaggio 
+      di programmazione Tcl da utilizzare unitamente al 
+      Web Server Apache.
+    </para>
+    <para>
+      Con questo manuale aspiriamo ad aiutarvi ad iniziare ed a 
+      farvi scrivere codice di produzione il più velocemente 
+      possibile, dandovi un'idea di come ottenere grandi vantaggi 
+      dall'architettura Rivet, finalizzati alla realizzazione di 
+      diverse tipologie di siti web.
+    </para>
+
+    <para>
+      Questa documentazione è un lavoro in corso e, come ogni cosa
+      riguardante Apache Rivet, è Software Libero. Se vedete qualche
+      sezione che necessita di miglioramenti ed avete idee o 
+      suggerimenti al riguardo, non esitate a farcelo sapere. Se 
+      volete contribuire direttamente, meglio ancora!
+    </para>
+  </section>
+
+
+  <section id="installation">
+    <title>Installazione di Apache Rivet</title>
+
+    <procedure>
+      <step>
+	<title>Verifica delle dipendenze</title>
+	<para>
+	  Per installare Rivet, avete bisogno di Tcl 8.2 o superiore e
+	  Apache 1.3.xx. Può essere eseguito su Linux, FreeBSD,
+	  OpenBSD, Solaris e HPUX. È possibile utilizzarlo anche in 
+	  Windows NT (per cortesia verificate le indicazioni nella 
+	  distribuzione).
+	</para>
+      </step>
+      <step>
+	<title>Procurarsi Rivet</title>
+	<para>
+	  Si possono scaricare i sorgenti di Rivet da 
+	  <ulink url="http://tcl.apache.org/rivet/download"/>.  
+	  Attualmente è il solo modo per ottenere Rivet. In futuro, 
+	  contiamo di distribuirlo anche direttamente nei formati 
+	  utilizzati da FreeBSD, Debian, Red Hat e windows.
+	</para>
+      </step>
+      <step performance="optional">
+	<title>Procurarsi ed installare i sorgenti Apache</title>
+	<para>
+          Rivet necessita di alcuni file include (.h) per essere 
+	  costruito. Il modo più facile per ottenerli, è scaricare il
+	  codice sorgente dal server web di Apache, sebbene alcuni
+	  sistemi (Debian GNU/Linux per esempio) rendano disponibili per
+	  per l'installazione i file header ed altri file di 
+	  sviluppo. Se intendete costruire Rivet staticamente 
+	  (compilandolo nel server web Apache, invece di caricarlo 
+	  dinamicamente), chiaramente necessitate dei sorgenti. 
+	  Raccomandiamo di costruire Rivet con una libreria caricabile 
+	  condivisa, per avere la massima flessibilità.</para>
+	<para>
+          Il codice sorgente del server web Apache può essere reperito
+	  al seguente link: <ulink url="http://httpd.apache.org/"/>.
+	</para>
+      </step>
+      <step>
+	<title>Decomprimere i sorgenti</title>
+	<para>
+	  Assumiamo, a questo punto, che abbiate installato Apache.
+	  Dovrete decomprimere i sorgenti di Rivet nella directory dove
+	  vorrete compilarli.
+
+	  <programlisting>gunzip tcl-rivet-X.X.X.tar.gz
+tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
+
+	</para>
+      </step>
+      <step>
+	<title>Compilare Rivet</title>
+	<para>
+	  Rivet usa un unico sistema di compilazione che abbiamo
+	  creato espressamente per questo progetto. Utilizza le
+	  informazioni incluse in Apache e Tcl, considerando le loro
+	  configurazioni, al fine di compilarlo tramite una serie di
+	  script Tcl, che sono ubicati nella directory 
+	  <filename>buildscripts/</filename>.
+	</para>
+	<substeps>
+	  <step>
+	    <title>Modificare src/make.tcl</title>
+	    <para>
+              Potrebbe essere necessario modificare a mano
+	      <filename>src/make.tcl</filename>, al fine di impostare
+	      alcune opzioni. Per prima cosa provate la prossima 
+	      istruzione e vedete se ha successo.
+	    </para>
+	  </step>
+	  <step>
+	    <para>A questo punto, siete pronti ad eseguire la compilazione
+	       del sistema:</para>
+
+	    <programlisting>cd src/
+./make.tcl <replaceable>option</replaceable></programlisting>
+
+	    <para>dove <replaceable>option</replaceable> può essere
+	    <option>shared</option> (condivisa) o 
+	    <option>static</option> (statica).
+	    </para>
+	  </step>
+	  <step>
+	    <title>Installazione</title>
+	    <para>
+	      Adesso siamo pronti ad eseguire il comando 
+	      <command>./make.tcl install</command> per installare i 
+	      file risultanti. Questo
+	      dovrebbe copiare gli oggetti condivisi (come
+	      <filename>mod_rivet.so</filename>, se è stato creato con
+	      successo) nella directory di Apache
+	      <filename>libexec</filename>, come pure installare alcuni
+	      script di supporto e codice vario.
+	    </para>
+	  </step>
+	</substeps>
+      </step>
+      <step>
+	<title>File di configurazione di Apache</title>
+	<para>
+	  Rivet è relativamente facile da configurare, cominceremo
+	  aggiungendogli il modulo:
+	</para>
+
+	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache/1.3/
+mod_rivet.so</replaceable></programlisting>
+
+	<para>
+          Questo informa Apache che deve caricare l'oggetto condiviso 
+	  Rivet, in qualsiasi parte esso risieda sul vostro file system.
+	  Ora abbiamo informato Apache su quali file sono del tipo 
+	  "Rivet" e come elaborarli:
+	</para>
+
+	<programlisting>AddType application/x-httpd-rivet .rvt
+	  AddType application/x-rivet-tcl .tcl</programlisting>
+
+	<para>
+	  Questo informa Apache di elaborare i file con le estensioni
+	  <filename>.rvt</filename> e <filename>.tcl</filename>
+	  come file Rivet.
+	</para>
+	<para>
+	  Per altre direttive che Rivet fornisce per la configurazione di
+	  Apache, per cortesia, vedete <xref linkend="directives"/>.
+	</para>
+      </step>
+    </procedure>
+  </section>
+
+  <section id="directives">
+    <title>Direttive di Apache</title>
+
+    <para>
+      Queste direttive sono utilizzate con i file di configurazione del
+      server httpd di Apache per modificare il comportamento di Apache
+      Rivet. Vi sono delle precedenze, come segue: 
+      <command>RivetDirConf</command>, <command>RivetUserConf</command>,
+      <command>RivetServerConf</command>, questo significa che DirConf 
+      non terrà conto di  UserConf, il quale a sua volta non terrà 
+      conto di ServerConf.
+    </para>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>RivetServerConf</command>
+	    <group choice="req">
+	      <arg>CacheSize</arg>
+	      <arg>GlobalInitScript</arg>
+	      <arg>ChildInitScript</arg>
+	      <arg>ChildExitScript</arg>
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	      <arg>UploadMaxSize</arg>
+	      <arg>UploadFilesToVar</arg>
+	      <arg>SeperateVirtualInterps</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para><command>RivetServerConf</command> specifica un opzione
+	    globale che è valida per l'intero server.
+	  </para>
+	</listitem>
+	<listitem>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>CacheSize</arg>
+		  <arg><replaceable>size</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Seleziona la dimensione della cache della pagina
+		  interna, dove
+		  <option><replaceable>size</replaceable></option> è il
+		  numero di pagine byte-compilate da essere
+		  memorizzate per un uso futuro. Il valore predefinito è
+		  <command>MaxRequestsPerChild</command> / 5, o 50,
+		  se <command>MaxRequestsPerChild</command> è 0.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>GlobalInitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script Tcl che è eseguito quando ogni interprete viene
+		  inizializzato. 
+		  <replaceable><option>script</option></replaceable>
+		  è uno script Tcl effettivo; così per eseguire un file, 
+		  voi eseguireste:
+
+		  <programlisting>RivetServerConf GlobalInitScript "source /var/www/ 
+foobar.tcl"</programlisting>
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>ChildInitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Lo script viene valutato quando ogni processo figlio
+		  di Apache è inizializzato. Questo è il posto
+		  raccomandato per caricare i moduli, creare le 
+		  variabili globali, aprire le connessioni ad altre
+		  applicazioni (quali database) e così via.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>ChildExitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Lo script viene valutato quando ogni processo figlio 
+		  di Apache termina. Questo è il posto più naturale dove
+		  ripulire le risorse create con 
+		  <option>ChildInitScript</option>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>BeforeScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Lo script viene valutato prima che ogni server abbia
+		  fatto l'analisi della pagina (.rvt). Questo può essere
+		  utilizzato per creare un'intestazione standard, per 
+		  ogni istanza.
+		  È anche possibile utilizzarlo per caricare codice di
+		  cui avete bisogno in ogni pagina, se non volete
+		  metterlo in un <option>GlobalInitScript</option>
+		  <option>ChildInitScript</option> quando siete al 
+		  vostro primo sviluppo di un sito web.
+		  <note>
+		    Questo codice è valutato globalmente e non 
+		    all'interno del namespace di dove le pagine sono
+		    elaborate.
+		  </note>
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>AfterScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Lo script viene chiamato dopo che ogni server ha
+		  analizzato la pagina (.rvt).
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>ErrorScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Quando Rivet incontra un errore in uno script, 
+		  costruisce una pagina HTML con alcune informazioni 
+		  circa l'errore e lo script che è stato valutato. Se 
+		  è stato specificato un <option>ErrorScript</option>,
+		  è possibile creare pagine personalizzate di errore. 
+		  Questo può essere vantaggioso se cercate di 
+		  assicurarvi che nessun utente possa mai vedere il 
+		  vostro codice sorgente.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>UploadDirectory</arg>
+		  <arg><replaceable>directory</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>Directory ove posizionare i file caricati.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>UploadMaxSize</arg>
+		  <arg><replaceable>size</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>Dimensione massima per i file caricati.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>UploadFilesToVar</arg>
+		  <group choice="req"><arg>yes</arg><arg>no</arg></group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Questa opzione controlla se è possibile caricare i file
+		  in una variabile Tcl. Se avete un limite alla dimensione
+		  e non potete usare file di grosse dimensioni, questa 
+		  soluzione potrebbe essere più conveniente che inviare 
+		  dati ad un file su disco.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>SeperateVirtualInterps</arg>
+		  <group choice="req">
+		    <arg>yes</arg>
+		    <arg>no</arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Se attivo, Rivet creerà un interprete Tcl separato per
+		  ogni host virtuale di Apache. Questo è utile in una
+		  situazione tipo ISP dove è desiderabile avere un 
+		  interprete dedicato per ciascun client, cosicché, anche
+		  accidentalmente, non possano interferire tra loro.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>RivetDirConf</command>
+	    <group choice="req">
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Queste opzioni sono le stesse di
+	    <command>RivetServerConf</command>, ad eccezione che sono
+	    valide solo per la directory dove sono state specificate e
+	    relative sotto directory. Potranno essere dichiarate 
+	    nelle sezioni <command>Directory</command>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>RivetUserConf</command>
+	    <group choice="req">
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Queste opzioni sono le stesse di
+	    <command>RivetServerConf</command>, ad eccezione che sono
+	    valide solo per la directory dove sono state specificate e
+	    relative sotto directory.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </section>
+  <section id="commands">
+    <title>Comandi e variabili Tcl di Rivet</title>
+    <variablelist>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>var</command>
+	    <group choice="req">
+	      <arg>get</arg>
+	      <arg>list</arg>
+	      <arg>exists</arg>
+	      <arg>number</arg>
+	      <arg>all</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Il comando <command>var</command> recupera le informazioni
+	    circa le variabili GET o POST, inviando lo script tramite una
+	    richiesta del client. Il trattamento di entrambe le 
+	    variabili GET e POST è identico, in considerazione delle 
+	    loro origini. Notate che vi sono due forme aggiuntive di 
+	    <command>var</command>: <command>var_qs</command> e 
+	    <command>var_post</command>.
+	    Queste due forme restringono le informazioni sui parametri
+	    ottenendo rispettivamente la querystring 
+	    (?foo=bar&amp;bee=bop) o la POSTing.
+	  </para>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>get</arg>
+		  <arg><replaceable>varname</replaceable></arg>
+		  <arg><replaceable><optional>default</optional></replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Ritorna il valore della variabile
+		  <option><replaceable>varname</replaceable></option>
+		  come una stringa (anche se vi sono valori multipli). Se
+		  non esiste come variabile GET o POST, viene restituito 
+		  il valore 
+	<option><replaceable><optional>default</optional></replaceable></option>,
+		  altrimenti viene ritornato "" (una stringa vuota).
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>list</arg>
+		  <arg><replaceable>varname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Restituisce il valore della variabile
+		  <option><replaceable>varname</replaceable></option> come
+		  una lista, se vi sono valori multipli.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>exists</arg>
+		  <arg><replaceable>varname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Restituisce 1 se
+		  <option><replaceable>varname</replaceable></option>
+		  esiste, 0 se non lo è.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>number</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Restituisce il numero di variabili.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>all</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Restituisce una lista di nomi di variabili e valori.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+
+	  <para>
+	    Vedete <xref linkend="variable_access"/>.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <group choice="req">
+	      <arg>channel</arg>
+	      <arg>save</arg>
+	      <arg>data</arg>
+	      <arg>exists</arg>
+	      <arg>size</arg>
+	      <arg>type</arg>
+	      <arg>filename</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>Il comando upload è usato per la manipolazione del 
+	  caricamento dei file. Vedete le principali direttive di Apache 
+	  per altri tipi di configurazioni del funzionamento di questa 
+	  caratteristica di Rivet. </para>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>channel</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Quando date il nome ad un file caricato,
+		  <option><replaceable>uploadname</replaceable></option>
+		  restituisce un canale Tcl che può essere usato per
+		  accedere allo stesso file.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>save</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		  <arg><replaceable>filename</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Salva 
+		  <option><replaceable>uploadname</replaceable></option> nel
+		  file
+		  <option><replaceable>filename</replaceable></option>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>data</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Restituisce i dati caricati dal server. Questo è il
+		  binario pulito. In altre parole, potrà lavorare
+		  anche con file come immagini, eseguibili, compressi 
+		  e così via.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>size</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Restituisce la dimensione del file caricato.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>type</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Se il <varname>Content-type</varname> è impostato, viene
+		  restituito il valore, altrimenti una stringa vuota.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>filename</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Viene restituito il nome del file dell'host remoto 
+		  che ha caricato il file.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>names</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Restituisce i nomi delle variabili, in una lista, di
+		  tutti i file caricati.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	  <para>
+	    See <xref linkend="upload"/>.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>load_env</command>
+	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Carica l'array delle variabili d'ambiente all'interno dello
+	    specificato nome di array. Utilizza l'array
+	    <option>::request::env</option> come valore predefinito.
+	  </para>
+	  <para>
+	    Le pagine di Rivet sono eseguite nel namespace
+	    <option>::request</option>, quindi non è necessario 
+	    precisare il nome dell'array per più utenti, va bene
+	    accedervi tramite <option>env</option>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>load_headers</command>
+	    <arg><replaceable>array_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Carica gli header che provengono dalla richiesta di un
+	    client all'interno del nome dell'array indicato, o usa
+	    <option>headers</option> se non è stato indicato alcun 
+	    nome.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>load_cookies</command>
+	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Carica l'array delle variabili cookie all'interno del nome
+	    dell'array indicato. Utilizza l'array
+	    <option>cookies</option> come valore predefinito.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>include</command>
+	    <arg><replaceable>filename_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Include un file senza analizzarlo per processare i tag &lt;?
+	    e ?&gt;.  Questo è il metodo migliore per includere un file 
+	    HTML o qualsiasi altro contenuto statico.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>parse</command>
+	    <arg><replaceable>filename</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Come il comando Tcl <command>source</command>, ma analizza
+	    pure i tag di elaborazione per Rivet  &lt;? e ?&gt;.
+	    Utilizzando questo comando, potete utilizzare diversi file 
+	    .rvt.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>headers</command>
+	    <group choice="req">
+	      <arg>set</arg>
+	      <arg>redirect</arg>
+	      <arg>add</arg>
+	      <arg>type</arg>
+	      <arg>numeric</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Il comando <command>headers</command> è per l'assegnazione e
+	    l'elaborazione di header HTTP.
+	  </para>
+	  <para>
+	    <variablelist>
+
+	      <varlistentry>
+		<term><cmdsynopsis>
+		    <arg>set</arg>
+		    <arg><replaceable>headername</replaceable></arg>
+		    <arg><replaceable>value</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    Assegna in modo discrezionale i valori ed i nomi
+		    agli header.
+		  </para>
+		</listitem>
+	      </varlistentry>
+
+	      <varlistentry>
+		<term>
+		  <cmdsynopsis>
+		    <arg>redirect</arg>
+		    <arg><replaceable>uri</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    Redirige dalla pagina corrente ad un nuovo URI.
+		    <emphasis>Questo</emphasis> viene fatto nel primo
+		    blocco di codice Tcl.
+		  </para>
+		</listitem>
+	      </varlistentry>
+
+	      <varlistentry>
+		<term>
+                  <cmdsynopsis>
+		    <arg>add</arg>
+		    <arg><replaceable>headername</replaceable></arg>
+		    <arg><replaceable>value</replaceable></arg>
+		  </cmdsynopsis>
+                </term>
+		<listitem>
+		  <para>Aggiunge testo all'header
+		  <varname>headername</varname>.</para>
+		</listitem>
+	      </varlistentry>
+
+	      <varlistentry>
+		<term><cmdsynopsis>
+		    <arg>type</arg>
+		    <arg><replaceable>content-type</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    Questo comando assegna l'header
+		    <constant>Content-type</constant> ritornato dallo
+		    script, è utile se desiderate inviare, con Rivet, 
+		    altri contenuti oltre all'HTML (PNG o immagini
+		    jpeg, per esempio).
+		  </para>
+		</listitem>
+	      </varlistentry>
+
+	      <varlistentry>
+		<term>
+                  <cmdsynopsis>
+		    <arg>numeric</arg>
+		    <arg><replaceable>response code</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>Assegna un codice di risposta numerico, come per
+		  esempio 200, 404 o 500.
+		  </para>
+		</listitem>
+	      </varlistentry>
+
+
+	    </variablelist>
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>makeurl</command>
+	    <arg><replaceable>filename</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Crea una URL di riferimento a se stesso dal nome di un file.
+	    Per esempio:
+	    <programlisting>makeurl /tclp.gif</programlisting>
+	    restituisce
+	    <constant>http://[hostname]:[port]/tclp.gif</constant>.
+	    Dove hostname e port sono il nome dell'host e la porta del
+	    server in questione.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </section>
+
+  <section id="examples">
+    <title>Esempi ed uso</title>
+
+    <para>
+      Seguono alcuni esempi sull'uso di Rivet.  Si presuppone che 
+      conosciate, anche parzialmente, il linguaggio di programmazione 
+      Tcl. Se non conoscete molto Tcl, non c'è da preoccuparsi: è 
+      semplice e vi sono alcune buone risorse disponibili
+      sul web che vi permetteranno di padroneggiarlo velocemente. 
+      A questo proposito, vedete la sezione 
+      <link linkend="websites">web sites</link>.
+    </para>
+
+    <example id="hello world">
+      <title>Hello World</title>
+      <para>
+	Come qualsiasi altro tool, è piacevole vedere qualcosa al 
+	lavoro, così andremo a creare una piccola pagina 
+	"Hello World".</para>
+      <para>
+	Assumendo che sia stato configurato correttamente Apache, 
+	create un file chiamato <filename>hello.rvt</filename> in una 
+	directory dove Apache lo possa trovare, con il seguente 
+	contenuto:
+      </para>
+      <programlisting>&hello.rvt;</programlisting>
+      <para>
+	Se poi vi accederete con vostro browser, sarà possibile vedere 
+	una pagina nera con il testo "Hello World" (senza apici).
+      </para>
+    </example>
+
+    <example id="table">
+      <title>Generare una tabella</title>
+      <para>
+	In un'altro semplice esempio, genereremo dinamicamente una
+	tabella:
+      </para>
+      <programlisting>&table.rvt;</programlisting>
+      <para>
+	Se leggete il codice, è possibile vedere che è puro Tcl. È
+	possibile mantenere lo stesso codice, eseguirlo fuori da Rivet
+	e generare la stessa pagina HTML!
+      </para>
+      <para>
+	Il risultato sarà qualcosa di simile a questo:
+      </para>
+      <graphic fileref="table.png"/>
+
+    </example>
+
+    <example id="variable_access">
+      <title>Accesso alle variabili</title>
+      <para>
+	In questa sezione mostreremo come accedere alle variabili 
+	utilizzando gli operatori GET o POST.
+      </para>
+      <para>
+	Data una form HTML come la seguente:
+      </para>
+      <programlisting>&vars.html;</programlisting>
+      <para>
+	Potete utilizzare questo script di Rivet per ottenere i valori
+	delle variabili:
+      </para>
+      <programlisting>&vars.rvt;</programlisting>
+      <para>
+	La prima istruzione si assicura che la variabile
+	<varname>boss</varname> sia passata allo script e poi fa
+	qualcosa con quella informazione.
+	Se non è presente, un errore viene aggiunto alla lista degli 
+	errori.
+      </para>
+      <para>
+	Nel secondo blocco del codice, la variabile
+	<varname>salary</varname> è riportata con un'altro errore di
+	controllo, poiché è un numero, è necessario che sia composto
+	da cifre.
+      </para>
+      <para>
+	Alla variabile <varname>boss</varname> non è richiesto di essere
+	inviata, la setteremo a "Mr. Burns" se non è tra le informazioni
+	ricevute.
+      </para>
+      <para>
+	L'ultimo pezzo del codice di gestione delle variabili è un pezzo
+	ingannatore perché <varname>skills</varname> è una listbox e può
+	avere, potenzialmente, valori multipli. Opteremo di riceverla
+	come una lista, in modo da poterla riutilizzare.
+      </para>
+      <para>
+	Lo script si assicura che la variabile 
+	<varname>errlist</varname> sia vuota e restituisce un messaggio 
+	di ringraziamento. Se <varname>errlist</varname> non è vuota,
+	viene stampata la lista degli errori riscontrati.
+      </para>
+    </example>
+
+    <example id="upload">
+      <title>Caricare file</title>
+      <para>
+	Il seguente HTML in un file, detto,
+	<filename>upload.html</filename>
+      </para>
+      <programlisting>&upload.html;</programlisting>
+      <para>
+	Può essere usato con il seguente codice Tcl in un secondo file
+	(<filename>upload.rvt</filename> per esempio) per creare una 
+	form che carica un file.
+      </para>
+      <programlisting>&upload.rvt;</programlisting>
+    </example>
+
+  </section>
+
+  <section id="tcl_packages">
+    <title>Pacchetti Tcl per Rivet</title>
+    <para>
+	In aggiunta al nucleo del modulo Apache, Rivet fornisce un
+	numero di pacchetti Tcl che includono codice potenzialmente
+	utile.
+    </para>
+    <itemizedlist>
+
+      <listitem>
+	<para>commserver è un package providing a .</para>
+      </listitem>
+
+      <listitem>
+	<para>dio è un database abstraction layer.</para>
+      </listitem>
+
+      <listitem>
+	<para>dtcl è un pacchetto di compatibilità per applicazioni
+	   mod_dtcl.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>form - per creare form.</para>
+      </listitem>
+
+      <listitem>
+	<para>rivet - alcune aggiunte, routine utili.</para>
+      </listitem>
+
+      <listitem>
+	<para>tclrivet</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section id="help">
+    <title>Risorse - Come ottenere aiuto</title>
+
+    <section>
+      <title>Mailing Lists</title>
+      <para>
+	Se non avete trovato la soluzione al problema nella
+	documentazione, la mailing list di Rivet è il primo posto da
+	visitare per ottenere aiuto; spedite un'email a
+	<email>rivet-user@tcl.apache.org</email>.  Se avete una domanda,
+	un'idea, o un commento circa il codice di Rivet, per cortesia 
+	mandate un'email a <email>rivet-dev@tcl.apache.org</email>. Per
+	iscriversi ad entrambe le liste, mandate un'email a
+	<email>rivet-<replaceable>list</replaceable>-subscribe@tcl.apache.org</email>.
+      </para>
+      <para>
+	Gli archivi delle mailing list sono disponibili a questo 
+	indirizzo: 
+	<ulink url="http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118"/>
+      </para>
+    </section>
+
+    <section>
+      <title>Newsgroup</title>
+      <para>
+	Il newsgroup <ulink url="news:comp.lang.tcl"/> è un buon posto
+	per porre domande circa Tcl in generale. Gli sviluppatori di
+	Rivet seguono anche il newsgroup, ma è meglio porre domande
+	specifiche su Rivet presso la sua mailing list.
+      </para>
+    </section>
+
+    <section id="websites">
+      <title>Siti Web</title>
+
+      <para>
+	Ci sono diversi siti web che estensivamente trattano di Apache e
+	Tcl.
+      </para>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <ulink url="http://tcl.apache.org"/> è la casa del progetto
+	    Apache Tcl. Andateci per ottenere l'ultima versione del 
+	    nostro software (se non state leggendo queste pagine fuori 
+	    dal sito!).
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://httpd.apache.org/docs/"/> è il primo
+	    posto da visitare per domande inerenti il web server Apache.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://www.tcl.tk"/> è il sito canonico per
+	    informazioni su Tcl.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://wiki.tcl.tk"/> è il Tcl'er Wiki, un
+	    posto dove poter ricercare domande e risposte di aiuto.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Bug Tracking System</title>
+
+      <para>
+	Apache Rivet usa il sistema Apache Bug Tracking presso <ulink
+	  url="http://nagoya.apache.org/bugzilla/"></ulink>.  Qui
+	è possibile segnalare problemi o verificare se sono già 
+	conosciuti e quindi rintracciare pubblicazioni che lo 
+	descrivono.
+      </para>
+    </section>
+
+  </section>
+
+  <section id="internals">
+    <title>Rivet Internals</title>
+    <para>
+      Questa sezione facilmente pare sorpassata, come nuovo codice 
+      viene aggiunto, vecchio codice viene rimosso e di conseguenza
+      vengono apportati i relativi cambiamenti. Il miglior posto 
+      dove poter verificare se sono state inserite nuove funzionalità
+      è il suo codice sorgente. Se siete interessati ai cambiamenti 
+      osservate il FIXME.
+    </para>
+    <section>
+      <title>Inizializzazione</title>
+      <para>
+	Quando Apache è attivo, (o quando i processi figli di Apache
+	sono attivi se un processo Tcl è in uso),
+	<function>Rivet_InitTclStuff</function> viene chiamata, 
+	creando un nuovo interprete, o un interprete per host virtuale,
+	dipendentemente dalla configurazione. Inoltre inizializza varie
+	cose, come il canale di sistema 
+	<structname>RivetChan</structname>, crea i comandi Tcl specifici 
+	di Rivet ed esegue <filename>init.tcl</filename>. 
+	Il sistema di caching è anch'esso impostato e se c'è un 
+	<command>GlobalInitScript</command>, viene eseguito.
+      </para>
+    </section>
+    <section>
+      <title>RivetChan</title>
+      <para>
+	Il sistema <structname>RivetChan</structname> fu creato al fine
+	di avere un canale Tcl reale che potesse redirigere lo standard
+	output. Questo permette di usare, per esempio, il comando
+	normale <command>puts</command> nelle pagine .rvt. Lavora
+	creando un canale che bufferizza l'output e, a tempi
+	predeterminati, lo passa al sistema IO di Apache. Il normale
+	standard output di Tcl è rimpiazzato con un'istanza di questo
+	tipo di canale, in modo che, predefinitamente, l'output venga
+	inviato alla pagina web.
+      </para>
+    </section>
+
+    <section>
+      <title>Parsing delle pagine, Esecuzione e Cacheing</title>
+      <para>
+	Quando una pagina Rivet viene richiesta, è trasformata in un
+	normale script Tcl tramite l'analisi nel file delle etichette di
+	elaborazione delle istruzioni &lt;? ?&gt;. Ogni cosa fuori da
+	queste etichette diviene un'istruzione estesa
+	<command>puts</command> ed ogni cosa dentro rimane codice Tcl.
+      </para>
+      <para>
+	Ogni file .rvt è valutato nel proprio
+	<constant>::request</constant> namespace, in modo che non sia
+	necessario creare e distruggere gli interpreti dopo ogni
+	pagina. Tuttavia, operando nel proprio namespace, ogni pagina
+	non verrà eseguita sporcando le variabili locali create da altri
+	scripts, perché verranno cancellate automaticamente quando il
+	namespace termina, dopo che Apache ha finito di gestire le
+	richieste.
+      <note>Un problema corrente con questo sistema è che, mentre le
+      variabili usano la garbage collection, e quindi vengono distrutte
+      automaticamente quando non sono più usate, i gestori dei file non
+      lo sono: è molto importante quindi che gli autori di script Rivet
+      si assicurino di chiudere tutti i file che hanno aperto.
+      </note>
+      </para>
+      <para>
+	Dopo che uno script è stato caricato ed analizzato dentro
+	una form di "puro Tcl", viene pure immagazzinato, affinché possa
+	essere utilizzato in futuro senza ricaricarlo (e rianalizzarlo)
+	da disco. Il numero degli script immagazzinati in memoria è
+	configurabile. Questa caratteristica può significativamente
+	migliorare l'esecuzione.
+      </para>
+    </section>
+  </section>
+
+  <section id="upgrading">
+    <title>Aggiornamenti da mod_dtcl o NeoWebScript</title>
+    <para>
+      Rivet ha rotto con il passato, in quanto noi, gli autori, ci
+      siamo dedicati ad acquisire ciò che preferivamo dalle nostre
+      passate fatiche e tolto o cambiato ciò che non abbiamo più
+      curato. La compatibilità all'indietro non fu un obiettivo
+      primario quando creammo Rivet, ma abbiamo fornito questa
+      informazione che potrebbere essere utilizzata da chi desideri
+      effettuare l'aggiornamento da installazioni mod_dtcl o NWS.
+    </para>
+    <section>
+      <title>mod_dtcl</title>
+      <para>
+	Rivet era originalmente basato su codice dtcl, ma ne è stata
+	cambiata (migliorata !) una parte. I concetti rimangono gli 
+	stessi, ma alcuni dei comandi sono cambiati.
+      </para>
+    </section>
+    <section>
+      <title>NeoWebScript</title>
+      <para>TODO</para>
+    </section>
+  </section>
+</article>
