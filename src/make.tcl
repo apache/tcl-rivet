@@ -187,6 +187,9 @@ AddNode clean {
 
 # FIXME - we need to do this at install time, because the file join
 # here makes the package index use "/".
+# 9/2004 KL - I think this is fixed by the install process now generating
+# it in the install directory, but it doesn't really support making a
+# distribution exactly, so I haven't removed this.
 AddNode $PKGINDEX {
     tcl {
 	set curdir [pwd]
@@ -214,6 +217,23 @@ AddNode install {
     tcl file mkdir [file join $PREFIX rivet packages rivet]
     tcl fileutil::install -m o+r $RIVETLIB_SHLIB [file join $PREFIX rivet packages rivet]
     tcl fileutil::install -m o+r $PARSER_SHLIB [file join $PREFIX rivet packages rivet]
+    tcl pkg_mkIndex [file join $PREFIX rivet packages rivet] *
+
+    # generate the overarching pkgIndex.tcl, including any shared libs we
+    # find, finding whatever shared library extensions we were told to
+    # expect (like *.so, typically, but also *.dylib on mac os x)
+    tcl {
+	set curdir [pwd]
+	cd [file join $PREFIX rivet]
+	eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join packages * *[info sharedlibextension]]]
+	cd $curdir
+	puts ""
+	puts "don't worry about any ``can't read \$dir'' errors, they're no problem"
+	puts ""
+	puts "*** Rivet installation complete ***"
+	puts ""
+    }
+
 }
 
 #foreach doc $HTML_DOCS {
