@@ -227,7 +227,7 @@ AddNode install {
 AddNode [file join .. VERSION] {
     tcl cd ..
     sh ./cvsversion.tcl
-    tcl cd src/
+    tcl cd src
 }
 
 # Clean up everything for distribution.
