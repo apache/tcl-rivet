@@ -129,7 +129,7 @@ INLINE int
 TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 {
     Tcl_SetStringObj(result, ap_construct_url(TCLWEBPOOL,
-					       filename, req->req), -1);
+					      filename, req->req), -1);
     return TCL_OK;
 }
 
@@ -141,14 +141,14 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
     table_entry *parms = (table_entry *)parmsarray->elts;
     int flag = 0;
 
-	/* determine which part of table to traverse */
-	if (source == VAR_SRC_QUERYSTRING) {
-		i = 0; j = req->apachereq->nargs;
-	} else if (source == VAR_SRC_POST) {
-		i = req->apachereq->nargs; j = parmsarray->nelts;
-	} else {
-		i = 0; j = parmsarray->nelts;
-	}
+    /* determine which part of table to traverse */
+    if (source == VAR_SRC_QUERYSTRING) {
+	i = 0; j = req->apachereq->nargs;
+    } else if (source == VAR_SRC_POST) {
+	i = req->apachereq->nargs; j = parmsarray->nelts;
+    } else {
+	i = 0; j = parmsarray->nelts;
+    }
 
     /* This isn't real efficient - move to hash table later
        on... */
@@ -192,14 +192,14 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *r
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-	/* determine which part of table to traverse */
-	if (source == VAR_SRC_QUERYSTRING) {
-		i = 0; j = req->apachereq->nargs;
-	} else if (source == VAR_SRC_POST) {
-		i = req->apachereq->nargs; j = parmsarray->nelts;
-	} else {
-		i = 0; j = parmsarray->nelts;
-	}
+    /* determine which part of table to traverse */
+    if (source == VAR_SRC_QUERYSTRING) {
+	i = 0; j = req->apachereq->nargs;
+    } else if (source == VAR_SRC_POST) {
+	i = req->apachereq->nargs; j = parmsarray->nelts;
+    } else {
+	i = 0; j = parmsarray->nelts;
+    }
 
     /* This isn't real efficient - move to hash table later on. */
     for (; i < j; ++i)
@@ -228,14 +228,14 @@ TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-	/* determine which part of table to traverse */
-	if (source == VAR_SRC_QUERYSTRING) {
-		i = 0; j = req->apachereq->nargs;
-	} else if (source == VAR_SRC_POST) {
-		i = req->apachereq->nargs; j = parmsarray->nelts;
-	} else {
-		i = 0; j = parmsarray->nelts;
-	}
+    /* determine which part of table to traverse */
+    if (source == VAR_SRC_QUERYSTRING) {
+	i = 0; j = req->apachereq->nargs;
+    } else if (source == VAR_SRC_POST) {
+	i = req->apachereq->nargs; j = parmsarray->nelts;
+    } else {
+	i = 0; j = parmsarray->nelts;
+    }
 
     for (; i < j; ++i)
     {
@@ -259,14 +259,14 @@ TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-	/* determine which part of table to traverse */
-	if (source == VAR_SRC_QUERYSTRING) {
-		i = 0; j = req->apachereq->nargs;
-	} else if (source == VAR_SRC_POST) {
-		i = req->apachereq->nargs; j = parmsarray->nelts;
-	} else {
-		i = 0; j = parmsarray->nelts;
-	}
+    /* determine which part of table to traverse */
+    if (source == VAR_SRC_QUERYSTRING) {
+	i = 0; j = req->apachereq->nargs;
+    } else if (source == VAR_SRC_POST) {
+	i = req->apachereq->nargs; j = parmsarray->nelts;
+    } else {
+	i = 0; j = parmsarray->nelts;
+    }
 
     for (; i < j; ++i)
     {
@@ -289,14 +289,14 @@ TclWeb_VarExists(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-	/* determine which part of table to traverse */
-	if (source == VAR_SRC_QUERYSTRING) {
-		i = 0; j = req->apachereq->nargs;
-	} else if (source == VAR_SRC_POST) {
-		i = req->apachereq->nargs; j = parmsarray->nelts;
-	} else {
-		i = 0; j = parmsarray->nelts;
-	}
+    /* determine which part of table to traverse */
+    if (source == VAR_SRC_QUERYSTRING) {
+	i = 0; j = req->apachereq->nargs;
+    } else if (source == VAR_SRC_POST) {
+	i = req->apachereq->nargs; j = parmsarray->nelts;
+    } else {
+	i = 0; j = parmsarray->nelts;
+    }
 
     /* This isn't real efficient - move to hash table later on. */
     for (; i < j; ++i)
@@ -318,13 +318,13 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
 {
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
 
-	if (source == VAR_SRC_QUERYSTRING) {
-		Tcl_SetIntObj(result, req->apachereq->nargs);
-	} else if (source == VAR_SRC_POST) {
-		Tcl_SetIntObj(result, parmsarray->nelts - req->apachereq->nargs);
-	} else {
-		Tcl_SetIntObj(result, parmsarray->nelts);
-	}
+    if (source == VAR_SRC_QUERYSTRING) {
+	Tcl_SetIntObj(result, req->apachereq->nargs);
+    } else if (source == VAR_SRC_POST) {
+	Tcl_SetIntObj(result, parmsarray->nelts - req->apachereq->nargs);
+    } else {
+	Tcl_SetIntObj(result, parmsarray->nelts);
+    }
 
     return TCL_OK;
 }
@@ -356,11 +356,11 @@ TclWeb_InitEnvVars( TclWebRequest *req )
     /* These were the "include vars"  */
 
     ap_table_set( table, "DATE_LOCAL",
-	ap_ht_time( TCLWEBPOOL, date, timefmt, 0 ) );
+		  ap_ht_time( TCLWEBPOOL, date, timefmt, 0 ) );
     ap_table_set( table, "DATE_GMT",
-	ap_ht_time( TCLWEBPOOL, date, timefmt, 1 ) );
+		  ap_ht_time( TCLWEBPOOL, date, timefmt, 1 ) );
     ap_table_set( table, "LAST_MODIFIED",
-	ap_ht_time( TCLWEBPOOL, req->req->finfo.st_mtime, timefmt, 1 ) );
+		  ap_ht_time( TCLWEBPOOL, req->req->finfo.st_mtime, timefmt, 1 ) );
     ap_table_set( table, "DOCUMENT_URI", req->req->uri );
     ap_table_set( table, "DOCUMENT_PATH_INFO", req->req->path_info );
 
@@ -374,26 +374,26 @@ TclWeb_InitEnvVars( TclWebRequest *req )
 	char *arg_copy = ap_pstrdup(TCLWEBPOOL, req->req->args);
 	ap_unescape_url(arg_copy);
 	ap_table_set( table, "QUERY_STRING_UNESCAPED",
-	    ap_escape_shell_cmd( TCLWEBPOOL, arg_copy ) );
+		      ap_escape_shell_cmd( TCLWEBPOOL, arg_copy ) );
     }
 
 #ifndef WIN32
     pw = getpwuid(req->req->finfo.st_uid);
     if( pw ) {
 	ap_table_set( table, "USER_NAME",
-	    ap_pstrdup( TCLWEBPOOL, pw->pw_name ) );
+		      ap_pstrdup( TCLWEBPOOL, pw->pw_name ) );
     } else {
 	ap_table_set( table, "USER_NAME",
-	    ap_psprintf( TCLWEBPOOL, "user#%lu",
-	    (unsigned long)req->req->finfo.st_uid ) );
+		      ap_psprintf( TCLWEBPOOL, "user#%lu",
+				   (unsigned long)req->req->finfo.st_uid ) );
     }
 #endif
 
     /* Here we create some variables with Rivet internal information. */
     ap_table_set( table, "RIVET_CACHE_FREE",
-	ap_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_free) ) );
+		  ap_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_free) ) );
     ap_table_set( table, "RIVET_CACHE_SIZE",
-	ap_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_size) ) );
+		  ap_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_size) ) );
 
     req->environment_set = 1;
 }
@@ -533,7 +533,7 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
     Tcl_Channel chan;
     Tcl_Channel savechan;
 
-   savechan = Tcl_OpenFileChannel(req->interp, Tcl_GetString(filename),
+    savechan = Tcl_OpenFileChannel(req->interp, Tcl_GetString(filename),
 				   "w", 0600);
     if (savechan == NULL) {
 	return TCL_ERROR;
@@ -595,40 +595,40 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
 
 int TclWeb_UploadSize(Tcl_Obj *sz, TclWebRequest *req)
 {
-   Tcl_SetIntObj(sz, ApacheUpload_size(req->upload));
-   return TCL_OK;
+    Tcl_SetIntObj(sz, ApacheUpload_size(req->upload));
+    return TCL_OK;
 }
 
 int TclWeb_UploadType(Tcl_Obj *type, TclWebRequest *req)
 {
-   /* If there is a type, return it, if not, return blank. */
-   Tcl_SetStringObj(type, ApacheUpload_type(req->upload)
-		    ? (char *)ApacheUpload_type(req->upload) : (char *)"", -1);
-   return TCL_OK;
+    /* If there is a type, return it, if not, return blank. */
+    Tcl_SetStringObj(type, ApacheUpload_type(req->upload)
+		     ? (char *)ApacheUpload_type(req->upload) : (char *)"", -1);
+    return TCL_OK;
 }
 
 int TclWeb_UploadFilename(Tcl_Obj *filename, TclWebRequest *req)
 {
-   Tcl_SetStringObj(filename,
-		    TclWeb_StringToUtf(req->upload->filename,
-				       req), -1);
-   return TCL_OK;
+    Tcl_SetStringObj(filename,
+		     TclWeb_StringToUtf(req->upload->filename,
+					req), -1);
+    return TCL_OK;
 }
 
 int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req)
 {
-   ApacheUpload *upload;
+    ApacheUpload *upload;
 
-   upload = ApacheRequest_upload(req->apachereq);
-   while (upload)
-   {
-       Tcl_ListObjAppendElement(
-	   req->interp, names,
-	   TclWeb_StringToUtfToObj(upload->name,req));
-       upload = upload->next;
-   }
+    upload = ApacheRequest_upload(req->apachereq);
+    while (upload)
+    {
+	Tcl_ListObjAppendElement(
+	    req->interp, names,
+	    TclWeb_StringToUtfToObj(upload->name,req));
+	upload = upload->next;
+    }
 
-   return TCL_OK;
+    return TCL_OK;
 }
 
 char *

@@ -1,5 +1,7 @@
 2002-12-14  David N. Welton  <davidw@dedasys.com>
 
+	* src/TclWebapache.c: Redid indendation.
+
 	* src/rivetCore.c: Implemented Tcl commands (via objv[0]) to
 	retrieve variables from different, specified sources (query
 	string, POST). (David Brancato).
