@@ -1477,7 +1477,7 @@ EOF
 	  esac
 	elif test "X$arg" = "X-lc_r"; then
 	 case $host in
-	 *-*-openbsd* | *-*-freebsd4*)
+	 *-*-openbsd* | *-*-freebsd*)
 	   # Do not include libc_r directly, use -pthread flag.
 	   continue
 	   ;;
@@ -1494,12 +1494,6 @@ EOF
 
       -module)
 	module=yes
-	case $host in
-	*-*-freebsd*)
-	  # Do not build the useless static library
-	  build_old_libs=no
-	  ;;
-	esac
 	continue
 	;;
 
@@ -1983,7 +1977,6 @@ EOF
 	    finalize_deplibs="$deplib $finalize_deplibs"
 	  else
 	    deplibs="$deplib $deplibs"
-	    test "$linkmode" = lib && newdependency_libs="$deplib $newdependency_libs"
 	  fi
 	  continue
 	  ;;
@@ -4449,9 +4442,6 @@ static const void *lt_preloaded_setup() {
 	  compile_command=`$echo "X$compile_command" | $Xsed -e "s%@SYMFILE@%$output_objdir/${outputname}S.${objext}%"`
 	  finalize_command=`$echo "X$finalize_command" | $Xsed -e "s%@SYMFILE@%$output_objdir/${outputname}S.${objext}%"`
 	  ;;
-	*-*-freebsd*)
-	  # FreeBSD doesn't need this...
-	  ;;
 	*)
 	  $echo "$modename: unknown suffix for \`$dlsyms'" 1>&2
 	  exit $EXIT_FAILURE
@@ -5537,17 +5527,10 @@ relink_command=\"$relink_command\""
 	fi
 
 	# Install the pseudo-library for information purposes.
-	case $host in
-	*-*-freebsd*)
-	  # Do not install the useless pseudo-library
-	  ;;
-	*)
-	  name=`$echo "X$file" | $Xsed -e 's%^.*/%%'`
-	  instname="$dir/$name"i
-	  $show "$install_prog $instname $destdir/$name"
-	  $run eval "$install_prog $instname $destdir/$name" || exit $?
-	  ;;
-	esac
+	name=`$echo "X$file" | $Xsed -e 's%^.*/%%'`
+	instname="$dir/$name"i
+	$show "$install_prog $instname $destdir/$name"
+	$run eval "$install_prog $instname $destdir/$name" || exit $?
 
 	# Maybe install the static library, too.
 	test -n "$old_library" && staticlibs="$staticlibs $dir/$old_library"

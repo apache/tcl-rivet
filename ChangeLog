@@ -1,3 +1,8 @@
+2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * Get automake, aclocal, and autoconf to run without complaint,
+	  generating the configure script, Makefile.in files, etc.
+
 2004-12-01  Karl Lehenbauer  <karl-rivet@sc.com>
 
         * Update autoconf build to TEA 3.1

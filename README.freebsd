@@ -30,4 +30,27 @@ Run configure in this directory with the following parameters:
 
 
 
+RUNNING AUTOMAKE, AUTOCONF, ETC
 
+
+you gotta use aclocal 1.9
+
+autoconf 2.59
+
+and automake 1.9
+
+you need to build and install /usr/ports/devel/gnu-autoconf
+
+PATH=/usr/local/gnu-autoconf/bin:$PATH
+
+You shouldn't have to include /usr/local/share/aclocal in your path, but
+otherwise aclocal19 can't find the LIBTOOL stuff, which is fatal.
+
+aclocal19 -I . -I tclconfig -I /usr/local/share/aclocal19 -I /usr/local/share/aclocal
+
+or try
+
+aclocal19 -I /usr/local/gnu-autotools/share/aclocal
+
+
+automake19 --foreign
