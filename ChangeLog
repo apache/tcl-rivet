@@ -1,3 +1,10 @@
+2003-06-14  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added CVS Id tag.
+
+	* doc/rivet.ru.xml: Added comment to indicate the version of
+	rivet.xml that the Russian translation is based on.
+
 2003-06-12  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_ParseExecFile): Rework checks for

@@ -10,6 +10,14 @@
       <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
 ]>
 
+<!--
+
+This translation is based on rivet.xml version FIXME.
+
+Please update this when you update the translation!
+
+-->
+
 <article>
   <articleinfo>
     <title>Apache Rivet</title>
