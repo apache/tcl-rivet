@@ -6,6 +6,12 @@
   from either rivet-chunk.xsl or rivet-nochunk.xsl.  -->
 
   <xsl:param name="use.id.as.filename" select="1"/>
+  <xsl:param name="header.rule" select="0"/>
+
+  <xsl:param name="navig.graphics" select="1"/>
+  <xsl:param name="navig.graphics.extension" select="'.png'"/>
+  <xsl:param name="admon.graphics" select="1"/>
+
   <xsl:variable name="arg.choice.opt.open.str">?</xsl:variable>
   <xsl:variable name="arg.choice.opt.close.str">?</xsl:variable>
   <xsl:variable name="group.choice.opt.open.str">(</xsl:variable>
@@ -310,4 +316,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   </xsl:stylesheet>

@@ -2,3 +2,13 @@ body {
     font-family: Arial, sans-serif;
     font-style: normal;
 }
+
+div.navheader  {
+    background-color: #405871;
+    color: #ffffff;
+    font-size: 150%;
+}
+
+div.navfooter {
+    font-weight: bold;
+}

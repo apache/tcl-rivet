@@ -59,9 +59,12 @@ set MOD_STLIB mod_rivet.a
 set MOD_SHLIB mod_rivet[info sharedlibextension]
 set MOD_OBJECTS "apache_multipart_buffer.o apache_request.o rivetChannel.o rivetParser.o rivetCore.o mod_rivet.o TclWebapache.o"
 
-set LIB_STLIB librivet.a
-set LIB_SHLIB librivet[info sharedlibextension]
-set LIB_OBJECTS "rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o"
+set RIVETLIB_STLIB librivet.a
+set RIVETLIB_SHLIB librivet[info sharedlibextension]
+set RIVETLIB_OBJECTS "rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o"
+
+set PARSER_SHLIB librivetparser[info sharedlibextension]
+set PARSER_OBJECTS "rivetParser.o parserPkgInit.o"
 
 set TCL_LIBS "$TCL_LIBS -lcrypt"
 
@@ -141,14 +144,24 @@ AddNode TclWebapache.o {
     sh {$COMPILE TclWebapache.c}
 }
 
-AddNode librivet.a {
-    depends $LIB_OBJECTS
-    sh {$TCL_STLIB_LD $LIB_STLIB $LIB_OBJECTS}
+AddNode parserPkgInit.o {
+    depends parserPkgInit.c rivetParser.h
+    sh {$COMPILE parserPkgInit.c}
 }
 
-AddNode librivet.so {
-    depends $LIB_OBJECTS
-    sh {$TCL_SHLIB_LD -o $LIB_SHLIB $LIB_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
+AddNode $PARSER_SHLIB {
+    depends $PARSER_OBJECTS
+    sh {$TCL_SHLIB_LD -o $PARSER_SHLIB $PARSER_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
+}
+
+AddNode $RIVETLIB_STLIB {
+    depends $RIVETLIB_OBJECTS
+    sh {$TCL_STLIB_LD $RIVETLIB_STLIB $RIVETLIB_OBJECTS}
+}
+
+AddNode $RIVETLIB_SHLIB {
+    depends $RIVETLIB_OBJECTS
+    sh {$TCL_SHLIB_LD -o $RIVETLIB_SHLIB $RIVETLIB_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
 
 AddNode mod_rivet.a {
@@ -172,13 +185,13 @@ AddNode module {
 # Make a shared build.
 
 AddNode shared {
-    depends $MOD_SHLIB $LIB_SHLIB
+    depends $MOD_SHLIB $RIVETLIB_SHLIB
 }
 
 # Make a static build - incomplete at the moment.
 
 AddNode static {
-    depends $MOD_STLIB $LIB_STLIB
+    depends $MOD_STLIB $RIVETLIB_STLIB
 }
 
 # Clean up source directory.
@@ -211,12 +224,13 @@ AddNode $PKGINDEX {
 # Install everything.
 
 AddNode install {
-    depends $MOD_SHLIB $LIB_SHLIB
+    depends $MOD_SHLIB $RIVETLIB_SHLIB
     tcl file delete -force [file join $LIBEXECDIR rivet]
     tcl file delete -force [file join $PREFIX rivet]
     tcl file copy -force $MOD_SHLIB $LIBEXECDIR
     tcl file copy -force [file join .. rivet] $PREFIX
-    tcl file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]
+    tcl file copy -force $RIVETLIB_SHLIB [file join $PREFIX rivet packages rivet]
+    tcl file copy -force $PARSER_SHLIB [file join $PREFIX rivet packages rivet]
 }
 
 # Install everything when creating a deb.  We need to find a better
@@ -225,11 +239,12 @@ AddNode install {
 
 set DEBPREFIX [file join [pwd] .. debian tmp]
 AddNode debinstall {
-    depends $MOD_SHLIB $LIB_SHLIB
+    depends $MOD_SHLIB $RIVETLIB_SHLIB
     tcl {file delete -force [file join $DEBPREFIX/$LIBEXECDIR rivet]}
     tcl {file copy -force $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
     tcl {file copy -force [file join .. rivet] "$DEBPREFIX/$PREFIX"}
-    tcl {file copy -force $LIB_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
+    tcl {file copy -force $RIVETLIB_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
+    tcl {file copy -force $PARSER_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
 }
 
 foreach doc $HTML_DOCS {

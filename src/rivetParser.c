@@ -8,8 +8,8 @@
 
 /* $Id$ */
 
+#include <string.h>
 #include <tcl.h>
-#include "mod_rivet.h"
 #include "rivetParser.h"
 
 static int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
@@ -26,7 +26,7 @@ static int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
  */
 
 int
-Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, TclWebRequest *req)
+Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
 {
     int result = 0;
 
@@ -34,24 +34,24 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, TclWebRequest *req)
      * and modified.
      */
 
-    Tcl_Channel chan = Tcl_OpenFileChannel(req->interp, filename, "r", 0644);
+    Tcl_Channel chan = Tcl_OpenFileChannel(interp, filename, "r", 0644);
     if (chan == (Tcl_Channel) NULL)
     {
-	Tcl_ResetResult(req->interp);
-	Tcl_AppendResult(req->interp, "couldn't read file \"", filename,
-			 "\": ", Tcl_PosixError(req->interp), (char *) NULL);
+	Tcl_ResetResult(interp);
+	Tcl_AppendResult(interp, "couldn't read file \"", filename,
+			 "\": ", Tcl_PosixError(interp), (char *) NULL);
 	return TCL_ERROR;
     }
     result = Tcl_ReadChars(chan, outbuf, -1, 1);
     if (result < 0)
     {
-	Tcl_Close(req->interp, chan);
-	Tcl_AppendResult(req->interp, "couldn't read file \"", filename,
-			 "\": ", Tcl_PosixError(req->interp), (char *) NULL);
+	Tcl_Close(interp, chan);
+	Tcl_AppendResult(interp, "couldn't read file \"", filename,
+			 "\": ", Tcl_PosixError(interp), (char *) NULL);
 	return TCL_ERROR;
     }
 
-    if (Tcl_Close(req->interp, chan) != TCL_OK)
+    if (Tcl_Close(interp, chan) != TCL_OK)
 	return TCL_ERROR;
 
     return TCL_OK;
@@ -73,16 +73,17 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, TclWebRequest *req)
 
 int
 Rivet_GetRivetFile(char *filename, int toplevel,
-		   Tcl_Obj *outbuf, TclWebRequest *req)
+		   Tcl_Obj *outbuf, Tcl_Interp *interp)
 {
     int inside = 0;	/* are we inside the starting/ending delimiters  */
     int sz = 0;
     Tcl_Obj *inbuf;
     Tcl_Channel rivetfile;
 
-    rivetfile = Tcl_OpenFileChannel(req->interp, filename, "r", 0664);
+    rivetfile = Tcl_OpenFileChannel(interp, filename, "r", 0664);
     if (rivetfile == NULL) {
-	Tcl_AddErrorInfo(req->interp, Tcl_PosixError(req->interp));
+	/* Don't need to adderrorinfo - Tcl_OpenFileChannel takes care
+	   of that for us. */
         return TCL_ERROR;
     }
 
@@ -96,10 +97,10 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     inbuf = Tcl_NewObj();
     sz = Tcl_ReadChars(rivetfile, inbuf, -1, 0);
 
-    Tcl_Close(req->interp, rivetfile);
+    Tcl_Close(interp, rivetfile);
     if (sz == -1)
     {
-	Tcl_AddErrorInfo(req->interp, Tcl_PosixError(req->interp));
+	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
 	return TCL_ERROR;
     }
 

@@ -1,10 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.60.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="help.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.60.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="help.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><p style="width:90%">
       This section easily falls out of date, as new code is added, old
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
       themselves FIXME.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396479"></a>Initialization</h3></div></div><div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396612"></a>Initialization</h3></div></div><div></div></div><p style="width:90%">
 	When Apache is started, (or when child Apache processes are
 	started if a threaded Tcl is used),
 	<tt class="function">Rivet_InitTclStuff</tt> is called, which
@@ -15,7 +15,7 @@
 	executes Rivet's <tt class="filename">init.tcl</tt>.  The caching
 	system is also set up, and if there is a
 	<span style="font-family:monospace"><b class="command">GlobalInitScript</b></span>, it is run.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396515"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396649"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
 	The <span class="structname">RivetChan</span> system was created in
 	order to have an actual Tcl channel that we could redirect
 	standard output to.  This lets us use, for instance, the
@@ -25,7 +25,7 @@
 	Tcl's regular standard output is replaced with an instance of
 	this channel type, so that, by default, output will go to the
 	web page.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396544"></a>Page Parsing, Execution and Cacheing</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396678"></a>Page Parsing, Execution and Cacheing</h3></div></div><div></div></div><p style="width:90%">
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
 	processing instruction tags.  Everything outside these tags
@@ -39,15 +39,15 @@
 	not run afoul of local variables created by other scripts,
 	because they will be deleted automatically when the namespace
 	goes away after Apache finishes handling the request.
-      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3>
+      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td colspan="2" align="left" valign="top">
 	One current problem with this system is that while variables
 	are garbage collected, file handles are not, so that it is
 	very important that Rivet script authors make sure to close
 	all the files they open.
-      </div><p style="width:90%">
+      </td></tr></table></div><p style="width:90%">
 	After a script has been loaded and parsed into it's &quot;pure Tcl&quot;
 	form, it is also cached, so that it may be used in the future
 	without having to reload it (and re-parse it) from the disk.
 	The number of scripts stored in memory is configurable.  This
 	feature can significantly improve performance.
-      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="help.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="upgrading.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Resources - How to Get Help </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Upgrading from mod_dtcl or NeoWebScript</td></tr></table></div></body></html>
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="help.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="upgrading.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Resources - How to Get Help </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Upgrading from mod_dtcl or NeoWebScript</td></tr></table></div></body></html>

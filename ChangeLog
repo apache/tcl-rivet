@@ -1,3 +1,31 @@
+2003-05-22  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetParser.c (Rivet_GetRivetFile): API Change: instead of
+	taking a TclWebRequest argument, we just give this function a
+	Tcl_Interp, which makes it easier to seperate this code from
+	Rivet.
+
+	* src/mod_rivet.h: STARTING_SEQUENCE and ENDING_SEQUENCE moved to
+	rivetParser.h, in order to make that file independant of
+	mod_rivet.h.
+
+	* src/make.tcl: Use slightly more descriptive variable names.  Add
+	code to compile librivetparser.so.
+
+	* src/parserPkgInit.c: New file.  Provides a Tcl extension to the
+	Tcl parser, so that regular (not running under Apache) scripts can
+	access it.
+
+	* doc/html/rivet.css: Updated a few stylesheet properties to make
+	the docs look a bit classier.
+
+2003-05-21  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xsl: Switch on parameter to use images in HTML output
+	from docbook.
+
+	* doc/rivet.xml: Added c.l.t. newsgroup to resources section.
+
 2003-05-20  David N. Welton  <davidw@dedasys.com>
 
 	* doc/html/rivet.css: Added CSS file.

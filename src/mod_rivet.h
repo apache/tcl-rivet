@@ -40,8 +40,8 @@
 #   define CONST84
 #endif
 
-#define STARTING_SEQUENCE "<?"
-#define ENDING_SEQUENCE "?>"
+/* Note that STARTING_SEQUENCE and ENDING_SEQUENCE (<? and ?>,
+   respectively) are now defined in rivetParser.h. */
 
 #define VAR_SRC_QUERYSTRING 1
 #define VAR_SRC_POST 2

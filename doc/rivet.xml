@@ -15,6 +15,7 @@
     <title>Apache Rivet</title>
     <copyright>
       <year>2002</year>
+      <year>2003</year>
       <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
@@ -36,7 +37,6 @@
       </affiliation>
     </author>
   </articleinfo>
-
 
   <section>
     <title>Introduction to Apache Rivet</title>
@@ -1038,6 +1038,41 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 
   </section>
 
+  <section id="tcl_packages">
+    <title>Rivet Tcl Packages</title>
+    <para>
+In addition to the core Apache module, Rivet provides a number of Tcl
+packages that include potentially useful code.
+    </para>
+    <itemizedlist>
+
+      <listitem>
+	<para>commserver is a package providing a .</para>
+      </listitem>
+
+      <listitem>
+	<para>dio is a database abstraction layer.</para>
+      </listitem>
+
+      <listitem>
+	<para>dtcl is a compatibility package for mod_dtcl
+	applications.</para>
+      </listitem>
+
+      <listitem>
+	<para>form - for creating forms.</para>
+      </listitem>
+
+      <listitem>
+	<para>rivet - some additional, useful routines.</para>
+      </listitem>
+
+      <listitem>
+	<para>tclrivet</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
   <section id="help">
     <title>Resources - How to Get Help</title>
 
@@ -1056,6 +1091,16 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
       <para>
 	The mailing list archives are available at <ulink
 	  url="http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118"/>
+      </para>
+    </section>
+
+    <section>
+      <title>Newsgroup</title>
+      <para>
+The <ulink url="news:comp.lang.tcl"/> newsgroup is a good place to ask
+about Tcl questions in general.  Rivet developers also follow the
+newsgroup, but it's best to ask Rivet-specific questions on the Rivet
+list.
       </para>
     </section>
 
@@ -1083,7 +1128,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	</listitem>
 	<listitem>
 	  <para>
-	    <ulink url="http://www.tcl.tk/"/> is the cannonical site
+	    <ulink url="http://www.tcl.tk"/> is the cannonical site
 	    for Tcl information.
 	  </para>
 	</listitem>

@@ -6,8 +6,6 @@ TODO
 
 * Apache 2 interface.
 
-* var_get and var_post commands.
-
 * getting the plain post data. I use mod_dtcl as an xml server and I
   need to collect the broken xml (due to query string proccessing). if
   the user enters in the xml "=" I am lost. (From yahalom emet).
@@ -30,25 +28,32 @@ TODO
 
 * Create escape_string and unescape_string using Apache conventions.
 
-* Free all Rivet commands of apache dependencies, which are moved into
-  the TclWebapache.c file.  Compatible file, for CGI only operating,
+* Free Rivet commands of apache dependencies, which are moved into the
+  TclWebapache.c file.  Compatible file, for CGI only operating,
   TclWebcgi.c needs to be created.
+
+* Create replacements, in Tcl where possible, for Rivet commands in
+  order to enable the aforementioned 'CGI' mode of operation.
 
 * Need to add a local.tcl for local procs and setup.
 
 * Script timeouts - limit time scripts can run before bailing out.
 
-* Safe mode?
+* Safe mode.
 
 * Add documentation for commands implemented in Tcl.
 
+* Make some tests for commands implemented in Tcl.
+
 * Integrate package documentation with main documentation.
 
+* Document the 'form' package.
 
 MAYBE
 =====
 
 * Maybe move ::request commands into a file called request.tcl.
+
 
 DONE
 ====
@@ -56,3 +61,5 @@ DONE
 * Nice logo.
 
 * Documentation in XML.
+
+* var_get and var_post commands.
