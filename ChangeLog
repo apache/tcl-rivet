@@ -1,3 +1,8 @@
+2002-01-19  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_LoadEnv): Roll back authorization
+	information command.
+
 2002-01-18  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetCore.c (Rivet_LoadAuth): New command to load
