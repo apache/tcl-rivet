@@ -642,10 +642,6 @@ static void tcl_init_stuff(server_rec *s, pool *p)
 	ap_log_error(APLOG_MARK, APLOG_ERR, s, "Error in Tcl_CreateInterp, aborting\n");
 	exit(1);
     }
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION > 0)
-    Tcl_FindExecutable(""); /* Needed for locating init.tcl */
-#endif
-
     if (Tcl_Init(interp) == TCL_ERROR)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, s, Tcl_GetStringResult(interp));
