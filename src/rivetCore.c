@@ -2,6 +2,8 @@
  * rivetCore.c - Core commands which are compiled into mod_rivet itself.
  */
 
+/* $Id$ */
+
 #include "httpd.h"
 #include "http_config.h"
 #include "http_request.h"
@@ -22,7 +24,6 @@
 #define BUFSZ 4096
 
 #define ENV_ARRAY_NAME "env"
-#define AUTH_ARRAY_NAME "auth"
 #define COOKIES_ARRAY_NAME "cookies"
 
 extern module rivet_module;
@@ -259,57 +260,6 @@ Rivet_Headers(
     return TCL_OK;
 }
 
-/* Tcl command to get authorization information. */
-
-static int
-Rivet_LoadAuth(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
-{
-    char *authorization = NULL;
-    Tcl_Obj *ArrayObj;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-
-    if( objc > 2 ) {
-	Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
-	return TCL_ERROR;
-    }
-
-    if( objc == 2 ) {
-	ArrayObj = objv[1];
-    } else {
-	ArrayObj = Tcl_NewStringObj( AUTH_ARRAY_NAME, -1 );
-    }
-    Tcl_IncrRefCount( ArrayObj );
-
-    /* Get the user/pass info for Basic authentication */
-    (const char*)authorization =
-	ap_table_get(globals->r->headers_in, "Authorization");
-    if (authorization
-	&& !strcasecmp(ap_getword_nc(POOL, &authorization, ' '), "Basic"))
-    {
-	char *tmp;
-	char *user;
-	char *pass;
-
-	tmp = ap_pbase64decode(POOL, authorization);
-	user = ap_getword_nulls_nc(POOL, &tmp, ':');
-	pass = tmp;
- 	Tcl_ObjSetVar2(interp, ArrayObj,
-		       Tcl_NewStringObj("user", -1),
-		       STRING_TO_UTF_TO_OBJ(user, POOL),
-		       0);
- 	Tcl_ObjSetVar2(interp, ArrayObj,
-		       Tcl_NewStringObj("pass", -1),
-		       STRING_TO_UTF_TO_OBJ(pass, POOL),
-		       0);
-    }
-
-    return TCL_OK;
-}
-
 /* Tcl command to get and parse any CGI and environmental variables */
 
 /* Get the environmental variables, but do it from a tcl function, so
@@ -327,6 +277,7 @@ Rivet_LoadEnv(
     struct passwd *pw;
 #endif /* ndef WIN32 */
     char *t;
+    char *authorization = NULL;
 
     time_t date;
 
@@ -365,6 +316,29 @@ Rivet_LoadEnv(
 
     env_arr =  ap_table_elts(globals->r->subprocess_env);
     env     = (table_entry *) env_arr->elts;
+
+    /* Get the user/pass info for Basic authentication */
+    (const char*)authorization =
+	ap_table_get(globals->r->headers_in, "Authorization");
+    if (authorization
+	&& !strcasecmp(ap_getword_nc(POOL, &authorization, ' '), "Basic"))
+    {
+	char *tmp;
+	char *user;
+	char *pass;
+
+	tmp = ap_pbase64decode(POOL, authorization);
+	user = ap_getword_nulls_nc(POOL, &tmp, ':');
+	pass = tmp;
+ 	Tcl_ObjSetVar2(interp, Tcl_NewStringObj("::request::USER", -1),
+		       Tcl_NewStringObj("user", -1),
+		       STRING_TO_UTF_TO_OBJ(user, POOL),
+		       0);
+ 	Tcl_ObjSetVar2(interp, Tcl_NewStringObj("::request::USER", -1),
+		       Tcl_NewStringObj("pass", -1),
+		       STRING_TO_UTF_TO_OBJ(pass, POOL),
+		       0);
+    }
 
     /* These were the "include vars"  */
     Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DATE_LOCAL", -1),
@@ -930,11 +904,6 @@ Rivet_InitCore( Tcl_Interp *interp )
     Tcl_CreateObjCommand(interp,
 			"load_cookies",
 			Rivet_LoadCookies,
-			NULL,
-			(Tcl_CmdDeleteProc *)NULL);
-    Tcl_CreateObjCommand(interp,
-			"load_auth",
-			Rivet_LoadAuth,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,
