@@ -585,7 +585,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	  </variablelist>
 
 	  <para>
-	    See the example: <xref linkend="variable_access"/>
+	    See <xref linkend="variable_access"/>.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -714,7 +714,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	    </varlistentry>
 	  </variablelist>
 	  <para>
-	    Please see the upload example.
+	    See <xref linkend="upload"/>.
 	  </para>
 	</listitem>
       </varlistentry>

@@ -1,3 +1,8 @@
+2002-12-30  David N. Welton  <davidw@dedasys.com>
+
+	* doc/examples/upload.html: Changed .ttml to .rvt - thanks to
+	Holger Zeinert for catching this.
+
 2002-12-18  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Noted the var_qs/var_post changes in the
