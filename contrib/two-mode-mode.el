@@ -22,6 +22,8 @@
 ;; Use of 'psgml-mode' is highly recommended.  It is, of course, a
 ;; part of Debian GNU/Linux.
 
+;; Author: David N. Welton <davidw@dedasys.com>
+
 ;; Modified by Marco Pantaleoni <panta@elasticworld.org>
 ;; to allow execution of an hook on mode switching.
 ;; Also added a standard mode hook and some documentation strings.
@@ -34,6 +36,7 @@
 ;; configure these:
 (defvar default-mode (list "SGML" 'sgml-mode))
 (defvar second-modes (list
+		      (list "Erlang" "<erl>" "</erl>" 'erlang-mode)
                       (list "C++" "<?php" "?>" 'c++-mode)
                       (list "Python" "<?python" "?>" 'python-mode)
 		      (list "Tcl" "<?" "?>" 'tcl-mode)
@@ -63,7 +66,9 @@
   (setq two-mode-bool t)
   (when two-mode-mode-idle-timer
     (cancel-timer two-mode-mode-idle-timer))
-  (setq two-mode-mode-idle-timer (run-with-idle-timer two-mode-mode-delay t 'two-mode-mode-update-mode))
+  (setq two-mode-mode-idle-timer
+	(run-with-idle-timer two-mode-mode-delay t
+			     'two-mode-mode-update-mode))
   (or (assq 'two-mode-bool minor-mode-alist)
       (setq minor-mode-alist
 	    (cons '(two-mode-bool " two-mode") minor-mode-alist))))
@@ -74,9 +79,8 @@
 (defun two-mode-change-mode (to-mode func)
   (if (string= to-mode mode-name)
       t
-    (progn 
+    (progn
       (funcall func)
-
       ;; After the mode was set, we reread the "Local Variables" section.
       ;; We do need this for example in SGML-mode if "sgml-parent-document"
       ;; was set, or otherwise it will be reset to nil when sgml-mode is left.
@@ -103,14 +107,14 @@
 		(setq lm (point))
 	      (setq lm -1)))
 	  (save-excursion
-	    (if (search-backward (caddr mode) nil t)
+	    (if (search-backward (car (cddr mode)) nil t)
 		(setq rm (point))
 	      (setq rm -1)))
 	  (if (and (not (and (= lm -1) (= rm -1))) (>= lm rm))
 	      (progn
 		(setq flag 1)
 		(setq mode-list '())
-		(two-mode-change-mode (car mode) (cadddr mode)))))
+		(two-mode-change-mode (car mode) (car (cdr (cddr mode)))))))
 	(setq mode-list (cdr mode-list)))
       (if (= flag 0)
 	  (two-mode-change-mode (car default-mode) (cadr default-mode))))))

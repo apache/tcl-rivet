@@ -1,3 +1,7 @@
+2004-06-04  David N. Welton  <davidw@dedasys.com>
+
+	* contrib/two-mode-mode.el: Updated two-mode-mode.
+
 2004-06-02  David N. Welton  <davidw@dedasys.com>
 
 	* src/buildscripts/aardvark.tcl: Use 'Output' instead of puts.  It
