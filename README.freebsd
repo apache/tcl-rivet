@@ -33,28 +33,30 @@ Run configure in this directory with the following parameters:
 RUNNING AUTOMAKE, AUTOCONF, ETC
 
 
-you gotta use aclocal 1.9
+you gotta use automake 1.9 (and with it, aclocal 1.9)
 
-autoconf 2.59
-
-and automake 1.9
+you gotta use autoconf 2.59 (and with it, autoheader 2.59)
 
 you need to build and install /usr/ports/devel/gnu-autoconf
+(actually i'm not sure if you do or not, read the pkg-descr
+and decide for yourself i guess)
 
 PATH=/usr/local/gnu-autoconf/bin:$PATH
 
-You shouldn't have to include /usr/local/share/aclocal in your path, but
-otherwise aclocal19 can't find the LIBTOOL stuff, which is fatal.
+aclocal19
+automake19
+autoconf259
+autoheader259
 
-aclocal19 -I . -I tclconfig -I /usr/local/share/aclocal19 -I /usr/local/share/aclocal
+Karl has found that setting some environment variables makes it work better...
 
-or try
-
-aclocal19 -I /usr/local/gnu-autotools/share/aclocal
-
-
-automake19 --foreign
-aclocal19 -I /usr/local/gnu-autotools/share/aclocal
-
-export AUTOMAKE=automake19
+export AUTOHEADER=autoheader259
 export AUTOCONF=autoconf259
+export AUTOMAKE=automake19
+export ACLOCAL=aclocal19
+
+But there's still a problem where it'll try to run aclocal as aclocal-1.9,
+and fail.  I usually just try to run aclocal19 there and see if that fixes
+the make dependency or whatever.
+
+I think the autoconf tools are moving towards that kind of naming scheme.
