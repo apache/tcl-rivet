@@ -10,3 +10,6 @@ Work in progress:
 ----------------
 
 Logo - waiting on iconized versions.
+
+David Brancato's patch to specify query string or POST origins for
+variables added.  Documentation and test cases still needed.
