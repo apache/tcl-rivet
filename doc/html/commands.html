@@ -2,8 +2,10 @@
 <html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"><title>Rivet Tcl Commands and Variables</title><meta name="generator" content="DocBook XSL Stylesheets V1.50.0"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="directives.html" title="Rivet Apache Directives"><link rel="next" href="examples.html" title="Examples and Usage"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Tcl Commands and Variables</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="directives.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="examples.html">Next</a></td></tr></table><hr></div><div class="section"><div class="titlepage"><div><hr><h2 class="title" style="clear: both"><a name="commands"></a>Rivet Tcl Commands and Variables</h2></div></div><div class="variablelist"><dl><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>  (<span style="font-family:monospace; text-decoration:underline">get</span> | <span style="font-family:monospace; text-decoration:underline">list</span> | <span style="font-family:monospace; text-decoration:underline">exists</span> | <span style="font-family:monospace; text-decoration:underline">number</span> | <span style="font-family:monospace; text-decoration:underline">all</span>)</span></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
-	    The <span style="font-family:monospace"><b>var</b></span> command manipulates variables
-	    set by the user.
+	    The <span style="font-family:monospace"><b>var</b></span> command retrieves information
+	    about GET or POST variables sent to the script via client
+	    request.  It treats both GET and POST variables the same,
+	    regardless of their origin.
 	  </div><div class="variablelist"><dl><dt><span class="term">
 		<div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">get</span> <span style="font-family:monospace; text-decoration:underline"><i><tt>varname</tt></i></span> <span style="font-family:monospace; text-decoration:underline"><i><tt>?default?</tt></i></span></span></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
@@ -13,7 +15,8 @@
 		  the variable doesn't exist as a GET or POST
 		  variable, the
 		  <tt><span style="text-decoration:underline"><i><tt>?default?</tt></i></span></tt>
-		  value is returned, otherwise an error is thrown.
+		  value is returned, otherwise &quot;&quot; - an empty string -
+		  is returned.
 		</div></div></dd><dt><span class="term">
 		<div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">list</span> <span style="font-family:monospace; text-decoration:underline"><i><tt>varname</tt></i></span></span></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">

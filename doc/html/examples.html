@@ -24,7 +24,7 @@ for {set i 1} { $i &lt;= 8 } {incr i} {
     puts &quot;&lt;tr&gt;\n&quot;
     for {set j 1} {$j &lt;= 8} {incr j} {
         set num [ expr $i * $j * 4 - 1]
-        puts [ format &quot;&lt;td bgcolor=%2x%2x%2x &gt; $num $num $num &lt;/td&gt;\n&quot; \
+        puts [ format &quot;&lt;td bgcolor=\&quot;%02x%02x%02x\&quot; &gt; $num $num $num &lt;/td&gt;\n&quot; \
 		   $num $num $num ]
     }
     puts &quot;&lt;/tr&gt;\n&quot;
