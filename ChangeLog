@@ -1,3 +1,11 @@
+2005-01-07  Karl Lehenbauer  <karl-rivet@sc.com>
+
+	* /rivet/packages/dio/diodisplay.tcl: Factor showform prolog and
+	  epilog code into showform_prolog and showform_epilog methods
+	  so that when a derived DIODisplay class is overriding, for 
+	  example, an Add or Edit method, the author doesn't have to 
+	  dup all of showform's functionality.
+
 2004-12-22  David N. Welton  <davidw@dedasys.com>
 
 	* Makefile.am (install-data-local): Added this target to install
@@ -17,6 +25,10 @@
 2004-12-08  David N. Welton  <davidw@dedasys.com>
 
 	* Makefile.am, configure.ac: Added the doc/ directory.
+
+2004-12-07  Karl Lehenbauer  <karl-rivet@sc.com>
+        * rivet/packages/dio/dio.tcl: "DIO delete" method now return the
+	  number of rows affected.
 
 2004-12-03  Karl Lehenbauer  <karl-rivet@sc.com>
 
