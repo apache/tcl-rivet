@@ -21,7 +21,7 @@
 
 # AM_CFLAGS = @TCL_INCLUDES@ @GM_CPPFLAGS@
 
-SOURCES = $(mod_rivet_la_SOURCES)
+SOURCES = $(librivet_la_SOURCES) $(librivetparser_la_SOURCES) $(mod_rivet_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -63,12 +63,20 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
+librivet_la_DEPENDENCIES =
+am_librivet_la_OBJECTS = librivet_la-rivetList.lo \
+	librivet_la-rivetCrypt.lo librivet_la-rivetWWW.lo \
+	librivet_la-rivetPkgInit.lo
+librivet_la_OBJECTS = $(am_librivet_la_OBJECTS)
+librivetparser_la_DEPENDENCIES =
+am_librivetparser_la_OBJECTS = librivetparser_la-rivetParser.lo \
+	librivetparser_la-parserPkgInit.lo
+librivetparser_la_OBJECTS = $(am_librivetparser_la_OBJECTS)
 mod_rivet_la_DEPENDENCIES =
 am_mod_rivet_la_OBJECTS = mod_rivet_la-apache_multipart_buffer.lo \
-	mod_rivet_la-rivetList.lo mod_rivet_la-apache_request.lo \
-	mod_rivet_la-rivetChannel.lo mod_rivet_la-rivetParser.lo \
-	mod_rivet_la-mod_rivet.lo mod_rivet_la-rivetCore.lo \
-	mod_rivet_la-rivetWWW.lo mod_rivet_la-rivetCrypt.lo \
+	mod_rivet_la-apache_request.lo mod_rivet_la-rivetChannel.lo \
+	mod_rivet_la-rivetParser.lo mod_rivet_la-mod_rivet.lo \
+	mod_rivet_la-rivetCore.lo mod_rivet_la-rivetCrypt.lo \
 	mod_rivet_la-TclWebapache.lo
 mod_rivet_la_OBJECTS = $(am_mod_rivet_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -82,8 +90,10 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(mod_rivet_la_SOURCES)
-DIST_SOURCES = $(mod_rivet_la_SOURCES)
+SOURCES = $(librivet_la_SOURCES) $(librivetparser_la_SOURCES) \
+	$(mod_rivet_la_SOURCES)
+DIST_SOURCES = $(librivet_la_SOURCES) $(librivetparser_la_SOURCES) \
+	$(mod_rivet_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -246,11 +256,19 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-lib_LTLIBRARIES = mod_rivet.la 
-mod_rivet_la_SOURCES = apache_multipart_buffer.c rivetList.c apache_request.c rivetChannel.c rivetParser.c mod_rivet.c rivetCore.c rivetWWW.c rivetCrypt.c TclWebapache.c mod_rivet.h
+lib_LTLIBRARIES = mod_rivet.la  librivet.la librivetparser.la
+mod_rivet_la_SOURCES = apache_multipart_buffer.c apache_request.c rivetChannel.c rivetParser.c mod_rivet.c rivetCore.c rivetCrypt.c TclWebapache.c mod_rivet.h
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+librivet_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
+librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
+librivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
+librivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
+librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
+librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
+librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 all: all-am
 
 .SUFFIXES:
@@ -311,6 +329,10 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
+librivet.la: $(librivet_la_OBJECTS) $(librivet_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(librivet_la_LDFLAGS) $(librivet_la_OBJECTS) $(librivet_la_LIBADD) $(LIBS)
+librivetparser.la: $(librivetparser_la_OBJECTS) $(librivetparser_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(librivetparser_la_LDFLAGS) $(librivetparser_la_OBJECTS) $(librivetparser_la_LIBADD) $(LIBS)
 mod_rivet.la: $(mod_rivet_la_OBJECTS) $(mod_rivet_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(mod_rivet_la_LDFLAGS) $(mod_rivet_la_OBJECTS) $(mod_rivet_la_LIBADD) $(LIBS)
 
@@ -320,6 +342,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librivet_la-rivetCrypt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librivet_la-rivetList.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librivet_la-rivetPkgInit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librivet_la-rivetWWW.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librivetparser_la-parserPkgInit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/librivetparser_la-rivetParser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-TclWebapache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-apache_multipart_buffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-apache_request.Plo@am__quote@
@@ -327,9 +355,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-rivetChannel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-rivetCore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-rivetCrypt.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-rivetList.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-rivetParser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod_rivet_la-rivetWWW.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -352,19 +378,54 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
+librivet_la-rivetList.lo: rivetList.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT librivet_la-rivetList.lo -MD -MP -MF "$(DEPDIR)/librivet_la-rivetList.Tpo" -c -o librivet_la-rivetList.lo `test -f 'rivetList.c' || echo '$(srcdir)/'`rivetList.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/librivet_la-rivetList.Tpo" "$(DEPDIR)/librivet_la-rivetList.Plo"; else rm -f "$(DEPDIR)/librivet_la-rivetList.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetList.c' object='librivet_la-rivetList.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o librivet_la-rivetList.lo `test -f 'rivetList.c' || echo '$(srcdir)/'`rivetList.c
+
+librivet_la-rivetCrypt.lo: rivetCrypt.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT librivet_la-rivetCrypt.lo -MD -MP -MF "$(DEPDIR)/librivet_la-rivetCrypt.Tpo" -c -o librivet_la-rivetCrypt.lo `test -f 'rivetCrypt.c' || echo '$(srcdir)/'`rivetCrypt.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/librivet_la-rivetCrypt.Tpo" "$(DEPDIR)/librivet_la-rivetCrypt.Plo"; else rm -f "$(DEPDIR)/librivet_la-rivetCrypt.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetCrypt.c' object='librivet_la-rivetCrypt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o librivet_la-rivetCrypt.lo `test -f 'rivetCrypt.c' || echo '$(srcdir)/'`rivetCrypt.c
+
+librivet_la-rivetWWW.lo: rivetWWW.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT librivet_la-rivetWWW.lo -MD -MP -MF "$(DEPDIR)/librivet_la-rivetWWW.Tpo" -c -o librivet_la-rivetWWW.lo `test -f 'rivetWWW.c' || echo '$(srcdir)/'`rivetWWW.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/librivet_la-rivetWWW.Tpo" "$(DEPDIR)/librivet_la-rivetWWW.Plo"; else rm -f "$(DEPDIR)/librivet_la-rivetWWW.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetWWW.c' object='librivet_la-rivetWWW.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o librivet_la-rivetWWW.lo `test -f 'rivetWWW.c' || echo '$(srcdir)/'`rivetWWW.c
+
+librivet_la-rivetPkgInit.lo: rivetPkgInit.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT librivet_la-rivetPkgInit.lo -MD -MP -MF "$(DEPDIR)/librivet_la-rivetPkgInit.Tpo" -c -o librivet_la-rivetPkgInit.lo `test -f 'rivetPkgInit.c' || echo '$(srcdir)/'`rivetPkgInit.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/librivet_la-rivetPkgInit.Tpo" "$(DEPDIR)/librivet_la-rivetPkgInit.Plo"; else rm -f "$(DEPDIR)/librivet_la-rivetPkgInit.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetPkgInit.c' object='librivet_la-rivetPkgInit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o librivet_la-rivetPkgInit.lo `test -f 'rivetPkgInit.c' || echo '$(srcdir)/'`rivetPkgInit.c
+
+librivetparser_la-rivetParser.lo: rivetParser.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivetparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT librivetparser_la-rivetParser.lo -MD -MP -MF "$(DEPDIR)/librivetparser_la-rivetParser.Tpo" -c -o librivetparser_la-rivetParser.lo `test -f 'rivetParser.c' || echo '$(srcdir)/'`rivetParser.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/librivetparser_la-rivetParser.Tpo" "$(DEPDIR)/librivetparser_la-rivetParser.Plo"; else rm -f "$(DEPDIR)/librivetparser_la-rivetParser.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetParser.c' object='librivetparser_la-rivetParser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivetparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o librivetparser_la-rivetParser.lo `test -f 'rivetParser.c' || echo '$(srcdir)/'`rivetParser.c
+
+librivetparser_la-parserPkgInit.lo: parserPkgInit.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivetparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT librivetparser_la-parserPkgInit.lo -MD -MP -MF "$(DEPDIR)/librivetparser_la-parserPkgInit.Tpo" -c -o librivetparser_la-parserPkgInit.lo `test -f 'parserPkgInit.c' || echo '$(srcdir)/'`parserPkgInit.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/librivetparser_la-parserPkgInit.Tpo" "$(DEPDIR)/librivetparser_la-parserPkgInit.Plo"; else rm -f "$(DEPDIR)/librivetparser_la-parserPkgInit.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parserPkgInit.c' object='librivetparser_la-parserPkgInit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(librivetparser_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o librivetparser_la-parserPkgInit.lo `test -f 'parserPkgInit.c' || echo '$(srcdir)/'`parserPkgInit.c
+
 mod_rivet_la-apache_multipart_buffer.lo: apache_multipart_buffer.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mod_rivet_la-apache_multipart_buffer.lo -MD -MP -MF "$(DEPDIR)/mod_rivet_la-apache_multipart_buffer.Tpo" -c -o mod_rivet_la-apache_multipart_buffer.lo `test -f 'apache_multipart_buffer.c' || echo '$(srcdir)/'`apache_multipart_buffer.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mod_rivet_la-apache_multipart_buffer.Tpo" "$(DEPDIR)/mod_rivet_la-apache_multipart_buffer.Plo"; else rm -f "$(DEPDIR)/mod_rivet_la-apache_multipart_buffer.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='apache_multipart_buffer.c' object='mod_rivet_la-apache_multipart_buffer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mod_rivet_la-apache_multipart_buffer.lo `test -f 'apache_multipart_buffer.c' || echo '$(srcdir)/'`apache_multipart_buffer.c
-
-mod_rivet_la-rivetList.lo: rivetList.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mod_rivet_la-rivetList.lo -MD -MP -MF "$(DEPDIR)/mod_rivet_la-rivetList.Tpo" -c -o mod_rivet_la-rivetList.lo `test -f 'rivetList.c' || echo '$(srcdir)/'`rivetList.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mod_rivet_la-rivetList.Tpo" "$(DEPDIR)/mod_rivet_la-rivetList.Plo"; else rm -f "$(DEPDIR)/mod_rivet_la-rivetList.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetList.c' object='mod_rivet_la-rivetList.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mod_rivet_la-rivetList.lo `test -f 'rivetList.c' || echo '$(srcdir)/'`rivetList.c
 
 mod_rivet_la-apache_request.lo: apache_request.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mod_rivet_la-apache_request.lo -MD -MP -MF "$(DEPDIR)/mod_rivet_la-apache_request.Tpo" -c -o mod_rivet_la-apache_request.lo `test -f 'apache_request.c' || echo '$(srcdir)/'`apache_request.c; \
@@ -400,13 +461,6 @@ mod_rivet_la-rivetCore.lo: rivetCore.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetCore.c' object='mod_rivet_la-rivetCore.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mod_rivet_la-rivetCore.lo `test -f 'rivetCore.c' || echo '$(srcdir)/'`rivetCore.c
-
-mod_rivet_la-rivetWWW.lo: rivetWWW.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mod_rivet_la-rivetWWW.lo -MD -MP -MF "$(DEPDIR)/mod_rivet_la-rivetWWW.Tpo" -c -o mod_rivet_la-rivetWWW.lo `test -f 'rivetWWW.c' || echo '$(srcdir)/'`rivetWWW.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/mod_rivet_la-rivetWWW.Tpo" "$(DEPDIR)/mod_rivet_la-rivetWWW.Plo"; else rm -f "$(DEPDIR)/mod_rivet_la-rivetWWW.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rivetWWW.c' object='mod_rivet_la-rivetWWW.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mod_rivet_la-rivetWWW.lo `test -f 'rivetWWW.c' || echo '$(srcdir)/'`rivetWWW.c
 
 mod_rivet_la-rivetCrypt.lo: rivetCrypt.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mod_rivet_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mod_rivet_la-rivetCrypt.lo -MD -MP -MF "$(DEPDIR)/mod_rivet_la-rivetCrypt.Tpo" -c -o mod_rivet_la-rivetCrypt.lo `test -f 'rivetCrypt.c' || echo '$(srcdir)/'`rivetCrypt.c; \
@@ -603,6 +657,13 @@ uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-libLTLIBRARIES
 
+
+# librivet.so
+# librivetparser.so
+# ld -shared -x -o librivetparser.so rivetParser.o parserPkgInit.o -L/usr/local/lib -ltcl84 -lm
+# ld -shared -x -o librivet.so rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o -L/usr/local/lib -ltcl84 -lm -lcrypt
+
+#
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
