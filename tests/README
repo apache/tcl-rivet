@@ -1,4 +1,5 @@
 Test Suite for Rivet
+====================
 
 $Id$
 
@@ -7,6 +8,7 @@ features.  They are not complete at this point, and work on them would
 be welcome.
 
 How to run the tests:
+--------------------
 
 The program 'runtest.tcl' is launched with the full path to the apache
 web server.  It then creates a minimal config file in the directory it
@@ -20,3 +22,40 @@ Apache must be compiled with Rivet built in.
 For example:
 
 ./runtest.tcl /usr/sbin/apache
+
+Where to put tests/which files are which:
+----------------------------------------
+
+binary.test: Test whether an image file comes through ok.
+
+broken.test: Test whether a broken page displays an error message
+	     correctly.
+
+config.test: Test different configuration combinations.
+
+cookies.test: Test whether cookies work.
+
+env.test: See if 'environmental' variables are coming through alright.
+
+get.test: Test whether a simple GET works with variables
+	  (i.e. ?foo=1&bar=2)
+
+hello.test: Test whether a simple hello world page works.
+
+include.test: Test whether flat file includes work.
+
+lang.test: Try some japanese encodings, to see if they come through
+	   ok.
+
+makeurl.test: Test whether the 'makeurl' command works.
+
+parse.test: Test whether the 'parse' command is able to correctly
+	    parse and utilize a second .rvt file.
+
+post.test: See if POST works ok.
+
+rivet.test: This starts the tests up and runs them.
+
+tclfile.test: Make sure that Rivet works ok with a plain .tcl file.
+
+upload.test: Check whether file uploads work.

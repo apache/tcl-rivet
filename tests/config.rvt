@@ -1,8 +1,8 @@
 <?
-if { [var exists config-1] } {
+if { [var exists brokenpage] } {
     # config-1.1
     broken
-} elseif { [var exists config-2] } {
+} elseif { [var exists goodpage] } {
     puts "Page Body"
 }
 ?>
