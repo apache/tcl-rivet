@@ -191,7 +191,6 @@ AddNode $PKGINDEX {
 
 AddNode install {
     depends $MOD_SHLIB $RIVETLIB_SHLIB $PARSER_SHLIB
-    tcl file delete -force [file join $PREFIX rivet]
     tcl fileutil::install -m o+r $MOD_SHLIB $LIBEXECDIR
     tcl fileutil::install -m o+r [file join .. rivet] $PREFIX
     tcl file mkdir [file join $PREFIX rivet packages rivet]

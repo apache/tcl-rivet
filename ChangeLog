@@ -1,3 +1,10 @@
+2004-02-11  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Don't delete rivet packages directory during
+	install.  This used to happen in order to keep things clean, but
+	people are using this directory for local packages/modifications,
+	so this is not a good thing to have.
+
 2004-02-06  David N. Welton  <davidw@dedasys.com>
 
 	* tests/headers.test: Include current version of http package in
