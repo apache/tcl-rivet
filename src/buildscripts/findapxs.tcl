@@ -24,6 +24,10 @@ namespace eval findapxs {
 	    break
 	}
 
+	if {$apxs == ""} {
+	    error "could not find Apache Extension Tool apxs in $apxsDirList"
+	}
+
 	return $apxs
     }
 }
