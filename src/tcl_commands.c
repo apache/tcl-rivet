@@ -18,6 +18,9 @@
 
 #define BUFSZ 4096
 
+#define ENV_ARRAY_NAME "env"
+#define COOKIES_ARRAY_NAME "cookies"
+
 extern module rivet_module;
 
 extern Tcl_Obj *uploadstorage[];
@@ -291,7 +294,7 @@ Rivet_LoadEnv(
     if( objc == 2 ) {
 	ArrayObj = objv[1];
     } else {
-	ArrayObj = Tcl_NewStringObj( "::request::env", -1 );
+	ArrayObj = Tcl_NewStringObj( ENV_ARRAY_NAME, -1 );
     }
 
     Tcl_IncrRefCount( ArrayObj );
@@ -424,7 +427,7 @@ Rivet_LoadCookies(
     if( objc == 2 ) {
 	ArrayObj = objv[1];
     } else {
-	ArrayObj = Tcl_NewStringObj( "::request::cookies", -1 );
+	ArrayObj = Tcl_NewStringObj( COOKIES_ARRAY_NAME, -1 );
     }
 
     do { /* I do this because I want some 'local' variables */
@@ -692,8 +695,9 @@ Rivet_Upload(
 		{
 		    /* create and return a file channel */
 		    char *channelname = NULL;
-		    chan = Tcl_MakeFileChannel((ClientData)fileno(
-			ApacheUpload_FILE(upload)), TCL_READABLE);
+		    chan = Tcl_MakeFileChannel(
+			(ClientData)fileno(ApacheUpload_FILE(upload)),
+			TCL_READABLE);
 		    Tcl_RegisterChannel(interp, chan);
 		    channelname = Tcl_GetChannelName(chan);
 		    Tcl_SetStringObj(result, channelname, -1);
@@ -719,8 +723,9 @@ Rivet_Upload(
 		    Tcl_SetChannelOption(interp, savechan,
 			"-translation", "binary");
 
-		chan = Tcl_MakeFileChannel((ClientData)fileno(
-		    ApacheUpload_FILE(upload)), TCL_READABLE);
+		chan = Tcl_MakeFileChannel(
+			(ClientData)fileno(ApacheUpload_FILE(upload)),
+			TCL_READABLE);
 		Tcl_SetChannelOption(interp, chan, "-translation", "binary");
 
 		while ((sz = Tcl_Read(chan, savebuffer, BUFSZ)))
@@ -746,8 +751,9 @@ Rivet_Upload(
 		    Tcl_Channel chan = NULL;
 
 		    bytes = Tcl_Alloc((unsigned)ApacheUpload_size(upload));
-		    chan = Tcl_MakeFileChannel((ClientData)fileno(
-			ApacheUpload_FILE(upload)), TCL_READABLE);
+		    chan = Tcl_MakeFileChannel(
+			(ClientData)fileno(ApacheUpload_FILE(upload)),
+			TCL_READABLE);
 		    Tcl_SetChannelOption(interp, chan,
 			"-translation", "binary");
 		    Tcl_SetChannelOption(interp, chan, "-encoding", "binary");
