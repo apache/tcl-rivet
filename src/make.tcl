@@ -142,6 +142,7 @@ AddNode all {
 
 AddNode module {
     depends shared
+    puts "mod_rivet[info sharedlibextension] built - now run $argv0 install to complete installation."
 }
 
 # Make a shared build.

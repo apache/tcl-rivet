@@ -1,3 +1,8 @@
+2004-01-08  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Added warning to default make.tcl target in order
+	to encourage people to run ./make.tcl install.
+
 2003-12-20  David N. Welton  <davidw@dedasys.com>
 
 	* tests/parsepackage.test: Added tests for the Rivet parser
@@ -531,7 +536,7 @@
 
 	* src/mod_rivet.c (Rivet_AppendToScript): Don't append
 	Before/After/Error scripts.  Just override them.
-	(Rivet_UserConf): Switch back to usig Rivet_AppendToScript.
+	(Rivet_UserConf): Switch back to using Rivet_AppendToScript.
 	(Rivet_SetScript): Change Rivet_AppendToScript to Rivet_SetScript
 	to reflect the fact that it doesn't always append - specifically,
 	in After/Before/Error scripts.
