@@ -1,3 +1,23 @@
+2002-01-09  Damon J. Courtney <damon@unreality.com>
+	* src/tcl_commands.c
+	    Renamed to rivetCore.c
+
+	* src/tcl_commands.h
+	    Removed.
+
+	* src/rivet.h
+	    Added as the default header file for Rivet Tcl commands.
+
+	* src/rivetList.c
+	    Added.  Only contains 'lremove' right now.
+
+	* src/rivetInit.c
+	    Added.  Contains the Tcl initialization routine for Rivet's Tcl
+	    commands.
+
+	* src/make.tcl
+	    Added rivetCore.c, rivetList.c and rivetInit.c to the make.
+	    
 2002-01-08  Damon J. Courtney <damon@unreality.com>
 	* src/mod_rivet.h
 	    Added RIVET_NEW_CONF macro to create a new rivet_server_conf.
