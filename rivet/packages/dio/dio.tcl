@@ -503,6 +503,7 @@ proc handle {interface args} {
 	    return -code error "Got '$errinf' executing '$req'"
 	}
 
+	set return [$res numrows]
 	$res destroy
 	return $return
     }
