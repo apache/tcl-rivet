@@ -932,6 +932,7 @@ catch { ::itcl::delete class ::DIODisplayField }
 	    set class [get_css_class $tag DIOFormField DIOFormField-$name]
 
 	    if {$type == "select"} {
+		$form default_value $name $value
 		$form select $name -values $values -class $class
 	    } else {
 		eval $form $type $name -value [list $value] $formargs -class $class
