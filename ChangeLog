@@ -1,3 +1,9 @@
+2002-12-10  David N. Welton  <davidw@dedasys.com>
+
+	* table.png: Transformed table.png so that it ought to display
+	correctly on older(?) browsers.  Thanks to Elchonon Edelson for
+	his help.
+
 2002-12-09  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_SendContent): Switched from EvalObj to
