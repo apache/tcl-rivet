@@ -1590,6 +1590,83 @@ list.
 	feature can significantly improve performance.
       </para>
     </section>
+
+    <section>
+      <title>Debugging Rivet and Apache</title>
+      <para>
+	If you are interested in hacking on Rivet, you're welcome to
+	contribute!  Invariably, when working with code, things go
+	wrong, and it's necessary to do some debugging.  In a server
+	environment like Apache, it can be a bit more difficult to
+	find the right way to do this.  Here are some techniques to
+	try.
+      </para>
+      <para>
+	The first thing you should know is that Apache can be launched
+	as a <emphasis>single process</emphasis> with the
+	<option>-X</option> argument:</para>
+      <programlisting>httpd -X</programlisting>.
+      <para>
+	On Linux, one of the first things to try is the system call
+	tracer, <command>strace</command>.  You don't even have to
+	recompile Rivet or Apache for this to work.
+      </para>
+
+      <programlisting>strace -o /tmp/outputfile -S 1000 httpd -X</programlisting>
+
+      <para>This command will run httpd in the system call tracer,
+	which leaves its output (there is potentially a lot of it) in
+	<filename>/tmp/outputfile</filename>.  The <option>-S</option>
+	option tells <command></command>strace to only record the
+	first 1000 bytes of a syscall.  Some calls such as
+	<function>write</function> can potentially be much longer than
+	this, so you may want to increase this number.  The results
+	are a list of all the system calls made by the program.  You
+	want to look at the end, where the failure presumably occured,
+	to see if you can find anything that looks like an error.  If
+	you're not sure what to make of the results, you can always
+	ask on the Rivet development mailing list.
+      </para>
+
+      <para>
+	If <command>strace</command> (or its equivalent on your
+	operating system) doesn't answer your question, it may be time
+	to debug Apache and Rivet.  To do this, you will need to run
+	the <command>./configure.tcl</command> script with the
+	<option>-enable-symbols</option> option, and recompile.
+      </para>
+      <para>
+	Since it's easier to debug a single process, we'll still run
+	Apache in single process mode with -X:
+      </para>
+
+      <programlisting>
+@ashland [~] $ gdb /usr/sbin/apache.dbg
+GNU gdb 5.3-debian
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "powerpc-linux"...
+(gdb) run -X
+Starting program: /usr/sbin/apache.dbg -X
+[New Thread 16384 (LWP 13598)]
+.
+.
+.
+      </programlisting>
+
+      <para>
+	When your apache session is up and running, you can request a
+	web page with the browser, and see where things go wrong (if
+	you are dealing with a crash, for instance).  A helpful
+	<command>gdb</command> tutorial is available here: <ulink
+	  url="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html"></ulink>
+      </para>
+
+    </section>
+
   </section>
   <section id="upgrading">
     <title>Upgrading from mod_dtcl or NeoWebScript</title>

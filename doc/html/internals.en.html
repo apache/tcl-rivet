@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.62.4"><link rel="home" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="previous" href="help.en.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.en.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.en.html#id5419745">Initialization</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420201">RivetChan</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420232">The global Command</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420282">Page Parsing, Execution and Caching</a></span></dt></dl></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.62.4"><link rel="home" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="previous" href="help.en.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.en.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.en.html#id5419745">Initialization</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420201">RivetChan</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420232">The global Command</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420282">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420340">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
       This section easily falls out of date, as new code is added, old
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
@@ -66,4 +66,60 @@
 	without having to reload it (and re-parse it) from the disk.
 	The number of scripts stored in memory is configurable.  This
 	feature can significantly improve performance.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5420340"></a>Debugging Rivet and Apache</h3></div></div><div></div></div><p style="width:90%">
+	If you are interested in hacking on Rivet, you're welcome to
+	contribute!  Invariably, when working with code, things go
+	wrong, and it's necessary to do some debugging.  In a server
+	environment like Apache, it can be a bit more difficult to
+	find the right way to do this.  Here are some techniques to
+	try.
+      </p><p style="width:90%">
+	The first thing you should know is that Apache can be launched
+	as a <span class="emphasis"><em>single process</em></span> with the
+	-X argument:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">httpd -X</pre>.
+      <p style="width:90%">
+	On Linux, one of the first things to try is the system call
+	tracer, <span style="font-family:monospace"><span><b class="command">strace</b></span></span>.  You don't even have to
+	recompile Rivet or Apache for this to work.
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">strace -o /tmp/outputfile -S 1000 httpd -X</pre><p style="width:90%">This command will run httpd in the system call tracer,
+	which leaves its output (there is potentially a lot of it) in
+	<tt class="filename">/tmp/outputfile</tt>.  The -S
+	option tells <span style="font-family:monospace"><span><b class="command"></b></span></span>strace to only record the
+	first 1000 bytes of a syscall.  Some calls such as
+	<tt class="function">write</tt> can potentially be much longer than
+	this, so you may want to increase this number.  The results
+	are a list of all the system calls made by the program.  You
+	want to look at the end, where the failure presumably occured,
+	to see if you can find anything that looks like an error.  If
+	you're not sure what to make of the results, you can always
+	ask on the Rivet development mailing list.
+      </p><p style="width:90%">
+	If <span style="font-family:monospace"><span><b class="command">strace</b></span></span> (or its equivalent on your
+	operating system) doesn't answer your question, it may be time
+	to debug Apache and Rivet.  To do this, you will need to run
+	the <span style="font-family:monospace"><span><b class="command">./configure.tcl</b></span></span> script with the
+	-enable-symbols option, and recompile.
+      </p><p style="width:90%">
+	Since it's easier to debug a single process, we'll still run
+	Apache in single process mode with -X:
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">
+@ashland [~] $ gdb /usr/sbin/apache.dbg
+GNU gdb 5.3-debian
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "powerpc-linux"...
+(gdb) run -X
+Starting program: /usr/sbin/apache.dbg -X
+[New Thread 16384 (LWP 13598)]
+.
+.
+.
+      </pre><p style="width:90%">
+	When your apache session is up and running, you can request a
+	web page with the browser, and see where things go wrong (if
+	you are dealing with a crash, for instance).  A helpful
+	<span style="font-family:monospace"><span><b class="command">gdb</b></span></span> tutorial is available here: <a href="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html" target="_top">http://www.delorie.com/gnu/docs/gdb/gdb_toc.html</a>
       </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.en.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Resources - How to Get Help </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Upgrading from mod_dtcl or NeoWebScript</td></tr></table></div></body></html>
