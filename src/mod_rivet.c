@@ -129,7 +129,6 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
-	int newString = 0;
 	Tcl_Obj *errscript =
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
 
@@ -140,7 +139,6 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	/* If we don't have an error script, use the default error handler. */
 	if( !errscript ) {
 	    errscript = Tcl_NewStringObj( "::Rivet::handle_error", -1 );
-	    ++newString;
 	}
 
 	if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
@@ -148,10 +146,6 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	    TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>", 1,
 				    globals->req);
 	    TclWeb_PrintError( errorinfo, 0, globals->req );
-	}
-
-	if( newString ) {
-	    Tcl_DecrRefCount( errscript );
 	}
     }
 
