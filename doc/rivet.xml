@@ -740,6 +740,18 @@
 	</listitem>
       </itemizedlist>
     </section>
+
+    <section>
+      <title>Bug Tracking System</title>
+
+      <para>
+	Apache Rivet uses the Apache Bug Tracking system at <ulink
+	  url="http://nagoya.apache.org/bugzilla/"></ulink>.  Here,
+	  you can report problems, or check and see if existing issues
+	  are already known and being dealt with.
+      </para>
+    </section>
+
   </section>
 
   <section id="internals.html">
