@@ -9,6 +9,9 @@
 	  causing some problems for mod_rivet.so.
 
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * Collected some build notes in README.configure
+
         * Clean up presentation of --with-apxs and --with-tclsh and
 	  have them show up when configure --help is run.
 
