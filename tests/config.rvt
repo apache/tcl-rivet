@@ -1,4 +1,8 @@
 <?
-# config-1.1
-broken
+if { [var exists config-1] } {
+    # config-1.1
+    broken
+} elseif { [var exists config-2] } {
+    puts "Page Body"
+}
 ?>

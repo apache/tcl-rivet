@@ -59,3 +59,16 @@ AddType application/x-rivet-tcl .tcl
 </IfModule>
 
 RivetServerConf UploadFilesToVar on
+
+<IfDefine SERVERCONFTEST>
+RivetServerConf BeforeScript 'puts "Page Header"'
+RivetServerConf AfterScript 'puts "Page Footer"'
+</IfDefine>
+
+<IfDefine DIRTEST>
+<Directory />
+RivetDirConf BeforeScript 'puts "Page Header"'
+RivetDirConf AfterScript 'puts "Page Footer"'
+</Directory>
+</IfDefine>
+

@@ -1,3 +1,5 @@
 # this file is a test file to simulate an .htaccess file.
 
 RivetUserConf ErrorScript 'puts "this page is BROKEN"'
+RivetUserConf BeforeScript 'puts "Local Page Header"'
+RivetUserConf AfterScript 'puts "Local Page Footer"'

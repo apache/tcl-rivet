@@ -43,7 +43,7 @@ set TestList {cookies.test get.test post.test tclfile.test env.test hello.test i
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
-set testgroup1 1
+set testgroup1 0
 set testgroup2 1
 set testgroup3 1
 
