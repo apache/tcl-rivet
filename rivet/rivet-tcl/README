@@ -1,0 +1,37 @@
+###
+## rivet/rivet-tcl - Tcl code for use with the Rivet Apache module.
+##
+###
+
+This directory contains an individual .tcl file for each proc in Rivet and
+a line in the tclIndex file for each corresponding .tcl file and procedure.
+
+This is done for two major reasons:
+
+1) Code is easy to manage.  If you want to edit a procedure, you know right
+   which file to look in.
+
+2) No code is loaded needlessly into the interpreters.  Since each command
+   resides in its own .tcl file, and those files are not sourced until the
+   command is needed, there is no loading of superfluous procs or code
+   when a particular command is needed.
+
+So, basically, if you want to add a single command to the Rivet library,
+you can easily do it by adding it as a .tcl file here.  Name the file
+<commandName>.tcl, and then add it to the tclIndex file.  You can either
+do this by hand or by Tcl's built-in functions.  IE:
+
+$ tclsh
+% auto_mkindex . *.tcl
+
+This should produce the desired result.
+
+This is NOT the directory to add packages or entire libraries of code.
+See the rivet/packages/ directory for that.
+
+There is a small trade-off to all of this.  The larger the proc library gets,
+the larger the auto_load array gets, making auto loading procedures take a
+little longer as the functions to load unknown commands have to pull the code
+to load each command from this array.  But, the trade-off is really quite
+nominal.  It will only even be used once, the first time a command is called.
+Once a command is loaded, none of this code is even called.

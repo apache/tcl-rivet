@@ -1,0 +1,13 @@
+###
+## rivet/ - Initialization code for the Rivet Apache module.
+##
+###
+
+init.tcl - Contains the initialization routines for Rivet in a
+           ::Rivet namespace.
+
+packages - Contains packages for use with Rivet.  Place any new packages or
+           procedure libraries in this directory.
+
+rivet-tcl - Contains .tcl files for procedures in Rivet.  Place new commands
+            to Rivet in this directory.
