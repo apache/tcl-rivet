@@ -320,8 +320,10 @@ Rivet_Var(
     int objc,
     Tcl_Obj *CONST objv[])
 {
+    char *cmd;
     char *command;
     Tcl_Obj *result = NULL;
+    int source;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if (objc < 2 || objc > 4)
@@ -331,8 +333,14 @@ Rivet_Var(
 			 "|number|all)");
 	return TCL_ERROR;
     }
+    cmd = Tcl_GetString(objv[0]);
     command = Tcl_GetString(objv[1]);
     result = Tcl_NewObj();
+
+    /* determine if var_qs, var_post or var was called */
+    if (!strcmp(cmd, "var_qs")) source = VAR_SRC_QUERYSTRING;
+    else if (!strcmp(cmd, "var_post")) source = VAR_SRC_POST;
+    else source = VAR_SRC_ALL;
 
     if (!strcmp(command, "get"))
     {
@@ -349,7 +357,7 @@ Rivet_Var(
 	    deflt = Tcl_GetString(objv[3]);
 	}
 
-	if (TclWeb_GetVar(result, key, globals->req) != TCL_OK)
+	if (TclWeb_GetVar(result, key, source, globals->req) != TCL_OK)
 	{
 	    if (deflt == NULL) {
 		Tcl_SetStringObj(result, "", -1);
@@ -366,7 +374,7 @@ Rivet_Var(
 	}
 	key = Tcl_GetString(objv[2]);
 
-	TclWeb_VarExists(result, key, globals->req);
+	TclWeb_VarExists(result, key, source, globals->req);
     } else if(!strcmp(command, "list")) {
 	char *key;
 	if (objc != 3)
@@ -376,7 +384,7 @@ Rivet_Var(
 	}
 	key = Tcl_GetStringFromObj(objv[2], NULL);
 
-	if (TclWeb_GetVarAsList(result, key, globals->req) != TCL_OK)
+	if (TclWeb_GetVarAsList(result, key, source, globals->req) != TCL_OK)
 	{
 	    result = Tcl_NewStringObj("", -1);
 	}
@@ -387,7 +395,7 @@ Rivet_Var(
 	    return TCL_ERROR;
 	}
 
-	if (TclWeb_GetVarNames(result, globals->req) != TCL_OK)
+	if (TclWeb_GetVarNames(result, source, globals->req) != TCL_OK)
 	{
 	    result = Tcl_NewStringObj("", -1);
 	}
@@ -398,14 +406,14 @@ Rivet_Var(
 	    return TCL_ERROR;
 	}
 
-	TclWeb_VarNumber(result, globals->req);
+	TclWeb_VarNumber(result, source, globals->req);
     } else if(!strcmp(command, "all")) {
 	if (objc != 2)
 	{
 	    Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	    return TCL_ERROR;
 	}
-	if (TclWeb_GetAllVars(result, globals->req) != TCL_OK)
+	if (TclWeb_GetAllVars(result, source, globals->req) != TCL_OK)
 	{
 	    result = Tcl_NewStringObj("", -1);
 	}
@@ -669,6 +677,16 @@ Rivet_InitCore( Tcl_Interp *interp )
 			 (Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,
 			 "var",
+			 Rivet_Var,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,
+			 "var_qs",
+			 Rivet_Var,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+	Tcl_CreateObjCommand(interp,
+			 "var_post",
 			 Rivet_Var,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);

@@ -134,16 +134,25 @@ TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 }
 
 int
-TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req)
+TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
 {
-    int i;
+    int i, j;
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
     int flag = 0;
 
+	/* determine which part of table to traverse */
+	if (source == VAR_SRC_QUERYSTRING) {
+		i = 0; j = req->apachereq->nargs;
+	} else if (source == VAR_SRC_POST) {
+		i = req->apachereq->nargs; j = parmsarray->nelts;
+	} else {
+		i = 0; j = parmsarray->nelts;
+	}
+
     /* This isn't real efficient - move to hash table later
        on... */
-    for (i = 0; i < parmsarray->nelts; ++i)
+    for (; i < j; ++i)
     {
 	char *parmkey = TclWeb_StringToUtf(parms[i].key, req);
 	if (!strncmp(varname, parmkey,
@@ -177,14 +186,23 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req)
 }
 
 int
-TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, TclWebRequest *req)
+TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
 {
-    int i;
+    int i, j;
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
+	/* determine which part of table to traverse */
+	if (source == VAR_SRC_QUERYSTRING) {
+		i = 0; j = req->apachereq->nargs;
+	} else if (source == VAR_SRC_POST) {
+		i = req->apachereq->nargs; j = parmsarray->nelts;
+	} else {
+		i = 0; j = parmsarray->nelts;
+	}
+
     /* This isn't real efficient - move to hash table later on. */
-    for (i = 0; i < parmsarray->nelts; ++i)
+    for (; i < j; ++i)
     {
 
 	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
@@ -204,13 +222,22 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, TclWebRequest *req)
 }
 
 int
-TclWeb_GetAllVars(Tcl_Obj *result, TclWebRequest *req)
+TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req)
 {
-    int i;
+    int i, j;
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    for (i = 0; i < parmsarray->nelts; ++i)
+	/* determine which part of table to traverse */
+	if (source == VAR_SRC_QUERYSTRING) {
+		i = 0; j = req->apachereq->nargs;
+	} else if (source == VAR_SRC_POST) {
+		i = req->apachereq->nargs; j = parmsarray->nelts;
+	} else {
+		i = 0; j = parmsarray->nelts;
+	}
+
+    for (; i < j; ++i)
     {
 	Tcl_ListObjAppendElement(req->interp, result,
 				 TclWeb_StringToUtfToObj(parms[i].key, req));
@@ -226,13 +253,22 @@ TclWeb_GetAllVars(Tcl_Obj *result, TclWebRequest *req)
 }
 
 int
-TclWeb_GetVarNames(Tcl_Obj *result, TclWebRequest *req)
+TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req)
 {
-    int i;
+    int i, j;
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    for (i = 0; i < parmsarray->nelts; ++i)
+	/* determine which part of table to traverse */
+	if (source == VAR_SRC_QUERYSTRING) {
+		i = 0; j = req->apachereq->nargs;
+	} else if (source == VAR_SRC_POST) {
+		i = req->apachereq->nargs; j = parmsarray->nelts;
+	} else {
+		i = 0; j = parmsarray->nelts;
+	}
+
+    for (; i < j; ++i)
     {
 	Tcl_ListObjAppendElement(req->interp, result,
 				 TclWeb_StringToUtfToObj(parms[i].key, req));
@@ -247,14 +283,23 @@ TclWeb_GetVarNames(Tcl_Obj *result, TclWebRequest *req)
 }
 
 int
-TclWeb_VarExists(Tcl_Obj *result, char *varname, TclWebRequest *req)
+TclWeb_VarExists(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
 {
-    int i;
+    int i, j;
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
+	/* determine which part of table to traverse */
+	if (source == VAR_SRC_QUERYSTRING) {
+		i = 0; j = req->apachereq->nargs;
+	} else if (source == VAR_SRC_POST) {
+		i = req->apachereq->nargs; j = parmsarray->nelts;
+	} else {
+		i = 0; j = parmsarray->nelts;
+	}
+
     /* This isn't real efficient - move to hash table later on. */
-    for (i = 0; i < parmsarray->nelts; ++i)
+    for (; i < j; ++i)
     {
 	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
 		     strlen(varname) < strlen(parms[i].key) ?
@@ -269,11 +314,18 @@ TclWeb_VarExists(Tcl_Obj *result, char *varname, TclWebRequest *req)
 }
 
 int
-TclWeb_VarNumber(Tcl_Obj *result, TclWebRequest *req)
+TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
 {
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
 
-    Tcl_SetIntObj(result, parmsarray->nelts);
+	if (source == VAR_SRC_QUERYSTRING) {
+		Tcl_SetIntObj(result, req->apachereq->nargs);
+	} else if (source == VAR_SRC_POST) {
+		Tcl_SetIntObj(result, parmsarray->nelts - req->apachereq->nargs);
+	} else {
+		Tcl_SetIntObj(result, parmsarray->nelts);
+	}
+
     return TCL_OK;
 }
 

@@ -1,3 +1,22 @@
+2002-12-14  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c: Implemented Tcl commands (via objv[0]) to
+	retrieve variables from different, specified sources (query
+	string, POST). (David Brancato).
+
+	* src/mod_rivet.h: Added defines for variable sources. (David
+	Brancato).
+
+	* src/apache_request.c: Added functions to get query and post
+	params. (David Brancato).
+
+	* src/TclWebapache.c: Implemented TclWeb.h API change. (David
+	Brancato).
+
+	* src/TclWeb.h: Changed API to include a source option in order to
+	indicate the origin (query string, POST) of a variable.  (David
+	Brancato).
+
 2002-12-13  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_InitTclStuff): Apache actually loads all

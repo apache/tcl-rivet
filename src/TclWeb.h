@@ -100,17 +100,17 @@ int TclWeb_SetStatus(int status, TclWebRequest *req);
 
 int TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req);
 
-int TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req);
+int TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req);
 
-int TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, TclWebRequest *req);
+int TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *req);
 
-int TclWeb_VarExists(Tcl_Obj *result, char *varname, TclWebRequest *req);
+int TclWeb_VarExists(Tcl_Obj *result, char *varname, int source, TclWebRequest *req);
 
-int TclWeb_VarNumber(Tcl_Obj *result, TclWebRequest *req);
+int TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req);
 
-int TclWeb_GetVarNames(Tcl_Obj *result, TclWebRequest *req);
+int TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req);
 
-int TclWeb_GetAllVars(Tcl_Obj *result, TclWebRequest *req);
+int TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req);
 
 int TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req);
 

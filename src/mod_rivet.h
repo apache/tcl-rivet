@@ -43,6 +43,10 @@
 #define STARTING_SEQUENCE "<?"
 #define ENDING_SEQUENCE "?>"
 
+#define VAR_SRC_QUERYSTRING 1
+#define VAR_SRC_POST 2
+#define VAR_SRC_ALL 3
+
 #define DEFAULT_ERROR_MSG "[an error occurred while processing this directive]"
 #define DEFAULT_TIME_FORMAT "%A, %d-%b-%Y %H:%M:%S %Z"
 #define MULTIPART_FORM_DATA 1
@@ -79,7 +83,6 @@ typedef struct {
 
     /* stuff for buffering output */
     Tcl_Channel *outchannel;
-
 } rivet_server_conf;
 
 /* eventually we will transfer 'global' variables in here and

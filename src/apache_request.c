@@ -167,6 +167,33 @@ char *ApacheRequest_params_as_string(ApacheRequest *req, const char *key)
     return retval;
 }
 
+table *ApacheRequest_query_params(ApacheRequest *req, ap_pool *p)
+{
+	array_header *a = ap_palloc(p, sizeof *a);
+	array_header *b = (array_header *)req->parms;
+
+	a->elts     = b->elts;
+	a->nelts    = req->nargs;
+
+	a->nalloc   = a->nelts; /* COW hack: array push will induce copying */
+	a->elt_size = sizeof(table_entry);
+	return (table *)a;
+}
+
+table *ApacheRequest_post_params(ApacheRequest *req, ap_pool *p)
+{
+	array_header *a = ap_palloc(p, sizeof *a);
+	array_header *b = (array_header *)req->parms;
+
+	a->elts     = (void *)( (table_entry *)b->elts + req->nargs );
+	a->nelts    = b->nelts - req->nargs;
+
+	a->nalloc   = a->nelts; /* COW hack: array push will induce copying */
+	a->elt_size = sizeof(table_entry);
+	return (table *)a;
+}
+
+
 ApacheUpload *ApacheUpload_new(ApacheRequest *req)
 {
     ApacheUpload *upload = (ApacheUpload *)
@@ -210,6 +237,7 @@ ApacheRequest *ApacheRequest_new(request_rec *r)
     req->temp_dir = NULL;
     req->parsed = 0;
     req->r = r;
+    req->nargs = 0;
 
     return req;
 }
@@ -264,6 +292,7 @@ int ApacheRequest___parse(ApacheRequest *req)
 
     if (r->args) {
         split_to_parms(req, r->args);
+	req->nargs = ((array_header *)req->parms)->nelts;
     }
 
     if (r->method_number == M_POST) {

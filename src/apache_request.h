@@ -45,6 +45,7 @@ typedef struct {
     void *hook_data;
     char* temp_dir;
     request_rec *r;
+    int nargs;
 } ApacheRequest;
 
 struct ApacheUpload {
@@ -97,6 +98,8 @@ char *ApacheRequest_params_as_string(ApacheRequest *req, const char *key);
 int ApacheRequest___parse(ApacheRequest *req);
 #define ApacheRequest_parse(req) \
     (req->status = req->parsed ? req->status : ApacheRequest___parse(req)) 
+table *ApacheRequest_query_params(ApacheRequest *req, ap_pool *p);
+table *ApacheRequest_post_params(ApacheRequest *req, ap_pool *p);
 
 FILE *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload);
 ApacheUpload *ApacheUpload_new(ApacheRequest *req);
