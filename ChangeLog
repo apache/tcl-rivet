@@ -1,3 +1,25 @@
+2003-09-29  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/packages/commserver/server.tcl: Exit 1 on failure.
+
+	* rivet/packages/commserver/commserver.tcl: Check to make sure the
+	server is really running before returning from commserver::start.
+
+	* rivet/packages/simpledb/simpledb.tcl: Added 'simpledb', although
+	it's not ready for production use.
+
+	* src/mod_rivet.c (Rivet_ChildInit): If we don't have separate
+	virtual servers, we only need to run the ChildInitScript once.  If
+	we do have interpreters for each virtual server, each one gets to
+	run the script.
+
+	* doc/rivet.ru.xml: Big update of the Russian translation by
+	Dmitry the Zuryanovich <dtz@XEPb.ru>.  Thanks!
+
+2003-09-26  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c: Spelling check: seperate->separate.
+
 2003-09-24  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Mention the global command in the 'internals'

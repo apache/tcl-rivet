@@ -48,13 +48,13 @@
   </articleinfo>
 
   <para>
-    This document is also available in the following languages: <ulink
+    Этот документ в переводах на другие языки: <ulink
     url="index.html.en">English</ulink>, <ulink url="index.html.it">Italian</ulink>
   </para>
 
   <!-- IMPORTANT: update the number below whenever you update this
   document! -->
-  <para>This document is based on version 1.20 of the original English
+  <para>This document is based on version 1.34 of the original English
   version.</para>
 
   <section>
@@ -65,9 +65,9 @@
       как система быстрая, мощная, расширяемая и достаточно простая для
       внедрения. Стоит заметить что с Apache Rivet вы получаете надежную
       платформу которая не только может интегрироваться в web, но
-      и может быть использована вне его. GUI и приложения командной 
-      строки (command line) могут использовать тот же код, который используется
-      при разработках web-приложений.
+      и может быть использована вне его. GUI, инструментарий администратора,
+      XML, манипуляции с БД,  консольные приложения могут использовать тот 
+      же код, который используется при разработках web-приложений.
        Это достигается применением языка TCL - вне и внутри Apache сервера.
     </para>
     <para>
@@ -83,6 +83,7 @@
       будет продолжаться еще очень долго.
       Если вы видите что что-то где-то почему-то не так - то пишите
       об этом, мы сами за всем не углядим без вашей помощи.
+      Это Свободное программное обеспечение!
     </para>
   </section>
 
@@ -95,10 +96,10 @@
         <title>Check Dependencies/Проверка связей между программным обеспечением</title>
         <para>
          Для того чтобы установить rivet, вам в первую очередь понадобится 
-         сам Tcl, версии 8.2 или выше. Известно что все должно работать
-         на Linux, FreeBSD,OpenBSD, Solaris и HPUX. Возможно что
-         можно заставитиь работать даже на Windows NT - читайте далее 
-         и экспериментируйте.
+         сам Tcl, версии 8.4 или выше и веб сервер Apache версий 1.3.x. Известно
+         что все должно работать на Linux, FreeBSD,OpenBSD, Solaris и HPUX. Возможно что
+         можно заставить работать даже на Windows NT - в дистрибутиве 
+         написано как это делать.
         </para>
       </step>
       <step>
@@ -114,17 +115,21 @@
       <step performance="optional">
         <title>Скачайте и соберите Apache</title>
         <para>
-        
-          Если у вас нет исходников Apache, или вы хотите собрать 
-          rivet как статический модуль, то вам придется скачать 
-          исходники apache отсюда
+          Rivety нужны заголовки (.h) от Apache. Самый простой способ -
+          это скачать исходники Apache, хотя во многих системах (Debian,
+	  например) позволяют поставить отдельно заголовки и прочие
+	  вещи, необходимые для разработчиков. Если вы хотите собрать 
+          rivet в статике (вместо того чтобы грузить его как .so), то
+          вам придется скачать все исходники apache отсюда
           <ulink
-            url="http://httpd.apache.org/"/>.
-          Но если вы не собираетесь собирать rivet как статический модуль -
-          то вам этого не придется делать. Мы рекомендуем собирать 
-          rivet как динамическую библиотеку (shared object), и соответсвенно
-          собирать его отдельно от Apache.
+            url="http://httpd.apache.org/"/>. 
+          Мы рекомендуем собирать rivet как динамическую библиотеку 
+          (shared object), и соответственно собирать его отдельно от Apache.
         </para>
+        <para>
+	Исходный код apache берут тут:<ulink
+          url="http://httpd.apache.org/"/>
+	</para>
       </step>
       <step>
         <title>Разархивация исходников</title>
@@ -143,33 +148,78 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
         <para>
           Rivet использует некую свою уникальную систему компиляции
           которую мы специально придумали именно для него. Она
-          использует информацию из инсталяций Apache и Tcl, для того 
-          чтобы собрать себя саму через набор Tcl скриптов, 
-          которые находятся 
+          использует информацию из инсталяций Apache (через 
+          <command>apxs</command>)и Tcl, для того чтобы собрать rivet 
+          через набор Tcl скриптов, которые находятся 
           <filename>buildscripts/</filename> тут.
         </para>
         <substeps>
-          <step>
-            <title>Редактирование  src/make.tcl</title>
-            <para>
-              Возможно вам придется отредактировать 
-              <filename>src/make.tcl</filename> при некоторых условиях.
-              Сначала попробуйте следующий шаг, и только если он у вас
-              не получится - то вам придется действительно поредактировать
-              этот файл.
-            </para>
-          </step>
-          <step>
-            <para> Сейчас вы должны быть готовы к сборке всего вместе:
-             </para>
-            <programlisting>cd src/
-./make.tcl <replaceable>option</replaceable></programlisting>
+	  <step>
+	    <title>Запустите ./configure.tcl</title>
+	    <para>
+	      По смыслу это практчески то же что и 
+              <filename>configure</filename>, скрипт который встречается
+              в большинстве систем. Он, конечно же, написан на Tcl.
+              У него есть несколько полезных аргументов:
+	    </para>
+	    <variablelist>
+	      <varlistentry>
+		<term>-help</term>
+		<listitem>
+		  <para>Показывает справку.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-enable-symbols</term>
+		<listitem>
+		  <para>Компилирует Rivet c символами для дебаггера.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-prefix <replaceable>directory</replaceable></term>
+		<listitem>
+		  <para>
+                    Место в котором будет установлен Rivet.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-with-apxs <replaceable>file</replaceable></term>
+		<listitem>
+		  <para> <replaceable>file</replaceable> который должен
+                  использоваться как apxs binary для сбора информации о
+                  инсталлированном Apache</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-with-tclconfig <replaceable>file</replaceable></term>
+		<listitem>
+		  <para>
+		    Использовать <replaceable>file</replaceable> как tclConfig.sh.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
 
-            <para>where <replaceable>option</replaceable> can be
-              either <option>shared</option> or
-              <option>static</option>.
-            </para>
-          </step>
+	    <programlisting>cd src/
+./configure.tcl
+Configuring
+.........done.</programlisting>
+
+	  </step>
+	  <step>
+	   <title>Запустите make.tcl</title>
+           <para>
+            Сейчас нужно скомпилировать Rivet:
+           </para>
+
+           <programlisting>./make.tcl <replaceable>option</replaceable></programlisting>
+
+	   <para>где <replaceable>option</replaceable> может быть
+	     <option>shared</option> или
+	     <option>static</option>.
+	   </para>
+	  </step>
           <step>
             <title>Установка</title>
             <para>
@@ -509,24 +559,59 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 
   </section>
   <section id="commands">
-    <title>Rivet Tcl: команды и переменные</title>
-    <variablelist>
+    <title>Rivet: Tcl команды и переменные</title>
 
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>var</command>
-            <group choice="req">
-              <arg>get</arg>
-              <arg>list</arg>
-              <arg>exists</arg>
-              <arg>number</arg>
-              <arg>all</arg>
-            </group>
-          </cmdsynopsis>
-        </term>
-        <listitem>
-          <para>
+    <refentry>
+      <refnamediv>
+	<refname>var</refname>
+	<refname>var_qs</refname>
+	<refname>var_post</refname>
+	<refpurpose>get the value of a form variable.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>
+	    var
+	  </command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+
+	<cmdsynopsis>
+	  <command>
+	    var_qs
+	  </command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+
+	<cmdsynopsis>
+	  <command>
+	    var_post
+	  </command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+     <refsect1>
+	<title>Описание</title>
+	<para>
             Команда  <command>var</command>
             предназначена для доступа к переменным которые были
             переданы методами GET или POST, не делая между 
@@ -534,60 +619,63 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
             формы команды <command>var</command>:
             <command>var_qs</command> и <command>var_post</command>.
             Эти команды рассматривают только переменные переданные
-            GETом и POSTом, соответсвенно. 
-          </para>
-          <variablelist>
-            <varlistentry>
-              <term>
-                <cmdsynopsis>
-                  <arg>get</arg>
-                  <arg><replaceable>varname</replaceable></arg>
-                  <arg><replaceable><optional>default</optional></replaceable></arg>
-                </cmdsynopsis>
-              </term>
-              <listitem>
-                <para>
-                  Возвращает значение переданной вам методом GET или POST переменной 
-                  <option><replaceable>varname</replaceable></option>
-                  (даже если есть несколько значений). Если же такой переменной
-                  не было передано - то возвращается
-                  <option><replaceable><optional>default</optional></replaceable></option>,
-                  а если и оно не было указано - то "" - пустая строка.
-                </para>
-              </listitem>
-            </varlistentry>
+            GETом и POSTом, соответственно.
+ 	</para>
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>get</arg>
+		<arg><replaceable>varname</replaceable></arg>
+		<arg><replaceable><optional>default</optional></replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Возвращает значение переменной 
+		<option><replaceable>varname</replaceable></option>
+		как строку, причем даже в случае когда у переменной есть
+		несколько значений
+		Если же такой переменной
+                не было передано - то возвращается
+                <option><replaceable><optional>default</optional></replaceable></option>,
+                а если и оно не было указано - то "" - пустая строка.
+	      </para>
+	    </listitem>
+	  </varlistentry>
 
-            <varlistentry>
-              <term>
-                <cmdsynopsis>
-                  <arg>list</arg>
-                  <arg><replaceable>varname</replaceable></arg>
-                </cmdsynopsis>
-              </term>
-              <listitem>
-                <para>
-                  Возвращает значение переменной
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>list</arg>
+		<arg><replaceable>varname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		 Возвращает значение переменной
                   <option><replaceable>varname</replaceable></option>
                   как список, если для этой переменной было много значений.
-                </para>
-              </listitem>
-            </varlistentry>
+	      </para>
+	    </listitem>
+	  </varlistentry>
 
-            <varlistentry>
-              <term>
-                <cmdsynopsis>
-                  <arg>exists</arg>
-                  <arg><replaceable>varname</replaceable></arg>
-                </cmdsynopsis>
-              </term>
-              <listitem>
-                <para>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>exists</arg>
+		<arg><replaceable>varname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
                   Возвращает 1 если
                   <option><replaceable>varname</replaceable></option>
                   вам передана, и 0 если нет.
-                </para>
-              </listitem>
-            </varlistentry>
+
+               </para>
+             </listitem>
+           </varlistentry>
 
             <varlistentry>
               <term>
@@ -615,35 +703,39 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
               </listitem>
             </varlistentry>
           </variablelist>
-
           <para>
             См. так же <xref linkend="variable_access"/>.
           </para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
+      </refsect1>
+    </refentry>
 
-    <variablelist>
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>upload</command>
-            <group choice="req">
-              <arg>channel</arg>
-              <arg>save</arg>
-              <arg>data</arg>
-              <arg>exists</arg>
-              <arg>size</arg>
-              <arg>type</arg>
-              <arg>filename</arg>
-            </group>
-          </cmdsynopsis>
-        </term>
-        <listitem>
+   <refentry>
+      <refnamediv>
+	<refname>upload</refname>
+	<refpurpose>предназначена для обработки закачанных (uploaded)
+          файлов.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>upload</command>
+	  <group choice="req">
+	    <arg>channel</arg>
+	    <arg>save</arg>
+	    <arg>data</arg>
+	    <arg>exists</arg>
+	    <arg>size</arg>
+	    <arg>type</arg>
+	    <arg>filename</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
           <para> Команда upload предназначена для обработки закачанных (uploaded)
-          файлов. Обратите внимание что поведение этой команды зависит от конфигурации
-          Apache и Rivet.
-            </para>
+          файлов. Обратите внимание что поведение этой команды зависит от конфигурации Apache и Rivet.
+          </para>
           <variablelist>
             <varlistentry>
               <term>
@@ -746,20 +838,40 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
           </variablelist>
           <para>
             См. так же <xref linkend="upload"/>.
-          </para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
+	</para>
+      </refsect1>
+    </refentry>
 
-    <variablelist>
-      <varlistentry>
-        <term>
+   <refentry>
+      <refnamediv>
+	<refname>load_response</refname>
+	<refpurpose>Сохряняет переданные данные в массиве.</refpurpose>
+      </refnamediv>
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_response</command>
+	  <arg><replaceable>arrayName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+	<title>Описание</title>
+        Сохраняет в массиве все переменные, переданные из формы
+      </refsect1>
+    </refentry>
+
+    <refentry>
+       <refnamediv>
+	<refname>load_env</refname>
+	<refpurpose>Загужает переменные окружения (environment).</refpurpose>
+       </refnamediv>
+       <refsynopsisdiv>
           <cmdsynopsis>
             <command>load_env</command>
             <arg choice="opt"><replaceable>array_name</replaceable></arg>
           </cmdsynopsis>
-        </term>
-        <listitem>
+       </refsynopsisdiv>
+       <refsect1>
+	<title>Описание</title>
           <para>
             Загружает в указанный массив переменные окружения. По умолчанию 
             делает это в массив <option>::request::env</option>
@@ -771,91 +883,142 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
             можно ограничиться просто
             <option>env</option> (примечание переводчика: щааааз!).
           </para>
-        </listitem>
-      </varlistentry>
+       </refsect1>
+     </refentry>
 
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>load_headers</command>
-            <arg><replaceable>array_name</replaceable></arg>
-          </cmdsynopsis>
-        </term>
-        <listitem>
-          <para>
+    <refentry>
+      <refnamediv>
+	<refname>load_headers</refname>
+	<refpurpose>Загружает заголовки (headers) из запроса (requestа).</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_headers</command>
+	  <arg><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	  <para>
             Загужает клиентские HTTP заголовки в указанный массив, или в
             <option>headers</option> если имя массива не указано.
           </para>
-        </listitem>
-      </varlistentry>
+      </refsect1>
+    </refentry>
 
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>load_cookies</command>
-            <arg choice="opt"><replaceable>array_name</replaceable></arg>
-          </cmdsynopsis>
-        </term>
-        <listitem>
+    <refentry>
+      <refnamediv>
+	<refname>load_cookies</refname>
+	<refpurpose>Загружает клиентские cookie.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_cookies</command>
+	  <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+      </refsect1>
           <para>
             Загужает переданные клиентом Cookie в указанный массив, или в
             <option>headers</option> если имя массива не указано.
           </para>
-        </listitem>
-      </varlistentry>
+     </refentry>
 
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>include</command>
-            <arg><replaceable>filename_name</replaceable></arg>
-          </cmdsynopsis>
-        </term>
-        <listitem>
-          <para>
-            Подгружает файл без обратки тэгов 
-            &lt;? и ?&gt;. Это лучший способ включить HTML файл 
-            или другой статический контент. 
-          </para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>parse</command>
-            <arg><replaceable>filename</replaceable></arg>
-          </cmdsynopsis>
-        </term>
-        <listitem>
-          <para>
+    <refentry>
+      <refnamediv>
+	<refname>include</refname>
+	<refpurpose> Считывает файл без всякой модификации.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>include</command>
+	  <arg><replaceable>filename_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	<para>
+	  Подгружает файл без обратки тэгов 
+	  &lt;? и ?&gt;. Это лучший способ включить HTML файл 
+	  или другой статический контент. 
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>parse</refname>
+	<refpurpose>обрабатывает файл Rivetом.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>parse</command>
+	  <arg><replaceable>filename</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	<para>
             Почти то же что и команда Tcl <command>source</command>, но только
             с учетом тегов  &lt;? и ?&gt;, используемых Rivetом. Этой командой можно 
-            загружать один .rvt файл в другой.
-          </para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>headers</command>
-            <group choice="req">
-              <arg>set</arg>
-              <arg>redirect</arg>
-              <arg>add</arg>
-              <arg>type</arg>
-              <arg>numeric</arg>
-            </group>
-          </cmdsynopsis>
-        </term>
-        <listitem>
-          <para>
+            вызывать один .rvt файл из другого.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>headers</refname>
+	<refpurpose>установка и обработка заголовков HTTP.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>headers</command>
+	  <group choice="req">
+	    <arg>set</arg>
+	    <arg>redirect</arg>
+	    <arg>add</arg>
+	    <arg>type</arg>
+	    <arg>numeric</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+         <para>
             Команда <command>headers</command> предназначена для работы с заголовками http.
-          </para>
-          <para>
-            <variablelist>
-              <varlistentry>
-                <term>
-                  <cmdsynopsis>
+         </para>
+         <variablelist>
+
+         <varlistentry>
+	    <term><cmdsynopsis>
+		<arg>set</arg>
+		<arg><replaceable>headername</replaceable></arg>
+		<arg><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Устанавливает разнообразные заголовки и значения.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+          <varlistentry>
+            <term>
+             <cmdsynopsis>
                     <arg>redirect</arg>
                     <arg><replaceable>uri</replaceable></arg>
                   </cmdsynopsis>
@@ -863,95 +1026,218 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
                 <listitem>
                   <para>
                     Перенаправление (redirect) с текущей страницы на новый URI.
-                    <emphasis>Обязана</emphasis> быть в самом начале кода (?)
-                  </para>
-                </listitem>
-              </varlistentry>
-              <varlistentry>
-                <term>
-                  <cmdsynopsis>
-                    <arg>setcookie</arg>
-                    <arg>-name</arg>
-                    <arg><replaceable>cookie-name</replaceable></arg>
-                    <arg>-value</arg>
-                    <arg><replaceable>cookie-value</replaceable></arg>
-                    <arg choice="opt">-expires <replaceable>date/time</replaceable></arg>
-                    <arg choice="opt">-domain <replaceable>domain</replaceable></arg>
-                    <arg choice="opt">-path <replaceable>path</replaceable></arg>
-                    <arg choice="opt">-secure</arg>
-                  </cmdsynopsis>
-                </term>
-                <listitem>
-                  <para>
-                    Эта команда преденазаначена для установки Cookies, которые
-                    будут посланы сервером клиенту. 
-                    <option>cookie-name</option> - это имя Cookie,
-                    <option>cookie-value</option> - это значение,
-                    <option>-expires</option> устанавливает дату протухания 
-                    Cookie, и обязана быть в виде
-                    <constant>'DD-Mon-YY HH:MM:SS'</constant>,
-                    <option>-path</option> устанавливает путь, 
-                    а <option>-secure</option> указывает что эта Cookie 
-                    должна передаваться только по HTTPS
+                    <emphasis>Обязана</emphasis> быть в самом начале кода.
                   </para>
                 </listitem>
               </varlistentry>
 
-              <varlistentry>
-                <term><cmdsynopsis>
-                    <arg>type</arg>
-                    <arg><replaceable>content-type</replaceable></arg>
-                  </cmdsynopsis>
+	      <varlistentry>
+		<term>
+                  <cmdsynopsis>
+		    <arg>add</arg>
+		    <arg><replaceable>headername</replaceable></arg>
+		    <arg><replaceable>value</replaceable></arg>
+		  </cmdsynopsis>
                 </term>
-                <listitem>
-                  <para>
-                    Эта команда устанавливает HTTP заголовок 
-                    <constant>Content-type</constant> который выозвращается
+		<listitem>
+		  <para>Добавляет текст в заголовок
+		  <varname>headername</varname>.</para>
+		</listitem>
+	      </varlistentry>
+
+	  <varlistentry>
+	    <term><cmdsynopsis>
+		<arg>type</arg>
+		<arg><replaceable>content-type</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+                   Эта команда устанавливает HTTP заголовок 
+                    <constant>Content-type</constant> который возвращается
                     клиенту при обращении к странице. Это полезно если вы
                     отдаете содержимое отличное от text/html или
                     указываете кодировку. 
-                  </para>
-                </listitem>
-              </varlistentry>
+	      </para>
+	    </listitem>
+	  </varlistentry>
 
-              <varlistentry>
-                <term><cmdsynopsis>
-                    <arg>set</arg>
-                    <arg><replaceable>headername</replaceable></arg>
-                    <arg><replaceable>value</replaceable></arg>
-                  </cmdsynopsis>
-                </term>
-                <listitem>
+         <varlistentry>
+	  <term>
+           <cmdsynopsis>
+		    <arg>numeric</arg>
+		    <arg><replaceable>response code</replaceable></arg>
+	   </cmdsynopsis>
+	  </term>
+          <listitem>
+		  <para>Устанавливает код http-ответа, типа 200, 404 или 500.
+		  </para>
+	  </listitem>
+	 </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+   <refentry>
+      <refnamediv>
+	<refname>makeurl</refname>
+	<refpurpose>Формирует url'и основываясь на hostname, port.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>makeurl</command>
+	  <arg><replaceable>filename</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	<para>
+          Создает URL который ссылается сам на себя исходя из имени
+	  файла. Например,
+	  <programlisting>makeurl /tclp.gif</programlisting>
+	  вернет 
+	  <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
+	  взяв информацию о hostname и порте из достоверного источника
+	</para>
+      </refsect1>
+    </refentry>
+
+
+    <refentry>
+      <refnamediv>
+	<refname>cookie</refname>
+	<refpurpose>работает с cookies.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>set</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	  <arg><replaceable><optional>cookiValue</optional></replaceable></arg>
+	  <arg>-days <replaceable>expireInDays</replaceable></arg>
+	  <arg>-hours <replaceable>expireInHours</replaceable></arg>
+	  <arg>-minutes <replaceable>expireInMinutes</replaceable></arg>
+	  <arg>-expires <replaceable>Wdy, DD-Mon-YYYY HH:MM:SS GMT</replaceable></arg>
+	  <arg>-path <replaceable>uriPathCookieAppliesTo</replaceable></arg>
+	  <arg>-secure <replaceable>1/0</replaceable></arg>
+	</cmdsynopsis>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>get</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
                   <para>
-                    Устанавливает любые имена и значения http заголовков
-                  </para>
-                </listitem>
-              </varlistentry>
-            </variablelist>
-          </para>
-        </listitem>
-      </varlistentry>
+                    Эта команда преденазаначена для установки или 
+                    считывания переданных Cookies. Когда вам передают 
+		    cookie, эта команда вам передает значение, или же
+		    пустую строку, если вам такую cookie не передали.
+	</para>
+      </refsect1>
+    </refentry>
 
-      <varlistentry>
-        <term>
-          <cmdsynopsis>
-            <command>makeurl</command>
-            <arg><replaceable>filename</replaceable></arg>
-          </cmdsynopsis>
-        </term>
-        <listitem>
-          <para>
-            Создает URL который ссылается сам на себя из имени файла. Например:
-            <programlisting>makeurl /tclp.gif</programlisting>
-            вернет
-            <constant>http://[hostname]:[port]/tclp.gif</constant>.
-            где hostname и port - это имя хоста и порт той страницы
-            которая была указана при запросе.
-          </para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
+   <refentry>
+      <refnamediv>
+	<refname>clock_to_rfc850_gmt</refname>
+	<refpurpose>Возвращает время согласно rfc850 основываясь на [clock seconds].</refpurpose>
+      </refnamediv>
 
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>clock_to_rfc850_gmt</command>
+	  <arg><replaceable>seconds</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	<para>
+          Конвертирует unix-time (количество секунд с 1970 года) в 
+	  формат RFC850, который требует чтобы оно было GMT.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>html</refname>
+	<refpurpose>создает html выделения в тексте.</refpurpose>
+      </refnamediv>
+     <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>html</command>
+	  <arg><replaceable>string</replaceable></arg>
+	  <arg rep="repeat"><replaceable>arg</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	<para>
+          Выводит текст с возможностию передачи HTML тэгов, переданных
+          как аргументы. Пример:
+	  <programlisting>html "Test" b i</programlisting>
+	  produces: <computeroutput>&lt;b&gt;&lt;i&gt;Test&lt;/i&gt;&lt;/b&gt;</computeroutput>
+	</para>
+      </refsect1>
+    </refentry>
+
+   <refentry>
+      <refnamediv>
+	<refname>incr0</refname>
+	<refpurpose>увеличивает переменную на 1 или делает ее равной 1 если переменная не существовала.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>incr0</command>
+	  <arg><replaceable>varname</replaceable></arg>
+	  <arg><replaceable>num</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	<para>
+	  Прибавляет 1 к 
+	  <option><replaceable>varname</replaceable></option>
+	  <option><replaceable>num</replaceable></option> раз. 
+	  Если такой переменной не существовало, то создает таковую
+          и присваивает ей 1, а не возвращает ошибку.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>parray</refname>
+	<refpurpose>команда Tcl's <command>parray</command> с html-форматированием.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>parray</command>
+	  <arg><replaceable>arrayName</replaceable></arg>
+	  <arg><replaceable><optional>pattern</optional></replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Описание</title>
+	<para>
+          Версия стандартной команды Tcl
+	  <command>parray</command>. Делает то же самое, но с 
+          красивым html оформлением.
+	</para>
+
+      </refsect1>
+    </refentry>
   </section>
 
   <section id="examples">
@@ -1040,7 +1326,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
         поступать.
       </para>
       <para>
-        Скрипт в последствии проверяет что  
+        Скрипт далее проверяет что  
         <varname>errlist</varname> пустой (а если нет - то информирует 
         вас об ошибках) и говорит что спасибо и все такое.
       </para>
@@ -1061,6 +1347,42 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
       <programlisting>&upload.rvt;</programlisting>
     </example>
 
+  </section>
+
+
+  <section id="tcl_packages">
+    <title>Rivet Tcl packagы</title>
+    <para>
+      Кроме всего прочего, Rivet - это еще и набор полезных
+      packageй.
+    </para>
+    <itemizedlist>
+      <listitem>
+	<para>commserver - это package который может быть использован при
+        IPC. Страшно экспериментальный. Ему нужен comm из tcllib
+       </para>
+      </listitem>
+
+      <listitem>
+	<para>dio - абстрактный интерфейс работы с базами данных.</para>
+      </listitem>
+
+      <listitem>
+	<para>dtcl - модуль для обеспечения совместимости с  mod_dtcl
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>form - для создания forms.</para>
+      </listitem>
+
+      <listitem>
+	<para>rivet - еще куча полезных процедур.</para>
+      </listitem>
+     <listitem>
+	<para>tclrivet</para>
+      </listitem>
+    </itemizedlist>
   </section>
 
   <section id="help">
@@ -1084,8 +1406,18 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
       </para>
     </section>
 
+    <section>
+      <title>Новостная группа</title>
+      <para>
+       Новостная группа <ulink url="news:comp.lang.tcl"/> - это хорошее 
+       место для вопросов по Tcl вообще. Но и разработчики Rivet туда
+       тоже заглядывают, можно и туда писать, но лучше в список рассылки.
+      </para>
+    </section>
+
+
     <section id="websites">
-      <title>Web Sites</title>
+      <title>Веб сайты</title>
 
       <para>
         Есть некоторое количество полезных веб сайтов про Apache и Tcl.
@@ -1130,6 +1462,30 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
         выяснить опыт ее решения, если кто-то уже с ней сталкивался.
       </para>
     </section>
+    <section>
+      <title>IRC</title>
+
+      <para>
+        Иногда случается что кто-то из команды Rivet доступен по IRC
+        на irc.freenode.net, канал #tcl.
+      </para>
+    </section>
+
+    <section>
+      <title>Редактирование Rivet файлов</title>
+      <para>
+        Для двух популярных редакторов
+	<application>emacs</application> и
+	<application>vim</application> есть код для удобного редактирования
+        файлов Rivet. Идея в том что редактор, завидев теги 
+        &lt;? and ?&gt; переключается то в режим HTML, то в Tcl.
+        Эти файлы
+	<filename>two-mode-mode.el</filename> и
+	<filename>rvt.vim</filename> находятся в директории
+	<filename>contrib/</filename>.
+      </para>
+    </section>
+
 
   </section>
 
@@ -1138,13 +1494,13 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
     <para>
       Эта секция давно устарела, поскольку новый код добавляется, а 
       старый убирается. Так что лучше читайте исходники - они рулез!.
-      И вообще если хотите чего-нибудь написать - FIXME.
+      А если вам интересны изменения, то пользуйтесь <command>cvs</command>
     </para>
     <section>
       <title>Инициализация</title>
       <para>
         Когда apavhe запускается (или когда запускается использующий TCL
-        дочерний процесс Apache ), вызывается
+        дочерний процесс Apache если Tcl собран с поддержкой threads), вызывается
         <function>Rivet_InitTclStuff</function>,
         который создает новый интерпретатор, по одному на каждый
         виртуальный хост, в зависимости от конфигурации. Также инициализируются
@@ -1169,6 +1525,27 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
         систему ввода-вывода Apache. 
       </para>
     </section>
+    <section>
+      <title>Команда <command>global</command></title>
+      <para>
+        Rivet сделан так, что должен запускать Tcl код с минимальным
+        количеством неожиданностей, Но иногда приходится идти на 
+        компромиссы - в этом случае вам и пригодится команда
+        <command>global</command>. Проблема в том что эта команда создаст
+        вам действительно глобальную переменную, и если пользователь 
+        просто задействует старый код без изменений, скорее всего 
+        он захочет получить доступ к переменным из других програм, не 
+        желая заботиться проверкой того как передается эта переменная 
+        из страницы в страницу. По этому поводу мы и создали процедурку
+	<command>::request::global</command> которая и  выполняет
+        роль команды <command>global</command> в Rivet страницах. Если
+        вам на самом деле нужны настоящие глобальные переменные, используйте
+        команду
+	<command>::global</command> или добавьте :: namespace 
+        к переменным которые вы хотите сделать глобальными
+      </para>
+    </section>
+   
     <section>
       <title>Обработка страниц, выполнение и кеширование</title>
       <para>

@@ -1,0 +1,106 @@
+# Test suite for the tcltest test suite.
+
+set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+
+package require tcltest
+package require simpledb
+
+proc maketables {} {
+    simpledb::createtable computer gfx cpu mem hd price
+    simpledb::createtable graphicscard name manufacturer mem
+}
+
+proc arraysort {lst} {
+    set sortlist {}
+    set reslist {}
+    foreach {key val} $lst {
+	lappend sortlist [list $key $val]
+    }
+    set sortlist [lsort -index 0 $sortlist]
+    foreach {keyval} $sortlist {
+	lappend reslist [lindex $keyval 0] [lindex $keyval 1]
+    }
+    return $reslist
+}
+
+proc deltables {} {
+    simpledb::deltable computer
+    simpledb::deltable graphicscard
+}
+
+proc populatetables {} {
+    set lt1 [simpledb::createitem computer {
+	gfx ATI
+	cpu "Motorola PPC"
+	mem 256
+	hd 10
+	price 1000
+    }]
+
+    set lt2 [simpledb::createitem computer {
+	gfx Permedia
+	cpu "PII"
+	mem 256
+	hd 10
+	price 1200
+    }]
+
+    set lt3 [simpledb::createitem computer {
+	gfx Matrox
+	cpu "Pentium"
+	mem 128
+	hd 5
+	price 5000
+    }]
+}
+
+tcltest::test createtables-1.1 {Create two tables} {
+    set res {}
+    maketables
+    set res [simpledb::tables]
+    deltables
+    set res
+} {graphicscard computer}
+
+tcltest::test deltables-1.1 {Make sure tables are gone} {
+    set res {}
+    maketables
+    deltables
+    simpledb::tables
+} {}
+
+tcltest::test populatetables-1.1 {Make tables, populate them} {
+    set res {}
+    maketables
+    populatetables
+} {}
+
+foreach arr [simpledb::items computer] {
+    lappend arrlist [arraysort $arr]
+}
+puts [lsort -index 9 $arrlist]
+
+simpledb::setitem computer $lt3 {
+    price 2000
+}
+
+simpledb::setitem computer $lt3 {
+    price 3000
+}
+
+puts "getitem computer lt1: [simpledb::getitem computer $lt1]"
+
+puts "finditems: [simpledb::finditems computer {
+    gfx Permedia
+    cpu PII
+}]"
+
+foreach item [simpledb::finditems computer {
+    gfx *
+}] {
+    puts [simpledb::getitem computer $item]
+}
+
+simpledb::synctostorage session.tcl
+
+tcltest::cleanupTests

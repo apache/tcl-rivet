@@ -18,6 +18,7 @@ if { [catch {
     # Ok, something failed.  This should mean that another copy is
     # already running.
     puts stderr "Could not launch commserver on port $Port, exiting"
+    exit 1
 } else {
     puts stderr "Launched commserver on port $Port"
     vwait forever

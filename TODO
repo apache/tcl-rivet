@@ -55,6 +55,8 @@ TODO
   'services'.  These are separate Tcl processes that most likely exist
   to allow the Apache children to share data.
 
+* Find a way of integrating the Tcl event loop?
+
 MAYBE
 =====
 

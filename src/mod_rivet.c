@@ -161,7 +161,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     return TCL_OK;
 }
 
-/* This is a seperate function so that it may be called from 'Parse' */
+/* This is a separate function so that it may be called from 'Parse' */
 int
 Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 {
@@ -718,13 +718,13 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     while (sr)
     {
 	rivet_server_conf *myrsc = NULL;
-	/* This should set up slave interpreters for other virtual hosts */
+	/* This sets up slave interpreters for other virtual hosts. */
 	if (sr != s) /* not the first one  */
 	{
 	    myrsc = RIVET_NEW_CONF(p);
 	    ap_set_module_config(sr->module_config, &rivet_module, myrsc);
 	    Rivet_CopyConfig( rsc, myrsc );
-	    if (rsc->seperate_virtual_interps != 0) {
+	    if (rsc->separate_virtual_interps != 0) {
 		myrsc->server_interp = NULL;
 	    }
 	} else {
@@ -862,9 +862,9 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 	}
     } else if( STREQU( var, "SeparateVirtualInterps" ) ) {
 	if( STREQU( val, "on" ) ) {
-	    rsc->seperate_virtual_interps = 1;
+	    rsc->separate_virtual_interps = 1;
 	} else {
-	    rsc->seperate_virtual_interps = 0;
+	    rsc->separate_virtual_interps = 0;
 	}
     } else {
 	string = Rivet_SetScript( cmd->pool, rsc, var, val);
@@ -1023,7 +1023,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->cache_free = oldrsc->cache_free;
     newrsc->upload_max = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
-    newrsc->seperate_virtual_interps = oldrsc->seperate_virtual_interps;
+    newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
     newrsc->server_name = oldrsc->server_name;
     newrsc->upload_dir = oldrsc->upload_dir;
     newrsc->objCacheList = oldrsc->objCacheList;
@@ -1059,7 +1059,7 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     *(rsc->cache_free) = 0;
     rsc->upload_max = 0;
     rsc->upload_files_to_var = 0;
-    rsc->seperate_virtual_interps = 0;
+    rsc->separate_virtual_interps = 0;
     rsc->server_name = NULL;
     rsc->upload_dir = "/tmp";
     rsc->objCacheList = NULL;
@@ -1158,7 +1158,13 @@ Rivet_ChildInit(server_rec *s, pool *p)
 
 	    }
 	}
-	sr = sr->next;
+	/* If we don't have separate virtual servers, we only need to
+	 * run the ChildInitScript once. */
+	if (rsc->separate_virtual_interps) {
+	    sr = sr->next;
+	} else {
+	    break;
+	}
     }
 }
 

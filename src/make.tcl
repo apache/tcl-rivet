@@ -166,12 +166,13 @@ AddNode clean {
     }
 }
 
+# FIXME - we need to do this at install time, because the file join
+# here makes the package index use "/".
 AddNode $PKGINDEX {
     tcl {
 	set curdir [pwd]
 	cd [file dirname $PKGINDEX]
 	eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl]]
-	puts [list pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl]]]
 	cd $curdir
     }
 }

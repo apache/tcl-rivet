@@ -70,7 +70,7 @@ typedef struct {
     int *cache_free;
     int upload_max;
     int upload_files_to_var;
-    int seperate_virtual_interps;
+    int separate_virtual_interps;
     char *server_name;
     char *upload_dir;
     table *rivet_server_vars;
