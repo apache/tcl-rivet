@@ -3,7 +3,7 @@
 set testfilename1 config.rvt
 
 ::tcltest::test config-1.1 {ErrorScript config test} {
-    server::start {
+    apachetest::start {
 	-c "RivetUserConf ErrorScript 'puts \"Page broken\"'"
     } {
 	catch {
@@ -15,7 +15,7 @@ set testfilename1 config.rvt
 } {Page broken}
 
 ::tcltest::test config-1.2 {ErrorScript config test} {
-    server::start {
+    apachetest::start {
 	-c "RivetUserConf ErrorScript 'puts \"Page broken\"'" -c "AccessFileName test-htaccess"
     } {
 	catch {
@@ -88,7 +88,7 @@ set i 0
 foreach Config $ConfigList {
     incr i
     ::tcltest::test config-${i}.1 {config test} {
-	server::start $Config {
+	apachetest::start $Config {
 	    catch {
 		set page [::http::geturl "${urlbase}$testfilename1?config-2"]
 		set match [string trim [::http::data $page]]

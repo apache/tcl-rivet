@@ -3,7 +3,7 @@
 set testfilename1 broken.rvt
 
 ::tcltest::test broken-1.1 {error page test} {
-    server::start {} {
+    apachetest::start {} {
 	catch {
 	    set page [::http::geturl "${urlbase}$testfilename1"]
 	    set match [string trim [::http::data $page]]

@@ -15,27 +15,6 @@ set urlbase "http://localhost:8081/"
 
 # Use this to start and stop the server:
 
-namespace eval server {
-    variable binname
-}
-set server::binname $binname
-
-proc server::start { options code } {
-    variable serverpid 0
-    variable binname
-    after 200
-    set serverpid [eval exec $binname -X -f "[file join [pwd] server.conf]" $options &]
-    after 100
-    puts "Apache started as PID $serverpid"
-    if { ! [catch {
-	uplevel $code
-    } err] } {
-	puts $err
-    }
-    after 100
-    exec kill $serverpid
-}
-
 set TestList {cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test makeurl.test}
 
 # Test stanzas are created by giving the test a name and a
@@ -43,13 +22,13 @@ set TestList {cookies.test get.test post.test tclfile.test env.test hello.test i
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
-set testgroup1 0
+set testgroup1 1
 set testgroup2 1
 set testgroup3 1
 
 if { $testgroup1 } {
     foreach Test $TestList {
-	server::start {} {
+	apachetest::start {} {
 	    source $Test
 	}
     }
@@ -59,7 +38,7 @@ if { $testgroup1 } {
 # around some.
 
 if { $testgroup2 } {
-    server::start {} {
+    apachetest::start {} {
 	foreach Test $TestList {
 	    source $Test
 	}
