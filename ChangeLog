@@ -1,3 +1,9 @@
+2002-01-10  David N. Welton  <davidw@dedasys.com>
+
+	* tests/template.conf.tcl: Re-add srm.conf and access.conf - if
+	they aren't present, it tries to grab the ones from /etc/ - not
+	what we want.
+
 2002-01-09  Damon J. Courtney <damon@unreality.com>
 	* src/tcl_commands.c
 	    Renamed to rivetCore.c
@@ -17,7 +23,7 @@
 
 	* src/make.tcl
 	    Added rivetCore.c, rivetList.c and rivetInit.c to the make.
-	    
+
 2002-01-08  Damon J. Courtney <damon@unreality.com>
 	* src/mod_rivet.h
 	    Added RIVET_NEW_CONF macro to create a new rivet_server_conf.
