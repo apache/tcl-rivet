@@ -7,6 +7,11 @@
 
 /* $Id$ */
 
+/* Tcl 8.4 migration. */
+#ifndef CONST84
+#   define CONST84
+#endif
+
 /* Error wrappers  */
 #define ER1 "<hr><p><code><pre>\n"
 #define ER2 "</pre></code><hr>\n"
