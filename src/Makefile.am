@@ -1,4 +1,4 @@
-# Makefile for creating libTclMagick and libTkMagick
+# Makefile for Rivet
 
 # Copyright 2004 The Apache Software Foundation
 
@@ -32,7 +32,6 @@ mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 # APXS_CPPFLAGS_SHLIB
-
 
 #
 # Rivet Library

@@ -224,7 +224,7 @@ fi
 # We have to either find apxs or be told where it is using --with-apxs
 AC_ARG_WITH(apxs, [  --with-apxs=FILE        location of Apache's apxs tool], with_apxs=${withval})
 
-dnl First check to see if --with-magick-config was specified.
+dnl First check to see if --with-apxs was specified.
 if test x"${with_apxs}" = x ; then
     AC_PATH_PROGS(APXS, apxs)
     if test x"${APXS}" = x ; then
