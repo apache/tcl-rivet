@@ -296,6 +296,8 @@ package require Itcl
 	set a(session_id) [id]
 	set a(package) $packageName
 	set a(key) $key
+
+	regsub -all {\\} $data {\\\\} data
 	set a(data) $data
 
 	debug "store session data, package '$packageName', key '$key', data '$data'"
