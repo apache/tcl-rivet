@@ -45,7 +45,7 @@ proc aardvark::Output { type txt } {
 	    puts "Output: $txt"
 	}
 	node {
-	    puts -nonewline "$txt-> "
+	    puts -nonewline "$txt -> "
 	}
 	result {
 	    puts "Result: $txt"
@@ -121,7 +121,7 @@ proc aardvark::runbuildcommand { direction graphname node } {
 		if { [info exists ::errorCode] } {
 		    unset ::errorCode
 		}
-		set fd [eval [list open "| $sh" r]]
+		set fd [eval [list open "| $sh" w]]
 		if { [catch {
 		    close $fd
 		} err] } {
@@ -230,9 +230,8 @@ proc aardvark::Nodes { } {
 }
 
 proc aardvark::Run { } {
-    global ::argv
     variable grph
-    set start [ lindex $::argv 0 ]
+    set start [lindex $::argv 0]
     if { [catch {
 	if { $start != "" } {
 	    $grph walk $start -order post -command runbuildcommand

@@ -14,7 +14,9 @@ set scripts {
     findapxs.tcl
 }
 
-foreach script $scripts { source [file join . buildscripts $script] }
+foreach script $scripts {
+    source [file join [file dirname [info script]] buildscripts $script]
+}
 
 # Do we have a threaded Tcl?
 

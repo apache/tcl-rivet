@@ -1,3 +1,60 @@
+2003-03-25  David N. Welton  <davidw@dedasys.com>
+
+	* debian/copyright: Added copyright file for debian.
+
+	* debian/dirs: Added dirs file that lists directories used by
+	Rivet on Debian.
+
+	* debian/control: Added debian/control file with information about
+	Rivet for the debian package.
+
+	* debian/changelog: Added debian changelog file to track versions
+	of the debian package.
+
+	* debian/rules: Use 'rules' file from mod_dtcl.
+
+2003-03-14  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_AppendToScript): Don't append
+	Before/After/Error scripts.  Just override them.
+	(Rivet_UserConf): Switch back to usig Rivet_AppendToScript.
+	(Rivet_SetScript): Change Rivet_AppendToScript to Rivet_SetScript
+	to reflect the fact that it doesn't always append - specifically,
+	in After/Before/Error scripts.
+
+	* doc/rivet.xml: Use eyebrowse link instead of apachelabs for
+	mailing list.
+
+2003-03-13  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.h: Backed out extra entries in rivet_server_conf -
+	they aren't necessary, as the overrides are taken care of for us.
+	The only things we really need are 1) to use the flag
+	user_scripts_updated to recompile scripts when UserConf variables
+	have changed 2) to not append to existing scripts, but instead
+	create new ones.
+
+2003-03-12  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_UserConf): Set user_scripts_updated flag.
+	(Rivet_ParseExecFile): Check and clear flag.
+
+	* src/mod_rivet.h: Added user_scripts_updated flag to signal that
+	UserConf options have been set.  This means that we need to
+	recompile the script.
+
+2003-03-01  David N. Welton  <davidw@dedasys.com>
+
+	* debian/debian.tcl: Helper file for generating .debs.
+
+2003-02-28  David N. Welton  <davidw@dedasys.com>
+
+	* src/Makefile (all): Clean out Makefile - force use of make.tcl.
+
+	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand): Use
+	'w' for shell command pipe, in order to not get broken pipes with
+	commands that output something to stdout (such as tcl scripts!).
+
 2003-02-21  David N. Welton  <davidw@dedasys.com>
 
 	* tests/config.test: Test to see if Rivet picks up changes in
