@@ -175,7 +175,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>array</arg>
 		<arg><replaceable>request</replaceable></arg>
 	      </cmdsynopsis>
@@ -189,7 +189,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<arg>objectName</arg>
+		<arg><replaceable>objectName</replaceable></arg>
 		<arg>autokey</arg>
 		<group choice="opt">
 		  <arg>value</arg>

@@ -354,25 +354,10 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 {
     int i;
 
-    array_header *hdrs_arr;
-    table_entry  *hdrs;
     array_header *env_arr;
     table_entry  *env;
 
     TclWeb_InitEnvVars( req );
-
-    /* Transfer client request headers to TCL request namespace. */
-    hdrs_arr = ap_table_elts(req->req->headers_in);
-    hdrs = (table_entry *) hdrs_arr->elts;
-    for (i = 0; i < hdrs_arr->nelts; ++i)
-    {
-	if (!hdrs[i].key)
-	    continue;
-
-	Tcl_ObjSetVar2(req->interp, envvar,
-		       TclWeb_StringToUtfToObj(hdrs[i].key, req),
-		       TclWeb_StringToUtfToObj(hdrs[i].val, req), 0);
-    }
 
     /* Transfer Apache internal CGI variables to TCL request namespace. */
     env_arr =  ap_table_elts(req->req->subprocess_env);
@@ -388,6 +373,34 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     }
 
     Tcl_DecrRefCount(envvar);
+    return TCL_OK;
+}
+
+int
+TclWeb_GetHeaderVars(Tcl_Obj *headersvar, TclWebRequest *req)
+{
+    int i;
+
+    array_header *hdrs_arr;
+    table_entry  *hdrs;
+
+    TclWeb_InitEnvVars( req );
+
+    /* Transfer client request headers to TCL request namespace. */
+    hdrs_arr = ap_table_elts(req->req->headers_in);
+    hdrs = (table_entry *) hdrs_arr->elts;
+    for (i = 0; i < hdrs_arr->nelts; ++i)
+    {
+	if (!hdrs[i].key)
+	    continue;
+
+	Tcl_ObjSetVar2(req->interp, headersvar,
+		       TclWeb_StringToUtfToObj(hdrs[i].key, req),
+		       TclWeb_StringToUtfToObj(hdrs[i].val, req), 0);
+    }
+
+    /* Transfer Apache internal CGI variables to TCL request namespace. */
+    Tcl_DecrRefCount(headersvar);
     return TCL_OK;
 }
 

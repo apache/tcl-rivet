@@ -109,6 +109,8 @@ int TclWeb_GetAllVars(Tcl_Obj *result, TclWebRequest *req);
 
 int TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req);
 
+int TclWeb_GetHeaderVars(Tcl_Obj *headersvar, TclWebRequest *req);
+
 /*
  *-----------------------------------------------------------------------------
  *

@@ -85,8 +85,9 @@ proc main {} {
 
 	set versionfile [ open VERSION "w" ]
 	while { 1 } {
-	    puts -nonewline stderr "Current version: $major.$minor.$point.  "
-	    puts -nonewline stderr {Increment [M]ajor, m[I]nor, [P]oint release, or [A]bort? >>> }
+	    puts -nonewline "Current version: $major.$minor.$point.  "
+	    puts -nonewline {Increment [M]ajor, m[I]nor, [P]oint release, or [A]bort? >>> }
+	    flush stdout
 	    gets stdin answer
 	    switch [string tolower $answer] {
 		m {
@@ -105,14 +106,14 @@ proc main {} {
 		    break
 		}
 		a {
-		    puts stderr "Aborted"
+		    puts "Aborted"
 		    break
 		}
 	    }
 	}
 	puts $versionfile "$major.$minor.$point"
 	close $versionfile
-	puts stderr "Done, version is $major.$minor.$point"
+	puts "Done, version is $major.$minor.$point"
     }
 }
 main

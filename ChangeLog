@@ -1,3 +1,17 @@
+2002-07-12  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand):
+	Updated functionality to hopefully better handle errors, warnings,
+	and output.
+
+	* src/make.tcl: Created a 'dist' target which rolls a tarball.
+
+2002-07-11  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c (TclWeb_GetHeaderVars): New function to get
+	client headers, which are now seperate from environmental
+	variables.
+
 2002-06-18  David N. Welton  <davidw@dedasys.com>
 
 	* cvsversion.tcl: Added tool to manage version numbers based on

@@ -35,7 +35,7 @@ proc aardvark::createnode { name } {
     }
 }
 
-    # the command that gets run when we walk the graph.
+# the command that gets run when we walk the graph.
 proc aardvark::runbuildcommand { direction graphname node } {
     variable grph
     set rebuild 0
@@ -56,7 +56,7 @@ proc aardvark::runbuildcommand { direction graphname node } {
 	    } else {
 		set depmtime 0
 	    }
-	    if { $depmtime > $mtime } {
+	    if { $depmtime >= $mtime } {
 		set rebuild 1
 	    }
 	}
@@ -64,30 +64,34 @@ proc aardvark::runbuildcommand { direction graphname node } {
 	set rebuild 1
     }
 
-    if { $rebuild == 1} {
-	if { $buildinfo(sh) != "" } {
-	    foreach sh $buildinfo(sh) {
+    if { $rebuild == 1 && [info exists buildinfo(cmds)] } {
+	foreach cmd $buildinfo(cmds) {
+	    if { [lindex $cmd 0] == "sh" } {
+		set sh [join [lrange $cmd 1 end]]
 		set result ""
 		puts -nonewline "$node :"
 		catch {
-		    set sh [uplevel #0 "subst {$sh}" ]
+		    set sh [uplevel \#0 "subst {$sh}" ]
 		    puts ""
 		    puts "\tCommand: $sh"
 		} err
-                if { $err != "" } {
+		if { $err != "" } {
 		    puts "Sh was supposed to be: $sh"
 		    puts "This error occured: $err"
 		    continue
 		}
+		if { [info exists errorCode] } {
+		    unset errorCode
+		}
 		catch {
-		    set result [ eval exec $sh ]
+		    eval exec $sh
 		} err
 		if { $err != "" } {
+		    puts "Output: $err"
+		}
+		if { [info exists errorCode] && $::errorCode != "NONE" } {
+		    puts "\tFatal Error ($::errorCode)!"
 		    puts "\tError: $err"
-		    if { [ info exists ::errorCode ] && $::errorCode != "NONE" } {
-			puts "\tFatal Error ($::errorCode)!"
-			exit 1
-		    }
 		    break
 		}
 
@@ -95,20 +99,19 @@ proc aardvark::runbuildcommand { direction graphname node } {
 		    puts "\tResult: $result"
 		}
 	    }
-	}
-	if { $buildinfo(tcl) != "" } {
-	    foreach tcl $buildinfo(tcl) {
+	    if { [lindex $cmd 0] == "tcl" } {
+		set tcl [join [lrange $cmd 1 end]]
 		catch {
 		    puts -nonewline "$node :"
 		    puts ""
 		    puts "\tTcl Command: $tcl"
-		    uplevel #0 $tcl
+		    uplevel \#0 $tcl
 		} err
-                if { $err != "" } {
+		if { $err != "" } {
 		    puts $err
 		}
+		puts ""
 	    }
-	    puts ""
 	}
     }
 }
@@ -118,14 +121,14 @@ proc aardvark::runbuildcommand { direction graphname node } {
 # Adds a shell command to be executed.
 proc aardvark::sh { buildcmd } {
     variable buildinfo
-    lappend buildinfo(sh) $buildcmd
-	return ""
+    lappend buildinfo(cmds) [list sh $buildcmd]
+    return ""
 }
 
 # Adds a Tcl command to be evaluated.
 proc aardvark::tcl { tclcommand } {
     variable buildinfo
-    lappend buildinfo(tcl) $tclcommand
+    lappend buildinfo(cmds) [list tcl $tclcommand]
     return ""
 }
 
@@ -142,7 +145,7 @@ proc aardvark::AddNode { name rest } {
     variable dependencies
     variable buildinfo
     set dependencies {}
-    array set buildinfo {sh "" tcl ""}
+    array set buildinfo {cmds ""}
     set self $name
     catch {
 	uplevel #0 $rest

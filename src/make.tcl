@@ -123,7 +123,7 @@ AddNode mod_rivet.o {
 }
 
 AddNode TclWebapache.o {
-    depends "TclWebapache.c mod_rivet.h apache_request.h"
+    depends "TclWebapache.c mod_rivet.h apache_request.h TclWeb.h"
     sh {$COMPILE TclWebapache.c}
 }
 
@@ -193,8 +193,28 @@ foreach doc $HTML_DOCS {
     }
 }
 
+AddNode VERSION {
+    tcl { cd .. }
+    sh { ./cvsversion.tcl }
+    tcl { cd src/ }
+}
+
+AddNode distclean {
+    depends clean
+    tcl { cd .. }
+    sh { find . -name "*~" | xargs rm }
+    sh { find . -name ".#*" | xargs rm }
+    sh { find . -name "\#*" | xargs rm }
+    tcl { cd src }
+}
+
 AddNode distdoc {
     depends "$XSL $HTML_DOCS"
+}
+
+AddNode dist {
+    depends {distclean distdoc VERSION}
+    sh { sh -c "cd ../../ ; tar czvf tcl-rivet-`cat tcl-rivet/VERSION`.tgz tcl-rivet" }
 }
 
 Run

@@ -23,6 +23,7 @@
 #include "TclWeb.h"
 
 #define ENV_ARRAY_NAME "env"
+#define HEADERS_ARRAY_NAME "headers"
 #define COOKIES_ARRAY_NAME "cookies"
 
 extern module rivet_module;
@@ -258,6 +259,31 @@ Rivet_LoadEnv(
 	ArrayObj = Tcl_NewStringObj( ENV_ARRAY_NAME, -1 );
     }
     return TclWeb_GetEnvVars(ArrayObj, globals->req);
+}
+
+/* Get the headers set by the client. */
+
+static int
+Rivet_LoadHeaders(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
+{
+    Tcl_Obj *ArrayObj;
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    if( objc > 2 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
+	return TCL_ERROR;
+    }
+
+    if( objc == 2 ) {
+	ArrayObj = objv[1];
+    } else {
+	ArrayObj = Tcl_NewStringObj( HEADERS_ARRAY_NAME, -1 );
+    }
+    return TclWeb_GetHeaderVars(ArrayObj, globals->req);
 }
 
 /* Tcl command to return a particular variable.  */
@@ -591,6 +617,11 @@ Rivet_InitCore( Tcl_Interp *interp )
     Tcl_CreateObjCommand(interp,
 			"load_env",
 			Rivet_LoadEnv,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"load_headers",
+			Rivet_LoadHeaders,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,

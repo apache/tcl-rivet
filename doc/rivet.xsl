@@ -40,14 +40,14 @@
   <xsl:variable name="arg.choice.def.open.str"></xsl:variable>
   <xsl:variable name="arg.choice.def.close.str"></xsl:variable>
 
-  <!-- <u> isn't a valid tag, so the best way to do this is via CSS,
-  but that's a pain - fixme-later.-->
   <xsl:template name="inline.underlineseq">
     <xsl:param name="content">
       <xsl:call-template name="anchor"/>
       <xsl:apply-templates/>
     </xsl:param>
-    <u><xsl:copy-of select="$content"/></u>
+    <span class="text-decoration:underline">
+      <xsl:copy-of select="$content"/>
+    </span>
   </xsl:template>
 
   <xsl:template name="inline.monounderlineseq">
