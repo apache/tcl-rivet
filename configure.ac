@@ -182,7 +182,22 @@ TEA_MAKE_LIB
 # Add WISH as well if this is a Tk extension.
 #--------------------------------------------------------------------
 
+#
+# allow them to override the tclsh we think we found
+#
+if test x"${with_tclsh}" != x ; then
+    AC_MSG_CHECKING([for tclsh])
+    if test -f "${with_tclsh}" ; then
+        TCLSH_PROG=${with_tclsh}
+        AC_MSG_RESULT([manually set by --with-tclsh=$TCLSH_PROG])
+    else
+        AC_MSG_ERROR([No tclsh at place specified by --with-tclsh (${with_tclsh})])
+    fi
+    AC_SUBST(TCLSH_PROG)
+else
 TEA_PROG_TCLSH
+fi
+
 #TEA_PROG_WISH
 
 # We have to either find apxs or be told where it is using --with-apxs

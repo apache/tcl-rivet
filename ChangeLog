@@ -1,12 +1,19 @@
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
 
+        * The configure scirpt is building the .so files properly, it
+	  appears.  However the install isn't quite right yet.  For
+	  example, the mod_rivet.so file needs to go into APXS_LIBEXECDIR,
+	  and the other .so files need to go where mod_*.so is currently
+	  going.
+
         * Move aclocal.m4 to acinclude.m4 -- we need the aclocal command
 	  to generate acinclude.m4 based on aclocal.m4 and stuff it gleans
 	  from the configure.ac script, etc.
 
-        * configure.ac: Remove the --with-tclsh option.  A path to tclsh is 
-	  automatically figured out by the TEA 3.1 build stuff -- it looks at 
-	  tclConfig.sh
+        * configure.ac: A path to tclsh is automatically figured out by the 
+	  TEA 3.1 build stuff.  However it is also possible to override
+	  with --with-tclsh, and the configure script also makes sure
+	  there at least is a file there as well.
 
         * src/configure.ac et al: Get automake, aclocal, and autoconf to run 
 	  without complaint, generating the configure script, Makefile.in 
