@@ -101,9 +101,8 @@ Rivet_Include(
     int objc,
     Tcl_Obj *CONST objv[])
 {
-    Tcl_Channel fd;
     int sz;
-    char buf[BUFSZ];
+    Tcl_Channel fd;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc =
 	RIVET_SERVER_CONF( globals->r->server->module_config );
@@ -122,30 +121,19 @@ Rivet_Include(
     if (fd == NULL)
     {
         return TCL_ERROR;
-    } else {
-	Tcl_SetChannelOption(interp, fd, "-translation", "lf");
     }
+    Tcl_SetChannelOption(interp, fd, "-translation", "binary");
 
     outobj = Tcl_NewObj();
     Tcl_IncrRefCount(outobj);
-    while ((sz = Tcl_ReadChars(fd, outobj, BUFSZ - 1, 0)))
+    sz = Tcl_ReadChars(fd, outobj, -1, 0);
+    if (sz == -1)
     {
-	if (sz == -1)
-	{
-	    Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
-	    Tcl_DecrRefCount(outobj);
-	    return TCL_ERROR;
-	}
-
-	buf[sz] = '\0';
-
-        /* we could include code to either ap_pwrite this or memwrite
-           it, depending on buffering */
-	Tcl_WriteObj(*(rsc->outchannel), outobj);
-
-	if (sz < BUFSZ - 1)
-	    break;
+	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
+	Tcl_DecrRefCount(outobj);
+	return TCL_ERROR;
     }
+    Tcl_WriteObj(*(rsc->outchannel), outobj);
     Tcl_DecrRefCount(outobj);
     return Tcl_Close(interp, fd);
 }
@@ -663,15 +651,12 @@ Rivet_NoBody(
     int objc,
     Tcl_Obj *CONST objv[])
 {
-
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc =
-	RIVET_SERVER_CONF( globals->r->server->module_config );
 
-    if (*(rsc->content_sent) == 1)
+    if (globals->req->content_sent == 1)
 	return TCL_ERROR;
 
-    *(rsc->content_sent) = 1;
+    globals->req->content_sent = 1;
     return TCL_OK;
 }
 

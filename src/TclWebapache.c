@@ -44,7 +44,7 @@ int
 TclWeb_SetHeaderType(char *header, TclWebRequest *req)
 {
     if(req->headers_set)
-	return 0;
+	return TCL_ERROR;
 
     req->req->content_type = header;
     req->headers_set = 1;
@@ -373,21 +373,21 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     return TCL_OK;
 }
 
-int
+INLINE int
 TclWeb_Base64Encode(char *out, char *in, TclWebRequest *req)
 {
     out = ap_pbase64encode(TCLWEBPOOL, in);
     return TCL_OK;
 }
 
-int
+INLINE int
 TclWeb_Base64Decode(char *out, char *in, TclWebRequest *req)
 {
     out = ap_pbase64decode(TCLWEBPOOL, in);
     return TCL_OK;
 }
 
-int
+INLINE int
 TclWeb_EscapeShellCommand(char *out, char *in, TclWebRequest *req)
 {
     out = ap_escape_shell_cmd(TCLWEBPOOL, in);
@@ -411,7 +411,7 @@ char *TclWeb_StringToUtf(char *in, TclWebRequest *req)
     return tmp;
 }
 
-Tcl_Obj *
+INLINE Tcl_Obj *
 TclWeb_StringToUtfToObj(char *in, TclWebRequest *req)
 {
     return Tcl_NewStringObj(TclWeb_StringToUtf(in, req), -1);

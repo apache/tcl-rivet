@@ -28,7 +28,7 @@ outputproc(ClientData instancedata, char *buf, int toWrite, int *errorCodePtr)
 	Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
 
     TclWeb_PrintHeaders(globals->req);
-    if (*(rsc->content_sent) == 0)
+    if (globals->req->content_sent == 0)
     {
 	ap_rwrite(buf, toWrite, globals->r);
 	ap_rflush(globals->r);

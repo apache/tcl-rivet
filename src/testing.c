@@ -2,7 +2,7 @@
 /* $Id$ */
 
 /* Use this as a place to more directly test C routines, without going
- * to the trouble of installing/compiling the whole thin in mod_rivet,
+ * to the trouble of installing/compiling the whole thing in mod_rivet,
  * and using with Apache. */
 
 

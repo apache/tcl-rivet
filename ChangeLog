@@ -1,3 +1,19 @@
+2002-01-27  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.h: Moved content_sent to TclWebRequest in TclWeb.h
+
+2002-01-26  David N. Welton  <davidw@dedasys.com>
+
+	* tests/binary.test: Added test file for binary file handling.
+
+	* src/mod_rivet.c (Rivet_SendContent): Moved 'header_only' option
+	so that the request is set up and we don't segfault.
+	(Rivet_GetRivetFile): changed puts to puts -nonewline, so as to
+	not add spurious newlines.
+
+	* src/rivetCore.c (Rivet_Include): Simplified code some, with '-1'
+	argument to Tcl_ReadChars.  Eliminated "lf" -translation option.
+
 2002-01-24  David N. Welton  <davidw@dedasys.com>
 
 	* tests/include.test: Added test for 'include' command.

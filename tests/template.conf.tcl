@@ -14,7 +14,7 @@ AccessConfig "$CWD/access.conf"
 
 Timeout 300
 
-MaxRequestsPerChild 100
+MaxRequestsPerChild 0
 
 $LOADMODULES
 

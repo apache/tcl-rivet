@@ -61,7 +61,6 @@ typedef struct {
     Tcl_Obj *request_cleanup; /* bit of Tcl for cleaning up after a request */
 
     /* stuff for buffering output */
-    int *content_sent;      /* make sure something gets sent */
     Tcl_Channel *outchannel;
 } rivet_server_conf;
 

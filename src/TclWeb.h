@@ -20,6 +20,7 @@ typedef struct TclWebRequest {
     ApacheRequest *apachereq;
     int headers_printed; 	/* has the header been printed yet? */
     int headers_set;       /* has the header been set yet? */
+    int content_sent;
 } TclWebRequest;
 
 /*

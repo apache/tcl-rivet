@@ -13,8 +13,7 @@ set testfilename1 include.rvt
 
   <body>
     <h1>Include Test</h1>
-    
-    <table>
+        <table>
       <tbody>
 	<tr>
 	  <td>row 1</td>

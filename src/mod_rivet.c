@@ -180,15 +180,16 @@ Rivet_GetRivetFile(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
     if (toplevel)
     {
 	Tcl_SetStringObj(outbuf, "namespace eval request {\n", -1);
-	if (rsc->rivet_before_script) {
+	if (rsc->rivet_before_script)
+	{
 	    Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
-ap_log_error( APLOG_MARK, APLOG_ERR, r->server,
-		Tcl_GetStringFromObj( rsc->rivet_before_script, NULL ) );
+	    ap_log_error( APLOG_MARK, APLOG_ERR, r->server,
+			  Tcl_GetStringFromObj( rsc->rivet_before_script, NULL ) );
 	}
-	Tcl_AppendToObj(outbuf, "puts \"", -1);
+	Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
     }
     else
-	Tcl_SetStringObj(outbuf, "puts \"\n", -1);
+	Tcl_SetStringObj(outbuf, "puts -nonewline \"\n", -1);
 
     /* if inside < 0, it's an error  */
     inside = Rivet_Parser(outbuf, f);
@@ -439,13 +440,6 @@ Rivet_SendContent(request_rec *r)
     if ((errstatus = ap_meets_conditions(r)) != OK)
 	return errstatus;
 
-    if (r->header_only)
-    {
-	TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
-	TclWeb_PrintHeaders(globals->req);
-	return OK;
-    }
-
     ap_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
     ap_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
     ap_chdir_file(r->filename);
@@ -476,6 +470,12 @@ Rivet_SendContent(request_rec *r)
     if ((errstatus = ApacheRequest___parse(globals->req->apachereq)) != OK)
 	return errstatus;
 
+    if (r->header_only)
+    {
+	TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
+	TclWeb_PrintHeaders(globals->req);
+	return OK;
+    }
     Rivet_ParseExecFile(r, rsc, r->filename, 1);
 
     if( Tcl_EvalObj( interp, rsc->request_cleanup ) == TCL_ERROR ) {
@@ -484,7 +484,7 @@ Rivet_SendContent(request_rec *r)
     }
 
     /* Reset globals */
-    *(rsc->content_sent) = 0;
+    globals->req->content_sent = 0;
 
     return OK;
 }
@@ -920,7 +920,6 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->request_init = oldrsc->request_init;
     newrsc->request_cleanup = oldrsc->request_cleanup;
 
-    newrsc->content_sent = oldrsc->content_sent;
     newrsc->outchannel = oldrsc->outchannel;
 }
 
@@ -952,8 +951,6 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->request_init = NULL;
     rsc->request_cleanup = NULL;
 
-    rsc->content_sent = ap_pcalloc(p, sizeof(int));
-    *(rsc->content_sent) = 0;
     rsc->outchannel = ap_pcalloc(p, sizeof(Tcl_Channel));
 
     rsc->rivet_server_vars = ap_make_table( p, 4 );

@@ -4,8 +4,6 @@
    tcl.h.
   */
 #include <tcl.h>
-#include "httpd.h"
-#include "apache_request.h"
 #include "mod_rivet.h"
 
 /*

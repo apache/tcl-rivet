@@ -1,0 +1,13 @@
+<?
+headers type "image/jpeg"
+if { [var exists test1] } {
+    set fl [ open AngeloFish.jpg r ]
+    fconfigure $fl -encoding binary
+    fconfigure $fl -translation binary
+    fconfigure stdout -encoding binary
+    puts -nonewline [read $fl]
+    close $fl
+} else {
+    include AngeloFish.jpg
+}
+?>

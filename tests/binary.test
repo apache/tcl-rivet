@@ -1,0 +1,26 @@
+# $Id$
+
+set testfilename1 binary.rvt
+set binaryfile AngeloFish.jpg
+
+::tcltest::test binary-1.1 {binary data test} {
+    set page [ ::http::geturl "${urlbase}$testfilename1?test1=1" ]
+    set fl [open $binaryfile r]
+    fconfigure $fl -translation binary
+    fconfigure $fl -encoding binary
+    set ret [string equal -length 42746 [::http::data $page] [read $fl]]
+    close $fl
+    set ret
+} 1
+
+::tcltest::test binary-2.1 {binary data test with 'include'} {
+    set page [ ::http::geturl "${urlbase}$testfilename1?test2=1" ]
+    set fl [open $binaryfile r]
+    fconfigure $fl -translation binary
+    fconfigure $fl -encoding binary
+    set ret [string equal -length 42746 [::http::data $page] [read $fl]]
+    close $fl
+    set ret
+} 1
+
+
