@@ -1,5 +1,12 @@
 2004-02-06  David N. Welton  <davidw@dedasys.com>
 
+	* tests/headers.test: Include current version of http package in
+	result automatically, so as to avoid having to update it by hand.
+
+	* tests/apachetest/apachetest.tcl (apachetest::getallincludes):
+	Create function to fetch a conf file and all the files Included it
+	from it.
+
 	* doc/rivet.xml: Add section for session package.
 
 	* doc/rivet.xml: Added SESSION documentation.

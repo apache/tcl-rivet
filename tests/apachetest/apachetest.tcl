@@ -1,6 +1,7 @@
 # $Id$
 
-# Tcl-based Apache test suite, by David N. Welton <davidw@dedasys.com>
+# apachetest.tcl -- Tcl-based Apache test suite, by David N. Welton
+# <davidw@dedasys.com>
 
 # This test suite provides a means to create configuration files, and
 # start apache with user-specified options.  All it needs to run is
@@ -185,16 +186,66 @@ proc apachetest::gethttpdconf { binname } {
     return $filename
 }
 
-# if we need to load some modules, find out how to do it from the
-# 'real' (the one installed on the system) conf file, with this proc
+# apachetest::getallincludes --
+#
+#	Reads the conf file, and returns its text, plus the text in
+#	all the files that it Includes itself.
+#
+# Arguments:
+#	conffile - file to read.
+#
+# Side Effects:
+#	None.
+#
+# Results:
+#	Text of configuration files.
+
+proc apachetest::getallincludes { conffile } {
+    set fl [open $conffile r]
+    set data [read $fl]
+    close $fl
+
+    set newdata {}
+    foreach line [split $data \n] {
+	# Look for Include lines.
+	if { [regexp -line {^[^\#]*Include +(.*)} $line match file] } {
+	    set file [string trim $file]
+	    # Since directories may be included, glob them for all
+	    # files contained therein.
+	    if { [file isdirectory $file] } {
+		foreach fl [glob -nocomplain [file join $file *]] {
+		    append newdata [getallincludes $fl]
+		}
+	    } else {
+		append newdata [getallincludes $file]
+	    }
+	}
+    }
+    append data $newdata
+    return $data
+}
+
+# apachetest::getloadmodules --
+#
+#	Get the LoadModule lines for modules that we want to load.
+#
+# Arguments:
+#	conffile - the name of the conf file to read.
+#	needtoget - list of modules that we want to load.
+#
+# Side Effects:
+#	None.
+#
+# Results:
+#	Returns a string suitable for inclusion in a conf file.
+
 
 proc apachetest::getloadmodules { conffile needtoget } {
-    set fl [open $conffile r]
-    set confdata [read $fl]
-    close $fl
+    set confdata [getallincludes $conffile]
     set loadline [list]
     foreach mod $needtoget {
-	if { ! [regexp -line "^.*?(LoadModule\\s+$mod\\s+.+)\$"\
+	# Look for LoadModule lines.
+	if { ! [regexp -line "^\[^\#\]*(LoadModule\\s+$mod\\s+.+)\$"\
 		    $confdata match line] } {
 	    error "No LoadModule line for $mod!"
 	} else {
