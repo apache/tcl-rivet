@@ -13,18 +13,6 @@ configure script, and no configure.in, and no Makefile.in, etc.
 
 You get to fiddle the autoconf stuff to create all that.
 
-CONFIG.GUESS AND FRIENDS
-
-There is some stuff that you see in a lot of packages, like config.guess,
-config.sub, install-sh, etc.
-
-This stuff a lot can get pooped out there using libtoolize.
-
-libtoolize --force --copy to install config.guess, config.sub, ltmain.sh
-
-This stuff is in the tclconfig directory, which isn't really the best
-name because it's grown to include a lot of autoconf-related stuff.
-
 VERSIONS
 
 autoconf and stuff has evolved, and old versions won't work and will cause
@@ -34,6 +22,22 @@ autoconf 2.59
 automake 1.9
 aclocal 1.9
 autoheader 2.59
+
+BUILDING IT
+
+First you gotta run "aclocal" to create the aclocal.m4 file.
+
+Then you can run "automake" to create the Makefile.in files from
+the Makefile.am automake source files.  NOTE that even though automake
+runs autoconf, you still have to run autoconf.
+
+Run "autoconf", make sure you're getting the right version by doing
+autoconf --version
+
+Run "autoheader" to generate the config.h.in
+
+Once all that is complete, you can probably run configure.
+
 
 AUTOMAKE
 
@@ -85,4 +89,17 @@ export AUTOHEADER=autoheader259
 export AUTOCONF=autoconf259
 export AUTOMAKE=automake19
 export ACLOCAL=aclocal19
+
+
+CONFIG.GUESS AND FRIENDS
+
+Ever wonder where config.guess, install-sh, and stuff come from?
+(You see them in a lot of packages.)
+
+This stuff a lot can get pooped out there using libtoolize.
+
+libtoolize --force --copy to install config.guess, config.sub, ltmain.sh
+
+This stuff is in the tclconfig directory, which isn't really the best
+name because it's grown to include a lot of autoconf-related stuff.
 

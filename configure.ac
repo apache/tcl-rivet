@@ -24,8 +24,8 @@ dnl
 
 AC_INIT([Rivet],[0.5.0])
 AC_CONFIG_HEADERS([config.h])
-#AC_DEFINE([HAVE_LIMITS_H],[],[Set to 1 if your machine has <limits.h>])
-#AC_DEFINE([HAVE_NET_ERRNO_H],[],[Set to 1 if your machine has < net/errno.h>])
+#AC_DEFINE([HAVE_LIMITS_H],[],[Define if your machine has <limits.h>])
+#AC_DEFINE([HAVE_NET_ERRNO_H],[],[Define if your machine has < net/errno.h>])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -115,7 +115,7 @@ TEA_ADD_TCL_SOURCES([])
 #--------------------------------------------------------------------
 
 if test "${TEA_PLATFORM}" = "windows" ; then
-    AC_DEFINE(BUILD_rivet,1,[Set to 1 to define the BUILD_rivet define (?)])
+    AC_DEFINE(BUILD_rivet,1,[Define to define the BUILD_rivet define (?)])
     CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
@@ -182,7 +182,7 @@ TEA_ENABLE_SYMBOLS
 # loaded into apache.  it would be nice if we did no stubs for this and
 # still did stubs for librivet and librivetparser, which seem to be OK.
 #
-#AC_DEFINE(USE_TCL_STUBS,1,[Set to 1 to link against the Tcl stub library])
+#AC_DEFINE(USE_TCL_STUBS,1,[Define to link against the Tcl stub library])
 #AC_DEFINE(USE_TK_STUBS)
 
 #--------------------------------------------------------------------
