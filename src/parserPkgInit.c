@@ -48,7 +48,7 @@ Parse_Rivet(
 }
 
 
-int
+EXTERN int
 Rivetparser_Init( Tcl_Interp *interp )
 {
     Tcl_CreateObjCommand(interp,

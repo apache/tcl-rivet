@@ -1,3 +1,10 @@
+
+/* This is for windows. */
+#ifdef BUILD_rivet
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLEXPORT
+#endif /* BUILD_rivet */
+
 #define STREQU(s1, s2) (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 
 #define TCL_CMD_HEADER(cmd)	\
@@ -14,8 +21,8 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      NULL,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
 
-int Rivet_Init( Tcl_Interp *interp );
-int Rivet_InitList( Tcl_Interp *interp );
-int Rivet_InitCrypt( Tcl_Interp *interp );
-int Rivet_InitWWW( Tcl_Interp *interp );
-int Rivet_InitCore( Tcl_Interp *interp );
+EXTERN int Rivet_Init( Tcl_Interp *interp );
+EXTERN int Rivet_InitList( Tcl_Interp *interp );
+EXTERN int Rivet_InitCrypt( Tcl_Interp *interp );
+EXTERN int Rivet_InitWWW( Tcl_Interp *interp );
+EXTERN int Rivet_InitCore( Tcl_Interp *interp );

@@ -3,9 +3,9 @@
  */
 
 #include <tcl.h>
+#include <string.h>
 #include "rivet.h"
-#include <crypt.h>
-#include <unistd.h>
+#include "ap_config.h"
 
 #define MODE_DECRYPT 0
 #define MODE_ENCRYPT 1
@@ -99,6 +99,7 @@ TCL_CMD_HEADER( Rivet_DecryptCmd )
 
 TCL_CMD_HEADER( Rivet_CryptCmd )
 {
+#ifdef crypt
     char *key, *salt;
     char *resultBuffer;
 
@@ -121,6 +122,11 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
     }
     Tcl_SetObjResult( interp, Tcl_NewStringObj( resultBuffer, -1 ) );
     return TCL_OK;
+#else /* ! crypt */
+    Tcl_SetObjResult(interp, 
+                     Tcl_NewStringObj("error: command not available", -1));
+    return TCL_ERROR;
+#endif /* ! crypt */
 }
 
 int

@@ -1,5 +1,32 @@
 2003-07-05  David N. Welton  <davidw@dedasys.com>
 
+	* src/rivetWWW.c (snprintf): Added snprintf define from Pat.
+
+	* src/rivetParser.h: Added bit of defines for windows builds,
+	declared some of the functions EXTERN's here.
+
+	* src/rivetList.c: Make list commands created here 'static' - Pat.
+
+	* src/rivetCrypt.c: Use ap_config.h to grab other header files we
+	might need, like crypt.h.  This is not an ideal solution, because
+	it adds a dependency we didn't have before.  Added change by Pat
+	to conditionally compile or not the 'Rivet_Crypt' command.
+
+	* src/rivet.h: Added EXTERN definitions for functions.
+
+	* src/parserPkgInit.c (Rivetparser_Init): Added EXTERN decleration
+	for win builds.
+
+	* win/rules.vc: New file: include file for Microsoft makefile.
+
+	* win/rivet.dsp: New file: Microsoft Developer Studio Project
+	File.
+
+	* win/nmakehlp.c: New file: helper for windows building.
+
+	* win/makefile.vc: New file: makefile for windows.  All from Pat
+	Thoyts <patthoyts@users.sourceforge.net>.
+
 	* doc/examples/vars.html: Use a table to make the form look nicer.
 
 	* doc/examples/vars.rvt: Now we display some results.

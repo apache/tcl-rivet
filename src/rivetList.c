@@ -3,8 +3,13 @@
  */
 
 #include <tcl.h>
+#include <string.h>
 #include "rivet.h"
 
+static Tcl_ObjCmdProc Rivet_LremoveObjCmd;
+static Tcl_ObjCmdProc Rivet_CommaSplitObjCmd;
+static Tcl_ObjCmdProc Rivet_CommaJoinObjCmd;
+static Tcl_ObjCmdProc Rivet_LassignArrayObjCmd;
 
 /*-----------------------------------------------------------------------------
  * Rivet_LremoveObjCmd --
