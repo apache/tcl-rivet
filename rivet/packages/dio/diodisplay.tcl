@@ -13,6 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# $Id$
+#
 
 package require Itcl
 package require DIO
@@ -26,6 +29,7 @@ catch { ::itcl::delete class DIODisplay }
     constructor {args} {
 	eval configure $args
 	load_response
+#parray response
 
 	if {[lempty $DIO]} {
 	    return -code error "You must specify a DIO object"
@@ -55,6 +59,7 @@ catch { ::itcl::delete class DIODisplay }
 
     method configvar {varName string} {
 	if {[lempty $string]} { return [set $varName] }
+#puts "$this configvar: setting $varName to '$string'<br>"
 	configure -$varName $string
     }
 
@@ -167,6 +172,9 @@ catch { ::itcl::delete class DIODisplay }
 	set cancel [button_image_src DIOFormCancelButton]
 
 	$form start
+	foreach fld [array names hidden] {
+	    $form hidden $fld -value $hidden($fld)
+        }
 	$form hidden mode -value Save
 	$form hidden DIODfromMode -value $response(mode)
 	$form hidden DIODkey -value [$DIO makekey array]
@@ -216,6 +224,9 @@ catch { ::itcl::delete class DIODisplay }
 	    puts "<TD ALIGN=LEFT CLASS=\"$class\">"
 	    set f [::form #auto -defaults response]
 	    $f start
+	    foreach fld [array names hidden] {
+	        $f hidden $fld -value $hidden($fld)
+            }
 	    $f hidden mode
 	    $f hidden query
 	    $f hidden searchBy
@@ -247,6 +258,9 @@ catch { ::itcl::delete class DIODisplay }
 	    puts "<TD ALIGN=RIGHT CLASS=\"$class\">"
 	    set f [::form #auto -defaults response]
 	    $f start
+	    foreach fld [array names hidden] {
+	        $f hidden $fld -value $hidden($fld)
+            }
 	    $f hidden mode
 	    $f hidden query
 	    $f hidden searchBy
@@ -281,7 +295,7 @@ catch { ::itcl::delete class DIODisplay }
 	if {$topnav} { page_buttons Top }
 
 	puts {<TABLE BORDER WIDTH="100%" CLASS="DIORowHeader">}
-	puts "<TR>"
+	puts "<TR CLASS=DIORowHeader>"
 	foreach field $fieldList {
 	    set text [$field text]
 	    ## If sorting is turned off, or this field is not in the
@@ -290,13 +304,16 @@ catch { ::itcl::delete class DIODisplay }
 		(![lempty $sortfields] && [lsearch $sortfields $field] < 0)} {
 		set html $text
 	    } else {
-		set html "<A HREF=\""
+		set html {<A HREF="}
 		append html "$document?mode=$response(mode)"
 		foreach var {query searchBy numResults} {
 		    if {[info exists response($var)]} {
 			append html "&$var=$response($var)"
 		    }
 		}
+	        foreach fld [array names hidden] {
+	            append html "&$fld=$hidden($fld)"
+                }
 		append html "&sortBy=$field\">$text</A>"
 	    }
 	    set class [get_css_class TH DIORowHeader DIORowHeader-$field]
@@ -320,17 +337,26 @@ catch { ::itcl::delete class DIODisplay }
 	puts "<TR>"
 	foreach field $fieldList {
 	    set class [get_css_class TD DIORowField$alt DIORowField$alt-$field]
-	    if {![info exists a($field)]} {
-		puts "<TD CLASS=\"$class\"></TD>"
-	    } else {
-		puts "<TD CLASS=\"$class\">$a($field)</TD>"
+	    set text ""
+	    if {[info exists a($field)]} {
+	        set text $a($field)
+		if [info exists filters($field)] {
+		    set text [$filters($field) $text]
+		}
 	    }
+	    if ![string length $text] {
+		set text "&nbsp;"
+	    }
+	    puts "<TD CLASS=\"$class\">$text</TD>"
 	}
 
 	if {![lempty $rowfunctions]} {
 	    puts "<TD NOWRAP CLASS=\"DIORowFunctions$alt\">"
 	    set f [::form #auto]
 	    $f start
+	    foreach fld [array names hidden] {
+	        $f hidden $fld -value $hidden($fld)
+            }
 	    $f hidden query -value [$DIO makekey a]
 	    $f select mode -values $rowfunctions -class DIORowFunctionSelect$alt
 	    $f submit submit -value "Go" -class DIORowFunctionButton$alt
@@ -379,8 +405,10 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method store {arrayName} {
-	upvar 1 $arrayName $arrayName
-	set result [$DIO store $arrayName]
+	upvar 1 $arrayName array
+#puts "storing"
+#parray array
+	set result [$DIO store array]
 	set error  [$DIO errorinfo]
 	if {![lempty $error]} { return -code error $error }
 	return $result
@@ -404,7 +432,10 @@ catch { ::itcl::delete class DIODisplay }
 	upvar 1 $arrayName array
 
 	foreach var [array names array] {
-	    catch { $var value $array($var) }
+#puts "set_field_values: $var value $array($var)<br>"
+	    if {[catch { $var value $array($var) } result] == 1} {
+#puts "error: $result<br>"
+	    }
 	}
     }
 
@@ -412,6 +443,7 @@ catch { ::itcl::delete class DIODisplay }
 	upvar 1 $arrayName array
 
 	foreach field $allfields {
+#puts "set array($field) [$field value]<br>"
 	    set array($field) [$field value]
 	}
     }
@@ -437,54 +469,56 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method Main {} {
+	puts "<TABLE BORDER=0 WIDTH=100% CLASS=DIOForm><TR>"
+
+	puts "<TD CLASS=DIOForm ALIGN=CENTER VALIGN=MIDDLE>"
+	puts "<BR/>"
+	set selfunctions {}
+	foreach f $functions {
+	    if {"$f" != "List"} {
+	        lappend selfunctions $f
+	    } else {
+	    	set f [::form #auto]
+	    	$f start
+	    	foreach fld [array names hidden] {
+	        	$f hidden $fld -value $hidden($fld)
+            	}
+	    	$f hidden mode -value "List"
+	    	$f hidden query -value ""
+	    	$f submit submit -value "List All" -class DIORowFunctionButton
+	    	$f end
+	    }
+	}
+	puts "</TD>"
+
+	puts "<TD CLASS=DIOForm VALIGN=MIDDLE>"
 	$form start
 
-	puts {<TABLE CLASS="DIOMain">}
+	foreach fld [array names hidden] {
+	    $form hidden $fld -value $hidden($fld)
+        }
 
-	puts "<TR>"
-	puts {<TD CLASS="DIOMainFunctionsHeader">Functions:</TD>}
-	puts {<TD CLASS="DIOMainFunctions">}
-	$form select mode -values $functions -class DIOMainFunctionsSelect
-	puts "</TD>"
-	puts "</TR>"
+	$form select mode -values $selfunctions -class DIOMainFunctionsSelect
 
 	set useFields $fields
 	if {![lempty $searchfields]} { set useFields $searchfields }
 
-	puts "<TR>"
-	puts {<TD CLASS="DIOMainSearchByHeader">Search By:</TD>}
-	puts {<TD CLASS="DIOMainSearchBy">}
-	$form select searchBy -values $useFields \
-	    -labels [pretty_fields $useFields] \
+        puts "where"
+	$form select searchBy -values [pretty_fields $useFields] \
 	    -class DIOMainSearchBy
-	puts "</TD>"
-	puts "</TR>"
-
-	puts "<TR>"
-	puts {<TD CLASS="DIOMainQueryHeader">Query:</TD>}
-	puts {<TD CLASS="DIOMainQuery">}
+        puts "is"
 	$form text query -value "" -class DIOMainQuery
-	puts "</TD>"
-	puts "</TR>"
+	$form submit submit -value "GO" -class DIOMainSubmitButton
+	puts "</TD></TR>"
 
 	if {![lempty $numresults]} {
-	    puts "<TR>"
-	    puts {<TD CLASS="DIOMainNumResultsHeader">Results Per Page:</TD>}
-	    puts {<TD CLASS="DIOMainNumResults">}
+	    puts "<TR><TD CLASS=DIOForm>Results per page: "
 	    $form select numResults -values $numresults -class DIOMainNumResults
-	    puts "</TD>"
-	    puts "</TR>"
+	    puts "</TD></TR>"
 	}
 
-	puts "<TR>"
-	puts {<TD COLSPAN=2 CLASS="DIOMainSubmitButton">}
-	$form submit submit -value "Submit Request" -class DIOMainSubmitButton
-	puts "</TD>"
-	puts "</TR>"
-
-	puts "</TABLE>"
-
 	$form end
+	puts "</TABLE>"
     }
 
     method sql_order_by_syntax {} {
@@ -506,20 +540,16 @@ catch { ::itcl::delete class DIODisplay }
 	}
 	return [$DIO sql_limit_syntax $pagesize $offset]
     }
-
+	
 
     method Search {} {
-	set searchField $response(searchBy)
-    
-	if {[string length $response(query)]} {
-	    set query "-$searchField $response(query)"
-	} else {
-	    set query ""
-	}
-	
+	set searchField $FieldTextMap($response(searchBy))	
+
+	set query "-$searchField $response(query)"
+
 	append query [sql_order_by_syntax]
 	append query [sql_limit_syntax]
-	puts QUERY=$query
+
 	DisplayRequest $query
     }
 
@@ -613,6 +643,9 @@ catch { ::itcl::delete class DIODisplay }
 	puts {<TD ALIGN="center" CLASS="DIODeleteConfirmYesButton">}
 	set f [::form #auto]
 	$f start
+	foreach fld [array names hidden] {
+	    $f hidden $fld -value $hidden($fld)
+        }
 	$f hidden mode -value DoDelete
 	$f hidden query -value $response(query)
 	$f submit submit -value Yes -class DIODeleteConfirmYesButton
@@ -621,6 +654,9 @@ catch { ::itcl::delete class DIODisplay }
 	puts {<TD ALIGN="center" CLASS="DIODeleteConfirmNoButton">}
 	set f [::form #auto]
 	$f start
+	foreach fld [array names hidden] {
+	    $f hidden $fld -value $hidden($fld)
+        }
 	$f submit submit -value No -class "DIODeleteConfirmNoButton"
 	$f end
 	puts "</TD>"
@@ -682,6 +718,30 @@ catch { ::itcl::delete class DIODisplay }
 	    }
 	}
 	set rowfields $list
+    }
+
+    method filter {field {value ""}} {
+	if [string length $value] {
+	    set filters($field) [uplevel 1 [list namespace which $value]]
+	} else {
+	    if [info exists filters($field)] {
+		return $filters($field)
+	    } else {
+		return ""
+	    }
+	}
+    }
+
+    method hidden {name {value ""}} {
+	if [string length $value] {
+	    set hidden($name) $value
+	} else {
+	    if [info exists hidden($name)] {
+		return $hidden($name)
+	    } else {
+		return ""
+	    }
+	}
     }
 
     method DIO {{string ""}} { configvar DIO $string }
@@ -758,6 +818,8 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     private variable rowcount
+    private variable filters
+    private variable hidden
 
 } ; ## ::itcl::class DIODisplay
 
@@ -935,7 +997,7 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	if {[lsearch -exact $values $val] > -1} { return 1 }
 	return 0
     }
-
+    
     public variable true	"Yes"
     public variable false	"No"
     public variable values	"1 y yes t true on"
@@ -947,4 +1009,7 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	    set value $false
 	}
     }
+
 } ; ## ::itcl::class ::DIODisplayField_boolean
+
+
