@@ -115,6 +115,10 @@ namespace eval DIO {
 
     } ; ## ::itcl::class Postgresql
 
+    #
+    # PostgresqlResult object -- superclass of ::DIO::Result object
+    #
+    #
     ::itcl::class PostgresqlResult {
 	inherit Result
 

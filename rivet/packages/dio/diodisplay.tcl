@@ -65,12 +65,21 @@ catch { ::itcl::delete class DIODisplay }
 	configure -$varName $string
     }
 
+    #
+    # is_function - return true if name is known to be a function
+    # such as Search List Add Edit Delete Details Main Save DoDelete Cancel
+    # etc.
+    #
     method is_function {name} {
 	if {[lsearch $functions $name] > -1} { return 1 }
 	if {[lsearch $allfunctions $name] > -1} { return 1 }
 	return 0
     }
 
+    #
+    # do_cleanup - clean up our field subobjects, DIO objects, forms, and the 
+    # like.
+    #
     method do_cleanup {} {
 	## Destroy all the fields created.
 	foreach field $allfields { catch { $field destroy } }
@@ -82,6 +91,9 @@ catch { ::itcl::delete class DIODisplay }
 	catch { $form destroy }
     }
 
+    #
+    # handle_error - emit an error message
+    #
     method handle_error {error} {
 	puts "<B>An error has occurred processing your request</B>"
 	puts "<PRE>"
@@ -89,6 +101,10 @@ catch { ::itcl::delete class DIODisplay }
 	puts "</PRE>"
     }
 
+    #
+    # read_css_file - parse and read in a CSS file so we can
+    #  recognize CSS info and emit it in appropriate places
+    #
     method read_css_file {} {
 	if {[lempty $css]} { return }
 	if {[catch {open [virtual_filename $css]} fp]} { return }
@@ -100,36 +116,71 @@ catch { ::itcl::delete class DIODisplay }
 	}
     }
 
-    ## Figure out which CSS class we want to use.  If class exists, we use
-    ## that.  If not, we use default.
+    #
+    # get_css_class - figure out which CSS class we want to use.  
+    # If class exists, we use that.  If not, we use default.
+    #
     method get_css_class {tag default class} {
+
+	# if tag.class exists, use that
 	if {[info exists cssArray([string toupper $tag.$class])]} {
 	    return $class
 	}
-	if {[info exists cssArray([string toupper .$class])]} { return $class }
+
+	# if .class exists, use that
+	if {[info exists cssArray([string toupper .$class])]} { 
+	    return $class 
+	}
+
+	# use the default
 	return $default
     }
 
+    #
+    # parse_css_class - given a class and the name of an array, parse
+    # the named CSS class (read from the style sheet) and return it as
+    # key-value pairs in the named array.
+    #
     method parse_css_class {class arrayName} {
-	if {![info exists cssArray($class)]} { return }
+
+	# if we don't have an entry for the specified glass, give up
+	if {![info exists cssArray($class)]} { 
+	    return
+        }
+
+	# split CSS entry on semicolons, for each one...
 	upvar 1 $arrayName array
 	foreach line [split $cssArray($class) \;] {
+
+	    # trim leading and trailing spaces
 	    set line [string trim $line]
+
+	    # split the line on a colon into property and value
 	    lassign [split $line :] property value
+
+	    # map the property to space-trimmed lowercase and
+	    # space-trim the value, then store in the passed array
 	    set property [string trim [string tolower $property]]
 	    set value [string trim $value]
 	    set array($property) $value
 	}
     }
 
+    #
+    # button_image_src - return the value of the image-src element in
+    # the specified class (from the CSS style sheet), or an empty
+    # string if there isn't one.
+    #
     method button_image_src {class} {
 	set class [string toupper input.$class]
 	parse_css_class $class array
-	if {![info exists array(image-src)]} { return }
+	if {![info exists array(image-src)]} { 
+	    return 
+	}
 	return $array(image-src)
     }
 
-    # return a list of name-value pairs that represents the current
+    # state - return a list of name-value pairs that represents the current
     # state of the query, which can be used to properly populate links
     # outside DIOdisplay.
     method state {} {
@@ -143,18 +194,29 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method show {} {
-	set mode Main
-	if {[info exists response(mode)]} { set mode $response(mode) }
 
+	# if there's a mode in the response array, use that, else set
+	# mode to Main
+	set mode Main
+	if {[info exists response(mode)]} {
+	    set mode $response(mode)
+	}
+
+	# if there is a style sheet defined, emit HTML to reference it
 	if {![lempty $css]} {
 	    puts "<LINK REL=\"stylesheet\" TYPE=\"text/css\" HREF=\"$css\">"
 	}
 
+	# put out the table header
 	puts {<TABLE WIDTH="100%" CLASS="DIO">}
 	puts "<TR>"
 	puts {<TD VALIGN="center" CLASS="DIO">}
 
-	if {$mode != "Main" && $persistentmain} { Main }
+	# if mode isn't Main and persistentmain is set (the default),
+	# run Main
+	if {$mode != "Main" && $persistentmain} { 
+	    Main 
+	}
 
 	if {![is_function $mode]} {
 	    puts "In-valid function"
@@ -945,7 +1007,11 @@ catch { ::itcl::delete class DIODisplay }
 
 catch { ::itcl::delete class ::DIODisplayField }
 
+#
+# DIODisplayField object -- defined for each field we're displaying
+#
 ::itcl::class ::DIODisplayField {
+
     constructor {args} {
 	## We want to simulate Itcl's configure command, but we want to
 	## check for arguments that are not variables of our object.  If
@@ -960,6 +1026,8 @@ catch { ::itcl::delete class ::DIODisplayField }
 	    }
 	}
 
+	# if text (field description) isn't set, prettify the actual
+	# field name and use that
 	if {[lempty $text]} { set text [pretty [split $name _]] }
     }
 
@@ -971,10 +1039,18 @@ catch { ::itcl::delete class ::DIODisplayField }
 	::itcl::delete object $this
     }
 
+    #
+    # get_css_class - ask the parent DIODIsplay object to look up
+    # a CSS class entry
+    #
     method get_css_class {tag default class} {
 	return [$display get_css_class $tag $default $class]
     }
 
+    #
+    # get_css_tag -- set tag to select or textarea if type is select
+    # or textarea, else to input
+    #
     method get_css_tag {} {
 	switch -- $type {
 	    "select" {
@@ -989,6 +1065,10 @@ catch { ::itcl::delete class ::DIODisplayField }
 	}
     }
 
+    #
+    # pretty -- prettify a list of words by uppercasing the first letter
+    #  of each word
+    #
     method pretty {string} {
 	set words ""
 	foreach w $string {
@@ -1003,6 +1083,13 @@ catch { ::itcl::delete class ::DIODisplayField }
 	configure -$varName $string
     }
 
+    #
+    # showview - emit a table row of either DIOViewRow, DIOViewRowAlt,
+    # DIOViewRow-fieldname (this object's field name), or 
+    # DIOViewRowAlt-fieldname, a table data field of either
+    # DIOViewHeader or DIOViewHeader-fieldname, and then a
+    # value of class DIOViewField or DIOViewField-fieldname
+    #
     method showview {{alt ""}} {
 	set class [get_css_class TR DIOViewRow$alt DIOViewViewRow$alt-$name]
 	puts "<TR CLASS=\"$class\">"
@@ -1016,6 +1103,11 @@ catch { ::itcl::delete class ::DIODisplayField }
 	puts "</TR>"
     }
 
+    #
+    # showform -- like showview, creates a table row and table data, but
+    # if readonly isn't set, emits a form field corresponding to the type
+    # of this field
+    #
     method showform {} {
 	puts "<TR>"
 
@@ -1079,6 +1171,10 @@ catch { ::itcl::delete class ::DIODisplayField }
 
 catch { ::itcl::delete class ::DIODisplayField_boolean }
 
+#
+# DIODisplayField_boolen -- superclass of DIODisplayField that overrides
+# a few methods to specially handle booleans
+#
 ::itcl::class ::DIODisplayField_boolean {
     inherit ::DIODisplayField
 
@@ -1090,6 +1186,9 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	lappend trueValues $string
     }
 
+    #
+    # showform -- emit a form field for a boolean
+    #
     method showform {} {
 	puts "<TR>"
 
@@ -1117,6 +1216,9 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	puts "</TR>"
     }
 
+    #
+    # showview -- emit a view for a boolean
+    #
     method showview {{alt ""}} {
 	set class [get_css_class TR DIOViewRow$alt DIOViewRow$alt-$name]
 	puts "<TR CLASS=\"$class\">"
@@ -1136,6 +1238,9 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	puts "</TR>"
     }
 
+    #
+    # boolean_value -- return 1 if value is found in the values list, else 0
+    #
     method boolean_value {} {
 	set val [string tolower $value]
 	if {[lsearch -exact $values $val] > -1} { return 1 }
