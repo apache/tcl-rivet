@@ -4,8 +4,8 @@
 
 proc getbinname { } {
     global argv
-    set binname [ lindex $argv 0 ]
-    if { $binname == "" || ! [ file exists $binname ] } {
+    set binname [lindex $argv 0]
+    if { $binname == "" || ! [file exists $binname] } {
 	puts stderr "Please supply the full name and path of the Apache executable on the command line!"
 	exit 1
     }
@@ -40,7 +40,7 @@ switch -exact [lindex $argv 1] {
 	}
     } 
     startserver {
-	set apachepid [ exec $binname -X -f "[file join [pwd] server.conf]" & ]
+	set apachepid [exec $binname -X -f "[file join [pwd] server.conf]" &]
     }
     default {
 	set apachepid [exec $binname -X -f "[file join [pwd] server.conf]" &]

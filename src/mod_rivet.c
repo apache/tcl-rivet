@@ -1,5 +1,3 @@
-/* Copyright David Welton 1998, 1999 */
-
 /* ====================================================================
  * The Apache Software License, Version 1.1
  *

@@ -85,6 +85,15 @@ AddNode clean {
     command {rm -f mod_rivet.a}
 }
 
+AddNode testing.o {
+    command {$COMPILE testing.c}
+}
+
+AddNode libtesting.so {
+    depends {parser.o testing.o}
+    command {$TCL_SHLIB_LD -o libtesting.so parser.o testing.o}
+}
+
 AddNode install {
     depends static
     command {./cvsversion.tcl}

@@ -61,20 +61,20 @@ Rivet_Parse(
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc =
 	RIVET_SERVER_CONF( globals->r->server->module_config );
-
+    
     if (objc != 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;
     }
-
+    
     filename = Tcl_GetStringFromObj (objv[1], (int *)NULL);
     if (!strcmp(filename, globals->r->filename))
     {
 	Tcl_AddErrorInfo(interp, "Cannot recursively call the same file!");
 	return TCL_ERROR;
     }
-
+    
     if (stat(filename, &finfo))
     {
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));

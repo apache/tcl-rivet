@@ -18,7 +18,7 @@
    handler, instead of in child init handlers. */
 #ifdef __MINGW32__
 #define THREADED_TCL 1
-#else 
+#else
 #define THREADED_TCL 0 /* Unless you have MINGW32, modify this one! */
 #endif
 

@@ -25,7 +25,7 @@ outputproc(ClientData instancedata, char *buf, int toWrite, int *errorCodePtr)
     rivet_server_conf *rsc = (rivet_server_conf *)instancedata;
     rivet_interp_globals *globals = Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
 
-    print_headers(globals->r);
+    Rivet_PrintHeaders(globals->r);
     if (*(rsc->content_sent) == 0)
     {
 	ap_rwrite(buf, toWrite, globals->r);

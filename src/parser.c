@@ -8,7 +8,7 @@
 #include "apache_request.h"
 #include "mod_rivet.h"
 
-/* 
+/*
    Accepts an 'outbuf' to be filled, and an open file descriptor
 
    Returns 'inside', letting the caller know whether the parser was
@@ -35,17 +35,15 @@ Rivet_Parser( Tcl_Obj *outbuf, FILE *openfile )
     {
 	if (ch == -1)
 	    return -1;
-	c = ch;
+	c = (char)ch;
 	if (!inside)
 	{
-	    /* OUTSIDE  */
-
+	    /* Outside the delimiting tags. */
 	    if (c == strstart[p])
 	    {
 		if ((++p) == endseqlen)
 		{
-		    /* Ok, we have matched the whole ending sequence.
-		     * Do something
+		    /* We have matched the whole ending sequence.
 		     */
 		    Tcl_DStringAppend(&dstr, "\"\n", 2);
 		    inside = 1;
@@ -53,41 +51,42 @@ Rivet_Parser( Tcl_Obj *outbuf, FILE *openfile )
 		    continue;
 		}
 	    } else {
-		if (p > 0)
+		if (p > 0) {
 		    Tcl_DStringAppend(&dstr, (char *)strstart, p);
+		    p = 0;
+		}
 		/* or else just put the char in outbuf  */
 		switch (c)
 		{
 		case '{':
-		    Tcl_DStringAppend(&dstr, "\\{", -1);
+		    Tcl_DStringAppend(&dstr, "\\{", 2);
 		    break;
 		case '}':
-		    Tcl_DStringAppend(&dstr, "\\}", -1);
+		    Tcl_DStringAppend(&dstr, "\\}", 2);
 		    break;
 		case '$':
-		    Tcl_DStringAppend(&dstr, "\\$", -1);
+		    Tcl_DStringAppend(&dstr, "\\$", 2);
 		    break;
 		case '[':
-		    Tcl_DStringAppend(&dstr, "\\[", -1);
+		    Tcl_DStringAppend(&dstr, "\\[", 2);
 		    break;
 		case ']':
-		    Tcl_DStringAppend(&dstr, "\\]", -1);
+		    Tcl_DStringAppend(&dstr, "\\]", 2);
 		    break;
 		case '"':
-		    Tcl_DStringAppend(&dstr, "\\\"", -1);
+		    Tcl_DStringAppend(&dstr, "\\\"", 2);
 		    break;
 		case '\\':
-		    Tcl_DStringAppend(&dstr, "\\\\", -1);
+		    Tcl_DStringAppend(&dstr, "\\\\", 2);
 		    break;
 		default:
 		    Tcl_DStringAppend(&dstr, &c, 1);
 		    break;
 		}
-		p = 0;
 		continue;
 	    }
 	} else {
-	    /* INSIDE  */
+	    /* Inside the delimiting tags. */
 
 	    if (c == strend[p])
 	    {
@@ -98,14 +97,13 @@ Rivet_Parser( Tcl_Obj *outbuf, FILE *openfile )
 		    p = 0;
 		    continue;
 		}
-	    }
-	    else
-	    {
+	    } else {
 		/*  plop stuff into outbuf, which we will then eval   */
-		if (p > 0)
+		if (p > 0) {
 		    Tcl_DStringAppend(&dstr, (char *)strend, p);
+		    p = 0;
+		}
 		Tcl_DStringAppend(&dstr, &c, 1);
-		p = 0;
 	    }
 	}
     }

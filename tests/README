@@ -14,5 +14,9 @@ is launched from, and launches Apache with the generated config.  We
 are thusly able to manipulate the environment completely, and run the
 tests directly in the tests/ directory...
 
-Note that mod_so.c must be compiled into Apache for this to work.
+Note that mod_so.c must be compiled into Apache for this to work, or
+Apache must be compiled with Rivet built in.
 
+For example:
+
+./runtest.tcl /usr/sbin/apache
