@@ -142,6 +142,8 @@ proc configure::AddOption {args} {
 #	None.
 
 proc configure::test {varname body} {
+    global errorInfo
+
     variable errors
     variable verbose
 
@@ -162,6 +164,11 @@ proc configure::test {varname body} {
 	# Exit on error.
 	puts stderr ""
 	puts stderr "Error in $varname test: $err"
+
+	# comment this line in if you need help debugging the error that
+	# happened:
+	#puts stderr "$errorInfo"
+
 	exit 1
     } else {
 	set ::configs::${varname} $val
