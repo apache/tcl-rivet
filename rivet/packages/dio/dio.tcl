@@ -471,13 +471,11 @@ proc handle {interface args} {
     #
     # insert - a pure insert, without store's somewhat clumsy
     # efforts to see if it needs to be an update rather than
-    # an insert
+    # an insert -- this shouldn't require fields, it's broken
     #
-    method insert {arrayName args} {
+    method insert {arrayName fields args} {
 	table_check $args
 	upvar 1 $arrayName $arrayName $arrayName array
-
-	set fields [array names array]
 	set req [build_insert_query array $fields $myTable]
 
 	set res [exec $req]
@@ -486,7 +484,6 @@ proc handle {interface args} {
 	    $res destroy
 	    return -code error "Got '$errinf' executing '$req'"
 	}
-
 	$res destroy
 	return 1
     }
