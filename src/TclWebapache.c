@@ -307,7 +307,7 @@ TclWeb_InitEnvVars( TclWebRequest *req )
     ap_table_set( table, "LAST_MODIFIED",
 	ap_ht_time( TCLWEBPOOL, req->req->finfo.st_mtime, timefmt, 1 ) );
     ap_table_set( table, "DOCUMENT_URI", req->req->uri );
-    ap_table_set( table, "DOCUMENT_URI", req->req->path_info );
+    ap_table_set( table, "DOCUMENT_PATH_INFO", req->req->path_info );
 
     if ((t = strrchr(req->req->filename, '/'))) {
 	ap_table_set( table, "DOCUMENT_NAME", ++t );
