@@ -50,6 +50,8 @@
   <xsl:variable name="group.choice.req.open.str">(</xsl:variable>
   <xsl:variable name="group.choice.req.close.str">)</xsl:variable>
 
+  <xsl:variable name="group.rep.repeat.str">...</xsl:variable>
+
   <xsl:template name="inline.underlineseq">
     <xsl:param name="content">
       <xsl:call-template name="anchor"/>

@@ -1,3 +1,7 @@
+2004-02-26  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added DIODisplay section.
+
 2004-02-25  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetParser.h: start/end tags removed from here.

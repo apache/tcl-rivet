@@ -1,10 +1,10 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.64.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="id4735361"></a>Apache Rivet</h1></div><div><div class="author"><h3 class="author"><span class="firstname">The Rivet Team</span></h3><div class="affiliation"><span class="orgname">The Apache Software Foundation<br></span><div class="address"><p><br>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.64.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="id4735368"></a>Apache Rivet</h1></div><div><div class="author"><h3 class="author"><span class="firstname">The Rivet Team</span></h3><div class="affiliation"><span class="orgname">The Apache Software Foundation<br></span><div class="address"><p><br>
 	  <tt class="email">&lt;<a href="mailto:rivet-dev@tcl.apache.org">rivet-dev@tcl.apache.org</a>&gt;</tt><br>
-	</p></div></div></div></div><div><p class="copyright">Copyright © 2002, 2003, 2004 Apache Software Foundation</p></div></div><div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#id4686068">Introduction to Apache Rivet</a></span></dt><dt><span class="section"><a href="#installation">Apache Rivet Installation</a></span></dt><dt><span class="section"><a href="#directives">Rivet Apache Directives</a></span></dt><dt><span class="section"><a href="#commands">Rivet Tcl Commands and Variables</a></span></dt><dt><span class="section"><a href="#examples">Examples and Usage</a></span></dt><dt><span class="section"><a href="#tcl_packages">Rivet Tcl Packages</a></span></dt><dt><span class="section"><a href="#dio">DIO - Database Interface Objects</a></span></dt><dt><span class="section"><a href="#session_package">Session Package</a></span></dt><dd><dl><dt><span class="section"><a href="#id4741069">Introduction</a></span></dt><dt><span class="section"><a href="#id4741106">Requirements</a></span></dt><dt><span class="section"><a href="#id4741119">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id4741169">Example Usage</a></span></dt><dt><span class="section"><a href="#id4741235">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id4741443">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id4741697">Session Methods</a></span></dt><dt><span class="section"><a href="#id4741936">Getting Additional Randomness From The Entropy File</a></span></dt></dl></dd><dt><span class="section"><a href="#help">Resources - How to Get Help</a></span></dt><dd><dl><dt><span class="section"><a href="#id4741971">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id4742011">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id4742098">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id4742116">IRC</a></span></dt><dt><span class="section"><a href="#id4742127">Editing Rivet Template Files</a></span></dt></dl></dd><dt><span class="section"><a href="#internals">Rivet Internals</a></span></dt><dd><dl><dt><span class="section"><a href="#id4742197">Initialization</a></span></dt><dt><span class="section"><a href="#id4742236">RivetChan</a></span></dt><dt><span class="section"><a href="#id4742263">The global Command</a></span></dt><dt><span class="section"><a href="#id4742314">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id4742364">Debugging Rivet and Apache</a></span></dt></dl></dd><dt><span class="section"><a href="#upgrading">Upgrading from mod_dtcl or NeoWebScript</a></span></dt><dd><dl><dt><span class="section"><a href="#id4742530">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id4742542">NeoWebScript</a></span></dt></dl></dd></dl></div><p style="width:90%">
+	</p></div></div></div></div><div><p class="copyright">Copyright © 2002, 2003, 2004 Apache Software Foundation</p></div></div><div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#id4678337">Introduction to Apache Rivet</a></span></dt><dt><span class="section"><a href="#installation">Apache Rivet Installation</a></span></dt><dt><span class="section"><a href="#directives">Rivet Apache Directives</a></span></dt><dt><span class="section"><a href="#commands">Rivet Tcl Commands and Variables</a></span></dt><dt><span class="section"><a href="#examples">Examples and Usage</a></span></dt><dt><span class="section"><a href="#tcl_packages">Rivet Tcl Packages</a></span></dt><dt><span class="section"><a href="#dio">DIO - Database Interface Objects</a></span></dt><dt><span class="section"><a href="#diodisplay">DIODisplay - Database Interface Objects Display Class</a></span></dt><dt><span class="section"><a href="#session_package">Session Package</a></span></dt><dd><dl><dt><span class="section"><a href="#id4743718">Introduction</a></span></dt><dt><span class="section"><a href="#id4743755">Requirements</a></span></dt><dt><span class="section"><a href="#id4743768">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id4743818">Example Usage</a></span></dt><dt><span class="section"><a href="#id4743891">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id4744099">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id4744353">Session Methods</a></span></dt><dt><span class="section"><a href="#id4744592">Getting Additional Randomness From The Entropy File</a></span></dt></dl></dd><dt><span class="section"><a href="#help">Resources - How to Get Help</a></span></dt><dd><dl><dt><span class="section"><a href="#id4744627">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id4744667">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id4744754">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id4744772">IRC</a></span></dt><dt><span class="section"><a href="#id4744783">Editing Rivet Template Files</a></span></dt></dl></dd><dt><span class="section"><a href="#internals">Rivet Internals</a></span></dt><dd><dl><dt><span class="section"><a href="#id4744853">Initialization</a></span></dt><dt><span class="section"><a href="#id4744892">RivetChan</a></span></dt><dt><span class="section"><a href="#id4744919">The global Command</a></span></dt><dt><span class="section"><a href="#id4744970">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id4745020">Debugging Rivet and Apache</a></span></dt></dl></dd><dt><span class="section"><a href="#upgrading">Upgrading from mod_dtcl or NeoWebScript</a></span></dt><dd><dl><dt><span class="section"><a href="#id4745186">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id4745198">NeoWebScript</a></span></dt></dl></dd></dl></div><p style="width:90%">
     This document is also available in the following languages: <a href="index.it.html" target="_top">Italian</a>, <a href="index.ru.html" target="_top">Russian</a>
   </p><p style="width:90%">
-    Document revision: $Revision: 1.42 $, last modified $Date: 2004/02/24 10:24:28 $ by $Author: davidw $.
-  </p><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="id4686068"></a>Introduction to Apache Rivet</h2></div></div><div></div></div><p style="width:90%">
+    Document revision: $Revision: 1.44 $, last modified $Date: 2004/02/25 12:56:48 $ by $Author: davidw $.
+  </p><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="id4678337"></a>Introduction to Apache Rivet</h2></div></div><div></div></div><p style="width:90%">
       Apache Rivet is a system for creating dynamic web content via a
       programming language integrated with Apache Web Server.  It is
       designed to be fast, powerful and extensible, consume few system
@@ -226,9 +226,9 @@ AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 	    <span style="font-family:monospace"><span><b class="command">RivetServerConf</b></span></span>, except that they are
 	    only valid for the directory where they are specified, and
 	    its subdirectories.
-	  </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="commands"></a>Rivet Tcl Commands and Variables</h2></div></div><div></div></div><div class="toc"><dl><dt><a href="#id4736037">var</a> - get the value of a form variable.</dt><dt><a href="#id4736514">upload</a> - handle a file uploaded by a client.</dt><dt><a href="#id4736938">load_response</a> - load form variables into an array.</dt><dt><a href="#id4736983">load_headers</a> - get client request's headers.</dt><dt><a href="#id4737036">load_cookies</a> - get any cookie variables sent by the client.</dt><dt><a href="#id4737089">load_env</a> - get the request's environment variables.</dt><dt><a href="#id4737155">env</a> - Loads a single
-	"environmental variable" into a Tcl variable.</dt><dt><a href="#id4737204">include</a> - includes a file into the output stream without modification.</dt><dt><a href="#id4737259">parse</a> - parses a Rivet template file.</dt><dt><a href="#id4737318">headers</a> - set and parse HTTP headers.</dt><dt><a href="#id4737652">makeurl</a> - construct url's based on hostname, port.</dt><dt><a href="#id4737715">cookie</a> - get and set cookies.</dt><dt><a href="#id4737879">clock_to_rfc850_gmt</a> - create a rfc850 time from [clock seconds].</dt><dt><a href="#id4737929">html</a> - construct html tagged text.</dt><dt><a href="#id4737999">incr0</a> - increment a variable or set it to 1 if nonexistant.</dt><dt><a href="#id4738066">parray</a> - Tcl's parray with html formatting.</dt><dt><a href="#id4738138">abort_page</a> - Stops outputing data to web page, similar in
-	  purpose to PHP's die command.</dt><dt><a href="#id4738193">no_body</a> - Prevents Rivet from sending any content.</dt></dl></div><div class="refentry" lang="en"><a name="id4736037"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">var, var_qs, var_post &#8212; get the value of a form variable.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">
+	  </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="commands"></a>Rivet Tcl Commands and Variables</h2></div></div><div></div></div><div class="toc"><dl><dt><a href="#id4736044">var</a> - get the value of a form variable.</dt><dt><a href="#id4736521">upload</a> - handle a file uploaded by a client.</dt><dt><a href="#id4736945">load_response</a> - load form variables into an array.</dt><dt><a href="#id4736990">load_headers</a> - get client request's headers.</dt><dt><a href="#id4737043">load_cookies</a> - get any cookie variables sent by the client.</dt><dt><a href="#id4737096">load_env</a> - get the request's environment variables.</dt><dt><a href="#id4737161">env</a> - Loads a single
+	"environmental variable" into a Tcl variable.</dt><dt><a href="#id4737211">include</a> - includes a file into the output stream without modification.</dt><dt><a href="#id4737266">parse</a> - parses a Rivet template file.</dt><dt><a href="#id4737325">headers</a> - set and parse HTTP headers.</dt><dt><a href="#id4737659">makeurl</a> - construct url's based on hostname, port.</dt><dt><a href="#id4737722">cookie</a> - get and set cookies.</dt><dt><a href="#id4737886">clock_to_rfc850_gmt</a> - create a rfc850 time from [clock seconds].</dt><dt><a href="#id4737936">html</a> - construct html tagged text.</dt><dt><a href="#id4738006">incr0</a> - increment a variable or set it to 1 if nonexistant.</dt><dt><a href="#id4738073">parray</a> - Tcl's parray with html formatting.</dt><dt><a href="#id4738145">abort_page</a> - Stops outputing data to web page, similar in
+	  purpose to PHP's die command.</dt><dt><a href="#id4738199">no_body</a> - Prevents Rivet from sending any content.</dt></dl></div><div class="refentry" lang="en"><a name="id4736044"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">var, var_qs, var_post &#8212; get the value of a form variable.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">
 	    var
 	  </span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">
 	    var_qs
@@ -277,7 +277,7 @@ AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 		Return a list of variable names and values.
 	      </div></div></dd></dl></div><p style="width:90%">
 	  See <a href="#variable_access" title="Example 3. Variable Access">Example 3, &#8220;Variable Access&#8221;</a>.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4736514"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">upload &#8212; handle a file uploaded by a client.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">upload</span>  (<span style="font-family:monospace; font-weight: bold;">channel</span> | <span style="font-family:monospace; font-weight: bold;">save</span> | <span style="font-family:monospace; font-weight: bold;">data</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">size</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">filename</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">The upload command is for file upload manipulation.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4736521"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">upload &#8212; handle a file uploaded by a client.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">upload</span>  (<span style="font-family:monospace; font-weight: bold;">channel</span> | <span style="font-family:monospace; font-weight: bold;">save</span> | <span style="font-family:monospace; font-weight: bold;">data</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">size</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">filename</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">The upload command is for file upload manipulation.
 	  See the relevant Apache Directives to further configure the
 	  behavior of this Rivet feature.</p><div class="variablelist"><dl><dt><span class="term">
 	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">upload</span>   <span style="font-family:monospace; font-weight: bold;">channel</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
@@ -319,18 +319,18 @@ AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 		uploaded.
 	      </div></div></dd></dl></div><p style="width:90%">
 	  See <a href="#upload" title="Example 4. File Upload">Example 4, &#8220;File Upload&#8221;</a>.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4736938"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_response &#8212; load form variables into an array.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_response</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3>
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4736945"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_response &#8212; load form variables into an array.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_response</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3>
 	Load any form variables passed to this page into an
 	array.
-      </div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4736983"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_headers &#8212; get client request's headers.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_headers</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+      </div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4736990"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_headers &#8212; get client request's headers.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_headers</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Load the headers that come from a client request into the
 	  provided array name, or use headers if no
 	  name is provided.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737036"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_cookies &#8212; get any cookie variables sent by the client.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_cookies</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3></div><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737043"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_cookies &#8212; get any cookie variables sent by the client.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_cookies</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3></div><p style="width:90%">
 	Load the array of cookie variables into the specified
 	array name.  Uses array cookies by
 	default.
-      </p></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737089"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_env &#8212; get the request's environment variables.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_env</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+      </p></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737096"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_env &#8212; get the request's environment variables.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_env</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Load the array of environment variables into the specified
 	  array name.  Uses array ::request::env by
 	  default.
@@ -339,20 +339,20 @@ AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 	  namespace, it isn't necessary to qualify the array name
 	  for most uses - it's ok to access it as
 	  env.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737155"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">env &#8212; Loads a single
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737161"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">env &#8212; Loads a single
 	"environmental variable" into a Tcl variable.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">env</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varName</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  If it is only necessary to load one environmental variable,
 	  this command may be used to avoid the overhead of loading
 	  and storing the entire array.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737204"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">include &#8212; includes a file into the output stream without modification.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">include</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737211"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">include &#8212; includes a file into the output stream without modification.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">include</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Include a file without parsing it for processing tags &lt;?
 	  and ?&gt;.  This is the best way to include an HTML file or
 	  any other static content.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737259"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">parse &#8212; parses a Rivet template file.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parse</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737266"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">parse &#8212; parses a Rivet template file.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parse</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Like the Tcl <span style="font-family:monospace"><span><b class="command">source</b></span></span> command, but also
 	  parses for Rivet &lt;?  and ?&gt; processing tags.  Using
 	  this command, you can use one .rvt file from another.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737318"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">headers &#8212; set and parse HTTP headers.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>  (<span style="font-family:monospace; font-weight: bold;">set</span> | <span style="font-family:monospace; font-weight: bold;">redirect</span> | <span style="font-family:monospace; font-weight: bold;">add</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">numeric</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737325"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">headers &#8212; set and parse HTTP headers.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>  (<span style="font-family:monospace; font-weight: bold;">set</span> | <span style="font-family:monospace; font-weight: bold;">redirect</span> | <span style="font-family:monospace; font-weight: bold;">add</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">numeric</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  The <span style="font-family:monospace"><span><b class="command">headers</b></span></span> command is for setting and
 	  parsing HTTP headers.
 	</p><div class="variablelist"><dl><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>   <span style="font-family:monospace; font-weight: bold;">set</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
@@ -376,44 +376,44 @@ AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 	      </div></div></dd><dt><span class="term">
 	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>   <span style="font-family:monospace; font-weight: bold;">numeric</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>response code</tt></i></span>?</div></div>
 	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Set a numeric response code, such as 200, 404 or 500.
-	      </div></div></dd></dl></div></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737652"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">makeurl &#8212; construct url's based on hostname, port.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	      </div></div></dd></dl></div></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737659"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">makeurl &#8212; construct url's based on hostname, port.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Create a self referencing URL from a filename.  For example:
 	  </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">makeurl /tclp.gif</pre><p style="width:90%">
 	  returns
 	  <tt class="computeroutput">http://[hostname]:[port]/tclp.gif</tt>.
 	  where hostname and port are the hostname and port of the
 	  server in question.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737715"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">cookie &#8212; get and set cookies.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">cookie</span>  ?<span style="font-family:monospace; font-weight: bold;">set</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>cookieName</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">cookiValue</span>?</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-days <i class="replaceable"><tt>expireInDays</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-hours <i class="replaceable"><tt>expireInHours</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-minutes <i class="replaceable"><tt>expireInMinutes</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-expires <i class="replaceable"><tt>Wdy, DD-Mon-YYYY HH:MM:SS GMT</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-path <i class="replaceable"><tt>uriPathCookieAppliesTo</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-secure <i class="replaceable"><tt>1/0</tt></i></span>?</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">cookie</span>  ?<span style="font-family:monospace; font-weight: bold;">get</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>cookieName</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737722"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">cookie &#8212; get and set cookies.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">cookie</span>  ?<span style="font-family:monospace; font-weight: bold;">set</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>cookieName</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">cookiValue</span>?</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-days <i class="replaceable"><tt>expireInDays</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-hours <i class="replaceable"><tt>expireInHours</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-minutes <i class="replaceable"><tt>expireInMinutes</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-expires <i class="replaceable"><tt>Wdy, DD-Mon-YYYY HH:MM:SS GMT</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-path <i class="replaceable"><tt>uriPathCookieAppliesTo</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;">-secure <i class="replaceable"><tt>1/0</tt></i></span>?</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">cookie</span>  ?<span style="font-family:monospace; font-weight: bold;">get</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>cookieName</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  <span style="font-family:monospace"><span><b class="command">cookie</b></span></span> gets or sets a cookie.  When you
 	  get a cookie, the command returns the value of the cookie,
 	  or an empty string if no cookie exists.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737879"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">clock_to_rfc850_gmt &#8212; create a rfc850 time from [clock seconds].</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">clock_to_rfc850_gmt</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>seconds</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737886"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">clock_to_rfc850_gmt &#8212; create a rfc850 time from [clock seconds].</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">clock_to_rfc850_gmt</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>seconds</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Convert an integer-seconds-since-1970 click value to
 	  RFC850 format, with the additional requirement that it be
 	  GMT only.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737929"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">html &#8212; construct html tagged text.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">html</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>string</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arg</tt></i></span>...?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737936"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">html &#8212; construct html tagged text.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">html</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>string</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arg</tt></i></span>...?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Print text with the added ability to pass HTML tags
 	  following the string.  Example:
 	  </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">html "Test" b i</pre><p style="width:90%">
 	  produces: <tt class="computeroutput">&lt;b&gt;&lt;i&gt;Test&lt;/i&gt;&lt;/b&gt;</tt>
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4737999"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">incr0 &#8212; increment a variable or set it to 1 if nonexistant.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">incr0</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>num</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4738006"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">incr0 &#8212; increment a variable or set it to 1 if nonexistant.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">incr0</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>num</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  Increment a variable
 	  <i class="replaceable"><tt>varname</tt></i> by
 	  <i class="replaceable"><tt>num</tt></i>.  If the
 	  variable doesn't exist, create it instead of returning an
 	  error.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4738066"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">parray &#8212; Tcl's <span style="font-family:monospace"><span><b class="command">parray</b></span></span> with html formatting.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parray</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">pattern</span>?</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4738073"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">parray &#8212; Tcl's <span style="font-family:monospace"><span><b class="command">parray</b></span></span> with html formatting.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parray</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">pattern</span>?</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  An html version of the standard Tcl
 	  <span style="font-family:monospace"><span><b class="command">parray</b></span></span> command.  Displays the entire
 	  contents of an array in a sorted, nicely-formatted way.
 	  Mostly used for debugging purposes.
-	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4738138"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">abort_page &#8212; Stops outputing data to web page, similar in
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4738145"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">abort_page &#8212; Stops outputing data to web page, similar in
 	  purpose to PHP's <span style="font-family:monospace"><span><b class="command">die</b></span></span> command.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">abort_page</span> </div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">This command flushes the
 	output buffer and stops the Tcl script from sending any more
 	data to the client.  A normal Tcl script might use the
 	<span style="font-family:monospace"><span><b class="command">exit</b></span></span> command, but that cannot be used in
 	Rivet without actually exiting the apache child
-	process!</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4738193"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">no_body &#8212; Prevents Rivet from sending any content.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">no_body</span> </div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	process!</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id4738199"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">no_body &#8212; Prevents Rivet from sending any content.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">no_body</span> </div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  This command is useful for situations where it is necessary
 	  to only return HTTP headers and no actual content.  For
 	  instance, when returning a 304 redirect.
@@ -596,7 +596,7 @@ puts "Saved file [upload filename MyUpload] \
     </p><div class="itemizedlist"><ul type="disc"><li><div style="margin-bottom:1.5ex ; padding .5ex">commserver is a package providing a server that can be
 	used for IPC.  Still experimental.  Requires the comm package
 	from tcllib.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">dio is a database abstraction layer.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">dtcl is a compatibility package for mod_dtcl
-	applications.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">form - for creating forms.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">rivet - some additional, useful routines.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">tclrivet</div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="dio"></a>DIO - Database Interface Objects</h2></div></div><div></div></div><div class="toc"><dl><dt><a href="#id4738489">DIO</a> - Database Interface Objects</dt></dl></div><div class="refentry" lang="en"><a name="id4738489"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">DIO &#8212; Database Interface Objects</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">::DIO::handle</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>interface</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>objectName</tt></i></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>option</tt></i></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>option</tt></i></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	applications.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">form - for creating forms.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">rivet - some additional, useful routines.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">tclrivet</div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="dio"></a>DIO - Database Interface Objects</h2></div></div><div></div></div><div class="toc"><dl><dt><a href="#id4738496">DIO</a> - Database Interface Objects</dt></dl></div><div class="refentry" lang="en"><a name="id4738496"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">DIO &#8212; Database Interface Objects</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">::DIO::handle</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>interface</tt></i></span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>objectName</tt></i></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>option</tt></i></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>option</tt></i></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  <span style="font-family:monospace"><span><b class="command">DIO</b></span></span> is designed to be a generic,
 	  object-oriented interface to SQL databases.  Its main goal
 	  is to be as generic as possible, but since not all SQL
@@ -608,9 +608,10 @@ puts "Saved file [upload filename MyUpload] \
 	  interface - The name of the database
 	  interface.  Currently supported interfaces are
 	  Postgresql and Mysql.
-	</p><p style="width:90%">If objectName is specified, DIO creates
-	  an object of that name.  If there is no
-	  <i class="replaceable"><tt>objectName</tt></i>
+	</p><p style="width:90%">
+	  If <i class="replaceable"><tt>objectName</tt></i> is
+	  specified, DIO creates an object of that name.  If there is
+	  no <i class="replaceable"><tt>objectName</tt></i>
 	  given, DIO will automatically generate a unique object ID
 	</p></div><div class="refsect1" lang="en"><h3>Options</h3><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-host</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>hostname</tt></i></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 		The hostname of the computer to connect to.  If none
@@ -810,7 +811,436 @@ puts "Saved file [upload filename MyUpload] \
 		current result record in the result object.  This
 		variable should not really be accessed outside of the
 		result object, but it's there if you want it.
-	      </div></div></dd></dl></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="session_package"></a>Session Package</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4741069">Introduction</a></span></dt><dt><span class="section"><a href="#id4741106">Requirements</a></span></dt><dt><span class="section"><a href="#id4741119">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id4741169">Example Usage</a></span></dt><dt><span class="section"><a href="#id4741235">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id4741443">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id4741697">Session Methods</a></span></dt><dt><span class="section"><a href="#id4741936">Getting Additional Randomness From The Entropy File</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741069"></a>Introduction</h3></div></div><div></div></div><p style="width:90%">
+	      </div></div></dd></dl></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="diodisplay"></a>DIODisplay - Database Interface Objects Display Class</h2></div></div><div></div></div><div class="toc"><dl><dt><a href="#id4741077">DIODisplay</a> - Database Interface Objects Display Class</dt></dl></div><div class="refentry" lang="en"><a name="id4741077"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">DIODisplay &#8212; Database Interface Objects Display Class</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">DIODisplay</span>  (<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>objectName</tt></i></span> | <span style="font-family:monospace; font-weight: bold;">#auto</span>) (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>option</tt></i></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>option</tt></i></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  DIODisplay is an HTML display class that uses a DIO object
+	  to do the database work and a form object to do the
+	  displaying.
+	</p></div><div class="refsect1" lang="en"><h3>Options</h3><div class="variablelist"><dl><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-DIO</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>dioObject</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		The DIO object to be used in conjunction with this
+		display object.  This is a required field.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-cleanup</span>  (<span style="font-family:monospace; font-weight: bold;">1</span> | <span style="font-family:monospace; font-weight: bold;">0</span>)</div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		If cleanup is true, when the display object is shown,
+		it will automatically destroy the DIO object, the form
+		object and itself. Default is true.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-confirmdelete</span>  (<span style="font-family:monospace; font-weight: bold;">1</span> | <span style="font-family:monospace; font-weight: bold;">0</span>)</div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		If confirmdelete is true, attempting to delete a
+		record from the database first requires that the user
+		confirm that they wish to delete it.  If it is false,
+		deletion occurs without prompting the user. Defaults
+		to true.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-errorhandler</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>procName</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		The name of a procedure to handle errors when they
+		occur.  During the processing of requests and pages,
+		sometimes unexpected errors can occur.  This procedure
+		will handle any errors.  It is called with a single
+		argument, the error string.  Use of the Tcl errorInfo
+		and errorCode variables is also recommended though.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		If no errorhandler is specified, the handle_error
+		method within the Display object will handle the
+		error.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-fields</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>fieldList</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Specify a list of fields to be used in this object.
+		The fields list is actually created by using the
+		<span style="font-family:monospace"><span><b class="command">field</b></span></span> command to add fields to the
+		display, but this option can be useful to sometimes
+		over-set the list of fields created.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-form</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>formObject</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		A Rivet form object to use when displaying a form.  If
+		one is not specified, the display object will
+		automatically create one when it is necessary.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-functions</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>functionList</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		A list of functions to be displayed in the main menu.
+		This is a list of functions the user is allowed to
+		execute.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-pagesize</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>pageSize</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		How many records to show per page on a search or
+		list. Default is 25.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-rowfields</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>fieldList</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		A list of fields to display in each row of a search or
+		list.  When a search or list is conducted and the
+		resulting rows are displayed, this list will limit
+		which fields are displayed.  Default is all fields.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-rowfunctions</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>functionList</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		A list of functions to display in each row of a search
+		or list.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-searchfields</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>fieldList</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		A list of fields to allow a user to search by.  This
+		list will appear in the main screen as a drop-down box
+		of fields the user can search on.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-title</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>title</tt></i></span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		The title of the display object.  This will be output
+		as the title of the HTML document.
+	      </div></div></dd></dl></div><div class="refsect2" lang="en"><h3>DIO Display Object Commands</h3><div class="variablelist"><dl><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">cleanup</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current cleanup value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for the cleanup
+		  option.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">delete</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>key</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Delete the specified key from the
+		  database.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  The default action of this method is to call the DIO
+		  object's delete command.  This method can be
+		  overridden.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">destroy</span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Destroy the diodisplay object.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">DIO</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current DIO value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for DIO.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">errorhandler</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current errorhandler value.  If
+		  <i class="replaceable"><tt>value</tt></i> is specified, it
+		  sets a new value for errorhandler.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">fetch</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>key</tt></i></span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Fetch the specified <i class="replaceable"><tt>key</tt></i>
+		  from the database and store it as an array in
+		  <i class="replaceable"><tt><i class="replaceable"><tt>arrayName</tt></i></tt></i>.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  The default of this method is to call the DIO object's fetch command.
+		  This method can be overridden.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">field</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>fieldName</tt></i></span>  (<span style="font-family:monospace; font-weight: bold;">-arg</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arg</tt></i></span>...)</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Create a new field object and add it to the display.
+		  When a field is added to the display, a new object
+		  of the DIODisplayField class is created with its
+		  values.  See [FIXME - LINK] DIO Display Fields for
+		  options and values.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">fields</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current fields value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for fields.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">form</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current form value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for form.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">function</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>functionName</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Add a new function to the list of possible
+		  functions.  The display object will only execute
+		  methods and procs which are defined as functions by
+		  the object.  This is to protect the program from
+		  executing a different procedure other than what is
+		  allowed.  The <span style="font-family:monospace"><span><b class="command">function</b></span></span> command
+		  adds a new function to the list of allowable
+		  functions.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">functions</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current functions value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for functions.  See
+		  [FIXME - LINK DIO Display Functions] for a list of
+		  default functions.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">pagesize</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current form pagesize.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for pagesize.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">rowfields</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current form rowfields.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for rowfields.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">rowfooter</span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Output the footer of a list of rows to the web page.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method can be overridden.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">rowfunctions</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current rowfunctions value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for rowfunctions.
+		  
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">rowheader</span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Output the header of a list of rows to the web page.
+		By default, this is an HTML table with a top row
+		listing the fields in the table.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method can be overridden.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">searchfields</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current searchfields value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for searchfields.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">show</span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Show the display object.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This is the main method of the display class.  It
+		  looks for a variable called <tt class="varname">mode</tt>
+		  to be passed in through a form response and uses
+		  that mode to execute the appropriate function.  If
+		  mode is not given, the <span style="font-family:monospace"><span><b class="command">Main</b></span></span>
+		  function is called.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This function should be called for every page.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">showform</span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Display the form of the object.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method displays the form for this display
+		  object.  It is used in the <span style="font-family:monospace"><span><b class="command">Add</b></span></span>
+		  and <span style="font-family:monospace"><span><b class="command">Edit</b></span></span> methods but can be
+		  called separately if needed.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method can be overridden if the default look of
+		  a form needs to be changed.  By default, the form
+		  displayed is simply the fields in a table, in order.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">showrow</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Display a single row of a resulting list or search.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method is used to display a single row while
+		  displaying the result of a list or search.
+		  <i class="replaceable"><tt>arrayName</tt></i>
+		  is a fetched array of the record.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method can be overriden if the default look of
+		  a row needs to be changed.  By default, each row is
+		  output as a table row with each field as a table
+		  data cell.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">showview</span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Display the view of the object.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method displays the view for this display
+		  object.  It is used in the
+		  <span style="font-family:monospace"><span><b class="command">Details</b></span></span> methods but can be
+		  called separately if needed.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This method can be overridden if the default look of
+		  a view needs to be changed.  By default, the view
+		  displayed is simply the fields in a table, in order.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">store</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Store the specified
+		  <i class="replaceable"><tt>arrayName</tt></i>
+		  in the database.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  The default of this method is to call the DIO
+		  object's store command.  This method can be
+		  overridden.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">text</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current text value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for text.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">title</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current title value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for title.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">type</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current type value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for type.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>objectName</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">value</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Return the current value value.  If
+		  <i class="replaceable"><tt>value</tt></i> is
+		  specified, it sets a new value for value.
+		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><h3>DIO Display Functions</h3><p style="width:90%">
+	    These functions are called from the
+	    <span style="font-family:monospace"><span><b class="command">show</b></span></span> method when a form response
+	    variable called <tt class="varname">mode</tt> is set.  If no
+	    mode has been set, the default mode is
+	    <span style="font-family:monospace"><span><b class="command">Main</b></span></span>.  The show method will handle
+	    the necessary switching of functions.  The show method
+	    also handles checking to make sure the function given is a
+	    true function.  If not, an error message is displayed.
+	    New functions can be added as methods or by use of the
+	    <span style="font-family:monospace"><span><b class="command">function</b></span></span> command, and any of the
+	    default functions can be overridden with new methods to
+	    create an entirely new class.  These are the default
+	    functions provided.
+	  </p><div class="variablelist"><dl><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Add</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Show a form that allows the user to add a new entry
+		  to the database.  This function calls
+		  <span style="font-family:monospace"><span><b class="command">showform</b></span></span> to display the form
+		  for adding the entry.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Cancel</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  The <span style="font-family:monospace"><span><b class="command">Cancel</b></span></span> function does nothing
+		  but redirect back to the <span style="font-family:monospace"><span><b class="command">Main</b></span></span>
+		  function.  This is handy for forms which have a
+		  cancel button to point to.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Delete</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  If <tt class="varname">confirmdelete</tt> is true (the
+		  default), the <span style="font-family:monospace"><span><b class="command">Delete</b></span></span> function
+		  will ask the user if they're sure they want to
+		  delete the record from the database.  If
+		  <tt class="varname">confirmdelete</tt> is false, or if the
+		  user confirms they wish to delete, this function
+		  calls the <span style="font-family:monospace"><span><b class="command">DoDelete</b></span></span> function to do
+		  the actual deletion of a record.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Details</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Display the view of a single record from the database.  This function calls
+		  the <span style="font-family:monospace"><span><b class="command">showview</b></span></span> method to display a single record from the database.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">DoDelete</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This function actually deletes a record from the
+		  database.  Once it has deleted the record, it
+		  redirects the user back to the
+		  <span style="font-family:monospace"><span><b class="command">Main</b></span></span> function.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Edit</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  Show a form that allows the user to edit an existing
+		  entry to the database.  This function calls
+		  <span style="font-family:monospace"><span><b class="command">showform</b></span></span> to display the form for
+		  editing the entry and fills in the fields with the
+		  values retrieved from the database.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">List</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This function lists the entires contents of the
+		  database.  Each record is output in a row using the
+		  <span style="font-family:monospace"><span><b class="command">showrow</b></span></span> method.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Main</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This function is the main function of the display
+		  object.  If there is no mode, or once most commands
+		  complete, the user will be redirected to this
+		  function.  The default <span style="font-family:monospace"><span><b class="command">Main</b></span></span>
+		  function displays a list of functions the user can
+		  execute, a list of searchfields the user can search
+		  on, and a query field.  This query field is used by
+		  all of the other functions to determine what the
+		  user is trying to find.
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		  In the case of a <span style="font-family:monospace"><span><b class="command">search</b></span></span>, query
+		  specifies what string the user is looking for in the
+		  specified search field.  In the case of
+		  <span style="font-family:monospace"><span><b class="command">delete</b></span></span>,
+		  <span style="font-family:monospace"><span><b class="command">details</b></span></span> or
+		  <span style="font-family:monospace"><span><b class="command">edit</b></span></span>, the query specifies the
+		  database key to access.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Save</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This function saves any data passed to using the
+		  <span style="font-family:monospace"><span><b class="command">store</b></span></span> method.  This is primarily
+		  used by the <span style="font-family:monospace"><span><b class="command">add</b></span></span> and
+		  <span style="font-family:monospace"><span><b class="command">edit</b></span></span> commands to store the
+		  results of the form the user has filled out.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><b class="command">Search</b></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  This function searches the database for any row
+		  whose <tt class="varname">searchBy</tt> field matches
+		  <tt class="varname">query</tt>. Once any number of records
+		  are found, <span style="font-family:monospace"><span><b class="command">Search</b></span></span> displays the
+		  results in rows.
+		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><h3>DIO Display Fields</h3><p style="width:90%">
+	    Display fields are created with the
+	    <span style="font-family:monospace"><span><b class="command">field</b></span></span> command of the DIODisplay object.
+	    Each field is created as a new DIODisplayField object or
+	    as a subclass of DIODisplayField.  The standard form
+	    fields use the standard field class, while specialized
+	    field types use a class with different options but still
+	    supports all of the same commands and values a generic
+	    field does.
+	  </p><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><i class="replaceable"><tt>displayObject</tt></i></span>   <span style="font-family:monospace; font-weight: bold;">field</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>fieldname</tt></i></span>  (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>option</tt></i></span>...)</div></div><p style="width:90%">
+	    These are the standard options supported by field types:
+	  </p><div class="variablelist"><dl><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-formargs</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arguments</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  When a field is created, any argument which is not a
+		  standard option is assumed to be an argument passed
+		  to the form object when the field is shown in a
+		  form.  These arguments are all appended to the
+		  <tt class="varname">formargs</tt> variable.  You can use
+		  this option to override or add options after the
+		  initial creation of an object
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-readonly</span>  (<span style="font-family:monospace; font-weight: bold;">1</span> | <span style="font-family:monospace; font-weight: bold;">0</span>)</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  If <tt class="varname">readonly</tt> is set to true, the
+		  field will not display a form entry when displaying
+		  in a form.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-text</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>text</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  The text displayed next to the form or view field.
+		  By default, DIODisplay tries to figure out a pretty
+		  way to display the field name.  This text will
+		  override that default and display whatever is
+		  specified.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-type</span>   <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>fieldType</tt></i></span> </div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  The type of field this is.  This type is used when
+		  creating the field in the form object.
+		  <i class="replaceable"><tt>fieldType</tt></i>
+		  can be any of the accepted form field types.  See
+		  [FIXME - LINK DIO Field Types] for a list of types
+		  available.
+		</div></div></dd></dl></div><p style="width:90%">
+	    All other arguments, unless specified in an individual
+	    field type, are passed directly to the form object when
+	    the field is created.  So, you can pass
+	    -size or -maxsize to
+	    specify the length and maximum length of the field entry.
+	    Or, if type were textarea, you could define
+	    -rows and -cols to
+	    specify its row and column count.
+	  </p></div><div class="refsect2" lang="en"><h3>DIO Display Field Types</h3><p style="width:90%">
+	    The following is a list of recognized field types by
+	    DIODisplay.  Some are standard HTML form fields, and
+	    others are DIODisplay fields which execute special actions
+	    and functions.
+	  </p></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="session_package"></a>Session Package</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4743718">Introduction</a></span></dt><dt><span class="section"><a href="#id4743755">Requirements</a></span></dt><dt><span class="section"><a href="#id4743768">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id4743818">Example Usage</a></span></dt><dt><span class="section"><a href="#id4743891">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id4744099">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id4744353">Session Methods</a></span></dt><dt><span class="section"><a href="#id4744592">Getting Additional Randomness From The Entropy File</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4743718"></a>Introduction</h3></div></div><div></div></div><p style="width:90%">
 	This is session management code.  It provides an interface
 	to allow you to generate and track a browser's visit as a
 	"session", giving you a unique session ID and an interface
@@ -832,12 +1262,12 @@ puts "Saved file [upload filename MyUpload] \
 	broswer and once in the response from it.
       </p><p style="width:90%">
 	Robust login systems, etc, can be built on top of this code.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741106"></a>Requirements</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4743755"></a>Requirements</h3></div></div><div></div></div><p style="width:90%">
 	  Rivet.  Currently has only been tested with Postgresql.
 	  All DB interfacing is done through DIO, though, so it
 	  should be relatively easy to add support for other
 	  databases.
-	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741119"></a>Preparing To Use It</h3></div></div><div></div></div><p style="width:90%">Create the tables in your SQL server.  With Postgres,
+	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4743768"></a>Preparing To Use It</h3></div></div><div></div></div><p style="width:90%">Create the tables in your SQL server.  With Postgres,
 	  do a <span style="font-family:monospace"><span><b class="command">psql www</b></span></span> or whatever DB you
 	  connect as, then a backslash-i on
 	  <tt class="filename">session-create.sql</tt></p><p style="width:90%">(If you need to delete the tables, use <tt class="filename">session-drop.sql</tt>)</p><p style="width:90%">The session code by default requires a DIO handle
@@ -845,7 +1275,7 @@ puts "Saved file [upload filename MyUpload] \
 	  overridden).  We get it by doing a</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">
   RivetServerConf ChildInitScript "package require DIO"
   RivetServerConf ChildInitScript "::DIO::handle Postgresql DIO -user www"
-</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741169"></a>Example Usage</h3></div></div><div></div></div><p style="width:90%">In your httpd.conf, add:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "package require Session; Session SESSION"</pre><p style="width:90%">
+</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4743818"></a>Example Usage</h3></div></div><div></div></div><p style="width:90%">In your httpd.conf, add:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "package require Session; Session SESSION"</pre><p style="width:90%">
 	  This tells Rivet you want to create a session object named
 	  SESSION in every child process Apache creates.</p><p style="width:90%">
 	  You can configure the session at this point using numerous
@@ -866,7 +1296,7 @@ puts "Saved file [upload filename MyUpload] \
 	  additional requests are received during the session, all
 	  under the control of the key-value pairs controlling the
 	  session object.
-	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741235"></a>Using Sessions From Your Code</h3></div></div><div></div></div><p style="width:90%">The main methods your code will use are:</p><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">SESSION</span> <span style="font-weight:bold ; font-family:monospace">id</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4743891"></a>Using Sessions From Your Code</h3></div></div><div></div></div><p style="width:90%">The main methods your code will use are:</p><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">SESSION</span> <span style="font-weight:bold ; font-family:monospace">id</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 		After doing a <span style="font-family:monospace"><span><b class="command">SESSION activate</b></span></span>,
 		this will return a 32-byte ASCII-encoded random
 		hexadecimal string.  Every time this browser comes
@@ -893,7 +1323,7 @@ puts "Saved file [upload filename MyUpload] \
 		none was set.  (Status is set to the DIO error that
 		occurred, it can be fetched using the status
 		method.)
-	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741443"></a>Session Configuration Options</h3></div></div><div></div></div><p style="width:90%">The following key-value pairs can be specified when a
+	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744099"></a>Session Configuration Options</h3></div></div><div></div></div><p style="width:90%">The following key-value pairs can be specified when a
 	  session object (like SESSION above) is created:</p><div class="variablelist"><dl><dt><span class="term">sessionLifetime</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">how many seconds the session will live for.
 		7200 == 2 hours
 	      </div></div></dd><dt><span class="term">sessionRefreshInterval</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
@@ -947,7 +1377,7 @@ puts "Saved file [upload filename MyUpload] \
 		file handle that debugging messages will be written
 		to (default
 		<tt class="varname">stdout</tt>)
-	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741697"></a>Session Methods</h3></div></div><div></div></div><p style="width:90%">
+	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744353"></a>Session Methods</h3></div></div><div></div></div><p style="width:90%">
 	  The following methods can be invoked to find out
 	  information about the current session, store and fetch
 	  server data identified with this session, etc:
@@ -986,7 +1416,7 @@ puts "Saved file [upload filename MyUpload] \
 		If they don't have one or it isn't valid (timed out,
 		etc), create a session and drop a cookie on
 		them.
-	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741936"></a>Getting Additional Randomness From The Entropy File</h3></div></div><div></div></div><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "Session SESSION -entropyFile /dev/urandom \
+	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744592"></a>Getting Additional Randomness From The Entropy File</h3></div></div><div></div></div><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "Session SESSION -entropyFile /dev/urandom \
   -entropyLength 10 -debugMode 1"</pre><p style="width:90%">
 	  This options say we want to get randomness from an entropy
 	  file (random data pseudo-device) of /dev/urandom, to get ten
@@ -994,7 +1424,7 @@ puts "Saved file [upload filename MyUpload] \
 	  on debug mode, which will cause the SESSION object to output
 	  all manner of debugging information as it does stuff.  This
 	  has been tested on FreeBSD and appears to work.
-      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="help"></a>Resources - How to Get Help</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4741971">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id4742011">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id4742098">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id4742116">IRC</a></span></dt><dt><span class="section"><a href="#id4742127">Editing Rivet Template Files</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4741971"></a>Mailing Lists</h3></div></div><div></div></div><p style="width:90%">
+      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="help"></a>Resources - How to Get Help</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4744627">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id4744667">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id4744754">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id4744772">IRC</a></span></dt><dt><span class="section"><a href="#id4744783">Editing Rivet Template Files</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744627"></a>Mailing Lists</h3></div></div><div></div></div><p style="width:90%">
 	The Rivet mailing list is the first place you should turn for
 	help, if you haven't found the solution to your problem in the
 	documentation.  Send email to
@@ -1005,7 +1435,7 @@ puts "Saved file [upload filename MyUpload] \
 	<tt class="email">&lt;<a href="mailto:rivet-list-subscribe@tcl.apache.org">rivet-<i class="replaceable"><tt>list</tt></i>-subscribe@tcl.apache.org</a>&gt;</tt>.
       </p><p style="width:90%">
 	The mailing list archives are available at <a href="http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118" target="_top">http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118</a>
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742011"></a>Newsgroup</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744667"></a>Newsgroup</h3></div></div><div></div></div><p style="width:90%">
 	The <a href="news:comp.lang.tcl" target="_top">news:comp.lang.tcl</a> newsgroup is a good
 	place to ask about Tcl questions in general.  Rivet developers
 	also follow the newsgroup, but it's best to ask Rivet-specific
@@ -1027,14 +1457,14 @@ puts "Saved file [upload filename MyUpload] \
 	  </div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">
 	    <a href="http://wiki.tcl.tk" target="_top">http://wiki.tcl.tk</a> is the Tcl'ers Wiki, a
 	    free-form place to search for answers and ask for help.
-	  </div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742098"></a>Bug Tracking System</h3></div></div><div></div></div><p style="width:90%">
+	  </div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744754"></a>Bug Tracking System</h3></div></div><div></div></div><p style="width:90%">
 	Apache Rivet uses the Apache Bug Tracking system at <a href="http://nagoya.apache.org/bugzilla/" target="_top">http://nagoya.apache.org/bugzilla/</a>.  Here,
 	you can report problems, or check and see if existing issues
 	are already known and being dealt with.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742116"></a>IRC</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744772"></a>IRC</h3></div></div><div></div></div><p style="width:90%">
         Occasionally, someone from the Rivet team is on IRC at
         irc.freenode.net, channel #tcl.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742127"></a>Editing Rivet Template Files</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744783"></a>Editing Rivet Template Files</h3></div></div><div></div></div><p style="width:90%">
 	Rivet makes available code for two popular editors,
 	<span class="application">emacs</span> and
 	<span class="application">vim</span> to facilitate the editing of
@@ -1044,13 +1474,13 @@ puts "Saved file [upload filename MyUpload] \
 	<tt class="filename">two-mode-mode.el</tt> and
 	<tt class="filename">rvt.vim</tt> are available in the
 	<tt class="filename">contrib/</tt> directory.
-      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4742197">Initialization</a></span></dt><dt><span class="section"><a href="#id4742236">RivetChan</a></span></dt><dt><span class="section"><a href="#id4742263">The global Command</a></span></dt><dt><span class="section"><a href="#id4742314">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id4742364">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
+      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4744853">Initialization</a></span></dt><dt><span class="section"><a href="#id4744892">RivetChan</a></span></dt><dt><span class="section"><a href="#id4744919">The global Command</a></span></dt><dt><span class="section"><a href="#id4744970">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id4745020">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
       This section easily falls out of date, as new code is added, old
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
       themselves, <span style="font-family:monospace"><span><b class="command">cvs</b></span></span> can provide you with
       information about what has been happening with the code.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742197"></a>Initialization</h3></div></div><div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744853"></a>Initialization</h3></div></div><div></div></div><p style="width:90%">
 	When Apache is started, (or when child Apache processes are
 	started if a threaded Tcl is used),
 	<tt class="function">Rivet_InitTclStuff</tt> is called, which
@@ -1061,7 +1491,7 @@ puts "Saved file [upload filename MyUpload] \
 	executes Rivet's <tt class="filename">init.tcl</tt>.  The caching
 	system is also set up, and if there is a
 	<span style="font-family:monospace"><span><b class="command">GlobalInitScript</b></span></span>, it is run.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742236"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744892"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
 	The <span class="structname">RivetChan</span> system was created in
 	order to have an actual Tcl channel that we could redirect
 	standard output to.  This lets us use, for instance, the
@@ -1071,7 +1501,7 @@ puts "Saved file [upload filename MyUpload] \
 	Tcl's regular standard output is replaced with an instance of
 	this channel type, so that, by default, output will go to the
 	web page.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742263"></a>The <span style="font-family:monospace"><span><b class="command">global</b></span></span> Command</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744919"></a>The <span style="font-family:monospace"><span><b class="command">global</b></span></span> Command</h3></div></div><div></div></div><p style="width:90%">
 	Rivet aims to run standard Tcl code with as few surprises as
 	possible.  At times this involves some compromises - in this
 	case regarding the <span style="font-family:monospace"><span><b class="command">global</b></span></span> command.  The
@@ -1086,7 +1516,7 @@ puts "Saved file [upload filename MyUpload] \
 	you really need a true global variable, use either
 	<span style="font-family:monospace"><span><b class="command">::global</b></span></span> or add the :: namespace qualifier
 	to variables you wish to make global.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742314"></a>Page Parsing, Execution and Caching</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4744970"></a>Page Parsing, Execution and Caching</h3></div></div><div></div></div><p style="width:90%">
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
 	processing instruction tags.  Everything outside these tags
@@ -1112,7 +1542,7 @@ puts "Saved file [upload filename MyUpload] \
 	without having to reload it (and re-parse it) from the disk.
 	The number of scripts stored in memory is configurable.  This
 	feature can significantly improve performance.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742364"></a>Debugging Rivet and Apache</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4745020"></a>Debugging Rivet and Apache</h3></div></div><div></div></div><p style="width:90%">
 	If you are interested in hacking on Rivet, you're welcome to
 	contribute!  Invariably, when working with code, things go
 	wrong, and it's necessary to do some debugging.  In a server
@@ -1168,15 +1598,15 @@ Starting program: /usr/sbin/apache.dbg -X
 	web page with the browser, and see where things go wrong (if
 	you are dealing with a crash, for instance).  A helpful
 	<span style="font-family:monospace"><span><b class="command">gdb</b></span></span> tutorial is available here: <a href="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html" target="_top">http://www.delorie.com/gnu/docs/gdb/gdb_toc.html</a>
-      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="upgrading"></a>Upgrading from mod_dtcl or NeoWebScript</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4742530">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id4742542">NeoWebScript</a></span></dt></dl></div><p style="width:90%">
+      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="upgrading"></a>Upgrading from mod_dtcl or NeoWebScript</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id4745186">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id4745198">NeoWebScript</a></span></dt></dl></div><p style="width:90%">
       Rivet is a break from the past, in that we, the authors, have
       attempted to take what we like best about our past efforts, and
       leave out or change things we no longer care for.  Backwards
       compatibility was not a primary goal when creating Rivet, but we
       do provide this information which may be of use to those wishing
       to upgrade from mod_dtcl or NWS installations.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742530"></a>mod_dtcl</h3></div></div><div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4745186"></a>mod_dtcl</h3></div></div><div></div></div><p style="width:90%">
 	Rivet was originally based on the dtcl code, but it has
 	changed (improved!) quite a bit.  The concepts remain the
 	same, but many of the commands have changed.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4742542"></a>NeoWebScript</h3></div></div><div></div></div><p style="width:90%">TODO</p></div></div></div></body></html>
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id4745198"></a>NeoWebScript</h3></div></div><div></div></div><p style="width:90%">TODO</p></div></div></div></body></html>
