@@ -16,11 +16,15 @@
 
 # AM_CFLAGS = @TCL_INCLUDES@ @GM_CPPFLAGS@
 
-apxs_libexecdir = @APXS_LIBEXECDIR@
 
-lib_LTLIBRARIES = librivet.la librivetparser.la
-
+# The weird and wild magic of auto* associates these two.
+apxs_libexecdir = @prefix@@APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
+
+# ... and these two.  We want to put the libs in the package path,
+# rather than the standard library location for the system.
+lib_libexecdir = @prefix@@TCL_PACKAGE_PATH@/rivet
+lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
 
 #
 # Apache Rivet Module, mod_rivet.so / mod_rivet.dll

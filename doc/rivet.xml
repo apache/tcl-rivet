@@ -158,12 +158,8 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
       <step>
 	<title>Building Rivet</title>
 	<para>
-	  Rivet uses the standard ./configure ; make ; make install.
-	  Rivet uses a unique build system which we created especially
-	  for this project.  It utilizes the information included with
-	  Apache (via the <command>apxs</command> command) and Tcl
-	  (<filename>tclConfig.sh</filename>) about their
-	  configurations, so that Rivet can compile itself.
+	  On Linux or Unix systems, Rivet uses the standard
+	  ./configure ; make ; make install technique.
 	</para>
 	<substeps>
 	  <step>

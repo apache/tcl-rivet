@@ -202,7 +202,7 @@ TEA_MAKE_LIB
 
 # We have to either find a working tclsh or be told where it is 
 # using --with-tclsh
-AC_ARG_WITH(apxs, [  --with-tclsh=FILE       location of a working tclsh executable], with_tclsh=${withval})
+AC_ARG_WITH(tclsh, [  --with-tclsh=FILE       location of a working tclsh executable], with_tclsh=${withval})
 
 #
 # allow them to override the tclsh we think we found
@@ -262,7 +262,12 @@ else
     AC_MSG_ERROR([${with_apxs} is not an executable file])
 fi
 
+
+
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
+
+# We need to use the package path for the installation procedure.
+AC_SUBST(TCL_PACKAGE_PATH)
 
 
 # Finally, substitute all of the various values into the Makefile.
