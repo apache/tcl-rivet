@@ -448,6 +448,22 @@ proc handle {interface args} {
     }
 
     #
+    # insert - a pure insert, without store's somewhat clumsy
+    # efforts to see if it needs to be an update rather than
+    # an insert
+    #
+    method insert {arrayName args} {
+	table_check $args
+	upvar 1 $arrayName $arrayName $arrayName array
+
+	set req [build_insert_query array $fields $myTable]
+	set res [exec $req]
+	set return [expr [$res error] == 0]
+	$res destroy
+	return $return
+    }
+
+    #
     # delete - delete matching record from the specified table
     #
     method delete {key args} {
