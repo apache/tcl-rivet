@@ -19,9 +19,14 @@ package require Itcl
 
 package provide form 1.0
 
+#
+# Rivet form class
+#
 ::itcl::class form {
 
     constructor {args} {
+	# set the form method to be a post and the action to be
+	# a refetching of the current page
 	set arguments(method) post
 	set arguments(action) [env DOCUMENT_URI]
 
@@ -42,21 +47,52 @@ package provide form 1.0
 	::itcl::delete object $this
     }
 
+    #
+    # import_data -- given a field type, field name, name of an array, and a 
+    # list of key-value pairs, prepend any default key-value pairs,
+    # set a default value if one exists, then store the resulting
+    # key-value pairs in the named array
+    #
     protected method import_data {type name arrayName list} {
 	upvar 1 $arrayName data
 
+	#
+	# If there are elements in the defaultArgs array for the
+	# specified type, combine them with the list of key-value
+	# pairs, putting the DefaultArgs values first so the
+	# key-value pairs from list can possibly override them.
+	#
 	if {[info exists DefaultArgs($type)]} {
 	    set list [concat $DefaultArgs($type) $list]
 	}
 
+	#
+	# if there is a default value for the name stored in the
+	# DefaultValues array in this class, set the value
+	# element of the array the caller named to contain that
+	# value
+	#
 	if {[info exists DefaultValues($name)]} {
 	    set data(value) $DefaultValues($name)
 	}
 
+	#
+	# if we don't have an even number of key-value pairs,
+	# that just ain't right
+	#
 	if {[expr [llength $list] % 2]} {
 	    return -code error "Unmatched key-value pairs"
 	}
 
+	#
+	# for each key-value pair in the list, strip the first
+	# dash character from the key part and map it to lower
+	# case, then use that as the key for the passed-in
+	# array and store the corresonding value in there
+	#
+	# we also prep and return the list of key-value pairs, normalized
+	# with the lowercase thing
+	#
 	set return ""
 	foreach {var val} $list {
 	    set var [string range [string tolower $var] 1 end]
@@ -67,6 +103,11 @@ package provide form 1.0
 	return $return
     }
 
+    #
+    # argstring - given an array name, construct areturn string of the
+    # style key1="data1" key2="data2" etc for each key value pair in the
+    # array
+    #
     protected method argstring {arrayName} {
 	upvar 1 $arrayName data
 	set string ""
@@ -76,6 +117,13 @@ package provide form 1.0
 	return $string
     }
 
+    #
+    # default_value -- if only a name is given, returns a default value
+    # for that name if one exists else an empty list.
+    #
+    # if a name and a value are given, the default value  is set to that
+    # name (and the new default value is returned).
+    #
     method default_value {name {newValue ""}} {
 	if {[lempty $newValue]} {
 	    if {![info exists DefaultValues($name)]} { return }
@@ -84,34 +132,78 @@ package provide form 1.0
 	return [set DefaultValues($name) $newValue]
     }
 
+    #
+    # default_args - given a type and a variable number of arguments,
+    #  if there are no arguments other than the type, return the
+    #  element of that name from the DefaultArgs array, if that element
+    #  exists, else return an empty list.
+    #
+    # if a name and a value are given, sets the DefaultArgs to the variable
+    # list of arguments.
+    #
     method default_args {type args} {
+
+	# if only one argument was specified
 	if {[lempty $args]} {
 	    if {![info exists DefaultArgs($type)]} { return }
 	    return $DefaultArgs($type)
 	}
+
+	# make sure we have an even number of key-value pairs
 	if {[expr [llength $args] % 2]} {
 	    return -code error "Unmatched key-value pairs"
 	}
+
+	# set the DefaultArgs for the specified type
 	return [set DefaultArgs($type) $args]
     }
 
+    #
+    # start - generate the <form> with all of its arguments
+    #
     method start {} {
 	html "<form [argstring arguments]>"
     }
 
+    #
+    # end - generate the </form>
+    #
     method end {} {
 	html "</form>"
     }
 
+    #
+    # field - emit a field of the given field type and name, including
+    # any default key-value pairs defined for this field type and
+    # optional key-value pairs included with the statement
+    #
     method field {type name args} {
+
+	# import any default key-value pairs, then any specified in this
+	# field declaration
 	import_data $type $name data $args
+
+	# generate the field definition
 	set string "<input type=\"$type\" name=\"$name\""
 	append string [argstring data]
+
 	switch -- $type {
 	    "radio" -
 	    "checkbox" {
-		if {![info exists data(value)]} { set data(value) "" }
-		if {![info exists data(label)]} { set data(label) $data(value) }
+		# if there's no value defined, create an empty value
+		if {![info exists data(value)]} { 
+		    set data(value) "" 
+		}
+
+		# if there's no label defined, make the label be the
+		# same as the value
+		if {![info exists data(label)]} { 
+		    set data(label) $data(value) 
+		}
+
+		# ...and if the is a default value for this field
+		# and it matches the value we have for it, make
+		# the field show up as selected (checked)
 		if {[info exists DefaultValues($name)]} {
 		    if {$data(value) == $DefaultValues($name)} {
 			append string { checked="checked"}
@@ -120,6 +212,8 @@ package provide form 1.0
 	    }
 	}
 	append string " />"
+
+	# ...and emit it
 	if {$type == "radio"} {
 	    html $string$data(label)
 	} else {
@@ -127,48 +221,88 @@ package provide form 1.0
 	}
     }
 
+    #
+    # text -- emit an HTML "text" field
+    #
     method text {name args} {
 	eval field text $name $args
     }
 
+    #
+    # password -- emit an HTML "password" field
+    #
     method password {name args} {
 	eval field password $name $args
     }
 
+    #
+    # hidden -- emit an HTML "hidden" field
+    #
     method hidden {name args} {
 	eval field hidden $name $args
     }
 
+    #
+    # submit -- emit an HTML "submit" field
+    #
     method submit {name args} {
 	eval field submit $name $args
     }
 
+    #
+    # reset -- emit an HTML "reset" button
+    #
     method reset {name args} {
 	eval field reset $name $args
     }
 
+    #
+    # reset -- emit an HTML image field
+    #
     method image {name args} {
 	eval field image $name $args
     }
 
+    #
+    # reset -- emit an HTML "checkbox" form field
+    #
     method checkbox {name args} {
 	eval field checkbox $name $args
     }
 
+    #
+    # radio -- emit an HTML "radiobutton" form field
+    #
     method radio {name args} {
 	eval field radio $name $args
     }
 
+    #
+    # radiobuttons -- 
+    #
     method radiobuttons {name args} {
 	set data(values) [list]
 	set data(labels) [list]
+
 	set list [import_data radiobuttons $name data $args]
-	if {[lempty $data(labels)]} { set data(labels) $data(values) }
+
+	if {[lempty $data(labels)]} { 
+	    set data(labels) $data(values) 
+	}
+
 	foreach label $data(labels) value $data(values) {
 	    eval radio $name $list -label $label -value $value
 	}
     }
 
+    #
+    # select -- generate a selector
+    #
+    # part of the key value pairs can include -values with a list,
+    # and -labels with a list and it'll populate the <option>
+    # elements with them.  if one matches the default value,
+    # it'll select it too.
+    #
     method select {name args} {
 	set data(values) [list]
 	set data(labels) [list]
@@ -199,6 +333,9 @@ package provide form 1.0
 	html "</select>"
     }
 
+    #
+    # textarea -- emit an HTML "textarea" form field
+    #
     method textarea {name args} {
 	import_data textarea $name data $args
 	set value ""
@@ -209,6 +346,10 @@ package provide form 1.0
 	html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
     }
 
+    #
+    # defaults -- when set, the value is the name of an array to suck
+    # the key-value pairs out of and copy them into DefaultValues
+    #
     public variable defaults "" {
 	upvar 1 $defaults array
 	array set DefaultValues [array get array]
