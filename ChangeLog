@@ -1,3 +1,9 @@
+2003-07-05  David N. Welton  <davidw@dedasys.com>
+
+	* doc/examples/vars.html: Use a table to make the form look nicer.
+
+	* doc/examples/vars.rvt: Now we display some results.
+
 2003-07-01  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetCore.c (Rivet_Upload): Pass the correct element of objv

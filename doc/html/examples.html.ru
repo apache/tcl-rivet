@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>&#1055;&#1088;&#1080;&#1084;&#1077;&#1088;&#1099; &#1080;&#1089;&#1087;&#1086;&#1083;&#1100;&#1079;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103;</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.60.1"><link rel="home" href="index.html.ru" title="Apache Rivet"><link rel="up" href="index.html.ru" title="Apache Rivet"><link rel="previous" href="commands.html.ru" title="Rivet Tcl: &#1082;&#1086;&#1084;&#1072;&#1085;&#1076;&#1099; &#1080; &#1087;&#1077;&#1088;&#1077;&#1084;&#1077;&#1085;&#1085;&#1099;&#1077;"><link rel="next" href="help.html.ru" title="&#1056;&#1077;&#1089;&#1091;&#1088;&#1089;&#1099; &#1080; &#1082;&#1072;&#1082; &#1087;&#1086;&#1083;&#1091;&#1095;&#1080;&#1090;&#1100; &#1087;&#1086;&#1084;&#1086;&#1097;&#1100;"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">&#1055;&#1088;&#1080;&#1084;&#1077;&#1088;&#1099; &#1080;&#1089;&#1087;&#1086;&#1083;&#1100;&#1079;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103;</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.html.ru"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="help.html.ru"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>&#1055;&#1088;&#1080;&#1084;&#1077;&#1088;&#1099; &#1080;&#1089;&#1087;&#1086;&#1083;&#1100;&#1079;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103;</h2></div></div><div></div></div><p style="width:90%">
       &#1044;&#1072;&#1083;&#1077;&#1077; - &#1087;&#1088;&#1080;&#1084;&#1077;&#1088;&#1099; &#1080;&#1089;&#1087;&#1086;&#1083;&#1100;&#1079;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103; Rivet. &#1055;&#1086;&#1076;&#1088;&#1072;&#1079;&#1091;&#1084;&#1077;&#1074;&#1072;&#1077;&#1090;&#1089;&#1103; &#1095;&#1090;&#1086; 
       &#1095;&#1080;&#1090;&#1072;&#1090;&#1077;&#1083;&#1100; &#1080;&#1084;&#1077;&#1077;&#1090; &#1085;&#1077;&#1082;&#1086;&#1090;&#1086;&#1088;&#1099;&#1077; &#1079;&#1085;&#1072;&#1085;&#1080;&#1103; Tcl. &#1045;&#1089;&#1083;&#1080; &#1078;&#1077; &#1074;&#1099; &#1077;&#1075;&#1086; &#1085;&#1077; &#1079;&#1085;&#1072;&#1077;&#1090;&#1077; -
@@ -41,26 +40,44 @@ puts &quot;&lt;/table&gt;\n&quot; ?&gt;
         &#1087;&#1077;&#1088;&#1077;&#1076;&#1072;&#1085;&#1085;&#1099;&#1084;&#1080; &#1074;&#1072;&#1084; &#1084;&#1077;&#1090;&#1086;&#1076;&#1086;&#1084; POST &#1080;&#1083;&#1080; GET.
       </p><p style="width:90%">
         &#1048;&#1079; &#1090;&#1072;&#1082;&#1086;&#1081; HTML &#1092;&#1086;&#1088;&#1084;&#1099;:
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;vars.rvt&quot;&gt;
-  &lt;p&gt;
-    &lt;input name=&quot;title&quot;&gt;
-    &lt;input name=&quot;salary&quot;&gt;
-    &lt;input name=&quot;boss&quot;&gt;
-    &lt;select name=&quot;skills&quot; multiple=&quot;multiple&quot;&gt;
-      &lt;option&gt;c&lt;/option&gt;
-      &lt;option&gt;java&lt;/option&gt;
-      &lt;option&gt;Tcl&lt;/option&gt;
-      &lt;option&gt;Perl&lt;/option&gt;
-    &lt;/select&gt;
-  &lt;/p&gt;
-&lt;/form&gt;
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">     &lt;form action=&quot;vars.rvt&quot;&gt;
+      &lt;table&gt;
+	&lt;tbody&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Title:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;&lt;input name=&quot;title&quot;&gt;&lt;/td&gt;
+	  &lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Salary:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;&lt;input name=&quot;salary&quot;&gt;&lt;/td&gt;
+	  &lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Boss:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;&lt;input name=&quot;boss&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Skills:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;
+	      &lt;select name=&quot;skills&quot; multiple=&quot;multiple&quot;&gt;
+		&lt;option&gt;c&lt;/option&gt;
+		&lt;option&gt;java&lt;/option&gt;
+		&lt;option&gt;Tcl&lt;/option&gt;
+		&lt;option&gt;Perl&lt;/option&gt;
+	      &lt;/select&gt;
+	    &lt;/td&gt;
+	  &lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;input type=&quot;submit&quot;&gt;&lt;/td&gt;
+	  &lt;/tr&gt;
+	&lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/form&gt;
 </pre><p style="width:90%">
         &#1052;&#1099; &#1084;&#1086;&#1078;&#1077;&#1084; &#1080;&#1089;&#1087;&#1086;&#1083;&#1100;&#1079;&#1086;&#1074;&#1072;&#1090;&#1100; rivet &#1089;&#1082;&#1088;&#1080;&#1087;&#1090; &#1095;&#1090;&#1086;&#1073;&#1099; &#1087;&#1086;&#1083;&#1091;&#1095;&#1080;&#1090;&#1100; &#1076;&#1086;&#1089;&#1090;&#1091;&#1087; &#1082;
         &#1101;&#1090;&#1080;&#1084; &#1087;&#1077;&#1088;&#1077;&#1084;&#1077;&#1085;&#1085;&#1099;&#1084;:
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 set errlist {}
 if { [var exists title] } {
-    set salary [var get title]
+    set title [var get title]
 } else {
     set errlist &quot;You need to enter a title&quot;
 }
@@ -92,8 +109,31 @@ if { [llength $errlist] != 0 } {
     }
 } else {
     puts &quot;Thanks for the information!&quot;
+    ?&gt;
+    &lt;table&gt;
+      &lt;tbody&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Title:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $title ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Boss:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $boss ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Salary:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $salary ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Skills:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $skills ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+    &lt;?
 }
-?&gt;</pre><p style="width:90%">
+?&gt;
+</pre><p style="width:90%">
         &#1055;&#1077;&#1088;&#1074;&#1099;&#1081; &#1086;&#1087;&#1077;&#1088;&#1072;&#1090;&#1086;&#1088; &#1087;&#1088;&#1086;&#1074;&#1077;&#1088;&#1103;&#1077;&#1090; &#1095;&#1090;&#1086; &#1087;&#1077;&#1088;&#1077;&#1084;&#1077;&#1085;&#1085;&#1072;&#1103; 
         <tt class="varname">boss</tt> &#1073;&#1099;&#1083;&#1072; &#1087;&#1077;&#1088;&#1077;&#1076;&#1072;&#1085;&#1085;&#1072; &#1089;&#1082;&#1088;&#1080;&#1087;&#1090;&#1091;, &#1080; &#1087;&#1086;&#1090;&#1086;&#1084;
         &#1095;&#1090;&#1086;-&#1090;&#1086; &#1076;&#1077;&#1083;&#1072;&#1077;&#1090; &#1089; &#1101;&#1090;&#1086;&#1081; &#1080;&#1085;&#1092;&#1086;&#1088;&#1084;&#1072;&#1094;&#1080;&#1077;&#1081;.
