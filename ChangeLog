@@ -4,6 +4,10 @@
 	  as bad syntax, etc, to raise a Tcl error in many methods that
 	  used to just return 1 or 0 (like DIO store).
 
+	* configure.ac: Remove superfluous commented-out lines
+
+        * Add BUGS file.  Update STATUS and VERSION files.
+
 2004-12-02  David N. Welton  <davidw@dedasys.com>
 
 	* Removed libtool - it appears to be under the GPL!

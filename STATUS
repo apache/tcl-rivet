@@ -30,5 +30,6 @@ Platform                  Tcl Version  Ok?
 Debian testing/unstable   Tcl 8.4      Yes
 Redhat 7.3		  Tcl 8.4      Yes
 FreeBSD 4.8-STABLE	  Tcl 8.4      Yes
+FreeBSD 5.3               Tcl 8.4      Yes
 
 *) auto* tools work in progress.

@@ -24,8 +24,6 @@ dnl
 
 AC_INIT([Rivet],[0.5.0])
 AC_CONFIG_HEADERS([config.h])
-#AC_DEFINE([HAVE_LIMITS_H],[],[Define if your machine has <limits.h>])
-#AC_DEFINE([HAVE_NET_ERRNO_H],[],[Define if your machine has < net/errno.h>])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.

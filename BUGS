@@ -1,0 +1,8 @@
+KNOWN BUGS
+
+$Id$
+
+"DIO store" will malfunction if the case of the variable names in the array
+does not match the case of the field names in the table.  What happens is that 
+any fields with case inconsistencies will neither be inserted or updated.
+
