@@ -88,7 +88,7 @@ int print_headers(request_rec *);
 int print_error(request_rec *, int, char *);
 int flush_output_buffer(request_rec *);
 char *StringToUtf(char *input, ap_pool *pool);
-rivet_server_conf *rivet_get_conf(request_rec *r);
+rivet_server_conf *Rivet_GetConf(request_rec *r);
 
 /* Macro to Tcl Objectify StringToUtf stuff */
 #define STRING_TO_UTF_TO_OBJ(string, pool) Tcl_NewStringObj(StringToUtf(string, pool), -1)

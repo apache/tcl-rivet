@@ -9,21 +9,23 @@
 #include "mod_rivet.h"
 
 /* 
-   accepts an 'outbuf' to be filled, and an open file descritptor
+   Accepts an 'outbuf' to be filled, and an open file descriptor
 
-   returns 'inside', letting the caller know whether the parser was
+   Returns 'inside', letting the caller know whether the parser was
    inside a block of Tcl or not when it stopped.
   */
 
-int rivet_parser(Tcl_Obj *outbuf, FILE *openfile)
+int
+Rivet_Parser( Tcl_Obj *outbuf, FILE *openfile )
 {
     const char *strstart = STARTING_SEQUENCE;
     const char *strend = ENDING_SEQUENCE;
 
     char c;
     int ch;
-    int endseqlen = strlen(ENDING_SEQUENCE), startseqlen = strlen(STARTING_SEQUENCE), p = 0;
-    int inside = 0;
+    int endseqlen = strlen(ENDING_SEQUENCE);
+    int startseqlen = strlen(STARTING_SEQUENCE);
+    int inside = 0, p = 0;
     Tcl_DString dstr;
     Tcl_DString convdstr;
 
@@ -38,27 +40,13 @@ int rivet_parser(Tcl_Obj *outbuf, FILE *openfile)
 	{
 	    /* OUTSIDE  */
 
-#if USE_OLD_TAGS == 1
-	    if (c == '<')
-	    {
-		int nextchar = getc(openfile);
-		if (nextchar == '+')
-		{
-		    Tcl_DStringAppend(&dstr, "\"\n", 2);
-		    inside = 1;
-		    p = 0;
-		    continue;
-		} else {
-		    ungetc(nextchar, openfile);
-		}
-	    }
-#endif
-
 	    if (c == strstart[p])
 	    {
 		if ((++p) == endseqlen)
 		{
-		    /* ok, we have matched the whole ending sequence - do something  */
+		    /* Ok, we have matched the whole ending sequence.
+		     * Do something
+		     */
 		    Tcl_DStringAppend(&dstr, "\"\n", 2);
 		    inside = 1;
 		    p = 0;
@@ -100,22 +88,6 @@ int rivet_parser(Tcl_Obj *outbuf, FILE *openfile)
 	    }
 	} else {
 	    /* INSIDE  */
-
-#if USE_OLD_TAGS == 1
-	    if (c == '+')
-	    {
-		int nextchar = getc(openfile);
-		if (nextchar == '>')
-		{
-		    Tcl_DStringAppend(&dstr, "\n puts \"", -1);
-		    inside = 0;
-		    p = 0;
-		    continue;
-		} else {
-		    ungetc(nextchar, openfile);
-		}
-	    }
-#endif
 
 	    if (c == strend[p])
 	    {

@@ -61,11 +61,12 @@
 
 /* mod_rivet.c by David Welton <davidw@apache.org>
  *            and Damon Courtney <damon@unreality.com>
- * - originally mod_include.
+ * Originally based off code from mod_include.
  */
 
 /* See http://tcl.apache.org/mod_rivet/credits.ttml for additional credits. */
 
+/* Apache includes */
 #include "httpd.h"
 #include "http_config.h"
 #include "http_request.h"
@@ -76,9 +77,11 @@
 #include "util_script.h"
 #include "http_conf_globals.h"
 
+/* Tcl includes */
 #include <tcl.h>
 #include <string.h>
 
+/* Rivet includes */
 #include "tcl_commands.h"
 #include "parser.h"
 #include "channel.h"
@@ -87,25 +90,25 @@
 
 module MODULE_VAR_EXPORT rivet_module;
 
-static void tcl_init_stuff(server_rec *s, pool *p);
-static void copy_rivet_config( rivet_server_conf *oldrsc,
+/* Need some arbitrary non-NULL pointer which can't also be a request_rec */
+#define NESTED_INCLUDE_MAGIC	(&rivet_module)
+
+static void Rivet_InitTclStuff(server_rec *s, pool *p);
+static void Rivet_CopyConfig( rivet_server_conf *oldrsc,
 				rivet_server_conf *newrsc);
 static int get_ttml_file(request_rec *r, rivet_server_conf *rsc,
 			 Tcl_Interp *interp, char *filename, int toplevel,
 			 Tcl_Obj *outbuf);
-static int send_content(request_rec *);
+static int Rivet_SendContent(request_rec *);
 static int execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf,
 				request_rec *r);
-
-/* Need some arbitrary non-NULL pointer which can't also be a request_rec */
-#define NESTED_INCLUDE_MAGIC	(&rivet_module)
 
 /* Set up the content type header */
 
 int
 set_header_type(request_rec *r, char *header)
 {
-    rivet_server_conf *rsc = rivet_get_conf(r);
+    rivet_server_conf *rsc = Rivet_GetConf(r);
 
     if( *(rsc->headers_set) ) return 0;
 
@@ -118,7 +121,7 @@ set_header_type(request_rec *r, char *header)
 int
 print_headers(request_rec *r)
 {
-    rivet_server_conf *rsc = rivet_get_conf(r);
+    rivet_server_conf *rsc = Rivet_GetConf(r);
 
     if( *(rsc->headers_printed) ) return 0;
 
@@ -159,7 +162,7 @@ print_error(request_rec *r, int htmlflag, char *errstr)
 int
 flush_output_buffer(request_rec *r)
 {
-    rivet_server_conf *rsc = rivet_get_conf(r);
+    rivet_server_conf *rsc = Rivet_GetConf(r);
     if (Tcl_DStringLength(rsc->buffer) != 0)
     {
 	ap_rwrite(Tcl_DStringValue(rsc->buffer),
@@ -283,7 +286,7 @@ get_ttml_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 	Tcl_SetStringObj(outbuf, "puts \"\n", -1);
 
     /* if inside < 0, it's an error  */
-    inside = rivet_parser(outbuf, f);
+    inside = Rivet_Parser(outbuf, f);
     if (inside < 0)
     {
 	if (ferror(f))
@@ -308,9 +311,6 @@ get_ttml_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 	if (rsc->rivet_after_script)
 	    Tcl_AppendObjToObj(outbuf, rsc->rivet_after_script);
 
-/* Seems redundant
- 	Tcl_AppendToObj(outbuf, "\n}\nnamespace delete request\n", -1);
- */
 	Tcl_AppendToObj(outbuf, "\n}\n", -1);
     }
     else
@@ -330,7 +330,7 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     char *errorinfo;
     rivet_server_conf *conf = NULL;
 
-    conf = rivet_get_conf(r);
+    conf = Rivet_GetConf(r);
     if (Tcl_EvalObj(interp, outbuf) == TCL_ERROR)
     {
 	Tcl_Obj *errscript =
@@ -441,7 +441,7 @@ get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
 
 /* Set things up to execute a file, then execute */
 static int
-send_content(request_rec *r)
+Rivet_SendContent(request_rec *r)
 {
     char error[MAX_STRING_LEN];
     char timefmt[MAX_STRING_LEN];
@@ -452,7 +452,7 @@ send_content(request_rec *r)
 
     rivet_interp_globals *globals = NULL;
     rivet_server_conf *rsc = NULL;
-    rsc = rivet_get_conf(r);
+    rsc = Rivet_GetConf(r);
     globals = ap_pcalloc(r->pool, sizeof(rivet_interp_globals));
     globals->r = r;
     interp = rsc->server_interp;
@@ -590,7 +590,8 @@ send_content(request_rec *r)
 	{
 	    if (upload->fp != NULL)
 	    {
-		chan = Tcl_MakeFileChannel((ClientData)fileno(upload->fp), TCL_READABLE);
+		chan = Tcl_MakeFileChannel((ClientData)fileno(upload->fp),
+						TCL_READABLE);
 		Tcl_RegisterChannel(interp, chan);
 		channelname = Tcl_GetChannelName(chan);
 		Tcl_ObjSetVar2(interp,
@@ -616,7 +617,7 @@ send_content(request_rec *r)
 }
 
 static void
-tcl_init_stuff(server_rec *s, pool *p)
+Rivet_InitTclStuff(server_rec *s, pool *p)
 {
     int rslt;
     Tcl_Interp *interp;
@@ -701,7 +702,7 @@ tcl_init_stuff(server_rec *s, pool *p)
 	{
 	    myrsc = ap_pcalloc(p, sizeof(rivet_server_conf));
 	    ap_set_module_config(sr->module_config, &rivet_module, myrsc);
-	    copy_rivet_config( rsc, myrsc );
+	    Rivet_CopyConfig( rsc, myrsc );
 	    if (rsc->seperate_virtual_interps != 0)
 		myrsc->server_interp = NULL;
 	} else {
@@ -720,19 +721,6 @@ tcl_init_stuff(server_rec *s, pool *p)
 	myrsc->server_name = ap_pstrdup(p, sr->server_hostname);
 	sr = sr->next;
     }
-}
-
-MODULE_VAR_EXPORT void
-rivet_init_handler(server_rec *s, pool *p)
-{
-#if THREADED_TCL == 0
-    tcl_init_stuff(s, p);
-#endif
-#ifndef HIDE_RIVET_VERSION
-    ap_add_version_component("Rivet / "RIVET_VERSION);
-#else
-    ap_add_version_component("Rivet");
-#endif /* !HIDE_RIVET_VERSION */
 }
 
 /*
@@ -759,7 +747,7 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
     server_rec *s = cmd->server;
     rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
 
-    if ( var == NULL || val == NULL) {
+    if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetServerConf requires two arguments";
     }
 
@@ -821,7 +809,7 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
     Tcl_Obj *objarg;
 
-    if ( var == NULL || val == NULL) {
+    if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetDirConf requires two arguments";
     }
 
@@ -851,7 +839,7 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 static const char *
 Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
-    if ( var == NULL || val == NULL) {
+    if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetUserConf requires two arguments";
     }
 
@@ -861,7 +849,7 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 
 /* Function to get a config and merge the directory/server options  */
 rivet_server_conf *
-rivet_get_conf( request_rec *r )
+Rivet_GetConf( request_rec *r )
 {
     rivet_server_conf *newconfig = NULL;
     rivet_server_conf *rsc = RIVET_SERVER_CONF( r->server->module_config );
@@ -878,7 +866,7 @@ rivet_get_conf( request_rec *r )
 						    sizeof(rivet_server_conf));
     newconfig->server_interp = rsc->server_interp;
 
-    copy_rivet_config( rsc, newconfig );
+    Rivet_CopyConfig( rsc, newconfig );
 
     /* List here things that can be per-directory. */
 
@@ -895,7 +883,7 @@ rivet_get_conf( request_rec *r )
 }
 
 static void
-copy_rivet_config( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
+Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 {
     newrsc->server_interp = oldrsc->server_interp;
     newrsc->rivet_global_init_script = oldrsc->rivet_global_init_script;
@@ -928,7 +916,7 @@ copy_rivet_config( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 }
 
 static void *
-create_rivet_config( pool *p, server_rec *s )
+Rivet_CreateConfig( pool *p, server_rec *s )
 {
     rivet_server_conf *rsc =
 	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
@@ -970,7 +958,7 @@ create_rivet_config( pool *p, server_rec *s )
 }
 
 void *
-create_rivet_dir_config(pool *p, char *dir)
+Rivet_CreateDirConfig(pool *p, char *dir)
 {
     rivet_server_conf *rdc =
 	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
@@ -978,7 +966,7 @@ create_rivet_dir_config(pool *p, char *dir)
 }
 
 void *
-merge_rivet_config(pool *p, void *basev, void *overridesv)
+Rivet_MergeConfig(pool *p, void *basev, void *overridesv)
 {
     rivet_server_conf *rsc = 
 	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
@@ -1009,13 +997,13 @@ merge_rivet_config(pool *p, void *basev, void *overridesv)
 }
 
 void
-rivet_child_init(server_rec *s, pool *p)
+Rivet_ChildInit(server_rec *s, pool *p)
 {
     server_rec *sr;
     rivet_server_conf *rsc;
 
 #if THREADED_TCL == 1
-    tcl_init_stuff(s, p);
+    Rivet_InitTclStuff(s, p);
 #endif
 
     sr = s;
@@ -1024,8 +1012,8 @@ rivet_child_init(server_rec *s, pool *p)
 	rsc = RIVET_SERVER_CONF(sr->module_config);
 	if( rsc->rivet_child_init_script != NULL ) 
 	{
-	    if (Tcl_EvalObjEx(rsc->server_interp, rsc->rivet_child_init_script, 0)
-		!= TCL_OK) {
+	    if (Tcl_EvalObjEx(rsc->server_interp,
+			      rsc->rivet_child_init_script, 0) != TCL_OK) {
 		ap_log_error(APLOG_MARK, APLOG_ERR, s,
 			     "Problem running child init script: %s",
 			     Tcl_GetString(rsc->rivet_child_init_script));
@@ -1036,7 +1024,7 @@ rivet_child_init(server_rec *s, pool *p)
 }
 
 void
-rivet_child_exit(server_rec *s, pool *p)
+Rivet_ChildExit(server_rec *s, pool *p)
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
 
@@ -1050,10 +1038,24 @@ rivet_child_exit(server_rec *s, pool *p)
     }
 }
 
+MODULE_VAR_EXPORT void
+Rivet_InitHandler(server_rec *s, pool *p)
+{
+#if THREADED_TCL == 0
+    Rivet_InitTclStuff(s, p);
+#endif
+
+#ifndef HIDE_RIVET_VERSION
+    ap_add_version_component("Rivet / "RIVET_VERSION);
+#else
+    ap_add_version_component("Rivet");
+#endif /* !HIDE_RIVET_VERSION */
+}
+
 const handler_rec rivet_handlers[] =
 {
-    {"application/x-httpd-tcl", send_content},
-    {"application/x-rivet-tcl", send_content},
+    {"application/x-httpd-tcl", Rivet_SendContent},
+    {"application/x-rivet-tcl", Rivet_SendContent},
     {NULL}
 };
 
@@ -1069,12 +1071,12 @@ const command_rec rivet_cmds[] =
 module MODULE_VAR_EXPORT rivet_module =
 {
     STANDARD_MODULE_STUFF,
-    rivet_init_handler,		/* initializer */
-    create_rivet_dir_config,	/* dir config creater */
+    Rivet_InitHandler,		/* initializer */
+    Rivet_CreateDirConfig,	/* dir config creater */
     NULL,                       /* dir merger --- default is to override */
-    create_rivet_config,         /* server config */
-    merge_rivet_config,          /* merge server config */
-    rivet_cmds,                  /* command table */
+    Rivet_CreateConfig,         /* server config */
+    Rivet_MergeConfig,          /* merge server config */
+    rivet_cmds,                 /* command table */
     rivet_handlers,		/* handlers */
     NULL,			/* filename translation */
     NULL,			/* check_user_id */
@@ -1084,8 +1086,8 @@ module MODULE_VAR_EXPORT rivet_module =
     NULL,			/* fixups */
     NULL,			/* logger */
     NULL,			/* header parser */
-    rivet_child_init,            /* child_init */
-    rivet_child_exit,            /* child_exit */
+    Rivet_ChildInit,            /* child_init */
+    Rivet_ChildExit,            /* child_exit */
     NULL			/* post read-request */
 };
 
