@@ -1,5 +1,10 @@
 2005-01-08  Karl Lehenbauer  <karl-rivet@sc.com>
 
+	* rivet/packages/dio/diodisplay.tcl: Accept arguments to the
+          showform_prolog method that are passed through to the form's
+	  start method.  This allows things like naming the form and
+	  accessing the fields from javascript by name.
+
 	* rivet/packages/form/form.tcl: Allow start method to take key-value
 	  arguments that will be expressed in the <form> tag.
 
