@@ -1,8 +1,5 @@
 # $Id$
 
-puts stderr "Auto path is $auto_path"
-
-
 package require tcltest
 package require tclrivetparser
 

@@ -1,11 +1,11 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.62.4"><link rel="home" href="index.it.html" title="Apache Rivet"><link rel="up" href="index.it.html" title="Apache Rivet"><link rel="previous" href="help.it.html" title="Risorse - Come ottenere aiuto"><link rel="next" href="upgrading.it.html" title="Aggiornamenti da mod_dtcl o NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr></table></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.it.html#id5419805">Inizializzazione</a></span></dt><dt><span class="section"><a href="internals.it.html#id5418802">RivetChan</a></span></dt><dt><span class="section"><a href="internals.it.html#id5418839">Parsing delle pagine, Esecuzione e Cacheing</a></span></dt></dl></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.64.1"><link rel="home" href="index.it.html" title="Apache Rivet"><link rel="up" href="index.it.html" title="Apache Rivet"><link rel="previous" href="help.it.html" title="Risorse - Come ottenere aiuto"><link rel="next" href="upgrading.it.html" title="Aggiornamenti da mod_dtcl o NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr></table></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.it.html#id4692630">Inizializzazione</a></span></dt><dt><span class="section"><a href="internals.it.html#id4692665">RivetChan</a></span></dt><dt><span class="section"><a href="internals.it.html#id4692012">Parsing delle pagine, Esecuzione e Cacheing</a></span></dt></dl></div><p style="width:90%">
       Questa sezione facilmente pare sorpassata, come nuovo codice 
       viene aggiunto, vecchio codice viene rimosso e di conseguenza
       vengono apportati i relativi cambiamenti. Il miglior posto 
       dove poter verificare se sono state inserite nuove funzionalità
       è il suo codice sorgente. Se siete interessati ai cambiamenti 
       osservate il FIXME.
-    </p><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id5419805"></a>Inizializzazione</h3></div></div><div></div></div><p style="width:90%">
+    </p><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id4692630"></a>Inizializzazione</h3></div></div><div></div></div><p style="width:90%">
 	Quando Apache è attivo, (o quando i processi figli di Apache
 	sono attivi se un processo Tcl è in uso),
 	<tt class="function">Rivet_InitTclStuff</tt> viene chiamata, 
@@ -16,7 +16,7 @@
 	di Rivet ed esegue <tt class="filename">init.tcl</tt>. 
 	Il sistema di caching è anch'esso impostato e se c'è un 
 	<span style="font-family:monospace"><span><b class="command">GlobalInitScript</b></span></span>, viene eseguito.
-      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id5418802"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id4692665"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
 	Il sistema <span class="structname">RivetChan</span> fu creato al fine
 	di avere un canale Tcl reale che potesse redirigere lo standard
 	output. Questo permette di usare, per esempio, il comando
@@ -26,7 +26,7 @@
 	standard output di Tcl è rimpiazzato con un'istanza di questo
 	tipo di canale, in modo che, predefinitamente, l'output venga
 	inviato alla pagina web.
-      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id5418839"></a>Parsing delle pagine, Esecuzione e Cacheing</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id4692012"></a>Parsing delle pagine, Esecuzione e Cacheing</h3></div></div><div></div></div><p style="width:90%">
 	Quando una pagina Rivet viene richiesta, è trasformata in un
 	normale script Tcl tramite l'analisi nel file delle etichette di
 	elaborazione delle istruzioni &lt;? ?&gt;. Ogni cosa fuori da

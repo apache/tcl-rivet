@@ -1,4 +1,6 @@
 This package provides "Rivet" for tclsh.  In other words, for Tcl
 scripts not executed inside Apache.
 
+tclrivetparser.tcl 
+
 $Id$

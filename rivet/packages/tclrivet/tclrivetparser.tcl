@@ -7,7 +7,33 @@ package provide tclrivetparser 0.1
 namespace eval tclrivetparser {
     set starttag <?
     set endtag   ?>
+    set outputcmd {puts -nonewline}
     namespace export parserivetdata
+}
+
+# tclrivetparser::setoutputcmd --
+#
+#	Set the output command used.  In regular Rivet scripts, we use
+#	puts, but that might not be ideal if you want to parse Rivet
+#	pages in a Tcl script.
+#
+# Arguments:
+#	newcmd - if empty, return the current command, if not, set the
+#	command.
+#
+# Side Effects:
+#	May set the output command used.
+#
+# Results:
+#	The current output command.
+
+proc tclrivetparser::setoutputcmd { {newcmd ""} } {
+    variable outputcmd
+
+    if { $outputcmd == "" } {
+	return $outputcmd
+    }
+    set outputcmd $newcmd
 }
 
 # tclrivetparser::parse --
@@ -28,6 +54,7 @@ namespace eval tclrivetparser {
 #	section, 0 if we outside.
 
 proc tclrivetparser::parse { data outbufvar } {
+    variable outputcmd
     variable starttag
     variable endtag
     set inside 0
@@ -90,7 +117,7 @@ proc tclrivetparser::parse { data outbufvar } {
 	    if { $cur == [string index $endtag $p] } {
 		incr p
 		if { $p == [string length $endtag] } {
-		    append outbuf "\nputs -nonewline \""
+		    append outbuf "\n$outputcmd \""
 		    set inside 0
 		    set p 0
 		}
@@ -122,8 +149,9 @@ proc tclrivetparser::parse { data outbufvar } {
 #	Returns the parsed script.
 
 proc tclrivetparser::parserivetdata { data } {
+    variable outputcmd
     set outbuf {}
-    append outbuf "puts -nonewline \""
+    append outbuf "$outputcmd \""
     if { [parse $data outbuf] == 0 } {
 	append outbuf "\"\n"
     }
