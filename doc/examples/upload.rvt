@@ -1,0 +1,5 @@
+&lt;?
+upload save MyUpload /tmp/uploadfiles/file1
+puts "Saved file [upload filename MyUpload] \
+	([upload size MyUploadto] bytes) to server"
+?&gt;

@@ -1,5 +1,7 @@
 2002-10-18  David N. Welton  <davidw@dedasys.com>
 
+	* doc/examples/: Added examples for XML document.
+
 	* doc/rivet.xml: Several examples of how to use Rivet.
 
 2002-10-17  David N. Welton  <davidw@dedasys.com>

@@ -1,0 +1,11 @@
+&lt;? puts "&lt;table&gt;\n"
+for {set i 1} { $i &lt;= 8 } {incr i} {
+    puts "&lt;tr&gt;\n"
+    for {set j 1} {$j &lt;= 8} {incr j} {
+        set num [ expr $i * $j * 4 - 1]
+        puts [ format "&lt;td bgcolor=%2x%2x%2x &gt; $num $num $num &lt;/td&gt;\n" \
+		   $num $num $num ]
+    }
+    puts "&lt;/tr&gt;\n"
+}
+puts "&lt;/table&gt;\n" ?&gt;
