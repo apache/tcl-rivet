@@ -9,6 +9,10 @@ proc load_response {{arrayName response}} {
     upvar 1 $arrayName response
 
     foreach {var elem} [var all] {
-	lappend response($var) $elem
+	if {[info exists response($var)]} {
+	    lappend response($var) $elem
+	} else {
+	    set response($var) $elem
+	}
     }
 }
