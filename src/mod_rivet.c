@@ -90,6 +90,8 @@ module MODULE_VAR_EXPORT rivet_module;
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
 #define NESTED_INCLUDE_MAGIC	(&rivet_module)
 
+static Tcl_Condition *sendMutex;
+
 static void Rivet_InitTclStuff(server_rec *s, pool *p);
 static void Rivet_CopyConfig( rivet_server_conf *oldrsc,
 				rivet_server_conf *newrsc);
@@ -372,6 +374,7 @@ Rivet_SendContent(request_rec *r)
     char error[MAX_STRING_LEN];
     char timefmt[MAX_STRING_LEN];
     int errstatus;
+    int retval;
 
     Tcl_Interp	*interp;
     Tcl_Obj	*request_init;
@@ -380,6 +383,8 @@ Rivet_SendContent(request_rec *r)
     rivet_interp_globals *globals = NULL;
     rivet_server_conf *rsc = NULL;
     rivet_server_conf *rdc;
+
+    Tcl_MutexLock(sendMutex);
     rsc = Rivet_GetConf(r);
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -390,8 +395,10 @@ Rivet_SendContent(request_rec *r)
 
     r->allowed |= (1 << M_GET);
     r->allowed |= (1 << M_POST);
-    if (r->method_number != M_GET && r->method_number != M_POST)
-	return DECLINED;
+    if (r->method_number != M_GET && r->method_number != M_POST) {
+	retval = DECLINED;
+	goto sendcleanup;
+    }
 
     if (r->finfo.st_mode == 0)
     {
@@ -400,11 +407,13 @@ Rivet_SendContent(request_rec *r)
 		     (r->path_info
 		      ? ap_pstrcat(r->pool, r->filename, r->path_info, NULL)
 		      : r->filename));
-	return HTTP_NOT_FOUND;
+	retval = HTTP_NOT_FOUND;
+	goto sendcleanup;
     }
 
     if ((errstatus = ap_meets_conditions(r)) != OK) {
-	return errstatus;
+	retval = errstatus;
+	goto sendcleanup;
     }
 
     ap_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
@@ -421,7 +430,8 @@ Rivet_SendContent(request_rec *r)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
 			"Could not create request namespace\n");
-	return HTTP_BAD_REQUEST;
+	retval = HTTP_BAD_REQUEST;
+	goto sendcleanup;
     }
 
 
@@ -447,14 +457,16 @@ Rivet_SendContent(request_rec *r)
 #endif
 
     if ((errstatus = ApacheRequest___parse(globals->req->apachereq)) != OK) {
-	return errstatus;
+	retval = errstatus;
+	goto sendcleanup;
     }
 
     if (r->header_only)
     {
 	TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
 	TclWeb_PrintHeaders(globals->req);
-	return OK;
+	retval = OK;
+	goto sendcleanup;
     }
 
     if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
@@ -470,11 +482,17 @@ Rivet_SendContent(request_rec *r)
     }
 
     /* Reset globals */
-    globals->req->content_sent = 0;
+
 
     Rivet_CleanupRequest( r );
 
-    return OK;
+    retval = OK;
+sendcleanup:
+    globals->req->content_sent = 0;
+
+    Tcl_MutexUnlock(sendMutex);
+
+    return retval;
 }
 
 /*

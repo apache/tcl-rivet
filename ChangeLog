@@ -2,6 +2,9 @@
 
 	* src/mod_rivet.c (Rivet_SendContent): Switched from EvalObj to
 	EvalObjEx.
+	(Rivet_SendContent): EXPERIMENTAL: added Mutex locks on
+	SendContent, in order to keep windows safe.  This needs testing
+	out!
 
 2002-12-04  David N. Welton  <davidw@dedasys.com>
 
