@@ -1,3 +1,7 @@
+/*
+ * rivetCore.c - Core commands which are compiled into mod_rivet itself.
+ */
+
 #include "httpd.h"
 #include "http_config.h"
 #include "http_request.h"

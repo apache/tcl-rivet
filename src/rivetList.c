@@ -1,3 +1,7 @@
+/*
+ * rivetList.c - Rivet commands that manipulate lists.
+ */
+
 #include <tcl.h>
 #include "rivet.h"
 
@@ -103,7 +107,7 @@ Rivet_LremoveObjCmd( clientData, interp, objc, objv )
 	    switch(mode) {
 	      case EXACT:
 		match = (valueLen == patternLen) &&
-		    (memcmp(value, pattern, valueLen) == 0);
+		    (memcmp(value, pattern, (unsigned)valueLen) == 0);
 		break;
 
 	      case GLOB:
@@ -170,6 +174,326 @@ Rivet_LremoveObjCmd( clientData, interp, objc, objv )
     return TCL_ERROR;
 }
 
+static void
+Rivet_ListObjAppendString (interp, targetList, string, length)
+    Tcl_Interp *interp;
+    Tcl_Obj    *targetList;
+    char       *string;
+    int         length;
+{
+    Tcl_Obj    *elementObj;
+
+    elementObj = Tcl_NewStringObj (string, length);
+    Tcl_ListObjAppendElement (interp, targetList, elementObj);
+    /* Tcl_DecrRefCount (elementObj); */
+}
+
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_CommaObjSplitCmd --
+ *
+ * Implements the `comma_split' Tcl command:
+ *    comma_split $line
+ *
+ * Results:
+ *      A standard Tcl result.
+ *
+ * Side effects:
+ *      See the user documentation.
+ *
+ *-----------------------------------------------------------------------------
+ */
+static int
+Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
+    ClientData   notUsed;
+    Tcl_Interp  *interp;
+    int          objc;
+    Tcl_Obj   *CONST objv[];
+{
+    char        *first, *next;
+    char         c;
+    int          stringLength;
+    Tcl_Obj     *resultList;
+
+    /* ??? need a way to set this */
+    /* true if two quotes ("") in the body of a field maps to one (") */
+    int          quotequoteQuotesQuote = 1;
+
+    /* true if quotes within strings not followed by a comma are allowed */
+    int          quotePairsWithinStrings = 1;
+
+    if( objc != 2 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "string" );
+	return TCL_ERROR;
+    }
+
+    /* get access to a textual representation of the object */
+    first = Tcl_GetStringFromObj (objv [1], &stringLength);
+
+    /* handle the trivial case... if the string is empty, so is the result */
+    if (stringLength == 0) return TCL_OK;
+
+    next = first;
+    resultList = Tcl_GetObjResult (interp);
+
+    /* this loop walks through the comma-separated string we've been passed */
+    while (1) {
+
+	/* grab the next character in the buffer */
+        c = *next;
+
+	/* if we've got a quote at this point, it is at the start
+	 * of a field, scan to the closing quote, make that a field, 
+	 * and update */
+
+	if (c == '"') {
+	    next = ++first;
+	    while (1) {
+	        c = *next;
+		/*
+		 * if we're at the end, we've got an unterminated quoted string
+		 */
+	        if (c == '\0') goto format_error;
+
+                /*
+		 * If we get a double quote, first see if it's a pair of double 
+		 * quotes, i.e. a quoted quote, and handle that.
+		 */
+	        if (c == '"') {
+		    /* if consecutive pairs of quotes as quotes of quotes
+		     * is enabled and the following char is a double quote,
+		     * turn the pair into a single by zooming on down */
+		    if (quotequoteQuotesQuote && (*(next + 1) == '"')) {
+			next += 2;
+			continue;
+		    }
+
+		    /* If double quotes within strings is enabled and the
+		     * char following this quote is not a comma, scan forward
+		     * for a quote */
+		    if (quotePairsWithinStrings && (*(next + 1) != ',')) {
+			next++;
+			continue;
+		    }
+		    /* It's a solo double-quote, not a pair of double-quotes, 
+		     * so terminate the element
+		     * at the current quote (the closing quote).
+		     */
+		    Rivet_ListObjAppendString (interp,
+			      resultList, first, next - first);
+
+		    /* skip the closing quote that we overwrote, and the
+		     * following comma if there is one.
+		     */
+
+		    ++next;
+		    c = *next;
+
+		    /* 
+		     *if we get end-of-line here, it's fine... and we're done
+		     */
+
+		    if (c == '\0')
+			return TCL_OK;
+
+                    /*
+		     * It's not end-of-line.  If the next character is
+		     * not a comma, it's an error.
+		     */
+		    if (c != ',') {
+		      format_error:
+			Tcl_ResetResult (interp);
+			Tcl_AppendResult (interp,
+					  "format error in string: \"", 
+					   first, "\"", (char *) NULL);
+			return TCL_ERROR;
+		    }
+
+		    /* We're done with that field.  The next one starts one
+		     * character past the current one, which is (was) a
+		     * comma */
+		    first = ++next;
+		    break;
+		}
+		/* It wasn't a quote, look at the next character. */
+		next++;
+	    }
+	    continue;
+	}
+
+	/* If we get here, we're at the start of a field that didn't
+	 * start with a quote */
+	next = first;
+	while (1) {
+	    c = *next;
+
+            /* If we reach end of the string, append the last element
+	     * and return to our caller. */
+	    if (c == '\0') {
+		Rivet_ListObjAppendString (interp, resultList, first, -1);
+		return TCL_OK;
+	    }
+
+            /* If we get a comma, that's the end of this piece,
+	     * stick it into the list.
+	     */
+	    if (c == ',') {
+		Rivet_ListObjAppendString (interp,
+			  resultList,
+			  first, next - first);
+		first = ++next;
+		break;
+	    }
+	    next++;
+	}
+    }
+    Rivet_ListObjAppendString (interp, resultList, first, -1);
+    return TCL_OK;
+}
+
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_CommaJoinCmd --
+ *
+ * Implements the `comma_join' Tcl command:
+ *    comma_join $list
+ *
+ * Results:
+ *      A standard Tcl result.
+ *
+ * Side effects:
+ *      See the user documentation.
+ *
+ *-----------------------------------------------------------------------------
+ */
+static int
+Rivet_CommaJoinObjCmd (notUsed, interp, objc, objv)
+    ClientData   notUsed;
+    Tcl_Interp  *interp;
+    int          objc;
+    Tcl_Obj   *CONST objv[];
+{
+    int         listObjc;
+    Tcl_Obj   **listObjv;
+    int         listIdx, didField;
+    Tcl_Obj    *resultPtr;
+    char       *walkPtr;
+    char       *strPtr;
+    int         stringLength;
+
+    if( objc != 2 ) {
+	Tcl_WrongNumArgs( interp, 1, objv,
+			"list arrayName elementName ?elementName..?" );
+        return TCL_ERROR;
+    }
+
+    resultPtr = Tcl_GetObjResult (interp);
+
+    if (Tcl_ListObjGetElements  (interp, 
+				 objv[1], 
+				 &listObjc, 
+				 &listObjv) != TCL_OK) {
+	return TCL_ERROR;
+    }
+
+    didField = 0;
+    for (listIdx = 0; listIdx < listObjc; listIdx++) {
+	/* If it's the first thing we've output, start it out
+	 * with a double quote.  If not, terminate the last
+	 * element with a double quote, then put out a comma,
+	 * then open the next element with a double quote
+	 */
+	if (didField) {
+	    Tcl_AppendToObj (resultPtr, "\",\"", 3);
+	} else {
+	    Tcl_AppendToObj (resultPtr, "\"", 1);
+	    didField = 1;
+	}
+	walkPtr = strPtr  = Tcl_GetStringFromObj (listObjv[listIdx], &stringLength);
+	/* Walk the string of the list element that we're about to
+	 * append to the result object.
+	 *
+	 * For each character, if it isn't a double quote, move on to
+	 * the next character until the string is exhausted.
+	 */
+	for (;stringLength; stringLength--) {
+	    if (*walkPtr++ != '"') continue;
+
+	    /* OK, we saw a double quote.  Emit everything up to and
+	     * including the double quote, then reset the string to
+	     * start at the same double quote (to issue it twice and
+	     * pick up where we left off.  Be sure to get the length
+	     * calculations right!
+	     */
+
+	     Tcl_AppendToObj (resultPtr, strPtr, walkPtr - strPtr);
+	     strPtr = walkPtr - 1;
+	}
+	Tcl_AppendToObj (resultPtr, strPtr, walkPtr - strPtr);
+    }
+    Tcl_AppendToObj (resultPtr, "\"", 1);
+    return TCL_OK;
+}
+
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_LassignArrayCmd --
+ *     Implements the TCL lassign_array command:
+ *         lassign_array list arrayname elementname ?elementname...?
+ *
+ * Results:
+ *      Standard TCL results.
+ *
+ *-----------------------------------------------------------------------------
+ */
+TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
+{
+    int	    listObjc, listIdx, idx;
+    Tcl_Obj **listObjv;
+    Tcl_Obj *varValue;
+
+    if( objc < 4 ) {
+	Tcl_WrongNumArgs( interp, 1, objv,
+			"list arrayName elementName ?elementName..?");
+        return TCL_ERROR;
+    }
+
+    if( Tcl_ListObjGetElements(interp, objv[1],
+                               &listObjc, &listObjv) != TCL_OK)
+        return TCL_ERROR;
+
+    for (idx = 3, listIdx = 0; idx < objc; idx++, listIdx++) {
+	varValue = (listIdx < listObjc) ?
+		listObjv[listIdx] : Tcl_NewStringObj( "", NULL );
+
+	if( Tcl_ObjSetVar2( interp, objv[2], objv[idx],
+				varValue, TCL_LEAVE_ERR_MSG ) == NULL ) {
+	    return TCL_ERROR;
+        }
+    }
+
+    /* We have some left over items.  Return them in a list. */
+    if( listIdx < listObjc ) {
+	Tcl_Obj *list = Tcl_NewListObj( 0, NULL );
+	int i;
+
+	for( i = listIdx; i < listObjc; ++i )
+	{
+	    if (Tcl_ListObjAppendElement(interp, list, listObjv[i]) != TCL_OK) {
+		return TCL_ERROR;
+	    }
+	}
+	Tcl_SetObjResult( interp, list );
+    }
+    return TCL_OK;
+}
+
 
 /*-----------------------------------------------------------------------------
  * Rivet_initList --
@@ -183,10 +507,10 @@ int
 Rivet_InitList( interp )
     Tcl_Interp *interp;
 {
-    Tcl_CreateObjCommand(interp,
-			 "lremove",
-			 Rivet_LremoveObjCmd, 
-                         (ClientData) NULL,
-			 (Tcl_CmdDeleteProc*) NULL);
+    TCL_OBJ_CMD( "lremove", Rivet_LremoveObjCmd );
+    TCL_OBJ_CMD( "comma_split", Rivet_CommaSplitObjCmd );
+    TCL_OBJ_CMD( "comma_join", Rivet_CommaJoinObjCmd );
+    TCL_OBJ_CMD( "lassign_array", Rivet_LassignArrayObjCmd );
+
     return TCL_OK;
 }

@@ -1,3 +1,39 @@
+2002-01-10  Damon J. Courtney <damon@unreality.com>
+	* src/rivet.h
+	    Added macro 'TCL_CMD_HEADER'.  Prints the default command header
+	    for Tcl commands in Rivet.
+
+	    Added macro 'TCL_OBJ_CMD'.  Prints the default object command
+	    creation for Tcl commands in Rivet.
+
+	* src/rivetInit.c
+	    Renamed to rivetPkgInit.c
+
+	* src/rivetCrypt.c
+	    Added.  Contains commands for encryption and decryption.
+		encrypt
+		decrypt
+		crypt
+
+	* src/rivetWWW.c
+	    Added.  Contains commands for the world wide web.
+		escape_string
+		unescape_string
+		escape_sgml_chars
+		escape_shell_command
+
+	* src/rivetList.c
+	    Added the following commands:
+		comma_split
+		comma_join
+		lassign_array
+
+	* src/make.tcl
+	    Moved all of the Rivet Tcl commands into their own library
+	    called librivet.  This will be automatically loaded into Rivet
+	    as the default configuration.  Anyone who wants can take it
+	    out if they choose.
+
 2002-01-10  David N. Welton  <davidw@dedasys.com>
 
 	* tests/template.conf.tcl: Re-add srm.conf and access.conf - if

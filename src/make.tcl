@@ -17,11 +17,21 @@ source [ file join . buildscripts parsetclConfig.tcl ]
 # add variables
 
 set APACHE "/usr/include/apache-1.3"
-set INC "-I$APACHE/include"
-set STATICLIB mod_rivet.a
-set SHLIB "mod_rivet[ info sharedlibextension ]"
+set INC "-I $APACHE/include"
+
+set APACHE "/usr/local/apache"
+set INC "-I $APACHE/include -I /usr/local/TclPro1.4/include"
+
 set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS -c"
-set OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o rivetList.o rivetInit.o mod_rivet.o"
+
+set MOD_STATICLIB mod_rivet.a
+set MOD_SHLIB "mod_rivet[info sharedlibextension]"
+set MOD_OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o mod_rivet.o"
+
+set LIB_SHLIB "librivet[info sharedlibextension]"
+set LIB_OBJECTS "rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o"
+
+set TCL_LIBS "$TCL_LIBS -lcrypt"
 
 # ------------
 
@@ -47,12 +57,12 @@ AddNode apache_request.o {
 }
 
 AddNode channel.o {
-    depends "channel.c mod_rivet.h channel.h"
+    depends "channel.c channel.h mod_rivet.h"
     command {$COMPILE channel.c}
 }
 
 AddNode parser.o {
-    depends "parser.c mod_rivet.h parser.h"
+    depends "parser.c parser.h mod_rivet.h"
     command {$COMPILE parser.c}
 }
 
@@ -61,33 +71,48 @@ AddNode rivetCore.o {
     command {$COMPILE rivetCore.c}
 }
 
+AddNode rivetCrypt.o {
+    depends "rivetCrypt.c"
+    command {$COMPILE rivetCrypt.c}
+}
+
 AddNode rivetList.o {
-    depends "rivetList.c rivetList.h mod_rivet.h"
+    depends "rivetList.c rivetList.h rivetList.h"
     command {$COMPILE rivetList.c}
 }
 
-AddNode rivetInit.o {
-    depends "rivetInit.c rivetInit.h mod_rivet.h"
-    command {$COMPILE rivetInit.c}
+AddNode rivetWWW.o {
+    depends "rivetWWW.c"
+    command {$COMPILE rivetWWW.c}
+}
+
+AddNode rivetPkgInit.o {
+    depends "rivetPkgInit.c mod_rivet.h"
+    command {$COMPILE rivetPkgInit.c}
 }
 
 AddNode mod_rivet.o {
-    depends "mod_rivet.c mod_rivet.h rivetCore.h apache_request.h parser.h parser.h"
+    depends "mod_rivet.c mod_rivet.h apache_request.h parser.h"
     command {$COMPILE mod_rivet.c}
 }
 
+AddNode librivet.so {
+    depends $LIB_OBJECTS
+    command {$TCL_SHLIB_LD -o $LIB_SHLIB $LIB_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
+}
+
 AddNode all {
-    depends shared
+    depends {librivet.so shared}
 }
 
 AddNode shared {
-    depends $OBJECTS
-    command {$TCL_SHLIB_LD -o $SHLIB $OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
+    depends $MOD_OBJECTS
+    command {$TCL_SHLIB_LD -o $MOD_SHLIB $MOD_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
 
 AddNode static {
-    depends $OBJECTS
-    command {$TCL_STLIB_LD $STATICLIB $OBJECTS}
+    depends $MOD_OBJECTS
+    command {$TCL_STLIB_LD $MOD_STATICLIB $MOD_OBJECTS}
 }
 
 AddNode clean {
