@@ -21,7 +21,7 @@ set INC "-I$APACHE/include"
 set STATICLIB mod_rivet.a
 set SHLIB "mod_rivet[ info sharedlibextension ]"
 set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS -c"
-set OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o mod_rivet.o"
+set OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o rivetList.o rivetInit.o mod_rivet.o"
 
 # ------------
 
@@ -46,14 +46,9 @@ AddNode apache_request.o {
     command {$COMPILE apache_request.c}
 }
 
-AddNode mod_rivet.o {
-    depends "mod_rivet.c mod_rivet.h rivetCore.h apache_request.h parser.h parser.h"
-    command {$COMPILE mod_rivet.c}
-}
-
-AddNode rivetCore.o {
-    depends "rivetCore.c rivetCore.h mod_rivet.h"
-    command {$COMPILE rivetCore.c}
+AddNode channel.o {
+    depends "channel.c mod_rivet.h channel.h"
+    command {$COMPILE channel.c}
 }
 
 AddNode parser.o {
@@ -61,9 +56,24 @@ AddNode parser.o {
     command {$COMPILE parser.c}
 }
 
-AddNode channel.o {
-    depends "channel.c mod_rivet.h channel.h"
-    command {$COMPILE channel.c}
+AddNode rivetCore.o {
+    depends "rivetCore.c rivetCore.h mod_rivet.h"
+    command {$COMPILE rivetCore.c}
+}
+
+AddNode rivetList.o {
+    depends "rivetList.c rivetList.h mod_rivet.h"
+    command {$COMPILE rivetList.c}
+}
+
+AddNode rivetInit.o {
+    depends "rivetInit.c rivetInit.h mod_rivet.h"
+    command {$COMPILE rivetInit.c}
+}
+
+AddNode mod_rivet.o {
+    depends "mod_rivet.c mod_rivet.h rivetCore.h apache_request.h parser.h parser.h"
+    command {$COMPILE mod_rivet.c}
 }
 
 AddNode all {

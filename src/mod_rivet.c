@@ -651,7 +651,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
 
     /* Initialize the interpreter with Rivet's Tcl commands */
-    Rivet_init( interp );
+    Rivet_Init( interp );
 
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables( interp, p );
@@ -721,7 +721,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	{
 	    myrsc->server_interp = Tcl_CreateSlave(interp,
 						    sr->server_hostname, 0);
-	    Rivet_init( myrsc->server_interp );
+	    Rivet_Init( myrsc->server_interp );
 	    Tcl_SetChannelOption(myrsc->server_interp, *(rsc->outchannel),
 				    "-buffering", "none");
 	    Tcl_RegisterChannel(myrsc->server_interp, *(rsc->outchannel));

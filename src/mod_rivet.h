@@ -93,6 +93,4 @@ rivet_server_conf *Rivet_GetConf(request_rec *r);
 
 #define RIVET_NEW_CONF(p) (rivet_server_conf *)ap_pcalloc(p, sizeof(rivet_server_conf))
 
-#define STREQU(s1, s2) (s1[0] == s2[0] && strcmp(s1, s2) == 0)
-
 #endif
