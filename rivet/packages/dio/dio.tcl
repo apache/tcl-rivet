@@ -49,49 +49,93 @@ proc handle {interface args} {
 	return [eval uplevel \#0 ::DIO::${interface}Result \#auto $args]
     }
 
+    #
+    # quote - given a string, return the same string with any single
+    #  quote characters preceded by a backslash
+    #
     method quote {string} {
 	regsub -all {'} $string {\'} string
 	return $string
     }
 
+    #
+    # build_select_query - build a select query based on given arguments,
+    #  which can include a table name, a select statement, switches to
+    # turn on boolean AND or OR processing, and possibly
+    # some key-value pairs that cause the where clause to be
+    # generated accordingly
+    #
     protected method build_select_query {args} {
+
 	set bool AND
 	set first 1
 	set req ""
 	set myTable $table
 	set what "*"
+
+	# for each argument passed us...
+	# (we go by integers because we mess with the index based on
+	#  what we find)
 	for {set i 0} {$i < [llength $args]} {incr i} {
+	    # fetch the argument we're currently processing
 	    set elem [lindex $args $i]
 
 	    switch -- [::string tolower $elem] {
+		# -and -- switch to AND-style processing
 		"-and" { set bool AND }
+
+		# -or -- switch to OR-style processing
 		"-or"  { set bool OR }
 
+		# -table -- identify which table the query is about
 		"-table" { set myTable [lindex $args [incr i]] }
 
+		# -select - 
 		"-select" {
 		    set what [lindex $args [incr i]]
 		}
 
+		# it wasn't -and, -or, -table, or -select...
 		default {
+
+		    # if the first character of the element is a dash,
+		    # it's a field name and a value
 		    if {[::string index $elem 0] == "-"} {
 			set field [::string range $elem 1 end]
 			set elem [lindex $args [incr i]]
 
+			# if it's the first field being processed, append
+			# WHERE to the SQL request we're generating
 			if {$first} {
 			    append req " WHERE"
 			    set first 0
 			} else {
+			    # it's not the first variable in the comparison
+			    # expression, so append the boolean state, either
+			    # AND or OR
 			    append req " $bool"
 			}
+
+			# convert any asterisks to percent signs in the
+			# value field
 			regsub -all {\*} $elem {%} elem
+
+			# if there is a percent sign in the value
+			# field now (having been there originally or
+			# mapped in there a moment ago),  the SQL aspect 
+			# is appended with a "field LIKE value"
+
 			if {[::string first {%} $elem] != -1} {
 			    append req " $field LIKE '[quote $elem]'"
 		        } elseif {[regexp {^([<=>]) *([0-9.]*)$} $elem _ fn val]} {
+			    # value starts with <, =, or >, then space, 
+			    # and a something
 			    append req " $field$fn$val"
 		        } elseif {[regexp {^([<>]=) *([0-9.]*)$} $elem _ fn val]} {
+			    # value starts with <= or >=, space, and something.
 			    append req " $field$fn$val"
 			} else {
+			    # otherwise it's a straight key=value comparison
 			    append req " $field='[quote $elem]'"
 			}
 
@@ -106,6 +150,13 @@ proc handle {interface args} {
 	return "select $what from $myTable $req"
     }
 
+    #
+    # build_insert_query -- given an array name, a list of fields, and
+    # possibly a table name, return a SQL insert statement inserting
+    # into the named table (or the object's table variable, if none
+    # is specified) for all of the fields specified, with their values
+    # coming from the array
+    #
     protected method build_insert_query {arrayName fields {myTable ""}} {
 	upvar 1 $arrayName array
 	if {[lempty $myTable]} { set myTable $table }
@@ -119,6 +170,16 @@ proc handle {interface args} {
 	return "insert into $myTable ($vars) VALUES ($vals)"
     }
 
+    #
+    # build_update_query -- given an array name, a list of fields, and
+    # possibly a table name, return a SQL update statement updating
+    # the named table (or using object's table variable, if none
+    # is named) for all of the fields specified, with their values
+    # coming from the array
+    #
+    # note that after use a where clause still neds to be added or
+    # you might update a lot more than you bargained for
+    #
     protected method build_update_query {arrayName fields {myTable ""}} {
 	upvar 1 $arrayName array
 	if {[lempty $myTable]} { set myTable $table }
@@ -130,6 +191,12 @@ proc handle {interface args} {
 	return "update $myTable SET $string"
     }
 
+    #
+    # lassign_array - given a list, an array name, and a variable number
+    # of arguments consisting of variable names, assign each element in
+    # the list, in turn, to elements corresponding to the variable
+    # arguments, into the named array.  From TclX.
+    #
     protected method lassign_array {list arrayName args} {
 	upvar 1 $arrayName array
 	foreach elem $list field $args {
@@ -137,11 +204,22 @@ proc handle {interface args} {
 	}
     }
 
+    #
+    # configure_variable - given a variable name and a string, if the
+    # string is empty return the variable name, otherwise set the
+    # variable to the string.
+    #
     protected method configure_variable {varName string} {
 	if {[lempty $string]} { return [cget -$varName] }
 	configure -$varName $string
     }
 
+    #
+    # build_where_key_clause - given a list of one or more key fields and 
+    # a corresponding list of one or more key values, construct a
+    # SQL where clause that boolean ANDs all of the key-value pairs 
+    # together.
+    #
     protected method build_key_where_clause {myKeyfield myKey} {
 	## If we're not using multiple keyfields, just return a simple
 	## where clause.
@@ -163,8 +241,14 @@ proc handle {interface args} {
     }
 
     ##
-    ## Given an array of values, return a key that would be used in this
-    ## database to store this array.
+    ## makekey -- Given an array containing a key-value pairs and
+    # an optional  list of key fields (we use the object's keyfield
+    # if none is specified)...
+    #
+    # if we're doing auto keys, create and return a new key,
+    # otherwise if it's a single key, just return its value
+    # from the array, else if it's multiple keys, return all their
+    # values as a list
     ##
     method makekey {arrayName {myKeyfield ""}} {
 	if {[lempty $myKeyfield]} { set myKeyfield $keyfield }
