@@ -197,7 +197,8 @@ if test x"${with_apxs}" = x ; then
 	with_apxs=${APXS}
     fi
 else
-    AC_MSG_RESULT([Using ${with_apxs} for apxs as specified by --with-apxs])
+    AC_MSG_CHECKING([for apxs])
+    AC_MSG_RESULT([--with-apxs=${with_apxs}])
 fi
 if test -x "${with_apxs}" ; then
     dnl It actually calls another script, so the PATH needs to be set.
@@ -210,6 +211,17 @@ if test -x "${with_apxs}" ; then
     AC_SUBST(APXS_LIBS)
     APXS_INCLUDES=-I`${with_apxs} -q INCLUDEDIR`
     AC_SUBST(APXS_INCLUDES)
+    APXS_CPPFLAGS_SHLIB=`${with_apxs} -q CFLAGS_SHLIB`
+    AC_SUBST(APXS_CPPFLAGS_SHLIB)
+    APXS_LD_SHLIB=`${with_apxs} -q LD_SHLIB`
+    AC_SUBST(APXS_LD_SHLIB)
+    APXS_LIBEXECDIR=`${with_apxs} -q LIBEXECDIR`
+    AC_SUBST(APXS_LIBEXECDIR)
+    APXS_SYSCONFDIR=`${with_apxs} -q SYSCONFDIR`
+    AC_SUBST(APXS_SYSCONFDIR)
+    APXS_PREFIX=`${with_apxs} -q PREFIX`
+    AC_SUBST(APXS_PREFIX)
+
 else
     AC_MSG_ERROR([${with_apxs} is not an executable file])
 fi
@@ -224,7 +236,8 @@ if test x"${with_tclsh}" = x ; then
 	with_tclsh=${TCLSH}
     fi
 else
-    AC_MSG_RESULT([Using ${with_tclsh} for tclsh as specified by --with-tclsh])
+    AC_MSG_CHECKING([for tclsh])
+    AC_MSG_RESULT([--with-tclsh=${with_tclsh}])
 fi
 
 if test -x "${with_tclsh}" ; then
