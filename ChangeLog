@@ -1,5 +1,8 @@
 2003-08-26  David N. Welton  <davidw@dedasys.com>
 
+	* doc/rivet.xml: Added section to documentation about emacs and
+	vim modesl for Rivet files.
+
 	* src/configure.in.tcl: -with-apxs option no longer takes a
 	default.  It should work that out on its own using the
 	findapxs.tcl script.

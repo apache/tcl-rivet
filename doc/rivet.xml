@@ -1107,8 +1107,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
   <section id="tcl_packages">
     <title>Rivet Tcl Packages</title>
     <para>
-In addition to the core Apache module, Rivet provides a number of Tcl
-packages that include potentially useful code.
+      In addition to the core Apache module, Rivet provides a number
+      of Tcl packages that include potentially useful code.
     </para>
     <itemizedlist>
 
@@ -1228,6 +1228,22 @@ list.
         irc.freenode.net, channel #tcl.
       </para>
     </section>
+
+    <section>
+      <title>Editing Rivet Template Files</title>
+      <para>
+	Rivet makes available code for two popular editors,
+	<command>emacs</command> and <command>vim</command> to
+	facilitate the editing of Rivet template files.  The key
+	concept is that the editor is aware of the &lt;? and ?&gt;
+	tags and switches back and forth between Tcl and HTML modes as
+	the cursor moves.  These files,
+	<filename>two-mode-mode.el</filename> and
+	<filename>rvt.vim</filename> are available in the
+	<filename>contrib/</filename> directory.
+      </para>
+    </section>
+
 
   </section>
 
