@@ -253,7 +253,7 @@ Rivet_Headers(
 }
 
 /* Get the environmental variables, but do it from a tcl function, so
-   we can decide whether we wish to or not */
+   we can decide whether we wish to or not. */
 
 static int
 Rivet_LoadEnv(
@@ -327,7 +327,7 @@ Rivet_Var(
     if (objc < 2 || objc > 4)
     {
 	Tcl_WrongNumArgs(interp, 1, objv,
-			 "(get varname|list varname|exists varname|names"
+			 "(get varname ?default?|list varname|exists varname|names"
 			 "|number|all)");
 	return TCL_ERROR;
     }

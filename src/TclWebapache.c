@@ -375,7 +375,6 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 	Tcl_DecrRefCount(val);
     }
 
-    Tcl_DecrRefCount(envvar);
     return TCL_OK;
 }
 

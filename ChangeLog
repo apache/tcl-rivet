@@ -1,3 +1,14 @@
+2002-12-04  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c (TclWeb_GetEnvVars): Put DecrRefCount back in
+	- must have taken it out by mistake while hunting a previous
+	memory leak.
+
+2002-11-23  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_SendContent): Set up information for
+	[info script] by using r->filename.
+
 2002-11-19  David N. Welton  <davidw@dedasys.com>
 
 	* doc/examples/table.rvt: Fixed up format operation to make nicer

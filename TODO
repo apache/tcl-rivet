@@ -4,6 +4,8 @@ BUGS
 TODO
 ====
 
+* var_get and var_post commands.
+
 * getting the plain post data. I use mod_dtcl as an xml server and I
   need to collect the broken xml (due to query string proccessing). if
   the user enters in the xml "=" I am lost. (From yahalom emet).

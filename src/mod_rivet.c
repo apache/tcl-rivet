@@ -423,8 +423,17 @@ Rivet_SendContent(request_rec *r)
 			"Could not create request namespace\n");
 	return HTTP_BAD_REQUEST;
     }
-    /* Apache Request stuff */
 
+
+    {
+	Tcl_Obj *infoscript[3];
+	infoscript[0] = Tcl_NewStringObj("info", -1);
+	infoscript[1] = Tcl_NewStringObj("script", -1);
+	infoscript[2] = Tcl_NewStringObj(r->filename, -1);
+	Tcl_EvalObjv(interp, 3, infoscript, 0);
+    }
+
+    /* Apache Request stuff */
     TclWeb_InitRequest(globals->req, interp, r);
     ApacheRequest_set_post_max(globals->req->apachereq, rsc->upload_max);
     ApacheRequest_set_temp_dir(globals->req->apachereq, rsc->upload_dir);
