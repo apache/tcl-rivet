@@ -544,675 +544,678 @@ AddType application/x-rivet-tcl .tcl</programlisting>
   <section id="commands">
     <title>Rivet Tcl Commands and Variables</title>
 
-    <index/>
 
-    <variablelist>
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>var</primary>
-	    <secondary>get the value of a form variable.</secondary>
-	    <tertiary>client input</tertiary>
-	  </indexterm>
-	  <cmdsynopsis>
-	    <command>
-	      var
-	    </command>
-	    <group choice="req">
-	      <arg>get</arg>
-	      <arg>list</arg>
-	      <arg>exists</arg>
-	      <arg>number</arg>
-	      <arg>all</arg>
-	    </group>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    The <command>var</command> command retrieves information
-	    about GET or POST variables sent to the script via client
-	    request.  It treats both GET and POST variables the same,
-	    regardless of their origin.  Note that there are two
-	    additional forms of <command>var</command>:
-	    <command>var_qs</command> and <command>var_post</command>.
-	    These two restrict the retrieval of information to
-	    parameters arriving via the querystring
-	    (?foo=bar&amp;bee=bop) or POSTing, respectively.
-	  </para>
-	  <variablelist>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>get</arg>
-		  <arg><replaceable>varname</replaceable></arg>
-		  <arg><replaceable><optional>default</optional></replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns the value of variable
-		  <option><replaceable>varname</replaceable></option>
-		  as a string (even if there are multiple values).  If
-		  the variable doesn't exist as a GET or POST
-		  variable, the
-		  <option><replaceable><optional>default</optional></replaceable></option>
-		  value is returned, otherwise "" - an empty string -
-		  is returned.
-		</para>
-	      </listitem>
-	    </varlistentry>
+    <refentry>
+      <refnamediv>
+	<refname>var</refname>
+	<refpurpose>get the value of a form variable.</refpurpose>
+      </refnamediv>
 
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>list</arg>
-		  <arg><replaceable>varname</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns the value of variable
-		  <option><replaceable>varname</replaceable></option> as a
-		  list, if there are multiple values.
-		</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>exists</arg>
-		  <arg><replaceable>varname</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns 1 if
-		  <option><replaceable>varname</replaceable></option>
-		  exists, 0 if it doesn't.
-		</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>number</arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns the number of variables.
-		</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>all</arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Return a list of variable names and values.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	  </variablelist>
-
-	  <para>
-	    See <xref linkend="variable_access"/>.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>upload</primary>
-	    <secondary>handle a file uploaded by a client.</secondary>
-	    <tertiary>client input</tertiary>
-	  </indexterm>
-	  <cmdsynopsis>
-	    <command>upload</command>
-	    <group choice="req">
-	      <arg>channel</arg>
-	      <arg>save</arg>
-	      <arg>data</arg>
-	      <arg>exists</arg>
-	      <arg>size</arg>
-	      <arg>type</arg>
-	      <arg>filename</arg>
-	    </group>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>The upload command is for file upload manipulation.
-	    See the relevant Apache Directives to further configure the
-	    behavior of this Rivet feature.</para>
-	  <variablelist>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>channel</arg>
-		  <arg><replaceable>uploadname</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  When given the name of a file upload
-		  <option><replaceable>uploadname</replaceable></option>,
-		  returns a Tcl channel that can be used to access the
-		  uploaded file.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>save</arg>
-		  <arg><replaceable>uploadname</replaceable></arg>
-		  <arg><replaceable>filename</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Saves the
-		  <option><replaceable>uploadname</replaceable></option> in
-		  the file
-		  <option><replaceable>filename</replaceable></option>.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>data</arg>
-		  <arg><replaceable>uploadname</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns data uploaded to the server.  This is binary clean
-		  - in other words, it will work even with files like
-		  images, executables, compressed files, and so on.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>size</arg>
-		  <arg><replaceable>uploadname</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns the size of the file uploaded.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>type</arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  If the <varname>Content-type</varname> is set, it is
-		  returned, otherwise, an empty string.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>filename</arg>
-		  <arg><replaceable>uploadname</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns the filename on the remote host that uploaded the file.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg>names</arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Returns the variable names, as a list, of all the files
-		  uploaded.
-		</para>
-	      </listitem>
-	    </varlistentry>
-	  </variablelist>
-	  <para>
-	    See <xref linkend="upload"/>.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>load_response</primary>
-	    <secondary>load form variables into an array.</secondary>
-	    <tertiary>user input</tertiary>
-	  </indexterm>
-
-	  <cmdsynopsis>
-	    <command>load_response</command>
-	    <arg><replaceable>arrayName</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Load any form variables passed to this page into an
-	    array.
-	  </para>
-	</listitem>
-      </varlistentry>
-    
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>load_env</primary>
-	    <secondary>get the request's environment variables.</secondary>
-	    <tertiary>client input</tertiary>
-	  </indexterm>
-	  <cmdsynopsis>
-	    <command>load_env</command>
-	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Load the array of environment variables into the specified
-	    array name.  Uses array <option>::request::env</option> by
-	    default.
-	  </para>
-	  <para>
-	    As Rivet pages are run in the <option>::request</option>
-	    namespace, it isn't necessary to qualify the array name
-	    for most uses - it's ok to access it as
-	    <option>env</option>.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>load_headers</primary>
-	    <secondary>get client request's headers.</secondary>
-	    <tertiary>client input</tertiary>
-	  </indexterm>
-	  <cmdsynopsis>
-	    <command>load_headers</command>
-	    <arg><replaceable>array_name</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Load the headers that come from a client request into the
-	    provided array name, or use <option>headers</option> if no
-	    name is provided.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>load_cookies</primary>
-	    <secondary>get any cookie variables sent by the client.</secondary>
-	    <tertiary>client input</tertiary>
-	  </indexterm>
-	  <cmdsynopsis>
-	    <command>load_cookies</command>
-	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Load the array of cookie variables into the specified
-	    array name.  Uses array <option>cookies</option> by
-	    default.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>include</primary>
-	    <secondary>includes a file into the output stream without modification.</secondary>
-	    <tertiary>files</tertiary>
-	  </indexterm>
-
-	  <cmdsynopsis>
-	    <command>include</command>
-	    <arg><replaceable>filename_name</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Include a file without parsing it for processing tags &lt;?
-	    and ?&gt;.  This is the best way to include an HTML file or
-	    any other static content.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>parse</primary>
-	    <secondary>parses a Rivet template file.</secondary>
-	    <tertiary>files</tertiary>
-	  </indexterm>
-
-	  <cmdsynopsis>
-	    <command>parse</command>
-	    <arg><replaceable>filename</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Like the Tcl <command>source</command> command, but also
-	    parses for Rivet &lt;?  and ?&gt; processing tags.  Using
-	    this command, you can use one .rvt file from another.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>headers</primary>
-	    <secondary>set and parse HTTP headers.</secondary>
-	    <tertiary>output</tertiary>
-	  </indexterm>
-
-	  <cmdsynopsis>
-	    <command>headers</command>
-	    <group choice="req">
-	      <arg>set</arg>
-	      <arg>redirect</arg>
-	      <arg>add</arg>
-	      <arg>type</arg>
-	      <arg>numeric</arg>
-	    </group>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    The <command>headers</command> command is for setting and
-	    parsing HTTP headers.
-	  </para>
-	  <para>
-	    <variablelist>
-
-	      <varlistentry>
-		<term><cmdsynopsis>
-		    <arg>set</arg>
-		    <arg><replaceable>headername</replaceable></arg>
-		    <arg><replaceable>value</replaceable></arg>
-		  </cmdsynopsis>
-		</term>
-		<listitem>
-		  <para>
-		    Set arbitrary header names and values.
-		  </para>
-		</listitem>
-	      </varlistentry>
-
-	      <varlistentry>
-		<term>
-		  <cmdsynopsis>
-		    <arg>redirect</arg>
-		    <arg><replaceable>uri</replaceable></arg>
-		  </cmdsynopsis>
-		</term>
-		<listitem>
-		  <para>
-		    Redirect from the current page to a new
-		    URI. <emphasis>Must</emphasis> be done in the first block
-		    of TCL code.
-		  </para>
-		</listitem>
-	      </varlistentry>
-
-	      <varlistentry>
-		<term>
-                  <cmdsynopsis>
-		    <arg>add</arg>
-		    <arg><replaceable>headername</replaceable></arg>
-		    <arg><replaceable>value</replaceable></arg>
-		  </cmdsynopsis>
-                </term>
-		<listitem>
-		  <para>Add text to header
-		  <varname>headername</varname>.</para>
-		</listitem>
-	      </varlistentry>
-
-	      <varlistentry>
-		<term><cmdsynopsis>
-		    <arg>type</arg>
-		    <arg><replaceable>content-type</replaceable></arg>
-		  </cmdsynopsis>
-		</term>
-		<listitem>
-		  <para>
-		    This command sets the <constant>Content-type</constant>
-		    header returned by the script, which is useful if you wish
-		    to send content other than HTML with Rivet - PNG or jpeg
-		    images, for example.
-		  </para>
-		</listitem>
-	      </varlistentry>
-
-	      <varlistentry>
-		<term>
-                  <cmdsynopsis>
-		    <arg>numeric</arg>
-		    <arg><replaceable>response code</replaceable></arg>
-		  </cmdsynopsis>
-		</term>
-		<listitem>
-		  <para>Set a numeric response code, such as 200, 404 or 500.
-		  </para>
-		</listitem>
-	      </varlistentry>
-
-
-	    </variablelist>
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>makeurl</primary>
-	    <secondary>construct url's.</secondary>
-	    <tertiary>output</tertiary>
-	  </indexterm>
-	  <cmdsynopsis>
-	    <command>makeurl</command>
-	    <arg><replaceable>filename</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Create a self referencing URL from a filename.  For example:
-	    <programlisting>makeurl /tclp.gif</programlisting>
-	    returns
-	    <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
-	    where hostname and port are the hostname and port of the
-	    server in question.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>cookie</primary>
-	    <secondary>get and set cookies.</secondary>
-	    <tertiary>output</tertiary>
-	  </indexterm>
-
-	  <cmdsynopsis>
-	    <command>cookie</command>
-	    <arg>set</arg>
-	    <arg><replaceable>cookieName</replaceable></arg>
-	    <arg><replaceable><optional>cookiValue</optional></replaceable></arg>
-	      <arg>-days <replaceable>expireInDays</replaceable></arg>
-	      <arg>-hours <replaceable>expireInHours</replaceable></arg>
-	      <arg>-minutes <replaceable>expireInMinutes</replaceable></arg>
-	      <arg>-expires <replaceable>Wdy, DD-Mon-YYYY HH:MM:SS GMT</replaceable></arg>
-	      <arg>-path <replaceable>uriPathCookieAppliesTo</replaceable></arg>
-	      <arg>-secure <replaceable>1/0</replaceable></arg>
-	  </cmdsynopsis>
-	  <cmdsynopsis>
-	    <command>cookie</command>
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>
+	    var
+	  </command>
+	  <group choice="req">
 	    <arg>get</arg>
-	    <arg><replaceable>cookieName</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    <command>cookie</command> gets or sets a cookie.  When you
-	    get a cookie, the command returns the value of the cookie,
-	    or an empty string if no cookie exists.
-	  </para>
-	</listitem>
-      </varlistentry>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
 
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>clock_to_rfc850_gmt</primary>
-	    <secondary>create a rfc850 time from [clock seconds].</secondary>
-	    <tertiary>utility</tertiary>
-	  </indexterm>
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  The <command>var</command> command retrieves information
+	  about GET or POST variables sent to the script via client
+	  request.  It treats both GET and POST variables the same,
+	  regardless of their origin.  Note that there are two
+	  additional forms of <command>var</command>:
+	  <command>var_qs</command> and <command>var_post</command>.
+	  These two restrict the retrieval of information to
+	  parameters arriving via the querystring
+	  (?foo=bar&amp;bee=bop) or POSTing, respectively.
+	</para>
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>get</arg>
+		<arg><replaceable>varname</replaceable></arg>
+		<arg><replaceable><optional>default</optional></replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the value of variable
+		<option><replaceable>varname</replaceable></option>
+		as a string (even if there are multiple values).  If
+		the variable doesn't exist as a GET or POST
+		variable, the
+		<option><replaceable><optional>default</optional></replaceable></option>
+		value is returned, otherwise "" - an empty string -
+		is returned.
+	      </para>
+	    </listitem>
+	  </varlistentry>
 
-	  <cmdsynopsis>
-	    <command>clock_to_rfc850_gmt</command>
-	    <arg><replaceable>seconds</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Convert an integer-seconds-since-1970 click value to
-	    RFC850 format, with the additional requirement that it be
-	    GMT only.
-	  </para>
-	</listitem>
-      </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>list</arg>
+		<arg><replaceable>varname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the value of variable
+		<option><replaceable>varname</replaceable></option> as a
+		list, if there are multiple values.
+	      </para>
+	    </listitem>
+	  </varlistentry>
 
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>html</primary>
-	    <secondary>construct html tagged text.</secondary>
-	    <tertiary>utility</tertiary>
-	  </indexterm>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>exists</arg>
+		<arg><replaceable>varname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns 1 if
+		<option><replaceable>varname</replaceable></option>
+		exists, 0 if it doesn't.
+	      </para>
+	    </listitem>
+	  </varlistentry>
 
-	  <cmdsynopsis>
-	    <command>html</command>
-	    <arg><replaceable>string</replaceable></arg>
-	    <arg rep="repeat"><replaceable>arg</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Print text with the added ability to pass HTML tags
-	    following the string.  Example:
-	    <programlisting>html "Test" b i</programlisting>
-	    produces: <computeroutput>&lt;b&gt;&lt;i&gt;Test&lt;/i&gt;&lt;/b&gt;</computeroutput>
-	  </para>
-	</listitem>
-      </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>number</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the number of variables.
+	      </para>
+	    </listitem>
+	  </varlistentry>
 
-      <varlistentry>
-	  <indexterm>
-	    <primary>incro</primary>
-	    <secondary>increment a variable or set it to 1 nonexistant.</secondary>
-	    <tertiary>utility</tertiary>
-	  </indexterm>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>all</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Return a list of variable names and values.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
 
-	<term>
-	  <cmdsynopsis>
-	    <command>incr0</command>
-	    <arg><replaceable>varname</replaceable></arg>
-	    <arg><replaceable>num</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Increment a variable
-	    <option><replaceable>varname</replaceable></option> by
-	    <option><replaceable>num</replaceable></option>.  If the
-	    variable doesn't exist, create it instead of returning an
-	    error.
-	  </para>
-	</listitem>
-      </varlistentry>
+	<para>
+	  See <xref linkend="variable_access"/>.
+	</para>
 
-      <varlistentry>
-	<term>
-	  <indexterm>
-	    <primary>parray</primary>
-	    <secondary>Tcl's <command>parray</command> with html formatting.</secondary>
-	    <tertiary>utility</tertiary>
-	  </indexterm>
+      </refsect1>
+    </refentry>
 
-	  <cmdsynopsis>
-	    <command>parray</command>
-	    <arg><replaceable>arrayName</replaceable></arg>
-	    <arg><replaceable><optional>pattern</optional></replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    An html version of the standard Tcl
-	    <command>parray</command> command.  Displays the entire
-	    contents of an array in a sorted, nicely-formatted way.
-	    Mostly used for debugging purposes.
-	  </para>
-	</listitem>
-      </varlistentry>
+    <refentry>
+      <refnamediv>
+	<refname>upload</refname>
+	<refpurpose>handle a file uploaded by a client.</refpurpose>
+      </refnamediv>
 
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>upload</command>
+	  <group choice="req">
+	    <arg>channel</arg>
+	    <arg>save</arg>
+	    <arg>data</arg>
+	    <arg>exists</arg>
+	    <arg>size</arg>
+	    <arg>type</arg>
+	    <arg>filename</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
 
-<!--
-     <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command></command>
-	    <arg></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para></para>
-	</listitem>
-      </varlistentry>
- -->
-
-    </variablelist>
+      <refsect1>
+	<title>Description</title>
+	<para>The upload command is for file upload manipulation.
+	  See the relevant Apache Directives to further configure the
+	  behavior of this Rivet feature.</para>
 
 
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>channel</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		When given the name of a file upload
+		<option><replaceable>uploadname</replaceable></option>,
+		returns a Tcl channel that can be used to access the
+		uploaded file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>save</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+		<arg><replaceable>filename</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Saves the
+		<option><replaceable>uploadname</replaceable></option> in
+		the file
+		<option><replaceable>filename</replaceable></option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>data</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns data uploaded to the server.  This is binary clean
+		- in other words, it will work even with files like
+		images, executables, compressed files, and so on.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>size</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the size of the file uploaded.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>type</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		If the <varname>Content-type</varname> is set, it is
+		returned, otherwise, an empty string.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>filename</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the filename on the remote host that uploaded the file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>names</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the variable names, as a list, of all the files
+		uploaded.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>
+	  See <xref linkend="upload"/>.
+	</para>
 
 
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>load_response</refname>
+	<refpurpose>load form variables into an array.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_response</command>
+	  <arg><replaceable>arrayName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	Load any form variables passed to this page into an
+	array.
+      </refsect1>
+    </refentry>
+
+
+    <refentry>
+      <refnamediv>
+	<refname>load_env</refname>
+	<refpurpose>get the request's environment variables.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_env</command>
+	  <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>
+	  Load the array of environment variables into the specified
+	  array name.  Uses array <option>::request::env</option> by
+	  default.
+	</para>
+	<para>
+	  As Rivet pages are run in the <option>::request</option>
+	  namespace, it isn't necessary to qualify the array name
+	  for most uses - it's ok to access it as
+	  <option>env</option>.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>load_headers</refname>
+	<refpurpose>get client request's headers.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_headers</command>
+	  <arg><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Load the headers that come from a client request into the
+	  provided array name, or use <option>headers</option> if no
+	  name is provided.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>load_cookies</refname>
+	<refpurpose>get any cookie variables sent by the client.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_cookies</command>
+	  <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+      </refsect1>
+      <para>
+	Load the array of cookie variables into the specified
+	array name.  Uses array <option>cookies</option> by
+	default.
+      </para>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>include</refname>
+	<refpurpose>includes a file into the output stream without modification.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>include</command>
+	  <arg><replaceable>filename_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Include a file without parsing it for processing tags &lt;?
+	  and ?&gt;.  This is the best way to include an HTML file or
+	  any other static content.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>parse</refname>
+	<refpurpose>parses a Rivet template file.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>parse</command>
+	  <arg><replaceable>filename</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Like the Tcl <command>source</command> command, but also
+	  parses for Rivet &lt;?  and ?&gt; processing tags.  Using
+	  this command, you can use one .rvt file from another.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>headers</refname>
+	<refpurpose>set and parse HTTP headers.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>headers</command>
+	  <group choice="req">
+	    <arg>set</arg>
+	    <arg>redirect</arg>
+	    <arg>add</arg>
+	    <arg>type</arg>
+	    <arg>numeric</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  The <command>headers</command> command is for setting and
+	  parsing HTTP headers.
+	</para>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term><cmdsynopsis>
+		<arg>set</arg>
+		<arg><replaceable>headername</replaceable></arg>
+		<arg><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Set arbitrary header names and values.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>redirect</arg>
+		<arg><replaceable>uri</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Redirect from the current page to a new
+		URI. <emphasis>Must</emphasis> be done in the first block
+		of TCL code.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>add</arg>
+		<arg><replaceable>headername</replaceable></arg>
+		<arg><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>Add text to header
+		<varname>headername</varname>.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><cmdsynopsis>
+		<arg>type</arg>
+		<arg><replaceable>content-type</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		This command sets the <constant>Content-type</constant>
+		header returned by the script, which is useful if you wish
+		to send content other than HTML with Rivet - PNG or jpeg
+		images, for example.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg>numeric</arg>
+		<arg><replaceable>response code</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>Set a numeric response code, such as 200, 404 or 500.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>makeurl</refname>
+	<refpurpose>construct url's based on hostname, port.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>makeurl</command>
+	  <arg><replaceable>filename</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Create a self referencing URL from a filename.  For example:
+	  <programlisting>makeurl /tclp.gif</programlisting>
+	  returns
+	  <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
+	  where hostname and port are the hostname and port of the
+	  server in question.
+	</para>
+      </refsect1>
+    </refentry>
+
+
+    <refentry>
+      <refnamediv>
+	<refname>cookie</refname>
+	<refpurpose>get and set cookies.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>set</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	  <arg><replaceable><optional>cookiValue</optional></replaceable></arg>
+	  <arg>-days <replaceable>expireInDays</replaceable></arg>
+	  <arg>-hours <replaceable>expireInHours</replaceable></arg>
+	  <arg>-minutes <replaceable>expireInMinutes</replaceable></arg>
+	  <arg>-expires <replaceable>Wdy, DD-Mon-YYYY HH:MM:SS GMT</replaceable></arg>
+	  <arg>-path <replaceable>uriPathCookieAppliesTo</replaceable></arg>
+	  <arg>-secure <replaceable>1/0</replaceable></arg>
+	</cmdsynopsis>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>get</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  <command>cookie</command> gets or sets a cookie.  When you
+	  get a cookie, the command returns the value of the cookie,
+	  or an empty string if no cookie exists.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>clock_to_rfc850_gmt</refname>
+	<refpurpose>create a rfc850 time from [clock seconds].</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>clock_to_rfc850_gmt</command>
+	  <arg><replaceable>seconds</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Convert an integer-seconds-since-1970 click value to
+	  RFC850 format, with the additional requirement that it be
+	  GMT only.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>html</refname>
+	<refpurpose>construct html tagged text.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>html</command>
+	  <arg><replaceable>string</replaceable></arg>
+	  <arg rep="repeat"><replaceable>arg</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Print text with the added ability to pass HTML tags
+	  following the string.  Example:
+	  <programlisting>html "Test" b i</programlisting>
+	  produces: <computeroutput>&lt;b&gt;&lt;i&gt;Test&lt;/i&gt;&lt;/b&gt;</computeroutput>
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>incr0</refname>
+	<refpurpose>increment a variable or set it to 1 if nonexistant.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>incr0</command>
+	  <arg><replaceable>varname</replaceable></arg>
+	  <arg><replaceable>num</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Increment a variable
+	  <option><replaceable>varname</replaceable></option> by
+	  <option><replaceable>num</replaceable></option>.  If the
+	  variable doesn't exist, create it instead of returning an
+	  error.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>parray</refname>
+	<refpurpose>Tcl's <command>parray</command> with html formatting.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>parray</command>
+	  <arg><replaceable>arrayName</replaceable></arg>
+	  <arg><replaceable><optional>pattern</optional></replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  An html version of the standard Tcl
+	  <command>parray</command> command.  Displays the entire
+	  contents of an array in a sorted, nicely-formatted way.
+	  Mostly used for debugging purposes.
+	</para>
+
+      </refsect1>
+    </refentry>
 
   </section>
 

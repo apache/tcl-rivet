@@ -22,6 +22,33 @@
 
   <!-- ==================================================================== -->
 
+<xsl:template match="section">
+  <xsl:variable name="depth" select="count(ancestor::section)+1"/>
+
+  <div class="{name(.)}">
+    <xsl:call-template name="language.attribute"/>
+    <xsl:call-template name="section.titlepage"/>
+
+    <xsl:variable name="toc.params">
+      <xsl:call-template name="find.path.params">
+        <xsl:with-param name="table" select="normalize-space($generate.toc)"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:if test="@role = 'reference' or (contains($toc.params, 'toc')
+                  and $depth &lt;= $generate.section.toc.level)">
+      <xsl:call-template name="section.toc">
+        <xsl:with-param name="toc.title.p" select="contains($toc.params, 'title')"/>
+      </xsl:call-template>
+      <xsl:call-template name="section.toc.separator"/>
+    </xsl:if>
+    <xsl:apply-templates/>
+    <xsl:call-template name="process.chunk.footnotes"/>
+  </div>
+</xsl:template>
+
+
+
   <!--
   <xsl:import
   href="http://docbook.sourceforge.net/release/xsl/1.48/html/docbook.xsl"/>

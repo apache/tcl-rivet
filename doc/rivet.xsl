@@ -11,7 +11,13 @@
   <xsl:param name="navig.graphics" select="1"/>
   <xsl:param name="navig.graphics.extension" select="'.png'"/>
   <xsl:param name="admon.graphics" select="1"/>
+  <xsl:param name="generate.section.toc.level" select="1"/>
+  <xsl:param name="refentry.separator" select="1"/>
 
+<!--
+  <xsl:param name="refentry.generate.title" select="1"/>
+  <xsl:param name="refentry.generate.name" select="0"/>
+-->
   <xsl:variable name="arg.choice.opt.open.str">?</xsl:variable>
   <xsl:variable name="arg.choice.opt.close.str">?</xsl:variable>
   <xsl:variable name="group.choice.opt.open.str">(</xsl:variable>
@@ -84,7 +90,7 @@
   </xsl:template>
 
   <xsl:template match="option">
-<!--    <xsl:call-template name="inline.monounderlineseq"/> -->
+    <!--    <xsl:call-template name="inline.monounderlineseq"/> -->
     <xsl:apply-templates/>
   </xsl:template>
 
@@ -109,22 +115,6 @@
       <xsl:apply-templates/>
     </span>
     <xsl:text> </xsl:text>
-  </xsl:template>
-
-
-  <xsl:template match="refnamediv">
-    <div class="{name(.)}">
-      <xsl:call-template name="anchor"/>
-      <h2 align="center">
-	<xsl:apply-templates/>
-      </h2>
-    </div>
-  </xsl:template>
-
-  <xsl:template match="refsect1/para">
-    <blockquote>
-      <xsl:apply-templates/>
-    </blockquote>
   </xsl:template>
 
   <xsl:template match="varlistentry">
@@ -319,23 +309,4 @@
     </xsl:choose>
   </xsl:template>
 
-<!-- This is to create the index of commands.  There should be a -->
-<!-- better way to do this, but I couldn't find it. -->
-
-  <xsl:template match="section/index">
-    <ul>
-      <xsl:for-each select="..//indexterm/primary">
-	<li>
-	  <span style="font-family:monospace; font-weight: bold;">
-	    <a href="#{generate-id(key('primary',.))}">
-	      <xsl:value-of select="."/>
-	    </a>
-	  </span>
-	  <xsl:text> - </xsl:text>
-	  <xsl:value-of select="../secondary"/>
-	</li>
-      </xsl:for-each>
-    </ul>
-  </xsl:template>
-
-  </xsl:stylesheet>
+</xsl:stylesheet>

@@ -1,3 +1,17 @@
+2003-08-29  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Use refentry and sub-elements instead of
+	variablelist.  This is more correct.
+
+	* doc/norefchunk.xsl: New file - handle refentries without making
+	them new files.
+
+	* doc/rivet.xsl: Scratch the last changes and go with refentry's
+	for all commands.  This is a more difficult solution to parse, but
+	in the end is more correct.
+
+	* doc/refentry.xsl: New file to handle refentry stuff.
+
 2003-08-28  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xsl: Minor changes to look and feel.
