@@ -24,7 +24,7 @@ place.
 
 Run configure in this directory with the following parameters:
 
-./configure  --with-tcl=/usr/local/lib/tcl8.4 --with-tclinclude=/usr/local/include/tcl8.4  --with-tclsh=/usr/local/bin/tclsh8.4
+./configure  --with-tcl=/usr/local/lib/tcl8.4 --with-tclinclude=/usr/local/include/tcl8.4
 
 ...or equivalent.  Your mileage may vary.
 
@@ -54,3 +54,4 @@ aclocal19 -I /usr/local/gnu-autotools/share/aclocal
 
 
 automake19 --foreign
+aclocal19 -I /usr/local/gnu-autotools/share/aclocal

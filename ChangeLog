@@ -1,7 +1,11 @@
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
+        * Remove the --with-tclsh option.  A path to tclsh is automatically
+	  figured out by the TEA 3.1 build stuff -- it looks at tclConfig.sh
 
         * Get automake, aclocal, and autoconf to run without complaint,
 	  generating the configure script, Makefile.in files, etc.
+
+	* Propagate the NAMEOFEXECUTABLE define via the autoconf scripts
 
 2004-12-01  Karl Lehenbauer  <karl-rivet@sc.com>
 

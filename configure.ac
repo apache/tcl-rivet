@@ -226,28 +226,8 @@ else
     AC_MSG_ERROR([${with_apxs} is not an executable file])
 fi
 
-AC_ARG_WITH(tclsh, [  --with-tclsh		location of the tclsh executable that corresponds to the --with-tcl directory used], with_tclsh=${withval})
+AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}")
 
-if test x"${with_tclsh}" = x ; then
-    AC_PATH_PROGS(TCLSH, tclsh)
-    if test x"${TCLSH}" = x; then
-	AC_MSG_ERROR([Could not find tclsh.  tclsh must be in your PATH or you must specify its location using --with-tclsh])
-    else
-	with_tclsh=${TCLSH}
-    fi
-else
-    AC_MSG_CHECKING([for tclsh])
-    AC_MSG_RESULT([--with-tclsh=${with_tclsh}])
-fi
-
-if test -x "${with_tclsh}" ; then
-   NAMEOFEXECUTABLE=-DNAMEOFEXECUTABLE=\\\"${with_tclsh}\\\"
-   AC_SUBST(NAMEOFEXECUTABLE)
-else
-    AC_MSG_ERROR([${with_tclsh} is not an executable file])
-fi
-
-#--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting th AC variables in.  Include these here.
