@@ -1,0 +1,27 @@
+<h1>Session Demo</h1>
+<?
+SESSION activate
+
+puts "<p>Here's some stuff about your session:"
+puts "<ul>"
+puts "<li>Your session ID is [SESSION id]"
+puts "<li>SESSION is_new_session -> [SESSION is_new_session]"
+puts "<li>SESSION new_session_reason -> [SESSION new_session_reason]"
+puts "</ul>"
+?>
+<p>Fetching key 'foo' from package 'dummy':
+<?  set data [SESSION fetch dummy foo]
+
+puts "Fetch status is '[SESSION status]'<br>"
+
+    if {$data == ""} {
+	puts "No data.  Storing data 'bar' with key 'foo' package 'dummy'.<p>"
+
+	SESSION store dummy foo bar
+
+    } else {
+	puts "<b>$data</b>"
+    }
+
+?>
+
