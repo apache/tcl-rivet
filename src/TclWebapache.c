@@ -136,8 +136,10 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req)
        on... */
     for (i = 0; i < parmsarray->nelts; ++i)
     {
-	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
-		     strlen(varname)))
+	char *parmkey = TclWeb_StringToUtf(parms[i].key, req);
+	if (!strncmp(varname, parmkey,
+		     strlen(varname) < strlen(parmkey) ?
+		     strlen(parmkey) : strlen(varname)))
 	{
 	    /* The following makes sure that we get one string,
 	       with no sub lists. */

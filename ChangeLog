@@ -1,5 +1,8 @@
 2002-03-13  David N. Welton  <davidw@dedasys.com>
 
+	* src/TclWebapache.c (TclWeb_GetVar): Make sure to compare all of
+	the variable key.
+
 	* src/mod_rivet.c (Rivet_InitTclStuff): Moved creation of "rivet"
 	AssocData here.
 
