@@ -6,10 +6,10 @@ exec tclsh "$0" "$@"
 
 # See README file for more information.
 
-# $Id$ 
+# $Id$
 
 package require tcltest
-package require http 2.1
+package require http
 
 set urlbase "http://localhost:8080/"
 

@@ -1,4 +1,11 @@
+2002-01-08  David N. Welton  <davidw@dedasys.com>
+
+	* tests/makeconf.tcl (makeconf): Added a command to copy over the
+	    init.tcl file to the testing directory.  It would probably be
+	    best to copy the whole directory, though.
+
 2002-01-08  Damon J. Courtney <damon@unreality.com>
+
 	* src/channel.c
 	    Just a text change.
 
@@ -53,6 +60,14 @@
 
 	* rivet/rivet-tcl/parray.tcl
 	    Added 'parray' command to rivet-tcl/.
+
+2002-01-07  David N. Welton  <davidw@dedasys.com>
+
+	* General: Renamed some more commands so that Rivet may be run
+	alongside mod_dtcl.
+
+	* src/mod_rivet.c (get_parse_exec_file): Oops - change httpd-tcl
+	to httpd-rivet in strcmp.
 
 2002-01-06  David N. Welton  <davidw@dedasys.com>
 

@@ -1,16 +1,16 @@
-#!/usr/bin/tclsh
-
+# Make configuration files by interacting with Apache.
+# $Id$
 
 # the modules we need and their '.c' names
 array set module_assoc {
-    mod_log_config	config_log_module 
-    mod_mime		mime_module 
-    mod_negotiation	negotiation_module 
-    mod_dir		dir_module 
-    mod_access		access_module 
+    mod_log_config	config_log_module
+    mod_mime		mime_module
+    mod_negotiation	negotiation_module
+    mod_dir		dir_module
+    mod_access		access_module
     mod_auth		auth_module
-}    
-    
+}
+
 # get the modules that adre compiled into Apache directly, and return
 # the _module name.  Check also for the existence of mod_so, which we
 # need to load mod_rivet.so in the directory above...
@@ -48,11 +48,11 @@ proc gethttpdconf { binname } {
     if { ! [ file exists $filename ] } {
 	# see if we can find something by combining HTTP_ROOT + SERVER_CONFIG_FILE
 	regexp {HTTPD_ROOT="(.*?)"} "$options" match httpdroot
-	set completename "$httpdroot/$filename"
+	set completename [file join $httpdroot $filename]
 	if { ! [ file exists $completename ] } {
 	    puts stderr "neither '$filename' or '$completename' exists"
 	    exit 1
-	} 
+	}
 	return $completename
     }
     return $filename
@@ -102,6 +102,13 @@ proc determinemodules { binname } {
     }
 }
 
+# copy the rivet init files.
+
+proc copyinit { } {
+    file copy -force [file join .. rivet init.tcl] rivet
+}
+
+
 # dump out a config
 
 proc makeconf { binname outfile } {
@@ -109,16 +116,17 @@ proc makeconf { binname outfile } {
 
     # replace with determinemodules
     set LOADMODULES [ determinemodules $binname ]
-    
+
     set fl [ open "template.conf.tcl" r ]
     set template [ read $fl ]
     close $fl
 
     set out [ subst $template ]
-    
+
     set of [ open $outfile w ]
     puts $of "$out"
     close $of
+    copyinit
 }
 #makeconf [ getbinname ]
 #puts [ determinemodules $binname ]

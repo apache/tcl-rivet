@@ -17,7 +17,7 @@ source [ file join . buildscripts parsetclConfig.tcl ]
 # add variables
 
 set APACHE "/usr/include/apache-1.3"
-set INC "-I $APACHE/include"
+set INC "-I$APACHE"
 set STATICLIB mod_rivet.a
 set SHLIB "mod_rivet[ info sharedlibextension ]"
 set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS -c"
