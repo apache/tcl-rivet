@@ -12,6 +12,7 @@
 #include "TclWeb.h"
 
 typedef struct _TclWebRequest {
+    Tcl_Interp *interp;
     int header_sent;
     Tcl_HashTable *headers;
     int status;

@@ -70,7 +70,7 @@ int TclWeb_GetCookie(Tcl_Obj *list, TclWebRequest *req);
 
 int TclWeb_GetCGIVars(Tcl_Obj *list, TclWebRequest *req);
 
-int TclWeb_GetEnvVars(Tcl_Obj *list, TclWebRequest *req);
+int TclWeb_GetEnvVars(Tcl_HashTable *envs, TclWebRequest *req);
 
 /* upload stuff goes here */
 

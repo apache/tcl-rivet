@@ -1,3 +1,18 @@
+2002-01-18  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_LoadAuth): New command to load
+	authorization information in its own array.
+
+	* src/TclWebcgi.c: New file for stand-alone implementations of
+	common web API.
+
+	* src/TclWebapache.c: New file for apache-based implementations of
+	web API.
+
+	* src/TclWeb.c: Common code for TclWeb API.
+
+	* src/TclWeb.h: TclWeb web interaction API.
+
 2002-01-11  Damon J. Courtney <damon@unreality.com>
 
 	* src/make.tcl
