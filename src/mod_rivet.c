@@ -251,6 +251,8 @@ Rivet_GetRivetFile(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 	Tcl_SetStringObj(outbuf, "namespace eval request {\n", -1);
 	if (rsc->rivet_before_script) {
 	    Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
+ap_log_error( APLOG_MARK, APLOG_ERR, r->server,
+		Tcl_GetStringFromObj( rsc->rivet_before_script, NULL ) );
 	}
 	Tcl_AppendToObj(outbuf, "puts \"", -1);
     }
@@ -651,7 +653,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
 
     /* Initialize the interpreter with Rivet's Tcl commands */
-    Rivet_Init( interp );
+    Rivet_InitCore( interp );
 
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables( interp, p );
@@ -721,7 +723,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	{
 	    myrsc->server_interp = Tcl_CreateSlave(interp,
 						    sr->server_hostname, 0);
-	    Rivet_Init( myrsc->server_interp );
+	    Rivet_InitCore( myrsc->server_interp );
 	    Tcl_SetChannelOption(myrsc->server_interp, *(rsc->outchannel),
 				    "-buffering", "none");
 	    Tcl_RegisterChannel(myrsc->server_interp, *(rsc->outchannel));
@@ -729,6 +731,80 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 
 	myrsc->server_name = ap_pstrdup(p, sr->server_hostname);
 	sr = sr->next;
+    }
+}
+
+static void
+Rivet_AppendToScript( rivet_server_conf *rsc, char *script, char *string )
+{
+    Tcl_Obj *objarg;
+
+    if( STREQU( script, "GlobalInitScript" ) ) {
+	if( rsc->rivet_global_init_script == NULL ) {
+	    objarg = Tcl_NewStringObj( string, -1 );
+	    Tcl_IncrRefCount( objarg );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	    rsc->rivet_global_init_script = objarg;
+	} else {
+	    objarg = rsc->rivet_global_init_script;
+	    Tcl_AppendToObj( objarg, string, -1 );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	}
+    } else if( STREQU( script, "ChildInitScript" ) ) {
+	if( rsc->rivet_child_init_script == NULL ) {
+	    objarg = Tcl_NewStringObj( string, -1 );
+	    Tcl_IncrRefCount( objarg );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	    rsc->rivet_child_init_script = objarg;
+	} else {
+	    objarg = rsc->rivet_child_init_script;
+	    Tcl_AppendToObj( objarg, string, -1 );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	}
+    } else if( STREQU( script, "ChildExitScript" ) ) {
+	if( rsc->rivet_child_exit_script == NULL ) {
+	    objarg = Tcl_NewStringObj( string, -1 );
+	    Tcl_IncrRefCount( objarg );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	    rsc->rivet_child_exit_script = objarg;
+	} else {
+	    objarg = rsc->rivet_child_exit_script;
+	    Tcl_AppendToObj( objarg, string, -1 );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	}
+    } else if( STREQU( script, "BeforeScript" ) ) {
+	if( rsc->rivet_before_script == NULL ) {
+	    objarg = Tcl_NewStringObj( string, -1 );
+	    Tcl_IncrRefCount( objarg );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	    rsc->rivet_before_script = objarg;
+	} else {
+	    objarg = rsc->rivet_before_script;
+	    Tcl_AppendToObj( objarg, string, -1 );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	}
+    } else if( STREQU( script, "AfterScript" ) ) {
+	if( rsc->rivet_after_script == NULL ) {
+	    objarg = Tcl_NewStringObj( string, -1 );
+	    Tcl_IncrRefCount( objarg );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	    rsc->rivet_after_script = objarg;
+	} else {
+	    objarg = rsc->rivet_after_script;
+	    Tcl_AppendToObj( objarg, string, -1 );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	}
+    } else if( STREQU( script, "ErrorScript" ) ) {
+	if( rsc->rivet_error_script == NULL ) {
+	    objarg = Tcl_NewStringObj( string, -1 );
+	    Tcl_IncrRefCount( objarg );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	    rsc->rivet_error_script = objarg;
+	} else {
+	    objarg = rsc->rivet_error_script;
+	    Tcl_AppendToObj( objarg, string, -1 );
+	    Tcl_AppendToObj( objarg, "\n", 1 );
+	}
     }
 }
 
@@ -752,7 +828,6 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 static const char *
 Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 {
-    Tcl_Obj *objarg;
     server_rec *s = cmd->server;
     rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
 
@@ -761,35 +836,17 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
     }
 
     if( STREQU( var, "GlobalInitScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rsc->rivet_global_init_script = objarg;
+	Rivet_AppendToScript( rsc, var, val );
     } else if( STREQU( var, "ChildInitScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rsc->rivet_child_init_script = objarg;
+	Rivet_AppendToScript( rsc, var, val );
     } else if( STREQU( var, "ChildExitScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rsc->rivet_child_exit_script = objarg;
+	Rivet_AppendToScript( rsc, var, val );
     } else if( STREQU( var, "BeforeScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rsc->rivet_before_script = objarg;
+	Rivet_AppendToScript( rsc, var, val );
     } else if( STREQU( var, "AfterScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rsc->rivet_after_script = objarg;
+	Rivet_AppendToScript( rsc, var, val );
     } else if( STREQU( var, "ErrorScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rsc->rivet_error_script = objarg;
+	Rivet_AppendToScript( rsc, var, val );
     } else if( STREQU( var, "CacheSize" ) ) {
 	*(rsc->cache_size) = strtol( val, NULL, 10 );
     } else if( STREQU( var, "UploadDirectory" ) ) {
@@ -811,7 +868,6 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
     }
 
     ap_table_set( rsc->rivet_server_vars, var, val );
-
     return( NULL );
 }
 
@@ -827,31 +883,19 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 static const char *
 Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
-    Tcl_Obj *objarg;
-
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetDirConf requires two arguments";
     }
 
     if( STREQU( var, "BeforeScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rdc->rivet_before_script = objarg;
+	Rivet_AppendToScript( rdc, var, val );
     } else if( STREQU( var, "AfterScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rdc->rivet_after_script = objarg;
+	Rivet_AppendToScript( rdc, var, val );
     } else if( STREQU( var, "ErrorScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rdc->rivet_error_script = objarg;
+	Rivet_AppendToScript( rdc, var, val );
     } else if( STREQU( var, "UploadDirectory" ) ) {
 	rdc->upload_dir = val;
     }
-
     ap_table_set( rdc->rivet_dir_vars, var, val );
     return( NULL );
 }
@@ -867,27 +911,16 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 static const char *
 Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
-    Tcl_Obj *objarg;
-
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetUserConf requires two arguments";
     }
 
     if( STREQU( var, "BeforeScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rdc->rivet_before_script = objarg;
+	Rivet_AppendToScript( rdc, var, val );
     } else if( STREQU( var, "AfterScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rdc->rivet_after_script = objarg;
+	Rivet_AppendToScript( rdc, var, val );
     } else if( STREQU( var, "ErrorScript" ) ) {
-	objarg = Tcl_NewStringObj(val, -1);
-	Tcl_IncrRefCount(objarg);
-	Tcl_AppendToObj(objarg, "\n", 1);
-	rdc->rivet_error_script = objarg;
+	Rivet_AppendToScript( rdc, var, val );
     }
 
     ap_table_set( rdc->rivet_user_vars, var, val );
