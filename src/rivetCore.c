@@ -103,9 +103,6 @@ Rivet_Include(
 {
     int sz;
     Tcl_Channel fd;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc =
-	RIVET_SERVER_CONF( globals->r->server->module_config );
     Tcl_Obj *outobj;
 
     if (objc != 2)
@@ -133,7 +130,7 @@ Rivet_Include(
 	Tcl_DecrRefCount(outobj);
 	return TCL_ERROR;
     }
-    Tcl_WriteObj(*(rsc->outchannel), outobj);
+    Tcl_WriteObj(Tcl_GetChannel(interp, "stdout", NULL), outobj);
     Tcl_DecrRefCount(outobj);
     return Tcl_Close(interp, fd);
 }

@@ -1,3 +1,8 @@
+2002-01-28  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_Include): Get channel via Tcl_GetChannel
+	instead of through the apache config structure.
+
 2002-01-27  David N. Welton  <davidw@dedasys.com>
 
 	* tests/parse.test: Added test for 'parse' command.
