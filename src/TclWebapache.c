@@ -555,7 +555,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
     rivet_server_conf *rsc = NULL;
 
     rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
-    /* this sucks - we should use the hook, but I want to
+    /* This sucks - we should use the hook, but I want to
        get everything fixed and working first */
     if (rsc->upload_files_to_var)
     {

@@ -100,6 +100,7 @@ TCL_CMD_HEADER( Rivet_UnescapeStringCmd )
     *newStringP = '\0';
 
     Tcl_SetObjResult( interp, Tcl_NewStringObj( newString, -1 ) );
+    Tcl_Free(newString);
     return TCL_OK;
 }
 
@@ -171,6 +172,7 @@ TCL_CMD_HEADER( Rivet_EscapeStringCmd )
     *newStringP = '\0';
 
     Tcl_SetObjResult( interp, Tcl_NewStringObj( newString, -1 ) );
+    Tcl_Free(newString);
     return TCL_OK;
 }
 
@@ -253,6 +255,7 @@ TCL_CMD_HEADER( Rivet_EscapeSgmlCharsCmd )
     *newStringP = '\0';
 
     Tcl_SetObjResult( interp, Tcl_NewStringObj( newString, -1 ) );
+    Tcl_Free(newString);
     return TCL_OK;
 }
 
@@ -302,6 +305,7 @@ TCL_CMD_HEADER( Rivet_EscapeShellCommandCmd )
     *newStringP = '\0';
 
     Tcl_SetObjResult( interp, Tcl_NewStringObj( newString, -1 ) );
+    Tcl_Free(newString);
     return TCL_OK;
 }
 

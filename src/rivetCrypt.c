@@ -65,6 +65,7 @@ TCL_CMD_HEADER( Rivet_EncryptCmd )
     }
 
     Tcl_SetObjResult( interp, Tcl_NewStringObj( resultBuffer, -1 ) );
+    Tcl_Free(resultBuffer);
     return TCL_OK;
 }
 
@@ -92,6 +93,7 @@ TCL_CMD_HEADER( Rivet_DecryptCmd )
     }
 
     Tcl_SetObjResult( interp, Tcl_NewStringObj( resultBuffer, -1 ) );
+    Tcl_Free(resultBuffer);
     return TCL_OK;
 }
 

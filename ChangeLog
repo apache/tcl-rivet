@@ -1,4 +1,18 @@
+2003-03-27  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetWWW.c (Rivet_UnescapeStringCmd): Free memory allocated
+	with Tcl_Alloc.
+	(Rivet_EscapeStringCmd): Free memory allocated with Tcl_Alloc.
+	(Rivet_EscapeSgmlCharsCmd): Free memory allocated with Tcl_Alloc.
+	(Rivet_EscapeShellCommandCmd): Free memory allocated with Tcl_Alloc.
+
+	* src/rivetCrypt.c (Rivet_DecryptCmd): Free memory allocated with
+	Tcl_Alloc.
+	(Rivet_EncryptCmd): Free memory allocated with Tcl_Alloc.
+
 2003-03-26  David N. Welton  <davidw@dedasys.com>
+
+	* Remove index.html and help.html.
 
 	* rivet/pkgIndex.tcl: Added index file for RivetTcl package -
 	i.e. init.tcl.
