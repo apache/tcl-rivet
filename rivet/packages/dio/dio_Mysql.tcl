@@ -100,11 +100,9 @@ namespace eval DIO {
 	}
 
 	method handle {} {
-	    if {[info exists conn]} {
-		return $conn
-	    } else {
-		return ""
-	    }
+	    if {![info exists conn]} { open }
+
+	    return $conn
 	}
 
 	public variable db "" {

@@ -98,11 +98,8 @@ namespace eval DIO {
 	# case, the postgres connection handle
 	#
 	method handle {} {
-	    if {[info exists conn]} {
-		return $conn
-	    } else {
-		return ""
-	    }
+	    if {![info exists conn]} { open }
+	    return $conn
 	}
 
 	## If they change DBs, we need to close the connection and re-open it.
