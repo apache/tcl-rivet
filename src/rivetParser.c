@@ -89,13 +89,14 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     if (toplevel) {
 	Tcl_SetStringObj(outbuf, "namespace eval request {\n", -1);
     } else {
-	outbuf = Tcl_NewStringObj("", -1);
+	Tcl_SetStringObj(outbuf, "", -1);
     }
     Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
 
     inbuf = Tcl_NewObj();
     Tcl_IncrRefCount(inbuf);
     sz = Tcl_ReadChars(rivetfile, inbuf, -1, 0);
+
     Tcl_Close(req->interp, rivetfile);
     if (sz == -1)
     {

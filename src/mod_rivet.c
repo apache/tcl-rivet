@@ -208,11 +208,11 @@ Rivet_ParseExecFile(TclWebRequest *req, rivet_server_conf *rsc,
 	if (toplevel && rsc->rivet_before_script) {
 	    Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
 	}
-	if( STREQU( req->req->content_type, "application/x-httpd-rivet") || !toplevel )
+	if( STREQU( req->req->content_type, "application/x-httpd-rivet")
+	    || !toplevel )
 	{
-	    /* It's a Rivet file - which we always are if toplevel is 0,
-	     * meaning we are in the Parse command.
-	     */
+	    /* toplevel == 0 means we are being called from the parse
+	     * command, which only works on Rivet .rvt files. */
 	    result = Rivet_GetRivetFile(filename, toplevel, outbuf, req);
 	} else {
 	    /* It's a plain Tcl file */

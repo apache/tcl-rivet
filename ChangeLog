@@ -1,5 +1,7 @@
 2002-01-27  David N. Welton  <davidw@dedasys.com>
 
+	* tests/parse.test: Added test for 'parse' command.
+
 	* src/mod_rivet.c (Rivet_ParseExecFile): Moved the addition of
 	before and after scripts to this file, so that GetRivetFile is
 	independant of any Apache specific code.
