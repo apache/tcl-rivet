@@ -1,3 +1,12 @@
+2004-12-03  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * rivet/packages/dio/dio.tcl: Cause fatal database errors such
+	  as bad syntax, etc, to raise a Tcl error in many methods that
+	  used to just return 1 or 0 (like DIO store).
+
+	  Make the DIO insert method not require a list of fields, for
+	  compatibility with DIO store.
+
 2004-12-02  David N. Welton  <davidw@dedasys.com>
 
 	* Removed libtool - it appears to be under the GPL!
