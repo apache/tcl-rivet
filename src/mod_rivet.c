@@ -158,7 +158,7 @@ Rivet_PrintError(request_rec *r, int htmlflag, char *errstr)
 
 /* Function to convert strings to UTF encoding */
 char *
-StringToUtf(char *input, ap_pool *pool)
+Rivet_StringToUtf(char *input, ap_pool *pool)
 {
     char *temp;
     Tcl_DString dstr;
@@ -341,7 +341,7 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
 /* This is a seperate function so that it may be called from 'Parse' */
 int
-get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
+Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
 			char *filename, int toplevel)
 {
     char *hashKey = NULL;
@@ -585,7 +585,7 @@ Rivet_SendContent(request_rec *r)
     }
 #endif /* USE_ONLY_UPLOAD_COMMAND == 1 */
 
-    get_parse_exec_file(r, rsc, r->filename, 1);
+    Rivet_ParseExecFile(r, rsc, r->filename, 1);
     /* reset globals  */
     *(rsc->headers_printed) = 0;
     *(rsc->headers_set) = 0;
@@ -609,7 +609,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     rsc->server_interp = interp; /* root interpreter */
 
     /* Create TCL commands to deal with Apache's BUFFs. */
-    *(rsc->outchannel) = Tcl_CreateChannel(&ApacheChan, "apacheout", rsc,
+    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc,
 					    TCL_WRITABLE);
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);

@@ -36,11 +36,11 @@ Rivet_MakeURL(
     Tcl_Obj *CONST objv[])
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    
+
     if (objc != 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
-	return TCL_ERROR;	
+	return TCL_ERROR;
     }
     Tcl_SetResult(interp,
 	ap_construct_url(POOL, Tcl_GetString(objv[1]), globals->r), NULL);
@@ -61,26 +61,26 @@ Rivet_Parse(
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc =
 	RIVET_SERVER_CONF( globals->r->server->module_config );
-    
+
     if (objc != 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;
     }
-    
+
     filename = Tcl_GetStringFromObj (objv[1], (int *)NULL);
     if (!strcmp(filename, globals->r->filename))
     {
 	Tcl_AddErrorInfo(interp, "Cannot recursively call the same file!");
 	return TCL_ERROR;
     }
-    
+
     if (stat(filename, &finfo))
     {
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
 	return TCL_ERROR;
     }
-    if (get_parse_exec_file(globals->r, rsc, filename, 0) == TCL_OK)
+    if (Rivet_ParseExecFile(globals->r, rsc, filename, 0) == TCL_OK)
 	return TCL_OK;
     else
 	return TCL_ERROR;
@@ -498,7 +498,7 @@ Rivet_Var(
            on... */
 	for (i = 0; i < parmsarray->nelts; ++i)
 	{
-	    if (!strncmp(key, StringToUtf(parms[i].key, POOL), strlen(key)))
+	    if (!strncmp(key, Rivet_StringToUtf(parms[i].key, POOL), strlen(key)))
 	    {
 		/* The following makes sure that we get one string,
                    with no sub lists. */
@@ -531,7 +531,7 @@ Rivet_Var(
         /* This isn't real efficient - move to hash table later on. */
 	for (i = 0; i < parmsarray->nelts; ++i)
 	{
-	    if (!strncmp(key, StringToUtf(parms[i].key, POOL), strlen(key)))
+	    if (!strncmp(key, Rivet_StringToUtf(parms[i].key, POOL), strlen(key)))
 	    {
 		result = Tcl_NewIntObj(1);
 		Tcl_IncrRefCount(result);
@@ -555,7 +555,7 @@ Rivet_Var(
         /* This isn't real efficient - move to hash table later on. */
 	for (i = 0; i < parmsarray->nelts; ++i)
 	{
-	    if (!strncmp(key, StringToUtf(parms[i].key, POOL), strlen(key)))
+	    if (!strncmp(key, Rivet_StringToUtf(parms[i].key, POOL), strlen(key)))
 	    {
 		if (result == NULL)
 		{
@@ -799,7 +799,7 @@ Rivet_Upload(
 		    Tcl_SetStringObj(result, "", -1);
 	    } else if (!strcmp(infotype, "filename")) {
 		Tcl_SetStringObj(result,
-				StringToUtf(upload->filename, POOL), -1);
+				Rivet_StringToUtf(upload->filename, POOL), -1);
 	    } else {
 		Tcl_AddErrorInfo(interp,"unknown upload info command, should "
 			"be exists|size|type|filename");

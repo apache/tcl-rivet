@@ -1,16 +1,13 @@
 /* Testing code for C routines. */
 /* $Id$ */
 
+/* Use this as a place to more directly test C routines, without going
+ * to the trouble of installing/compiling the whole thin in mod_rivet,
+ * and using with Apache. */
+
+
 #include <tcl.h>
 #include "httpd.h"
-
-
-
-
-
-
-
-
 
 int
 Rivet_Parser_Test
@@ -36,7 +33,7 @@ Rivet_Parser_Test
 	return TCL_ERROR;
     }
     outbuf = Tcl_NewStringObj("", 0);
-    Rivet_Parser(outbuf, testfile); //, "<?", "?>");
+    Rivet_Parser(outbuf, testfile);
     return TCL_OK;
 }
 
@@ -48,13 +45,9 @@ Cleanup
     int objc,
     Tcl_Obj *CONST objv[])
 {
-    struct stat foo;
-    printf("size of stat __pad1 is %d\n", sizeof(foo.__pad1));
     printf("cleaning up\n");
     return TCL_OK;
 }
-
-//extern void _init (void), etext (void);
 
 int
 Testing_Init(Tcl_Interp *interp)
@@ -63,8 +56,6 @@ Testing_Init(Tcl_Interp *interp)
 			 (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
     Tcl_CreateObjCommand(interp, "cleanup", Cleanup,
 			 (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-
-
     Tcl_PkgProvide(interp, "rivettesting", "1.0");
     return TCL_OK;
 }

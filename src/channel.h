@@ -10,5 +10,5 @@ extern int setoptionproc(ClientData, Tcl_Interp *, char *, char *);
 extern void watchproc(ClientData, int);
 extern int gethandleproc(ClientData, int, ClientData *);
 
-extern Tcl_ChannelType ApacheChan;
+extern Tcl_ChannelType RivetChan;
 

@@ -60,7 +60,7 @@ gethandleproc(ClientData instancedata, int direction, ClientData *handlePtr)
     return TCL_ERROR;
 }
 
-Tcl_ChannelType ApacheChan = {
+Tcl_ChannelType RivetChan = {
     "apache_channel",
     NULL,
     closeproc,

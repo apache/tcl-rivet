@@ -80,15 +80,15 @@ typedef struct {
     ApacheRequest *req;         /* libapreq request  */
 } rivet_interp_globals;
 
-int get_parse_exec_file(request_rec *r, rivet_server_conf *rsc, char *filename, int toplevel);
+int Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc, char *filename, int toplevel);
 int Rivet_SetHeaderType(request_rec *, char *);
 int Rivet_PrintHeaders(request_rec *);
 int Rivet_PrintError(request_rec *, int, char *);
-char *StringToUtf(char *input, ap_pool *pool);
+char *Rivet_StringToUtf(char *input, ap_pool *pool);
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
 /* Macro to Tcl Objectify StringToUtf stuff */
-#define STRING_TO_UTF_TO_OBJ(string, pool) Tcl_NewStringObj(StringToUtf(string, pool), -1)
+#define STRING_TO_UTF_TO_OBJ(string, pool) Tcl_NewStringObj(Rivet_StringToUtf(string, pool), -1)
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 
