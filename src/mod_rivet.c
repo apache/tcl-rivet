@@ -158,21 +158,6 @@ print_error(request_rec *r, int htmlflag, char *errstr)
     return 0;
 }
 
-/* Make sure that everything in the output buffer has been flushed. */
-int
-flush_output_buffer(request_rec *r)
-{
-    rivet_server_conf *rsc = Rivet_GetConf(r);
-    if (Tcl_DStringLength(rsc->buffer) != 0)
-    {
-	ap_rwrite(Tcl_DStringValue(rsc->buffer),
-		    Tcl_DStringLength(rsc->buffer), r);
-	Tcl_DStringInit(rsc->buffer);
-    }
-    *(rsc->content_sent) = 1;
-    return 0;
-}
-
 /* Function to convert strings to UTF encoding */
 char *
 StringToUtf(char *input, ap_pool *pool)
@@ -337,7 +322,7 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
 
         print_headers(r);
-        flush_output_buffer(r);
+	Tcl_Flush(*(conf->outchannel));
         if (errscript)
         {
 	    if (Tcl_EvalObj(interp, errscript) == TCL_ERROR)
@@ -354,7 +339,7 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     } else {
         /* Make sure to flush the output if buffer_add was the only output */
         print_headers(r);
-        flush_output_buffer(r);
+	Tcl_Flush(*(conf->outchannel));
     }
     return OK;
 }
@@ -608,7 +593,6 @@ Rivet_SendContent(request_rec *r)
 
     get_parse_exec_file(r, rsc, r->filename, 1);
     /* reset globals  */
-    *(rsc->buffer_output) = 0;
     *(rsc->headers_printed) = 0;
     *(rsc->headers_set) = 0;
     *(rsc->content_sent) = 0;
@@ -635,7 +619,8 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 					    TCL_WRITABLE);
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
-    Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffering", "none");
+/*     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffering", "none");  */
+     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
 
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
     if (interp == NULL)
@@ -907,11 +892,9 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->objCache = oldrsc->objCache;
     newrsc->namespacePrologue = oldrsc->namespacePrologue;
 
-    newrsc->buffer_output = oldrsc->buffer_output;
     newrsc->headers_printed = oldrsc->headers_printed;
     newrsc->headers_set = oldrsc->headers_set;
     newrsc->content_sent = oldrsc->content_sent;
-    newrsc->buffer = oldrsc->buffer;
     newrsc->outchannel = oldrsc->outchannel;
 }
 
@@ -943,16 +926,12 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->objCache = ap_pcalloc(p, sizeof(Tcl_HashTable));
     rsc->namespacePrologue = NULL;
 
-    rsc->buffer_output = ap_pcalloc(p, sizeof(int));
     rsc->headers_printed = ap_pcalloc(p, sizeof(int));
     rsc->headers_set = ap_pcalloc(p, sizeof(int));
     rsc->content_sent = ap_pcalloc(p, sizeof(int));
-    *(rsc->buffer_output) = 0;
     *(rsc->headers_printed) = 0;
     *(rsc->headers_set) = 0;
     *(rsc->content_sent) = 0;
-    rsc->buffer = ap_pcalloc(p, sizeof(Tcl_DString));
-    Tcl_DStringInit(rsc->buffer);
     rsc->outchannel = ap_pcalloc(p, sizeof(Tcl_Channel));
     return rsc;
 }

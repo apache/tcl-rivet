@@ -66,11 +66,9 @@ typedef struct {
     Tcl_Obj *namespacePrologue; /* initial bit of Tcl for namespace creation */
 
     /* stuff for buffering output */
-    int *buffer_output;     /* Start with output buffering off */
     int *headers_printed; 	/* has the header been printed yet? */
     int *headers_set;       /* has the header been set yet? */
     int *content_sent;      /* make sure something gets sent */
-    Tcl_DString *buffer;
     Tcl_Channel *outchannel;
 } rivet_server_conf;
 
@@ -86,7 +84,6 @@ int get_parse_exec_file(request_rec *r, rivet_server_conf *rsc, char *filename, 
 int set_header_type(request_rec *, char *);
 int print_headers(request_rec *);
 int print_error(request_rec *, int, char *);
-int flush_output_buffer(request_rec *);
 char *StringToUtf(char *input, ap_pool *pool);
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 

@@ -2,8 +2,8 @@
 # $Id$
 # rivet page used with Rivet's rivet1-test
 
-load_env ENVS
-load_cookies COOKIES
+load_env 
+load_cookies 
 
 headers setcookie -name mod -value rivet -expires 01-01-2003 
 

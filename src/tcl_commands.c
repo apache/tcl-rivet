@@ -873,9 +873,8 @@ Rivet_NoBody(
 
     if (*(rsc->content_sent) == 1)
 	return TCL_ERROR;
-
-    print_headers(globals->r);
-    Tcl_DStringInit(rsc->buffer);
+    
+    *(rsc->content_sent) = 1;
     return TCL_OK;
 }
 

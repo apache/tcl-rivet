@@ -17,22 +17,26 @@ inputproc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
 }
 
 /* This is the output 'method' for the Memory Buffer Tcl 'File'
-   Channel that we create to divert stdout to */
+   Channel that we create to divert stdout to. */
 
 static int
 outputproc(ClientData instancedata, char *buf, int toWrite, int *errorCodePtr)
 {
     rivet_server_conf *rsc = (rivet_server_conf *)instancedata;
-    Tcl_DStringAppend(rsc->buffer, buf, toWrite);
+    rivet_interp_globals *globals = Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
+
+    print_headers(globals->r);
+    if (*(rsc->content_sent) == 0)
+    {
+	ap_rwrite(buf, toWrite, globals->r);
+	ap_rflush(globals->r);
+    }
     return toWrite;
 }
 
 static int
 closeproc(ClientData instancedata, Tcl_Interp *interp)
 {
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    print_headers(globals->r);
-    flush_output_buffer(globals->r);
     return 0;
 }
 
@@ -67,5 +71,8 @@ Tcl_ChannelType ApacheChan = {
     NULL,
     watchproc,
     gethandleproc,
+    NULL,
+    NULL,
+    NULL,
     NULL
 };
