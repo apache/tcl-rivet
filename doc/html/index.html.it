@@ -1,0 +1,32 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.60.1"><link rel="home" href="index.html.it" title="Apache Rivet"><link rel="next" href="installation.html.it" title="Installazione di Apache Rivet"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Apache Rivet</th></tr><tr><td width="20%" align="left"> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="installation.html.it"><img src="images/next.png" alt="Avanti"></a></td></tr></table></div><div class="article" lang="it"><div class="titlepage"><div><div><h1 class="title"><a name="id5336180"></a>Apache Rivet</h1></div><div><div class="author"><h3 class="author"><span class="firstname">David</span> <span class="surname">Welton</span></h3><div class="affiliation"><div class="address"><p><br>
+	  <tt class="email">&lt;<a href="mailto:davidw@apache.org">davidw@apache.org</a>&gt;</tt><br>
+	</p></div></div></div></div><div><div class="author"><h3 class="author"><span class="firstname">Damon</span> <span class="surname">Courtney</span></h3><div class="affiliation"><div class="address"><p><br>
+	  <tt class="email">&lt;<a href="mailto:damonc@apache.org">damonc@apache.org</a>&gt;</tt><br>
+	</p></div></div></div></div><div><p class="othercredit"><span class="contrib">Italian Translation</span>: <span class="firstname">Fabio</span> <span class="surname">Zanotti</span></p><div class="affiliation"><span class="orgname">Italian Linux Documentation Project<br></span><div class="address"><p><tt class="email">&lt;<a href="mailto:zendune@virgilio.it">zendune@virgilio.it</a>&gt;</tt></p></div></div></div><div><p class="copyright">Copyright © 2002, 2003 Apache Software Foundation</p></div></div><div></div><hr></div><div class="toc"><p><b>Sommario</b></p><dl><dt><a href="index.html.it#id5393782">Introduzione ad Apache Rivet</a></dt><dt><a href="installation.html.it">Installazione di Apache Rivet</a></dt><dt><a href="directives.html.it">Direttive di Apache</a></dt><dt><a href="commands.html.it">Comandi e variabili Tcl di Rivet</a></dt><dt><a href="examples.html.it">Esempi ed uso</a></dt><dt><a href="tcl_packages.html.it">Pacchetti Tcl per Rivet</a></dt><dt><a href="help.html.it">Risorse - Come ottenere aiuto</a></dt><dd><dl><dt><a href="help.html.it#id5396771">Mailing Lists</a></dt><dt><a href="help.html.it#id5396818">Newsgroup</a></dt><dt><a href="help.html.it#websites">Siti Web</a></dt><dt><a href="help.html.it#id5396936">Bug Tracking System</a></dt></dl></dd><dt><a href="internals.html.it">Rivet Internals</a></dt><dd><dl><dt><a href="internals.html.it#id5396988">Inizializzazione</a></dt><dt><a href="internals.html.it#id5397028">RivetChan</a></dt><dt><a href="internals.html.it#id5397063">Parsing delle pagine, Esecuzione e Cacheing</a></dt></dl></dd><dt><a href="upgrading.html.it">Aggiornamenti da mod_dtcl o NeoWebScript</a></dt><dd><dl><dt><a href="upgrading.html.it#id5396174">mod_dtcl</a></dt><dt><a href="upgrading.html.it#id5396194">NeoWebScript</a></dt></dl></dd></dl></div><p style="width:90%">
+    Questo documento è anche disponibile nelle seguenti lingue: <a href="index.html.en" target="_top">Inglese</a>, <a href="index.html.ru" target="_top">Russo</a>
+  </p><p style="width:90%">Questo documento e` basato sulla versione 1.27 dell'originale
+  in inglese.</p><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="id5393782"></a>Introduzione ad Apache Rivet</h2></div></div><div></div></div><p style="width:90%">
+      Apache Rivet è un sistema per la creazione di contenuti web
+      dinamici mediante un linguaggio di programmazione integrato con
+      il Web Server Apache . È progettato per essere veloce, 
+      potente ed estensibile, utilizza poche risorse, è facile da 
+      imparare e fornisce all'utente una piattaforma che può pure 
+      essere utilizzata con altri programmi per lavori da eseguire 
+      fuori dal web (GUI, compiti di amministrazione di sistema, 
+      elaboratori di testo, gestori di database, XML e così via). 
+      Per ottenere questi risultati, è stato scelto il linguaggio 
+      di programmazione Tcl da utilizzare unitamente al 
+      Web Server Apache.
+    </p><p style="width:90%">
+      Con questo manuale aspiriamo ad aiutarvi ad iniziare ed a 
+      farvi scrivere codice di produzione il più velocemente 
+      possibile, dandovi un'idea di come ottenere grandi vantaggi 
+      dall'architettura Rivet, finalizzati alla realizzazione di 
+      diverse tipologie di siti web.
+    </p><p style="width:90%">
+      Questa documentazione è un lavoro in corso e, come ogni cosa
+      riguardante Apache Rivet, è Software Libero. Se vedete qualche
+      sezione che necessita di miglioramenti ed avete idee o 
+      suggerimenti al riguardo, non esitate a farcelo sapere. Se 
+      volete contribuire direttamente, meglio ancora!
+    </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="installation.html.it"><img src="images/next.png" alt="Avanti"></a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"> </td><td width="40%" align="right" valign="top"> Installazione di Apache Rivet</td></tr></table></div></body></html>
