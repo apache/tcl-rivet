@@ -1,0 +1,27 @@
+# $Id$
+
+set testfilename1 post.ttml
+
+::tcltest::test postvariables-1.1 {POST variables} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" -query foobar=goober ]
+    regexp -line {^\[var get foobar\] = goober$} [ ::http::data $page ] match
+    set match
+} {[var get foobar] = goober}
+
+::tcltest::test postvariables-1.2 {POST variables + I18N} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" -query Más=Tú ]
+    regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
+    set match
+} {[var get Más] = Tú}
+
+::tcltest::test postvariables-1.3 {POST variables + I18N + encoding} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" -query [ ::http::formatQuery Más Tú ] ]
+    regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
+    set match
+} {[var get Más] = Tú}
+
+::tcltest::test multivariables-1.1 {multiple variables: foo=1&foo=2} {
+    set page [ ::http::geturl "${urlbase}$testfilename1?foobar=1&foobar=2&foobar=foo+bar" ]
+    regexp -line {^\[var get foobar\] = 1 2 foo bar$} [ ::http::data $page ] match
+    set match
+} {[var get foobar] = 1 2 foo bar}

@@ -1,0 +1,16 @@
+# $Id$
+
+set testfilename1 hello.ttml
+
+::tcltest::test hello-1.1 {hello world test} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" ]
+    regexp -line {^Hello, World$} [ ::http::data $page ] match
+    set match
+} {Hello, World}
+
+::tcltest::test i18n-1.1 {I18N test} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" ]
+    regexp -line {^¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!$} [ ::http::data $page ] match
+    set match
+} {¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!}
+

@@ -1,0 +1,9 @@
+<?
+
+# hello-1.1
+puts "Hello, World\n"
+
+# i18n-1.1
+puts "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!\n"
+
+?>

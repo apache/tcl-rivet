@@ -1,0 +1,18 @@
+HTML
+<?
+no_body
+puts "foo"
+?>
+MORE HTML
+<?
+puts bar
+#headers set Foo Bar
+
+flush stdout
+
+#headers set Bee Bop
+
+after 2000
+puts stdout baz
+?>
+LAST HTML

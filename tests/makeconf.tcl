@@ -1,14 +1,5 @@
 #!/usr/bin/tclsh
 
-proc getbinname { } {
-    global argv
-    set binname [ lindex $argv 0 ]
-    if { $binname == "" || ! [ file exists $binname ] } {
-	puts stderr "Please supply the full name and path of the Apache executable on the command line!"
-	exit 1
-    }
-    return $binname
-}
 
 # the modules we need and their '.c' names
 array set module_assoc {

@@ -1,0 +1,41 @@
+# $Id$
+
+set testfilename1 cookies.ttml
+
+::tcltest::test cookies-1.1 {Cookies} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "foo=bar"} ]
+    regexp -line {^cookies\(foo\) = bar$} [ ::http::data $page ] match
+    set match
+} {cookies(foo) = bar}
+
+::tcltest::test cookies-1.2 {Cookies + I18N} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "Más=Tú"} ]
+    regexp -line {^cookies\(Más\) = Tú$} [ ::http::data $page ] match
+    set match
+} {cookies(Más) = Tú}
+
+::tcltest::test cookies-1.3 {Cookies + I18N + encoding} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" -headers [ list Cookie [ ::http::formatQuery Más Tú ] ] ]
+    regexp -line {^cookies\(Más\) = Tú$} [ ::http::data $page ] match
+    set match
+} {cookies(Más) = Tú}
+
+::tcltest::test cookies-1.4 {Multiple Cookies} {
+    set rslt 0
+    set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "bop; foo=bar;doo=wah; shoo=be ;doooo=bee;dot=dow  "} ]
+    set pgdata [ ::http::data $page ]
+    incr rslt [ regexp -line {^cookies\(foo\) = bar$} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(doo\) = wah} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(shoo\) = be} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(doooo\) = bee} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(dot\) = dow$} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(bop\) = } $pgdata ]
+} 6
+
+::tcltest::test servercookies-1.1 {Cookies from Server} {
+    set rslt 0
+    set page [ ::http::geturl "${urlbase}$testfilename1" ]
+    upvar 0 $page state
+    array set statehash $state(meta)
+    regexp -line {mod=rivet; path=[^;]*; expires=01-01-2003} $statehash(Set-Cookie)
+} 1

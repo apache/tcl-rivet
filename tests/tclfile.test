@@ -1,0 +1,7 @@
+# $Id$
+
+::tcltest::test tclfile-1.1 {Plain .tcl file} {
+    set page [ ::http::geturl "${urlbase}tclfile.tcl" ]
+    set pgdata [string trim [ ::http::data $page ] ]
+} "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!"
+

@@ -1,0 +1,13 @@
+<?
+
+load_cookies 
+
+headers setcookie -name mod -value rivet -expires 01-01-2003 
+
+if { [ array exists cookies ] } {
+    foreach { ck } [ array names cookies ]  {
+        puts "cookies($ck) = $cookies($ck)\n"
+    }
+}
+
+?>
