@@ -1,3 +1,7 @@
+2004-12-14  David N. Welton  <davidw@dedasys.com>
+
+	* doc/Makefile.am: Added html doc targets.
+
 2004-12-08  David N. Welton  <davidw@dedasys.com>
 
 	* Makefile.am, configure.ac: Added the doc/ directory.

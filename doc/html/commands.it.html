@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Comandi e variabili Tcl di Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.64.1"><link rel="home" href="index.it.html" title="Apache Rivet"><link rel="up" href="index.it.html" title="Apache Rivet"><link rel="previous" href="directives.it.html" title="Direttive di Apache"><link rel="next" href="examples.it.html" title="Esempi ed uso"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Comandi e variabili Tcl di Rivet</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="directives.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="examples.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr></table></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="commands"></a>Comandi e variabili Tcl di Rivet</h2></div></div><div></div></div><div class="variablelist"><dl><dt><span class="term">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Comandi e variabili Tcl di Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.66.1"><link rel="start" href="index.it.html" title="Apache Rivet"><link rel="up" href="index.it.html" title="Apache Rivet"><link rel="prev" href="directives.it.html" title="Direttive di Apache"><link rel="next" href="examples.it.html" title="Esempi ed uso"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Comandi e variabili Tcl di Rivet</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="directives.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="examples.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr></table></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="commands"></a>Comandi e variabili Tcl di Rivet</h2></div></div></div><div class="variablelist"><dl><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Il comando <span style="font-family:monospace"><span><b class="command">var</b></span></span> recupera le informazioni
@@ -12,7 +12,7 @@
 	    ottenendo rispettivamente la querystring 
 	    (?foo=bar&amp;bee=bop) o la POSTing.
 	  </div><div class="variablelist"><dl><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">get</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">get</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Ritorna il valore della variabile
 		  <i class="replaceable"><tt>varname</tt></i>
@@ -22,23 +22,23 @@
 	<i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i>,
 		  altrimenti viene ritornato "" (una stringa vuota).
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">list</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">list</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce il valore della variabile
 		  <i class="replaceable"><tt>varname</tt></i> come
 		  una lista, se vi sono valori multipli.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">exists</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">exists</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce 1 se
 		  <i class="replaceable"><tt>varname</tt></i>
 		  esiste, 0 se non lo è.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">number</span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">number</span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce il numero di variabili.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">all</span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">all</span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce una lista di nomi di variabili e valori.
 		</div></div></dd></dl></div><div style="margin-bottom:1.5ex ; padding .5ex">
@@ -49,42 +49,42 @@
 	  caricamento dei file. Vedete le principali direttive di Apache 
 	  per altri tipi di configurazioni del funzionamento di questa 
 	  caratteristica di Rivet. </div><div class="variablelist"><dl><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">channel</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">channel</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Quando date il nome ad un file caricato,
 		  <i class="replaceable"><tt>uploadname</tt></i>
 		  restituisce un canale Tcl che può essere usato per
 		  accedere allo stesso file.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">save</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">save</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Salva 
 		  <i class="replaceable"><tt>uploadname</tt></i> nel
 		  file
 		  <i class="replaceable"><tt>filename</tt></i>.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">data</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">data</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce i dati caricati dal server. Questo è il
 		  binario pulito. In altre parole, potrà lavorare
 		  anche con file come immagini, eseguibili, compressi 
 		  e così via.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">size</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">size</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce la dimensione del file caricato.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">type</span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">type</span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Se il <tt class="varname">Content-type</tt> è impostato, viene
 		  restituito il valore, altrimenti una stringa vuota.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">filename</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">filename</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Viene restituito il nome del file dell'host remoto 
 		  che ha caricato il file.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">names</span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">names</span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce i nomi delle variabili, in una lista, di
 		  tutti i file caricati.
@@ -102,7 +102,7 @@
 	    precisare il nome dell'array per più utenti, va bene
 	    accedervi tramite env.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_headers</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span></div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_headers</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Carica gli header che provengono dalla richiesta di un
 	    client all'interno del nome dell'array indicato, o usa
@@ -115,13 +115,13 @@
 	    dell'array indicato. Utilizza l'array
 	    cookies come valore predefinito.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">include</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename_name</tt></i></span></div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">include</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename_name</tt></i></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Include un file senza analizzarlo per processare i tag &lt;?
 	    e ?&gt;.  Questo è il metodo migliore per includere un file 
 	    HTML o qualsiasi altro contenuto statico.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parse</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span></div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parse</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Come il comando Tcl <span style="font-family:monospace"><span><b class="command">source</b></span></span>, ma analizza
 	    pure i tag di elaborazione per Rivet  &lt;? e ?&gt;.
@@ -133,20 +133,20 @@
 	    Il comando <span style="font-family:monospace"><span><b class="command">headers</b></span></span> è per l'assegnazione e
 	    l'elaborazione di header HTTP.
 	  </div><div style="margin-bottom:1.5ex ; padding .5ex">
-	    <div class="variablelist"><dl><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">set</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span></div></div>
+	    <div class="variablelist"><dl><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">set</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Assegna in modo discrezionale i valori ed i nomi
 		    agli header.
 		  </div></div></dd><dt><span class="term">
-		  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">redirect</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uri</tt></i></span></div></div>
+		  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">redirect</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uri</tt></i></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Redirige dalla pagina corrente ad un nuovo URI.
 		    <span class="emphasis"><em>Questo</em></span> viene fatto nel primo
 		    blocco di codice Tcl.
 		  </div></div></dd><dt><span class="term">
-                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">add</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span></div></div>
+                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">add</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
                 </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Aggiunge testo all'header
-		  <tt class="varname">headername</tt>.</div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">type</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>content-type</tt></i></span></div></div>
+		  <tt class="varname">headername</tt>.</div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">type</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>content-type</tt></i></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Questo comando assegna l'header
 		    <tt class="constant">Content-type</tt> ritornato dallo
@@ -154,12 +154,12 @@
 		    altri contenuti oltre all'HTML (PNG o immagini
 		    jpeg, per esempio).
 		  </div></div></dd><dt><span class="term">
-                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">numeric</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>response code</tt></i></span></div></div>
+                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">numeric</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>response code</tt></i></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Assegna un codice di risposta numerico, come per
 		  esempio 200, 404 o 500.
 		  </div></div></dd></dl></div>
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span></div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Crea una URL di riferimento a se stesso dal nome di un file.
 	    Per esempio:
