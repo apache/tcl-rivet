@@ -70,6 +70,12 @@ int rivet_parser(Tcl_Obj *outbuf, FILE *openfile)
 		/* or else just put the char in outbuf  */
 		switch (c)
 		{
+		case '{':
+		    Tcl_DStringAppend(&dstr, "\\{", -1);
+		    break;
+		case '}':
+		    Tcl_DStringAppend(&dstr, "\\}", -1);
+		    break;
 		case '$':
 		    Tcl_DStringAppend(&dstr, "\\$", -1);
 		    break;

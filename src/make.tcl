@@ -24,7 +24,11 @@ set OBJECTS "apache_cookie.o apache_request.o mod_rivet.o tcl_commands.o apache_
 
 # ------------
 
-Verbose
+# Verbose
+
+# AddNode adds a compile target
+# depends lists the nodes on which it depends
+# command is the command to compile
 
 AddNode apache_cookie.o {
     depends "apache_cookie.c apache_cookie.h"
