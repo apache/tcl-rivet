@@ -496,7 +496,8 @@ static int send_content(request_rec *r)
     }
 #endif
 
-    ApacheRequest___parse(globals->req);
+    if ((errstatus = ApacheRequest___parse(globals->req)) != OK)
+	return errstatus;
 
     /* take results and create tcl variables from them */
 #if USE_ONLY_VAR_COMMAND == 0
