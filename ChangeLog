@@ -1,3 +1,24 @@
+2002-01-08  Damon J. Courtney <damon@unreality.com>
+	* src/mod_rivet.h
+	    Added RIVET_NEW_CONF macro to create a new rivet_server_conf.
+
+	* src/mod_rivet.c
+	    Added Rivet_MergeDirConfig to merge directory configurations.
+
+	    Fixed bug where RivetDirConf was giving erroneous information.
+
+2002-01-08  Damon J. Courtney <damon@unreality.com>
+
+	* tests/makeconf.tcl
+	    Went ahead and copied over the entire rivet directory.
+
+	* tests/rivet.test
+	    Changed the default port to 8081.
+
+	* tests/template.conf.tcl
+	    Changed the default port to 8081.
+	    Removed access.conf and srm.conf.
+
 2002-01-08  David N. Welton  <davidw@dedasys.com>
 
 	* tests/makeconf.tcl (makeconf): Added a command to copy over the

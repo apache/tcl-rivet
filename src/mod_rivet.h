@@ -54,8 +54,9 @@ typedef struct {
     int seperate_virtual_interps;
     char *server_name;
     char *upload_dir;
-    table *rivet_dir_vars;
     table *rivet_server_vars;
+    table *rivet_dir_vars;
+    table *rivet_user_vars;
 
     char **objCacheList;   /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache; /* Objects cache - the key is the script name */
@@ -89,6 +90,8 @@ rivet_server_conf *Rivet_GetConf(request_rec *r);
 #define STRING_TO_UTF_TO_OBJ(string, pool) Tcl_NewStringObj(Rivet_StringToUtf(string, pool), -1)
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
+
+#define RIVET_NEW_CONF(p) (rivet_server_conf *)ap_pcalloc(p, sizeof(rivet_server_conf))
 
 #define STREQU(s1, s2) (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 

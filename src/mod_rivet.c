@@ -416,6 +416,52 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
     return TCL_OK;
 }
 
+static void
+Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
+{
+    table *t;
+    array_header *arr;
+    table_entry  *elts;
+    int i, nelts;
+
+    /* Make sure RivetDirConf doesn't exist from a previous request. */
+    Tcl_UnsetVar( interp, "RivetDirConf", TCL_GLOBAL_ONLY );
+
+    /* Propagate all of the DirConf variables into an array. */
+    t = rsc->rivet_dir_vars;
+    arr   = ap_table_elts( t );
+    elts  = (table_entry *)arr->elts;
+    nelts = arr->nelts;
+
+    for( i = 0; i < nelts; ++i )
+    {
+	Tcl_ObjSetVar2(interp,
+		       Tcl_NewStringObj("RivetDirConf", -1),
+		       Tcl_NewStringObj( elts[i].key, -1),
+		       Tcl_NewStringObj( elts[i].val, -1),
+		       TCL_GLOBAL_ONLY);
+    }
+
+    /* Make sure RivetUserConf doesn't exist from a previous request. */
+    Tcl_UnsetVar( interp, "RivetUserConf", TCL_GLOBAL_ONLY );
+
+    /* Propagate all of the UserConf variables into an array. */
+    t = rsc->rivet_user_vars;
+    arr   = ap_table_elts( t );
+    elts  = (table_entry *)arr->elts;
+    nelts = arr->nelts;
+
+    for( i = 0; i < nelts; ++i )
+    {
+	Tcl_ObjSetVar2(interp,
+		       Tcl_NewStringObj("RivetUserConf", -1),
+		       Tcl_NewStringObj( elts[i].key, -1),
+		       Tcl_NewStringObj( elts[i].val, -1),
+		       TCL_GLOBAL_ONLY);
+    }
+
+}
+
 /* Set things up to execute a file, then execute */
 static int
 Rivet_SendContent(request_rec *r)
@@ -428,11 +474,14 @@ Rivet_SendContent(request_rec *r)
 
     rivet_interp_globals *globals = NULL;
     rivet_server_conf *rsc = NULL;
+    rivet_server_conf *rdc;
     rsc = Rivet_GetConf(r);
     globals = ap_pcalloc(r->pool, sizeof(rivet_interp_globals));
     globals->r = r;
     interp = rsc->server_interp;
     Tcl_SetAssocData(interp, "rivet", NULL, globals);
+
+    rdc = RIVET_SERVER_CONF( r->per_dir_config );
 
     r->allowed |= (1 << M_GET);
     r->allowed |= (1 << M_POST);
@@ -462,6 +511,8 @@ Rivet_SendContent(request_rec *r)
     ap_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
     ap_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
     ap_chdir_file(r->filename);
+
+    Rivet_PropagatePerDirConfArrays( interp, rdc );
 
     if (Tcl_EvalObj(interp, rsc->request_init) == TCL_ERROR)
     {
@@ -494,11 +545,6 @@ Rivet_SendContent(request_rec *r)
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
-
-    /* Unset the RivetUserConf array so that the next request gets a new,
-     * clean array.
-     */
-    Tcl_UnsetVar( interp, "RivetUserConf", TCL_GLOBAL_ONLY );
 
     /* Reset globals */
     *(rsc->headers_printed) = 0;
@@ -546,7 +592,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, pool *p )
 }
 
 static void
-Rivet_PropagateConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
+Rivet_PropagateServerConfArray( Tcl_Interp *interp, rivet_server_conf *rsc )
 {
     table *t;
     array_header *arr;
@@ -563,21 +609,6 @@ Rivet_PropagateConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     {
 	Tcl_ObjSetVar2(interp,
 		       Tcl_NewStringObj("RivetServerConf", -1),
-		       Tcl_NewStringObj( elts[i].key, -1),
-		       Tcl_NewStringObj( elts[i].val, -1),
-		       TCL_GLOBAL_ONLY);
-    }
-
-    /* Propagate all of the DirConf variables into an array. */
-    t = rsc->rivet_dir_vars;
-    arr   = ap_table_elts( t );
-    elts  = (table_entry *)arr->elts;
-    nelts = arr->nelts;
-
-    for( i = 0; i < nelts; ++i )
-    {
-	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj("RivetDirConf", -1),
 		       Tcl_NewStringObj( elts[i].key, -1),
 		       Tcl_NewStringObj( elts[i].val, -1),
 		       TCL_GLOBAL_ONLY);
@@ -625,7 +656,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables( interp, p );
 
-    Rivet_PropagateConfArrays( interp, rsc );
+    Rivet_PropagateServerConfArray( interp, rsc );
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
     if( Tcl_EvalFile( interp, ap_server_root_relative(p, RIVET_INIT) )
@@ -678,7 +709,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	/* This should set up slave interpreters for other virtual hosts */
 	if (sr != s) /* not the first one  */
 	{
-	    myrsc = ap_pcalloc(p, sizeof(rivet_server_conf));
+	    myrsc = RIVET_NEW_CONF(p);
 	    ap_set_module_config(sr->module_config, &rivet_module, myrsc);
 	    Rivet_CopyConfig( rsc, myrsc );
 	    if (rsc->seperate_virtual_interps != 0)
@@ -797,8 +828,6 @@ static const char *
 Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
     Tcl_Obj *objarg;
-    server_rec *s = cmd->server;
-    rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
 
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetDirConf requires two arguments";
@@ -823,7 +852,7 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 	rdc->upload_dir = val;
     }
 
-    ap_table_set( rsc->rivet_dir_vars, var, val );
+    ap_table_set( rdc->rivet_dir_vars, var, val );
     return( NULL );
 }
 
@@ -839,9 +868,6 @@ static const char *
 Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
     Tcl_Obj *objarg;
-    server_rec *s = cmd->server;
-    rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
-    Tcl_Interp *interp = rsc->server_interp;
 
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetUserConf requires two arguments";
@@ -864,20 +890,7 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 	rdc->rivet_error_script = objarg;
     }
 
-    /* Set the variables in a Tcl array so that we can use them in Tcl-level
-     * code but also so the user can access them.
-     *
-     * We do this here instead of setting another table of variables like
-     * rivet_server_vars and rivet_dir_vars because user variables can
-     * change without a reboot of the server.  By setting them here, we
-     * always insure that the array is being generated with each page load.
-     */
-    Tcl_ObjSetVar2(interp,
-		   Tcl_NewStringObj("RivetUserConf", -1),
-		   Tcl_NewStringObj( var, -1),
-		   Tcl_NewStringObj( val, -1),
-		   TCL_GLOBAL_ONLY);
-
+    ap_table_set( rdc->rivet_user_vars, var, val );
     return( NULL );
 }
 
@@ -896,8 +909,7 @@ Rivet_GetConf( request_rec *r )
 
     rdc = RIVET_SERVER_CONF( dconf );
 
-    newconfig = (rivet_server_conf *) ap_pcalloc(r->pool,
-						    sizeof(rivet_server_conf));
+    newconfig = RIVET_NEW_CONF( r->pool );
     newconfig->server_interp = rsc->server_interp;
 
     Rivet_CopyConfig( rsc, newconfig );
@@ -951,8 +963,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 static void *
 Rivet_CreateConfig( pool *p, server_rec *s )
 {
-    rivet_server_conf *rsc =
-	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
+    rivet_server_conf *rsc = RIVET_NEW_CONF(p);
 
     rsc->server_interp = NULL;
     rsc->rivet_global_init_script = NULL;
@@ -985,8 +996,9 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     *(rsc->content_sent) = 0;
     rsc->outchannel = ap_pcalloc(p, sizeof(Tcl_Channel));
 
-    rsc->rivet_dir_vars = ap_make_table( p, 4 );
     rsc->rivet_server_vars = ap_make_table( p, 4 );
+    rsc->rivet_dir_vars = ap_make_table( p, 4 );
+    rsc->rivet_user_vars = ap_make_table( p, 4 );
 
     return rsc;
 }
@@ -994,20 +1006,43 @@ Rivet_CreateConfig( pool *p, server_rec *s )
 void *
 Rivet_CreateDirConfig(pool *p, char *dir)
 {
-    rivet_server_conf *rdc =
-	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
+    rivet_server_conf *rdc = RIVET_NEW_CONF(p);
 
-    rdc->rivet_dir_vars = ap_make_table( p, 4 );
     rdc->rivet_server_vars = ap_make_table( p, 4 );
+    rdc->rivet_dir_vars = ap_make_table( p, 4 );
+    rdc->rivet_user_vars = ap_make_table( p, 4 );
 
     return rdc;
 }
 
 void *
+Rivet_MergeDirConfig( pool *p, void *basev, void *addv )
+{
+    rivet_server_conf *base = (rivet_server_conf *)basev;
+    rivet_server_conf *add  = (rivet_server_conf *)addv;
+    rivet_server_conf *new  = RIVET_NEW_CONF(p);
+
+    /* Merge the allowed directory options. */
+    new->rivet_before_script = add->rivet_before_script ?
+	add->rivet_before_script : base->rivet_before_script;
+    new->rivet_after_script = add->rivet_after_script ?
+	add->rivet_after_script : base->rivet_after_script;
+    new->rivet_error_script = add->rivet_error_script ?
+	add->rivet_error_script : base->rivet_error_script;
+
+    /* Merge the tables of dir and user variables. */
+    new->rivet_dir_vars =
+	ap_overlay_tables( p, base->rivet_dir_vars, add->rivet_dir_vars );
+    new->rivet_user_vars =
+	ap_overlay_tables( p, base->rivet_user_vars, add->rivet_user_vars );
+
+    return new;
+}
+
+void *
 Rivet_MergeConfig(pool *p, void *basev, void *overridesv)
 {
-    rivet_server_conf *rsc =
-	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
+    rivet_server_conf *rsc = RIVET_NEW_CONF(p);
     rivet_server_conf *base = (rivet_server_conf *) basev;
     rivet_server_conf *overrides = (rivet_server_conf *) overridesv;
 
@@ -1100,7 +1135,7 @@ const handler_rec rivet_handlers[] =
 const command_rec rivet_cmds[] =
 {
     {"RivetServerConf", Rivet_ServerConf, NULL, RSRC_CONF, TAKE2, NULL},
-    {"RivetDirConf", Rivet_DirConf, NULL, RSRC_CONF, TAKE2, NULL},
+    {"RivetDirConf", Rivet_DirConf, NULL, ACCESS_CONF, TAKE2, NULL},
     {"RivetUserConf", Rivet_UserConf, NULL, ACCESS_CONF|OR_FILEINFO, TAKE2,
      "RivetUserConf key value: sets RivetUserConf(key) = value"},
     {NULL}
@@ -1111,7 +1146,7 @@ module MODULE_VAR_EXPORT rivet_module =
     STANDARD_MODULE_STUFF,
     Rivet_InitHandler,		/* initializer */
     Rivet_CreateDirConfig,	/* dir config creater */
-    NULL,                       /* dir merger --- default is to override */
+    Rivet_MergeDirConfig,       /* dir merger --- default is to override */
     Rivet_CreateConfig,         /* server config */
     Rivet_MergeConfig,          /* merge server config */
     rivet_cmds,                 /* command table */
