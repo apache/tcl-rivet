@@ -19,6 +19,17 @@ namespace eval ::Rivet {
 	}
     }
 
+    proc handle_error {} {
+	global errorInfo
+	global errorOutbuf
+
+	puts <PRE>
+	puts "<HR>$errorInfo<HR>"
+	puts "<P><B>OUTPUT BUFFER:</B></P>"
+	puts $errorOutbuf
+	puts </PRE>
+    }
+
     ###
     ## This routine gets called each time a request is finished.  Any kind
     ## of special cleanup can be placed here.

@@ -1,4 +1,15 @@
 2002-03-13  Damon J. Courtney <damon@unreality.com>
+
+	* src/mod_rivet.c
+	    Cleaned up the error handling a little.  There was a really nasty
+	    bug that if the ErrorScript was defined, it wouldn't actually
+	    error out.  This had something to do with the header output and
+	    flush being before the ErrorScript was executed.
+
+	* rivet/init.tcl
+	    Changed the default error handler to a Tcl proc.
+
+2002-03-13  Damon J. Courtney <damon@unreality.com>
 	* src/make.tcl
 	* src/TclWebapache.c
 	    Cleaned up the remainder of the compiler warnings.
