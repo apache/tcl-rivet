@@ -22,4 +22,8 @@ Work in progress:
 
 *) Documentation
 
+*) Installation
 
+Platform                  Tcl Version  Ok?
+--------                  -----------  ---
+Debian testing/unstable   Tcl 8.4      Yes
