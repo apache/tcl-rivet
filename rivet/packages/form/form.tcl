@@ -15,11 +15,14 @@ package provide form 1.0
 	    array set DefaultValues [array get defaults]
 	    unset arguments(DEFAULTS)
 	}
-	start
     }
 
     destructor {
 
+    }
+
+    method destroy {} {
+	::itcl::delete object $this
     }
 
     protected method import_data {type name arrayName list} {
@@ -81,6 +84,7 @@ package provide form 1.0
 
     method end {} {
 	puts "</FORM>"
+	destroy
     }
 
     method field {type name args} {
@@ -134,13 +138,17 @@ package provide form 1.0
 	eval field checkbox $name $args
     }
 
+    method radio {name args} {
+	eval field radio $name $args
+    }
+
     method radiobuttons {name args} {
 	set list [import_data radiobuttons $name data $args]
 	if {![info exists data(VALUES)]} {
 	    return -code error "No -values specified for radiobuttons"
 	}
 	foreach value $data(VALUES) {
-	    eval field radio $name $list -value $value
+	    eval radio $name $list -value $value
 	}
     }
 
@@ -172,6 +180,12 @@ package provide form 1.0
 	    unset data(VALUE)
 	}
 	puts "<TEXTAREA NAME=\"$name\" [argstring data]>$value</TEXTAREA>"
+    }
+
+    public variable defaults "" {
+	upvar 1 $defaults array
+	unset array
+	array set DefaultValues [array get array]
     }
 
     private variable DefaultValues
