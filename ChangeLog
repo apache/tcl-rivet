@@ -1,4 +1,22 @@
+2002-09-29  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Reworked several elements to better utilize
+	docbook.
+
+	* doc/rivet.xsl: Major reworking of several elements, including
+	group and arg.  Added lots of style changes.
+
+	* src/make.tcl: Add commands and dependencies to build extensions
+	documents without chunks, and the main Rivet docs in chunks
+	(seperate HTML files are output).
+
+	* doc/rivet.xml: Updated docs to reflect new Apache directives.
+
 2002-09-27  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_InitTclStuff): Change default CacheSize
+	to MaxRequestsPerChild / 5, which should still be plenty, but will
+	waste less space.
 
 	* src/rivetCore.c (Rivet_Include): "include" command now saves
 	channel encoding/translation, outputs the included file to stdout

@@ -66,7 +66,11 @@ set TCL_LIBS "$TCL_LIBS -lcrypt"
 
 set XML_DOCS [glob [file join .. doc packages * *].xml]
 set HTML_DOCS [string map {.xml .html} $XML_DOCS]
+set HTML "[file join .. doc html]/"
+set XSLNOCHUNK [file join .. doc rivet-nochunk.xsl]
+set XSLCHUNK [file join .. doc rivet-chunk.xsl]
 set XSL [file join .. doc rivet.xsl]
+set XML [file join .. doc rivet.xml]
 
 # ------------
 
@@ -202,8 +206,8 @@ AddNode install {
 foreach doc $HTML_DOCS {
     set xml [string map {.html .xml} $doc]
     AddNode $doc {
-	depends "$XSL $xml"
-	sh "xsltproc --nonet -o $doc $XSL $xml"
+	depends "$XSLNOCHUNK $xml"
+	sh "xsltproc --nonet -o $doc $XSLNOCHUNK $xml"
     }
 }
 
@@ -227,7 +231,8 @@ AddNode distclean {
 # Create the HTML documentation from the XML document.
 
 AddNode distdoc {
-    depends "$XSL $HTML_DOCS"
+    depends "$XML $XSL $HTML_DOCS"
+    sh "xsltproc --nonet -o $HTML $XSLCHUNK $XML"
 }
 
 # Create the distribution.  This is a bit unix-specific for the

@@ -6,9 +6,6 @@
 <article>
   <articleinfo>
     <title>Apache Rivet</title>
-    <releaseinfo>
-      $Id$
-    </releaseinfo>
     <copyright>
       <year>2002</year>
       <holder>Apache Software Foundation</holder>
@@ -16,6 +13,10 @@
     <author>
       <firstname>David</firstname>
       <surname>Welton</surname>
+    </author>
+    <author>
+      <firstname>Damon</firstname>
+      <surname>Courtney</surname>
     </author>
   </articleinfo>
 
@@ -51,9 +52,9 @@
 	<para>
 	  Download the sources at <ulink
 	    url="http://tcl.apache.org/rivet/download"/>.  Currently
-	    the only way to obtain Rivet.  In the future, we hope to
-	    have a FreeBSD port, Debian package, RPM's, and windows
-	    binaries.
+	  the only way to obtain Rivet.  In the future, we hope to
+	  have a FreeBSD port, Debian package, RPM's, and windows
+	  binaries.
 	</para>
       </step>
       <step performance="optional">
@@ -62,7 +63,7 @@
 	  If you don't have them, or if you want to build Rivet as a
 	  static (built in) part of the Apache web server, you need
 	  the source code to Apache, which is available from <ulink
-	  url="http://httpd.apache.org/"/>.  Otherwise, you don't need
+	    url="http://httpd.apache.org/"/>.  Otherwise, you don't need
 	  to perform this step.  Infact, we recommend that you build
 	  Rivet as a shared object, and therefore, build it seperately
 	  from Apache.
@@ -74,10 +75,10 @@
 	  We will assume that you have Apache installed at this point.
 	  You must uncompress the Rivet sources in the directory where you
 	  wish to compile them.
-	  <programlisting>
-	    gunzip tcl-rivet-X.X.X.tar.gz
-	    tar -xvf tcl-rivet-X.X.X.tar.gz
-	  </programlisting>
+
+	  <programlisting>gunzip tcl-rivet-X.X.X.tar.gz
+tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
+
 	</para>
       </step>
       <step>
@@ -102,10 +103,10 @@
 	  <step>
 	    <para>At this point, you are ready to run the build
 	      system:</para>
-	    <programlisting>
-	      cd src/
-	      ./make.tcl <replaceable>option</replaceable>
-	    </programlisting>
+
+	    <programlisting>cd src/
+./make.tcl <replaceable>option</replaceable></programlisting>
+
 	    <para>where <replaceable>option</replaceable> can be
 	      either <option>shared</option> or
 	      <option>static</option>.
@@ -131,19 +132,19 @@
 	  Rivet is relatively easy to configure - we start off by
 	  adding the module itself:
 	</para>
-	<programlisting>
-	  LoadModule rivet_module <replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable>
-	</programlisting>
+
+	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable></programlisting>
+
 	<para>
 	  This tells Apache to load the Rivet shared object, wherever
 	  it happens to reside on your file system.  Now we have to
 	  tell Apache what kind of files are "Rivet" files and how to
 	  process them:
 	</para>
-	<programlisting>
-	  AddType application/x-httpd-rivet .rvt
-	  AddType application/x-rivet-tcl .tcl
-	</programlisting>
+
+	<programlisting>AddType application/x-httpd-rivet .rvt
+AddType application/x-rivet-tcl .tcl</programlisting>
+
 	<para>
 	  These tell Apache to process files with the
 	  <filename>.rvt</filename> and <filename>.tcl</filename>
@@ -177,6 +178,7 @@
 	      <arg>ChildExitScript</arg>
 	      <arg>BeforeScript</arg>
 	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
 	      <arg>UploadDirectory</arg>
 	      <arg>UploadMaxSize</arg>
 	      <arg>UploadFilesToVar</arg>
@@ -188,112 +190,249 @@
 	  <para><command>RivetServerConf</command> specifies a global
 	    option that is valid for the whole server.
 	  </para>
+	</listitem>
+	<listitem>
 	  <variablelist>
 	    <varlistentry>
 	      <term>
-		  <cmdsynopsis>
-		    <command>CacheSize</command>
-		    <arg><replaceable>size</replaceable></arg>
-		  </cmdsynopsis>
-		</term>
-		<listitem>
-		  <para>
-		    Sets the size of the internal page cache, where
-		    <option><replaceable>size</replaceable></option>
-		    is the number of byte-compiled pages to be cached
-		    for future use.
-		  </para>
-		</listitem>
-	      </varlistentry>
-	    </variablelist>
+		<cmdsynopsis>
+		  <arg>CacheSize</arg>
+		  <arg><replaceable>size</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Sets the size of the internal page cache, where
+		  <option><replaceable>size</replaceable></option> is
+		  the number of byte-compiled pages to be cached for
+		  future use.  Default is
+		  <command>MaxRequestsPerChild</command> / 5, or 50,
+		  if <command>MaxRequestsPerChild</command> is 0.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>GlobalInitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Tcl script that is run when each interpreter is
+		  initialized. <replaceable><option>script</option></replaceable>
+		  is an actual Tcl script, so to run a file, you would
+		  do:
+
+		  <programlisting>Rivet_Script GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>ChildInitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be evaluated when each Apache child
+		  process is initialized.  This is the recommended
+		  place to load modules, create global variables, open
+		  connections to other facilities (such as databases)
+		  and so on.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>ChildExitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be evaluated when each Apache child
+		  process exits.  This is the logical place to clean
+		  up resources created in
+		  <option>ChildInitScript</option>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>BeforeScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be evaluated before each server parsed
+		  (.rvt) page.  This can be used to create a standard
+		  header, for instance.  It could also be used to load
+		  code that you need for every page, if you don't want
+		  to put it in a <option>GlobalInitScript</option>
+		  <option>ChildInitScript</option> when you are first
+		  developing a web site.
+		  <note>
+		    This code is evaluated at the global level, not
+		    inside the request namespace where pages are
+		    evaluated.
+		  </note>
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>AfterScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be called after each server parsed (.rvt) page.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>ErrorScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  When Rivet encounters an error in a script, it
+		  constructs an HTML page with some information about
+		  the error, and the script that was being
+		  evaluated. If an <option>ErrorScript</option> is
+		  specified, it is possible to create custom error
+		  pages.  This may be useful if you want to make sure
+		  that users never view your source code.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>UploadDirectory</arg>
+		  <arg><replaceable>directory</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>Directory to place uploaded files.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>UploadMaxSize</arg>
+		  <arg><replaceable>size</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>Maximum size for uploaded files.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>UploadFilesToVar</arg>
+		  <group choice="req"><arg>yes</arg><arg>no</arg></group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  This option controls whether it is possible to
+		  upload files to a Tcl variable.  If you have a size
+		  limit, and don't have to deal with large files, this
+		  might be more convenient than sending the data to a
+		  file on disk.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>SeperateVirtualInterps</arg>
+		  <group choice="req">
+		    <arg>yes</arg>
+		    <arg>no</arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  If on, Rivet will create a seperate Tcl interpreter
+		  for each Apache virtual host.  This is useful in an
+		  ISP type situation where it is desirable to seperate
+		  clients into seperate interpreters, so that they
+		  don't accidentally interfere with one another.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
 	</listitem>
       </varlistentry>
+
       <varlistentry>
 	<term>
 	  <cmdsynopsis>
-	    <command>Rivet_Script</command>
-	    <arg>ChildInitScript</arg>
-	    <arg><replaceable>script</replaceable></arg>
+	    <command>RivetDirConf</command>
+	    <group choice="req">
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	    </group>
 	  </cmdsynopsis>
 	</term>
 	<listitem>
 	  <para>
-	    Script to be evaluated when each Apache child process is
-	    initialized.  This is the recommended place to load modules.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>Rivet_Script</command>
-	    <arg>ChildExitScript</arg>
-	    <arg><replaceable>script</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Script to be evaluated when each Apache child process exits.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>Rivet_Script</command>
-	    <arg>BeforeScript</arg>
-	    <arg><replaceable>script</replaceable></arg>
-	  </cmdsynopsis></term>
-	<listitem>
-	  <para>
-	    Script to be evaluated before each server parsed (.rvt) page.
+	    These options are the same as for
+	    <command>RivetServerConf</command>, except that they are
+	    only valid for the directory where they are specified, and
+	    its subdirectories.  It may be specified in
+	    <command>Directory</command> sections, as well as in
+	    <filename>.htaccess</filename> files.
 	  </para>
 	</listitem>
       </varlistentry>
 
-
       <varlistentry>
 	<term>
 	  <cmdsynopsis>
-	    <command>Rivet_Script</command>
-	    <arg>AfterScript</arg>
-	    <arg><replaceable>script</replaceable></arg>
-	  </cmdsynopsis></term>
-	<listitem>
-	  <para>
-	    Script to be called after each server parsed (.rvt) page.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>Rivet_Script</command>
-	    <arg>ErrorScript</arg>
-	    <arg><replaceable>script</replaceable></arg>
+	    <command>RivetUserConf</command>
+	    <group choice="req">
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	    </group>
 	  </cmdsynopsis>
 	</term>
 	<listitem>
 	  <para>
-	    This code is called in place of the standard 'error' pages
-	    generated for Rivet.  This directive may be useful if you
-	    have sensitive logic that you wish to protect.
-	  </para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>Rivet_CacheSize</command>
-	    <arg><replaceable>cachesize</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Number of rvt scripts to cache as Tcl Objects.  Default is
-	    <command>MaxRequestsPerChild</command> / 2, or 50, if
-	    <command>MaxRequestsPerChild</command> is 0.
+	    These options are the same as for
+	    <command>RivetServerConf</command>, except that they are
+	    only valid for the directory where they are specified, and
+	    its subdirectories.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -313,7 +452,8 @@
 	</term>
 	<listitem>
 	  <para>
-	    Returns the value of variable <option>varname</option> as a
+	    Returns the value of variable
+	    <option><replaceable>varname</replaceable></option> as a
 	    string (even if there are multiple values).
 	  </para>
 	</listitem>
@@ -329,8 +469,9 @@
 	</term>
 	<listitem>
 	  <para>
-	    Returns the value of variable <option>varname</option> as
-	    a list, if there are multiple values.
+	    Returns the value of variable
+	    <option><replaceable>varname</replaceable></option> as a
+	    list, if there are multiple values.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -345,8 +486,9 @@
 	</term>
 	<listitem>
 	  <para>
-	    Returns 1 if <option>varname</option> exists, 0 if it
-	    doesn't.
+	    Returns 1 if
+	    <option><replaceable>varname</replaceable></option>
+	    exists, 0 if it doesn't.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -493,22 +635,19 @@
     <example>
       <title>upload</title>
       The following HTML:
-      <programlisting>
-	&lt;form action="foo.ttml" enctypee="multipart/form-data"
-	method="post"&gt;
-	&lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
-	&lt;/form&gt;
-      </programlisting>
+
+      <programlisting>&lt;form action="foo.ttml" enctype="multipart/form-data"
+method="post"&gt;
+&lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
+&lt;/form&gt;</programlisting>
 
       Can be used with the following Tcl code in order to create a
       file upload form.
 
-      <programlisting>
-	upload save MyUpload /tmp/uploadfiles/file1
+      <programlisting>upload save MyUpload /tmp/uploadfiles/file1
+puts "Saved file [upload filename MyUpload]
+([upload size MyUploadto] bytes) to server"</programlisting>
 
-	puts "Saved file [upload filename MyUpload]
-	([upload size MyUploadto] bytes) to server"
-      </programlisting>
     </example>
 
     <variablelist>
@@ -621,18 +760,9 @@
 	    <arg><replaceable>cookie-name</replaceable></arg>
 	    <arg>-value</arg>
 	    <arg><replaceable>cookie-value</replaceable></arg>
-	    <group choice="opt">
-	      <arg>-expires</arg>
-	      <arg><replaceable>date/time</replaceable></arg>
-	    </group>
-	    <group choice="opt">
-	      <arg>-domain</arg>
-	      <arg><replaceable>domain</replaceable></arg>
-	    </group>
-	    <group choice="opt">
-	      <arg>-path</arg>
-	      <arg><replaceable>path</replaceable></arg>
-	    </group>
+	    <arg choice="opt">-expires <replaceable>date/time</replaceable></arg>
+	    <arg choice="opt">-domain <replaceable>domain</replaceable></arg>
+	    <arg choice="opt">-path <replaceable>path</replaceable></arg>
 	    <arg choice="opt">-secure</arg>
 	  </cmdsynopsis>
 	</term>
@@ -757,7 +887,7 @@
 	</listitem>
 	<listitem>
 	  <para>
-	    <ulink url="htt://wiki.tcl.tk"/> is the Tcl'ers Wiki, a
+	    <ulink url="http://wiki.tcl.tk"/> is the Tcl'ers Wiki, a
 	    free-form place to search for answers and ask for help.
 	  </para>
 	</listitem>
@@ -770,14 +900,14 @@
       <para>
 	Apache Rivet uses the Apache Bug Tracking system at <ulink
 	  url="http://nagoya.apache.org/bugzilla/"></ulink>.  Here,
-	  you can report problems, or check and see if existing issues
-	  are already known and being dealt with.
+	you can report problems, or check and see if existing issues
+	are already known and being dealt with.
       </para>
     </section>
 
   </section>
 
-  <section id="internals.html">
+  <section id="internals">
     <title>Rivet Internals</title>
     <para>
       This section easily falls out of date, as new code is added, old

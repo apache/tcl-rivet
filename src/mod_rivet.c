@@ -628,7 +628,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     if(*(rsc->cache_size) < 0)
     {
 	if (ap_max_requests_per_child != 0) {
-	    *(rsc->cache_size) = ap_max_requests_per_child / 2;
+	    *(rsc->cache_size) = ap_max_requests_per_child / 5;
 	} else {
 	    *(rsc->cache_size) = 10; /* FIXME: Arbitrary number */
 	}

@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"><title>Apache Rivet</title><meta name="generator" content="DocBook XSL Stylesheets V1.50.0"><link rel="home" href="index.html" title="Apache Rivet"><link rel="next" href="directives.html" title="Rivet Apache Directives"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Apache Rivet</th></tr><tr><td width="20%" align="left"> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="directives.html">Next</a></td></tr></table><hr></div><div class="article"><div class="titlepage"><div><h1 class="title"><a name="id5343475"></a>Apache Rivet</h1></div><div><div class="author"><h3 class="author">David Welton</h3></div></div><div><div class="author"><h3 class="author">Damon Courtney</h3></div></div><div><p class="copyright">Copyright © 2002 Apache Software Foundation</p></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><a href="index.html#id5341909">Apache Rivet Installation</a></dt><dt><a href="directives.html">Rivet Apache Directives</a></dt><dt><a href="commands.html">Rivet Tcl Commands and Variables</a></dt><dt><a href="help.html">Resources - How to Get Help</a></dt><dd><dl><dt><a href="help.html#id5347126">Mailing Lists</a></dt><dt><a href="help.html#id5347172">Web Sites</a></dt><dt><a href="help.html#id5347254">Bug Tracking System</a></dt></dl></dd><dt><a href="internals.html">Rivet Internals</a></dt><dd><dl><dt><a href="internals.html#id5347294">Initialization</a></dt><dt><a href="internals.html#id5347331">RivetChan</a></dt><dt><a href="internals.html#id5347360">Page Parsing, Execution and Cacheing</a></dt></dl></dd><dt><a href="upgrading.html">Upgrading from mod_dtcl or NeoWebScript</a></dt><dd><dl><dt><a href="upgrading.html#id5347439">mod_dtcl</a></dt><dt><a href="upgrading.html#id5347455">NeoWebScript</a></dt></dl></dd></dl></div><div class="section"><div class="titlepage"><div><hr><h2 class="title" style="clear: both"><a name="id5341909"></a>Apache Rivet Installation</h2></div></div><div class="procedure"><ol type="1"><li><p class="title"><b>Check Dependencies</b></p><p style="width:90%">
+	  To install Rivet, you will need Tcl 8.2 or greater and
+	  Apache 1.3.xx.  It is known to run on Linux, FreeBSD,
+	  OpenBSD, and Solaris and HPUX.  Windows NT is also possible
+	  - please see the directions in the distribution.
+	</p></li><li><p class="title"><b>Get Rivet</b></p><p style="width:90%">
+	  Download the sources at <a href="http://tcl.apache.org/rivet/download" target="_top">http://tcl.apache.org/rivet/download</a>.  Currently
+	  the only way to obtain Rivet.  In the future, we hope to
+	  have a FreeBSD port, Debian package, RPM's, and windows
+	  binaries.
+	</p></li><li><p class="title"><b>Get and Install Apache Sources</b></p><p style="width:90%">
+	  If you don't have them, or if you want to build Rivet as a
+	  static (built in) part of the Apache web server, you need
+	  the source code to Apache, which is available from <a href="http://httpd.apache.org/" target="_top">http://httpd.apache.org/</a>.  Otherwise, you don't need
+	  to perform this step.  Infact, we recommend that you build
+	  Rivet as a shared object, and therefore, build it seperately
+	  from Apache.
+	</p></li><li><p class="title"><b>Uncompress Sources</b></p><p style="width:90%">
+	  We will assume that you have Apache installed at this point.
+	  You must uncompress the Rivet sources in the directory where you
+	  wish to compile them.
+
+	  </p><div style="background:#bbffbb ; width:80ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">gunzip tcl-rivet-X.X.X.tar.gz
+tar -xvf tcl-rivet-X.X.X.tar.gz</div><p style="width:90%">
+
+	</p></li><li><p class="title"><b>Building Rivet</b></p><p style="width:90%">
+	  Rivet uses a unique build system which we created especially
+	  for this project.  It utilizes the information included in
+	  Apache and Tcl regarding their configurations, in order to
+	  compile itself via a series of Tcl scripts, which are
+	  located in the <tt>buildscripts/</tt> directory.
+	</p><ol type="a"><li><p class="title"><b>Edit src/make.tcl</b></p><p style="width:90%">
+	      It may be necessary to edit
+	      <tt>src/make.tcl</tt> by hand in order to
+	      set certain options.  Try the next step first, and see
+	      if it's successful.
+	    </p></li><li><p style="width:90%">At this point, you are ready to run the build
+	      system:</p><div style="background:#bbffbb ; width:80ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
+./make.tcl <i><tt>option</tt></i></div><p style="width:90%">where <i><tt>option</tt></i> can be
+	      either <tt><span style="text-decoration:underline">shared</span></tt> or
+	      <tt><span style="text-decoration:underline">static</span></tt>.
+	    </p></li><li><p class="title"><b>Install</b></p><p style="width:90%">
+	      Now, you are ready to run the <span style="font-family:monospace"><b>./make
+		install</b></span> command to install the resulting
+	      files.  This should copy the shared object (like
+	      <tt>mod_rivet.so</tt>, if one was
+	      successfully created, into Apache's
+	      <tt>libexec</tt> directory, as well as
+	      install some support scripts and various code.
+	    </p></li></ol></li><li><p class="title"><b>Apache Configuration Files</b></p><p style="width:90%">
+	  Rivet is relatively easy to configure - we start off by
+	  adding the module itself:
+	</p><div style="background:#bbffbb ; width:80ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">LoadModule rivet_module	<i><tt>/usr/lib/apache/1.3/mod_rivet.so</tt></i></div><p style="width:90%">
+	  This tells Apache to load the Rivet shared object, wherever
+	  it happens to reside on your file system.  Now we have to
+	  tell Apache what kind of files are &quot;Rivet&quot; files and how to
+	  process them:
+	</p><div style="background:#bbffbb ; width:80ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">AddType application/x-httpd-rivet .rvt
+AddType application/x-rivet-tcl .tcl</div><p style="width:90%">
+	  These tell Apache to process files with the
+	  <tt>.rvt</tt> and <tt>.tcl</tt>
+	  extensions as Rivet files.
+	</p><p style="width:90%">
+	  For other directives that Rivet provides for Apache
+	  configuration, please see <a href="directives.html#directives" title="Rivet Apache Directives">the section called &#8220;Rivet Apache Directives&#8221;</a>.
+	</p></li></ol></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="directives.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"> </td><td width="20%" align="center"> </td><td width="40%" align="right" valign="top"> Rivet Apache Directives</td></tr></table></div></body></html>

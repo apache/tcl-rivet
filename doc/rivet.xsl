@@ -1,46 +1,26 @@
-<?xml version='1.0'?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:doc="http://nwalsh.com/xsl/documentation/1.0"
-  exclude-result-prefixes="doc"
-  version='1.0'>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <!--
-  <xsl:output method="html"
-  encoding="ISO-8859-1"
-  indent="no"/>
-  -->
-
-  <!-- ********************************************************************
-  $Id$
-  ********************************************************************
-
-  This file is part of the XSL DocBook Stylesheet distribution.
-  See ../README or http://nwalsh.com/docbook/xsl/ for copyright
-  and other information.
-
-  ******************************************************************** -->
-
-  <!-- ==================================================================== -->
-
-  <!--
-  <xsl:import
-  href="http://docbook.sourceforge.net/release/xsl/1.48/html/docbook.xsl"/>
-  -->
-
-  <xsl:import
-    href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/chunk.xsl"
-    />
-
+  <!-- This is the body of the XSL stylesheet for Rivet.  It is called
+  from either rivet-chunk.xsl or rivet-nochunk.xsl.  -->
 
   <xsl:param name="use.id.as.filename" select="1"/>
-
   <xsl:variable name="arg.choice.opt.open.str">?</xsl:variable>
   <xsl:variable name="arg.choice.opt.close.str">?</xsl:variable>
+  <xsl:variable name="group.choice.opt.open.str">(</xsl:variable>
+  <xsl:variable name="group.choice.opt.close.str">)</xsl:variable>
+
+  <!--
   <xsl:variable name="arg.choice.req.open.str"></xsl:variable>
   <xsl:variable name="arg.choice.req.close.str"></xsl:variable>
-
+  -->
   <xsl:variable name="arg.choice.def.open.str"></xsl:variable>
   <xsl:variable name="arg.choice.def.close.str"></xsl:variable>
+  <xsl:variable name="group.choice.def.open.str"></xsl:variable>
+  <xsl:variable name="group.choice.def.close.str"></xsl:variable>
+  <xsl:variable name="group.choice.req.open.str">(</xsl:variable>
+  <xsl:variable name="group.choice.req.close.str">)</xsl:variable>
 
   <xsl:template name="inline.underlineseq">
     <xsl:param name="content">
@@ -108,8 +88,9 @@
   </xsl:template>
 
   <xsl:template match="cmdsynopsis">
-    <div class="{name(.)}">
-      <span style="background:#bbbbff">
+    <div class="{name(.)}" style="width:80%">
+      <span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;
+	word-spacing:1ex ">
 	<xsl:call-template name="anchor"/>
 	<xsl:apply-templates/>
       </span>
@@ -117,9 +98,8 @@
   </xsl:template>
 
   <xsl:template match="cmdsynopsis/command">
-    <br/>
-    <span style="font-weight:bold">
-      <xsl:call-template name="inline.monoseq"/>
+    <span style="font-weight:bold ; font-family:monospace">
+      <xsl:apply-templates/>
     </span>
     <xsl:text> </xsl:text>
   </xsl:template>
@@ -142,12 +122,10 @@
   <xsl:template match="varlistentry">
     <dt>
       <xsl:call-template name="anchor"/>
-      <span style="background:#bbbbff">
-	<xsl:apply-templates select="term"/>
-      </span>
+      <xsl:apply-templates select="term"/>
     </dt>
     <dd>
-      <div style="background:#dddddd ; padding:4 ; margin-top:3 ;
+      <div style="padding:4 ; margin-top:3 ;
 	margin-bottom:3 ; width:75%" >
 	<xsl:apply-templates select="listitem"/>
       </div>
@@ -155,7 +133,7 @@
   </xsl:template>
 
   <xsl:template match="listitem/para">
-    <div style="margin-bottom:6">
+    <div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
       <xsl:apply-templates/>
     </div>
   </xsl:template>
@@ -188,14 +166,9 @@
 	<xsl:value-of select="$arg.choice.def.open.str"/>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:choose>
-      <xsl:when test="$choice='plain'">
-	<xsl:call-template name="inline.monoseq"/>
-      </xsl:when>
-      <xsl:otherwise>
-	<xsl:call-template name="inline.monounderlineseq"/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <span style="font-family:monospace; text-decoration:underline">
+      <xsl:apply-templates/>
+    </span>
     <xsl:choose>
       <xsl:when test="$rep='repeat'">
 	<xsl:value-of select="$arg.rep.repeat.str"/>
@@ -223,6 +196,72 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template match="group">
+    <xsl:variable name="choice" select="@choice"/>
+    <xsl:variable name="rep" select="@rep"/>
+    <xsl:variable name="sepchar">
+      <xsl:choose>
+	<xsl:when test="ancestor-or-self::*/@sepchar">
+	  <xsl:value-of select="ancestor-or-self::*/@sepchar"/>
+	</xsl:when>
+	<xsl:otherwise>
+	  <xsl:text> </xsl:text>
+	</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="position()>1"><xsl:value-of select="$sepchar"/></xsl:if>
+    <xsl:choose>
+      <xsl:when test="$choice='plain'">
+	<xsl:value-of select="$group.choice.plain.open.str"/>
+      </xsl:when>
+      <xsl:when test="$choice='req'">
+	<xsl:value-of select="$group.choice.req.open.str"/>
+      </xsl:when>
+      <xsl:when test="$choice='opt'">
+	<xsl:value-of select="$group.choice.opt.open.str"/>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:value-of select="$group.choice.def.open.str"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:apply-templates/>
+    <xsl:choose>
+      <xsl:when test="$rep='repeat'">
+	<xsl:value-of select="$group.rep.repeat.str"/>
+      </xsl:when>
+      <xsl:when test="$rep='norepeat'">
+	<xsl:value-of select="$group.rep.norepeat.str"/>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:value-of select="$arg.rep.def.str"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="$choice='plain'">
+	<xsl:value-of select="$group.choice.plain.close.str"/>
+      </xsl:when>
+      <xsl:when test="$choice='req'">
+	<xsl:value-of select="$group.choice.req.close.str"/>
+      </xsl:when>
+      <xsl:when test="$choice='opt'">
+	<xsl:value-of select="$group.choice.opt.close.str"/>
+      </xsl:when>
+      <xsl:otherwise>
+	<xsl:value-of select="$group.choice.def.close.str"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="group/arg">
+    <xsl:variable name="choice" select="@choice"/>
+    <xsl:variable name="rep" select="@rep"/>
+    <xsl:if test="position()>1"><xsl:value-of
+	select="$arg.or.sep"/></xsl:if>
+    <span style="font-family:monospace; text-decoration:underline">
+      <xsl:apply-templates/>
+    </span>
+  </xsl:template>
+
   <xsl:template match="programlisting|screen|synopsis">
     <xsl:param name="suppress-numbers" select="'0'"/>
     <xsl:variable name="id">
@@ -247,9 +286,11 @@
 	  </pre>
 	</xsl:when>
 	<xsl:otherwise>
-	  <pre style="background:#bbffbb ; width:auto" class="{name(.)}">
+	  <div style="background:#bbffbb ; width:80ex ; margin: 2ex ;
+	    padding: 1ex; border: solid black 1px ; white-space: pre;
+	    font-family:monospace ; " class="{name(.)}">
 	    <xsl:apply-templates/>
-	  </pre>
+	  </div>
 	</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -269,5 +310,4 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-</xsl:stylesheet>
+  </xsl:stylesheet>
