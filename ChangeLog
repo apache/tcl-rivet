@@ -1,3 +1,10 @@
+2004-08-03  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* win/Rivet.nsi: Added a NSIS script. This is used with the
+	Nullsoft scriptable installer system to create an installer for
+	Rivet to install onto a Windows system.
+	* win/makefile.vc: Added htmlhelp and installer targets.
+
 2004-06-25  Pat Thoyts  <patthoyts@users.sourceforge.net>
 
 	* src/rivetCrypt.c: Fix const-ness of resultBuffer to match 

@@ -378,6 +378,37 @@ $(PRJSTUBLIB): $(PRJSTUBOBJS)
 	$(lib32) -nologo -out:$@ $(PRJSTUBOBJS)
 
 #---------------------------------------------------------------------
+# HTML Help
+#---------------------------------------------------------------------
+
+# You may need to edit this, but this is the default location.
+HHC = "C:\Program Files\HTML Help Workshop\hhc.exe"
+HHP = $(DOCDIR)\$(PROJECT).hhp
+
+htmlhelp:
+	@cd $(DOCDIR)
+	@type << >$(HHP)
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=Rivet.chm
+Display compile progress=No
+Full-text search=Yes
+Language=0x809 English (United Kingdom)
+Title=Apache Rivet
+;;Index file=Rivet.hhk
+Default topic=html\index.en.html
+
+[FILES]
+<<
+	@for %i in (html\*.html) do @echo %i >> $(HHP)
+	@$(HHC) $(HHP)
+
+# Create the Windows Nullsoft installer file.
+MAKENSIS="C:\Program Files\NSIS\MakeNSIS.exe"
+installer: $(PROJECT)
+	$(MAKENSIS) $(PROJECT).nsi
+
+#---------------------------------------------------------------------
 # Implicit rules
 #---------------------------------------------------------------------
 
