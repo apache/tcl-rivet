@@ -1,3 +1,27 @@
+2003-08-20  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.tcl (aardvark::getconfigs): Added new
+	function to fetch the config info out of configs.tcl.
+
+	* src/make.tcl: Removed debinstall target, because we can now
+	accomplish the same thing by overriding configure options on
+	make's command line.   Removed the configure-style code at the top
+	of the file.
+
+	* src/configure.in.tcl: Specify the variables to test for/create,
+	as well as some command line options specific to Rivet.
+
+	* src/configure.tcl: Added new configure-like system to obtain
+	information about the environment where Rivet is being compiled.
+	Running ./configure.tcl creates a file, configs.tcl, with the
+	its findings.  make.tcl now uses those values as its defaults,
+	unless they are overridden on make.tcl's command line.
+
+2003-08-11  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Added fileutils Tcl package to buildscripts, in
+	order to utilize the 'install' command.
+
 2003-08-05  David N. Welton  <davidw@dedasys.com>
 
 	* contrib/rvt.vim: Added contributed vim mode for editing Rivet

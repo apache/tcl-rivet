@@ -29,7 +29,7 @@ binary-arch: checkroot build
 	-rm -rf debian/tmp
 	install -d debian/tmp
 	cd debian/tmp && install -d `cat ../dirs`
-	( cd src ; ./make.tcl debinstall )
+	( cd src ; ./make.tcl install PREFIX=$(CURDIR)/debian/tmp/usr/lib LIBEXECDIR=$(CURDIR)/debian/tmp/usr/lib/ )
 	cp debian/500mod_rivet.info debian/tmp/usr/lib/apache/1.3/
 	dh_installdocs doc/
 	dh_installchangelogs

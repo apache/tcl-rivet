@@ -7,8 +7,6 @@ foreach script {
     cmdline.tcl
     fileutil.tcl
     helpers.tcl
-    parsetclConfig.tcl
-    findapxs.tcl
 } {
     source [file join [file dirname [info script]] $script]
 }
