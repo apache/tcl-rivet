@@ -1,5 +1,7 @@
 2003-04-07  David N. Welton  <davidw@dedasys.com>
 
+	* VERSION: Bump point number for new release.
+
 	* src/make.tcl: Use package require to load aardvark.
 
 	* src/buildscripts/graph.tcl: This file should provide the
