@@ -8,7 +8,7 @@
 	    additional forms of <span style="font-family:monospace"><b class="command">var</b></span>:
 	    <span style="font-family:monospace"><b class="command">var_qs</b></span> and <span style="font-family:monospace"><b class="command">var_post</b></span>.
 	    These two restrict the retrieval of information to
-	    parameters arriving very the querystring
+	    parameters arriving via the querystring
 	    (?foo=bar&amp;bee=bop) or POSTing, respectively.
 	  </div><div class="variablelist"><dl><dt><span class="term">
 		<div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">get</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>varname</tt></i></span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i></span></span></div>

@@ -42,7 +42,7 @@ proc configure::ProcessOptions {} {
     set optionvars(prefix) PREFIX
     set optionvars(enable-symbols) DEBUGSYMBOLS
     set options {
-	{prefix.arg ""		"prefix - where"}
+	{prefix.arg ""		"prefix - where to install"}
 	{enable-symbols		"enable debugging symbols"}
 	{verbose		"verbose output"}
     }

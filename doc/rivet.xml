@@ -137,27 +137,74 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	<title>Building Rivet</title>
 	<para>
 	  Rivet uses a unique build system which we created especially
-	  for this project.  It utilizes the information included in
-	  Apache and Tcl regarding their configurations, in order to
-	  compile itself via a series of Tcl scripts, which are
-	  located in the <filename>buildscripts/</filename> directory.
+	  for this project.  It utilizes the information included with
+	  Apache (via the <command>apxs</command> command) and Tcl
+	  (<filename>tclConfig.sh</filename>) about their
+	  configurations, so that Rivet can compile itself.
 	</para>
 	<substeps>
 	  <step>
-	    <title>Edit src/make.tcl</title>
+	    <title>Run ./configure.tcl</title>
 	    <para>
-	      It may be necessary to edit
-	      <filename>src/make.tcl</filename> by hand in order to
-	      set certain options.  Try the next step first, and see
-	      if it's successful.
+	      This is similar to the <filename>configure</filename>
+	      script included with many systems.  It's written in Tcl
+	      though, for increased speed and clarity.  It takes
+	      several arguments:
 	    </para>
-	  </step>
-	  <step>
-	    <para>At this point, you are ready to run the build
-	      system:</para>
+
+	    <variablelist>
+	      <varlistentry>
+		<term>-help</term>
+		<listitem>
+		  <para>Prints usage information.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-enable-symbols</term>
+		<listitem>
+		  <para>Compiles Rivet with debugging symbols.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-prefix <replaceable>directory</replaceable></term>
+		<listitem>
+		  <para>
+		    Install Rivet Tcl packages to
+		    <replaceable>directory</replaceable>.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-with-apxs <replaceable>file</replaceable></term>
+		<listitem>
+		  <para>Use <replaceable>file</replaceable> as apxs binary to
+		  gather information about the local Apache installation.</para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>-with-tclconfig <replaceable>file</replaceable></term>
+		<listitem>
+		  <para>
+		    Specify <replaceable>file</replaceable> as tclConfig.sh.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
 
 	    <programlisting>cd src/
-./make.tcl <replaceable>option</replaceable></programlisting>
+./configure.tcl
+Configuring
+.........done.</programlisting>
+
+	  </step>
+	  <step>
+	    <title>Run make.tcl</title>
+	    <para>
+	      At this point, you are ready to run the build
+	      system:
+	    </para>
+
+	    <programlisting>./make.tcl <replaceable>option</replaceable></programlisting>
 
 	    <para>where <replaceable>option</replaceable> can be
 	      either <option>shared</option> or
@@ -195,7 +242,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	</para>
 
 	<programlisting>AddType application/x-httpd-rivet .rvt
-	  AddType application/x-rivet-tcl .tcl</programlisting>
+AddType application/x-rivet-tcl .tcl</programlisting>
 
 	<para>
 	  These tell Apache to process files with the
@@ -215,7 +262,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 
     <para>
       These directives are used within the Apache httpd server
-      configuration files to modify Apache Rivet's behaviour.  Their
+      configuration files to modify Apache Rivet's behavior.  Their
       precedence is as follows: <command>RivetDirConf</command>,
       <command>RivetUserConf</command>,
       <command>RivetServerConf</command>, meaning that DirConf will
@@ -435,10 +482,10 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	      </term>
 	      <listitem>
 		<para>
-		  If on, Rivet will create a seperate Tcl interpreter
+		  If on, Rivet will create a separate Tcl interpreter
 		  for each Apache virtual host.  This is useful in an
-		  ISP type situation where it is desirable to seperate
-		  clients into seperate interpreters, so that they
+		  ISP type situation where it is desirable to separate
+		  clients into separate interpreters, so that they
 		  don't accidentally interfere with one another.
 		</para>
 	      </listitem>
@@ -520,7 +567,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	    additional forms of <command>var</command>:
 	    <command>var_qs</command> and <command>var_post</command>.
 	    These two restrict the retrieval of information to
-	    parameters arriving very the querystring
+	    parameters arriving via the querystring
 	    (?foo=bar&amp;bee=bop) or POSTing, respectively.
 	  </para>
 	  <variablelist>
@@ -1066,7 +1113,9 @@ packages that include potentially useful code.
     <itemizedlist>
 
       <listitem>
-	<para>commserver is a package providing a .</para>
+	<para>commserver is a package providing a server that can be
+	used for IPC.  Still experimental.  Requires the comm package
+	from tcllib.</para>
       </listitem>
 
       <listitem>
@@ -1147,7 +1196,7 @@ list.
 	</listitem>
 	<listitem>
 	  <para>
-	    <ulink url="http://www.tcl.tk"/> is the cannonical site
+	    <ulink url="http://www.tcl.tk"/> is the canonical site
 	    for Tcl information.
 	  </para>
 	</listitem>
@@ -1175,7 +1224,7 @@ list.
       <title>IRC</title>
 
       <para>
-        Occassionally, someone from the Rivet team is on IRC at
+        Occasionally, someone from the Rivet team is on IRC at
         irc.freenode.net, channel #tcl.
       </para>
     </section>
@@ -1188,7 +1237,8 @@ list.
       This section easily falls out of date, as new code is added, old
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
-      themselves FIXME.
+      themselves, <command>cvs</command> can provide you with
+      information about what has been happening with the code.
     </para>
     <section>
       <title>Initialization</title>
@@ -1220,7 +1270,7 @@ list.
       </para>
     </section>
     <section>
-      <title>Page Parsing, Execution and Cacheing</title>
+      <title>Page Parsing, Execution and Caching</title>
       <para>
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;

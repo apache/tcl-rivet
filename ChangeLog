@@ -1,5 +1,8 @@
 2003-08-22  David N. Welton  <davidw@dedasys.com>
 
+	* doc/rivet.xml: Added installation instructions corresponding to
+	the new ./configure.tcl system. Ran the spellchecker.
+
 	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand):
 	Rebuild only if file depended on is newer than the target, rather
 	than >=.  This prevents some files from being remade if make is
