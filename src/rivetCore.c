@@ -279,7 +279,7 @@ TCL_CMD_HEADER( Rivet_Headers )
 	    Tcl_WrongNumArgs(interp, 2, objv, "mime/type");
 	    return TCL_ERROR;
 	}
-	TclWeb_SetHeaderType(Tcl_GetStringFromObj(objv[2], (int *)NULL), globals->req);
+	TclWeb_SetHeaderType(Tcl_GetString(objv[2]), globals->req);
     } else if (!strcmp("numeric", opt)) /* ### numeric ### */
     {
 	int st = 200;

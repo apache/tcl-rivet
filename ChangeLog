@@ -1,3 +1,8 @@
+2004-02-20  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c (TclWeb_SetHeaderType): strdup object's
+	string value so we have our own copy of it.
+
 2004-02-19  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Added some additional comments regarding the
