@@ -93,10 +93,17 @@
       </span>
     </dt>
     <dd>
-      <div style="background:#dddddd">
+      <div style="background:#dddddd ; padding:4 ; margin-top:3 ;
+	margin-bottom:3 ; width:75%" >
 	<xsl:apply-templates select="listitem"/>
       </div>
     </dd>
+  </xsl:template>
+
+  <xsl:template match="listitem/para">
+    <div style="margin-bottom:6">
+      <xsl:apply-templates/>
+    </div>
   </xsl:template>
 
   <xsl:template match="arg">

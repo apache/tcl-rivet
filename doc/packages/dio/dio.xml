@@ -27,8 +27,8 @@
       <refsynopsisdiv>
 	<cmdsynopsis>
 	  <command>::DIO::handle</command>
-	  <arg>interface</arg>
-	  <arg choice="opt">objectName</arg>
+	  <arg><replaceable>interface</replaceable></arg>
+	  <arg choice="opt"><replaceable>objectName</replaceable></arg>
 	  <group choice="opt">
 	    <arg>-option</arg>
 	    <arg><replaceable>option</replaceable></arg>
@@ -64,68 +64,107 @@
 	<title>Options</title>
 	<variablelist>
 	  <varlistentry>
-	    <term><option>-host</option> <option>hostname</option></term>
 	    <listitem>
-	      The hostname of the computer to connect to.  If none is
-	      given, DIO assumes the local host.
+	      <cmdsynopsis>
+		<arg>-host</arg>
+		<arg choice="opt"><replaceable>hostname</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The hostname of the computer to connect to.  If none
+		is given, DIO assumes the local host.
+	      </para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-port</option> <option>portNumber</option></term>
 	    <listitem>
-	      The port number to connect to on <option>hostname</option>.
+	      <cmdsynopsis>
+		<arg>-port</arg>
+		<arg><replaceable>portNumber</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The port number to connect to on <option>hostname</option>.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-user</option> <option>username</option></term>
 	    <listitem>
-	      The username you wish to login to the server as.
+	      <cmdsynopsis>
+		<arg>-user</arg>
+		<arg><replaceable>username</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The username you wish to login to the server as.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-pass</option> <option>password</option></term>
 	    <listitem>
-	      The password to login to the server with.
+	      <cmdsynopsis>
+		<arg>-pass</arg>
+		<arg><replaceable>password</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The password to login to the server with.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-db</option> <option>database</option></term>
 	    <listitem>
-	      The name of the database to connect to.
+	      <cmdsynopsis>
+		<arg>-db</arg>
+		<arg><replaceable>database</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The name of the database to connect to.
+	      </para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-table</option> <option>tableName</option></term>
 	    <listitem>
-	      The default table to use when using built-in commands
-	      for storing and fetching.
+	      <cmdsynopsis>
+		<arg>-table</arg>
+		<arg><replaceable>tableName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The default table to use when using built-in commands
+		for storing and fetching.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-keyfield</option> <option>keyFieldname</option></term>
 	    <listitem>
-	      The default field to use as the primary key when using
-	      built-in commands for storing and fetching.
+	      <cmdsynopsis>
+		<arg>-keyfield</arg>
+		<arg><replaceable>keyFieldname</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The default field to use as the primary key when using
+		built-in commands for storing and fetching.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-autokey</option> <option>boolean</option></term>
 	    <listitem>
-	      If this option is set to 1, DIO will attempt to
-	      determine an automatic key for <option>keyField</option>
-	      when storing and fetching.  In most databases, this
-	      requires that the <option>sequence</option> also be
-	      specified.  In the case of MySQL, where sequences do not
-	      exist, autokey must be used in conjunction with a table
-	      which has a field specified as AUTO.
+	      <cmdsynopsis>
+		<arg>-autokey</arg>
+		<group>
+		  <arg>1</arg>
+		  <arg>0</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		If this option is set to 1, DIO will attempt to
+		determine an automatic key for
+		<option>keyField</option> when storing and fetching.
+		In most databases, this requires that the
+		<option>sequence</option> also be specified.  In the
+		case of MySQL, where sequences do not exist, autokey
+		must be used in conjunction with a table which has a
+		field specified as AUTO.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
-	    <term><option>-sequence</option> <option>sequenceName</option></term>
 	    <listitem>
-	      If DIO is automatically generating keys, it will use
-	      this sequence as a means to gain a unique number for the
-	      stored key.
+	      <cmdsynopsis>
+		<arg>-sequence</arg>
+		<arg><replaceable>sequenceName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		If DIO is automatically generating keys, it will use
+		this sequence as a means to gain a unique number for
+		the stored key.</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -244,7 +283,7 @@
 		there, the result object can be used to obtain
 		information about the query status and records in a
 		generic way.  See <link linkend="resultobj">Result
-		Object Commands</link>
+		  Object Commands</link>
 	      </para>
 	    </listitem>
 	  </varlistentry>
@@ -560,7 +599,7 @@
 	      <cmdsynopsis>
 		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>forall</arg>
-		<arg>-type</arg>
+		<arg><replaceable>-type</replaceable></arg>
 		<arg><replaceable>varName</replaceable></arg>
 		<arg><replaceable>body</replaceable></arg>
 	      </cmdsynopsis>
@@ -613,7 +652,7 @@
 	      <cmdsynopsis>
 		<arg><replaceable>resultObj</replaceable></arg>
 		<arg>next</arg>
-		<arg>-type</arg>
+		<arg><replaceable>-type</replaceable></arg>
 		<arg choice="opt"><replaceable>varName</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
