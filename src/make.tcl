@@ -213,7 +213,10 @@ foreach doc $HTML_DOCS {
 }
 
 AddNode VERSION {
-    tcl { cd .. }
+    tcl {
+	cd ..
+	pwd
+    }
     sh { ./cvsversion.tcl }
     tcl { cd src/ }
 }
@@ -223,9 +226,9 @@ AddNode VERSION {
 AddNode distclean {
     depends clean
     tcl { cd .. }
-    sh { find . -name "*~" | xargs rm }
-    sh { find . -name ".#*" | xargs rm }
-    sh { find . -name "\#*" | xargs rm }
+    sh { find . -name "*~" | xargs rm -f}
+    sh { find . -name ".#*" | xargs rm -f}
+    sh { find . -name "\#*" | xargs rm -f}
     tcl { cd src }
 }
 
@@ -241,7 +244,13 @@ AddNode distdoc {
 
 AddNode dist {
     depends {distclean distdoc VERSION}
-    sh { sh -c "cd ../../ ; tar czvf tcl-rivet-`cat tcl-rivet/VERSION`.tgz tcl-rivet" }
+    tcl {
+	set fl [open [file join .. VERSION]]
+	set VERSION [string trim [read $fl]]
+	close $fl
+	cd [file join .. ..]
+	exec tar czvf tcl-rivet-${VERSION}.tgz tcl-rivet/
+    }
 }
 
 Run

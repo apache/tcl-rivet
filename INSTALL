@@ -4,6 +4,7 @@ Rivet is built by means of a Tcl make-like script which calculates
 dependencies and runs the C compiler and linker.
 
 To build mod_rivet.so, cd to the src/ directory, and run the make.tcl
-script, then copy that to your Apache libexec/ directory.
+script (using a tclsh linked against the libraries you want to use),
+then copy that to your Apache libexec/ directory.
 
-For more detailed instructions, see 
+For more detailed instructions, see the docs/html/ directory.
