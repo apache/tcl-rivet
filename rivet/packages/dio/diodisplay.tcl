@@ -454,7 +454,8 @@ catch { ::itcl::delete class DIODisplay }
 	puts "<TR>"
 	puts {<TD CLASS="DIOMainSearchByHeader">Search By:</TD>}
 	puts {<TD CLASS="DIOMainSearchBy">}
-	$form select searchBy -values [pretty_fields $useFields] \
+	$form select searchBy -values $useFields \
+	    -labels [pretty_fields $useFields] \
 	    -class DIOMainSearchBy
 	puts "</TD>"
 	puts "</TR>"
@@ -508,8 +509,6 @@ catch { ::itcl::delete class DIODisplay }
 
 
     method Search {} {
-	set searchField $FieldTextMap($response(searchBy))
-
 	set query "-$searchField $response(query)"
 
 	append query [sql_order_by_syntax]
