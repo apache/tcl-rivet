@@ -491,9 +491,15 @@ int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
     if (ApacheUpload_FILE(req->upload) != NULL)
     {
 	/* create and return a file channel */
+
+#ifdef __MINGW32__
 	*chan = Tcl_MakeFileChannel(
-	    (ClientData)(int)fileno(ApacheUpload_FILE(req->upload)),
-	    TCL_READABLE);
+	    (ClientData)_get_osfhandle(
+		fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
+#else
+	*chan = Tcl_MakeFileChannel(
+	    (ClientData)fileno(ApacheUpload_FILE(req->upload)), TCL_READABLE);
+#endif
 	Tcl_RegisterChannel(req->interp, *chan);
 	return TCL_OK;
     } else {
@@ -517,9 +523,14 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 			     "-translation", "binary");
     }
 
+#ifdef __MINGW32__
     chan = Tcl_MakeFileChannel(
-	(ClientData)(int)fileno(ApacheUpload_FILE(req->upload)),
-	TCL_READABLE);
+	(ClientData)_get_osfhandle(
+	    fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
+#else
+    chan = Tcl_MakeFileChannel(
+	(ClientData)fileno(ApacheUpload_FILE(req->upload)), TCL_READABLE);
+#endif
     Tcl_SetChannelOption(req->interp, chan, "-translation", "binary");
 
     while ((sz = Tcl_Read(chan, savebuffer, BUFSZ)))
@@ -552,9 +563,14 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
 	Tcl_Channel chan = NULL;
 
 	bytes = Tcl_Alloc((unsigned)ApacheUpload_size(req->upload));
+#ifdef __MINGW32__
 	chan = Tcl_MakeFileChannel(
-	    (ClientData)(int)fileno(ApacheUpload_FILE(req->upload)),
-	    TCL_READABLE);
+	    (ClientData)_get_osfhandle(
+		fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
+#else
+	chan = Tcl_MakeFileChannel(
+	    (ClientData)fileno(ApacheUpload_FILE(req->upload)), TCL_READABLE);
+#endif
 	Tcl_SetChannelOption(req->interp, chan,
 			     "-translation", "binary");
 	Tcl_SetChannelOption(req->interp, chan, "-encoding", "binary");

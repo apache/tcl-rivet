@@ -1,3 +1,8 @@
+2003-01-07  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c (TclWeb_UploadData): Fix from Holger Zeinert
+	that makes file uploads work on windows.
+
 2002-12-30  David N. Welton  <davidw@dedasys.com>
 
 	* doc/examples/upload.html: Changed .ttml to .rvt - thanks to
