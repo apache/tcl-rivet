@@ -57,9 +57,12 @@ catch { ::itcl::delete class DIODisplay }
 	::itcl::delete object $this
     }
 
+    #
+    # configvar - a convenient helper for creating methods that can
+    #  set and fetch one of the object's variables
+    #
     method configvar {varName string} {
 	if {[lempty $string]} { return [set $varName] }
-#puts "$this configvar: setting $varName to '$string'<br>"
 	configure -$varName $string
     }
 
@@ -191,7 +194,7 @@ catch { ::itcl::delete class DIODisplay }
 	# search field and it matches one of the fields in the
 	# record (and it should), put that in as the default
 	foreach field $fields {
-	    if {$response(searchBy) == [$field text]} {
+	    if {[info exists response(searchBy)] && $response(searchBy) == [$field text]} {
 		if {![$field readonly] && $response(query) != ""} {
 		    $field value $response(query)
 		}
