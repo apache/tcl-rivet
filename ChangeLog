@@ -1,3 +1,20 @@
+2002-06-10  David N. Welton  <davidw@dedasys.com>
+
+	* doc/packages/dio/dio.xml: Further updates.
+
+2002-06-08  David N. Welton  <davidw@dedasys.com>
+
+	* doc/packages/dio/dio.xml: Finished up adding material to
+	dio.xml.
+
+2002-06-06  David N. Welton  <davidw@dedasys.com>
+
+	* doc/packages/dio/dio.xml: Initial commit of (incomplete) docbook
+	documentation.
+
+	* doc/packages/dio/rivet.xsl: Added XSL file for docbook
+	documentation.
+
 2002-05-03  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c (TclWeb_GetVarAsList): Added check to length
