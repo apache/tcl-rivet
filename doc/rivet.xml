@@ -548,6 +548,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
     <refentry>
       <refnamediv>
 	<refname>var</refname>
+	<refname>var_qs</refname>
+	<refname>var_post</refname>
 	<refpurpose>get the value of a form variable.</refpurpose>
       </refnamediv>
 
@@ -564,6 +566,34 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <arg>all</arg>
 	  </group>
 	</cmdsynopsis>
+
+	<cmdsynopsis>
+	  <command>
+	    var_qs
+	  </command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+
+	<cmdsynopsis>
+	  <command>
+	    var_post
+	  </command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+
+
       </refsynopsisdiv>
 
       <refsect1>
