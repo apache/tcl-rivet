@@ -277,15 +277,17 @@ proc simpledb::items {table} {
 
 proc simpledb::synctostorage {savefile} {
     set fl [open $savefile w]
-    set collist [array names ${ns}::cols]
     foreach ns [namespace children] {
+	# Let's store the goodoids array.
+	set collist [array names ${ns}::cols]
 	puts $fl "namespace eval $ns \{"
-	puts $fl "array set cols [array get ${ns}::cols]"
+	puts $fl "    array set cols \{ [array get ${ns}::cols] \}"
+	puts $fl "    array set goodoids \{ [array get ${ns}::goodoids] \}".
 	foreach col $collist {
-	    puts $fl "namespace eval ${col} \{"
-	    puts $fl "array set data [list [array get ${ns}::${col}::data]]"
-	    puts $fl "array set values [list [array get ${ns}::${col}::values]]"
-	    puts $fl "\}"
+	    puts $fl "    namespace eval ${col} \{"
+	    puts $fl "        array set data [list [array get ${ns}::${col}::data]]"
+	    puts $fl "        array set values [list [array get ${ns}::${col}::values]]"
+	    puts $fl "    \}"
 	}
 	puts $fl "\}"
     }
