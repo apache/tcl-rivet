@@ -1,3 +1,13 @@
+2004-12-01  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * Update autoconf build to TEA 3.1
+
+        * configure.am: Automatically locate apxs in the PATH if it hasn't
+	  been overridden by --with-apxs.  Likewise automatically locate
+	  tclsh if it hasn't been overridden by --with-tclsh.
+
+	* Add of README.freebsd for FreeBSD.
+
 2004-11-17  Karl Lehenbauer  <karl-rivet@sc.com>
 
         * rivet/packages/dio/dio.tcl: Fixed comments incorrectly placed 

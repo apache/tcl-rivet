@@ -1,0 +1,33 @@
+
+
+$Id$
+
+Rivet can be built under FreeBSD without any special tweaks.
+
+We'd love some help in making this a port in the FreeBSD ports tree, so this 
+build could be even more automatic.
+
+For now, you need to build and install Tcl and Apache
+
+    cd /usr/ports/lang/tcl84
+    make
+    make install
+
+    cd /usr/ports/www/apache13
+    make
+    make install
+
+Since the maintainer of the Tcl stuff in the FreeBSD ports tree has
+chosen to have Tcl build in such a way that there can be multiple different
+versions on a system at the same time, stuff isn't quite in the expected
+place.
+
+Run configure in this directory with the following parameters:
+
+./configure  --with-tcl=/usr/local/lib/tcl8.4 --with-tclinclude=/usr/local/include/tcl8.4  --with-tclsh=/usr/local/bin/tclsh8.4
+
+...or equivalent.  Your mileage may vary.
+
+
+
+

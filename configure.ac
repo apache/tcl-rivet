@@ -71,7 +71,7 @@ TEA_SETUP_COMPILER
 # and PKG_TCL_SOURCES.
 #-----------------------------------------------------------------------
 
-TEA_ADD_SOURCES([TclWeb.c TclWebapache.c TclWebcgi.c apache_multipart_buffer.c apache_request.c mod_rivet.c parserPkgInit.c rivetChannel.c rivetCore.c rivetCrypt.c rivetList.c rivetParser.c rivetPkgInit.c rivetWWW.c testing.c nmakehlp.c])
+TEA_ADD_SOURCES([src/TclWeb.c src/TclWebapache.c src/TclWebcgi.c src/apache_multipart_buffer.c src/apache_request.c src/mod_rivet.c src/parserPkgInit.c src/rivetChannel.c src/rivetCore.c src/rivetCrypt.c src/rivetList.c src/rivetParser.c src/rivetPkgInit.c src/rivetWWW.c src/testing.c win/nmakehlp.c])
 TEA_ADD_HEADERS([src/TclWeb.h src/apache_multipart_buffer.h src/apache_request.h src/mod_rivet.h src/rivet.h src/rivetChannel.h src/rivetParser.h])
 TEA_ADD_INCLUDES([])
 TEA_ADD_LIBS([])
@@ -179,45 +179,53 @@ TEA_MAKE_LIB
 TEA_PROG_TCLSH
 #TEA_PROG_WISH
 
-dnl This is required, because we need this information!
+# We have to either find apxs or be told where it is using --with-apxs
 AC_ARG_WITH(apxs, [  --with-apxs              location of Apache's apxs tool], with_apxs=${withval})
-AC_MSG_CHECKING([for apxs])
 
 dnl First check to see if --with-magick-config was specified.
-if test x"${with_apxs}" != x ; then
-    if test -x "${with_apxs}" ; then
-	dnl It actually calls another script, so the PATH needs to be set.
-	export PATH=$PATH:`dirname ${with_apxs}`
-	AC_MSG_RESULT("Using ${with_apxs}")
-	APXS_CPPFLAGS=`${with_apxs} -q CFLAGS`
-	AC_SUBST(APXS_CPPFLAGS)
-	APXS_LDFLAGS=`${with_apxs} -q LDFLAGS_SHLIB`
-	AC_SUBST(APXS_LDFLAGS)
-	APXS_LIBS=`${with_apxs} -q LIBS_SHLIB`
-	AC_SUBST(APXS_LIBS)
-	APXS_INCLUDES=-I`${with_apxs} -q INCLUDEDIR`
-	AC_SUBST(APXS_INCLUDES)
-
+if test x"${with_apxs}" = x ; then
+    AC_PATH_PROGS(APXS, apxs)
+    if test x"${APXS}" = x ; then
+	AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
     else
-	AC_MSG_ERROR([${with_apxs} is not an executable file])
+	with_apxs=${APXS}
     fi
 else
-    AC_MSG_ERROR([You must specify the location of the apxs script --with-apxs!])
+    AC_MSG_RESULT([Using ${with_apxs} for apxs as specified by --with-apxs])
+fi
+if test -x "${with_apxs}" ; then
+    dnl It actually calls another script, so the PATH needs to be set.
+    export PATH=$PATH:`dirname ${with_apxs}`
+    APXS_CPPFLAGS=`${with_apxs} -q CFLAGS`
+    AC_SUBST(APXS_CPPFLAGS)
+    APXS_LDFLAGS=`${with_apxs} -q LDFLAGS_SHLIB`
+    AC_SUBST(APXS_LDFLAGS)
+    APXS_LIBS=`${with_apxs} -q LIBS_SHLIB`
+    AC_SUBST(APXS_LIBS)
+    APXS_INCLUDES=-I`${with_apxs} -q INCLUDEDIR`
+    AC_SUBST(APXS_INCLUDES)
+else
+    AC_MSG_ERROR([${with_apxs} is not an executable file])
 fi
 
-
 AC_ARG_WITH(tclsh, [  --with-tclsh		location of the tclsh executable that corresponds to the --with-tcl directory used], with_tclsh=${withval})
-AC_MSG_CHECKING([for tclsh])
 
-if test x"${with_tclsh}" != x ; then
-    if test -x "${with_tclsh}" ; then
-       NAMEOFEXECUTABLE=-DNAMEOFEXECUTABLE=\\\"${with_tclsh}\\\"
-       AC_SUBST(NAMEOFEXECUTABLE)
+if test x"${with_tclsh}" = x ; then
+    AC_PATH_PROGS(TCLSH, tclsh)
+    if test x"${TCLSH}" = x; then
+	AC_MSG_ERROR([Could not find tclsh.  tclsh must be in your PATH or you must specify its location using --with-tclsh])
     else
-	AC_MSG_ERROR([${with_tclsh} is not an executable file])
+	with_tclsh=${TCLSH}
     fi
 else
-    AC_MSG_ERROR([You must specify the location of the tclsh corresponding to the dir used with --with-tcl using --with-tclsh!])
+    AC_MSG_RESULT([Using ${with_tclsh} for tclsh as specified by --with-tclsh])
+fi
+
+if test -x "${with_tclsh}" ; then
+   NAMEOFEXECUTABLE=-DNAMEOFEXECUTABLE=\\\"${with_tclsh}\\\"
+   AC_SUBST(NAMEOFEXECUTABLE)
+else
+    AC_MSG_ERROR([${with_tclsh} is not an executable file])
 fi
 
 #--------------------------------------------------------------------
