@@ -15,6 +15,11 @@
    limitations under the License.
 */
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 /* Apache includes */
 #include "httpd.h"
 #include "http_config.h"
@@ -30,7 +35,7 @@
 #include <tcl.h>
 #include <string.h>
 
-/* Rivet includes */
+/* Rivet Includes */
 #include "mod_rivet.h"
 #include "rivet.h"
 #include "rivetParser.h"

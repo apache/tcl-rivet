@@ -19,6 +19,11 @@
 
 /* $Id$ */
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "httpd.h"
 #include "http_config.h"
 #include "http_request.h"

@@ -8,8 +8,8 @@
 #
 # Include the TEA standard macro set
 #
-builtin([include],[tclconfig/tcl.m4])
-#m4_include([tclconfig/tcl.m4])
+#builtin([include],[tclconfig/tcl.m4])
+m4_include([tclconfig/tcl.m4])
 
 #
 # Include the libtool macro set

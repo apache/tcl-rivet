@@ -19,6 +19,11 @@
 
 /* Code originally from TclX by Karl Lehenbauer and others. */
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <tcl.h>
 #include <string.h>
 #include "rivet.h"

@@ -5,6 +5,10 @@
  * to the trouble of installing/compiling the whole thing in mod_rivet,
  * and using with Apache. */
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <tcl.h>
 #include "httpd.h"

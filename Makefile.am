@@ -5,6 +5,7 @@
 #
 # $Id$
 #
+#foreign -- need to set this somehow
 
 EXTRA_DIST=LICENSE doc
 SUBDIRS = src

@@ -395,9 +395,9 @@ AC_DEFUN([TEA_ENABLE_SHARED], [
     else
 	AC_MSG_RESULT([static])
 	SHARED_BUILD=0
-	AC_DEFINE(STATIC_BUILD)
+	AC_DEFINE(STATIC_BUILD,1,[Set to 1 if you want to build static libraries])
     fi
-    AC_SUBST(SHARED_BUILD)
+    AC_SUBST(SHARED_BUILD,1,[Set to 1 if you want to build shared libraries])
 ])
 
 #------------------------------------------------------------------------
@@ -435,9 +435,9 @@ AC_DEFUN([TEA_ENABLE_THREADS], [
 
 	if test "${TEA_PLATFORM}" != "windows" ; then
 	    # We are always OK on Windows, so check what this platform wants.
-	    AC_DEFINE(USE_THREAD_ALLOC)
-	    AC_DEFINE(_REENTRANT)
-	    AC_DEFINE(_THREAD_SAFE)
+	    AC_DEFINE(USE_THREAD_ALLOC,1,[Set to 1 to use the special threaded alloc (Windows)])
+	    AC_DEFINE(_REENTRANT,1,[Set to 1 to build for reentrant operation (Windows)])
+	    AC_DEFINE(_THREAD_SAFE,1,[Set to 1 to build thread safe (Windows)])
 	    AC_CHECK_LIB(pthread,pthread_mutex_init,tcl_ok=yes,tcl_ok=no)
 	    if test "$tcl_ok" = "no"; then
 		# Check a little harder for __pthread_mutex_init in the
@@ -491,7 +491,7 @@ AC_DEFUN([TEA_ENABLE_THREADS], [
     # Do checking message here to not mess up interleaved configure output
     AC_MSG_CHECKING([for building with threads])
     if test "${TCL_THREADS}" = "1"; then
-	AC_DEFINE(TCL_THREADS)
+	AC_DEFINE(TCL_THREADS,1,[Set to 1 to build with Tcl thread support])
 	#LIBS="$LIBS $THREADS_LIBS"
 	AC_MSG_RESULT([yes])
     else
@@ -583,7 +583,7 @@ AC_DEFUN([TEA_ENABLE_SYMBOLS], [
     AC_SUBST(LDFLAGS_DEFAULT)
 
     if test "$tcl_ok" = "mem" -o "$tcl_ok" = "all"; then
-	AC_DEFINE(TCL_MEM_DEBUG)
+	AC_DEFINE(TCL_MEM_DEBUG,1,[Set to 1 to enable Tcl memory leak debugging])
     fi
 
     if test "$tcl_ok" != "yes" -a "$tcl_ok" != "no"; then
@@ -634,7 +634,7 @@ AC_DEFUN([TEA_ENABLE_LANGINFO], [
 	    langinfo_ok="no (could not compile with nl_langinfo)";
 	fi
 	if test "$langinfo_ok" = "yes"; then
-	    AC_DEFINE(HAVE_LANGINFO)
+	    AC_DEFINE(HAVE_LANGINFO,1,[Set to 1 if you have <langinfo.h>])
 	fi
     fi
     AC_MSG_RESULT([$langinfo_ok])
@@ -927,8 +927,8 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		    for i in $defs ; do
 			AC_DEFINE_UNQUOTED($i)
 		    done
-		    AC_DEFINE_UNQUOTED(_WIN32_WCE, $CEVERSION)
-		    AC_DEFINE_UNQUOTED(UNDER_CE, $CEVERSION)
+		    AC_DEFINE_UNQUOTED(_WIN32_WCE, $CEVERSION, [The version of Windows CE])
+		    AC_DEFINE_UNQUOTED(UNDER_CE, $CEVERSION, [Windows CE version])
 		    CFLAGS_DEBUG="-nologo -Zi -Od"
 		    CFLAGS_OPTIMIZE="-nologo -Ox"
 		    lversion=`echo ${CEVERSION} | sed -e 's/\(.\)\(..\)/\1\.\2/'`
@@ -1051,7 +1051,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    AC_CHECK_LIB(bsd, gettimeofday, libbsd=yes, libbsd=no)
 	    if test $libbsd = yes; then
 	    	MATH_LIBS="$MATH_LIBS -lbsd"
-	    	AC_DEFINE(USE_DELTA_FOR_TZ)
+	    	AC_DEFINE(USE_DELTA_FOR_TZ,1,[Set to 1 if your machines uses deltas for TZ (AIX)])
 	    fi
 	    ;;
 	BeOS*)
@@ -1092,7 +1092,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    ;;
 	HP-UX-*.11.*)
 	    # Use updated header definitions where possible
-	    AC_DEFINE(_XOPEN_SOURCE_EXTENDED)
+	    AC_DEFINE(_XOPEN_SOURCE_EXTENDED,1,[Set to 1 to use updated header definitions where possible (HP-UX)])
 
 	    SHLIB_SUFFIX=".sl"
 	    AC_CHECK_LIB(dld, shl_load, tcl_ok=yes, tcl_ok=no)
@@ -1409,7 +1409,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    ;;
 	OS/390-*)
 	    CFLAGS_OPTIMIZE=""      # Optimizer is buggy
-	    AC_DEFINE(_OE_SOCKETS)  # needed in sys/socket.h
+	    AC_DEFINE(_OE_SOCKETS,1,[Set to 1 to define _OE_SOCKETS< needed in sys/socket.h (OS/390)])  # needed in sys/socket.h
 	    ;;      
 	OSF1-1.0|OSF1-1.1|OSF1-1.2)
 	    # OSF/1 1.[012] from OSF, and derivatives, including Paragon OSF/1
@@ -1540,8 +1540,8 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    # Note: If _REENTRANT isn't defined, then Solaris
 	    # won't define thread-safe library routines.
 
-	    AC_DEFINE(_REENTRANT)
-	    AC_DEFINE(_POSIX_PTHREAD_SEMANTICS)
+	    AC_DEFINE(_REENTRANT,1,[Set to 1 to use thread-safe library routines])
+	    AC_DEFINE(_POSIX_PTHREAD_SEMANTICS,1,[Set to 1 if your machine has Posix pthread semantics])
 
 	    SHLIB_CFLAGS="-KPIC"
 
@@ -1565,8 +1565,8 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    # Note: If _REENTRANT isn't defined, then Solaris
 	    # won't define thread-safe library routines.
 
-	    AC_DEFINE(_REENTRANT)
-	    AC_DEFINE(_POSIX_PTHREAD_SEMANTICS)
+	    AC_DEFINE(_REENTRANT,1,[Set to 1 to use thread-safe library routines])
+	    AC_DEFINE(_POSIX_PTHREAD_SEMANTICS,1,[Set to 1 if your machine uses Posix pthread semantics])
 
 	    SHLIB_CFLAGS="-KPIC"
     
@@ -1677,7 +1677,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
     ], tcl_ok=usable, tcl_ok=unusable)
 	AC_MSG_RESULT([$tcl_ok])
 	if test $tcl_ok = usable; then
-	    AC_DEFINE(USE_SYS_EXEC_H)
+	    AC_DEFINE(USE_SYS_EXEC_H,1,[Set to one to use <sys/exec.h>])
 	else
 	    AC_MSG_CHECKING([a.out.h])
 	    AC_TRY_COMPILE([#include <a.out.h>],[
@@ -1694,7 +1694,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    ], tcl_ok=usable, tcl_ok=unusable)
 	    AC_MSG_RESULT([$tcl_ok])
 	    if test $tcl_ok = usable; then
-		AC_DEFINE(USE_A_OUT_H)
+		AC_DEFINE(USE_A_OUT_H,1,[Set to 1 if your system has a.out.h])
 	    else
 		AC_MSG_CHECKING([sys/exec_aout.h])
 		AC_TRY_COMPILE([#include <sys/exec_aout.h>],[
@@ -1711,7 +1711,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		], tcl_ok=usable, tcl_ok=unusable)
 		AC_MSG_RESULT([$tcl_ok])
 		if test $tcl_ok = usable; then
-		    AC_DEFINE(USE_SYS_EXEC_AOUT_H)
+		    AC_DEFINE(USE_SYS_EXEC_AOUT_H,1,[Set to 1 if your machine has <sys/exec_aout.h>])
 		else
 		    DL_OBJS=""
 		fi
@@ -1914,9 +1914,9 @@ int main() {
 }], tcl_cv_api_serial=sgtty, tcl_cv_api_serial=none, tcl_cv_api_serial=none)
     fi])
     case $tcl_cv_api_serial in
-	termios) AC_DEFINE(USE_TERMIOS);;
-	termio)  AC_DEFINE(USE_TERMIO);;
-	sgtty)   AC_DEFINE(USE_SGTTY);;
+	termios) AC_DEFINE(USE_TERMIOS,1,[Set to 1 if your machine uses termios for serial comm]);;
+	termio)  AC_DEFINE(USE_TERMIO,1,[Set to 1 if your machine uses termio for serial comm]);;
+	sgtty)   AC_DEFINE(USE_SGTTY,1,[Set to 1 if your machine uses sgtty for serial comm]);;
     esac
     AC_MSG_RESULT([$tcl_cv_api_serial])
 ])
@@ -1977,21 +1977,21 @@ closedir(d);
 ], tcl_ok=yes, tcl_ok=no)
 
     if test $tcl_ok = no; then
-	AC_DEFINE(NO_DIRENT_H)
+	AC_DEFINE(NO_DIRENT_H,1,[Set to 1 if your system does not have dirent.h])
     fi
 
     AC_MSG_RESULT([$tcl_ok])
-    AC_CHECK_HEADER(errno.h, , [AC_DEFINE(NO_ERRNO_H)])
-    AC_CHECK_HEADER(float.h, , [AC_DEFINE(NO_FLOAT_H)])
-    AC_CHECK_HEADER(values.h, , [AC_DEFINE(NO_VALUES_H)])
+    AC_CHECK_HEADER(errno.h, , [AC_DEFINE(NO_ERRNO_H,1,[Set to 1 if your system does not have an errno.h])])
+    AC_CHECK_HEADER(float.h, , [AC_DEFINE(NO_FLOAT_H,1,[Set to 1 if you do not have <float.h>])])
+    AC_CHECK_HEADER(values.h, , [AC_DEFINE(NO_VALUES_H,1,[Set to 1 if your system does not have <values.h>])])
     AC_CHECK_HEADER(limits.h,
-	[AC_DEFINE(HAVE_LIMITS_H)], [AC_DEFINE(NO_LIMITS_H)])
+	[AC_DEFINE(HAVE_LIMITS_H,1,[Set to 1 if you have <limits.h>])], [AC_DEFINE(NO_LIMITS_H,1,[Set to 1 if you have no <limits.h>])])
     AC_CHECK_HEADER(stdlib.h, tcl_ok=1, tcl_ok=0)
     AC_EGREP_HEADER(strtol, stdlib.h, , tcl_ok=0)
     AC_EGREP_HEADER(strtoul, stdlib.h, , tcl_ok=0)
     AC_EGREP_HEADER(strtod, stdlib.h, , tcl_ok=0)
     if test $tcl_ok = 0; then
-	AC_DEFINE(NO_STDLIB_H)
+	AC_DEFINE(NO_STDLIB_H,1,[Set to 1 if your system does not have <stdlib.h>])
     fi
     AC_CHECK_HEADER(string.h, tcl_ok=1, tcl_ok=0)
     AC_EGREP_HEADER(strstr, string.h, , tcl_ok=0)
@@ -2001,11 +2001,11 @@ closedir(d);
     # set and why.
 
     if test $tcl_ok = 0; then
-	AC_DEFINE(NO_STRING_H)
+	AC_DEFINE(NO_STRING_H,1,[Set to 1 if your system does not have <string.h>])
     fi
 
-    AC_CHECK_HEADER(sys/wait.h, , [AC_DEFINE(NO_SYS_WAIT_H)])
-    AC_CHECK_HEADER(dlfcn.h, , [AC_DEFINE(NO_DLFCN_H)])
+    AC_CHECK_HEADER(sys/wait.h, , [AC_DEFINE(NO_SYS_WAIT_H,1,[Set to 1 if your system does not have <sys/wait.h>])])
+    AC_CHECK_HEADER(dlfcn.h, , [AC_DEFINE(NO_DLFCN_H,1,[Set to 1 if your system doesn't have <dlfcn.h>])])
 
     # OS/390 lacks sys/param.h (and doesn't need it, by chance).
     AC_HAVE_HEADERS(sys/param.h)
@@ -2364,7 +2364,7 @@ AC_DEFUN([TEA_TCL_LINK_LIBS], [
     #--------------------------------------------------------------------
 
     AC_CHECK_LIB(inet, main, [LIBS="$LIBS -linet"])
-    AC_CHECK_HEADER(net/errno.h, AC_DEFINE(HAVE_NET_ERRNO_H))
+    AC_CHECK_HEADER(net/errno.h, AC_DEFINE(HAVE_NET_ERRNO_H,1,[Set to 1 if you have net/errno.h]))
 
     #--------------------------------------------------------------------
     #	Check for the existence of the -lsocket and -lnsl libraries.
@@ -2431,7 +2431,7 @@ AC_DEFUN([TEA_TCL_EARLY_FLAG],[
 		[tcl_cv_flag_]translit($1,[A-Z],[a-z])=yes,
 		[tcl_cv_flag_]translit($1,[A-Z],[a-z])=no)))
     if test ["x${tcl_cv_flag_]translit($1,[A-Z],[a-z])[}" = "xyes"] ; then
-	AC_DEFINE($1)
+	dnl AC_DEFINE($1)
 	tcl_flags="$tcl_flags $1"
     fi
 ])
@@ -2441,6 +2441,7 @@ AC_DEFUN([TEA_TCL_EARLY_FLAGS],[
     tcl_flags=""
     TEA_TCL_EARLY_FLAG(_ISOC99_SOURCE,[#include <stdlib.h>],
 	[char *p = (char *)strtoll; char *q = (char *)strtoull;])
+    AC_DEFINE(_ISOC99_SOURCE,[],[something tcl.m4 does, shrug])
     TEA_TCL_EARLY_FLAG(_LARGEFILE64_SOURCE,[#include <sys/stat.h>],
 	[struct stat64 buf; int i = stat64("/", &buf);])
     if test "x${tcl_flags}" = "x" ; then
@@ -2448,6 +2449,7 @@ AC_DEFUN([TEA_TCL_EARLY_FLAGS],[
     else
 	AC_MSG_RESULT([${tcl_flags}])
     fi
+    AC_DEFINE(_LARGEFILE64_SOURCE,[],[something tcl.m4 does, shrug])
 ])
 
 #--------------------------------------------------------------------
@@ -2483,14 +2485,14 @@ AC_DEFUN([TEA_TCL_64BIT_FLAGS], [
             case 1: case (sizeof(]${tcl_type_64bit}[)==sizeof(long)): ; 
         }],tcl_cv_type_64bit=${tcl_type_64bit})])
     if test "${tcl_cv_type_64bit}" = none ; then
-	AC_DEFINE(TCL_WIDE_INT_IS_LONG)
+	AC_DEFINE(TCL_WIDE_INT_IS_LONG,1,[Set to 1 if wide ints are long])
 	AC_MSG_RESULT([using long])
     elif test "${tcl_cv_type_64bit}" = "__int64" ; then
 	# We actually want to use the default tcl.h checks in this
 	# case to handle both TCL_WIDE_INT_TYPE and TCL_LL_MODIFIER*
 	AC_MSG_RESULT([using Tcl header defaults])
     else
-	AC_DEFINE_UNQUOTED(TCL_WIDE_INT_TYPE,${tcl_cv_type_64bit})
+	AC_DEFINE_UNQUOTED(TCL_WIDE_INT_TYPE,${tcl_cv_type_64bit},[How Tcl defines a wide int])
 	AC_MSG_RESULT([${tcl_cv_type_64bit}])
 
 	# Now check for auxiliary declarations
@@ -2500,7 +2502,7 @@ AC_DEFUN([TEA_TCL_64BIT_FLAGS], [
 #include <sys/dirent.h>],[struct dirent64 p;],
 		tcl_cv_struct_dirent64=yes,tcl_cv_struct_dirent64=no)])
 	if test "x${tcl_cv_struct_dirent64}" = "xyes" ; then
-	    AC_DEFINE(HAVE_STRUCT_DIRENT64)
+	    AC_DEFINE(HAVE_STRUCT_DIRENT64,1,[Set to 1 if sys/types.h defines struct dirent64])
 	fi
 	AC_MSG_RESULT([${tcl_cv_struct_dirent64}])
 
@@ -2510,7 +2512,7 @@ AC_DEFUN([TEA_TCL_64BIT_FLAGS], [
 ],
 		tcl_cv_struct_stat64=yes,tcl_cv_struct_stat64=no)])
 	if test "x${tcl_cv_struct_stat64}" = "xyes" ; then
-	    AC_DEFINE(HAVE_STRUCT_STAT64)
+	    AC_DEFINE(HAVE_STRUCT_STAT64,1,[Set to 1 if your machines defines struct stat64])
 	fi
 	AC_MSG_RESULT([${tcl_cv_struct_stat64}])
 
@@ -2520,7 +2522,7 @@ AC_DEFUN([TEA_TCL_64BIT_FLAGS], [
 ],
 		tcl_cv_type_off64_t=yes,tcl_cv_type_off64_t=no)])
 	if test "x${tcl_cv_type_off64_t}" = "xyes" ; then
-	    AC_DEFINE(HAVE_TYPE_OFF64_T)
+	    AC_DEFINE(HAVE_TYPE_OFF64_T,1,[Set to 1 if your sys/types.h defines off64_t])
 	fi
 	AC_MSG_RESULT([${tcl_cv_type_off64_t}])
     fi

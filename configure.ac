@@ -2,6 +2,9 @@
 dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run when building Rivet
 dnl	to configure the system for the local environment.
+dnl
+dnl You need at least autoconf 2.59
+dnl
 #
 # RCS: @(#) $Id$
 
@@ -20,6 +23,9 @@ dnl	to configure the system for the local environment.
 #-----------------------------------------------------------------------
 
 AC_INIT([Rivet],[0.5.0])
+AC_CONFIG_HEADERS([config.h])
+#AC_DEFINE([HAVE_LIMITS_H],[],[Set to 1 if your machine has <limits.h>])
+#AC_DEFINE([HAVE_NET_ERRNO_H],[],[Set to 1 if your machine has < net/errno.h>])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -35,7 +41,7 @@ AC_CONFIG_AUX_DIR(tclconfig)
 # Init automake stuff
 #
 AC_DISABLE_STATIC
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
@@ -109,7 +115,7 @@ TEA_ADD_TCL_SOURCES([])
 #--------------------------------------------------------------------
 
 if test "${TEA_PLATFORM}" = "windows" ; then
-    AC_DEFINE(BUILD_sample)
+    AC_DEFINE(BUILD_rivet,1,[Set to 1 to define the BUILD_rivet define (?)])
     CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
@@ -171,7 +177,12 @@ TEA_ENABLE_SYMBOLS
 # link against the non-stubbed Tcl library.  Add Tk too if necessary.
 #--------------------------------------------------------------------
 
-#AC_DEFINE(USE_TCL_STUBS)
+#
+# stubs are causing segmentation violations when mod_rivet is getting
+# loaded into apache.  it would be nice if we did no stubs for this and
+# still did stubs for librivet and librivetparser, which seem to be OK.
+#
+#AC_DEFINE(USE_TCL_STUBS,1,[Set to 1 to link against the Tcl stub library])
 #AC_DEFINE(USE_TK_STUBS)
 
 #--------------------------------------------------------------------
@@ -191,6 +202,10 @@ TEA_MAKE_LIB
 # Add WISH as well if this is a Tk extension.
 #--------------------------------------------------------------------
 
+# We have to either find a working tclsh or be told where it is 
+# using --with-tclsh
+AC_ARG_WITH(apxs, [  --with-tclsh=FILE       location of a working tclsh executable], with_tclsh=${withval})
+
 #
 # allow them to override the tclsh we think we found
 #
@@ -206,11 +221,10 @@ if test x"${with_tclsh}" != x ; then
 else
 TEA_PROG_TCLSH
 fi
-
 #TEA_PROG_WISH
 
 # We have to either find apxs or be told where it is using --with-apxs
-AC_ARG_WITH(apxs, [  --with-apxs              location of Apache's apxs tool], with_apxs=${withval})
+AC_ARG_WITH(apxs, [  --with-apxs=FILE        location of Apache's apxs tool], with_apxs=${withval})
 
 dnl First check to see if --with-magick-config was specified.
 if test x"${with_apxs}" = x ; then
@@ -250,7 +264,8 @@ else
     AC_MSG_ERROR([${with_apxs} is not an executable file])
 fi
 
-AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}")
+AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
+
 
 # Finally, substitute all of the various values into the Makefile.
 # You may alternatively have a special pkgIndex.tcl.in or other files

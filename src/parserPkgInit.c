@@ -19,8 +19,12 @@
    limitations under the License.
 */
 
-
 /* $Id$ */
+
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <tcl.h>
 #include "rivetParser.h"

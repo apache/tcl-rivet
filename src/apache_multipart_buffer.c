@@ -13,6 +13,11 @@
    limitations under the License.
 */
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "apache_multipart_buffer.h"
 
 /*********************** internal functions *********************/

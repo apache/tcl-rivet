@@ -55,3 +55,6 @@ aclocal19 -I /usr/local/gnu-autotools/share/aclocal
 
 automake19 --foreign
 aclocal19 -I /usr/local/gnu-autotools/share/aclocal
+
+export AUTOMAKE=automake19
+export AUTOCONF=autoconf259

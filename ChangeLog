@@ -9,10 +9,20 @@
 	  causing some problems for mod_rivet.so.
 
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
+        * Clean up presentation of --with-apxs and --with-tclsh and
+	  have them show up when configure --help is run.
 
-        * The configure script is building the .so files but they are
-	  causing a segmentation violation upon an apachectl configtest, it
-	  appears.  Orhters parts of the install aren't quite right yet.  
+	* tclconfig/tcl.m4, configure.ac, config.h, src/*.c:
+	  Switch most autoconf-generated elements that get put on 
+	  compiler command lines as -DHAVE_NET_ERRNO_H, etc, to put 
+	  that stuff in config.h instead.  This included altering
+	  all AC_DEFINE and AC_DEFINE_UNQUOTED macros to have three 
+	  arguments, where the third argument is a description, so that 
+	  autoheader can generate the config.h.in, significantly 
+	  decluttering the compiler command lines.
+	  (tcl.m4 changes should be fed back to the TEA project,
+	  as well as the technique for using automake to simplify
+	  the build)
 
         * Move aclocal.m4 to acinclude.m4 -- we need the aclocal command
 	  to generate acinclude.m4 based on aclocal.m4 and stuff it gleans

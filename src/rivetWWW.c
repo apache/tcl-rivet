@@ -19,6 +19,11 @@
 
 /* $Id$ */
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <tcl.h>
 #include <ctype.h>
 #include "rivet.h"
