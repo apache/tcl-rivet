@@ -13,9 +13,13 @@
       <year>2002</year>
       <holder>Apache Software Foundation</holder>
     </copyright>
+    <author>
+      <firstname>David</firstname>
+      <surname>Welton</surname>
+    </author>
   </articleinfo>
 
-  <section>
+  <section id="directives">
     <title>Rivet Apache Directives</title>
     <variablelist>
       <varlistentry>
@@ -324,8 +328,8 @@
       The following HTML:
       <programlisting>
 	&lt;form action="foo.ttml" enctypee="multipart/form-data"
-	  method="post"&gt;
-	  &lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
+	method="post"&gt;
+	&lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
 	&lt;/form&gt;
       </programlisting>
 
@@ -421,8 +425,7 @@
 	  <para>
 	    Like the Tcl <command>source</command> command, but also
 	    parses for Rivet &lt;?  and ?&gt; processing tags.  Using
-	    this command, you can use one <filename>.rvt</filename>
-	    file from another.
+	    this command, you can use one .rvt file from another.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -515,7 +518,8 @@
       </varlistentry>
 
       <varlistentry>
-	<term><cmdsynopsis>
+	<term>
+	  <cmdsynopsis>
 	    <command>makeurl</command>
 	    <arg><replaceable>filename</replaceable></arg>
 	  </cmdsynopsis>
@@ -531,8 +535,283 @@
 	  </para>
 	</listitem>
       </varlistentry>
-
     </variablelist>
 
+  </section>
+
+  <section>
+    <title>Resources - How to Get Help</title>
+
+    <section>
+      <title>Mailing Lists</title>
+      <para>
+	The Rivet mailing list is the first place you should turn for
+	help, if you haven't found the solution to your problem in the
+	documentation.  Send email to
+	<email>rivet-user@tcl.apache.org</email>.  If you have a
+	question, idea, or comment about the Rivet code itself, please
+	send us email at <email>rivet-dev@tcl.apache.org</email>.  To
+	subscribe to either list, post email to
+	<email>rivet-<replaceable>list</replaceable>-subscribe@tcl.apache.org</email>.
+      </para>
+      <para>
+	The mailing list archives are available at <ulink
+	  url="http://www.apachelabs.org"/>
+      </para>
+    </section>
+
+    <section>
+      <title>Web Sites</title>
+
+      <para>
+	There are several web sites that cover Apache and Tcl
+	extensively.
+      </para>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <ulink url="http://tcl.apache.org"/> is the home for the
+	    Apache Tcl project.  Go there for the latest versions of
+	    our software (if you aren't reading these pages off of the
+	    site!).
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://httpd.apache.org/docs/"/> is the first
+	    place to go for questions about the Apache web server.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://www.tcl.tk/"/> is the cannonical site
+	    for Tcl information.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="htt://wiki.tcl.tk"/> is the Tcl'ers Wiki, a
+	    free-form place to search for answers and ask for help.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+  </section>
+
+  <section>
+    <title>Apache Rivet Installation</title>
+
+    <procedure>
+      <step>
+	<title>Check Dependencies</title>
+	<para>
+	  To install Rivet, you will need Tcl 8.2 or greater and
+	  Apache 1.3.xx.  It is known to run on Linux, FreeBSD,
+	  OpenBSD, and Solaris and HPUX.  Windows NT is also possible
+	  - please see the directions in the distribution.
+	</para>
+      </step>
+      <step>
+	<title>Get Rivet</title>
+	<para>
+	  Download the sources at <ulink
+	    url="http://tcl.apache.org/Rivet/download"/>.  Currently
+	  the only way to obtain Rivet.  In the future, we hope to
+	  have a FreeBSD port, Debian package, RPM's, and windows
+	  binaries.
+	</para>
+      </step>
+      <step performance="optional">
+	<title>Get and Install Apache Sources</title>
+	<para>
+	  If you don't have them, or if you want to build Rivet as a
+	  static (built in) part of the Apache web server, you need
+	  the source code to Apache, which is available from <ulink
+	    url="http://httpd.apache.org/"/>.  Otherwise, you don't need
+	  to perform this step.  Infact, we recommend that you build
+	  Rivet as a shared object, and therefore, build it seperately
+	  from Apache.
+	</para>
+      </step>
+      <step>
+	<title>Uncompress Sources</title>
+	<para>
+	  We will assume that you have Apache installed at this point.
+	  You must uncompress the Rivet sources in the directory where you
+	  wish to compile them.
+	  <programlisting>
+	    gunzip tcl-rivet-X.X.X.tar.gz
+	    tar -xvf tcl-rivet-X.X.X.tar.gz
+	  </programlisting>
+	</para>
+      </step>
+      <step>
+	<title>Building Rivet</title>
+	<para>
+	  Rivet uses a unique build system which we created especially
+	  for this project.  It utilizes the information included in
+	  Apache and Tcl regarding their configurations, in order to
+	  compile itself via a series of Tcl scripts, which are
+	  located in the <filename>buildscripts/</filename> directory.
+	</para>
+	<substeps>
+	  <step>
+	    <title>Edit src/make.tcl</title>
+	    <para>
+	      It may be necessary to edit
+	      <filename>src/make.tcl</filename> by hand in order to
+	      set certain options.  Try the next step first, and see
+	      if it's successful.
+	    </para>
+	  </step>
+	  <step>
+	    <para>At this point, you are ready to run the build
+	      system:</para>
+	    <programlisting>
+	      cd src/
+	      ./make.tcl <replaceable>option</replaceable>
+	    </programlisting>
+	    <para>where <replaceable>option</replaceable> can be
+	      either <option>shared</option> or
+	      <option>static</option>.
+	    </para>
+	  </step>
+	  <step>
+	    <title>Install</title>
+	    <para>
+	      Now, you are ready to run the <command>./make
+		install</command> command to install the resulting
+	      files.  This should copy the shared object (like
+	      <filename>mod_rivet.so</filename>, if one was
+	      successfully created, into Apache's
+	      <filename>libexec</filename> directory, as well as
+	      install some support scripts and various code.
+	    </para>
+	  </step>
+	</substeps>
+      </step>
+      <step>
+	<title>Apache Configuration Files</title>
+	<para>
+	  Rivet is relatively easy to configure - we start off by
+	  adding the module itself:
+	</para>
+	<programlisting>
+	  LoadModule rivet_module <replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable>
+	</programlisting>
+	<para>
+	  This tells Apache to load the Rivet shared object, wherever
+	  it happens to reside on your file system.  Now we have to
+	  tell Apache what kind of files are "Rivet" files and how to
+	  process them:
+	</para>
+	<programlisting>
+	  AddType application/x-httpd-rivet .rvt
+	  AddType application/x-rivet-tcl .tcl
+	</programlisting>
+	<para>
+	  These tell Apache to process files with the
+	  <filename>.rvt</filename> and <filename>.tcl</filename>
+	  extensions as Rivet files.
+	</para>
+	<para>
+	  For other directives that Rivet provides for Apache
+	  configuration, please see <xref linkend="directives"/>.
+	</para>
+      </step>
+    </procedure>
+  </section>
+  <section>
+    <title>Rivet Internals</title>
+    <para>
+      This section easily falls out of date, as new code is added, old
+      code is removed, and changes are made.  The best place to look
+      is the source code itself.  If you are interested in the changes
+      themselves FIXME.
+    </para>
+    <section>
+      <title>Initialization</title>
+      <para>
+	When Apache is started, (or when child Apache processes are
+	started if a threaded Tcl is used),
+	<function>Rivet_InitTclStuff</function> is called, which
+	creates a new interpreter, or one interpreter per virtual
+	host, depending on the configuration. It also initializes
+	various things, like the <structname>RivetChan</structname>
+	channel system, creates the Rivet-specific Tcl commands, and
+	executes Rivet's <filename>init.tcl</filename>.  The caching
+	system is also set up, and if there is a
+	<command>GlobalInitScript</command>, it is run.
+      </para>
+    </section>
+    <section>
+      <title>RivetChan</title>
+      <para>
+	The <structname>RivetChan</structname> system was created in
+	order to have an actual Tcl channel that we could redirect
+	standard output to.  This lets us use, for instance, the
+	regular <command>puts</command> command in .rvt pages.  It
+	works by creating a channel that buffers output, and, at
+	predetermined times, passes it on to Apache's IO system.
+	Tcl's regular standard output is replaced with an instance of
+	this channel type, so that, by default, output will go to the
+	web page.
+      </para>
+    </section>
+    <section>
+      <title>Page Parsing, Execution and Cacheing</title>
+      <para>
+	When a Rivet page is requested, it is transformed into an
+	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
+	processing instruction tags.  Everything outside these tags
+	becomes a large <command>puts</command> statement, and
+	everything inside them remains Tcl code.
+      </para>
+      <para>
+	Each .rvt file is evaluated in its own
+	<constant>::request</constant> namespace, so that it is not
+	necessary to create and tear down interpreters after each
+	page.  By running in its own namespace, though, each page will
+	not run afoul of local variables created by other scripts,
+	because they will be deleted automatically when the namespace
+	goes away after Apache finishes handling the request.
+      </para>
+      <note>
+	One current problem with this system is that while variables
+	are garbage collected, file handles are not, so that it is
+	very important that Rivet script authors make sure to close
+	all the files they open.
+      </note>
+      <para>
+	After a script has been loaded and parsed into it's "pure Tcl"
+	form, it is also cached, so that it may be used in the future
+	without having to reload it (and re-parse it) from the disk.
+	The number of scripts stored in memory is configurable.  This
+	feature can significantly improve performance.
+      </para>
+    </section>
+  </section>
+  <section>
+    <title>Upgrading from mod_dtcl or NeoWebScript</title>
+    <para>
+      Rivet is a break from the past, in that we, the authors, have
+      attempted to take what we like best about our past efforts, and
+      leave out or change things we no longer care for.  Backwards
+      compatibility was not a primary goal when creating Rivet, but we
+      do provide this information which may be of use to those wishing
+      to upgrade from mod_dtcl or NWS installations.
+    </para>
+    <section>
+      <title>mod_dtcl</title>
+      <para>
+	Rivet was originally based on the dtcl code, but it has
+	changed (improved!) quite a bit.  The concepts remain the
+	same, but many of the commands have changed.
+      </para>
+    </section>
+    <section>
+      <title>NeoWebScript</title>
+      <para>TODO</para>
+    </section>
   </section>
 </article>
