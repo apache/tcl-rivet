@@ -99,6 +99,14 @@ namespace eval DIO {
 	    return " LIMIT [expr $offset - 1],$limit"
 	}
 
+	method handle {} {
+	    if {[info exists conn]} {
+		return $conn
+	    } else {
+		return ""
+	    }
+	}
+
 	public variable db "" {
 	    if {[info exists conn]} {
 		mysqluse $conn $db

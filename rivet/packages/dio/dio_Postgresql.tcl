@@ -93,6 +93,18 @@ namespace eval DIO {
 	    return $sql
 	}
 
+	#
+	# handle - return the internal database handle, in the postgres
+	# case, the postgres connection handle
+	#
+	method handle {} {
+	    if {[info exists conn]} {
+		return $conn
+	    } else {
+		return ""
+	    }
+	}
+
 	## If they change DBs, we need to close the connection and re-open it.
 	public variable db "" {
 	    if {[info exists conn]} {
