@@ -40,7 +40,6 @@ namespace eval ::Rivet {
     ## of special cleanup can be placed here.
     ###
     proc cleanup_request {} {
-
     }
 
     ###

@@ -1,3 +1,8 @@
+2002-09-07  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_PropagatePerDirConfArrays): Do the right
+	tricks with IncrRefCount and DecrRefCount to stop the leak.
+
 2002-08-03  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_AppendToScript): Changed before, after,

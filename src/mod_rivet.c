@@ -262,6 +262,31 @@ static void
 Rivet_CleanupRequest( request_rec *r )
 {
 #if 0
+    table *t;
+    array_header *arr;
+    table_entry  *elts;
+    int i, nelts;
+    Tcl_Obj *arrayName;
+    Tcl_Interp *interp;
+
+    rivet_server_conf *rsc = RIVET_SERVER_CONF( r->per_dir_config );
+
+    t = rsc->rivet_user_vars;
+    arr   = ap_table_elts( t );
+    elts  = (table_entry *)arr->elts;
+    nelts = arr->nelts;
+    arrayName = Tcl_NewStringObj( "RivetUserConf", -1 );
+    interp = rsc->server_interp;
+
+    for( i = 0; i < nelts; ++i )
+    {
+	Tcl_UnsetVar2(interp,
+		      "RivetUserConf",
+		      elts[i].key,
+		      TCL_GLOBAL_ONLY);
+    }
+    Tcl_DecrRefCount(arrayName);
+
     rivet_server_conf *rdc = RIVET_SERVER_CONF( r->per_dir_config );
 
     if( rdc->rivet_before_script ) {
@@ -284,7 +309,8 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     table_entry  *elts;
     int i, nelts;
     Tcl_Obj *arrayName;
-
+    Tcl_Obj *key;
+    Tcl_Obj *val;
 
     /* Make sure RivetDirConf doesn't exist from a previous request. */
     Tcl_UnsetVar( interp, "RivetDirConf", TCL_GLOBAL_ONLY );
@@ -318,11 +344,17 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
 
     for( i = 0; i < nelts; ++i )
     {
-	Tcl_ObjSetVar2(interp,
+	key = Tcl_NewStringObj( elts[i].key, -1);
+	val = Tcl_NewStringObj( elts[i].val, -1);
+	Tcl_IncrRefCount(key);
+	Tcl_IncrRefCount(val);
+ 	Tcl_ObjSetVar2(interp,
 		       arrayName,
-		       Tcl_NewStringObj( elts[i].key, -1),
-		       Tcl_NewStringObj( elts[i].val, -1),
+		       key,
+		       val,
 		       TCL_GLOBAL_ONLY);
+	Tcl_DecrRefCount(key);
+	Tcl_DecrRefCount(val);
     }
     Tcl_DecrRefCount(arrayName);
 }
@@ -698,6 +730,8 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
     rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
     char *string = val;
 
+    FILEDEBUGINFO;
+
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetServerConf requires two arguments";
     }
@@ -742,6 +776,8 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
     char *string = val;
 
+    FILEDEBUGINFO;
+
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetDirConf requires two arguments";
     }
@@ -768,6 +804,7 @@ static const char *
 Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
     char *string = val;
+
     FILEDEBUGINFO;
 
     if ( var == NULL || val == NULL ) {
@@ -776,7 +813,7 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 
     string = Rivet_AppendToScript( cmd->pool, rdc, var, val );
 
-    /* ap_table_set( rdc->rivet_user_vars, var, string ); */
+    ap_table_set( rdc->rivet_user_vars, var, string );
     return( NULL );
 }
 
@@ -807,7 +844,7 @@ Rivet_MergeDirConfigVars( pool *p, rivet_server_conf *new,
 	new->rivet_dir_vars = base->rivet_dir_vars;
     }
     if (base->rivet_user_vars && add->rivet_user_vars) {
-	new->rivet_user_vars =
+   	new->rivet_user_vars =
 	    ap_overlay_tables( p, base->rivet_user_vars, add->rivet_user_vars );
     } else {
 	new->rivet_user_vars = base->rivet_user_vars;
@@ -844,6 +881,8 @@ Rivet_GetConf( request_rec *r )
 static void
 Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 {
+    FILEDEBUGINFO;
+
     newrsc->server_interp = oldrsc->server_interp;
     newrsc->rivet_global_init_script = oldrsc->rivet_global_init_script;
     newrsc->rivet_child_init_script = oldrsc->rivet_child_init_script;
@@ -874,6 +913,8 @@ static void *
 Rivet_CreateConfig( pool *p, server_rec *s )
 {
     rivet_server_conf *rsc = RIVET_NEW_CONF(p);
+
+    FILEDEBUGINFO;
 
     rsc->server_interp = NULL;
     rsc->rivet_global_init_script = NULL;
@@ -913,6 +954,8 @@ Rivet_CreateDirConfig(pool *p, char *dir)
 {
     rivet_server_conf *rdc = RIVET_NEW_CONF(p);
 
+    FILEDEBUGINFO;
+
     rdc->rivet_server_vars = ap_make_table( p, 4 );
     rdc->rivet_dir_vars = ap_make_table( p, 4 );
     rdc->rivet_user_vars = ap_make_table( p, 4 );
@@ -940,6 +983,8 @@ Rivet_MergeConfig(pool *p, void *basev, void *overridesv)
     rivet_server_conf *rsc = RIVET_NEW_CONF(p);
     rivet_server_conf *base = (rivet_server_conf *) basev;
     rivet_server_conf *overrides = (rivet_server_conf *) overridesv;
+
+    FILEDEBUGINFO;
 
     rsc->server_interp = overrides->server_interp ?
 	overrides->server_interp : base->server_interp;

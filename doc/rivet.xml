@@ -51,9 +51,9 @@
 	<para>
 	  Download the sources at <ulink
 	    url="http://tcl.apache.org/rivet/download"/>.  Currently
-	  the only way to obtain Rivet.  In the future, we hope to
-	  have a FreeBSD port, Debian package, RPM's, and windows
-	  binaries.
+	    the only way to obtain Rivet.  In the future, we hope to
+	    have a FreeBSD port, Debian package, RPM's, and windows
+	    binaries.
 	</para>
       </step>
       <step performance="optional">
@@ -62,7 +62,7 @@
 	  If you don't have them, or if you want to build Rivet as a
 	  static (built in) part of the Apache web server, you need
 	  the source code to Apache, which is available from <ulink
-	    url="http://httpd.apache.org/"/>.  Otherwise, you don't need
+	  url="http://httpd.apache.org/"/>.  Otherwise, you don't need
 	  to perform this step.  Infact, we recommend that you build
 	  Rivet as a shared object, and therefore, build it seperately
 	  from Apache.
@@ -159,6 +159,12 @@
 
   <section id="directives">
     <title>Rivet Apache Directives</title>
+
+    <para>
+      These directives are used within the Apache httpd server
+      configuration files to modify Apache Rivet's behaviour.
+    </para>
+
     <variablelist>
       <varlistentry>
 	<term>
