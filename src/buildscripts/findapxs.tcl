@@ -27,7 +27,7 @@ namespace eval findapxs {
 	}
 
 	if {$apxs == ""} {
-	    error "could not find Apache Extension Tool apxs in $apxsDirList"
+	    error "could not find Apache Extension Tool apxs in $apxsDirList\nThe location of apxs can also be specified using the \"-with-apxs\" option on the configure command line."
 	}
 
 	return $apxs
