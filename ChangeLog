@@ -1,3 +1,11 @@
+2004-01-20  Karl Lehenbauer  <karl@sc.com>
+
+	*  rivet/packages/dio/diodisplay.tcl: Removed calls to abort_page
+	when relatively benign conditions like no records matching a search
+	occur.  This allows us to emit all the code we need, like closing
+	the table (</table>) and emiting our page trailer, etc, instead of
+	having the page cut off somewhere in the middle.
+
 2004-01-15  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/rivet-tcl/load_response.tcl (load_response): Fixed a bug

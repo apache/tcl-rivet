@@ -122,7 +122,6 @@ catch { ::itcl::delete class DIODisplay }
 
 	if {![is_function $mode]} {
 	    puts "In-valid function"
-	    abort_page
 	    return
 	}
 
@@ -406,7 +405,6 @@ catch { ::itcl::delete class DIODisplay }
 
 	if {[$DIOResult numrows] <= 0} {
 	    puts "Could not find any matching records."
-	    abort_page
 	    return
 	}
 
@@ -518,7 +516,6 @@ catch { ::itcl::delete class DIODisplay }
     method Edit {} {
 	if {![fetch $response(query) array]} {
 	    puts "That record does not exist in the database."
-	    abort_page
 	    return
 	}
 
@@ -564,7 +561,6 @@ catch { ::itcl::delete class DIODisplay }
 
 	if {[array exists a]} {
 	    puts "That record already exists in the database."
-	    abort_page
 	    return
 	}
 
@@ -577,7 +573,6 @@ catch { ::itcl::delete class DIODisplay }
     method Delete {} {
 	if {![fetch $response(query) array]} {
 	    puts "That record does not exist in the database."
-	    abort_page
 	    return
 	}
 
@@ -622,7 +617,6 @@ catch { ::itcl::delete class DIODisplay }
     method Details {} {
 	if {![fetch $response(query) array]} {
 	    puts "That record does not exist in the database."
-	    abort_page
 	    return
 	}
 
