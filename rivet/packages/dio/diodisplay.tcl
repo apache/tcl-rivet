@@ -98,6 +98,8 @@ catch { ::itcl::delete class DIODisplay }
 	puts "<B>An error has occurred processing your request</B>"
 	puts "<PRE>"
 	puts "$error"
+	puts ""
+	puts "$::errorInfo"
 	puts "</PRE>"
     }
 
@@ -300,20 +302,26 @@ catch { ::itcl::delete class DIODisplay }
     method showform {} {
 	showform_prolog
 
-	# emit the fields for each field using the showform method
-	# of the field.  if they've typed something into the
-	# search field and it matches one of the fields in the
-	# record (and it should), put that in as the default
+	# emit each field
 	foreach field $fields {
-	    if {[info exists response(by)] && $response(by) == [$field text]} {
-		if {![$field readonly] && $response(query) != ""} {
-		    $field value $response(query)
-		}
-	    }
-	    $field showform
+	    showform_field $field
 	}
 
 	showform_epilog
+    }
+
+    # showform_field - emit the form field for the specified field using 
+    # the showform method of the field.  If the user has typed something 
+    # into the search field and it matches the fields being emitted,
+    # use that value as the default
+    #
+    method showform_field {field} {
+	if {[info exists response(by)] && $response(by) == [$field text]} {
+	    if {![$field readonly] && $response(query) != ""} {
+		$field value $response(query)
+	    }
+	}
+	$field showform
     }
 
     method page_buttons {end {count 0}} {
