@@ -1,5 +1,11 @@
 2004-05-05  Karl Lehenbauer  <karl@sc.com>
 
+	* /rivet/packages/dio/diodisplay.tcl: When adding a new record,
+	if they've typed anything into the "is" field, set the default
+	value of the field specified in the "where" part to match.
+
+2004-05-05  Karl Lehenbauer  <karl@sc.com>
+
 	* doc/rivet.xml: Documented the escape_string, unescape_string,
 	escape_sgml_chars, and escape_shell_command functions.
 

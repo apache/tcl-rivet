@@ -165,6 +165,12 @@ catch { ::itcl::delete class DIODisplay }
 	puts "</TABLE>"
     }
 
+    #
+    # showform - emit a form for inserting a new record
+    #
+    # response(searchBy) will contain whatever was in the "where" field
+    # response(query) will contain whatever was in the "is" field
+    #
     method showform {} {
 	get_field_values array
 
@@ -179,7 +185,17 @@ catch { ::itcl::delete class DIODisplay }
 	$form hidden DIODfromMode -value $response(mode)
 	$form hidden DIODkey -value [$DIO makekey array]
 	puts {<TABLE CLASS="DIOForm">}
+
+	# emit the fields for each field using the showform method
+	# of the field.  if they've typed something into the
+	# search field and it matches one of the fields in the
+	# record (and it should), put that in as the default
 	foreach field $fields {
+	    if {$response(searchBy) == [$field text]} {
+		if {![$field readonly] && $response(query) != ""} {
+		    $field value $response(query)
+		}
+	    }
 	    $field showform
 	}
 	puts "</TABLE>"
@@ -926,10 +942,21 @@ catch { ::itcl::delete class ::DIODisplayField }
     public variable display		""
     public variable form		""
     public variable formargs		""
+
+    # name - the field name
     public variable name		""
+
+    # text - the description text for the field. if not specified,
+    #  it's constructed from a prettified version of the field name
     public variable text		""
+
+    # value - the default value of the field
     public variable value		""
+
+    # type - the data type of the field
     public variable type		"text"
+
+    # readonly - if 1, we don't allow the value to be changed
     public variable readonly		0
 
 } ; ## ::itcl::class DIODisplayField
