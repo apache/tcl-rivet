@@ -589,20 +589,32 @@ Rivet_Upload(
     return TCL_OK;
 }
 
-/* Tcl command to erase body, so that only header is returned.
-   Necessary for 304 responses */
 
-static int
-Rivet_NoBody(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_NoBody --
+ *
+ * 	Tcl command to erase body, so that only header is returned.
+ *	Necessary for 304 responses.
+ *
+ * Results:
+ *	A standard Tcl return value.
+ *
+ * Side Effects:
+ *	Eliminates any body returned in the HTTP response.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_NoBody )
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    if (globals->req->content_sent == 1)
+    if (globals->req->content_sent == 1) {
+	Tcl_AddErrorInfo(interp, "Content already sent");
 	return TCL_ERROR;
+    }
 
     globals->req->content_sent = 1;
     return TCL_OK;

@@ -57,7 +57,7 @@ TODO
 
 * Find a way of integrating the Tcl event loop?
 
-* Document parser commands.
+* Document and add tests for parserivetdata command.
 
 MAYBE
 =====

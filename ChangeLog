@@ -1,3 +1,8 @@
+2003-12-20  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_NoBody): Return an error if content has
+	already been sent.
+
 2003-12-13  David N. Welton  <davidw@dedasys.com>
 
 	* tests/broken.test: Updated test results for what is actually
