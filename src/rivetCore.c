@@ -238,7 +238,7 @@ Rivet_Headers(
 
 	if (objc != 3)
 	{
-	    Tcl_WrongNumArgs(interp, 2, objv, "response code");
+	    Tcl_WrongNumArgs(interp, 2, objv, "response_code_number");
 	    return TCL_ERROR;
 	}
 	if (Tcl_GetIntFromObj(interp, objv[2], &st) != TCL_ERROR) {

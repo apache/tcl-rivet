@@ -1,4 +1,17 @@
+2003-05-26  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_Headers): Change error message to better
+	reflect that there is only one argument to 'headers numeric'.
+	Thanks to "Dmitry Zuryanovich".
+
+	* src/mod_rivet.c (Rivet_ParseExecFile): Updated
+	Rivet_GetRivetFile and Rivet_GetTclFile to use the right
+	arguments.
+
 2003-05-24  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/packages/tclrivet/tclrivet.tcl: Added commands that need
+	to be filled in.
 
 	* tests/runtests.tcl: Use apachetest::need_modules.
 

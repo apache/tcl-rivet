@@ -217,10 +217,10 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	{
 	    /* toplevel == 0 means we are being called from the parse
 	     * command, which only works on Rivet .rvt files. */
-	    result = Rivet_GetRivetFile(filename, toplevel, outbuf, req);
+	    result = Rivet_GetRivetFile(filename, toplevel, outbuf, interp);
 	} else {
 	    /* It's a plain Tcl file */
-	    result = Rivet_GetTclFile(filename, outbuf, req);
+	    result = Rivet_GetTclFile(filename, outbuf, interp);
 	}
 	if (result != TCL_OK)
 	{
@@ -462,7 +462,8 @@ Rivet_SendContent(request_rec *r)
     }
 #endif
 
-    if ((errstatus = ApacheRequest___parse(globals->req->apachereq)) != OK) {
+    errstatus = ApacheRequest_parse(globals->req->apachereq);
+    if (errstatus != OK) {
 	retval = errstatus;
 	goto sendcleanup;
     }
