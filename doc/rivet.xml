@@ -50,7 +50,7 @@
 	<title>Get Rivet</title>
 	<para>
 	  Download the sources at <ulink
-	    url="http://tcl.apache.org/Rivet/download"/>.  Currently
+	    url="http://tcl.apache.org/rivet/download"/>.  Currently
 	  the only way to obtain Rivet.  In the future, we hope to
 	  have a FreeBSD port, Debian package, RPM's, and windows
 	  binaries.
