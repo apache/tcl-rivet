@@ -3,6 +3,7 @@
 
 #include <tcl.h>
 #include "apache_request.h"
+#include "TclWeb.h"
 
 /* init.tcl file relative to the server root directory */
 #define RIVET_DIR "rivet"
@@ -76,18 +77,14 @@ typedef struct {
 
 typedef struct {
     request_rec *r;             /* request rec */
-    ApacheRequest *req;         /* libapreq request  */
+    TclWebRequest *req;         /* TclWeb API request */
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc, char *filename, int toplevel);
 int Rivet_SetHeaderType(request_rec *, char *);
 int Rivet_PrintHeaders(request_rec *);
 int Rivet_PrintError(request_rec *, int, char *);
-char *Rivet_StringToUtf(char *input, ap_pool *pool);
 rivet_server_conf *Rivet_GetConf(request_rec *r);
-
-/* Macro to Tcl Objectify StringToUtf stuff */
-#define STRING_TO_UTF_TO_OBJ(string, pool) Tcl_NewStringObj(Rivet_StringToUtf(string, pool), -1)
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 

@@ -16,15 +16,30 @@ source [ file join . buildscripts parsetclConfig.tcl ]
 
 # add variables
 
-set APXS "/usr/local/apache/bin/apxs"
+if { [file executable "/usr/local/apache/bin/apxs"] == 1 } {
+    set APXS "/usr/local/apache/bin/apxs"
+} else {
+    # edit here
+    set APXS "apxs"
+}
 
-set INC "-I[exec $APXS -q INCLUDEDIR] -I$TCL_PREFIX/include"
+if { [catch {
+    set INCLUDEDIR [exec $APXS -q INCLUDEDIR]
+    set LIBEXECDIR [exec $APXS -q LIBEXECDIR]
+    set PREFIX [exec $APXS -q PREFIX]
+} err] != 0 } {
+    puts stderr $err
+    puts stderr "You need to edit 'make.tcl' to supply the location of Apache's apxs tool"
+    exit 1
+}
+
+set INC "-I$INCLUDEDIR -I$TCL_PREFIX/include"
 
 set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS -c"
 
 set MOD_STLIB mod_rivet.a
 set MOD_SHLIB mod_rivet[info sharedlibextension]
-set MOD_OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o mod_rivet.o"
+set MOD_OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o mod_rivet.o TclWebapache.o"
 
 set LIB_STLIB librivet.a
 set LIB_SHLIB librivet[info sharedlibextension]
@@ -125,7 +140,7 @@ AddNode all {
 }
 
 AddNode module {
-    depends "TclWebapache.o shared"
+    depends "shared"
 }
 
 AddNode shared {
@@ -153,8 +168,8 @@ AddNode libtesting.so {
 
 AddNode install {
     depends "$MOD_SHLIB $LIB_SHLIB"
-    tclcommand "file copy -force $MOD_SHLIB [exec $APXS -q LIBEXECDIR]"
-    tclcommand "file copy -force ../rivet [exec $APXS -q PREFIX]"
+    tclcommand "file copy -force $MOD_SHLIB $LIBEXECDIR"
+    tclcommand "file copy -force ../rivet $PREFIX"
     tclcommand "file copy -force $LIB_SHLIB ../rivet/packages/rivet"
 }
 

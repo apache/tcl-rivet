@@ -1,3 +1,22 @@
+2002-01-22  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetList.c (Rivet_LassignArrayObjCmd): Use -1 instead of
+	NULL when doing NewStringObj.
+
+	* src/rivetCrypt.c: Added header file.
+
+	* src/make.tcl: Added slightly nicer apxs handling.
+
+	* src/mod_rivet.c: Moved StringToUtf to TclWeb.
+
+	* src/mod_rivet.h: Removed StringToUtf macro.
+
+	* src/TclWebapache.c: Lots of bug fixes and corrections.
+
+	* src/rivetCore.c (Rivet_LoadEnv): Switched to TclWeb API.
+	(Rivet_LoadCookies): Switched to TclWeb API.
+	(Rivet_Var): Switched to TclWeb API.
+
 2002-01-19  Damon J. Courtney <damon@unreality.com>
 
 	* src/rivetCore.c

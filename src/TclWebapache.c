@@ -13,24 +13,19 @@
 
 #include "apache_request.h"
 #include "apache_cookie.h"
-#include "mod_rivet.h"
+#include "TclWeb.h"
 
 #define TCLWEBPOOL req->req->pool
 
-typedef struct TclWebRequest {
-    Tcl_Interp *interp;
-    request_rec *req;
-    ApacheRequest *apachereq;
-} TclWebRequest;
-
-#include "TclWeb.h"
-
 int
-TclWeb_InitRequest(TclWebRequest *req, void *arg)
+TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
 {
-    req = (TclWebRequest *)Tcl_Alloc(sizeof(TclWebRequest));
-    req->req = (request_rec *)arg;
-    req->apachereq = ApacheRequest_new(req->req);
+    request_rec *r;
+
+    r = (request_rec *)arg;
+    req->interp = interp;
+    req->req = r;
+    req->apachereq = ApacheRequest_new(r);
     return TCL_OK;
 }
 
@@ -62,34 +57,37 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req)
     int i;
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
-
-    result = NULL;
+    int flag = 0;
 
     /* This isn't real efficient - move to hash table later
        on... */
     for (i = 0; i < parmsarray->nelts; ++i)
     {
-	if (!strncmp(varname, Rivet_StringToUtf(parms[i].key, TCLWEBPOOL), strlen(varname)))
+	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
+		     strlen(varname)))
 	{
 	    /* The following makes sure that we get one string,
 	       with no sub lists. */
-	    if (result == NULL)
+	    if (flag == 0)
 	    {
-		result = STRING_TO_UTF_TO_OBJ(parms[i].val, TCLWEBPOOL);
+		flag = 1;
+		Tcl_SetStringObj(result,
+				 TclWeb_StringToUtf(parms[i].val, req), -1);
 		Tcl_IncrRefCount(result);
 	    } else {
+		Tcl_Obj *tmpobj;
 		Tcl_Obj *tmpobjv[2];
 		tmpobjv[0] = result;
-		tmpobjv[1] = STRING_TO_UTF_TO_OBJ(parms[i].val, TCLWEBPOOL);
-		result = Tcl_ConcatObj(2, tmpobjv);
+		tmpobjv[1] = TclWeb_StringToUtfToObj(parms[i].val, req);
+		tmpobj = Tcl_ConcatObj(2, tmpobjv);
+		Tcl_SetStringObj(result, Tcl_GetString(tmpobj), -1);
 	    }
 	}
     }
 
     if (result == NULL)
     {
-	result = Tcl_NewStringObj("", -1);
-	Tcl_IncrRefCount(result);
+	return TCL_ERROR;
     }
 
     return TCL_OK;
@@ -105,22 +103,17 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, TclWebRequest *req)
     /* This isn't real efficient - move to hash table later on. */
     for (i = 0; i < parmsarray->nelts; ++i)
     {
-	if (!strncmp(varname, Rivet_StringToUtf(parms[i].key, TCLWEBPOOL), strlen(varname)))
+
+	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req), strlen(varname)))
 	{
-	    if (result == NULL)
-	    {
-		result = Tcl_NewObj();
-		Tcl_IncrRefCount(result);
-	    }
 	    Tcl_ListObjAppendElement(req->interp, result,
-				     STRING_TO_UTF_TO_OBJ(parms[i].val, TCLWEBPOOL));
+				     TclWeb_StringToUtfToObj(parms[i].val, req));
 	}
     }
 
     if (result == NULL)
     {
-	result = Tcl_NewStringObj("", -1);
-	Tcl_IncrRefCount(result);
+	return TCL_ERROR;
     }
     return TCL_OK;
 }
@@ -132,22 +125,18 @@ TclWeb_GetAllVars(Tcl_Obj *result, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    result = Tcl_NewObj();
-    Tcl_IncrRefCount(result);
     for (i = 0; i < parmsarray->nelts; ++i)
     {
 	Tcl_ListObjAppendElement(req->interp, result,
-				 STRING_TO_UTF_TO_OBJ(parms[i].key, TCLWEBPOOL));
+				 TclWeb_StringToUtfToObj(parms[i].key, req));
 	Tcl_ListObjAppendElement(req->interp, result,
-				 STRING_TO_UTF_TO_OBJ(parms[i].val, TCLWEBPOOL));
+				 TclWeb_StringToUtfToObj(parms[i].val, req));
     }
 
     if (result == NULL)
     {
-	result = Tcl_NewStringObj("", -1);
-	Tcl_IncrRefCount(result);
+	return TCL_ERROR;
     }
-
     return TCL_OK;
 }
 
@@ -158,28 +147,22 @@ TclWeb_GetVarNames(Tcl_Obj *result, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    result = Tcl_NewObj();
-    Tcl_IncrRefCount(result);
-
-    result = Tcl_NewObj();
-    Tcl_IncrRefCount(result);
     for (i = 0; i < parmsarray->nelts; ++i)
     {
 	Tcl_ListObjAppendElement(req->interp, result,
-				 STRING_TO_UTF_TO_OBJ(parms[i].key, TCLWEBPOOL));
+				 TclWeb_StringToUtfToObj(parms[i].key, req));
     }
 
     if (result == NULL)
     {
-	result = Tcl_NewStringObj("", -1);
-	Tcl_IncrRefCount(result);
+	return TCL_ERROR;
     }
 
     return TCL_OK;
 }
 
 int
-TclWeb_VarExists(char *varname, TclWebRequest *req)
+TclWeb_VarExists(Tcl_Obj *result, char *varname, TclWebRequest *req)
 {
     int i;
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
@@ -188,12 +171,16 @@ TclWeb_VarExists(char *varname, TclWebRequest *req)
     /* This isn't real efficient - move to hash table later on. */
     for (i = 0; i < parmsarray->nelts; ++i)
     {
-	if (!strncmp(varname, Rivet_StringToUtf(parms[i].key, TCLWEBPOOL), strlen(varname)))
+	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req), strlen(varname)))
 	{
+	    Tcl_SetIntObj(result, 1);
+	    Tcl_IncrRefCount(result);
 	    return TCL_OK;
 	}
     }
-    return TCL_ERROR;
+    Tcl_SetIntObj(result, 0);
+    Tcl_IncrRefCount(result);
+    return TCL_OK;
 }
 
 int
@@ -201,7 +188,7 @@ TclWeb_VarNumber(Tcl_Obj *result, TclWebRequest *req)
 {
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
 
-    result = Tcl_NewIntObj(parmsarray->nelts);
+    Tcl_SetIntObj(result, parmsarray->nelts);
     Tcl_IncrRefCount(result);
     return TCL_OK;
 }
@@ -236,7 +223,6 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 #endif /* ndef WIN32 */
     char *t;
     time_t date;
-
     int i;
 
     array_header *hdrs_arr;
@@ -260,38 +246,39 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 
     /* These were the "include vars"  */
     Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DATE_LOCAL", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(TCLWEBPOOL,
-					date, timefmt, 0), TCLWEBPOOL), 0);
+		   TclWeb_StringToUtfToObj(ap_ht_time(TCLWEBPOOL, date, timefmt, 0), req), 0);
+
     Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DATE_GMT", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(TCLWEBPOOL,
-					date, timefmt, 1), TCLWEBPOOL), 0);
+		   TclWeb_StringToUtfToObj(ap_ht_time(TCLWEBPOOL, date, timefmt, 1), req), 0);
+
+
     Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("LAST_MODIFIED", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(TCLWEBPOOL,
-					req->req->finfo.st_mtime,
-					timefmt, 0), TCLWEBPOOL), 0);
+		   TclWeb_StringToUtfToObj(ap_ht_time(TCLWEBPOOL,
+						      req->req->finfo.st_mtime,
+						      timefmt, 1), req), 0);
     Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_URI", -1),
-		   STRING_TO_UTF_TO_OBJ(req->req->uri, TCLWEBPOOL), 0);
+		   TclWeb_StringToUtfToObj(req->req->uri, req), 0);
     Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_PATH_INFO", -1),
-		   STRING_TO_UTF_TO_OBJ(req->req->path_info, TCLWEBPOOL), 0);
+		   TclWeb_StringToUtfToObj(req->req->path_info, req), 0);
 
 #ifndef WIN32
     pw = getpwuid(req->req->finfo.st_uid);
     if (pw)
 	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("USER_NAME", -1),
-	       STRING_TO_UTF_TO_OBJ(ap_pstrdup(TCLWEBPOOL, pw->pw_name), TCLWEBPOOL), 0);
+	       TclWeb_StringToUtfToObj(ap_pstrdup(TCLWEBPOOL, pw->pw_name), req), 0);
     else
 	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("USER_NAME", -1),
-		       STRING_TO_UTF_TO_OBJ(
+		       TclWeb_StringToUtfToObj(
 			   ap_psprintf(TCLWEBPOOL, "user#%lu",
-			   (unsigned long)req->req->finfo.st_uid), TCLWEBPOOL), 0);
+			   (unsigned long)req->req->finfo.st_uid), req), 0);
 #endif
 
     if ((t = strrchr(req->req->filename, '/')))
 	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_NAME", -1),
-		       STRING_TO_UTF_TO_OBJ(++t, TCLWEBPOOL), 0);
+		       TclWeb_StringToUtfToObj(++t, req), 0);
     else
 	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_NAME", -1),
-		       STRING_TO_UTF_TO_OBJ(req->req->uri, TCLWEBPOOL), 0);
+		       TclWeb_StringToUtfToObj(req->req->uri, req), 0);
 
     if (req->req->args)
     {
@@ -299,7 +286,7 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 	ap_unescape_url(arg_copy);
 	Tcl_ObjSetVar2(req->interp, envvar,
 	   Tcl_NewStringObj("QUERY_STRING_UNESCAPED", -1),
-	   STRING_TO_UTF_TO_OBJ(ap_escape_shell_cmd(TCLWEBPOOL, arg_copy), TCLWEBPOOL), 0);
+	   TclWeb_StringToUtfToObj(ap_escape_shell_cmd(TCLWEBPOOL, arg_copy), req), 0);
     }
 
     /* ----------------------------  */
@@ -311,8 +298,8 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 	    continue;
 	else {
 	    Tcl_ObjSetVar2(req->interp, envvar,
-			   STRING_TO_UTF_TO_OBJ(hdrs[i].key, TCLWEBPOOL),
-			   STRING_TO_UTF_TO_OBJ(hdrs[i].val, TCLWEBPOOL), 0);
+			   TclWeb_StringToUtfToObj(hdrs[i].key, req),
+			   TclWeb_StringToUtfToObj(hdrs[i].val, req), 0);
 	}
     }
 
@@ -321,8 +308,8 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     {
 	if (!env[i].key)
 	    continue;
-	Tcl_ObjSetVar2(req->interp, envvar, STRING_TO_UTF_TO_OBJ(env[i].key, TCLWEBPOOL),
-		       STRING_TO_UTF_TO_OBJ(env[i].val, TCLWEBPOOL), 0);
+	Tcl_ObjSetVar2(req->interp, envvar, TclWeb_StringToUtfToObj(env[i].key, req),
+		       TclWeb_StringToUtfToObj(env[i].val, req), 0);
     }
 
     /* cleanup system cgi variables */
@@ -350,6 +337,29 @@ TclWeb_EscapeShellCommand(char *out, char *in, TclWebRequest *req)
 {
     out = ap_escape_shell_cmd(TCLWEBPOOL, in);
     return TCL_OK;
+}
+
+/* Functions to convert strings to UTF encoding */
+
+/* These API's are a bit different, because it's so much more
+ * practical. */
+
+char *TclWeb_StringToUtf(char *in, TclWebRequest *req)
+{
+    char *tmp;
+    Tcl_DString dstr;
+    Tcl_DStringInit(&dstr);
+    Tcl_ExternalToUtfDString(NULL, in, (signed)strlen(in), &dstr);
+
+    tmp = ap_pstrdup(TCLWEBPOOL, Tcl_DStringValue(&dstr));
+    Tcl_DStringFree(&dstr);
+    return tmp;
+}
+
+Tcl_Obj *
+TclWeb_StringToUtfToObj(char *in, TclWebRequest *req)
+{
+    return Tcl_NewStringObj(TclWeb_StringToUtf(in, req), -1);
 }
 
 /* output/write/flush?  */

@@ -156,20 +156,6 @@ Rivet_PrintError(request_rec *r, int htmlflag, char *errstr)
     return 0;
 }
 
-/* Function to convert strings to UTF encoding */
-char *
-Rivet_StringToUtf(char *input, ap_pool *pool)
-{
-    char *temp;
-    Tcl_DString dstr;
-    Tcl_DStringInit(&dstr);
-    Tcl_ExternalToUtfDString(NULL, input, (signed)strlen(input), &dstr);
-
-    temp = ap_pstrdup(pool, Tcl_DStringValue(&dstr));
-    Tcl_DStringFree(&dstr);
-    return temp;
-}
-
 /* Function to be used should we desire to upload files to a variable */
 
 #if 0
@@ -483,6 +469,7 @@ Rivet_SendContent(request_rec *r)
     rsc = Rivet_GetConf(r);
     globals = ap_pcalloc(r->pool, sizeof(rivet_interp_globals));
     globals->r = r;
+    globals->req = (TclWebRequest *)ap_pcalloc(r->pool, sizeof(TclWebRequest));
     interp = rsc->server_interp;
     Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
@@ -528,20 +515,19 @@ Rivet_SendContent(request_rec *r)
 
     /* Apache Request stuff */
 
-    globals->req = ApacheRequest_new(r);
-
-    ApacheRequest_set_post_max(globals->req, rsc->upload_max);
-    ApacheRequest_set_temp_dir(globals->req, rsc->upload_dir);
+    TclWeb_InitRequest(globals->req, interp, r);
+    ApacheRequest_set_post_max(globals->req->apachereq, rsc->upload_max);
+    ApacheRequest_set_temp_dir(globals->req->apachereq, rsc->upload_dir);
 
 #if 0
     if (upload_files_to_var)
     {
-	globals->req->hook_data = interp;
-	globals->req->upload_hook = Rivet_UploadHook;
+	globals->req->apachereq->hook_data = interp;
+	globals->req->apachereq->upload_hook = Rivet_UploadHook;
     }
 #endif
 
-    if ((errstatus = ApacheRequest___parse(globals->req)) != OK)
+    if ((errstatus = ApacheRequest___parse(globals->req->apachereq)) != OK)
 	return errstatus;
 
     Rivet_ParseExecFile(r, rsc, r->filename, 1);

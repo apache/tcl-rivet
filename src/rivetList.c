@@ -470,7 +470,7 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
 
     for (idx = 3, listIdx = 0; idx < objc; idx++, listIdx++) {
 	varValue = (listIdx < listObjc) ?
-		listObjv[listIdx] : Tcl_NewStringObj( "", NULL );
+		listObjv[listIdx] : Tcl_NewStringObj("", -1);
 
 	if( Tcl_ObjSetVar2( interp, objv[2], objv[idx],
 				varValue, TCL_LEAVE_ERR_MSG ) == NULL ) {

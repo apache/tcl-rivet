@@ -21,6 +21,7 @@
 #include "apache_cookie.h"
 #include "mod_rivet.h"
 #include "rivet.h"
+#include "TclWeb.h"
 
 #define BUFSZ 4096
 
@@ -273,24 +274,8 @@ Rivet_LoadEnv(
     int objc,
     Tcl_Obj *CONST objv[])
 {
-    char *timefmt = DEFAULT_TIME_FORMAT;
-    char *auth = NULL;
-#ifndef WIN32
-    struct passwd *pw;
-#endif /* ndef WIN32 */
-    char *t;
-
-    time_t date;
-
-    int i;
-
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-
-    array_header *hdrs_arr;
-    table_entry *hdrs;
-    array_header *env_arr;
-    table_entry  *env;
     Tcl_Obj *ArrayObj;
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( objc > 2 ) {
 	Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
@@ -304,112 +289,8 @@ Rivet_LoadEnv(
     }
 
     Tcl_IncrRefCount( ArrayObj );
-    date = globals->r->request_time;
-    /* ensure that the system area which holds the cgi variables is empty */
-    ap_clear_table(globals->r->subprocess_env);
 
-    /* retrieve cgi variables */
-    ap_add_cgi_vars(globals->r);
-    ap_add_common_vars(globals->r);
-
-    hdrs_arr = ap_table_elts(globals->r->headers_in);
-    hdrs = (table_entry *) hdrs_arr->elts;
-
-    env_arr =  ap_table_elts(globals->r->subprocess_env);
-    env     = (table_entry *) env_arr->elts;
-
-    /* Get the user/pass info for Basic authentication */
-    (const char*)auth = ap_table_get(globals->r->headers_in, "Authorization");
-    if ( auth && STREQU(ap_getword_nc(POOL, &auth, ' '), "Basic") )
-    {
-	char *tmp;
-	char *user;
-	char *pass;
-
-	tmp = ap_pbase64decode(POOL, auth);
-	user = ap_getword_nulls_nc(POOL, &tmp, ':');
-	pass = tmp;
- 	Tcl_ObjSetVar2(interp, ArrayObj,
-		       Tcl_NewStringObj("HTTP_USER", -1),
-		       STRING_TO_UTF_TO_OBJ(user, POOL),
-		       0);
- 	Tcl_ObjSetVar2(interp, ArrayObj,
-		       Tcl_NewStringObj("HTTP_PASS", -1),
-		       STRING_TO_UTF_TO_OBJ(pass, POOL),
-		       0);
-    }
-
-    /* These were the "include vars"  */
-    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DATE_LOCAL", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
-					date, timefmt, 0), POOL), 0);
-    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DATE_GMT", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
-					date, timefmt, 1), POOL), 0);
-    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("LAST_MODIFIED", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
-					globals->r->finfo.st_mtime,
-					timefmt, 0), POOL), 0);
-    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_URI", -1),
-		   STRING_TO_UTF_TO_OBJ(globals->r->uri, POOL), 0);
-    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_PATH_INFO", -1),
-		   STRING_TO_UTF_TO_OBJ(globals->r->path_info, POOL), 0);
-
-#ifndef WIN32
-    pw = getpwuid(globals->r->finfo.st_uid);
-    if (pw)
-	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("USER_NAME", -1),
-	       STRING_TO_UTF_TO_OBJ(ap_pstrdup(POOL, pw->pw_name), POOL), 0);
-    else
-	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("USER_NAME", -1),
-		       STRING_TO_UTF_TO_OBJ(
-			   ap_psprintf(POOL, "user#%lu",
-			   (unsigned long)globals->r->finfo.st_uid), POOL), 0);
-#endif
-
-    if ((t = strrchr(globals->r->filename, '/')))
-	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_NAME", -1),
-		       STRING_TO_UTF_TO_OBJ(++t, POOL), 0);
-    else
-	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_NAME", -1),
-		       STRING_TO_UTF_TO_OBJ(globals->r->uri, POOL), 0);
-
-    if (globals->r->args)
-    {
-	char *arg_copy = ap_pstrdup(POOL, globals->r->args);
-	ap_unescape_url(arg_copy);
-	Tcl_ObjSetVar2(interp, ArrayObj,
-	   Tcl_NewStringObj("QUERY_STRING_UNESCAPED", -1),
-	   STRING_TO_UTF_TO_OBJ(ap_escape_shell_cmd(POOL, arg_copy), POOL), 0);
-    }
-
-    /* ----------------------------  */
-
-    /* transfer client request headers to TCL request namespace */
-    for (i = 0; i < hdrs_arr->nelts; ++i)
-    {
-	if (!hdrs[i].key)
-	    continue;
-	else {
-	    Tcl_ObjSetVar2(interp, ArrayObj,
-			   STRING_TO_UTF_TO_OBJ(hdrs[i].key, POOL),
-			   STRING_TO_UTF_TO_OBJ(hdrs[i].val, POOL), 0);
-	}
-    }
-
-    /* transfer apache internal cgi variables to TCL request namespace */
-    for (i = 0; i < env_arr->nelts; ++i)
-    {
-	if (!env[i].key)
-	    continue;
-	Tcl_ObjSetVar2(interp, ArrayObj, STRING_TO_UTF_TO_OBJ(env[i].key, POOL),
-		       STRING_TO_UTF_TO_OBJ(env[i].val, POOL), 0);
-    }
-
-    /* cleanup system cgi variables */
-    ap_clear_table(globals->r->subprocess_env);
-
-    return TCL_OK;
+    return TclWeb_GetEnvVars(ArrayObj, globals->req);
 }
 
 static int
@@ -419,9 +300,8 @@ Rivet_LoadCookies(
     int objc,
     Tcl_Obj *CONST objv[])
 {
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    int i;
     Tcl_Obj *ArrayObj;
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( objc > 2 ) {
 	Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
@@ -434,24 +314,7 @@ Rivet_LoadCookies(
 	ArrayObj = Tcl_NewStringObj( COOKIES_ARRAY_NAME, -1 );
     }
 
-    do { /* I do this because I want some 'local' variables */
-	ApacheCookieJar *cookies = ApacheCookie_parse(globals->r, NULL);
-
-	for (i = 0; i < ApacheCookieJarItems(cookies); i++) {
-	    ApacheCookie *c = ApacheCookieJarFetch(cookies, i);
-	    int j;
-	    for (j = 0; j < ApacheCookieItems(c); j++) {
-		char *name = c->name;
-		char *value = ApacheCookieFetch(c, j);
-		Tcl_ObjSetVar2(interp, ArrayObj,
-			       Tcl_NewStringObj(name, -1),
-			       Tcl_NewStringObj(value, -1), 0);
-	    }
-
-	}
-    } while (0);
-
-    return TCL_OK;
+    return TclWeb_GetCookieVars(ArrayObj, globals->req);
 }
 
 /* Tcl command to return a particular variable.  */
@@ -472,11 +335,8 @@ Rivet_Var(
     Tcl_Obj *CONST objv[])
 {
     char *command;
-    int i;
     Tcl_Obj *result = NULL;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    array_header *parmsarray = ap_table_elts(globals->req->parms);
-    table_entry *parms = (table_entry *)parmsarray->elts;
 
     if (objc < 2 || objc > 3)
     {
@@ -486,6 +346,7 @@ Rivet_Var(
 	return TCL_ERROR;
     }
     command = Tcl_GetString(objv[1]);
+    result = Tcl_NewObj();
 
     if (!strcmp(command, "get"))
     {
@@ -497,31 +358,11 @@ Rivet_Var(
 	}
 	key = Tcl_GetStringFromObj(objv[2], NULL);
 
-        /* This isn't real efficient - move to hash table later
-           on... */
-	for (i = 0; i < parmsarray->nelts; ++i)
+	if (TclWeb_GetVar(result, key, globals->req) != TCL_OK)
 	{
-	    if (!strncmp(key, Rivet_StringToUtf(parms[i].key, POOL), strlen(key)))
-	    {
-		/* The following makes sure that we get one string,
-                   with no sub lists. */
-		if (result == NULL)
-		{
-		    result = STRING_TO_UTF_TO_OBJ(parms[i].val, POOL);
-		    Tcl_IncrRefCount(result);
-		} else {
-		    Tcl_Obj *tmpobjv[2];
-		    tmpobjv[0] = result;
-		    tmpobjv[1] = STRING_TO_UTF_TO_OBJ(parms[i].val, POOL);
-		    result = Tcl_ConcatObj(2, tmpobjv);
-		}
-	    }
+	    result = Tcl_NewStringObj("", -1);
+	    Tcl_IncrRefCount(result);
 	}
-
-	if (result == NULL)
-	    Tcl_AppendResult(interp, "", NULL);
-	else
-	    Tcl_SetObjResult(interp, result);
     } else if(!strcmp(command, "exists")) {
 	char *key;
 	if (objc != 3)
@@ -531,21 +372,7 @@ Rivet_Var(
 	}
 	key = Tcl_GetString(objv[2]);
 
-        /* This isn't real efficient - move to hash table later on. */
-	for (i = 0; i < parmsarray->nelts; ++i)
-	{
-	    if (!strncmp(key, Rivet_StringToUtf(parms[i].key, POOL), strlen(key)))
-	    {
-		result = Tcl_NewIntObj(1);
-		Tcl_IncrRefCount(result);
-	    }
-	}
-
-	if (result == NULL)
-	    Tcl_SetObjResult(interp, Tcl_NewIntObj(0));
-	else
-	    Tcl_SetObjResult(interp, result);
-
+	TclWeb_VarExists(result, key, globals->req);
     } else if(!strcmp(command, "list")) {
 	char *key;
 	if (objc != 3)
@@ -555,44 +382,23 @@ Rivet_Var(
 	}
 	key = Tcl_GetStringFromObj(objv[2], NULL);
 
-        /* This isn't real efficient - move to hash table later on. */
-	for (i = 0; i < parmsarray->nelts; ++i)
+	if (TclWeb_GetVarAsList(result, key, globals->req) != TCL_OK)
 	{
-	    if (!strncmp(key, Rivet_StringToUtf(parms[i].key, POOL), strlen(key)))
-	    {
-		if (result == NULL)
-		{
-		    result = Tcl_NewObj();
-		    Tcl_IncrRefCount(result);
-		}
-		Tcl_ListObjAppendElement(interp, result,
-				     STRING_TO_UTF_TO_OBJ(parms[i].val, POOL));
-	    }
+	    result = Tcl_NewStringObj("", -1);
+	    Tcl_IncrRefCount(result);
 	}
-
-	if (result == NULL)
-	    Tcl_AppendResult(interp, "", NULL);
-	else
-	    Tcl_SetObjResult(interp, result);
     } else if(!strcmp(command, "names")) {
 	if (objc != 2)
 	{
 	    Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	    return TCL_ERROR;
 	}
-	result = Tcl_NewObj();
-	Tcl_IncrRefCount(result);
-	for (i = 0; i < parmsarray->nelts; ++i)
+
+	if (TclWeb_GetVarNames(result, globals->req) != TCL_OK)
 	{
-	    Tcl_ListObjAppendElement(interp, result,
-				     STRING_TO_UTF_TO_OBJ(parms[i].key, POOL));
+	    result = Tcl_NewStringObj("", -1);
+	    Tcl_IncrRefCount(result);
 	}
-
-	if (result == NULL)
-	    Tcl_AppendResult(interp, "", NULL);
-	else
-	    Tcl_SetObjResult(interp, result);
-
     } else if(!strcmp(command, "number")) {
 	if (objc != 2)
 	{
@@ -600,37 +406,25 @@ Rivet_Var(
 	    return TCL_ERROR;
 	}
 
-	result = Tcl_NewIntObj(parmsarray->nelts);
-	Tcl_IncrRefCount(result);
-	Tcl_SetObjResult(interp, result);
+	TclWeb_VarNumber(result, globals->req);
     } else if(!strcmp(command, "all")) {
 	if (objc != 2)
 	{
 	    Tcl_WrongNumArgs(interp, 2, objv, NULL);
 	    return TCL_ERROR;
 	}
-	result = Tcl_NewObj();
-	Tcl_IncrRefCount(result);
-	for (i = 0; i < parmsarray->nelts; ++i)
+	if (TclWeb_GetAllVars(result, globals->req) != TCL_OK)
 	{
-	    Tcl_ListObjAppendElement(interp, result,
-				     STRING_TO_UTF_TO_OBJ(parms[i].key, POOL));
-	    Tcl_ListObjAppendElement(interp, result,
-				     STRING_TO_UTF_TO_OBJ(parms[i].val, POOL));
+	    result = Tcl_NewStringObj("", -1);
+	    Tcl_IncrRefCount(result);
 	}
-
-	if (result == NULL)
-	    Tcl_AppendResult(interp, "", NULL);
-	else
-	    Tcl_SetObjResult(interp, result);
-
-
     } else {
 	/* bad command  */
 	Tcl_AddErrorInfo(interp, "bad option: must be one of "
 		"'get, list, names, number, all'");
 	return TCL_ERROR;
     }
+    Tcl_SetObjResult(interp, result);
 
     return TCL_OK;
 }
@@ -688,7 +482,7 @@ Rivet_Upload(
 	    return TCL_ERROR;
 	}
 	varname = Tcl_GetString(objv[2]);
-	upload = ApacheUpload_find(globals->req->upload, varname);
+	upload = ApacheUpload_find(globals->req->apachereq->upload, varname);
 	if (upload != NULL) /* make sure we have an upload */
 	{
 	    Tcl_Channel chan;
@@ -785,7 +579,7 @@ Rivet_Upload(
 	varname = Tcl_GetString(objv[2]);
 	infotype = Tcl_GetString(objv[3]);
 
-	upload = ApacheUpload_find(globals->req->upload, varname);
+	upload = ApacheUpload_find(globals->req->apachereq->upload, varname);
 	if (upload != NULL)
 	{
 	    if (!strcmp(infotype, "exists"))
@@ -802,7 +596,8 @@ Rivet_Upload(
 		    Tcl_SetStringObj(result, "", -1);
 	    } else if (!strcmp(infotype, "filename")) {
 		Tcl_SetStringObj(result,
-				Rivet_StringToUtf(upload->filename, POOL), -1);
+				 TclWeb_StringToUtf(upload->filename,
+						    globals->req), -1);
 	    } else {
 		Tcl_AddErrorInfo(interp,"unknown upload info command, should "
 			"be exists|size|type|filename");
@@ -817,11 +612,11 @@ Rivet_Upload(
 	    }
 	}
     } else if (!strcmp(command, "names")) {
-	upload = ApacheRequest_upload(globals->req);
+	upload = ApacheRequest_upload(globals->req->apachereq);
 	while (upload)
 	{
 	    Tcl_ListObjAppendElement(interp, result,
-				     STRING_TO_UTF_TO_OBJ(upload->name, POOL));
+				     TclWeb_StringToUtfToObj(upload->name, globals->req));
 	    upload = upload->next;
 	}
     } else {

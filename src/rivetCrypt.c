@@ -5,6 +5,7 @@
 #include <tcl.h>
 #include "rivet.h"
 #include <unistd.h>
+#include <crypt.h>
 
 #define MODE_DECRYPT 0
 #define MODE_ENCRYPT 1
@@ -107,7 +108,7 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
     key = Tcl_GetStringFromObj( objv[1], NULL );
     salt = Tcl_GetStringFromObj( objv[2], NULL );
 
-    resultBuffer = crypt( key, salt );
+    resultBuffer = crypt((const char *)key, (const char *)salt);
 
     if( resultBuffer == NULL ) {
 	Tcl_AppendResult (interp,
