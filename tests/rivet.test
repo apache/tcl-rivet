@@ -76,38 +76,38 @@ set testfilename2 "rivet2-test.tcl"
 
 ::tcltest::test env-1.1 {Environment variable} {
     set page [ ::http::geturl "${urlbase}$testfilename1" ]
-    regexp -line "^ENVS\\(DOCUMENT_NAME\\) = $testfilename1\$" [ ::http::data $page ] match
+    regexp -line "^env\\(DOCUMENT_NAME\\) = $testfilename1\$" [ ::http::data $page ] match
     set match
-} "ENVS(DOCUMENT_NAME) = $testfilename1"
+} "env(DOCUMENT_NAME) = $testfilename1"
 
 ::tcltest::test cookies-1.1 {Cookies} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "foo=bar"} ]
-    regexp -line {^COOKIES\(foo\) = bar$} [ ::http::data $page ] match
+    regexp -line {^cookies\(foo\) = bar$} [ ::http::data $page ] match
     set match
-} {COOKIES(foo) = bar}
+} {cookies(foo) = bar}
 
 ::tcltest::test cookies-1.2 {Cookies + I18N} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "Más=Tú"} ]
-    regexp -line {^COOKIES\(Más\) = Tú$} [ ::http::data $page ] match
+    regexp -line {^cookies\(Más\) = Tú$} [ ::http::data $page ] match
     set match
-} {COOKIES(Más) = Tú}
+} {cookies(Más) = Tú}
 
 ::tcltest::test cookies-1.3 {Cookies + I18N + encoding} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -headers [ list Cookie [ ::http::formatQuery Más Tú ] ] ]
-    regexp -line {^COOKIES\(Más\) = Tú$} [ ::http::data $page ] match
+    regexp -line {^cookies\(Más\) = Tú$} [ ::http::data $page ] match
     set match
-} {COOKIES(Más) = Tú}
+} {cookies(Más) = Tú}
 
 ::tcltest::test cookies-1.4 {Multiple Cookies} {
     set rslt 0
     set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "bop; foo=bar;doo=wah; shoo=be ;doooo=bee;dot=dow  "} ]
     set pgdata [ ::http::data $page ]
-    incr rslt [ regexp -line {^COOKIES\(foo\) = bar$} $pgdata ]
-    incr rslt [ regexp -line {^COOKIES\(doo\) = wah} $pgdata ]
-    incr rslt [ regexp -line {^COOKIES\(shoo\) = be} $pgdata ]
-    incr rslt [ regexp -line {^COOKIES\(doooo\) = bee} $pgdata ]
-    incr rslt [ regexp -line {^COOKIES\(dot\) = dow$} $pgdata ]
-    incr rslt [ regexp -line {^COOKIES\(bop\) = } $pgdata ]
+    incr rslt [ regexp -line {^cookies\(foo\) = bar$} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(doo\) = wah} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(shoo\) = be} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(doooo\) = bee} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(dot\) = dow$} $pgdata ]
+    incr rslt [ regexp -line {^cookies\(bop\) = } $pgdata ]
 } 6
 
 ::tcltest::test servercookies-1.1 {Cookies from Server} {

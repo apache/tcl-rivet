@@ -2,7 +2,8 @@
 # $Id$
 # rivet page used with Rivet's rivet1-test
 
-hgetvars
+load_env ENVS
+load_cookies COOKIES
 
 headers setcookie -name mod -value rivet -expires 01-01-2003 
 
@@ -24,12 +25,12 @@ if { [ var number ] > 0 } {
 }
 
 # env
-puts "ENVS(DOCUMENT_NAME) = $ENVS(DOCUMENT_NAME)\n"
+puts "env(DOCUMENT_NAME) = $env(DOCUMENT_NAME)\n"
 
 # cookies
-if { [ array exists COOKIES ] } {
-    foreach { ck } [ array names COOKIES ]  {
-        puts "COOKIES($ck) = $COOKIES($ck)\n"
+if { [ array exists cookies ] } {
+    foreach { ck } [ array names cookies ]  {
+        puts "cookies($ck) = $cookies($ck)\n"
     }
 }
 
