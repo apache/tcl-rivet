@@ -65,7 +65,7 @@ proc aardvark::Output { type txt } {
 
 proc aardvark::createnode { name } {
     variable grph
-    if { ! [ $grph node exists $name ] } {
+    if { ! [$grph node exists $name] } {
 	$grph node insert $name
 	$grph node set $name -key buildinfo {sh "" tcl ""}
     }
@@ -76,19 +76,19 @@ proc aardvark::runbuildcommand { direction graphname node } {
     variable grph
     set rebuild 0
     set mtime 0
-    set deps [ $grph nodes -out $node ]
-    array set buildinfo [ $grph node get $node -key buildinfo ]
+    set deps [$grph nodes -out $node]
+    array set buildinfo [$grph node get $node -key buildinfo]
 
     # check file time
-    if { [ file exists $node ] } {
-	set mtime [ file mtime $node ]
+    if { [file exists $node] } {
+	set mtime [file mtime $node]
     }
 
     # rebuild if dependencies are newer than file
     if { [ llength $deps ] > 0 } {
 	foreach dep $deps {
-	    if { [ file exists $dep ] } {
-		set depmtime [ file mtime $dep ]
+	    if { [file exists $dep] } {
+		set depmtime [file mtime $dep]
 	    } else {
 		set depmtime 0
 	    }

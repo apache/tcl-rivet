@@ -2,17 +2,22 @@ tcl-rivet STATUS:
 $Id$
 
 Committers:
-----------
+==========
 David Welton
 Damon Courtney
 
 Work in progress:
-----------------
+================
 
-Windows patches by Holger have yet to be applied.
+*) Windows patches by Holger have yet to be applied.
 
-Apache 2.0:
+*) Apache 2.0:
 
- * Waiting on apreq 2.0.
+   * Waiting on apreq 2.0.
 
- * Need a good thread strategy.
+   * Need a good thread strategy.
+
+*) Tcl code
+
+   * In make.tcl, create pkgIndex.tcl that includes all the
+     sub-packages.

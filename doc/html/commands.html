@@ -124,17 +124,14 @@
 	    parses for Rivet &lt;?  and ?&gt; processing tags.  Using
 	    this command, you can use one .rvt file from another.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>  (<span style="font-family:monospace; text-decoration:underline">set</span> | <span style="font-family:monospace; text-decoration:underline">redirect</span> | <span style="font-family:monospace; text-decoration:underline">add</span> | <span style="font-family:monospace; text-decoration:underline">type</span> | <span style="font-family:monospace; text-decoration:underline">numeric</span>)</span></div>
+	  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>  (<span style="font-family:monospace; text-decoration:underline">set</span> | <span style="font-family:monospace; text-decoration:underline">setcookie</span> | <span style="font-family:monospace; text-decoration:underline">redirect</span> | <span style="font-family:monospace; text-decoration:underline">add</span> | <span style="font-family:monospace; text-decoration:underline">type</span> | <span style="font-family:monospace; text-decoration:underline">numeric</span>)</span></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
 	    The <span style="font-family:monospace"><b class="command">headers</b></span> command is for setting and
 	    parsing HTTP headers.
 	  </div><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
-	    <div class="variablelist"><dl><dt><span class="term">
-		  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">redirect</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>uri</tt></i></span></span></div>
+	    <div class="variablelist"><dl><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">set</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>headername</tt></i></span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>value</tt></i></span></span></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
-		    Redirect from the current page to a new
-		    URI. <span class="emphasis"><em>Must</em></span> be done in the first block
-		    of TCL code.
+		    Set arbitrary header names and values.
 		  </div></div></dd><dt><span class="term">
 		  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">setcookie</span> <span style="font-family:monospace; text-decoration:underline">-name</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>cookie-name</tt></i></span> <span style="font-family:monospace; text-decoration:underline">-value</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>cookie-value</tt></i></span> ?<span style="font-family:monospace; text-decoration:underline">-expires <i class="replaceable"><tt>date/time</tt></i></span>? ?<span style="font-family:monospace; text-decoration:underline">-domain <i class="replaceable"><tt>domain</tt></i></span>? ?<span style="font-family:monospace; text-decoration:underline">-path <i class="replaceable"><tt>path</tt></i></span>? ?<span style="font-family:monospace; text-decoration:underline">-secure</span>?</span></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
@@ -148,15 +145,25 @@
 		    is valid, and <tt><span style="text-decoration:underline">-secure</span></tt> specifies that the
 		    cookie is only to be transmitted if the connection is
 		    secure (HTTPS).
-		  </div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">type</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>content-type</tt></i></span></span></div>
+		  </div></div></dd><dt><span class="term">
+		  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">redirect</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>uri</tt></i></span></span></div>
+		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
+		    Redirect from the current page to a new
+		    URI. <span class="emphasis"><em>Must</em></span> be done in the first block
+		    of TCL code.
+		  </div></div></dd><dt><span class="term">
+                  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">add</span> <span style="font-family:monospace; text-decoration:underline">headername</span> <span style="font-family:monospace; text-decoration:underline">value</span></span></div>
+                </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">Add text to header
+		  <tt class="varname">headername</tt>.</div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">type</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>content-type</tt></i></span></span></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
 		    This command sets the <tt class="constant">Content-type</tt>
 		    header returned by the script, which is useful if you wish
 		    to send content other than HTML with Rivet - PNG or jpeg
 		    images, for example.
-		  </div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">set</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>headername</tt></i></span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>value</tt></i></span></span></div>
+		  </div></div></dd><dt><span class="term">
+<div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; text-decoration:underline">numeric</span> <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>response code</tt></i></span></span></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
-		    Set arbitrary header names and values.
+  Set a numeric response code, such as 200, 404 or 500.
 		  </div></div></dd></dl></div>
 	  </div></div></dd><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  <span style="font-family:monospace; text-decoration:underline"><i class="replaceable"><tt>filename</tt></i></span></span></div>

@@ -72,6 +72,7 @@ set XSLNOCHUNK [file join .. doc rivet-nochunk.xsl]
 set XSLCHUNK [file join .. doc rivet-chunk.xsl]
 set XSL [file join .. doc rivet.xsl]
 set XML [file join .. doc rivet.xml]
+set PKGINDEX [file join .. rivet pkgIndex.tcl]
 
 # ------------
 
@@ -188,6 +189,16 @@ AddNode clean {
     sh {rm -f [glob -nocomplain *.a]}
 }
 
+AddNode $PKGINDEX {
+    tcl {
+	set curdir [pwd]
+	cd [file dirname $PKGINDEX]
+	eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl]]
+	puts [list pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl]]]
+	cd $curdir
+    }
+}
+
 #AddNode testing.o {
 #    sh {$COMPILE testing.c}
 #}
@@ -229,13 +240,10 @@ foreach doc $HTML_DOCS {
     }
 }
 
-AddNode VERSION {
-    tcl {
-	cd ..
-	pwd
-    }
-    sh { ./cvsversion.tcl }
-    tcl { cd src/ }
+AddNode ../VERSION {
+    tcl cd ..
+    sh ./cvsversion.tcl
+    tcl cd src/
 }
 
 # Clean up everything for distribution.
@@ -243,9 +251,9 @@ AddNode VERSION {
 AddNode distclean {
     depends clean
     tcl cd ..
-    sh { find . -name "*~" | xargs rm -f}
-    sh { find . -name ".#*" | xargs rm -f}
-    sh { find . -name "\#*" | xargs rm -f}
+    sh { find . -name "*~" | xargs rm -f }
+    sh { find . -name ".#*" | xargs rm -f }
+    sh { find . -name "\#*" | xargs rm -f }
     tcl cd src
 }
 
@@ -260,7 +268,7 @@ AddNode distdoc {
 # moment, as it uses the bourne shell and unix commands.
 
 AddNode dist {
-    depends {distclean distdoc VERSION}
+    depends {distclean distdoc ../VERSION}
     tcl {
 	set fl [open [file join .. VERSION]]
 	set VERSION [string trim [read $fl]]

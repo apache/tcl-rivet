@@ -1,4 +1,18 @@
+2003-05-14  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Target ../VERSION node correctly.
+	New target $PKGINDEX to automatically generate a top-level (which
+	is where Tcl searches) package index for all the sub-packages in
+	the Rivet distribution.
+
+	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand): A few
+	stylistic changes: [ cmd ] -> [cmd].
+
 2003-05-13  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added a few options - numeric and add to the
+	header documentation.  Removed 'setcookie', which has been
+	replaced by the 'cookie' command.
 
 	* src/make.tcl: Pass [info nameofexecutable] to mod_rivet.c
 	compilation, in order to make Rivet aware of the location of

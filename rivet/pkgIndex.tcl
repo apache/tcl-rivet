@@ -8,4 +8,9 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
+package ifneeded DIO 1.0 [list source [file join $dir packages/dio/dio.tcl]]
+package ifneeded DIODisplay 1.0 [list source [file join $dir packages/dio/diodisplay.tcl]]
+package ifneeded Dtcl 1.0 [list source [file join $dir packages/dtcl/dtcl.tcl]]
 package ifneeded RivetTcl 1.1 [list source [file join $dir init.tcl]]
+package ifneeded commserver 0.1 [list source [file join $dir packages/commserver/commserver.tcl]]
+package ifneeded form 1.0 [list source [file join $dir packages/form/form.tcl]]

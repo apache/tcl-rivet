@@ -828,6 +828,21 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	  </para>
 	  <para>
 	    <variablelist>
+
+	      <varlistentry>
+		<term><cmdsynopsis>
+		    <arg>set</arg>
+		    <arg><replaceable>headername</replaceable></arg>
+		    <arg><replaceable>value</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    Set arbitrary header names and values.
+		  </para>
+		</listitem>
+	      </varlistentry>
+
 	      <varlistentry>
 		<term>
 		  <cmdsynopsis>
@@ -843,33 +858,18 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 		  </para>
 		</listitem>
 	      </varlistentry>
+
 	      <varlistentry>
 		<term>
-		  <cmdsynopsis>
-		    <arg>setcookie</arg>
-		    <arg>-name</arg>
-		    <arg><replaceable>cookie-name</replaceable></arg>
-		    <arg>-value</arg>
-		    <arg><replaceable>cookie-value</replaceable></arg>
-		    <arg choice="opt">-expires <replaceable>date/time</replaceable></arg>
-		    <arg choice="opt">-domain <replaceable>domain</replaceable></arg>
-		    <arg choice="opt">-path <replaceable>path</replaceable></arg>
-		    <arg choice="opt">-secure</arg>
+                  <cmdsynopsis>
+		    <arg>add</arg>
+		    <arg><replaceable>headername</replaceable></arg>
+		    <arg><replaceable>value</replaceable></arg>
 		  </cmdsynopsis>
-		</term>
+                </term>
 		<listitem>
-		  <para>
-		    This command is for setting cookies for the server to send
-		    to the client.  <option>cookie-name</option> is the name
-		    of the cookie, <option>cookie-value</option> is the data
-		    associated with the cookie.  <option>-expires</option>
-		    sets an expiration date for the cookie, and must be in the
-		    format <constant>'DD-Mon-YY HH:MM:SS'</constant>,
-		    <option>-path</option> sets the path for which the cookie
-		    is valid, and <option>-secure</option> specifies that the
-		    cookie is only to be transmitted if the connection is
-		    secure (HTTPS).
-		  </para>
+		  <para>Add text to header
+		  <varname>headername</varname>.</para>
 		</listitem>
 	      </varlistentry>
 
@@ -890,18 +890,19 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	      </varlistentry>
 
 	      <varlistentry>
-		<term><cmdsynopsis>
-		    <arg>set</arg>
-		    <arg><replaceable>headername</replaceable></arg>
-		    <arg><replaceable>value</replaceable></arg>
+		<term>
+                  <cmdsynopsis>
+		    <arg>numeric</arg>
+		    <arg><replaceable>response code</replaceable></arg>
 		  </cmdsynopsis>
 		</term>
 		<listitem>
-		  <para>
-		    Set arbitrary header names and values.
+		  <para>Set a numeric response code, such as 200, 404 or 500.
 		  </para>
 		</listitem>
 	      </varlistentry>
+
+
 	    </variablelist>
 	  </para>
 	</listitem>

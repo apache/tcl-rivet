@@ -4,7 +4,7 @@
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
       themselves FIXME.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396299"></a>Initialization</h3></div></div><div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396599"></a>Initialization</h3></div></div><div></div></div><p style="width:90%">
 	When Apache is started, (or when child Apache processes are
 	started if a threaded Tcl is used),
 	<tt class="function">Rivet_InitTclStuff</tt> is called, which
@@ -15,7 +15,7 @@
 	executes Rivet's <tt class="filename">init.tcl</tt>.  The caching
 	system is also set up, and if there is a
 	<span style="font-family:monospace"><b class="command">GlobalInitScript</b></span>, it is run.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396336"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396636"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
 	The <span class="structname">RivetChan</span> system was created in
 	order to have an actual Tcl channel that we could redirect
 	standard output to.  This lets us use, for instance, the
@@ -25,7 +25,7 @@
 	Tcl's regular standard output is replaced with an instance of
 	this channel type, so that, by default, output will go to the
 	web page.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396364"></a>Page Parsing, Execution and Cacheing</h3></div></div><div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396665"></a>Page Parsing, Execution and Cacheing</h3></div></div><div></div></div><p style="width:90%">
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
 	processing instruction tags.  Everything outside these tags
