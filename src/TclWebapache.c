@@ -187,7 +187,7 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, TclWebRequest *req)
     for (i = 0; i < parmsarray->nelts; ++i)
     {
 
-	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req), strlen(varname)
+	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
 		     strlen(varname) < strlen(parms[i].key) ?
 		     strlen(parms[i].key) : strlen(varname)))
 	{
