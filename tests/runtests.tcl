@@ -8,7 +8,9 @@ set binname [ getbinname ]
 
 makeconf $binname server.conf
 
-set apachepid [ exec $binname -X -f "[pwd]/server.conf" & ]
-set oput [ exec ./rivet.test ]
+# We could include some sort of loop here, running the server + tests
+
+set apachepid [ exec $binname -X -f "[file join [pwd] server.conf]" & ]
+set oput [ exec [file join . rivet.test] ]
 puts $oput
 exec kill $apachepid

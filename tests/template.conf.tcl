@@ -48,7 +48,7 @@ ErrorLog $CWD/error_log
 LogLevel debug
 
 LogFormat "%h %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" combined
-CustomLog /home/davidw/install/apache-1.3/logs/access_log combined
+CustomLog "$CWD/access_log" combined
 
 <IfModule mod_mime.c>
 AddLanguage en .en
