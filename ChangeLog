@@ -1,5 +1,8 @@
 2003-03-25  David N. Welton  <davidw@dedasys.com>
 
+	* src/make.tcl: Add a debinstall target as a temporary way to
+	build .deb files.
+
 	* debian/copyright: Added copyright file for debian.
 
 	* debian/dirs: Added dirs file that lists directories used by

@@ -6,15 +6,13 @@
 #
 # This file is responsible for the top-level "make" style processing.
 
-set scripts {
+foreach script {
     helpers.tcl
     graph.tcl
     aardvark.tcl
     parsetclConfig.tcl
     findapxs.tcl
-}
-
-foreach script $scripts {
+} {
     source [file join [file dirname [info script]] buildscripts $script]
 }
 
@@ -80,6 +78,8 @@ set XML [file join .. doc rivet.xml]
 # "depends" lists the nodes on which it depends
 
 # "sh" is a shell command to execute
+
+# "tcl" executes some Tcl code.
 
 AddNode apache_multipart_buffer.o {
     depends apache_multipart_buffer.c apache_multipart_buffer.h
@@ -202,6 +202,18 @@ AddNode install {
     tcl file copy -force $MOD_SHLIB $LIBEXECDIR
     tcl file copy -force [file join .. rivet] $PREFIX
     tcl file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]
+}
+
+# Install everything when creating a deb.  We need to find a better
+# way of doing this.  It would involve passing arguments on the
+# command line.
+
+set DEBPREFIX [file join [pwd] .. debian tmp]
+AddNode debinstall {
+    depends $MOD_SHLIB $LIB_SHLIB
+    tcl {file copy -force $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
+    tcl {file copy -force [file join .. rivet] "$DEBPREFIX/$PREFIX/lib"}
+    tcl {file copy -force $LIB_SHLIB "$DEBPREFIX/[file join $PREFIX/lib rivet packages rivet]"}
 }
 
 foreach doc $HTML_DOCS {
