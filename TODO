@@ -36,13 +36,14 @@ TODO
 
 * Need to add a local.tcl for local procs and setup.
 
-* Documentation in XML.
-
 * Script timeouts - limit time scripts can run before bailing out.
 
 * Safe mode?
 
-* Nice logo.
+* Add documentation for commands implemented in Tcl.
+
+* Integrate package documentation with main documentation.
+
 
 MAYBE
 =====
@@ -51,3 +52,7 @@ MAYBE
 
 DONE
 ====
+
+* Nice logo.
+
+* Documentation in XML.

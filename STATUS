@@ -18,3 +18,7 @@ Work in progress:
    * Need a good thread strategy.
 
 *) Tcl code
+
+*) Documentation
+
+   * Add documentation for commands implemented in Tcl.

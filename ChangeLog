@@ -1,7 +1,14 @@
+2003-05-20  David N. Welton  <davidw@dedasys.com>
+
+	* doc/html/rivet.css: Added CSS file.
+
+	* src/make.tcl: Added parameter to xsltproc to link the html
+	output to a CSS file.
+
 2003-05-14  David N. Welton  <davidw@dedasys.com>
 
-	* src/make.tcl: Added PKGINDEX as list of dependencies for rolling
-	a distribution.  Updated STATUS file.
+	* src/make.tcl: Added PKGINDEX to the list of dependencies for
+	rolling a distribution.  Updated STATUS file.
 
 	* rivet/packages/commserver/commserver.tcl: Added commserver
 	package as one potential IPC method.

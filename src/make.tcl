@@ -236,7 +236,7 @@ foreach doc $HTML_DOCS {
     set xml [string map {.html .xml} $doc]
     AddNode $doc {
 	depends $XSLNOCHUNK $xml
-	sh xsltproc --nonet -o $doc $XSLNOCHUNK $xml
+	sh xsltproc --stringparam html.stylesheet rivet.css --nonet -o $doc $XSLNOCHUNK $xml
     }
 }
 
@@ -261,7 +261,7 @@ AddNode distclean {
 
 AddNode distdoc {
     depends $XML $XSL $HTML_DOCS
-    sh xsltproc --nonet -o $HTML $XSLCHUNK $XML
+    sh xsltproc --stringparam html.stylesheet rivet.css --nonet -o $HTML $XSLCHUNK $XML
 }
 
 # Create the distribution.  This is a bit unix-specific for the
