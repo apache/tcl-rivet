@@ -1,6 +1,6 @@
 #!/bin/bash -norc
 dnl	This file is an input file used by the GNU "autoconf" program to
-dnl	generate the file "configure", which is run during Tcl installation
+dnl	generate the file "configure", which is run when building Rivet
 dnl	to configure the system for the local environment.
 #
 # RCS: @(#) $Id$
@@ -30,6 +30,11 @@ AC_INIT([Rivet],[0.5.0])
 TEA_INIT([3.1])
 
 AC_CONFIG_AUX_DIR(tclconfig)
+
+#
+# Init automake stuff
+#
+AC_DISABLE_STATIC
 AM_INIT_AUTOMAKE
 
 #--------------------------------------------------------------------
@@ -65,7 +70,11 @@ TEA_SETUP_COMPILER
 #
 # For automake to be happy, we also need AC_PROG_LIBTOOL
 #
+# the LIBTOOL_DEPS macro sets up for automatic updating of the
+# libtool script if it becomes out of date, as per libtool docs
+#
 AC_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
 
 #-----------------------------------------------------------------------
 # __CHANGE__

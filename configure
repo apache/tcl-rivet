@@ -462,7 +462,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP RANLIB ac_ct_RANLIB EGREP MATH_LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TCL_THREADS SHARED_BUILD CELIB_DIR LIBOBJS DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_FLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG APXS APXS_CPPFLAGS APXS_LDFLAGS APXS_LIBS APXS_INCLUDES APXS_CPPFLAGS_SHLIB APXS_LD_SHLIB APXS_LIBEXECDIR APXS_SYSCONFDIR APXS_PREFIX LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CPP RANLIB ac_ct_RANLIB EGREP MATH_LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOL_DEPS PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TCL_THREADS SHARED_BUILD CELIB_DIR LIBOBJS DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_FLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG APXS APXS_CPPFLAGS APXS_LDFLAGS APXS_LIBS APXS_INCLUDES APXS_CPPFLAGS_SHLIB APXS_LD_SHLIB APXS_LIBEXECDIR APXS_SYSCONFDIR APXS_PREFIX LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1024,12 +1024,12 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-static[=PKGS]
+                          build static libraries [default=no]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-shared[=PKGS]
                           build shared libraries [default=yes]
-  --enable-static[=PKGS]
-                          build static libraries [default=yes]
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
@@ -1648,6 +1648,35 @@ fi
 ac_config_guess="$SHELL $ac_aux_dir/config.guess"
 ac_config_sub="$SHELL $ac_aux_dir/config.sub"
 ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
+
+
+#
+# Init automake stuff
+#
+# Check whether --enable-static or --disable-static was given.
+if test "${enable_static+set}" = set; then
+  enableval="$enable_static"
+  p=${PACKAGE-default}
+    case $enableval in
+    yes) enable_static=yes ;;
+    no) enable_static=no ;;
+    *)
+     enable_static=no
+      # Look at the argument we got.  We use all the common list separators.
+      lt_save_ifs="$IFS"; IFS="${IFS}$PATH_SEPARATOR,"
+      for pkg in $enableval; do
+	IFS="$lt_save_ifs"
+	if test "X$pkg" = "X$p"; then
+	  enable_static=yes
+	fi
+      done
+      IFS="$lt_save_ifs"
+      ;;
+    esac
+else
+  enable_static=no
+fi;
+
 
 am__api_version="1.9"
 # Find a good install program.  We prefer a C program (faster),
@@ -6827,6 +6856,9 @@ done
 #
 # For automake to be happy, we also need AC_PROG_LIBTOOL
 #
+# the LIBTOOL_DEPS macro sets up for automatic updating of the
+# libtool script if it becomes out of date, as per libtool docs
+#
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
@@ -6849,30 +6881,6 @@ if test "${enable_shared+set}" = set; then
     esac
 else
   enable_shared=yes
-fi;
-
-# Check whether --enable-static or --disable-static was given.
-if test "${enable_static+set}" = set; then
-  enableval="$enable_static"
-  p=${PACKAGE-default}
-    case $enableval in
-    yes) enable_static=yes ;;
-    no) enable_static=no ;;
-    *)
-     enable_static=no
-      # Look at the argument we got.  We use all the common list separators.
-      lt_save_ifs="$IFS"; IFS="${IFS}$PATH_SEPARATOR,"
-      for pkg in $enableval; do
-	IFS="$lt_save_ifs"
-	if test "X$pkg" = "X$p"; then
-	  enable_static=yes
-	fi
-      done
-      IFS="$lt_save_ifs"
-      ;;
-    esac
-else
-  enable_static=yes
 fi;
 
 # Check whether --enable-fast-install or --disable-fast-install was given.
@@ -7415,7 +7423,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7418 "configure"' > conftest.$ac_ext
+  echo '#line 7426 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8521,7 +8529,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:8524:" \
+echo "$as_me:8532:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -9553,6 +9561,10 @@ fi
 
 
 
+## CAVEAT EMPTOR:
+## There is no encapsulation within the following macros, do not change
+## the running order or otherwise move them around unless you know exactly
+## what you are doing...
 
 lt_prog_compiler_no_builtin_flag=
 
@@ -9578,11 +9590,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9581: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9593: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9585: \$? = $ac_status" >&5
+   echo "$as_me:9597: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -9821,11 +9833,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9824: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9836: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9828: \$? = $ac_status" >&5
+   echo "$as_me:9840: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -9881,11 +9893,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9884: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9896: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9888: \$? = $ac_status" >&5
+   echo "$as_me:9900: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12066,7 +12078,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12069 "configure"
+#line 12081 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12164,7 +12176,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12167 "configure"
+#line 12179 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13959,6 +13971,10 @@ test "$ld_shlibs_CXX" = no && can_build_shared=no
 GCC_CXX="$GXX"
 LD_CXX="$LD"
 
+## CAVEAT EMPTOR:
+## There is no encapsulation within the following macros, do not change
+## the running order or otherwise move them around unless you know exactly
+## what you are doing...
 
 cat > conftest.$ac_ext <<EOF
 class Foo
@@ -14357,11 +14373,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14360: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14376: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14364: \$? = $ac_status" >&5
+   echo "$as_me:14380: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14417,11 +14433,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14420: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14436: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14424: \$? = $ac_status" >&5
+   echo "$as_me:14440: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15778,7 +15794,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 15781 "configure"
+#line 15797 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15876,7 +15892,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 15879 "configure"
+#line 15895 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -16713,11 +16729,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16716: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16732: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16720: \$? = $ac_status" >&5
+   echo "$as_me:16736: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16773,11 +16789,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16776: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16792: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16780: \$? = $ac_status" >&5
+   echo "$as_me:16796: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18783,6 +18799,10 @@ compiler_GCJ=$CC
 # GCJ did not exist at the time GCC didn't implicitly link libc in.
 archive_cmds_need_lc_GCJ=no
 
+## CAVEAT EMPTOR:
+## There is no encapsulation within the following macros, do not change
+## the running order or otherwise move them around unless you know exactly
+## what you are doing...
 
 lt_prog_compiler_no_builtin_flag_GCJ=
 
@@ -18808,11 +18828,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18811: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18831: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18815: \$? = $ac_status" >&5
+   echo "$as_me:18835: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -19051,11 +19071,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19054: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19074: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:19058: \$? = $ac_status" >&5
+   echo "$as_me:19078: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -19111,11 +19131,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19114: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19134: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:19118: \$? = $ac_status" >&5
+   echo "$as_me:19138: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21296,7 +21316,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 21299 "configure"
+#line 21319 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -21394,7 +21414,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 21397 "configure"
+#line 21417 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -22388,6 +22408,7 @@ LIBTOOL_DEPS="$ac_aux_dir/ltmain.sh"
 LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 # Prevent multiple expansion
+
 
 
 
@@ -27145,6 +27166,7 @@ s,@F77@,$F77,;t t
 s,@FFLAGS@,$FFLAGS,;t t
 s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
+s,@LIBTOOL_DEPS@,$LIBTOOL_DEPS,;t t
 s,@PKG_SOURCES@,$PKG_SOURCES,;t t
 s,@PKG_OBJECTS@,$PKG_OBJECTS,;t t
 s,@CLEANFILES@,$CLEANFILES,;t t
