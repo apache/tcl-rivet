@@ -72,5 +72,11 @@ proc cookie {cmd name args} {
 	    if {![info exists RivetCookies($name)]} { return }
 	    return $RivetCookies($name)
 	}
+
+	"delete" {
+	    ## In order to delete a cookie, we just need to set a cookie
+	    ## with a time that has already expired.
+	    cookie set $name "" -minutes -1
+	}
     }
 }
