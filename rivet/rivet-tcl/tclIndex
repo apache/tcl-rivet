@@ -8,3 +8,9 @@
 
 set auto_index(load_response) [list source [file join $dir load_response.tcl]]
 set auto_index(parray) [list source [file join $dir parray.tcl]]
+set auto_index(html) [list source [file join $dir html.tcl]]
+set auto_index(incr0) [list source [file join $dir incr0.tcl]]
+set auto_index(read_file) [list source [file join $dir read_file.tcl]]
+set auto_index(wrap) [list source [file join $dir wrap.tcl]]
+set auto_index(wrapline) [list source [file join $dir wrap.tcl]]
+set auto_index(debug) [list source [file join $dir debug.tcl]]
