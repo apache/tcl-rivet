@@ -30,6 +30,7 @@ package provide form 1.0
 	set arguments(method) post
 	set arguments(action) [env DOCUMENT_URI]
 
+	# use $this for the type for form-global stuff like form arguments
 	import_data form $this arguments $args
 
 	if {[info exists arguments(defaults)]} {
@@ -161,7 +162,11 @@ package provide form 1.0
     #
     # start - generate the <form> with all of its arguments
     #
-    method start {} {
+    method start {{args ""}} {
+        if {![lempty $args]} {
+	    # replicated in constructor
+	    import_data form $this arguments $args
+	}
 	html "<form [argstring arguments]>"
     }
 

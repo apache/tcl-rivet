@@ -1,3 +1,8 @@
+2005-01-08  Karl Lehenbauer  <karl-rivet@sc.com>
+
+	* rivet/packages/form/form.tcl: Allow start method to take key-value
+	  arguments that will be expressed in the <form> tag.
+
 2005-01-07  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* /rivet/packages/dio/diodisplay.tcl: Factor showform prolog and
