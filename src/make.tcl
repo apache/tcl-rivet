@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using tclsh \
-	exec tclsh "$0" "$@"
+	exec tclsh8.4 "$0" "$@"
 
 # This file is responsible for the top-level "make" style processing.
 # It uses the 'aardvark' make-like system, located in the buildscripts
