@@ -41,16 +41,54 @@ TEA_ENABLE_SHARED
 
 TEA_CONFIG_CFLAGS
 
-AC_DEFINE(USE_TCL_STUBS)
-AC_DEFINE(USE_TK_STUBS)
-
 TEA_MAKE_LIB
 
 TEA_PROG_TCLSH
+
+dnl This is required, because we need this information!
+AC_ARG_WITH(apxs, [  --with-apxs              location of Apache's apxs tool], with_apxs=${withval})
+AC_MSG_CHECKING([for apxs])
+
+dnl First check to see if --with-magick-config was specified.
+if test x"${with_apxs}" != x ; then
+    if test -x "${with_apxs}" ; then
+	dnl It actually calls another script, so the PATH needs to be set.
+	export PATH=$PATH:`dirname ${with_apxs}`
+	AC_MSG_RESULT("Using ${with_apxs}")
+	APXS_CPPFLAGS=`${with_apxs} -q CFLAGS`
+	AC_SUBST(APXS_CPPFLAGS)
+	APXS_LDFLAGS=`${with_apxs} -q LDFLAGS_SHLIB`
+	AC_SUBST(APXS_LDFLAGS)
+	APXS_LIBS=`${with_apxs} -q LIBS_SHLIB`
+	AC_SUBST(APXS_LIBS)
+	APXS_INCLUDES=-I`${with_apxs} -q INCLUDEDIR`
+	AC_SUBST(APXS_INCLUDES)
+
+    else
+	AC_MSG_ERROR([${with_apxs} is not an executable file])
+    fi
+else
+    AC_MSG_ERROR([You must specify the location of the apxs script --with-apxs!])
+fi
+
+
+AC_ARG_WITH(tclsh, [  --with-tclsh		location of the tclsh executable that corresponds to the --with-tcl directory used], with_tclsh=${withval})
+AC_MSG_CHECKING([for tclsh])
+
+if test x"${with_tclsh}" != x ; then
+    if test -x "${with_tclsh}" ; then
+       NAMEOFEXECUTABLE=-DNAMEOFEXECUTABLE=\\\"${with_tclsh}\\\"
+       AC_SUBST(NAMEOFEXECUTABLE)
+    else
+	AC_MSG_ERROR([${with_tclsh} is not an executable file])
+    fi
+else
+    AC_MSG_ERROR([You must specify the location of the tclsh corresponding to the dir used with --with-tcl using --with-tclsh!])
+fi
 
 
 
 AC_OUTPUT([
 Makefile
-generic/Makefile
+src/Makefile
 ])

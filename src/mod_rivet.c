@@ -1384,7 +1384,7 @@ MODULE_VAR_EXPORT void
 Rivet_InitHandler(server_rec *s, pool *p)
 {
 #ifndef HIDE_RIVET_VERSION
-    ap_add_version_component("Rivet / "RIVET_VERSION);
+    ap_add_version_component("Rivet / "VERSION);
 #else
     ap_add_version_component("Rivet");
 #endif /* !HIDE_RIVET_VERSION */
