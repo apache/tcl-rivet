@@ -1,4 +1,12 @@
+2005-03-24  David N. Welton  <davidw@dedasys.com>
+
+	* Makefile.am (EXTRA_DIST): Added the doc, rivet and debian
+	directories to the distribution.
+
 2005-03-23  David N. Welton  <davidw@dedasys.com>
+
+	* doc/norefchunk.xsl: Removed chunk-first-section-with-parent and
+	chunk-all-sections.
 
 	* genconf.sh: Updated to use 1.8 autotools.
 

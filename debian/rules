@@ -9,7 +9,7 @@ package=rivet
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	./configure --with-tcl=/usr/lib/tcl$(TCLVERSION)/ --with-apxs=/usr/bin/apxs --enable-threads  --with-tcl=/usr/bin/tclsh$(TCL_VERSION)
+	./configure --with-tcl=/usr/lib/tcl$(TCL_VERSION)/ --with-apxs=/usr/bin/apxs --enable-threads  --with-tclsh=/usr/bin/tclsh$(TCL_VERSION)
 	touch configure-stamp
 
 build: build-stamp
@@ -31,7 +31,7 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/rivet
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 
 binary-indep: build install
 

@@ -7,7 +7,7 @@
 #
 #foreign -- need to set this somehow
 
-EXTRA_DIST=LICENSE
+EXTRA_DIST=LICENSE contrib debian doc rivet win/nmakehlp.c src/testing.c src/TclWebcgi.c
 SUBDIRS = src doc
 
 libtool: $(LIBTOOL_DEPS)

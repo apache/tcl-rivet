@@ -90,7 +90,9 @@ AC_SUBST(LIBTOOL_DEPS)
 # and PKG_TCL_SOURCES.
 #-----------------------------------------------------------------------
 
-TEA_ADD_SOURCES([src/TclWeb.c src/TclWebapache.c src/TclWebcgi.c src/apache_multipart_buffer.c src/apache_request.c src/mod_rivet.c src/parserPkgInit.c src/rivetChannel.c src/rivetCore.c src/rivetCrypt.c src/rivetList.c src/rivetParser.c src/rivetPkgInit.c src/rivetWWW.c src/testing.c win/nmakehlp.c])
+# Unused: src/TclWeb.c
+
+TEA_ADD_SOURCES([src/TclWebcgi.c src/TclWebapache.c src/apache_multipart_buffer.c src/apache_request.c src/mod_rivet.c src/parserPkgInit.c src/rivetChannel.c src/rivetCore.c src/rivetCrypt.c src/rivetList.c src/rivetParser.c src/rivetPkgInit.c src/rivetWWW.c win/nmakehlp.c src/testing.c])
 TEA_ADD_HEADERS([src/TclWeb.h src/apache_multipart_buffer.h src/apache_request.h src/mod_rivet.h src/rivet.h src/rivetChannel.h src/rivetParser.h])
 TEA_ADD_INCLUDES([])
 TEA_ADD_LIBS([])
