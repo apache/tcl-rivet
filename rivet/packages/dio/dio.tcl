@@ -59,6 +59,7 @@ proc handle {interface args} {
 	set first 1
 	set req ""
 	set myTable $table
+	set what "*"
 	for {set i 0} {$i < [llength $args]} {incr i} {
 	    set elem [lindex $args $i]
 
@@ -67,6 +68,10 @@ proc handle {interface args} {
 		"-or"  { set bool OR }
 
 		"-table" { set myTable [lindex $args [incr i]] }
+
+		"-select" {
+		    set what [lindex $args [incr i]]
+		}
 
 		default {
 		    if {[::string index $elem 0] == "-"} {
@@ -92,7 +97,9 @@ proc handle {interface args} {
 		}
 	    }
 	}
-	return "select * from $myTable $req"
+	return "select $what from $myTable $req"
+
+	return "select $what from $myTable $req"
     }
 
     protected method build_insert_query {arrayName fields {myTable ""}} {
