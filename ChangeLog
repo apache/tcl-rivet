@@ -1,3 +1,8 @@
+2004-11-04  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_ServerConf): Use Tcl_GetBoolean, at
+	Karl's suggestion.
+
 2004-11-03  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_ServerConf): Instead of just "on", accept
