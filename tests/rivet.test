@@ -13,13 +13,39 @@ package require http
 
 set urlbase "http://localhost:8081/"
 
+# Use this to start and stop the server:
+
+namespace eval server {
+    variable binname
+}
+set server::binname $binname
+
+proc server::start { options code } {
+    variable serverpid 0
+    variable binname
+    after 200
+    set serverpid [eval exec $binname -X -f "[file join [pwd] server.conf]" $options &]
+    puts "Apache started as PID $serverpid"
+    after 200
+    if { ! [catch {
+	uplevel $code
+    } err] } {
+	puts $err
+    }
+    after 100
+    exec kill $serverpid
+}
+
+
 # Test stanzas are created by giving the test a name and a
 # description.  The code is then executed, and the results compared
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
 foreach Test {cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test} {
-    source $Test
+    server::start {} {
+	source $Test
+    }
 }
 
 ::tcltest::cleanupTests

@@ -17,28 +17,11 @@ set binname [ getbinname ]
 source makeconf.tcl
 makeconf $binname server.conf
 
-switch -exact [lindex $argv 1] {
-    withconfigs {
-	foreach {option val} {
-	    {} {}
-	    RivetServerConf {GlobalInitScript "source tclconf.tcl"}
-	    RivetServerConf {ChildInitScript "source tclconf.tcl"}
-	    RivetServerConf {ChildExitScript "source tclconf.tcl"}
-	    RivetServerConf {BeforeScript "source tclconf.tcl"}
-	    RivetServerConf {AfterScript "source tclconf.tcl"}
-	    RivetServerConf {ErrorScript "source tclconf.tcl"}
-	    RivetServerConf {CacheSize 20}
-	    RivetServerConf {UploadDirectory /tmp/}
-	    RivetServerConf {UploadMaxSize 2000}
-	    RivetServerConf {UploadFilesToVar yes}
-	    RivetServerConf {SeparateVirtualInterps yes}
-	} {
-	    set apachepid [exec $binname -X -f "[file join [pwd] server.conf]" -c "$option $val" &]
-	    set oput [exec [file join . rivet.test]]
-	    puts $oput
-	    exec kill $apachepid
-	}
-    }
+# we do this to keep tcltest happy - it reads argv...
+set commandline [lindex $argv 1]
+set argv {}
+
+switch -exact [lindex $commandline 1] {
     startserver {
 	if { [catch {
 	    exec $binname -X -f "[file join [pwd] server.conf]"
@@ -47,9 +30,6 @@ switch -exact [lindex $argv 1] {
 	}
     }
     default {
-	set apachepid [exec $binname -X -f "[file join [pwd] server.conf]" &]
-	set oput [exec [file join . rivet.test]]
-	puts $oput
-	exec kill $apachepid
+	source [file join . rivet.test]
     }
 }
