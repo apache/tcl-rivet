@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- $Id$ -->
+<html>
+  <head>
+    <title>mod_dtcl Apache directives</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    
+    <h2 align="center">mod_dtcl Apache directives</h2>
+
+    <ul>
+      <li>
+	<code><b>Dtcl_Script GlobalInitScript <i>"script"</i></code></b><br>
+	Tcl script that is run when each interpreter is
+	initialized.  <code>"script"</code> is actual Tcl
+	script, so to run a file, you would do
+	<code>Dtcl_Script GlobalInitScript "source /var/www/foobar.tcl"</code>.
+      </li>
+
+      <li>
+	<code><b>Dtcl_Script ChildInitScript <i>"script"</i></b></code><br>		
+	Script to be evaluated when each apache child is
+	initialized. This is the best place to load modules.
+      </li>
+
+      <li>
+	<code><b>Dtcl_Script ChildExitScript <i>"script"</i></b></code><br>	      
+	Script to be evaluated when each apache child exits.
+      </li>
+
+      <li>
+	<code><b>Dtcl_Script BeforeScript <i>"script"</i></b></code><br>		
+	Script to be evaluated before each .ttml page.
+	<strong>Note</strong> that you cannot use
+	<code>hputs</code> in the BeforeScript, but must
+	instead use <code>buffer_add</code>.
+      </li>
+
+      <li>
+	<code><b>Dtcl_Script AfterScript <i>"script"</i></b></code><br>	      
+	Script to be called after each .ttml page.
+      </li>
+
+      <li>
+	<code><b>Dtcl_Script ErrorScript <i>"script"</i></b></code><br>	      
+	This code is called in place of the standard 'error' pages
+	generated for mod_dtcl.  This directive may be useful if you
+	have sensitive logic that you wish to protect.
+      </li>
+      
+      <li>
+	<code><b>Dtcl_CacheSize <i>cachesize</i></b></code><br> 
+	Number of ttml scripts to cache as Tcl Objects.
+	Default is MaxRequestsPerChild / 2, or 50, if
+	MaxRequestsPerChild is 0.
+      </li>
+
+      <li>
+	<code><b>Dtcl_UploadFilesToVar <i>on/off</i></b></code><br> If
+	on, files will be uploaded to the variable UPLOAD(data).  Be
+	careful with this, as large files could use up your memory.
+      </li>
+
+      <li>
+	<code><b>Dtcl_SeperateVirtualInterps
+	<i>on/off</i></b></code><br> If on, each VirtualHost will have
+	its own Tcl interpreter.
+      </li>
+
+    </ul>
+  </body>
+</html>

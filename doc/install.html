@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>mod_dtcl installation</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+
+    <!-- $Id$ -->
+    <h2 align="center">mod_dtcl Installation</h2>
+    
+    <ol>
+      <li><b>Check dependencies</b><br>
+	
+	To install mod_dtcl, you will need <b>Tcl 8.2</b> or greater
+	and <b>Apache 1.3.xx</b>.  It is known to run on Linux,
+	FreeBSD, OpenBSD, and Solaris and HPUX.  NT is also possible -
+	please see the directions in the distribution.
+      </li>
+
+      <li><b>Get mod_dtcl</b><br>
+	If you are running a Debian or FreeBSD system, there
+	are pre-built packages available at:
+	<a target="_top" href="http://www.debian.org/Packages/unstable/web/libapache-mod-dtcl.html">http://www.debian.org/Packages/unstable/web/libapache-mod-dtcl.html</a> 
+
+	or
+	
+	<a
+	  target="_top" href="http://www.freebsd.org/cgi/ports.cgi?query=mod_dtcl">http://www.freebsd.org/cgi/ports.cgi?query=mod_dtcl</a>.<br>
+
+	Otherwise, download the sources at <a target="_top"
+	href="download/">http://tcl.apache.org/mod_dtcl/download/</a>.
+	<br>
+      </li>
+      <li><b>Uncompress the sources</b><br>
+	<code>
+	  gunzip apache-1.3.X.tar.gz<br>
+	  tar -xvf apache-1.3.X.tar.gz<br>
+	</code>
+	You don't need the Apache sources if you are building a shared
+	object module.  You do, however, need the header files.
+	Some systems, such as Debian GNU/Linux, provide these
+	independently - otherwise, you probably still need the sources.<br>
+	<code>
+	  gunzip mod_dtcl-X.X.X.tar.gz<br>
+	  tar -xvf mod_dtcl-X.X.X.tar.gz<br>
+	</code>
+      </li>
+
+      <li><b>Configuring, builddtcl.sh, etc...</b><br> 
+
+	Do you want to build mod_dtcl as a shared object (such as a
+	.so file on Linux, or a .dll on windows), or compile it
+	directly as a part of the Apache executable?  The Apache
+	Software Foundation has put together a nice <a target="_top"
+	href="http://httpd.apache.org/docs/dso.html">manual</a> which
+	explains things in detail.
+
+	<ul>
+	  <li><b>For shared objects</b><br>
+	    
+	    <code>cd ../mod_dtcl/<br></code>
+	    Edit the <code>builddtcl.sh</code> script.  The 3
+	    variables you may need to change are: 
+	    <ul>
+	      <li><code>TCLSH</code><br>
+		Name of the tclsh program on your computer.
+	      </li>
+	      <li><code>APACHE</code><br>
+		Location of the Apache sources (for static builds only).
+	      </li>
+	      <li><code>INC</code><br>
+		Location of the Apache headers (you will need this even
+		for building shared objects).
+	      </li>
+	    </ul>
+
+	    <code>
+	      ./builddtcl.sh shared
+	    </code><br>
+
+	    <code>
+	      cp mod_dtcl.so
+	      /usr/lib/apache/wherever/the/other/shared/objects/reside
+	    </code> For shared object builds, you need to copy the
+	    object into the directory where the other shared
+	    objects are kept for your Apache build.  On Debian
+	    GNU/Linux systems, for instance, this is in
+	    <code>/usr/lib/apache/1.3/</code>.
+
+	  </li>
+	  
+	  <li><b>For static builds</b><br>
+	    <code>
+	      cd apache-1.3.X/<br>
+	      ./configure<br>
+	    </code>
+
+	    <code>cd ../mod_dtcl/<br></code>
+	    Edit the <code>builddtcl.sh</code> script.  The 3
+	    variables you may need to change are: 
+	    <ul>
+	      <li><code>TCLSH</code><br>
+		Name of the tclsh program on your computer.
+	      </li>
+	      <li><code>APACHE</code><br>
+		Location of the Apache sources (for static builds only).
+	      </li>
+	      <li><code>INC</code><br>
+		Location of the Apache headers (you will need this even
+		for building shared objects).
+	      </li>
+	    </ul>
+
+	    <code>
+	      ./builddtcl.sh static
+	    </code><br>
+
+	    <code>
+	      ./builddtcl.sh install
+	    </code><br>
+
+	    <code>cd ../apache-1.3.X<br></code>
+	    <code>./configure
+	      --activate-module=src/modules/mod_dtcl/mod_dtcl.a [ other configure
+	      options ]<br></code>
+	    <code>export EXTRA_LIBS="-ltcl8.X -lm"</code><br>
+	    <code>make -e<br></code>
+	    <code>make install<br></code>
+	    
+	  </li>
+	</ul>
+      </li>
+      <li><b>Configure Apache<br></b>		
+	<ul>
+	  <li>
+	    <b>http.conf</b><br> <code>LoadModule dtcl_module
+	      /usr/lib/apache/1.3/mod_dtcl.so</code><br> 
+	    This points Apache to the shared object if
+	    mod_dtcl is being used as a loadable module.
+	  </li>
+	  <li>
+	    <b>srm.conf</b><br> 
+	    <code>AddType application/x-httpd-tcl .ttml</code><br>
+	    <code>AddType application/x-dtcl-tcl .tcl</code>
+	    (optional)<br>
+	    These add the .ttml and .tcl (if desired) types to
+	    Apache, so that they are processed by mod_dtcl.
+	  </li>
+	</ul>
+      </li>
+    </ol>
+  </body>
+</html>

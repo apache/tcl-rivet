@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+    <!-- $Id$ -->
+<html>
+  <head>
+    <title>mod_dtcl tcl commands</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+
+    <h2 align="center">mod_dtcl specific Tcl commands and variables</h2>
+
+    <ul>
+      <li>
+	<code><b>buffer_add <i>string</i></b></code><br>	      
+	Add text to output_buffer for later printing. Used
+	internally.
+      </li>
+
+      <li>
+	<code><b>hputs <i>?-error? text</i></b></code><br>
+	The mod_dtcl version of "puts".  Outputs to the
+	client, instead of to stdout.
+	The error option permits you to send an 'error message' to the
+	apache log file, at the NOTICE level.
+      </li>
+      <li><code><b>var</b></code><br> These commands retrieve or
+	retrieve information about "CGI" variables that are passed to
+	the dtcl script via GET or POST operations.  
+      </li>
+      <li>
+	<code><b>var get <i>varname</i></b></code><br> Returns the
+	value of variable 'varname' as a string (even if there are
+	multiple values).
+      </li>
+      <li>
+	<code><b>var list <i>varname</i></b></code><br>
+	Returns the value of variable 'varname' as a list, if there
+	are multiple values.
+      </li>
+      <li>
+	<code><b>var exists <i>varname</i></b></code><br>
+	Returns 1 if <i>varname</i> exists, 0 if it doesn't.
+      </li>
+      <li>
+	<code><b>var number</b></code><br>
+	Returns the number of variables.
+      </li>
+      <li>
+	<code><b>var all</b></code><br>
+	Return a list of variable names and values.
+      </li>
+
+      <li><code><b>upload</b></code><br> These commands retrieve or
+	retrieve information about files that have been uploaded to
+	the server.  They replace the <code>UPLOAD</code> variable.
+      </li>
+      <li>
+	<code><b>upload get <i>varname</i> channel</b></code><br>
+	Returns a Tcl channel that can be used to access the uploaded file.
+      </li>
+      <li>
+	<code><b>upload get <i>varname</i> save <i>name</i></b></code><br>
+	Moves the uploaded file to the give name.
+      </li>
+      <li>
+	<code><b>upload get <i>varname</i> data</b></code><br>
+	Returns data uploaded to the server.  This is binary clean.
+      </li>
+
+      <li>
+	<code><b>upload info <i>varname</i> exists</b></code><br>
+	Returns 1 if the variable exists, 0 if not.
+      </li>
+      <li>
+	<code><b>upload info <i>varname</i> size</b></code><br>
+	Returns the size of the file uploaded.
+      </li>
+      <li>
+	<code><b>upload info <i>varname</i> type</b></code><br>If the
+	Content-type is set, it is returned, otherwise, an empty
+	string.
+      </li>
+      <li>
+	<code><b>upload info <i>varname</i> filename</b></code><br>
+	Returns the filename on the remote host that uploaded the file.
+      </li>
+      <li>
+	<code><b>upload names</b></code><br> Returns the variable
+	names, as a list, of all the files uploaded.
+      </li>
+
+      <li>
+	<code><b>hgetvars</b></code><br> Get environmental, and Cookie
+	variables. This is in a seperate command so as not to make the
+	server do this every time you load a .ttml file. <code>ENVS</code> and
+	<code>COOKIES</code> are the associative arrays created.  <code>ENVS</code> contains
+	environmental variables, and <code>COOKIES</code> contains any cookies
+	recieved from the client.
+      </li>
+      <li>
+	<code><b>include <i>filename</i></b></code><br>	      
+	Include a file without parsing it.  This is the best
+	way to include an HTML file or any other static content.
+      </li>
+      <li>
+	<code><b>parse <i>filename</i></b></code><br>	      
+	"Source" a .ttml file.  This is the way to include
+	other .ttml files.
+      </li>
+      <li>
+	<code><b>hflush</b></code><br>	      
+	Flush the output buffers to the client.  Use this if
+	you want to incrementally update a page.
+      </li>
+      <li>
+	<code><b>headers redirect <i>uri</i></b></code><br>	      
+
+	Redirect from the current page to a new
+	URI. <b>Must</b> be done in the first block of TCL code.
+      </li>
+      <li>
+	<code><b>headers setcookie <i>-name cookie-name
+	      -value cookie-value ?-expires date/time? ?-domain domain?
+	      ?-path path? ?-secure?</i></b></code><br>
+
+	This command is for setting cookies.  Cookie-name is
+	the name of the cookie, cookie-value is the data
+	associated with the variable.  Expires sets an
+	expiration date for the cookie, and must be in the
+	format 'DD-Mon-YY HH:MM:SS', path sets the path for
+	which the cookie is valid, and secure specifies that
+	the cookie is only to be transmitted if the connection
+	is secure (HTTPS).
+      </li>
+      <li>
+	<code><b>headers type
+	    <i>content-type</i></b></code><br>
+
+	This command sets the "Content-type:" header returned
+	by the script, which is useful if you wish to create a
+	PNG (image), for example, with mod_dtcl.
+      </li>
+      <li>
+	<code><b>headers set <i>headername value</i></b></code><br>
+
+	Set arbitrary header names and values.
+      </li>
+
+      <li>
+	<code><b>dtcl_info</b></code><br>	      
+
+	Prints information on the internals of the module in
+	HTML.  Currently, only the PID and size of the object
+	cache are reported.
+      </li>
+<!--
+      <li>
+	Note that these variables may be lists if more than one file
+	is uploaded at a time.<br>
+	<code><b>$::request::UPLOAD(filename)</b></code><br>
+	The filename of the uploaded file.<br>
+
+	<code><b>$::request::UPLOAD(name)</b></code><br>
+	The form variable name of the upload.<br>
+
+	<code><b>$::request::UPLOAD(size)</b></code><br>
+	The size of the uploaded file.<br>
+
+	<code><b>$::request::UPLOAD(type)</b></code><br>
+	The content type of the file upload. <i>Not always available!</i><br>
+
+	<code><b>$::request::UPLOAD(channelname)</b></code><br> The
+	name of a Tcl channel which may be used to manipulate the
+	uploaded file.  If Dtcl_UploadFilesToVar is set, this
+	variable doesn't get created.  If no file is passed to the
+	server, this variable does not exist!  Be sure to check for
+	this.<br>
+
+	<code><b>$::request::UPLOAD(data)</b></code><br>
+	Contents of the uploaded file, if Dtcl_UploadFilesToVar is
+	set.<br>
+      </li>
+-->
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>miscellaneous mod_dtcl documentation</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h2>Other mod_dtcl Documentation</h2>
+        
+    <h3>Internals</h3>
+    <ul>
+      <li><b>Read the code!</b></li>
+      <li>		
+	<b>Initialization</b><br>
+		
+	When Apache is started, (or when child Apache
+	processes are started if a threaded Tcl is used),
+	<code>tcl_init_stuff</code> is called, which creates
+	a new interpreter, and initializes various things,
+	like the <code>apache_channel</code> channel system.
+	The caching system is also set up, and if there is a
+	GlobalScript, it is run.
+      </li>
+      <li><b>Achan/apache_channel</b><br>
+
+	The "Apache Channel" system was created so that it is
+	possible to have an actual Tcl channel that we could
+	redirect standard output to.  This lets us use, for
+	instance, the regular "puts" command in .ttml pages.
+	It works by creating commands that write to memory
+	that is slated to be sent to the client.
+      </li>
+
+      <li><b>Page parsing/execution</b><br>
+
+	In <code>send_parsed_file</code> Each .ttml file is
+	loaded and run within its own namespace.  No new
+	interpreter is created for each page.  This lets you
+	share variables, and most importantly, loaded modules,
+	from a common parent (such as one of the InitScripts).
+	When a file is loaded, it is transformed into a Tcl
+	script by putting everything outside of &lt;? and
+	?&gt; into large hputs statements.  When the script is
+	complete, it is then inserted into the cache, for
+	future use.  In fact, if the file modification
+	information doesn't change, mod_dtcl will execute the
+	cached version of the script the next time it is
+	encountered.
+      </li>
+      <li><b>Binary data</b><br>
+	mod_dtcl is capable of outputing binary data, such as
+	images, or loading binary data with 'include'.
+      </li>
+    </ul>
+
+    <h3>Upgrading From Older (< 0.9.3) Versions</h3>
+    <ul>
+      <li><b>New tags</b><br> As of version 0.9.4, mod_dtcl uses
+	&lt;? and ?&gt; instead of &lt;+ and +&gt; to delimit
+	sections of Tcl code.  By default, dtcl is still compiled
+	with code to parse the &lt;?  ?&gt; tags, but it will run
+	faster if <code>USE_OLD_TAGS</code> is set to 0 in
+	<code>mod_dtcl.h</code>.  You can automatically change your
+	.ttml files to the new format by using the
+	<code>newtags.sh</code> script in the contrib/ directory.
+	Run it at the top level of your DocumentRoot.
+      </li>
+      <li><b>headers setcookie</b><br>
+	The <code>headers setcookie</code> command now uses the
+	<code>-name</code> and <code>-value</code> flags for those
+	arguments, whereas this was not necessary in the past.
+      </li>
+    </ul>
+ </body>
+</html>
+    <!-- $Id$ -->

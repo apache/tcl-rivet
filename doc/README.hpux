@@ -1,0 +1,18 @@
+
+   A bit of information from Craig Huckabee (huck@nosc.mil) regarding
+   building mod_dtcl on HPUX:
+   
+   I had to tweak the makefile to get everything to build (adding some
+   include and library paths and -DEAPI) Apparently that mod_dtcl_module
+   [this is from an error he was getting - davidw] came from one of the
+   steps described in the Apache documentation for installing a DSO. I
+   rebuilt and redid the steps and now it appears to work OK. My next
+   test will be using some of the tcl extensions and seeing how well they
+   work.
+   
+   I also have to track down and beat out a linker problem with Tcl
+   itself. I had to add -lm to your makefile to include the math
+   libraries when linking against my Tcl build which is wrong. Somewhere
+   along the way, while building Tcl, that library isn't being linked in
+   correctly (at least that's what I think). Just one of the joys of
+   building on HP-UX I guess.
