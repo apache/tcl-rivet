@@ -1,11 +1,17 @@
 The only thing you need to install Rivet is a C compiler, linker, and
 of course, Tcl!
 
-Rivet is built by means of a Tcl make-like script which calculates
-dependencies and runs the C compiler and linker.
+Rivet is built by means of Tcl based configure and make like scripts
+which calculate dependencies and run the C compiler and linker.
 
-To build mod_rivet.so, cd to the src/ directory, and run the make.tcl
-script (using a tclsh linked against the libraries you want to use),
-then copy that to your Apache libexec/ directory.
+To build mod_rivet.so, cd to the src/ directory, run the
+./configure.tcl script, then run make.tcl. Make sure to use a tclsh
+linked against the libraries you want to use for Rivet.  Then do a
+./make.tcl install to install everything.
+
+cd src
+./configure.tcl
+./make.tcl shared
+./make.tcl install
 
 For more detailed instructions, see the docs/html/ directory.

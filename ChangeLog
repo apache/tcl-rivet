@@ -1,3 +1,11 @@
+2003-08-21  David N. Welton  <davidw@dedasys.com>
+
+	* INSTALL: Updated instructions.
+
+	* src/configure.tcl (configure::parsetclconfig): We need access to
+	previously parsed variables, so we do this in the ::configs
+	namespace.
+
 2003-08-20  David N. Welton  <davidw@dedasys.com>
 
 	* src/buildscripts/aardvark.tcl (aardvark::getconfigs): Added new

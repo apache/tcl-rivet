@@ -257,8 +257,9 @@ proc configure::parsetclconfig { config } {
 		set val ""
 		set var [lindex $line 0]
 		catch {
-		    set val [subst [string trim [lindex $line 1] ']]
-		}
+		    set val [namespace eval ::configs \
+				 [list subst [string trim [lindex $line 1] ']]]
+		} err
 		set ::configs::[set var] $val
 	    }
 	}
