@@ -17,6 +17,14 @@ set scripts {
 
 foreach script $scripts { source [file join . buildscripts $script] }
 
+# Do we have a threaded Tcl?
+
+if { [info exists tcl_platform(threaded)] } {
+    set TCL_THREADED "-DTCL_THREADED=1"
+} else {
+    set TCL_THREADED "-DTCL_THREADED=0"
+}
+
 namespace import ::aardvark::*
 
 ## Add variables
@@ -44,7 +52,7 @@ set PREFIX [exec $APXS -q PREFIX]
 
 set INC "-I$INCLUDEDIR -I$TCL_PREFIX/include"
 
-set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS -c"
+set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
 
 set MOD_STLIB mod_rivet.a
 set MOD_SHLIB mod_rivet[info sharedlibextension]

@@ -1,3 +1,21 @@
+2002-08-03  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_AppendToScript): Changed before, after,
+	and error scripts back to plain old ascii, in order to plug a
+	memory leak.
+
+	* src/mod_rivet.h: New macro: FILEDEBUGINFO off by default.
+	Useful for debugging the order of functions called.
+
+2002-07-28  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xsl: Updated rivet.xsl from Websh's xsl.
+
+2002-07-21  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Several new sections.  We now have most of what
+	is in the HTML documents.
+
 2002-07-19  David N. Welton  <davidw@dedasys.com>
 
 	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand):

@@ -9,6 +9,12 @@
 #define RIVET_DIR "rivet"
 #define RIVET_INIT RIVET_DIR"/init.tcl"
 
+#if 0
+#define FILEDEBUGINFO fprintf(stderr, "Function " __FUNCTION__ "\n")
+#else
+#define FILEDEBUGINFO
+#endif
+
 /* Configuration options  */
 
 /* If you do not have a threaded Tcl, you can define this to 0.  This
@@ -20,7 +26,9 @@
 #define THREADED_TCL 0 /* Unless you have MINGW32, modify this one! */
 #endif
 
-/* If you want to show the mod_rivet version, you can define this to 0.
+/* If you want to show the mod_rivet version in the server
+   information, you can define this to 0.
+
    Otherwise, set this to 1 to hide the version from potential
    troublemakers.  */
 #define HIDE_RIVET_VERSION 1
@@ -40,9 +48,15 @@ typedef struct {
     Tcl_Obj *rivet_global_init_script;   /* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
-    Tcl_Obj *rivet_before_script;        /* script run before each page */
-    Tcl_Obj *rivet_after_script;         /*            after            */
-    Tcl_Obj *rivet_error_script;         /*            for errors */
+    char *rivet_before_script;        /* script run before each page */
+    char *rivet_after_script;         /*            after            */
+    char *rivet_error_script;         /*            for errors */
+
+    /* These next three flags mean that the scripts have been set up
+       via UserConf. */
+    int rivet_before_script_user;
+    int rivet_after_script_user;
+    int rivet_error_script_user;
     Tcl_Obj *rivet_default_error_script;         /*            for errors */
     int *cache_size;
     int *cache_free;

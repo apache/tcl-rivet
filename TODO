@@ -30,6 +30,12 @@ TODO
 
 * Documentation in XML.
 
+* Script timeouts - limit time scripts can run before bailing out.
+
+* Safe mode?
+
+* Nice logo.
+
 MAYBE
 =====
 
