@@ -1,3 +1,21 @@
+2004-05-04  Karl Lehenbauer  <karl@sc.com>
+
+	* rivet/packages/dio/diodisplay.tcl: Added enhancements from 
+	Peter da Silva (peter@taronga.com): Add support for hidden variables.
+	(This is so that you can have state variables that are maintained by 
+	the function outside of DIOdisplay, retained as you jump through 
+	DIOdisplay.) Added DIORowHeader to the style sheet.  Turned the search 
+	table into a navigation bar.  Added a filter method that allows you 
+	to edit the display of fields on the fly, for example, you have a 
+	time in integer seconds since 1970 and you can add a filter that 
+	does a "clock format" using -filter, or, for example, it can look 
+	up an IP address from a table.
+
+	* rivet/packages/dio/dio.tcl: Added enhancements from 
+	Peter da Silva (peter@taronga.com): New "forall" method will apply
+	a result across a code body for each record returned in the result
+	and then delete the result handle, all in one fell swoop.
+
 2004-04-24  David N. Welton  <davidw@dedasys.com>
 
 	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand): If
