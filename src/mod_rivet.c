@@ -142,7 +142,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	}
 	Tcl_IncrRefCount(errscript);
 	if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
-	    char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+	    CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
 	    TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>", 1,
 				    globals->req);
 	    TclWeb_PrintError( errorinfo, 0, globals->req );

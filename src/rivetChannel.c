@@ -21,7 +21,7 @@ inputproc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
    Channel that we create to divert stdout to. */
 
 static int
-outputproc(ClientData instancedata, char *buf, int toWrite, int *errorCodePtr)
+outputproc(ClientData instancedata, CONST84 char *buf, int toWrite, int *errorCodePtr)
 {
     rivet_server_conf *rsc = (rivet_server_conf *)instancedata;
     rivet_interp_globals *globals =
@@ -44,7 +44,7 @@ closeproc(ClientData instancedata, Tcl_Interp *interp)
 
 static int
 setoptionproc(ClientData instancedata, Tcl_Interp *interp,
-		 char *optionname, char *value)
+	      CONST84 char *optionname, CONST84 char *value)
 {
     return TCL_OK;
 }

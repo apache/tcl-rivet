@@ -2,10 +2,11 @@
 # the next line restarts using tclsh \
 	exec tclsh "$0" "$@"
 
+# make.tcl
+#
 # $Id$
-
-# this file actually runs things, making use of the aardvark build
-# system.
+#
+# This file is responsible for the top-level "make" style processing.
 
 set scripts {
     helpers.tcl
@@ -38,7 +39,7 @@ set APXS "apxs"
 ## Try to find the Apache apxs script.
 set APXS [FindAPXS $APXS]
 
-if {![string length $APXS]} {
+if { ![string length $APXS] } {
     puts stderr "Could not find Apache apxs script."
     append err "You need to edit 'make.tcl' to supply the location of "
     append err "Apache's apxs tool."
@@ -78,7 +79,7 @@ set XML [file join .. doc rivet.xml]
 
 # "depends" lists the nodes on which it depends
 
-# "sh" is the command to execute
+# "sh" is a shell command to execute
 
 AddNode apache_multipart_buffer.o {
     depends "apache_multipart_buffer.c apache_multipart_buffer.h"

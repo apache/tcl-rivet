@@ -111,7 +111,7 @@
 	  wish to compile them.
 
 	  <programlisting>gunzip tcl-rivet-X.X.X.tar.gz
-	    tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
+tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 
 	</para>
       </step>

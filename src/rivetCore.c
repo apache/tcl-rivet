@@ -446,7 +446,7 @@ Rivet_Upload(
 
     Tcl_Obj *result = NULL;
 
-    static char *SubCommand[] = {
+    static CONST84 char *SubCommand[] = {
 	"channel",
 	"save",
 	"data",
@@ -516,7 +516,7 @@ Rivet_Upload(
 	if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	channelname = Tcl_GetChannelName(chan);
+	(CONST84 char *)channelname = Tcl_GetChannelName(chan);
 	Tcl_SetStringObj(result, channelname, -1);
 	break;
     }

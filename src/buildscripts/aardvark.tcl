@@ -8,7 +8,6 @@
 package provide aardvark 0.1
 package require struct
 
-
 namespace eval aardvark {
     # the graph 'object' we use throughout.
     variable grph

@@ -35,6 +35,11 @@
 
 /* End Configuration options  */
 
+/* For Tcl 8.3/8.4 compatibility - see http://mini.net/tcl/3669 */
+#ifndef CONST84
+#   define CONST84
+#endif
+
 #define STARTING_SEQUENCE "<?"
 #define ENDING_SEQUENCE "?>"
 

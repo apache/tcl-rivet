@@ -12,6 +12,8 @@ package provide apachetest 0.1
 
 namespace eval apachetest {
 
+    set debug 1
+
     # Associate module names with their internal names.
     array set module_assoc {
 	mod_log_config	  config_log_module
@@ -67,7 +69,11 @@ proc apachetest::start { options code } {
 
 proc apachetest::startserver { args } {
     variable binname
+    variable debug
     if { [catch {
+	if { $debug } {
+	    puts "$binname -X -f [file join [pwd] server.conf] [concat $args]"
+	}
 	eval exec $binname -X -f \
 	    "[file join [pwd] server.conf]" [concat $args]
     } err] } {

@@ -158,7 +158,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
     while (*next != 0)
     {
 	cur = next;
-	next = Tcl_UtfNext(cur);
+	(CONST84 char*)next = Tcl_UtfNext(cur);
 	if (!inside)
 	{
 	    /* Outside the delimiting tags. */
@@ -170,7 +170,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 		    Tcl_AppendToObj(outbuf, "\"\n", 2);
 		    inside = 1;
 		    p = 0;
-		    cur = Tcl_UtfNext(cur);
+		    (CONST84 char*)cur = Tcl_UtfNext(cur);
 		    continue;
 		}
 	    } else {

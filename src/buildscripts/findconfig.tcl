@@ -32,7 +32,7 @@ proc FindTclConfig {} {
 		return [file join $libdir tclConfig.sh]
 	    }
 	}
-    } 
+    }
     # Not in usual places, go searching for tclsh...
     set candshells [list]
     if {[regsub -nocase wish $exec tclsh shell]} {

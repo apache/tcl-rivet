@@ -1,3 +1,10 @@
+2002-10-21  David N. Welton  <davidw@dedasys.com>
+
+	* src/*.c: "CONST"ification.  See http://mini.net/tcl/3669 for
+	more information.
+
+	* src/: Minor build script updates.
+
 2002-10-20  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: "make" needed to be "make.tcl".  Thanks to Makoto
