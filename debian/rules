@@ -8,7 +8,7 @@ package=rivet
 
 build:
 	$(checkdir)
-	( export C_INCLUDE_PATH=/usr/include/tcl$(TCL_VERSION)/ ; cd src ; ./make.tcl shared )
+	( cd src ; ./make.tcl shared )
 	touch build
 
 clean:

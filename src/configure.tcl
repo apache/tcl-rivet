@@ -14,6 +14,7 @@ namespace eval configure {
     array set errors {}
     set useroptions {}
     array set optionvars {}
+    set verbose 0
 }
 
 namespace eval configs {}
@@ -37,11 +38,13 @@ proc configure::ProcessOptions {} {
     global argv argv0
     variable useroptions
     variable optionvars
+    variable verbose
     set optionvars(prefix) PREFIX
     set optionvars(enable-symbols) DEBUGSYMBOLS
     set options {
 	{prefix.arg ""		"prefix - where"}
 	{enable-symbols		"enable debugging symbols"}
+	{verbose		"verbose output"}
     }
     set options [concat $options $useroptions]
     set usage "options:"
@@ -55,6 +58,9 @@ proc configure::ProcessOptions {} {
 	if { [info exists optionvars($key)] } {
 	    set ::configs::[set optionvars($key)] $val
 	}
+    }
+    if { $params(verbose) } {
+	set verbose 1
     }
 }
 
@@ -137,22 +143,32 @@ proc configure::AddOption {args} {
 
 proc configure::test {varname body} {
     variable errors
+    variable verbose
 
-    puts -nonewline "."
-    flush stdout
+    if { ! $verbose } {
+	puts -nonewline "."
+	flush stdout
+    }
     if { [info exists ::configs::${varname}] && [set ::configs::[set varname]] != "" } {
 	# It already exists - it was probably passed on the command
 	# line.
 	return
     }
+
     set val ""
     set oldvars [lsort [info vars ::configs::*]]
     if { [catch {set val [namespace eval ::configs $body]} err] } {
-	set errors($varname) $err
+	# Exit on error.
+	puts stderr ""
+	puts stderr "Error in $varname test: $err"
+	exit 1
     } else {
 	set ::configs::${varname} $val
     }
     set newvars [lsort [info vars ::configs::*]]
+    if { $verbose } {
+	puts "$varname	=	$val"
+    }
     # Clean up temporary variables.
     foreach var $newvars {
 	if { [lsearch $oldvars $var] < 0 } {
@@ -161,6 +177,37 @@ proc configure::test {varname body} {
 	    }
 	}
     }
+}
+
+
+# configure::assert --
+#
+#	Exits if an assertion is false.  We use this to make sure the
+#	environment meets specific criterion.
+#
+# Arguments:
+#	name - useful for looking it up, doesn't really matter.
+#	body - code to test.
+#
+# Side Effects:
+#	Exits on failure.
+#
+# Results:
+#	None.
+
+proc configure::assert {name body} {
+    set val 0
+    set errmsg ""
+    if { [catch {set val [namespace eval ::configs $body]} err] } {
+	set errmsg "$name assertion error: $err"
+    } elseif { $val == 0 } {
+	set errmsg "$name assertion false: $body"
+    } else {
+	return
+    }
+    puts stderr ""
+    puts stderr $errmsg
+    exit 1
 }
 
 # Helper procedures for findtclconfig
@@ -335,7 +382,7 @@ proc configure::errorexit { msg } {
     exit 1
 }
 
-puts -nonewline "Configuring "
+puts "Configuring"
 
 # Here is where we actually read in the user's tests.
 source [file join [file dirname [info script]] configure.in.tcl]

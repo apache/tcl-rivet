@@ -2,6 +2,9 @@
 
 # $Id$
 
+# We need Tcl 8.3 or later.
+package require Tcl 8.3
+
 # Add some command-line configuration options specific to Rivet.
 configure::AddOption -flag with-apxs -var APXS \
     -desc "Location of the apxs binary" -arg -default apxs
@@ -38,18 +41,17 @@ configure::test PREFIX {
 }
 
 configure::test INC {
-    set tmp "-I$INCLUDEDIR -I[file join $TCL_PREFIX include]"
+    set tmp "-I$INCLUDEDIR $TCL_INCLUDE_SPEC"
 }
 
 configure::test COMPILE {
     if { $DEBUGSYMBOLS } {
-	set tmp "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
+	set tmp "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
     } else {
-	set tmp "$TCL_CC $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
+	set tmp "$TCL_CC $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
     }
 }
 
 configure::test CRYPT_LIB {
     configure::lib_has_function crypt crypt
 }
-

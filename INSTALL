@@ -10,8 +10,8 @@ linked against the libraries you want to use for Rivet.  Then do a
 ./make.tcl install to install everything.
 
 cd src
-./configure.tcl
-./make.tcl shared
-./make.tcl install
+tclsh ./configure.tcl
+tclsh ./make.tcl shared
+tclsh ./make.tcl install
 
 For more detailed instructions, see the docs/html/ directory.

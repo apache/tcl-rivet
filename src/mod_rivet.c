@@ -181,8 +181,8 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     rsc = Rivet_GetConf( req->req );
 
     /* If the user configuration has indeed been updated, I guess that
-     * pretty much invalidates anything that might have been
-     * cached. */
+       pretty much invalidates anything that might have been
+       cached. */
 
     /* This is all horrendously slow, and means we should *also* be
        doing caching on the modification time of the .htaccess files

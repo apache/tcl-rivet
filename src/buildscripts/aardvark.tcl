@@ -85,14 +85,14 @@ proc aardvark::runbuildcommand { direction graphname node } {
     }
 
     # rebuild if dependencies are newer than file
-    if { [ llength $deps ] > 0 } {
+    if { [llength $deps] > 0 } {
 	foreach dep $deps {
 	    if { [file exists $dep] } {
 		set depmtime [file mtime $dep]
 	    } else {
 		set depmtime 0
 	    }
-	    if { $depmtime >= $mtime } {
+	    if { $depmtime > $mtime } {
 		set rebuild 1
 	    }
 	}
