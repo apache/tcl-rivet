@@ -151,8 +151,6 @@ proc handle {interface args} {
 	    }
 	}
 	return "select $what from $myTable $req"
-
-	return "select $what from $myTable $req"
     }
 
     #
@@ -164,6 +162,7 @@ proc handle {interface args} {
     #
     protected method build_insert_query {arrayName fields {myTable ""}} {
 	upvar 1 $arrayName array
+
 	if {[lempty $myTable]} { set myTable $table }
 	foreach field $fields {
 	    if {![info exists array($field)]} { continue }
@@ -452,10 +451,9 @@ proc handle {interface args} {
     # efforts to see if it needs to be an update rather than
     # an insert
     #
-    method insert {arrayName args} {
+    method insert {arrayName fields args} {
 	table_check $args
 	upvar 1 $arrayName $arrayName $arrayName array
-
 	set req [build_insert_query array $fields $myTable]
 	set res [exec $req]
 	set return [expr [$res error] == 0]
