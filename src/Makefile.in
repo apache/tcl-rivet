@@ -60,9 +60,10 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)"
+am__installdirs = "$(DESTDIR)$(apxs_libexecdir)" "$(DESTDIR)$(libdir)"
+apxs_libexecLTLIBRARIES_INSTALL = $(INSTALL)
 libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
+LTLIBRARIES = $(apxs_libexec_LTLIBRARIES) $(lib_LTLIBRARIES)
 librivet_la_DEPENDENCIES =
 am_librivet_la_OBJECTS = librivet_la-rivetList.lo \
 	librivet_la-rivetCrypt.lo librivet_la-rivetWWW.lo \
@@ -256,15 +257,29 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-lib_LTLIBRARIES = mod_rivet.la  librivet.la librivetparser.la
+apxs_libexecdir = @APXS_LIBEXECDIR@
+lib_LTLIBRARIES = librivet.la librivetparser.la
+apxs_libexec_LTLIBRARIES = mod_rivet.la
+
+#
+# Apache Rivet Module, mod_rivet.so / mod_rivet.dll
+#
 mod_rivet_la_SOURCES = apache_multipart_buffer.c apache_request.c rivetChannel.c rivetParser.c mod_rivet.c rivetCore.c rivetCrypt.c TclWebapache.c mod_rivet.h
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+
+#
+# Rivet Library
+#
 librivet_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
 librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
 librivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 librivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+
+#
+# Rivet Parser Library
+#
 librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
 librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
 librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
@@ -302,6 +317,33 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+install-apxs_libexecLTLIBRARIES: $(apxs_libexec_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(apxs_libexecdir)" || $(mkdir_p) "$(DESTDIR)$(apxs_libexecdir)"
+	@list='$(apxs_libexec_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) --mode=install $(apxs_libexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(apxs_libexecdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(apxs_libexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(apxs_libexecdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-apxs_libexecLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@set -x; list='$(apxs_libexec_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(apxs_libexecdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(apxs_libexecdir)/$$p"; \
+	done
+
+clean-apxs_libexecLTLIBRARIES:
+	-test -z "$(apxs_libexec_LTLIBRARIES)" || rm -f $(apxs_libexec_LTLIBRARIES)
+	@list='$(apxs_libexec_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
@@ -334,7 +376,7 @@ librivet.la: $(librivet_la_OBJECTS) $(librivet_la_DEPENDENCIES)
 librivetparser.la: $(librivetparser_la_OBJECTS) $(librivetparser_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(librivetparser_la_LDFLAGS) $(librivetparser_la_OBJECTS) $(librivetparser_la_LIBADD) $(LIBS)
 mod_rivet.la: $(mod_rivet_la_OBJECTS) $(mod_rivet_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(mod_rivet_la_LDFLAGS) $(mod_rivet_la_OBJECTS) $(mod_rivet_la_LIBADD) $(LIBS)
+	$(LINK) -rpath $(apxs_libexecdir) $(mod_rivet_la_LDFLAGS) $(mod_rivet_la_OBJECTS) $(mod_rivet_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -565,7 +607,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)"; do \
+	for dir in "$(DESTDIR)$(apxs_libexecdir)" "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -595,8 +637,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	mostlyclean-am
+clean-am: clean-apxs_libexecLTLIBRARIES clean-generic \
+	clean-libLTLIBRARIES clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -616,7 +658,8 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-apxs_libexecLTLIBRARIES \
+	install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -642,20 +685,23 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
+uninstall-am: uninstall-apxs_libexecLTLIBRARIES uninstall-info-am \
+	uninstall-libLTLIBRARIES
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+.PHONY: CTAGS GTAGS all all-am check check-am clean \
+	clean-apxs_libexecLTLIBRARIES clean-generic \
 	clean-libLTLIBRARIES clean-libtool ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	install install-am install-apxs_libexecLTLIBRARIES \
+	install-data install-data-am install-exec install-exec-am \
+	install-info install-info-am install-libLTLIBRARIES \
+	install-man install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-apxs_libexecLTLIBRARIES \
+	uninstall-info-am uninstall-libLTLIBRARIES
 
 
 # librivet.so
