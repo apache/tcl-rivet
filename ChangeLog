@@ -1,3 +1,12 @@
+2003-02-21  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.tcl (aardvark::Nodes): Add command to
+	return list of all nodes.
+
+	* doc/rivet.xml: Add some information on the precedence of the
+	different Conf options.  Change information about DirConf - it
+	isn't allowed in .htaccess files.
+
 2003-02-19  David N. Welton  <davidw@dedasys.com>
 
 	* src/buildscripts/aardvark.test: Add test script and files for

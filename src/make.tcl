@@ -2,8 +2,6 @@
 # the next line restarts using tclsh \
 	exec tclsh "$0" "$@"
 
-# make.tcl
-#
 # $Id$
 #
 # This file is responsible for the top-level "make" style processing.
@@ -250,6 +248,18 @@ AddNode dist {
 	close $fl
 	cd [file join .. ..]
 	exec tar czvf tcl-rivet-${VERSION}.tgz tcl-rivet/
+    }
+}
+
+AddNode help {
+    tcl {
+	puts "Usage: $::argv0 target"
+	puts "Targets are the following:"
+    }
+    tcl {
+	foreach nd [lsort [Nodes]] {
+	    puts "\t$nd"
+	}
     }
 }
 

@@ -197,7 +197,11 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 
     <para>
       These directives are used within the Apache httpd server
-      configuration files to modify Apache Rivet's behaviour.
+      configuration files to modify Apache Rivet's behaviour.  Their
+      precedence is as follows: <command>RivetDirConf</command>,
+      <command>RivetUserConf</command>,
+      <command>RivetServerConf</command>, meaning that DirConf will
+      override UserConf, which will in turn override ServerConf.
     </para>
 
     <variablelist>
@@ -443,8 +447,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	    <command>RivetServerConf</command>, except that they are
 	    only valid for the directory where they are specified, and
 	    its subdirectories.  It may be specified in
-	    <command>Directory</command> sections, as well as in
-	    <filename>.htaccess</filename> files.
+	    <command>Directory</command> sections.
 	  </para>
 	</listitem>
       </varlistentry>

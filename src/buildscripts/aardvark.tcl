@@ -213,6 +213,22 @@ proc aardvark::AddNode { name rest } {
     }
 }
 
+# aardvark::Nodes --
+#
+#	Return a list of all the nodes.
+#
+# Arguments:
+#	None.
+#
+# Results:
+#	List of all the nodes.
+
+
+proc aardvark::Nodes { } {
+    variable grph
+    return [$grph nodes]
+}
+
 proc aardvark::Run { } {
     global ::argv
     variable grph
@@ -231,5 +247,5 @@ proc aardvark::Run { } {
 }
 
 namespace eval aardvark {
-    namespace export AddNode Run Verbose sh tcl depends
+    namespace export AddNode Run Verbose sh tcl depends Nodes
 }

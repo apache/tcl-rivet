@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><meta name="generator" content="DocBook XSL Stylesheets V1.56.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="commands.html" title="Rivet Tcl Commands and Variables"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr></table><hr></div><div class="section"><div class="titlepage"><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><meta name="generator" content="DocBook XSL Stylesheets V1.60.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="commands.html" title="Rivet Tcl Commands and Variables"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div><div></div></div><p style="width:90%">
       Some examples of Rivet usage follow.  Some prior Tcl knowledge
       is assumed.  If you don't know much Tcl, don't worry, it's easy,
       and there are some good resources available on the web that will
@@ -8,7 +8,7 @@
 	As with any tool, it's always nice to see something work, so
 	let's create a small &quot;Hello World&quot; page.</p><p style="width:90%">
 	Assuming you have Apache configured correctly, create a file
-	called <tt>hello.rvt</tt> where Apache can find
+	called <tt class="filename">hello.rvt</tt> where Apache can find
 	it, with the following content:
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 puts &quot;Hello World&quot;
@@ -94,36 +94,36 @@ if { [llength $errlist] != 0 } {
 }
 ?&gt;</pre><p style="width:90%">
 	The first statement checks to make sure that the
-	<tt>boss</tt> variable has been passed to the
+	<tt class="varname">boss</tt> variable has been passed to the
 	script, and then does something with that information.  If
 	it's not present, an error is added to the list of errors.
       </p><p style="width:90%">
 	In the second block of code, the variable
-	<tt>salary</tt> is fetched, with one more error
+	<tt class="varname">salary</tt> is fetched, with one more error
 	check - because it's a number, it needs to be composed of
 	digits.
       </p><p style="width:90%">
-	The <tt>boss</tt> variable isn't required to have
+	The <tt class="varname">boss</tt> variable isn't required to have
 	been sent - we set it to &quot;Mr. Burns&quot; if it isn't among the
 	information we received.
       </p><p style="width:90%">
 	The last bit of variable handing code is a bit trickier.
-	Because <tt>skills</tt> is a listbox, and can
+	Because <tt class="varname">skills</tt> is a listbox, and can
 	potentially have multiple values, we opt to receive them as a
 	list, so that at some point, we could iterate over them.
       </p><p style="width:90%">
 	The script then checks to make sure that
-	<tt>errlist</tt> is empty (printing an error if it
+	<tt class="varname">errlist</tt> is empty (printing an error if it
 	is) and outputting a thankyou message.
       </p></div><div class="example"><a name="upload"></a><p class="title"><b>Example 4. File Upload</b></p><p style="width:90%">
 	The following HTML in one file, say,
-	<tt>upload.html</tt>
+	<tt class="filename">upload.html</tt>
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;foo.rvt&quot; enctype=&quot;multipart/form-data&quot;
 method=&quot;post&quot;&gt;
 &lt;input type=&quot;file&quot; name=&quot;MyUpload&quot;&gt;&lt;/input&gt;
 &lt;/form&gt;</pre><p style="width:90%">
 	Can be used with the following Tcl code, in a second file
-	(<tt>upload.rvt</tt> for instance)
+	(<tt class="filename">upload.rvt</tt> for instance)
 	in order to create a file upload form.
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 upload save MyUpload /tmp/uploadfiles/file1
