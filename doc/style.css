@@ -3,6 +3,7 @@ body {
     font-style: normal;
     color: #000000;
     background-color: #FFFFFF;
+    font-size: smaller;
 }
 
 A:link { color: #cc3300 }
@@ -10,11 +11,13 @@ A:visited { color : #003399; }
 A:hover { color : #000000 ; background-color : #aaaaaa }
 
 h1 {
+    font-size: xx-large;
     font-family: Arial, sans-serif;
     color: #000000;
 }
 
 h2 {
+    font-size: larger;
     font-family: Arial, sans-serif;
 }
 
@@ -32,6 +35,7 @@ td {
 }
 
 code {
+     font-size: larger;
      color: #006600;
 }
 

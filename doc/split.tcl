@@ -12,7 +12,6 @@ proc main { } {
 	</head>
 	<body>
     }
-	
     foreach fl $argv {
 	set ofl [ open $fl r ]
 	set dump [ read $ofl ]
@@ -21,7 +20,7 @@ proc main { } {
 	foreach ln $lines {
 	    if { [ string first "<body>" $ln ] != -1 } {
 		set inbody 1
-	    } elseif { [ string first "</body>" $ln ] != -1 } { 
+	    } elseif { [ string first "</body>" $ln ] != -1 } {
 		set inbody 0
 	    } else {
 		if { $inbody == 1 } { puts $ln }
@@ -31,7 +30,7 @@ proc main { } {
     puts {
 	</body>
 	</html>
-    }    
+    }
 }
 
 main

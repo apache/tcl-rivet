@@ -2,7 +2,7 @@
     <!-- $Id$ -->
 <html>
   <head>
-    <title>Rivet tcl commands</title>
+    <title>Apache Rivet Tcl Commands</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -13,77 +13,83 @@
       <li><code><b>var</b></code><br> These commands retrieve or
 	retrieve information about "CGI" variables that are passed to
 	the rivet script via GET or POST operations.
-      </li>
-      <li>
-	<code><b>var get <i>varname</i></b></code><br> Returns the
-	value of variable 'varname' as a string (even if there are
-	multiple values).
-      </li>
-      <li>
-	<code><b>var list <i>varname</i></b></code><br>
-	Returns the value of variable 'varname' as a list, if there
-	are multiple values.
-      </li>
-      <li>
-	<code><b>var exists <i>varname</i></b></code><br>
-	Returns 1 if <i>varname</i> exists, 0 if it doesn't.
-      </li>
-      <li>
-	<code><b>var number</b></code><br>
-	Returns the number of variables.
-      </li>
-      <li>
-	<code><b>var all</b></code><br>
-	Return a list of variable names and values.
+	<ul>
+	  <li>
+	    <code><b>var get <i>varname</i></b></code><br> Returns the
+	    value of variable 'varname' as a string (even if there are
+	    multiple values).
+	  </li>
+	  <li>
+	    <code><b>var list <i>varname</i></b></code><br>
+	    Returns the value of variable 'varname' as a list, if there
+	    are multiple values.
+	  </li>
+	  <li>
+	    <code><b>var exists <i>varname</i></b></code><br>
+	    Returns 1 if <i>varname</i> exists, 0 if it doesn't.
+	  </li>
+	  <li>
+	    <code><b>var number</b></code><br>
+	    Returns the number of variables.
+	  </li>
+	  <li>
+	    <code><b>var all</b></code><br>
+	    Return a list of variable names and values.
+	  </li>
+	</ul>
       </li>
 
       <li><code><b>upload</b></code><br> These commands retrieve or
 	retrieve information about files that have been uploaded to
-	the server.  They replace the <code>UPLOAD</code> variable.
-      </li>
-      <li>
-	<code><b>upload get <i>varname</i> channel</b></code><br>
-	Returns a Tcl channel that can be used to access the uploaded file.
-      </li>
-      <li>
-	<code><b>upload get <i>varname</i> save <i>name</i></b></code><br>
-	Moves the uploaded file to the give name.
-      </li>
-      <li>
-	<code><b>upload get <i>varname</i> data</b></code><br>
-	Returns data uploaded to the server.  This is binary clean.
+	the server.
+	<ul>
+	  <li>
+	    <code><b>upload get <i>varname</i> channel</b></code><br>
+	    Returns a Tcl channel that can be used to access the uploaded file.
+	  </li>
+	  <li>
+	    <code><b>upload get <i>varname</i> save <i>name</i></b></code><br>
+	    Moves the uploaded file to the give name.
+	  </li>
+	  <li>
+	    <code><b>upload get <i>varname</i> data</b></code><br>
+	    Returns data uploaded to the server.  This is binary clean.
+	  </li>
+
+	  <li>
+	    <code><b>upload info <i>varname</i> exists</b></code><br>
+	    Returns 1 if the variable exists, 0 if not.
+	  </li>
+	  <li>
+	    <code><b>upload info <i>varname</i> size</b></code><br>
+	    Returns the size of the file uploaded.
+	  </li>
+	  <li>
+	    <code><b>upload info <i>varname</i> type</b></code><br>If the
+	    Content-type is set, it is returned, otherwise, an empty
+	    string.
+	  </li>
+	  <li>
+	    <code><b>upload info <i>varname</i> filename</b></code><br>
+	    Returns the filename on the remote host that uploaded the file.
+	  </li>
+	  <li>
+	    <code><b>upload names</b></code><br> Returns the variable
+	    names, as a list, of all the files uploaded.
+	  </li>
+	</ul>
       </li>
 
       <li>
-	<code><b>upload info <i>varname</i> exists</b></code><br>
-	Returns 1 if the variable exists, 0 if not.
-      </li>
-      <li>
-	<code><b>upload info <i>varname</i> size</b></code><br>
-	Returns the size of the file uploaded.
-      </li>
-      <li>
-	<code><b>upload info <i>varname</i> type</b></code><br>If the
-	Content-type is set, it is returned, otherwise, an empty
-	string.
-      </li>
-      <li>
-	<code><b>upload info <i>varname</i> filename</b></code><br>
-	Returns the filename on the remote host that uploaded the file.
-      </li>
-      <li>
-	<code><b>upload names</b></code><br> Returns the variable
-	names, as a list, of all the files uploaded.
+	<code><b>load_env <i>array_name</i></b></code><br> Load the
+	array of environment variables into the specified array name.
       </li>
 
       <li>
-	<code><b>hgetvars</b></code><br> Get environmental, and Cookie
-	variables. This is in a seperate command so as not to make the
-	server do this every time you load an .rvt file. <code>ENVS</code> and
-	<code>COOKIES</code> are the associative arrays created.  <code>ENVS</code> contains
-	environmental variables, and <code>COOKIES</code> contains any cookies
-	recieved from the client.
+	<code><b>load_cookies <i>array_name</i></b></code><br> Load
+	the array of cookie variables into the specified array name.
       </li>
+
       <li>
 	<code><b>include <i>filename</i></b></code><br>
 	Include a file without parsing it.  This is the best
@@ -95,37 +101,41 @@
 	other .rvt files.
       </li>
       <li>
-	<code><b>headers redirect <i>uri</i></b></code><br>
+	<code><b>headers</b></code><br>
+	Commands to manipulate http headers.
+	<ul>
+	  <li>
+	    <code><b>headers redirect <i>uri</i></b></code><br>
+	    Redirect from the current page to a new
+	    URI. <b>Must</b> be done in the first block of TCL code.
+	  </li>
+	  <li>
+	    <code><b>headers setcookie <i>-name cookie-name
+		  -value cookie-value ?-expires date/time? ?-domain domain?
+		  ?-path path? ?-secure?</i></b></code><br>
+	    This command is for setting cookies.  Cookie-name is
+	    the name of the cookie, cookie-value is the data
+	    associated with the variable.  Expires sets an
+	    expiration date for the cookie, and must be in the
+	    format 'DD-Mon-YY HH:MM:SS', path sets the path for
+	    which the cookie is valid, and secure specifies that
+	    the cookie is only to be transmitted if the connection
+	    is secure (HTTPS).
+	  </li>
+	  <li>
+	    <code><b>headers type
+		<i>content-type</i></b></code><br>
 
-	Redirect from the current page to a new
-	URI. <b>Must</b> be done in the first block of TCL code.
-      </li>
-      <li>
-	<code><b>headers setcookie <i>-name cookie-name
-	      -value cookie-value ?-expires date/time? ?-domain domain?
-	      ?-path path? ?-secure?</i></b></code><br>
+	    This command sets the "Content-type:" header returned
+	    by the script, which is useful if you wish to create a
+	    PNG (image), for example, with Rivet.
+	  </li>
+	  <li>
+	    <code><b>headers set <i>headername value</i></b></code><br>
 
-	This command is for setting cookies.  Cookie-name is
-	the name of the cookie, cookie-value is the data
-	associated with the variable.  Expires sets an
-	expiration date for the cookie, and must be in the
-	format 'DD-Mon-YY HH:MM:SS', path sets the path for
-	which the cookie is valid, and secure specifies that
-	the cookie is only to be transmitted if the connection
-	is secure (HTTPS).
-      </li>
-      <li>
-	<code><b>headers type
-	    <i>content-type</i></b></code><br>
-
-	This command sets the "Content-type:" header returned
-	by the script, which is useful if you wish to create a
-	PNG (image), for example, with Rivet.
-      </li>
-      <li>
-	<code><b>headers set <i>headername value</i></b></code><br>
-
-	Set arbitrary header names and values.
+	    Set arbitrary header names and values.
+	  </li>
+	</ul>
       </li>
 
       <li>
@@ -143,34 +153,34 @@
 	HTML.  Currently, only the PID and size of the object
 	cache are reported.
       </li>
-<!--
+      <!--
       <li>
-	Note that these variables may be lists if more than one file
-	is uploaded at a time.<br>
-	<code><b>$::request::UPLOAD(filename)</b></code><br>
-	The filename of the uploaded file.<br>
+      Note that these variables may be lists if more than one file
+      is uploaded at a time.<br>
+      <code><b>$::request::UPLOAD(filename)</b></code><br>
+      The filename of the uploaded file.<br>
 
-	<code><b>$::request::UPLOAD(name)</b></code><br>
-	The form variable name of the upload.<br>
+      <code><b>$::request::UPLOAD(name)</b></code><br>
+      The form variable name of the upload.<br>
 
-	<code><b>$::request::UPLOAD(size)</b></code><br>
-	The size of the uploaded file.<br>
+      <code><b>$::request::UPLOAD(size)</b></code><br>
+      The size of the uploaded file.<br>
 
-	<code><b>$::request::UPLOAD(type)</b></code><br>
-	The content type of the file upload. <i>Not always available!</i><br>
+      <code><b>$::request::UPLOAD(type)</b></code><br>
+      The content type of the file upload. <i>Not always available!</i><br>
 
-	<code><b>$::request::UPLOAD(channelname)</b></code><br> The
-	name of a Tcl channel which may be used to manipulate the
-	uploaded file.  If Rivet_UploadFilesToVar is set, this
-	variable doesn't get created.  If no file is passed to the
-	server, this variable does not exist!  Be sure to check for
-	this.<br>
+      <code><b>$::request::UPLOAD(channelname)</b></code><br> The
+      name of a Tcl channel which may be used to manipulate the
+      uploaded file.  If Rivet_UploadFilesToVar is set, this
+      variable doesn't get created.  If no file is passed to the
+      server, this variable does not exist!  Be sure to check for
+      this.<br>
 
-	<code><b>$::request::UPLOAD(data)</b></code><br>
-	Contents of the uploaded file, if Rivet_UploadFilesToVar is
-	set.<br>
-      </li>
--->
+      <code><b>$::request::UPLOAD(data)</b></code><br>
+      Contents of the uploaded file, if Rivet_UploadFilesToVar is
+      set.<br>
+    </li>
+      -->
     </ul>
   </body>
 </html>

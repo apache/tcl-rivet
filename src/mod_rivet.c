@@ -668,7 +668,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	*(rsc->cache_free) = *(rsc->cache_size);
     }
     /* Initializing cache structures */
-    rsc->objCacheList = ap_pcalloc(p, 
+    rsc->objCacheList = ap_pcalloc(p,
 				(signed)(*(rsc->cache_size) * sizeof(char *)));
     Tcl_InitHashTable(rsc->objCache, TCL_STRING_KEYS);
 
@@ -984,7 +984,7 @@ Rivet_ChildInit(server_rec *s, pool *p)
     while(sr)
     {
 	rsc = RIVET_SERVER_CONF(sr->module_config);
-	if( rsc->rivet_child_init_script != NULL ) 
+	if( rsc->rivet_child_init_script != NULL )
 	{
 	    if (Tcl_EvalObjEx(rsc->server_interp,
 			      rsc->rivet_child_init_script, 0) != TCL_OK) {

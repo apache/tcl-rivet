@@ -874,7 +874,7 @@ Rivet_NoBody(
 
     if (*(rsc->content_sent) == 1)
 	return TCL_ERROR;
-    
+
     *(rsc->content_sent) = 1;
     return TCL_OK;
 }
