@@ -1033,8 +1033,9 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
       </para>
       <para>
 	The script then checks to make sure that
-	<varname>errlist</varname> is empty (printing an error if it
-	is) and outputting a thankyou message.
+	<varname>errlist</varname> is empty and outputting a thankyou
+	message.  If <varname>errlist</varname> is not empty, the list
+	of errors it contains is printed.
       </para>
     </example>
 

@@ -163,12 +163,12 @@ AddNode $RIVETLIB_SHLIB {
     sh {$TCL_SHLIB_LD -o $RIVETLIB_SHLIB $RIVETLIB_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
 
-AddNode mod_rivet.a {
+AddNode $MOD_STLIB {
     depends $MOD_OBJECTS
     sh {$TCL_STLIB_LD $MOD_STLIB $MOD_OBJECTS}
 }
 
-AddNode mod_rivet.so {
+AddNode $MOD_SHLIB {
     depends $MOD_OBJECTS
     sh {$TCL_SHLIB_LD -o $MOD_SHLIB $MOD_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
@@ -196,9 +196,11 @@ AddNode static {
 # Clean up source directory.
 
 AddNode clean {
-    sh {rm -f [glob -nocomplain *.o]}
-    sh {rm -f [glob -nocomplain *.so]}
-    sh {rm -f [glob -nocomplain *.a]}
+    tcl {
+	foreach fl [glob -nocomplain *.o *.so *.a] {
+	    file delete $fl
+	}
+    }
 }
 
 AddNode $PKGINDEX {
