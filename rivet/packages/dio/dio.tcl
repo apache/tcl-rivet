@@ -139,8 +139,8 @@ proc handle {interface args} {
 
 			if {[::string first {%} $elem] != -1} {
 			    append req " $field LIKE '[quote $elem]'"
-		        } elseif {[regexp {^([<=>]) *([0-9.]*)$} $elem _ fn val]} {
-			    # value starts with <, =, or >, then space, 
+		        } elseif {[regexp {^([<>]) *([0-9.]*)$} $elem _ fn val]} {
+			    # value starts with <, or >, then space, 
 			    # and a something
 			    append req " $field$fn$val"
 		        } elseif {[regexp {^([<>]=) *([0-9.]*)$} $elem _ fn val]} {
@@ -346,6 +346,13 @@ proc handle {interface args} {
 	upvar 1 $arrayName $arrayName
 
 	set res [exec $req]
+
+	if {[$res error]} {
+	    set errinf [$res errorinfo]
+	    $res destroy
+	    return -code error "Got '$errinf' executing '$req'"
+	}
+
         set ret [$res numrows]
 	$res forall -array $arrayName {
 	    uplevel 1 $body
@@ -406,10 +413,12 @@ proc handle {interface args} {
 	upvar 1 $arrayName $arrayName
 	set req "select * from $myTable"
 	append req [build_key_where_clause $myKeyfield $key]
+
 	set res [$this exec $req]
 	if {[$res error]} {
+	    set errinf [$res errorinfo]
 	    $res destroy
-	    return 0
+	    return -code error "Got '$errinf' executing '$req'"
 	}
 	set return [expr [$res numrows] > 0]
 	$res next -array $arrayName
@@ -434,8 +443,9 @@ proc handle {interface args} {
 	append req [build_key_where_clause $myKeyfield $key]
 	set res [exec $req]
 	if {[$res error]} {
+	    set errinf [$res errorinfo]
 	    $res destroy
-	    return 0
+	    return -code error "Got '$errinf' executing '$req'"
 	}
 	set numrows [$res numrows]
 	set fields  [$res fields]
@@ -447,10 +457,15 @@ proc handle {interface args} {
 	} else {
 	    set req [build_insert_query array $fields $myTable]
 	}
+
 	set res [exec $req]
-	set return [expr [$res error] == 0]
+	if {[$res error]} {
+	    set errinf [$res errorinfo]
+	    $res destroy
+	    return -code error "Got '$errinf' executing '$req'"
+	}
 	$res destroy
-	return $return
+	return 1
     }
 
     #
@@ -458,14 +473,22 @@ proc handle {interface args} {
     # efforts to see if it needs to be an update rather than
     # an insert
     #
-    method insert {arrayName fields args} {
+    method insert {arrayName args} {
 	table_check $args
 	upvar 1 $arrayName $arrayName $arrayName array
+
+	set fields [array names array]
 	set req [build_insert_query array $fields $myTable]
+
 	set res [exec $req]
-	set return [expr [$res error] == 0]
+	if {[$res error]} {
+	    set errinf [$res errorinfo]
+	    $res destroy
+	    return -code error "Got '$errinf' executing '$req'"
+	}
+
 	$res destroy
-	return $return
+	return 1
     }
 
     #
@@ -475,8 +498,14 @@ proc handle {interface args} {
 	table_check $args
 	set req "delete from $myTable"
 	append req [build_key_where_clause $myKeyfield $key]
+
 	set res [exec $req]
-	set return [expr [$res error] == 0]
+	if {[$res error]} {
+	    set errinf [$res errorinfo]
+	    $res destroy
+	    return -code error "Got '$errinf' executing '$req'"
+	}
+
 	$res destroy
 	return $return
     }
