@@ -270,6 +270,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 static void
 Rivet_CleanupRequest( request_rec *r )
 {
+#if 0
     rivet_server_conf *rdc = RIVET_SERVER_CONF( r->per_dir_config );
 
     if( rdc->rivet_before_script ) {
@@ -281,6 +282,7 @@ Rivet_CleanupRequest( request_rec *r )
     if( rdc->rivet_error_script ) {
 	Tcl_DecrRefCount( rdc->rivet_error_script );
     }
+#endif
 }
 
 static void
@@ -842,7 +844,6 @@ Rivet_GetConf( request_rec *r )
     Rivet_MergeDirConfigVars( r->pool, newconfig, rsc, rdc );
 
     return newconfig;
-    return rsc;
 }
 
 static void

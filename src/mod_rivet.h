@@ -36,8 +36,8 @@
 /* #define RIVET_VERSION "X.X.X" */
 
 typedef struct {
-    Tcl_Interp *server_interp;          /* per server Tcl interpreter */
-    Tcl_Obj *rivet_global_init_script;   /* run once when apache is first started */
+    Tcl_Interp *server_interp;           /* per server Tcl interpreter */
+    Tcl_Obj *rivet_global_init_script;   /* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
     Tcl_Obj *rivet_before_script;        /* script run before each page */
@@ -69,12 +69,14 @@ typedef struct {
     TclWebRequest *req;         /* TclWeb API request */
 } rivet_interp_globals;
 
-int Rivet_ParseExecFile(TclWebRequest *req, char *filename,
-			int toplevel);
+int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);
+
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
-#define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
+#define RIVET_SERVER_CONF(module) \
+	(rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 
-#define RIVET_NEW_CONF(p) (rivet_server_conf *)ap_pcalloc(p, sizeof(rivet_server_conf))
+#define RIVET_NEW_CONF(p) \
+	(rivet_server_conf *)ap_pcalloc(p, sizeof(rivet_server_conf))
 
 #endif
