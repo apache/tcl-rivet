@@ -6,6 +6,8 @@
 	  example, an Add or Edit method, the author doesn't have to 
 	  dup all of showform's functionality.
 
+	* rivet/packages/form/form.tcl: Commented the package.
+
 2004-12-22  David N. Welton  <davidw@dedasys.com>
 
 	* Makefile.am (install-data-local): Added this target to install
