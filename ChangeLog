@@ -1,3 +1,8 @@
+2002-06-17  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.tcl: Changed commands to 'sh' for
+	shell commands and 'tcl' for Tcl commands.
+
 2002-06-10  David N. Welton  <davidw@dedasys.com>
 
 	* doc/packages/dio/dio.xml: Further updates.

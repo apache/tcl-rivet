@@ -31,7 +31,7 @@ proc aardvark::createnode { name } {
     variable grph
     if { ! [ $grph node exists $name ] } {
 	$grph node insert $name
-	$grph node set $name -key buildinfo {cmd "" tclcommand ""}
+	$grph node set $name -key buildinfo {sh "" tcl ""}
     }
 }
 
@@ -42,12 +42,12 @@ proc aardvark::runbuildcommand { direction graphname node } {
     set mtime 0
     set deps [ $grph nodes -out $node ]
     array set buildinfo [ $grph node get $node -key buildinfo ]
-    
+
     # check file time
     if { [ file exists $node ] } {
 	set mtime [ file mtime $node ]
     }
-    
+
     # rebuild if dependencies are newer than file
     if { [ llength $deps ] > 0 } {
 	foreach dep $deps {
@@ -63,24 +63,24 @@ proc aardvark::runbuildcommand { direction graphname node } {
     } else {
 	set rebuild 1
     }
-    
+
     if { $rebuild == 1} {
-	if { $buildinfo(cmd) != "" } {
-	    foreach cmd $buildinfo(cmd) {
+	if { $buildinfo(sh) != "" } {
+	    foreach sh $buildinfo(sh) {
 		set result ""
 		puts -nonewline "$node :"
 		catch {
-		    set cmd [uplevel #0 "subst {$cmd}" ]
+		    set sh [uplevel #0 "subst {$sh}" ]
 		    puts ""
-		    puts "\tCommand: $cmd"
+		    puts "\tCommand: $sh"
 		} err
                 if { $err != "" } {
-		    puts "Command was supposed to be: $cmd"
+		    puts "Sh was supposed to be: $sh"
 		    puts "This error occured: $err"
 		    continue
 		}
 		catch {
-		    set result [ eval exec $cmd ]
+		    set result [ eval exec $sh ]
 		} err
 		if { $err != "" } {
 		    puts "\tError: $err"
@@ -90,19 +90,19 @@ proc aardvark::runbuildcommand { direction graphname node } {
 		    }
 		    break
 		}
-		
+
 		if { $result != "" } {
 		    puts "\tResult: $result"
 		}
 	    }
-	} 
-	if { $buildinfo(tclcommand) != "" } {
-	    foreach tclcommand $buildinfo(tclcommand) {
+	}
+	if { $buildinfo(tcl) != "" } {
+	    foreach tcl $buildinfo(tcl) {
 		catch {
 		    puts -nonewline "$node :"
 		    puts ""
-		    puts "\tTcl Command: $tclcommand"
-		    uplevel #0 $tclcommand
+		    puts "\tTcl Command: $tcl"
+		    uplevel #0 $tcl
 		} err
                 if { $err != "" } {
 		    puts $err
@@ -113,31 +113,36 @@ proc aardvark::runbuildcommand { direction graphname node } {
     }
 }
 
-# these form the 'syntax' of our mini build language
-proc aardvark::command { buildcmd } {
+# these are the commands of our mini build language
+
+# Adds a shell command to be executed.
+proc aardvark::sh { buildcmd } {
     variable buildinfo
-    lappend buildinfo(cmd) $buildcmd
+    lappend buildinfo(sh) $buildcmd
 	return ""
 }
 
-proc aardvark::tclcommand { tclcommand } {
+# Adds a Tcl command to be evaluated.
+proc aardvark::tcl { tclcommand } {
     variable buildinfo
-    lappend buildinfo(tclcommand) $tclcommand
+    lappend buildinfo(tcl) $tclcommand
     return ""
 }
 
+# Adds a file dependency.
 proc aardvark::depends { deps } {
     variable dependencies
     set dependencies $deps
     return ""
 }
 
+# Add a node to the dependency tree.
 proc aardvark::AddNode { name rest } {
     variable grph
     variable dependencies
     variable buildinfo
     set dependencies {}
-    array set buildinfo {cmd "" tclcommand ""}
+    array set buildinfo {sh "" tcl ""}
     set self $name
     catch {
 	uplevel #0 $rest
@@ -152,7 +157,7 @@ proc aardvark::AddNode { name rest } {
 	createnode $dep
 	$grph arc insert $name $dep
     }
-}   
+}
 
 proc aardvark::Run { } {
     global ::argv
@@ -166,5 +171,5 @@ proc aardvark::Run { } {
 }
 
 namespace eval aardvark {
-    namespace export AddNode Run Verbose command tclcommand depends
+    namespace export AddNode Run Verbose sh tcl depends
 }
