@@ -278,14 +278,67 @@ TclWeb_VarNumber(Tcl_Obj *result, TclWebRequest *req)
 static void
 TclWeb_InitEnvVars( TclWebRequest *req )
 {
+    rivet_server_conf *rsc;
+    table *table = req->req->subprocess_env;
+    char *timefmt = DEFAULT_TIME_FORMAT;
+    char *t;
+    time_t date = req->req->request_time;
+#ifndef WIN32
+    struct passwd *pw;
+#endif /* ndef WIN32 */
+
     if( req->environment_set ) return;
 
+    rsc = RIVET_SERVER_CONF( req->req->server->module_config );
+
     /* Ensure that the system area which holds the cgi variables is empty. */
-    ap_clear_table(req->req->subprocess_env);
+    ap_clear_table( req->req->subprocess_env );
 
     /* Retrieve cgi variables. */
-    ap_add_cgi_vars(req->req);
-    ap_add_common_vars(req->req);
+    ap_add_cgi_vars( req->req );
+    ap_add_common_vars( req->req );
+
+    /* These were the "include vars"  */
+
+    ap_table_set( table, "DATE_LOCAL",
+	ap_ht_time( TCLWEBPOOL, date, timefmt, 0 ) );
+    ap_table_set( table, "DATE_GMT",
+	ap_ht_time( TCLWEBPOOL, date, timefmt, 1 ) );
+    ap_table_set( table, "LAST_MODIFIED",
+	ap_ht_time( TCLWEBPOOL, req->req->finfo.st_mtime, timefmt, 1 ) );
+    ap_table_set( table, "DOCUMENT_URI", req->req->uri );
+    ap_table_set( table, "DOCUMENT_URI", req->req->path_info );
+
+    if ((t = strrchr(req->req->filename, '/'))) {
+	ap_table_set( table, "DOCUMENT_NAME", ++t );
+    } else {
+	ap_table_set( table, "DOCUMENT_NAME", req->req->uri );
+    }
+
+    if( req->req->args ) {
+	char *arg_copy = ap_pstrdup(TCLWEBPOOL, req->req->args);
+	ap_unescape_url(arg_copy);
+	ap_table_set( table, "QUERY_STRING_UNESCAPED",
+	    ap_escape_shell_cmd( TCLWEBPOOL, arg_copy ) );
+    }
+
+#ifndef WIN32
+    pw = getpwuid(req->req->finfo.st_uid);
+    if( pw ) {
+	ap_table_set( table, "USER_NAME",
+	    ap_pstrdup( TCLWEBPOOL, pw->pw_name ) );
+    } else {
+	ap_table_set( table, "USER_NAME",
+	    ap_psprintf( TCLWEBPOOL, "user#%lu",
+	    (unsigned long)req->req->finfo.st_uid ) );
+    }
+#endif
+
+    /* Here we create some variables with Rivet internal information. */
+    ap_table_set( table, "RIVET_CACHE_FREE",
+	ap_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_free) ) );
+    ap_table_set( table, "RIVET_CACHE_SIZE",
+	ap_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_size) ) );
 
     req->environment_set = 1;
 }
@@ -293,105 +346,40 @@ TclWeb_InitEnvVars( TclWebRequest *req )
 int
 TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 {
-    char *timefmt = DEFAULT_TIME_FORMAT;
-#ifndef WIN32
-    struct passwd *pw;
-#endif /* ndef WIN32 */
-    char *t;
-    time_t date;
     int i;
 
     array_header *hdrs_arr;
-    table_entry *hdrs;
+    table_entry  *hdrs;
     array_header *env_arr;
     table_entry  *env;
-    rivet_server_conf *rsc = NULL;
-
-    date = req->req->request_time;
 
     TclWeb_InitEnvVars( req );
 
+    /* Transfer client request headers to TCL request namespace. */
     hdrs_arr = ap_table_elts(req->req->headers_in);
     hdrs = (table_entry *) hdrs_arr->elts;
-
-    env_arr =  ap_table_elts(req->req->subprocess_env);
-    env     = (table_entry *) env_arr->elts;
-
-    rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
-
-    /* These were the "include vars"  */
-    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DATE_LOCAL", -1),
-		   TclWeb_StringToUtfToObj(ap_ht_time(TCLWEBPOOL, date, timefmt, 0), req), 0);
-
-    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DATE_GMT", -1),
-		   TclWeb_StringToUtfToObj(ap_ht_time(TCLWEBPOOL, date, timefmt, 1), req), 0);
-
-
-    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("LAST_MODIFIED", -1),
-		   TclWeb_StringToUtfToObj(ap_ht_time(TCLWEBPOOL,
-						      req->req->finfo.st_mtime,
-						      timefmt, 1), req), 0);
-    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_URI", -1),
-		   TclWeb_StringToUtfToObj(req->req->uri, req), 0);
-    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_PATH_INFO", -1),
-		   TclWeb_StringToUtfToObj(req->req->path_info, req), 0);
-
-#ifndef WIN32
-    pw = getpwuid(req->req->finfo.st_uid);
-    if (pw)
-	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("USER_NAME", -1),
-	       TclWeb_StringToUtfToObj(ap_pstrdup(TCLWEBPOOL, pw->pw_name), req), 0);
-    else
-	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("USER_NAME", -1),
-		       TclWeb_StringToUtfToObj(
-			   ap_psprintf(TCLWEBPOOL, "user#%lu",
-			   (unsigned long)req->req->finfo.st_uid), req), 0);
-#endif
-
-    if ((t = strrchr(req->req->filename, '/')))
-	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_NAME", -1),
-		       TclWeb_StringToUtfToObj(++t, req), 0);
-    else
-	Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DOCUMENT_NAME", -1),
-		       TclWeb_StringToUtfToObj(req->req->uri, req), 0);
-
-    if (req->req->args)
-    {
-	char *arg_copy = ap_pstrdup(TCLWEBPOOL, req->req->args);
-	ap_unescape_url(arg_copy);
-	Tcl_ObjSetVar2(req->interp, envvar,
-	   Tcl_NewStringObj("QUERY_STRING_UNESCAPED", -1),
-	   TclWeb_StringToUtfToObj(ap_escape_shell_cmd(TCLWEBPOOL, arg_copy), req), 0);
-    }
-
-    /* ----------------------------  */
-
-    /* transfer client request headers to TCL request namespace */
     for (i = 0; i < hdrs_arr->nelts; ++i)
     {
 	if (!hdrs[i].key)
 	    continue;
-	else {
-	    Tcl_ObjSetVar2(req->interp, envvar,
-			   TclWeb_StringToUtfToObj(hdrs[i].key, req),
-			   TclWeb_StringToUtfToObj(hdrs[i].val, req), 0);
-	}
+
+	Tcl_ObjSetVar2(req->interp, envvar,
+		       TclWeb_StringToUtfToObj(hdrs[i].key, req),
+		       TclWeb_StringToUtfToObj(hdrs[i].val, req), 0);
     }
 
-    /* transfer apache internal cgi variables to TCL request namespace */
+    /* Transfer Apache internal CGI variables to TCL request namespace. */
+    env_arr =  ap_table_elts(req->req->subprocess_env);
+    env     = (table_entry *) env_arr->elts;
     for (i = 0; i < env_arr->nelts; ++i)
     {
 	if (!env[i].key)
 	    continue;
-	Tcl_ObjSetVar2(req->interp, envvar, TclWeb_StringToUtfToObj(env[i].key, req),
-		       TclWeb_StringToUtfToObj(env[i].val, req), 0);
-    }
 
-    /* Here we create some variables with Rivet internal information. */
-    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("RIVET_CACHE_FREE", -1),
-		   Tcl_NewIntObj(*(rsc->cache_free)), 0);
-    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("RIVET_CACHE_SIZE", -1),
-		   Tcl_NewIntObj(*(rsc->cache_size)), 0);
+	Tcl_ObjSetVar2(req->interp, envvar,
+			TclWeb_StringToUtfToObj(env[i].key, req),
+			TclWeb_StringToUtfToObj(env[i].val, req), 0);
+    }
 
     Tcl_DecrRefCount(envvar);
     return TCL_OK;
@@ -576,18 +564,14 @@ TclWeb_GetEnvVar( TclWebRequest *req, char *key )
 {
     char *val;
 
+    TclWeb_InitEnvVars( req );
+
     /* Check to see if it's a header variable first. */
     (const char *)val = ap_table_get( req->req->headers_in, key );
 
     if( !val ) {
-	TclWeb_InitEnvVars( req );
 	(const char *)val = ap_table_get( req->req->subprocess_env, key );
     }
 
     return val;
 }
-
-
-/* output/write/flush?  */
-
-/* error (log) ?  send to stderr. */

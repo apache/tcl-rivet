@@ -1,3 +1,10 @@
+2002-03-26  Damon J. Courtney <damon@unreality.com>
+
+	* src/TclWebapache.c
+	    Moved the setting of include variables from LoadEnv to the
+	    InitEnv command.  This will allow us to retrieve these variables
+	    via the env command as well as load_env.
+
 2002-03-21  Damon J. Courtney <damon@unreality.com>
 
 	* src/TclWebapache.c
