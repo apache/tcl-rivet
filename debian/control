@@ -1,7 +1,7 @@
 Source: rivet
 Section: unknown
 Priority: optional
-Maintainer: David N. Welton <davidw@ashland>
+Maintainer: David N. Welton <davidw@debian.org>
 Build-Depends: apache-dev, tcl8.4, tcl8.4-dev, debhelper (>> 3.0.0)
 Standards-Version: 3.5.8
 
