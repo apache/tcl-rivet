@@ -72,7 +72,5 @@ Tcl_ChannelType ApacheChan = {
     watchproc,
     gethandleproc,
     NULL,
-    NULL,
-    NULL,
     NULL
 };

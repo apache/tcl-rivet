@@ -106,7 +106,7 @@ static int execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf,
 /* Set up the content type header */
 
 int
-set_header_type(request_rec *r, char *header)
+Rivet_SetHeaderType(request_rec *r, char *header)
 {
     rivet_server_conf *rsc = Rivet_GetConf(r);
 
@@ -119,14 +119,14 @@ set_header_type(request_rec *r, char *header)
 
 /* Printer headers if they haven't been printed yet */
 int
-print_headers(request_rec *r)
+Rivet_PrintHeaders(request_rec *r)
 {
     rivet_server_conf *rsc = Rivet_GetConf(r);
 
     if( *(rsc->headers_printed) ) return 0;
 
     if (*(rsc->headers_set) == 0)
-	set_header_type(r, DEFAULT_HEADER_TYPE);
+	Rivet_SetHeaderType(r, DEFAULT_HEADER_TYPE);
 
     ap_send_http_header(r);
     *(rsc->headers_printed) = 1;
@@ -135,10 +135,10 @@ print_headers(request_rec *r)
 
 /* Print nice HTML formatted errors */
 int
-print_error(request_rec *r, int htmlflag, char *errstr)
+Rivet_PrintError(request_rec *r, int htmlflag, char *errstr)
 {
-    set_header_type(r, DEFAULT_HEADER_TYPE);
-    print_headers(r);
+    Rivet_SetHeaderType(r, DEFAULT_HEADER_TYPE);
+    Rivet_PrintHeaders(r);
 
     if (htmlflag != 1)
 	ap_rputs(ER1, r);
@@ -321,24 +321,22 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	Tcl_Obj *errscript =
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
 
-        print_headers(r);
+        Rivet_PrintHeaders(r);
 	Tcl_Flush(*(conf->outchannel));
         if (errscript)
         {
 	    if (Tcl_EvalObj(interp, errscript) == TCL_ERROR)
-                print_error(r, 1, "<b>Tcl_ErrorScript failed!</b>");
+                Rivet_PrintError(r, 1, "<b>Tcl_ErrorScript failed!</b>");
         } else {
             /* default action  */
             errorinfo = Tcl_GetVar(interp, "errorInfo", 0);
-            print_error(r, 0, errorinfo);
-            print_error(r, 1, "<p><b>OUTPUT BUFFER:</b></p>");
-            print_error(r, 0, Tcl_GetStringFromObj(outbuf, (int *)NULL));
+            Rivet_PrintError(r, 0, errorinfo);
+            Rivet_PrintError(r, 1, "<p><b>OUTPUT BUFFER:</b></p>");
+            Rivet_PrintError(r, 0, Tcl_GetStringFromObj(outbuf, (int *)NULL));
         }
-/*                  "</pre><b>OUTPUT BUFFER</b><pre>\n",
-                    Tcl_GetStringFromObj(outbuf, (int *)NULL));  */
     } else {
         /* Make sure to flush the output if buffer_add was the only output */
-        print_headers(r);
+        Rivet_PrintHeaders(r);
 	Tcl_Flush(*(conf->outchannel));
     }
     return OK;
@@ -466,8 +464,8 @@ Rivet_SendContent(request_rec *r)
 
     if (r->header_only)
     {
-	set_header_type(r, DEFAULT_HEADER_TYPE);
-	print_headers(r);
+	Rivet_SetHeaderType(r, DEFAULT_HEADER_TYPE);
+	Rivet_PrintHeaders(r);
 
 	return OK;
     }
@@ -620,7 +618,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
 /*     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffering", "none");  */
-     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
+    Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
 
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
     if (interp == NULL)

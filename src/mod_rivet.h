@@ -81,9 +81,9 @@ typedef struct {
 } rivet_interp_globals;
 
 int get_parse_exec_file(request_rec *r, rivet_server_conf *rsc, char *filename, int toplevel);
-int set_header_type(request_rec *, char *);
-int print_headers(request_rec *);
-int print_error(request_rec *, int, char *);
+int Rivet_SetHeaderType(request_rec *, char *);
+int Rivet_PrintHeaders(request_rec *);
+int Rivet_PrintError(request_rec *, int, char *);
 char *StringToUtf(char *input, ap_pool *pool);
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 

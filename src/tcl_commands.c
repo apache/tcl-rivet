@@ -155,7 +155,7 @@ Rivet_Headers(
 {
     char *opt;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)
+    rivet_server_conf *rsc =
 	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc < 2)
@@ -235,7 +235,8 @@ Rivet_Headers(
 	    Tcl_WrongNumArgs(interp, 2, objv, "mime/type");
 	    return TCL_ERROR;
 	}
-	set_header_type(globals->r, Tcl_GetStringFromObj(objv[2],(int *)NULL));
+	Rivet_SetHeaderType(globals->r,
+				Tcl_GetStringFromObj(objv[2],(int *)NULL));
     } else if (!strcmp("numeric", opt)) /* ### numeric ### */
     {
 	int st = 200;
@@ -663,7 +664,7 @@ Rivet_Upload(
     Tcl_Obj *result = NULL;
     ApacheUpload *upload;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)
+    rivet_server_conf *rsc =
 	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc < 2 || objc > 5)
