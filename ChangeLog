@@ -1,3 +1,11 @@
+2004-11-11  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * rivet/packages/dio/dio.tcl: Added "insert" method that
+	  doesn't try to see if it's there already all the other
+	  stuff that "store" does.
+
+	* doc/rivet.xml: Documentation for above.
+
 2004-11-05  Karl Lehenbauer  <karl-rivet@sc.com>
 
         * rivet/packages/session/session-class.tcl: Quote backslashes when
