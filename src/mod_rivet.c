@@ -384,7 +384,7 @@ get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
 	outbuf = Tcl_NewObj();
 	Tcl_IncrRefCount(outbuf);
 
-	if( STREQU( r->content_type, "application/x-httpd-tcl") || !toplevel )
+	if( STREQU( r->content_type, "application/x-httpd-rivet") || !toplevel )
 	{
 	    /* It's a TTML file - which we always are if toplevel is
                0, meaning we are in the Parse command */
@@ -425,7 +425,6 @@ Rivet_SendContent(request_rec *r)
 {
     char error[MAX_STRING_LEN];
     char timefmt[MAX_STRING_LEN];
-    struct stat foo;
     int errstatus;
 
     Tcl_Interp *interp;
