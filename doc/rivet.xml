@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-  "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd">
+  "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd" [
+      <!ENTITY hello.rvt SYSTEM "examples/hello.rvt" >
+      <!ENTITY table.rvt SYSTEM "examples/table.rvt" >
+      <!ENTITY vars.html SYSTEM "examples/vars.html" >
+      <!ENTITY vars.rvt SYSTEM "examples/vars.rvt" >
+      <!ENTITY upload.html SYSTEM "examples/upload.html" >
+      <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
+]>
 
 <article>
   <articleinfo>
@@ -32,7 +39,7 @@
 
 
   <section>
-  <title>Introduction to Apache Rivet</title>
+    <title>Introduction to Apache Rivet</title>
     <para>
       Apache Rivet is a system for creating dynamic web content via a
       programming language integrated with Apache Web Server.  It is
@@ -104,7 +111,7 @@
 	  wish to compile them.
 
 	  <programlisting>gunzip tcl-rivet-X.X.X.tar.gz
-tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
+	    tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 
 	</para>
       </step>
@@ -132,7 +139,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	      system:</para>
 
 	    <programlisting>cd src/
-./make.tcl <replaceable>option</replaceable></programlisting>
+	      ./make.tcl <replaceable>option</replaceable></programlisting>
 
 	    <para>where <replaceable>option</replaceable> can be
 	      either <option>shared</option> or
@@ -170,7 +177,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	</para>
 
 	<programlisting>AddType application/x-httpd-rivet .rvt
-AddType application/x-rivet-tcl .tcl</programlisting>
+	  AddType application/x-rivet-tcl .tcl</programlisting>
 
 	<para>
 	  These tell Apache to process files with the
@@ -469,81 +476,103 @@ AddType application/x-rivet-tcl .tcl</programlisting>
   <section id="commands">
     <title>Rivet Tcl Commands and Variables</title>
     <variablelist>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>var</command>
-	    <arg>get</arg>
-	    <arg><replaceable>varname</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Returns the value of variable
-	    <option><replaceable>varname</replaceable></option> as a
-	    string (even if there are multiple values).
-	  </para>
-	</listitem>
-      </varlistentry>
 
       <varlistentry>
 	<term>
 	  <cmdsynopsis>
 	    <command>var</command>
-	    <arg>list</arg>
-	    <arg><replaceable>varname</replaceable></arg>
+	    <group choice="req">
+	      <arg>get</arg>
+	      <arg>list</arg>
+	      <arg>exists</arg>
+	      <arg>number</arg>
+	      <arg>all</arg>
+	    </group>
 	  </cmdsynopsis>
 	</term>
 	<listitem>
 	  <para>
-	    Returns the value of variable
-	    <option><replaceable>varname</replaceable></option> as a
-	    list, if there are multiple values.
+	    The <command>var</command> command manipulates variables
+	    set by the user.
 	  </para>
-	</listitem>
-      </varlistentry>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>get</arg>
+		  <arg><replaceable>varname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the value of variable
+		  <option><replaceable>varname</replaceable></option> as a
+		  string (even if there are multiple values).
+		</para>
+	      </listitem>
+	    </varlistentry>
 
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>var</command>
-	    <arg>exists</arg>
-	    <arg><replaceable>varname</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Returns 1 if
-	    <option><replaceable>varname</replaceable></option>
-	    exists, 0 if it doesn't.
-	  </para>
-	</listitem>
-      </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>list</arg>
+		  <arg><replaceable>varname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the value of variable
+		  <option><replaceable>varname</replaceable></option> as a
+		  list, if there are multiple values.
+		</para>
+	      </listitem>
+	    </varlistentry>
 
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>var</command>
-	    <arg>number</arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Returns the number of variables.
-	  </para>
-	</listitem>
-      </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>exists</arg>
+		  <arg><replaceable>varname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns 1 if
+		  <option><replaceable>varname</replaceable></option>
+		  exists, 0 if it doesn't.
+		</para>
+	      </listitem>
+	    </varlistentry>
 
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>var</command>
-	    <arg>all</arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>number</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the number of variables.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>all</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return a list of variable names and values.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+
 	  <para>
-	    Return a list of variable names and values.
+	    See the example.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -554,128 +583,129 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	<term>
 	  <cmdsynopsis>
 	    <command>upload</command>
-	    <arg>channel</arg>
-	    <arg><replaceable>uploadname</replaceable></arg>
+	    <group choice="req">
+	      <arg>channel</arg>
+	      <arg>save</arg>
+	      <arg>data</arg>
+	      <arg>exists</arg>
+	      <arg>size</arg>
+	      <arg>type</arg>
+	      <arg>filename</arg>
+	    </group>
 	  </cmdsynopsis>
 	</term>
 	<listitem>
+	  <para>The upload command is for file upload manipulation.
+	    See the relevant Apache Directives to further configure the
+	    behavior of this Rivet feature.</para>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>channel</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  When given the name of a file upload
+		  <option><replaceable>uploadname</replaceable></option>,
+		  returns a Tcl channel that can be used to access the
+		  uploaded file.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>save</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		  <arg><replaceable>filename</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Saves the
+		  <option><replaceable>uploadname</replaceable></option> in
+		  the file
+		  <option><replaceable>filename</replaceable></option>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>data</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns data uploaded to the server.  This is binary clean
+		  - in other words, it will work even with files like
+		  images, executables, compressed files, and so on.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>size</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the size of the file uploaded.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>type</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  If the <varname>Content-type</varname> is set, it is
+		  returned, otherwise, an empty string.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>filename</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the filename on the remote host that uploaded the file.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>names</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the variable names, as a list, of all the files
+		  uploaded.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
 	  <para>
-	    When given the name of a file upload
-	    <option><replaceable>uploadname</replaceable></option>,
-	    returns a Tcl channel that can be used to access the
-	    uploaded file.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>upload</command>
-	    <arg>save</arg>
-	    <arg><replaceable>uploadname</replaceable></arg>
-	    <arg><replaceable>filename</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Saves the
-	    <option><replaceable>uploadname</replaceable></option> in
-	    the file
-	    <option><replaceable>filename</replaceable></option>.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>upload</command>
-	    <arg>data</arg>
-	    <arg><replaceable>uploadname</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Returns data uploaded to the server.  This is binary clean
-	    - in other words, it will work even with files like
-	    images, executables, compressed files, and so on.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>upload</command>
-	    <arg>size</arg>
-	    <arg><replaceable>uploadname</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Returns the size of the file uploaded.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>upload</command>
-	    <arg>type</arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    If the Content-type is set, it is returned, otherwise, an
-	    empty string.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>upload</command>
-	    <arg>filename</arg>
-	    <arg><replaceable>uploadname</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Returns the filename on the remote host that uploaded the file.
-	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>upload</command>
-	    <arg>names</arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Returns the variable names, as a list, of all the files
-	    uploaded.
+	    Please see the upload example.
 	  </para>
 	</listitem>
       </varlistentry>
     </variablelist>
-
-    <example>
-      <title>upload</title>
-      The following HTML:
-
-      <programlisting>&lt;form action="foo.ttml" enctype="multipart/form-data"
-method="post"&gt;
-&lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
-&lt;/form&gt;</programlisting>
-
-      Can be used with the following Tcl code in order to create a
-      file upload form.
-
-      <programlisting>upload save MyUpload /tmp/uploadfiles/file1
-puts "Saved file [upload filename MyUpload]
-([upload size MyUploadto] bytes) to server"</programlisting>
-
-    </example>
 
     <variablelist>
       <varlistentry>
@@ -766,77 +796,97 @@ puts "Saved file [upload filename MyUpload]
 	<term>
 	  <cmdsynopsis>
 	    <command>headers</command>
-	    <arg>redirect</arg>
-	    <arg><replaceable>uri</replaceable></arg>
+	    <group choice="req">
+	      <arg>set</arg>
+	      <arg>redirect</arg>
+	      <arg>add</arg>
+	      <arg>type</arg>
+	      <arg>numeric</arg>
+	    </group>
 	  </cmdsynopsis>
 	</term>
 	<listitem>
 	  <para>
-	    Redirect from the current page to a new
-	    URI. <emphasis>Must</emphasis> be done in the first block
-	    of TCL code.
+	    The <command>headers</command> command is for setting and
+	    parsing HTTP headers.
 	  </para>
-	</listitem>
-      </varlistentry>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>headers</command>
-	    <arg>setcookie</arg>
-	    <arg>-name</arg>
-	    <arg><replaceable>cookie-name</replaceable></arg>
-	    <arg>-value</arg>
-	    <arg><replaceable>cookie-value</replaceable></arg>
-	    <arg choice="opt">-expires <replaceable>date/time</replaceable></arg>
-	    <arg choice="opt">-domain <replaceable>domain</replaceable></arg>
-	    <arg choice="opt">-path <replaceable>path</replaceable></arg>
-	    <arg choice="opt">-secure</arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
 	  <para>
-	    This command is for setting cookies for the server to send
-	    to the client.  <option>cookie-name</option> is the name
-	    of the cookie, <option>cookie-value</option> is the data
-	    associated with the cookie.  <option>-expires</option>
-	    sets an expiration date for the cookie, and must be in the
-	    format <constant>'DD-Mon-YY HH:MM:SS'</constant>,
-	    <option>-path</option> sets the path for which the cookie
-	    is valid, and <option>-secure</option> specifies that the
-	    cookie is only to be transmitted if the connection is
-	    secure (HTTPS).
-	  </para>
-	</listitem>
-      </varlistentry>
+	    <variablelist>
+	      <varlistentry>
+		<term>
+		  <cmdsynopsis>
+		    <arg>redirect</arg>
+		    <arg><replaceable>uri</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    Redirect from the current page to a new
+		    URI. <emphasis>Must</emphasis> be done in the first block
+		    of TCL code.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>
+		  <cmdsynopsis>
+		    <arg>setcookie</arg>
+		    <arg>-name</arg>
+		    <arg><replaceable>cookie-name</replaceable></arg>
+		    <arg>-value</arg>
+		    <arg><replaceable>cookie-value</replaceable></arg>
+		    <arg choice="opt">-expires <replaceable>date/time</replaceable></arg>
+		    <arg choice="opt">-domain <replaceable>domain</replaceable></arg>
+		    <arg choice="opt">-path <replaceable>path</replaceable></arg>
+		    <arg choice="opt">-secure</arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    This command is for setting cookies for the server to send
+		    to the client.  <option>cookie-name</option> is the name
+		    of the cookie, <option>cookie-value</option> is the data
+		    associated with the cookie.  <option>-expires</option>
+		    sets an expiration date for the cookie, and must be in the
+		    format <constant>'DD-Mon-YY HH:MM:SS'</constant>,
+		    <option>-path</option> sets the path for which the cookie
+		    is valid, and <option>-secure</option> specifies that the
+		    cookie is only to be transmitted if the connection is
+		    secure (HTTPS).
+		  </para>
+		</listitem>
+	      </varlistentry>
 
-      <varlistentry>
-	<term><cmdsynopsis>
-	    <command>headers</command>
-	    <arg>type</arg>
-	    <arg><replaceable>content-type</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    This command sets the <constant>Content-type</constant>
-	    header returned by the script, which is useful if you wish
-	    to send content other than HTML with Rivet - PNG or jpeg
-	    images, for example.
-	  </para>
-	</listitem>
-      </varlistentry>
+	      <varlistentry>
+		<term><cmdsynopsis>
+		    <arg>type</arg>
+		    <arg><replaceable>content-type</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    This command sets the <constant>Content-type</constant>
+		    header returned by the script, which is useful if you wish
+		    to send content other than HTML with Rivet - PNG or jpeg
+		    images, for example.
+		  </para>
+		</listitem>
+	      </varlistentry>
 
-      <varlistentry>
-	<term><cmdsynopsis>
-	    <command>headers</command>
-	    <arg>set</arg>
-	    <arg><replaceable>headername</replaceable></arg>
-	    <arg><replaceable>value</replaceable></arg>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    Set arbitrary header names and values.
+	      <varlistentry>
+		<term><cmdsynopsis>
+		    <arg>set</arg>
+		    <arg><replaceable>headername</replaceable></arg>
+		    <arg><replaceable>value</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    Set arbitrary header names and values.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
 	  </para>
 	</listitem>
       </varlistentry>
@@ -863,6 +913,114 @@ puts "Saved file [upload filename MyUpload]
 
   </section>
 
+  <section id="examples">
+    <title>Examples and Usage</title>
+
+    <para>
+      Some examples of Rivet usage follow.  Some prior Tcl knowledge
+      is assumed.  If you don't know much Tcl, don't worry, it's easy,
+      and there are some good resources available on the web that will
+      get you up to speed quickly.  Go to the <link
+	linkend="websites">web sites</link> section and have a look.
+    </para>
+
+    <example id="hello world">
+      <title>Hello World</title>
+      <para>
+	As with any tool, it's always nice to see something work, so
+	let's create a small "Hello World" page.</para>
+      <para>
+	Assuming you have Apache configured correctly, create a file
+	called <filename>hello.rvt</filename> where Apache can find
+	it, with the following content:
+      </para>
+      <programlisting>&hello.rvt;</programlisting>
+      <para>
+	If you then access it with your browser, you should see a
+	blank page with the text "Hello World" (without the quotes) on
+	it.
+      </para>
+    </example>
+
+    <example id="table">
+      <title>Generate a Table</title>
+      <para>
+	In another simple example, we dynamically generate a table:
+      </para>
+      <programlisting>&table.rvt;</programlisting>
+      <para>
+	If you read the code, you can see that this is pure Tcl.  We
+	could take the same code, run it outside of Rivet, and it
+	would generate the same HTML!
+      </para>
+      <para>
+	The result should look something like this:
+      </para>
+      <graphic fileref="table.png"/>
+
+    </example>
+
+    <example>
+      <title>Variable Access</title>
+      <para>
+	Here, we demonstrate how to access variables set by GET or
+	POST operations.
+      </para>
+      <para>
+	Given an HTML form like the following:
+      </para>
+      <programlisting>&vars.html;</programlisting>
+      <para>
+	We can use this Rivet script to get the variable values:
+      </para>
+      <programlisting>&vars.rvt;</programlisting>
+      <para>
+	The first statement checks to make sure that the
+	<varname>boss</varname> variable has been passed to the
+	script, and then does something with that information.  If
+	it's not present, an error is added to the list of errors.
+      </para>
+      <para>
+	In the second block of code, the variable
+	<varname>salary</varname> is fetched, with one more error
+	check - because it's a number, it needs to be composed of
+	digits.
+      </para>
+      <para>
+	The <varname>boss</varname> variable isn't required to have
+	been sent - we set it to "Mr. Burns" if it isn't among the
+	information we received.
+      </para>
+      <para>
+	The last bit of variable handing code is a bit trickier.
+	Because <varname>skills</varname> is a listbox, and can
+	potentially have multiple values, we opt to receive them as a
+	list, so that at some point, we could iterate over them.
+      </para>
+      <para>
+	The script then checks to make sure that
+	<varname>errlist</varname> is empty (printing an error if it
+	is) and outputting a thankyou message.
+      </para>
+    </example>
+
+    <example id="upload">
+      <title>File Upload</title>
+      <para>
+	The following HTML in one file, say,
+	<filename>upload.html</filename>
+      </para>
+      <programlisting>&upload.html;</programlisting>
+      <para>
+	Can be used with the following Tcl code, in a second file
+	(<filename>upload.rvt</filename> for instance)
+	in order to create a file upload form.
+      </para>
+      <programlisting>&upload.rvt;</programlisting>
+    </example>
+
+  </section>
+
   <section id="help">
     <title>Resources - How to Get Help</title>
 
@@ -884,7 +1042,7 @@ puts "Saved file [upload filename MyUpload]
       </para>
     </section>
 
-    <section>
+    <section id="websites">
       <title>Web Sites</title>
 
       <para>

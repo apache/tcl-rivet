@@ -1,3 +1,13 @@
+2002-10-18  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Several examples of how to use Rivet.
+
+2002-10-17  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added Entities to deal with included files.  This
+	makes it easier to correctly format the source code that is to be
+	included.
+
 2002-10-09  David N. Welton  <davidw@dedasys.com>
 
 	* src/buildscripts/findapxs.tcl: Added /usr/sbin/ at the request

@@ -409,6 +409,9 @@ Rivet_SendContent(request_rec *r)
 
     ap_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
     ap_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
+
+    /* This one is the big catch when it comes to moving towards
+       Apache 2.0, or one of them, at least. */
     ap_chdir_file(r->filename);
 
     Rivet_PropagatePerDirConfArrays( interp, rdc );

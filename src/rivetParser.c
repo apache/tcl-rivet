@@ -166,8 +166,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 	    {
 		if ((++p) == startseqlen)
 		{
-		    /* We have matched the whole ending sequence.
-		     */
+		    /* We have matched the whole ending sequence. */
 		    Tcl_AppendToObj(outbuf, "\"\n", 2);
 		    inside = 1;
 		    p = 0;
@@ -221,7 +220,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 		    p = 0;
 		}
 	    } else {
-		/*  plop stuff into outbuf, which we will then eval   */
+		/* Plop stuff into outbuf, which we will then eval. */
 		if (p > 0) {
 		    Tcl_AppendToObj(outbuf, (char *)strend, p);
 		    p = 0;
