@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet], [0.5.0])
+AC_INIT([Rivet],[0.5.0])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -30,6 +30,7 @@ AC_INIT([Rivet], [0.5.0])
 TEA_INIT([3.1])
 
 AC_CONFIG_AUX_DIR(tclconfig)
+AM_INIT_AUTOMAKE
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
@@ -60,6 +61,11 @@ TEA_PREFIX
 #-----------------------------------------------------------------------
 
 TEA_SETUP_COMPILER
+
+#
+# For automake to be happy, we also need AC_PROG_LIBTOOL
+#
+AC_PROG_LIBTOOL
 
 #-----------------------------------------------------------------------
 # __CHANGE__
@@ -234,5 +240,6 @@ fi
 # which require substituting th AC variables in.  Include these here.
 #--------------------------------------------------------------------
 
-AC_OUTPUT([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
+AC_OUTPUT
 
