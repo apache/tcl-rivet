@@ -67,7 +67,7 @@ proc cookie {cmd name args} {
 
 	    append cookieValue [make_cookie_attributes params]
 
-	    headers set $cookieKey $cookieValue
+	    headers add $cookieKey $cookieValue
 	}
 
 	"get" {

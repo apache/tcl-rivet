@@ -1,6 +1,20 @@
 2002-03-21  Damon J. Courtney <damon@unreality.com>
 
 	* src/TclWebapache.c
+	* src/TclWeb.h
+	    Added new command 'TclWeb_HeaderAdd'.
+
+	* src/rivetCore.c
+	    Added 'add' option to headers command to add a header instead
+	    of just setting over one.
+
+	* rivet/rivet-tcl/cookie.tcl
+	    The cookie command adds a header instead of setting one.  This
+	    allows multiple cookies in a single page.
+
+2002-03-21  Damon J. Courtney <damon@unreality.com>
+
+	* src/TclWebapache.c
 	    If the header being set is Set-Cookie, we add it to the table
 	    instead of overwriting it.  This allows us to set more than
 	    one cookie per page, which is legal to all browsers.

@@ -174,6 +174,15 @@ Rivet_Headers(
 	}
 	TclWeb_HeaderSet(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]), globals->req);
     }
+    else if (!strcmp("add", opt)) /* ### set ### */
+    {
+	if (objc != 4)
+	{
+	    Tcl_WrongNumArgs(interp, 2, objv, "headername value");
+	    return TCL_ERROR;
+	}
+	TclWeb_HeaderAdd(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]), globals->req);
+    }
     else if (!strcmp("type", opt)) /* ### set ### */
     {
 	if (objc != 3)

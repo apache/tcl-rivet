@@ -70,6 +70,17 @@ int TclWeb_PrintError(char *errstr, int htmlflag, TclWebRequest *req);
 
 int TclWeb_HeaderSet(char *header, char *val, TclWebRequest *req);
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_HeaderSet --
+ * Adds an HTTP headers.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_HeaderAdd(char *header, char *val, TclWebRequest *req);
+
 
 /*
  *-----------------------------------------------------------------------------
