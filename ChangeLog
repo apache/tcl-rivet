@@ -1,3 +1,14 @@
+2002-02-01  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c: Deleted rivet_info command.
+
+	* src/TclWebapache.c (TclWeb_GetEnvVars): Added RIVET_CACHE_FREE
+	# and RIVET_CACHE_SIZE as environmental variables.
+
+2002-01-29  David N. Welton  <davidw@dedasys.com>
+
+	* doc/help.html: Updated mailing list archive location.
+
 2002-01-28  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetCore.c (Rivet_Include): Get channel via Tcl_GetChannel

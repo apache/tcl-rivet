@@ -1,31 +1,43 @@
-Write commands after like 'open' and such in the request namespace that
-keep track of open file pointers and close them in the cleanup.
+TODO
+====
 
-Complete the NWS package.
+* Write commands after like 'open' and such in the request namespace
+  that keep track of open file pointers and close them in the cleanup.
 
-Swipe include_* from NWS and rework it like:
-    include ?-virtual? ?-noparse? file
+* Complete the NWS package.
 
-Add a '-virtual' option to include and parse.  This will include or parse
-a file based on the server root.
+* Swipe include_* from NWS and rework it like: include ?-virtual?
+  ?-noparse? file
 
-Re-write load_file.  This basically loads an entire .tcl file into the
-current document instead of sourcing it.  This will allow us to cache
-even pages which only source a huge .tcl file.  load_virtual should do the
-same but relative to the document root.
+* Add a '-virtual' option to include and parse.  This will include or
+  parse a file based on the server root.
 
-Create escape_string and unescape_string using Apache conventions.
+* Re-write load_file.  This basically loads an entire .tcl file into
+  the current document instead of sourcing it.  This will allow us to
+  cache even pages which only source a huge .tcl file.  load_virtual
+  should do the same but relative to the document root.
 
-Add a PackageRequire Server directive that will load packages on start-up.
+* Create escape_string and unescape_string using Apache conventions.
+
+* Add a PackageRequire Server directive that will load packages on
+  start-up.
+
+* Free all Rivet commands of apache dependencies, which are moved into
+  the TclWebapache.c file.  Compatible file, for CGI only operating,
+  TclWebcgi.c needs to be created.
 
 
 MAYBE
+=====
 
-Maybe write load_cookies in Tcl and try to get rid of the apache_cookie.* stuff.
+* Maybe write load_cookies in Tcl and try to get rid of the
+  apache_cookie.* stuff.
 
-Maybe write the header command in Tcl.
+* Maybe write the header command in Tcl.
+  - basic API is in C... difficult to do.
 
-Maybe move ::request commands into a file called request.tcl.
+* Maybe move ::request commands into a file called request.tcl.
 
 
 DONE
+====

@@ -542,7 +542,7 @@ Rivet_Upload(
 		    Tcl_ReadChars(chan, result, ApacheUpload_size(upload), 0);
 		} else {
 		    Tcl_AppendResult(interp,
-			"Rivet_UploadFilesToVar is not set", NULL);
+			"RivetServerConf UploadFilesToVar is not set", NULL);
 		    return TCL_ERROR;
 		}
 	    }
@@ -607,34 +607,6 @@ Rivet_Upload(
 	return TCL_ERROR;
     }
     Tcl_SetObjResult(interp, result);
-    return TCL_OK;
-}
-
-
-/* Tcl command to get, and print some information about the current
-   state of affairs */
-
-static int
-Rivet_Info(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
-{
-    char *tble;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc =
-	RIVET_SERVER_CONF( globals->r->server->module_config );
-
-    tble = ap_psprintf(POOL,
-		       "<table border=0 bgcolor=green><tr><td>\n"
-		       "<table border=0 bgcolor=\"#000000\">\n"
-		       "<tr><td align=center bgcolor=blue><font color=\"#ffffff\" size=\"+2\">rivet_info</font><br></td></tr>\n"
-		       "<tr><td><font color=\"#ffffff\">Free cache size: %d</font><br></td></tr>\n"
-		       "<tr><td><font color=\"#ffffff\">PID: %d</font><br></td></tr>\n"
-		       "</table>\n"
-		       "</td></tr></table>\n", *(rsc->cache_free), getpid());
-    Tcl_WriteObj(*(rsc->outchannel), Tcl_NewStringObj(tble, -1));
     return TCL_OK;
 }
 
@@ -718,11 +690,6 @@ Rivet_InitCore( Tcl_Interp *interp )
     Tcl_CreateObjCommand(interp,
 			"parse",
 			Rivet_Parse,
-			NULL,
-			(Tcl_CmdDeleteProc *)NULL);
-    Tcl_CreateObjCommand(interp,
-			"rivet_info",
-			Rivet_Info,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,

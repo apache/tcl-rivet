@@ -485,7 +485,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 
     /* Create TCL commands to deal with Apache's BUFFs. */
     *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc,
-					    TCL_WRITABLE);
+					   TCL_WRITABLE);
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");

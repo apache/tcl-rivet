@@ -13,8 +13,10 @@
 
 #include "apache_request.h"
 #include "apache_cookie.h"
+#include "mod_rivet.h"
 #include "TclWeb.h"
 
+extern module rivet_module;
 #define TCLWEBPOOL req->req->pool
 
 int
@@ -284,6 +286,7 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     table_entry *hdrs;
     array_header *env_arr;
     table_entry  *env;
+    rivet_server_conf *rsc = NULL;
 
     date = req->req->request_time;
     /* ensure that the system area which holds the cgi variables is empty */
@@ -298,6 +301,8 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 
     env_arr =  ap_table_elts(req->req->subprocess_env);
     env     = (table_entry *) env_arr->elts;
+
+    rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
 
     /* These were the "include vars"  */
     Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("DATE_LOCAL", -1),
@@ -366,6 +371,12 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 	Tcl_ObjSetVar2(req->interp, envvar, TclWeb_StringToUtfToObj(env[i].key, req),
 		       TclWeb_StringToUtfToObj(env[i].val, req), 0);
     }
+
+    /* Here we create some variables with Rivet internal information. */
+    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("RIVET_CACHE_FREE", -1),
+		   Tcl_NewIntObj(*(rsc->cache_free)), 0);
+    Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("RIVET_CACHE_SIZE", -1),
+		   Tcl_NewIntObj(*(rsc->cache_size)), 0);
 
     /* cleanup system cgi variables */
     ap_clear_table(req->req->subprocess_env);
