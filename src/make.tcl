@@ -243,7 +243,8 @@ AddNode debinstall {
     depends $MOD_SHLIB $RIVETLIB_SHLIB $PARSER_SHLIB
     tcl {file delete -force [file join $DEBPREFIX/$LIBEXECDIR rivet]}
     tcl {fileutil::install -m o+r $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
-    tcl {fileutil::install -m o+r [file join .. rivet] "$DEBPREFIX/$PREFIX"}    tcl {fileutil::install -m o+r $RIVETLIB_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
+    tcl {fileutil::install -m o+r [file join .. rivet] "$DEBPREFIX/$PREFIX"} 
+    tcl {fileutil::install -m o+r $RIVETLIB_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
     tcl {fileutil::install -m o+r $PARSER_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
 }
 
