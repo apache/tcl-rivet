@@ -1,5 +1,10 @@
 2002-03-26  Damon J. Courtney <damon@unreality.com>
 
+	* rivet/packages/form
+	    Added a new package for handling forms in Rivet.
+
+2002-03-26  Damon J. Courtney <damon@unreality.com>
+
 	* src/TclWebapache.c
 	    Moved the setting of include variables from LoadEnv to the
 	    InitEnv command.  This will allow us to retrieve these variables
