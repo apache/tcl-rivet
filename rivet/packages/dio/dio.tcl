@@ -18,17 +18,19 @@
 
 catch {package require Tclx}
 package require Itcl
+set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
 namespace eval ::DIO {
 
 proc handle {interface args} {
-    set obj #auto
+    set obj \#auto
     set first [lindex $args 0]
     if {![lempty $first] && [string index $first 0] != "-"} {
 	set obj  [lindex $args 0]
 	set args [lreplace $args 0 0]
     }
-    return [uplevel #0 ::DIO::$interface $obj $args]
+    uplevel \#0 package require dio_$interface
+    return [uplevel \#0 ::DIO::$interface $obj $args]
 }
 
 ##
@@ -44,7 +46,7 @@ proc handle {interface args} {
     }
 
     protected method result {interface args} {
-	return [eval uplevel #0 ::DIO::${interface}Result #auto $args]
+	return [eval uplevel \#0 ::DIO::${interface}Result \#auto $args]
     }
 
     method quote {string} {
@@ -525,238 +527,6 @@ proc handle {interface args} {
     protected variable cacheArray
 
 } ; ## ::itcl::class Result
-
-::itcl::class Postgresql {
-    inherit Database
-
-    constructor {args} {eval configure $args} {
-	package require Pgtcl
-	set_conn_defaults
-	eval configure $args
-    }
-
-    destructor {
-	close
-    }
-
-    ## Setup our variables with the default conninfo from Postgres.
-    private method set_conn_defaults {} {
-	foreach list [pg_conndefaults] {
-	    set var [lindex $list 0]
-	    set val [lindex $list end]
-	    switch -- $var {
-		"dbname" { set db $val }
-		default  { set $var $val }
-	    }
-	}
-    }
-
-    method open {} {
-	set command "pg_connect"
-
-	set info ""
-	if {![lempty $user]} { append info " user=$user" }
-	if {![lempty $pass]} { append info " password=$pass" }
-	if {![lempty $host]} { append info " host=$host" }
-	if {![lempty $port]} { append info " port=$port" }
-	if {![lempty $db]}   { append info " dbname=$db" }
-
-	if {![lempty $info]} { append command " -conninfo [::list $info]" }
-
-	if {[catch $command error]} { return -code error $error }
-
-	set conn $error
-    }
-
-    method close {} {
-	if {![info exists conn]} { return }
-	pg_disconnect $conn
-	unset conn
-    }
-
-    method exec {req} {
-	if {![info exists conn]} { open }
-
-	set command pg_exec
-	if {[catch {$command $conn $req} result]} { return -code error $result }
-
-	set errorinfo ""
-	set obj [result Postgresql -resultid $result]
-	if {[$obj error]} { set errorinfo [$obj errorinfo] }
-	return $obj
-    }
-
-    method nextkey {} {
-	return [$this string "select nextval( '$sequence' )"]
-    }
-
-    method lastkey {} {
-	return [$this string "select last_value from $sequence"]
-    }
-
-    method sql_limit_syntax {limit {offset ""}} {
-	set sql " LIMIT $limit"
-	if {![lempty $offset]} { append sql " OFFSET $offset" }
-	return $sql
-    }
-
-    ## If they change DBs, we need to close the connection and re-open it.
-    public variable db "" {
-	if {[info exists conn]} {
-	    close
-	    open
-	}
-    }
-
-    public variable interface	"Postgresql"
-    private variable conn
-
-} ; ## ::itcl::class Postgresql
-
-::itcl::class PostgresqlResult {
-    inherit Result
-
-    constructor {args} {
-	eval configure $args
-
-	if {[lempty $resultid]} {
-	    return -code error "No resultid specified while creating result"
-	}
-
-	set numrows   [pg_result $resultid -numTuples]
-	set fields    [pg_result $resultid -attributes]
-	set errorcode [pg_result $resultid -status]
-	set errorinfo [pg_result $resultid -error]
-
-	if {$errorcode != "PGRES_COMMAND_OK" \
-	    && $errorcode != "PGRES_TUPLES_OK"} { set error 1 }
-
-	## Reconfigure incase we want to overset the default values.
-	eval configure $args
-    }
-
-    destructor {
-	pg_result $resultid -clear
-    }
-
-    method clear {} {
-	pg_result $resultid -clear
-    }
-
-    method nextrow {} {
-	if {$rowid >= $numrows} { return }
-	return [pg_result $resultid -getTuple $rowid]
-    }
-
-} ; ## ::itcl::class PostgresqlResult
-
-::itcl::class Mysql {
-    inherit Database
-
-    constructor {args} {eval configure $args} {
-	if {[catch {package require Mysqltcl}] \
-	    && [catch {package require mysql}]} {
-	    return -code error "No MySQL Tcl package available"
-	}
-
-	eval configure $args
-
-	if {[lempty $db]} {
-	    if {[lempty $user]} {
-		set user $::env(USER)
-	    }
-	    set db $user
-	}
-    }
-
-    destructor {
-	close
-    }
-
-    method open {} {
-	set command "mysqlconnect"
-
-	if {![lempty $user]} { lappend command -user $user }
-	if {![lempty $pass]} { lappend command -password $pass }
-	if {![lempty $port]} { lappend command -port $port }
-	if {![lempty $host]} { lappend command $host }
-
-	if {[catch $command error]} { return -code error $error }
-
-	set conn $error
-
-	if {![lempty $db]} { mysqluse $conn $db }
-    }
-
-    method close {} {
-	if {![info exists conn]} { return }
-	catch {mysqlclose $conn}
-	unset conn
-    }
-
-    method exec {req} {
-	if {![info exists conn]} { open }
-
-	set cmd mysqlexec
-	if {[::string tolower [lindex $req 0]] == "select"} { set cmd mysqlsel }
-
-	set errorinfo ""
-	if {[catch {$cmd $conn $req} error]} {
-	    set errorinfo $error
-	    set obj [result Mysql -error 1 -errorinfo [::list $error]]
-	    return $obj
-	}
-	if {[catch {mysqlcol $conn -current name} fields]} { set fields "" }
-	set obj [result Mysql -resultid $conn \
-		-numrows [::list $error] -fields [::list $fields]]
-	return $obj
-    }
-
-    method lastkey {} {
-	if {![info exists conn]} { return }
-	return [mysqlinsertid $conn]
-    }
-
-    method quote {string} {
-	if {![catch {mysqlquote $string} result]} { return $result }
-	regsub -all {'} $string {\'} string
-	return $string
-    }
-
-    method sql_limit_syntax {limit {offset ""}} {
-	if {[lempty $offset]} {
-	    return " LIMIT $limit"
-	}
-	return " LIMIT [expr $offset - 1],$limit"
-    }
-
-    public variable db "" {
-	if {[info exists conn]} {
-	    mysqluse $conn $db
-	}
-    }
-
-    public variable interface	"Mysql"
-    private variable conn
-
-} ; ## ::itcl::class Mysql
-
-::itcl::class MysqlResult {
-    inherit Result
-
-    constructor {args} {
-	eval configure $args
-    }
-
-    destructor {
-
-    }
-
-    method nextrow {} {
-	return [mysqlnext $resultid]
-    }
-
-} ; ## ::itcl::class MysqlResult
 
 } ; ## namespace eval DIO
 
