@@ -80,18 +80,18 @@ proc aardvark::runbuildcommand { direction graphname node } {
 		    puts "This error occured: $err"
 		    continue
 		}
-		if { [info exists errorCode] } {
-		    unset errorCode
+		if { [info exists ::errorCode] } {
+		    unset ::errorCode
 		}
+		set fd [eval [list open "| $sh" r]]
 		catch {
-		    eval exec $sh
+		    close $fd
 		} err
 		if { $err != "" } {
 		    puts "Output: $err"
 		}
-		if { [info exists errorCode] && $::errorCode != "NONE" } {
-		    puts "\tFatal Error ($::errorCode)!"
-		    puts "\tError: $err"
+		if { [info exists ::errorCode] && $::errorCode != "NONE" } {
+		    puts "\tFatal Error ($::errorCode) ($::errorInfo)!"
 		    break
 		}
 

@@ -1,5 +1,5 @@
 <?
 
-puts "[ upload names ] [ upload info uploadtest exists ] [ upload info uploadtest size ] [ upload info uploadtest type ] [ upload info uploadtest filename ]"
+puts "[upload names] [upload exists uploadtest] [upload size uploadtest] [upload type uploadtest] [upload filename uploadtest]"
 
 ?>

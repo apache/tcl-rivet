@@ -1,3 +1,18 @@
+2002-07-19  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand):
+	Attempt to use 'open' to execute shell commands, in order to both
+	catch the output as well as the return code.
+
+	* doc/rivet.xml: New file.  Removed directives.xml in favor of
+	this, which we will use to build individual HTML files and other
+	forms of documentation.
+
+2002-07-18  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_Upload): Changed format of 'upload'
+	command to be more like 'var'.  Changed relevant tests.
+
 2002-07-14  David N. Welton  <davidw@dedasys.com>
 
 	* doc/directives.xml: New file - XML version of directives.html.
