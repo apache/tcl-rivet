@@ -21,20 +21,11 @@
       <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
-      <firstname>David</firstname>
-      <surname>Welton</surname>
+      <firstname>The Rivet Team</firstname>
       <affiliation>
+	<orgname>The Apache Software Foundation</orgname>
 	<address>
-	  <email>davidw@apache.org</email>
-	</address>
-      </affiliation>
-    </author>
-    <author>
-      <firstname>Damon</firstname>
-      <surname>Courtney</surname>
-      <affiliation>
-	<address>
-	  <email>damonc@apache.org</email>
+	  <email>rivet-dev@tcl.apache.org</email>
 	</address>
       </affiliation>
     </author>
@@ -857,37 +848,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-
-    <refentry>
-      <refnamediv>
-	<refname>load_env</refname>
-	<refpurpose>get the request's environment variables.</refpurpose>
-      </refnamediv>
-
-      <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>load_env</command>
-	  <arg choice="opt"><replaceable>array_name</replaceable></arg>
-	</cmdsynopsis>
-      </refsynopsisdiv>
-
-      <refsect1>
-	<title>Description</title>
-
-	<para>
-	  Load the array of environment variables into the specified
-	  array name.  Uses array <option>::request::env</option> by
-	  default.
-	</para>
-	<para>
-	  As Rivet pages are run in the <option>::request</option>
-	  namespace, it isn't necessary to qualify the array name
-	  for most uses - it's ok to access it as
-	  <option>env</option>.
-	</para>
-      </refsect1>
-    </refentry>
-
     <refentry>
       <refnamediv>
 	<refname>load_headers</refname>
@@ -933,6 +893,61 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	default.
       </para>
     </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>load_env</refname>
+	<refpurpose>get the request's environment variables.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_env</command>
+	  <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>
+	  Load the array of environment variables into the specified
+	  array name.  Uses array <option>::request::env</option> by
+	  default.
+	</para>
+	<para>
+	  As Rivet pages are run in the <option>::request</option>
+	  namespace, it isn't necessary to qualify the array name
+	  for most uses - it's ok to access it as
+	  <option>env</option>.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>env</refname> <refpurpose>Loads a single
+	"environmental variable" into a Tcl variable.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>env</command>
+	  <arg><replaceable>varName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>
+	  If it is only necessary to load one environmental variable,
+	  this command may be used to avoid the overhead of loading
+	  and storing the entire array.
+	</para>
+      </refsect1>
+    </refentry>
+
 
     <refentry>
       <refnamediv>
@@ -1244,6 +1259,52 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  Mostly used for debugging purposes.
 	</para>
 
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>abort_page</refname>
+	<refpurpose>Stops outputing data to web page, similar in
+	  purpose to PHP's <command>die</command> command.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>abort_page</command>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title> <para>This command flushes the
+	output buffer and stops the Tcl script from sending any more
+	data to the client.  A normal Tcl script might use the
+	<command>exit</command> command, but that cannot be used in
+	Rivet without actually exiting the apache child
+	process!</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>no_body</refname>
+	<refpurpose>Prevents Rivet from sending any content.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>no_body</command>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>
+	  This command is useful for situations where it is necessary
+	  to only return HTTP headers and no actual content.  For
+	  instance, when returning a 304 redirect.
+	</para>
       </refsect1>
     </refentry>
 

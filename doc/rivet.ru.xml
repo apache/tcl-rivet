@@ -19,21 +19,12 @@
       <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
-      <firstname>David</firstname>
-      <surname>Welton</surname>
+      <firstname>The Rivet Team</firstname>
       <affiliation>
-        <address>
-          <email>davidw@apache.org</email>
-        </address>
-      </affiliation>
-    </author>
-    <author>
-      <firstname>Damon</firstname>
-      <surname>Courtney</surname>
-      <affiliation>
-        <address>
-          <email>damonc@apache.org</email>
-        </address>
+	<orgname>The Apache Software Foundation</orgname>
+	<address>
+	  <email>rivet-dev@tcl.apache.org</email>
+	</address>
       </affiliation>
     </author>
     <othercredit>

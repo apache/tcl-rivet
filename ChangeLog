@@ -1,5 +1,14 @@
 2003-12-20  David N. Welton  <davidw@dedasys.com>
 
+	* doc/rivet.xml: Add abort_page, no_body and env commands,
+	reordered the load_* commands.
+
+	* doc/rivet.it.xml: Updated author.
+
+	* doc/rivet.ru.xml: Updated author.
+
+	* doc/rivet.xml: Changed documention author to "The Rivet Team".
+
 	* src/rivetCore.c (Rivet_NoBody): Return an error if content has
 	already been sent.
 
