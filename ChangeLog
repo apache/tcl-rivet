@@ -1,5 +1,12 @@
 2004-05-05  Karl Lehenbauer  <karl@sc.com>
 
+	* /rivet/packages/dio/diodisplay.tcl: Added "-type select"
+	option to DIOdisplay fields, and a new option, "-values $list"
+	which takes a list of values to be made available with a form
+	selector.
+
+2004-05-05  Karl Lehenbauer  <karl@sc.com>
+
 	* /rivet/packages/dio/diodisplay.tcl: When adding a new record,
 	if they've typed anything into the "is" field, set the default
 	value of the field specified in the "where" part to match.

@@ -927,12 +927,19 @@ catch { ::itcl::delete class ::DIODisplayField }
 	} else {
 	    set tag [get_css_tag]
 	    set class [get_css_class $tag DIOFormField DIOFormField-$name]
-	    eval $form $type $name -value [list $value] $formargs -class $class
+
+	    if {$type == "select"} {
+		$form select $name -values $values -class $class
+	    } else {
+		eval $form $type $name -value [list $value] $formargs -class $class
+	    }
 	}
 	puts "</TD>"
 	puts "</TR>"
     }
 
+    # methods that give us method-based access to get and set the
+    # object's variables...
     method display  {{string ""}} { configvar display $string }
     method form  {{string ""}} { configvar form $string }
     method formargs  {{string ""}} { configvar formargs $string }
@@ -945,6 +952,10 @@ catch { ::itcl::delete class ::DIODisplayField }
     public variable display		""
     public variable form		""
     public variable formargs		""
+
+    # values - for fields of type "select" only, the values that go in
+    # the popdown (or whatever) selector
+    public variable values              ""
 
     # name - the field name
     public variable name		""
