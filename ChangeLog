@@ -3,6 +3,36 @@
 	* src/make.tcl: Added warning to default make.tcl target in order
 	to encourage people to run ./make.tcl install.
 
+2004-01-08  Karl Lehenbauer  <karl@sc.com>
+
+	*  src/buildscripts/findapxs.tcl: When the apxs program cannot
+	be located, the message now mentions that the location of apxs
+	can also be specified using the "-with-apxs" option on the
+	command line.
+
+2004-01-05  Karl Lehenbauer  <karl@sc.com>
+
+	*  rivet/packages/session/*: Checkin of session management code.
+	This is a from-scratch rewrite of Superconnect's session
+	management code, donated to Rivet under the terms of the
+	Apache Software License. See rivet/packages/session/README.txt 
+	for details of what it does and how it works.
+
+2004-01-02  Karl Lehenbauer  <karl@sc.com>
+
+	*  src/buildscripts/findapxs.tcl: Added /usr/local/bin and
+	/usr/local/sbin to the directories that Rivet configuration
+	looks in to find apxs, when the path to apxs wasn't specified
+	on the configure command line.
+
+	Changed findapxs::FindAPXS to generate an error if it couldn't 
+	find a working apxs utility, rather than just returning an empty 
+	string.  Previously if apxs could not be found, the error message 
+	emitted by configure.tcl was: "Error in CFLAGS test: couldn't 
+	execute "": no such file or directory"  Now it says it couldn't
+	find the Apache Extension Tool apxs and lists everywhere it looked.
+
+
 2003-12-20  David N. Welton  <davidw@dedasys.com>
 
 	* tests/parsepackage.test: Added tests for the Rivet parser
