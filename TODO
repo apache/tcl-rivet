@@ -15,9 +15,6 @@ TODO
 * Swipe include_* from NWS and rework it like: include ?-virtual?
   ?-noparse? file
 
-* Add a '-virtual' option to include and parse.  This will include or
-  parse a file based on the server root.
-
 * Re-write load_file.  This basically loads an entire .tcl file into
   the current document instead of sourcing it.  This will allow us to
   cache even pages which only source a huge .tcl file.  load_virtual

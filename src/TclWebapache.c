@@ -11,6 +11,8 @@
 
 #include <tcl.h>
 
+#include <httpd.h>
+#include <http_request.h>
 #include "apache_request.h"
 #include "mod_rivet.h"
 #include "TclWeb.h"
@@ -574,4 +576,19 @@ TclWeb_GetEnvVar( TclWebRequest *req, char *key )
     }
 
     return val;
+}
+
+char *
+TclWeb_GetVirtualFile( TclWebRequest *req, char *virtualname )
+{
+    request_rec *apreq;
+    char *filename = NULL;
+
+    apreq = ap_sub_req_lookup_uri( virtualname, req->req );
+
+    if( apreq->status == 200 && apreq->finfo.st_mode != 0 ) {
+	filename = apreq->filename;
+    }
+    if( apreq != NULL ) ap_destroy_sub_req( apreq );
+    return( filename );
 }

@@ -1,3 +1,15 @@
+2002-04-19  Damon J. Courtney <damon@unreality.com>
+	* src/TclWebapache.c
+	    Added 'TclWeb_GetVirtualFile' command which returns the full
+	    path to a virtual file.
+
+	* src/rivetCore.c
+	    Added command 'virtual_filename' to return the full path to a
+	    virtual file.
+
+	    Added -virtual option to include and parse commands to enable
+	    them to parse a virtual file which is relative to the webserver.
+
 2002-03-26  Damon J. Courtney <damon@unreality.com>
 
 	* rivet/packages/form

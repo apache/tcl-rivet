@@ -238,6 +238,8 @@ Tcl_Obj * TclWeb_StringToUtfToObj(char *in, TclWebRequest *req);
 
 char *TclWeb_GetEnvVar( TclWebRequest *req, char * );
 
+char *TclWeb_GetVirtualFile( TclWebRequest *req, char *virtualname );
+
 /* output/write/flush?  */
 
 /* error (log) ? */

@@ -64,13 +64,23 @@ Rivet_Parse(
     struct stat finfo;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    if (objc != 2)
+    if( objc < 2 || objc > 3 )
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "filename");
+	Tcl_WrongNumArgs(interp, 1, objv, "?-virtual? filename");
 	return TCL_ERROR;
     }
 
-    filename = Tcl_GetStringFromObj (objv[1], (int *)NULL);
+    if( objc == 2 ) {
+	filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
+    } else {
+	if( !STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual") ) {
+	   Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
+	   return TCL_ERROR;
+	}
+	filename = TclWeb_GetVirtualFile( globals->req,
+				Tcl_GetStringFromObj(objv[2], (int *)NULL) );
+    }
+
     if (!strcmp(filename, globals->r->filename))
     {
 	Tcl_AddErrorInfo(interp, "Cannot recursively call the same file!");
@@ -82,10 +92,11 @@ Rivet_Parse(
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
 	return TCL_ERROR;
     }
-    if (Rivet_ParseExecFile(globals->req, filename, 0) == TCL_OK)
+    if (Rivet_ParseExecFile(globals->req, filename, 0) == TCL_OK) {
 	return TCL_OK;
-    else
+    } else {
 	return TCL_ERROR;
+    }
 }
 
 /* Tcl command to include flat files */
@@ -100,16 +111,28 @@ Rivet_Include(
     int sz;
     Tcl_Channel fd;
     Tcl_Obj *outobj;
+    char *filename;
 
-    if (objc != 2)
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    if( objc < 2 || objc > 3 )
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "filename");
+	Tcl_WrongNumArgs(interp, 1, objv, "?-virtual? filename");
 	return TCL_ERROR;
     }
 
-    fd = Tcl_OpenFileChannel(interp,
-			     Tcl_GetStringFromObj(objv[1], (int *)NULL),
-			     "r", 0664);
+    if( objc == 2 ) {
+	filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
+    } else {
+	if( !STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual") ) {
+	   Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
+	   return TCL_ERROR;
+	}
+	filename = TclWeb_GetVirtualFile( globals->req,
+				Tcl_GetStringFromObj(objv[2], (int *)NULL) );
+    }
+
+    fd = Tcl_OpenFileChannel(interp, filename, "r", 0664);
 
     if (fd == NULL)
     {
@@ -534,6 +557,24 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
     return TCL_OK;
 }
 
+TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    char *filename;
+    char *virtual;
+
+    if( objc != 2 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "filename" );
+	return TCL_ERROR;
+    }
+
+    virtual   = Tcl_GetStringFromObj( objv[1], NULL );
+    filename  = TclWeb_GetVirtualFile( globals->req, virtual );
+
+    Tcl_SetObjResult(interp, Tcl_NewStringObj( filename, -1 ) );
+    return TCL_OK;
+}
+
 int
 Rivet_InitCore( Tcl_Interp *interp )
 {
@@ -584,6 +625,7 @@ Rivet_InitCore( Tcl_Interp *interp )
 			(Tcl_CmdDeleteProc *)NULL);
 
     TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
+    TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
 
     return TCL_OK;
 }
