@@ -324,11 +324,17 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
 
     for( i = 0; i < nelts; ++i )
     {
+	key = Tcl_NewStringObj( elts[i].key, -1);
+	val = Tcl_NewStringObj( elts[i].val, -1);
+	Tcl_IncrRefCount(key);
+	Tcl_IncrRefCount(val);
 	Tcl_ObjSetVar2(interp,
 		       arrayName,
-		       Tcl_NewStringObj( elts[i].key, -1),
-		       Tcl_NewStringObj( elts[i].val, -1),
-		       TCL_GLOBAL_ONLY);
+		       key,
+		       val,
+ 		       TCL_GLOBAL_ONLY);
+	Tcl_DecrRefCount(key);
+	Tcl_DecrRefCount(val);
     }
     Tcl_DecrRefCount(arrayName);
 
@@ -473,27 +479,43 @@ Rivet_SendContent(request_rec *r)
 static void
 Rivet_InitServerVariables( Tcl_Interp *interp, pool *p )
 {
-    Tcl_ObjSetVar2(interp,
-		   Tcl_NewStringObj("server", -1),
-		   Tcl_NewStringObj("SERVER_ROOT", -1),
-		   Tcl_NewStringObj(ap_server_root, -1),
-		   TCL_GLOBAL_ONLY);
-    Tcl_ObjSetVar2(interp,
-		   Tcl_NewStringObj("server", -1),
-		   Tcl_NewStringObj("SERVER_CONF", -1),
-		   Tcl_NewStringObj(
-			ap_server_root_relative(p, ap_server_confname), -1),
-		   TCL_GLOBAL_ONLY);
-    Tcl_ObjSetVar2(interp,
-		   Tcl_NewStringObj("server", -1),
-		   Tcl_NewStringObj("RIVET_DIR", -1),
-		   Tcl_NewStringObj(ap_server_root_relative(p, RIVET_DIR), -1),
-		   TCL_GLOBAL_ONLY);
-    Tcl_ObjSetVar2(interp,
-		   Tcl_NewStringObj("server", -1),
-		   Tcl_NewStringObj("RIVET_INIT", -1),
-		   Tcl_NewStringObj(ap_server_root_relative(p, RIVET_INIT), -1),
-		   TCL_GLOBAL_ONLY);
+    Tcl_Obj *obj;
+
+    obj = Tcl_NewStringObj(ap_server_root, -1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+		  "server",
+		  "SERVER_ROOT",
+		  obj,
+		  TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
+
+    obj = Tcl_NewStringObj(ap_server_root_relative(p, ap_server_confname), -1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+		 "server",
+		 "SERVER_CONF",
+		  obj,
+		  TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
+
+    obj = Tcl_NewStringObj(ap_server_root_relative(p, RIVET_DIR), -1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+		  "server",
+		  "RIVET_DIR",
+		  obj,
+		  TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
+
+    obj = Tcl_NewStringObj(ap_server_root_relative(p, RIVET_INIT), -1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+		 "server",
+		 "RIVET_INIT",
+		  obj,
+		  TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
 }
 
 static void
@@ -503,6 +525,9 @@ Rivet_PropagateServerConfArray( Tcl_Interp *interp, rivet_server_conf *rsc )
     array_header *arr;
     table_entry  *elts;
     int i, nelts;
+    Tcl_Obj *key;
+    Tcl_Obj *val;
+    Tcl_Obj *arrayName;
 
     /* Propagate all of the ServerConf variables into an array. */
     t = rsc->rivet_server_vars;
@@ -510,14 +535,24 @@ Rivet_PropagateServerConfArray( Tcl_Interp *interp, rivet_server_conf *rsc )
     elts  = (table_entry *)arr->elts;
     nelts = arr->nelts;
 
+    arrayName = Tcl_NewStringObj("RivetServerConf", -1);
+    Tcl_IncrRefCount(arrayName);
+
     for( i = 0; i < nelts; ++i )
     {
-	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj("RivetServerConf", -1),
-		       Tcl_NewStringObj( elts[i].key, -1),
-		       Tcl_NewStringObj( elts[i].val, -1),
+	key = Tcl_NewStringObj( elts[i].key, -1);
+	val = Tcl_NewStringObj( elts[i].val, -1);
+	Tcl_IncrRefCount(key);
+	Tcl_IncrRefCount(val);
+ 	Tcl_ObjSetVar2(interp,
+		       arrayName,
+		       key,
+		       val,
 		       TCL_GLOBAL_ONLY);
+	Tcl_DecrRefCount(key);
+	Tcl_DecrRefCount(val);
     }
+    Tcl_DecrRefCount(arrayName);
 }
 
 static void

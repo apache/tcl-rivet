@@ -356,6 +356,8 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 
     array_header *env_arr;
     table_entry  *env;
+    Tcl_Obj *key;
+    Tcl_Obj *val;
 
     TclWeb_InitEnvVars( req );
 
@@ -367,9 +369,13 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 	if (!env[i].key)
 	    continue;
 
-	Tcl_ObjSetVar2(req->interp, envvar,
-			TclWeb_StringToUtfToObj(env[i].key, req),
-			TclWeb_StringToUtfToObj(env[i].val, req), 0);
+	key = TclWeb_StringToUtfToObj(env[i].key, req);
+	val = TclWeb_StringToUtfToObj(env[i].val, req);
+	Tcl_IncrRefCount(key);
+	Tcl_IncrRefCount(val);
+	Tcl_ObjSetVar2(req->interp, envvar, key, val, 0);
+ 	Tcl_DecrRefCount(key);
+	Tcl_DecrRefCount(val);
     }
 
     Tcl_DecrRefCount(envvar);
