@@ -1,3 +1,12 @@
+2002-02-17  Damon J. Courtney <damon@unreality.com>
+
+	* src/make.tcl
+	    Added a script to look around a little more for Apache's apxs tool.
+	    If we can't find it, we output an error message to the user.
+
+	* src/buildscripts/findapxs.tcl
+	    Added to repository.
+
 2002-02-12  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c: Added some INLINE's.

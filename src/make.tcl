@@ -7,31 +7,38 @@
 # this file actually runs things, making use of the aardvark build
 # system.
 
-# get aardvark build system
-source [ file join . buildscripts aardvark.tcl ]
+set scripts {
+    aardvark.tcl
+    parsetclConfig.tcl
+    findapxs.tcl
+}
+
+foreach script $scripts { source [file join . buildscripts $script] }
+
 namespace import ::aardvark::*
 
-# add in variables from tclConfig.sh
-source [ file join . buildscripts parsetclConfig.tcl ]
+## Add variables
 
-# add variables
+##
+## Set this variable to the location of your apxs script if it cannot be
+## found by make.tcl
+##
+set APXS "apxs"
 
-if { [file executable "/usr/local/apache/bin/apxs"] == 1 } {
-    set APXS "/usr/local/apache/bin/apxs"
-} else {
-    # edit here
-    set APXS "apxs"
-}
+## Try to find the Apache apxs script.
+set APXS [FindAPXS $APXS]
 
-if { [catch {
-    set INCLUDEDIR [exec $APXS -q INCLUDEDIR]
-    set LIBEXECDIR [exec $APXS -q LIBEXECDIR]
-    set PREFIX [exec $APXS -q PREFIX]
-} err] != 0 } {
+if {![string length $APXS]} {
+    puts stderr "Could not find Apache apxs script."
+    append err "You need to edit 'make.tcl' to supply the location of "
+    append err "Apache's apxs tool."
     puts stderr $err
-    puts stderr "You need to edit 'make.tcl' to supply the location of Apache's apxs tool"
     exit 1
 }
+
+set INCLUDEDIR [exec $APXS -q INCLUDEDIR]
+set LIBEXECDIR [exec $APXS -q LIBEXECDIR]
+set PREFIX [exec $APXS -q PREFIX]
 
 set INC "-I$INCLUDEDIR -I$TCL_PREFIX/include"
 

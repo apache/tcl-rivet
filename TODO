@@ -1,6 +1,8 @@
 TODO
 ====
 
+* Add a command in Tcl that will return a file relative to the document root.
+
 * Write commands after like 'open' and such in the request namespace
   that keep track of open file pointers and close them in the cleanup.
 
