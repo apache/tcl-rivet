@@ -1105,6 +1105,9 @@ Rivet_ChildInit(server_rec *s, pool *p)
 		ap_log_error(APLOG_MARK, APLOG_ERR, s,
 			     "Problem running child init script: %s",
 			     Tcl_GetString(rsc->rivet_child_init_script));
+		ap_log_error(APLOG_MARK, APLOG_ERR, s, "%s",
+ 			     Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
+
 	    }
 	}
 	sr = sr->next;
