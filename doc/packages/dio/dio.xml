@@ -450,6 +450,259 @@
       </refsect1>
       <refsect1 id="resultobj">
 	<title>Result Object Commands</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>autocache</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current autocache value.  If
+		<option>value</option> is specified, it sets a new
+		value for autocache.
+	      </para>
+	      <para>
+		If autocache is true, the result object will
+		automatically cache rows as you use them.  This means
+		that the first time you execute a forall command, each
+		row is being cached in the result object itself and
+		will no longer need to access the SQL result.
+		<emphasis>Default is true</emphasis>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>cache</arg>
+	      </cmdsynopsis>
+	      <para>
+		Cache the results of the current SQL result in the
+		result object itself.  This means that even if the
+		database connection is closed and all the results of
+		the DIO object are lost, this result object will still
+		maintain a cached copy of its records.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>errorcode</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current errorcode value.  If <option>value</option>
+		is specified, it sets a new value for errorcode.
+	      </para>
+	      <para>
+		<option>errorcode</option> contains the current code from the
+		SQL database which specifies the result of the query
+		statement which created this object.  This variable
+		can be used to determine the success or failure of a
+		query.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>errorinfo</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current errorinfo value.  If <option>value</option>
+		is specified, it sets a new value for errorinfo.
+	      </para>
+	      <para>
+		If an error occurred during the SQL query, DIO
+		attempts to set the value of <option>errorinfo</option> to the
+		resulting error message.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>fields</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current fields value.  If <option>value</option> is specified, it sets
+		a new value for fields.
+	      </para>
+	      <para>
+		<option>fields</option> contains the list of fields used in this
+		query.  The fields are in order of the fields
+		retrieved for each row.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>forall</arg>
+		<arg>-type</arg>
+		<arg>varName</arg>
+		<arg>body</arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>body</option> over each record in the
+		result object.
+	      </para>
+	      <para>Types:</para>
+	      <variablelist>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg>-array</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Create varName as an array where the indexes are
+		      the names of the fields in the table and the
+		      values are the values of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg>-keyvalue</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set varName to a list containing key-value pairs
+		      of fields and values from the current
+		      row. (-field value -field value)
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg>-list</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set varName to a list that contains the values
+		      of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>next</arg>
+		<arg>-type</arg>
+		<arg choice="opt">varName</arg>
+	      </cmdsynopsis>
+	      <para>
+		Retrieve the next record in the result object.
+	      </para>
+	      <para>Types:</para>
+	      <variablelist>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg>-array</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Create varName as an array where the indexes are
+		      the names of the fields in the table and the
+		      values are the values of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg>-keyvalue</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set varName to a list containing key-value pairs
+		      of fields and values from the current
+		      row. (-field value -field value)
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg>-list</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set varName to a list that contains the values
+		      of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>numrows</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current numrows value.  If <option>value</option> is
+		specified, it sets a new value for numrows.
+	      </para>
+	      <para>
+		<option>numrows</option> is the number of rows in this result.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>resultid</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current resultid value.  If <option>value</option> is
+		specified, it sets a new value for resultid.
+	      </para>
+	      <para>
+		<option>resultid</option> in most databases is the result
+		pointer which was given us by the database.  This
+		variable is not generic and should not really be used,
+		but it's there if you want it.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg>resultObj</arg>
+		<arg>rowid</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current rowid value.  If <option>value</option> is
+		specified, it sets a new value for rowid.
+	      </para>
+	      <para>
+		<option>rowid</option> contains the number of the
+		current result record in the result object.  This
+		variable should not really be accessed outside of the
+		result object, but it's there if you want it.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
       </refsect1>
     </refentry>
   </section>
