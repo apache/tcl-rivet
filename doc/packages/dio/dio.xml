@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd">
+
+<article>
+  <articleinfo>
+    <title>DIO</title>
+    <releaseinfo>
+      $Id$
+    </releaseinfo>
+    <copyright>
+      <year>2002</year>
+      <holder>Apache Software Foundation</holder>
+    </copyright>
+  </articleinfo>
+
+  <section>
+    <title>DIO SECTION TITLE</title>
+
+    <refentry>
+      <refnamediv>
+	<refname>DIO</refname>
+	<refpurpose>Database Interface Objects</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>::DIO::handle</command>
+	  <arg>interface</arg>
+	  <arg choice="opt">objectName</arg>
+	  <group choice="opt">
+	    <arg>-option</arg>
+	    <arg>option</arg>
+	    <arg>-option</arg>
+	    <arg>option</arg>
+	    <arg>...</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  <command>DIO</command> is designed to be a generic,
+	  object-oriented interface to SQL databases.  Its main goal
+	  is to be as generic as possible, but since not all SQL
+	  databases support the exact same syntaxes, keeping code
+	  generic between databases is left to the abilities of the
+	  programmer.  DIO simply provides a way to keep the Tcl
+	  interface generic.
+	</para>
+	<para>
+	  <option>interface</option> - The name of the database
+	  interface.  Currently supported interfaces are
+	  <option>Postgresql</option> and <option>Mysql</option>.
+	</para>
+	<para>If <option>objectName</option> is specified, DIO creates
+	  an object of that name.  If there is no
+	  <option>objectName</option> given, DIO will automatically
+	  generate a unique object ID
+	</para>
+      </refsect1>
+      <refsect1>
+	<title>Options</title>
+	<variablelist>
+	  <varlistentry>
+	    <term><option>-host</option> <option>hostname</option></term>
+	    <listitem>
+	      The hostname of the computer to connect to.  If none is
+	      given, DIO assumes the local host.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-port</option> <option>portNumber</option></term>
+	    <listitem>
+	      The port number to connect to on <option>hostname</option>.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-user</option> <option>username</option></term>
+	    <listitem>
+	      The username you wish to login to the server as.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-pass</option> <option>password</option></term>
+	    <listitem>
+	      The password to login to the server with.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-db</option> <option>database</option></term>
+	    <listitem>
+	      The name of the database to connect to.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-table</option> <option>tableName</option></term>
+	    <listitem>
+	      The default table to use when using built-in commands
+	      for storing and fetching.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-keyfield</option> <option>keyFieldname</option></term>
+	    <listitem>
+	      The default field to use as the primary key when using
+	      built-in commands for storing and fetching.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-autokey</option> <option>[ 0 | 1 ]</option></term>
+	    <listitem>
+	      If this option is set to 1, DIO will attempt to
+	      determine an automatic key for <option>keyField</option>
+	      when storing and fetching.  In most databases, this
+	      requires that the <option>sequence</option> also be
+	      specified.  In the case of MySQL, where sequences do not
+	      exist, autokey must be used in conjunction with a table
+	      which has a field specified as AUTO.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><option>-sequence</option> <option>sequenceName</option></term>
+	    <listitem>
+	      If DIO is automatically generating keys, it will use
+	      this sequence as a means to gain a unique number for the
+	      stored key.
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+      <refsect1>
+	<title>DIO Object Commands</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>array</arg>
+		<arg>request</arg>
+	      </cmdsynopsis>
+	      Execute <option>request</option> as a SQL query and
+	      create an array from the first record found.  The array
+	      is set with the fields of the table and the values of
+	      the record found.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>autokey</arg>
+		<group choice="opt">
+		  <arg>value</arg>
+		  <arg>boolean</arg>
+		</group>
+	      </cmdsynopsis>
+	      Return the current autokey value.  If
+	      <option>value</option> is specified, it sets a new value
+	      for the autokey option.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>close</arg>
+	      </cmdsynopsis>
+	      Close the current database connection.  This command is
+	      automatically called when the DIO object is destroyed.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>db</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      Return the current database.  If <option>value</option> is
+	      specified, it sets a new value for the database.  In
+	      most cases, the DIO object will automatically connect to
+	      the new database when this option is changed.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>delete</arg>
+		<arg>key</arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg>option</arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      Delete a record from the database where the primary key
+	      matches <option>key</option>.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>destroy</arg>
+	      </cmdsynopsis>
+	      Destroy the DIO object.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>errorinfo</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <option>errorinfo</option> contains the value of the
+	      last error, if any, to occur while executing a request.
+	      When a request fails for any reason, this variable is
+	      filled with the error message from the SQL interface
+	      package.
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>exec</arg>
+		<arg>request</arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as an SQL query.
+		When the exec command is called, the query is
+		executed, and a DIO result object is returned.  From
+		there, the result object can be used to obtain
+		information about the query status and records in a
+		generic way.  See <link linkend="resultobj">Result
+		Object Commands</link>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>fetch</arg>
+		<arg>key</arg>
+		<arg>arrayName</arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg>option</arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Fetch a record from the database where the primary key
+		matches <option>key</option> and store the result in
+		an array called <option>arrayName</option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>host</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current host value.  If
+		<option>value</option> is specified, it sets a new
+		value for the host.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>keyfield</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current keyfield.  If
+		<option>value</option> is specified, it sets a new
+		value for the keyfield.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>keys</arg>
+		<arg choice="opt">pattern</arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg>option</arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Return a list of keys in the database.  If
+		<option>pattern</option> is specified, only the keys
+		matching will be returned.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>lastkey</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the last key that was used from
+		<option>sequence</option>.  If sequence has not been
+		specified, this command returns an empty string.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>list</arg>
+		<arg>request</arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		return a list of the first column of each record
+		found.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>nextkey</arg>
+	      </cmdsynopsis>
+	      <para>Increment <option>sequence</option> and return the
+		next key to be used.  If sequence has not been
+		specified, this command returns an empty
+		string.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>open</arg>
+	      </cmdsynopsis>
+	      <para>Open the connection to the current database.  This
+		command is automatically called from any command which
+		accesses the database.</para>
+	    </listitem>
+	  </varlistentry>	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>pass</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>Return the current pass value.  If
+		<option>value</option> is specified, it sets a new
+		value for the password.</para>
+	    </listitem>
+	  </varlistentry>	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>port</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>Return the current port value.  If <option>value</option> is
+		specified, it sets a new value for the port.</para>
+	    </listitem>
+	  </varlistentry>	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>sequence</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current sequence value.  If <option>value</option> is
+		specified, it sets a new value for the sequence.
+	      </para>
+	    </listitem>
+	  </varlistentry>	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>store</arg>
+		<arg>arrayName</arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg>option</arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Store <option>arrayName</option> in the database.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>string</arg>
+		<arg>request</arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		return a string containing the first record
+		found.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>table</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>Return the current table.  If
+		<option>value</option> is specified, it sets a new
+		value for the table.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>objectName</command>
+		<arg>user</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current user value.  If
+		<option>value</option> is specified, it sets a new
+		value for the user.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+      <refsect1 id="resultobj">
+	<title>Result Object Commands</title>
+      </refsect1>
+    </refentry>
+  </section>
+</article>
