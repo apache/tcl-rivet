@@ -18,7 +18,7 @@ set urlbase "http://localhost:8081/"
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
-foreach Test {cookies.test get.test post.test tclfile.test env.test hello.test} {
+foreach Test {cookies.test get.test post.test tclfile.test env.test hello.test include.test} {
     source $Test
 }
 

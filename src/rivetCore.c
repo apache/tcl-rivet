@@ -218,7 +218,7 @@ Rivet_Headers(
 	}
 	ap_table_set(globals->r->headers_out, "Location",
 		     Tcl_GetStringFromObj (objv[2], (int *)NULL));
-	globals->r->status = 301;
+	TclWeb_SetStatus(301, globals->req);
 	return TCL_RETURN;
     }
     else if (!strcmp("set", opt)) /* ### set ### */
@@ -239,7 +239,7 @@ Rivet_Headers(
 	    Tcl_WrongNumArgs(interp, 2, objv, "mime/type");
 	    return TCL_ERROR;
 	}
-	TclWeb_SetHeaderType(Tcl_GetStringFromObj(objv[2],(int *)NULL), globals->req);
+	TclWeb_SetHeaderType(Tcl_GetStringFromObj(objv[2], (int *)NULL), globals->req);
     } else if (!strcmp("numeric", opt)) /* ### numeric ### */
     {
 	int st = 200;
@@ -249,10 +249,11 @@ Rivet_Headers(
 	    Tcl_WrongNumArgs(interp, 2, objv, "response code");
 	    return TCL_ERROR;
 	}
-	if (Tcl_GetIntFromObj(interp, objv[2], &st) != TCL_ERROR)
-	    globals->r->status = st;
-	else
+	if (Tcl_GetIntFromObj(interp, objv[2], &st) != TCL_ERROR) {
+	    TclWeb_SetStatus(st, globals->req);
+	} else {
 	    return TCL_ERROR;
+	}
     } else {
 	return TCL_ERROR;
     }

@@ -1,3 +1,7 @@
+2002-01-24  David N. Welton  <davidw@dedasys.com>
+
+	* tests/include.test: Added test for 'include' command.
+
 2002-01-22  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c, src/channel.c, src/rivetCore.c: Switched to

@@ -13,7 +13,7 @@
 ##    Options:
 ##	-subst <on|off> - Each word should be considered a variable and subst'd.
 ##	-separator <string> - A text string that goes between each variable.
-##	-ip <ip address> - A list of IP addresses to display to.	
+##	-ip <ip address> - A list of IP addresses to display to.
 ###
 
 proc debug {args} {
