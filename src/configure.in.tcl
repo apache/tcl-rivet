@@ -24,6 +24,16 @@ configure::test APXS {
     findapxs::FindAPXS [set APXS]
 }
 
+# FreeBSD and MacOS X seem to be broken - they do not include this in
+# their tclConfig.sh files.
+configure::test INCLUDE_SPEC {
+    if { ! [info exists TCL_INCLUDE_SPEC] } {
+	set tmp "-I[file join $TCL_PREFIX include]"
+    } else {
+	set TCL_INCLUDE_SPEC
+    }
+}
+
 configure::test TCL_THREADED {
     set tmp "-DTCL_THREADED=[info exists tcl_platform(threaded)]"
 }
@@ -41,7 +51,7 @@ configure::test PREFIX {
 }
 
 configure::test INC {
-    set tmp "-I$INCLUDEDIR $TCL_INCLUDE_SPEC"
+    set tmp "-I$INCLUDEDIR $INCLUDE_SPEC"
 }
 
 configure::test COMPILE {

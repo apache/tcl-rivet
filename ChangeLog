@@ -1,5 +1,8 @@
 2003-08-22  David N. Welton  <davidw@dedasys.com>
 
+	* src/configure.in.tcl: Add test for broken Tcl installations on
+	FreeBSD and MacOS X.
+
 	* doc/rivet.xml: Added installation instructions corresponding to
 	the new ./configure.tcl system. Ran the spellchecker.
 

@@ -149,7 +149,8 @@ proc configure::test {varname body} {
 	puts -nonewline "."
 	flush stdout
     }
-    if { [info exists ::configs::${varname}] && [set ::configs::[set varname]] != "" } {
+    if { [info exists ::configs::${varname}] && \
+	     [set ::configs::[set varname]] != "" } {
 	# It already exists - it was probably passed on the command
 	# line.
 	return

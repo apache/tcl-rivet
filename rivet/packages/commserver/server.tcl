@@ -1,5 +1,6 @@
 # This is a server that is detached from the main Apache process, in
-# order to provide inter-process comunication via Tcl's comm package.
+# order to provide inter-process comunication via tcllib's comm
+# package.
 
 # $Id$
 

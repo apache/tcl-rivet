@@ -16,8 +16,8 @@ is launched from, and launches Apache with the generated config.  We
 are thusly able to manipulate the environment completely, and run the
 tests directly in the tests/ directory...
 
-Note that mod_so.c must be compiled into Apache for this to work, or
-Apache must be compiled with Rivet built in.
+Note that either mod_so.c (to load Rivet as DSO) or Rivet itself must
+be compiled into Apache for this to work.
 
 For example:
 
