@@ -6,6 +6,15 @@ source [file join apachetest apachetest.tcl]
 
 apachetest::getbinname $argv
 
+apachetest::need_modules {
+    {mod_log_config	  config_log_module}
+    {mod_mime		mime_module}
+    {mod_negotiation	 negotiation_module}
+    {mod_dir		         dir_module}
+    {mod_access	      access_module}
+    {mod_auth		auth_module}
+}
+
 apachetest::makeconf server.conf {
     LoadModule rivet_module [file join $CWD .. src mod_rivet[info sharedlibextension]]
 
@@ -33,11 +42,9 @@ apachetest::makeconf server.conf {
     </IfDefine>
 }
 
-# copy the rivet init files.
-
-if { ! [file exists [file join rivet init.tcl]] } {
-    file copy -force [file join .. rivet] .
-}
+# Copy the rivet init files.
+file delete -force rivet
+file copy -force [file join .. rivet] .
 
 # If 'startserver' is specified on the command line, just start up the
 # server without running tests.

@@ -14,15 +14,6 @@ namespace eval apachetest {
 
     set debug 0
 
-    # Associate module names with their internal names.
-    array set module_assoc {
-	mod_log_config	  config_log_module
-	mod_mime		mime_module
-	mod_negotiation	 negotiation_module
-	mod_dir			 dir_module
-	mod_access	      access_module
-	mod_auth		auth_module
-    }
     # name of the apache binary, such as /usr/sbin/httpd
     variable binname ""
     # this file should be in the same directory this script is.
@@ -30,11 +21,41 @@ namespace eval apachetest {
 			       template.conf.tcl]
 }
 
-# make sure we can connect to the server
+# apachetest::need_modules --
+#
+#	Tell the test suite which modules we *need* to have.  The test
+#	suite will then check to see if these are either 1) compiled
+#	into the server or 2) loaded in its configuration file.
+#
+# Arguments:
+#	args
+#
+# Side Effects:
+#	Sets up the rest of the apachetest tools to find the needed
+#	modules.
+#
+# Results:
+#	None.
+
+proc apachetest::need_modules { modlist } {
+    variable module_assoc
+    foreach module_pair $modlist {
+	set module_assoc([lindex $module_pair 0]) [lindex $module_pair 1]
+    }
+}
+
+# apachetest::connect --
+#
+#	Attempt to open a socket to the web server we are using in our
+#	tests.  Try for 10 seconds before giving up.
+#
+# Arguments:
+#	None.
 
 proc apachetest::connect { } {
     set starttime [clock seconds]
     set diff 0
+    # We try for 10 seconds.
     while { $diff < 10 } {
 	if { ! [catch {
 	    set sk [socket localhost 8081]
@@ -46,8 +67,20 @@ proc apachetest::connect { } {
     }
 }
 
-# start - start the server in the background with 'options' and then
-# run 'code'.
+# apachetest::start --
+#
+#	Start the web server in the background.  After running the
+#	script specified, stop the server.
+#
+# Arguments:
+#	options - command line options to pass to the web server.
+#	code - code to run.
+#
+# Side Effects:
+#	Runs 'code' in the global namespace.
+#
+# Results:
+#	None.
 
 proc apachetest::start { options code } {
     variable serverpid 0
@@ -56,7 +89,7 @@ proc apachetest::start { options code } {
 
     # There has got to be a better way to do this, aside from waiting.
     set serverpid [eval exec  $binname -X -f \
-		       [file join [pwd] server.conf] $options >& apachelog.txt & ]
+		       [file join [pwd] server.conf] $options >& apachelog.txt &]
 
     apachetest::connect
     if { $debug > 0 } {
@@ -67,6 +100,7 @@ proc apachetest::start { options code } {
     } err] } {
 	puts $err
     }
+    # Kill and wait are the only reasons we need TclX.
     kill $serverpid
     catch {
 	set waitres [wait $serverpid]
@@ -99,7 +133,7 @@ proc apachetest::getbinname { argv } {
     variable binname
     set binname [lindex $argv 0]
     if { $binname == "" || ! [file exists $binname] } {
-	error "Please supply the full name and path of the Apache executable on the command line!"
+	error "Please supply the full name and path of the Apache executable on the command line."
     }
     return $binname
 }
@@ -135,8 +169,8 @@ proc apachetest::getcompiledin { binname } {
 # find the httpd.conf file
 
 proc apachetest::gethttpdconf { binname } {
-    set bin [ open [list | "$binname" -V ] r ]
-    set options [ read $bin ]
+    set bin [open [list | "$binname" -V] r]
+    set options [read $bin]
     close $bin
     regexp {SERVER_CONFIG_FILE="(.*?)"} "$options" match filename
     if { ! [file exists $filename] } {
@@ -170,7 +204,7 @@ proc apachetest::getloadmodules { conffile needtoget } {
     return [join $loadline "\n"]
 }
 
-# compare what's compiled in with what we need
+# Compare what's compiled in with what we need.
 
 proc apachetest::determinemodules { binname } {
     variable module_assoc
@@ -196,16 +230,16 @@ proc apachetest::determinemodules { binname } {
 }
 
 # apachetest::makeconf --
-
+#
 #	Creates a config file and writes it to disk.
-
+#
 # Arguments:
 #	outfile - the file to create/write to.
 #	extra - extra config options to add.
-
+#
 # Side Effects:
 #	Creates a new config file.
-
+#
 # Results:
 #	None.
 
