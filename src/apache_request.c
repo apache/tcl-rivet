@@ -469,7 +469,7 @@ int ApacheRequest_parse_multipart(ApacheRequest *req)
 		if (req->upload_hook != NULL) {
 		    wlen = req->upload_hook(req->hook_data, buff, blen, upload);
 		} else {
-		    wlen = fwrite(buff, 1, blen, upload->fp);
+		    wlen = fwrite(buff, 1, (unsigned)blen, upload->fp);
 		}
 		if (wlen != blen) {
 		    return HTTP_INTERNAL_SERVER_ERROR;

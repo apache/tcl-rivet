@@ -56,8 +56,8 @@ Rivet_Parse(
     char *filename;
     struct stat finfo;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(globals->r->server->module_config, &rivet_module);
+    rivet_server_conf *rsc =
+	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc != 2)
     {
@@ -97,9 +97,7 @@ Rivet_Include(
     char buf[BUFSZ];
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc =
-	(rivet_server_conf *)ap_get_module_config(
-				globals->r->server->module_config,
-				&rivet_module);
+	RIVET_SERVER_CONF( globals->r->server->module_config );
     Tcl_Obj *outobj;
 
     if (objc != 2)
@@ -118,8 +116,6 @@ Rivet_Include(
     } else {
 	Tcl_SetChannelOption(interp, fd, "-translation", "lf");
     }
-/*     print_headers(globals->r);
-       flush_output_buffer(globals->r);  */
 
     outobj = Tcl_NewObj();
     Tcl_IncrRefCount(outobj);
@@ -157,7 +153,7 @@ Rivet_Headers(
     char *opt;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(globals->r->server->module_config, &rivet_module);
+	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc < 2)
     {
@@ -166,7 +162,8 @@ Rivet_Headers(
     }
     if (*(rsc->headers_printed) != 0)
     {
-	Tcl_AddObjErrorInfo(interp, "Cannot manipulate headers - already sent", -1);
+	Tcl_AddObjErrorInfo(interp,
+		"Cannot manipulate headers - already sent", -1);
 	return TCL_ERROR;
     }
     opt = Tcl_GetStringFromObj(objv[1], NULL);
@@ -181,11 +178,15 @@ Rivet_Headers(
 	if (objc < 4 || objc > 14)
 	{
 	    Tcl_WrongNumArgs(interp, 2, objv,
-			     "-name cookie-name -value cookie-value ?-expires expires? ?-domain domain? ?-path path? ?-secure on/off?");
+			     "-name cookie-name -value cookie-value "
+			     "?-expires expires? ?-domain domain? "
+			     "?-path path? ?-secure on/off?");
 	    return TCL_ERROR;
 	}
 
-	/* SetCookie: foo=bar; EXPIRES=DD-Mon-YY HH:MM:SS; DOMAIN=domain; PATH=path; SECURE */
+	/* SetCookie: foo=bar; EXPIRES=DD-Mon-YY HH:MM:SS;
+	 * DOMAIN=domain; PATH=path; SECURE
+	 */
 
 	for (i = 0; i < objc - 2; i++)
 	{
@@ -231,7 +232,7 @@ Rivet_Headers(
 	    Tcl_WrongNumArgs(interp, 2, objv, "mime/type");
 	    return TCL_ERROR;
 	}
-	set_header_type(globals->r, Tcl_GetStringFromObj(objv[2], (int *)NULL));
+	set_header_type(globals->r, Tcl_GetStringFromObj(objv[2],(int *)NULL));
     } else if (!strcmp("numeric", opt)) /* ### numeric ### */
     {
 	int st = 200;
@@ -246,7 +247,6 @@ Rivet_Headers(
 	else
 	    return TCL_ERROR;
     } else {
-	/* XXX	Tcl_WrongNumArgs(interp, 1, objv, "headers option arg ?arg ...?");  */
 	return TCL_ERROR;
     }
     return TCL_OK;
@@ -258,7 +258,7 @@ Rivet_Headers(
    we can decide whether we wish to or not */
 
 int
-Rivet_HGetVars(
+Rivet_LoadEnv(
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -283,7 +283,7 @@ Rivet_HGetVars(
     table_entry  *env;
     Tcl_Obj *EnvsObj = NULL;
 
-    EnvsObj = Tcl_NewStringObj("::request::ENVS", -1);
+    EnvsObj = Tcl_NewStringObj("::request::env", -1);
     Tcl_IncrRefCount(EnvsObj);
     date = globals->r->request_time;
     /* ensure that the system area which holds the cgi variables is empty */
@@ -300,8 +300,10 @@ Rivet_HGetVars(
     env     = (table_entry *) env_arr->elts;
 
     /* Get the user/pass info for Basic authentication */
-    (const char*)authorization = ap_table_get(globals->r->headers_in, "Authorization");
-    if (authorization && !strcasecmp(ap_getword_nc(POOL, &authorization, ' '), "Basic"))
+    (const char*)authorization =
+	ap_table_get(globals->r->headers_in, "Authorization");
+    if (authorization
+	&& !strcasecmp(ap_getword_nc(POOL, &authorization, ' '), "Basic"))
     {
 	char *tmp;
 	char *user;
@@ -322,11 +324,15 @@ Rivet_HGetVars(
 
     /* These were the "include vars"  */
     Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DATE_LOCAL", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL, date, timefmt, 0), POOL), 0);
+		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
+					date, timefmt, 0), POOL), 0);
     Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DATE_GMT", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL, date, timefmt, 1), POOL), 0);
+		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
+					date, timefmt, 1), POOL), 0);
     Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("LAST_MODIFIED", -1),
-		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL, globals->r->finfo.st_mtime, timefmt, 0), POOL), 0);
+		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
+					globals->r->finfo.st_mtime,
+					timefmt, 0), POOL), 0);
     Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DOCUMENT_URI", -1),
 		   STRING_TO_UTF_TO_OBJ(globals->r->uri, POOL), 0);
     Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DOCUMENT_PATH_INFO", -1),
@@ -336,12 +342,12 @@ Rivet_HGetVars(
     pw = getpwuid(globals->r->finfo.st_uid);
     if (pw)
 	Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("USER_NAME", -1),
-		       STRING_TO_UTF_TO_OBJ(ap_pstrdup(POOL, pw->pw_name), POOL), 0);
+	       STRING_TO_UTF_TO_OBJ(ap_pstrdup(POOL, pw->pw_name), POOL), 0);
     else
 	Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("USER_NAME", -1),
 		       STRING_TO_UTF_TO_OBJ(
 			   ap_psprintf(POOL, "user#%lu",
-				       (unsigned long) globals->r->finfo.st_uid), POOL), 0);
+			   (unsigned long)globals->r->finfo.st_uid), POOL), 0);
 #endif
 
     if ((t = strrchr(globals->r->filename, '/')))
@@ -355,8 +361,9 @@ Rivet_HGetVars(
     {
 	char *arg_copy = ap_pstrdup(POOL, globals->r->args);
 	ap_unescape_url(arg_copy);
-	Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("QUERY_STRING_UNESCAPED", -1),
-		       STRING_TO_UTF_TO_OBJ(ap_escape_shell_cmd(POOL, arg_copy), POOL), 0);
+	Tcl_ObjSetVar2(interp, EnvsObj,
+	   Tcl_NewStringObj("QUERY_STRING_UNESCAPED", -1),
+	   STRING_TO_UTF_TO_OBJ(ap_escape_shell_cmd(POOL, arg_copy), POOL), 0);
     }
 
     /* ----------------------------  */
@@ -367,7 +374,8 @@ Rivet_HGetVars(
 	if (!hdrs[i].key)
 	    continue;
 	else {
-	    Tcl_ObjSetVar2(interp, EnvsObj, STRING_TO_UTF_TO_OBJ(hdrs[i].key, POOL),
+	    Tcl_ObjSetVar2(interp, EnvsObj,
+			   STRING_TO_UTF_TO_OBJ(hdrs[i].key, POOL),
 			   STRING_TO_UTF_TO_OBJ(hdrs[i].val, POOL), 0);
 	}
     }
@@ -381,9 +389,25 @@ Rivet_HGetVars(
 		       STRING_TO_UTF_TO_OBJ(env[i].val, POOL), 0);
     }
 
+    /* cleanup system cgi variables */
+    ap_clear_table(globals->r->subprocess_env);
+
+    return TCL_OK;
+}
+
+int
+Rivet_LoadCookies(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    int i;
+
     do { /* I do this because I want some 'local' variables */
 	ApacheCookieJar *cookies = ApacheCookie_parse(globals->r, NULL);
-	Tcl_Obj *cookieobj = Tcl_NewStringObj("::request::COOKIES", -1);
+	Tcl_Obj *cookieobj = Tcl_NewStringObj("::request::cookies", -1);
 
 	for (i = 0; i < ApacheCookieJarItems(cookies); i++) {
 	    ApacheCookie *c = ApacheCookieJarFetch(cookies, i);
@@ -394,15 +418,10 @@ Rivet_HGetVars(
 		Tcl_ObjSetVar2(interp, cookieobj,
 			       Tcl_NewStringObj(name, -1),
 			       Tcl_NewStringObj(value, -1), 0);
-/* 			       STRING_TO_UTF_TO_OBJ(name, POOL),
-			       STRING_TO_UTF_TO_OBJ(value, POOL), 0);  */
 	    }
 
 	}
     } while (0);
-
-    /* cleanup system cgi variables */
-    ap_clear_table(globals->r->subprocess_env);
 
     return TCL_OK;
 }
@@ -434,7 +453,8 @@ Rivet_Var(
     if (objc < 2 || objc > 3)
     {
 	Tcl_WrongNumArgs(interp, 1, objv,
-			 "(get varname|list varname|exists varname|names|number|all)");
+			 "(get varname|list varname|exists varname|names"
+			 "|number|all)");
 	return TCL_ERROR;
     }
     command = Tcl_GetString(objv[1]);
@@ -518,7 +538,7 @@ Rivet_Var(
 		    Tcl_IncrRefCount(result);
 		}
 		Tcl_ListObjAppendElement(interp, result,
-					 STRING_TO_UTF_TO_OBJ(parms[i].val, POOL));
+				     STRING_TO_UTF_TO_OBJ(parms[i].val, POOL));
 	    }
 	}
 
@@ -579,7 +599,8 @@ Rivet_Var(
 
     } else {
 	/* bad command  */
-	Tcl_AddErrorInfo(interp, "bad option: must be one of 'get, list, names, number, all'");
+	Tcl_AddErrorInfo(interp, "bad option: must be one of "
+		"'get, list, names, number, all'");
 	return TCL_ERROR;
     }
 
@@ -619,7 +640,7 @@ Rivet_Upload(
     ApacheUpload *upload;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(globals->r->server->module_config, &rivet_module);
+	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc < 2 || objc > 5)
     {
@@ -634,7 +655,8 @@ Rivet_Upload(
 	char *varname = NULL;
 	if (objc < 4)
 	{
-	    Tcl_WrongNumArgs(interp, 2, objv, "varname channel|save filename|var varname");
+	    Tcl_WrongNumArgs(interp, 2, objv,
+		"varname channel|save filename|var varname");
 	    return TCL_ERROR;
 	}
 	varname = Tcl_GetString(objv[2]);
@@ -668,11 +690,13 @@ Rivet_Upload(
 		    return TCL_ERROR;
 		}
 
-		savechan = Tcl_OpenFileChannel(interp, Tcl_GetString(objv[4]), "w", 0600);
+		savechan = Tcl_OpenFileChannel(interp, Tcl_GetString(objv[4]),
+						"w", 0600);
 		if (savechan == NULL)
 		    return TCL_ERROR;
 		else
-		    Tcl_SetChannelOption(interp, savechan, "-translation", "binary");
+		    Tcl_SetChannelOption(interp, savechan,
+			"-translation", "binary");
 
 		chan = Tcl_MakeFileChannel((ClientData)fileno(
 		    ApacheUpload_FILE(upload)), TCL_READABLE);
@@ -703,12 +727,14 @@ Rivet_Upload(
 		    bytes = Tcl_Alloc((unsigned)ApacheUpload_size(upload));
 		    chan = Tcl_MakeFileChannel((ClientData)fileno(
 			ApacheUpload_FILE(upload)), TCL_READABLE);
-		    Tcl_SetChannelOption(interp, chan, "-translation", "binary");
+		    Tcl_SetChannelOption(interp, chan,
+			"-translation", "binary");
 		    Tcl_SetChannelOption(interp, chan, "-encoding", "binary");
-		    /* put data in a variable  */
+		    /* Put data in a variable  */
 		    Tcl_ReadChars(chan, result, ApacheUpload_size(upload), 0);
 		} else {
-		    Tcl_AppendResult(interp, "Rivet_UploadFilesToVar is not set", NULL);
+		    Tcl_AppendResult(interp,
+			"Rivet_UploadFilesToVar is not set", NULL);
 		    return TCL_ERROR;
 		}
 	    }
@@ -721,7 +747,8 @@ Rivet_Upload(
 	char *infotype = NULL;
 	if (objc != 4)
 	{
-	    Tcl_WrongNumArgs(interp, 2, objv, "varname exists|size|type|filename");
+	    Tcl_WrongNumArgs(interp, 2, objv,
+		"varname exists|size|type|filename");
 	    return TCL_ERROR;
 	}
 	varname = Tcl_GetString(objv[2]);
@@ -743,9 +770,11 @@ Rivet_Upload(
 		else
 		    Tcl_SetStringObj(result, "", -1);
 	    } else if (!strcmp(infotype, "filename")) {
-		Tcl_SetStringObj(result, StringToUtf(upload->filename, POOL), -1);
+		Tcl_SetStringObj(result,
+				StringToUtf(upload->filename, POOL), -1);
 	    } else {
-		Tcl_AddErrorInfo(interp, "unknown upload info command, should be exists|size|type|filename");
+		Tcl_AddErrorInfo(interp,"unknown upload info command, should "
+			"be exists|size|type|filename");
 		return TCL_ERROR;
 	    }
 	} else {
@@ -785,7 +814,8 @@ Rivet_Info(
 {
     char *tble;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)ap_get_module_config(globals->r->server->module_config, &rivet_module);
+    rivet_server_conf *rsc =
+	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     tble = ap_psprintf(POOL,
 		       "<table border=0 bgcolor=green><tr><td>\n"
@@ -795,8 +825,6 @@ Rivet_Info(
 		       "<tr><td><font color=\"#ffffff\">PID: %d</font><br></td></tr>\n"
 		       "</table>\n"
 		       "</td></tr></table>\n", *(rsc->cache_free), getpid());
-/*     print_headers(globals->r);
-       flush_output_buffer(globals->r);  */
     Tcl_WriteObj(*(rsc->outchannel), Tcl_NewStringObj(tble, -1));
     return TCL_OK;
 }
@@ -804,12 +832,17 @@ Rivet_Info(
 /* Tcl command to erase body, so that only header is returned.
    Necessary for 304 responses */
 
-int Rivet_NoBody(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_NoBody(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(globals->r->server->module_config, &rivet_module);
+    rivet_server_conf *rsc =
+	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (*(rsc->content_sent) == 1)
 	return TCL_ERROR;
@@ -833,8 +866,13 @@ Rivet_init(Tcl_Interp *interp)
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,
-			"hgetvars",
-			Rivet_HGetVars,
+			"load_env",
+			Rivet_LoadEnv,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"load_cookies",
+			Rivet_LoadCookies,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,

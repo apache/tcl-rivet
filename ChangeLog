@@ -1,3 +1,20 @@
+2001-11-20  Damon J. Courtney <damon@unreality.com>
+
+	* src/tcl_commands.c
+	    Cleaned up some more code.  Just textual changes.
+	* src/mod_rivet.c
+	    Cleaned up some run-over lines and code.
+	* src/mod_rivet.c
+	    Changed module signature from "mod_rivet" to "Rivet"
+	* src/tcl_commands.c
+	    Changed hgetvars command to load_env command.
+	* src/tcl_command.c
+	    Moved loading of cookies to load_cookies command.
+	* src/tcl_command.c
+	    Renamed default load_env array from ENVS array to env.
+	* src/tcl_command.c
+	    Renamed default load_cookies array from COOKIES to cookies.
+
 2001-11-08  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (rivet_child_init): Fix loop, pass correct
@@ -15,4 +32,3 @@
 2001-09-23  David N. Welton  <davidw@dedasys.com>
 
 	* Initial commit and cleanup of old mod_dtcl code.
-

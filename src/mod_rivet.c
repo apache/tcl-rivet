@@ -59,7 +59,11 @@
 
 /* $Id$  */
 
-/* mod_rivet.c by David Welton <davidw@apache.org> - originally mod_include.  */
+/* mod_rivet.c by David Welton <davidw@apache.org>
+ *            and Damon Courtney <damon@unreality.com>
+ * - originally mod_include.
+ */
+
 /* See http://tcl.apache.org/mod_rivet/credits.ttml for additional credits. */
 
 #include "httpd.h"
@@ -84,16 +88,17 @@
 module MODULE_VAR_EXPORT rivet_module;
 
 static void tcl_init_stuff(server_rec *s, pool *p);
-static void copy_rivet_config( rivet_server_conf *oldrsc, rivet_server_conf *newrsc);
+static void copy_rivet_config( rivet_server_conf *oldrsc,
+				rivet_server_conf *newrsc);
 static int get_ttml_file(request_rec *r, rivet_server_conf *rsc,
-			 Tcl_Interp *interp, char *filename, int toplevel, Tcl_Obj *outbuf);
+			 Tcl_Interp *interp, char *filename, int toplevel,
+			 Tcl_Obj *outbuf);
 static int send_content(request_rec *);
-static int execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r);
+static int execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf,
+				request_rec *r);
 
-/* just need some arbitrary non-NULL pointer which can't also be a request_rec */
+/* Need some arbitrary non-NULL pointer which can't also be a request_rec */
 #define NESTED_INCLUDE_MAGIC	(&rivet_module)
-
-#define RIVET_SERVER_CONF(module)	(rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 
 /* Set up the content type header */
 
@@ -101,14 +106,12 @@ int
 set_header_type(request_rec *r, char *header)
 {
     rivet_server_conf *rsc = rivet_get_conf(r);
-    if (*(rsc->headers_set) == 0)
-    {
-	r->content_type = header;
-	*(rsc->headers_set) = 1;
-	return 1;
-    } else {
-	return 0;
-    }
+
+    if( *(rsc->headers_set) ) return 0;
+
+    r->content_type = header;
+    *(rsc->headers_set) = 1;
+    return 1;
 }
 
 /* Printer headers if they haven't been printed yet */
@@ -116,17 +119,15 @@ int
 print_headers(request_rec *r)
 {
     rivet_server_conf *rsc = rivet_get_conf(r);
-    if (*(rsc->headers_printed) == 0)
-    {
-	if (*(rsc->headers_set) == 0)
-	    set_header_type(r, DEFAULT_HEADER_TYPE);
 
-	ap_send_http_header(r);
-	*(rsc->headers_printed) = 1;
-	return 1;
-    } else {
-	return 0;
-    }
+    if( *(rsc->headers_printed) ) return 0;
+
+    if (*(rsc->headers_set) == 0)
+	set_header_type(r, DEFAULT_HEADER_TYPE);
+
+    ap_send_http_header(r);
+    *(rsc->headers_printed) = 1;
+    return 1;
 }
 
 /* Print nice HTML formatted errors */
@@ -161,7 +162,8 @@ flush_output_buffer(request_rec *r)
     rivet_server_conf *rsc = rivet_get_conf(r);
     if (Tcl_DStringLength(rsc->buffer) != 0)
     {
-	ap_rwrite(Tcl_DStringValue(rsc->buffer), Tcl_DStringLength(rsc->buffer), r);
+	ap_rwrite(Tcl_DStringValue(rsc->buffer),
+		    Tcl_DStringLength(rsc->buffer), r);
 	Tcl_DStringInit(rsc->buffer);
     }
     *(rsc->content_sent) = 1;
@@ -287,7 +289,8 @@ get_ttml_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 	if (ferror(f))
 	{
 	    ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
-			 "Encountered error in mod_rivet getchar routine while reading %s",
+			 "Encountered error in mod_rivet getchar routine "
+			 "while reading %s",
 			 r->uri);
 	    ap_pfclose( r->pool, f);
 	}
@@ -305,7 +308,9 @@ get_ttml_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 	if (rsc->rivet_after_script)
 	    Tcl_AppendObjToObj(outbuf, rsc->rivet_after_script);
 
-/* 	Tcl_AppendToObj(outbuf, "\n}\nnamespace delete request\n", -1); seems redundant */
+/* Seems redundant
+ 	Tcl_AppendToObj(outbuf, "\n}\nnamespace delete request\n", -1);
+ */
 	Tcl_AppendToObj(outbuf, "\n}\n", -1);
     }
     else
@@ -328,7 +333,7 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     conf = rivet_get_conf(r);
     if (Tcl_EvalObj(interp, outbuf) == TCL_ERROR)
     {
-	Tcl_Obj *errscript = conf->rivet_error_script ? conf->rivet_error_script :
+	Tcl_Obj *errscript =
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
 
         print_headers(r);
@@ -347,7 +352,7 @@ execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 /*                  "</pre><b>OUTPUT BUFFER</b><pre>\n",
                     Tcl_GetStringFromObj(outbuf, (int *)NULL));  */
     } else {
-        /* We make sure to flush the output if buffer_add was the only output */
+        /* Make sure to flush the output if buffer_add was the only output */
         print_headers(r);
         flush_output_buffer(r);
     }
@@ -399,7 +404,7 @@ get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
 	outbuf = Tcl_NewObj();
 	Tcl_IncrRefCount(outbuf);
 
-	if(!strcmp(r->content_type, "application/x-httpd-tcl") || toplevel == 0)
+	if( STREQU( r->content_type, "application/x-httpd-tcl") || !toplevel )
 	{
 	    /* It's a TTML file - which we always are if toplevel is
                0, meaning we are in the Parse command */
@@ -416,10 +421,10 @@ get_parse_exec_file(request_rec *r, rivet_server_conf *rsc,
 
 	if (*(rsc->cache_free)) {
 	    rsc->objCacheList[-- *(rsc->cache_free) ] = strdup(hashKey);
-	} else if (*(rsc->cache_size)) { /* if it's zero, we just skip this... */
+	} else if (*(rsc->cache_size)) { /* If it's zero, we just skip this. */
 	    Tcl_HashEntry *delEntry;
 	    delEntry = Tcl_FindHashEntry(rsc->objCache,
-					 rsc->objCacheList[*(rsc->cache_size) - 1]);
+				     rsc->objCacheList[*(rsc->cache_size)-1]);
 	    Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
 	    Tcl_DeleteHashEntry(delEntry);
 	    free(rsc->objCacheList[*(rsc->cache_size) - 1]);
@@ -488,7 +493,8 @@ send_content(request_rec *r)
 
     if (Tcl_EvalObj(interp, rsc->namespacePrologue) == TCL_ERROR)
     {
-	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "Could not create request namespace\n");
+	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
+			"Could not create request namespace\n");
 	return HTTP_BAD_REQUEST;
     }
 
@@ -536,7 +542,8 @@ send_content(request_rec *r)
 		    Tcl_Obj *concat[2];
 		    concat[0] = oldval;
 		    concat[1] = newval;
-		    Tcl_ObjSetVar2(interp, varsobj, newkey, Tcl_ConcatObj(2, concat), 0);
+		    Tcl_ObjSetVar2(interp, varsobj, newkey,
+					Tcl_ConcatObj(2, concat), 0);
 		}
 	    }
 	}
@@ -613,9 +620,9 @@ tcl_init_stuff(server_rec *s, pool *p)
 {
     int rslt;
     Tcl_Interp *interp;
-    rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(s->module_config, &rivet_module);
+    rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
     server_rec *sr;
+
     /* Initialize TCL stuff  */
 
     Tcl_FindExecutable(NULL);
@@ -623,7 +630,8 @@ tcl_init_stuff(server_rec *s, pool *p)
     rsc->server_interp = interp; /* root interpreter */
 
     /* Create TCL commands to deal with Apache's BUFFs. */
-    *(rsc->outchannel) = Tcl_CreateChannel(&ApacheChan, "apacheout", rsc, TCL_WRITABLE);
+    *(rsc->outchannel) = Tcl_CreateChannel(&ApacheChan, "apacheout", rsc,
+					    TCL_WRITABLE);
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffering", "none");
@@ -631,7 +639,8 @@ tcl_init_stuff(server_rec *s, pool *p)
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
     if (interp == NULL)
     {
-	ap_log_error(APLOG_MARK, APLOG_ERR, s, "Error in Tcl_CreateInterp, aborting\n");
+	ap_log_error(APLOG_MARK, APLOG_ERR, s,
+		"Error in Tcl_CreateInterp, aborting\n");
 	exit(1);
     }
     if (Tcl_Init(interp) == TCL_ERROR)
@@ -639,17 +648,21 @@ tcl_init_stuff(server_rec *s, pool *p)
 	ap_log_error(APLOG_MARK, APLOG_ERR, s, Tcl_GetStringResult(interp));
 	exit(1);
     }
+
     Rivet_init( interp );
+
     rsc->namespacePrologue = Tcl_NewStringObj(
 	"catch { namespace delete request }\n"
 	"namespace eval request { }\n"
-	"proc ::request::global { args } { foreach arg $args { uplevel \"::global ::request::$arg\" } }\n", -1);
+	"proc ::request::global { args } { "
+	"foreach arg $args { uplevel \"::global ::request::$arg\" } }\n", -1);
     Tcl_IncrRefCount(rsc->namespacePrologue);
 
 #if DBG
     ap_log_error(APLOG_MARK, APLOG_ERR, s, "Config string = \"%s\"",
-		 Tcl_GetStringFromObj(rsc->rivet_global_init_script, NULL));  /* XXX */
-    ap_log_error(APLOG_MARK, APLOG_ERR, s, "Cache size = \"%d\"", *(rsc->cache_size));  /* XXX */
+		 Tcl_GetStringFromObj(rsc->rivet_global_init_script, NULL));
+    ap_log_error(APLOG_MARK, APLOG_ERR, s, "Cache size = \"%d\"",
+		*(rsc->cache_size));
 #endif
 
     if (rsc->rivet_global_init_script != NULL)
@@ -692,13 +705,15 @@ tcl_init_stuff(server_rec *s, pool *p)
 	    if (rsc->seperate_virtual_interps != 0)
 		myrsc->server_interp = NULL;
 	} else {
-	    myrsc = (rivet_server_conf *) ap_get_module_config(sr->module_config, &rivet_module);
+	    myrsc = RIVET_SERVER_CONF( sr->module_config );
 	}
 	if (!myrsc->server_interp)
 	{
-	    myrsc->server_interp = Tcl_CreateSlave(interp, sr->server_hostname, 0);
+	    myrsc->server_interp = Tcl_CreateSlave(interp,
+						    sr->server_hostname, 0);
 	    Rivet_init( myrsc->server_interp );
-	    Tcl_SetChannelOption(myrsc->server_interp, *(rsc->outchannel), "-buffering", "none");
+	    Tcl_SetChannelOption(myrsc->server_interp, *(rsc->outchannel),
+				    "-buffering", "none");
 	    Tcl_RegisterChannel(myrsc->server_interp, *(rsc->outchannel));
 	}
 
@@ -714,9 +729,9 @@ rivet_init_handler(server_rec *s, pool *p)
     tcl_init_stuff(s, p);
 #endif
 #ifndef HIDE_RIVET_VERSION
-    ap_add_version_component("mod_rivet/"RIVET_VERSION);
+    ap_add_version_component("Rivet / "RIVET_VERSION);
 #else
-    ap_add_version_component("mod_rivet");
+    ap_add_version_component("Rivet");
 #endif /* !HIDE_RIVET_VERSION */
 }
 
@@ -1023,8 +1038,7 @@ rivet_child_init(server_rec *s, pool *p)
 void
 rivet_child_exit(server_rec *s, pool *p)
 {
-    rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(s->module_config, &rivet_module);
+    rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
 
     if( rsc->rivet_child_exit_script == NULL ) return;
 

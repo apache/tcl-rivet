@@ -1,1 +1,4 @@
 * Kill 'old style vars and use only command'.
+
+Add a '-virtual' option to include and parse.  This will include or parse
+a file based on the server root.

@@ -93,6 +93,8 @@ rivet_server_conf *rivet_get_conf(request_rec *r);
 /* Macro to Tcl Objectify StringToUtf stuff */
 #define STRING_TO_UTF_TO_OBJ(string, pool) Tcl_NewStringObj(StringToUtf(string, pool), -1)
 
+#define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
+
 #define STREQU(s1, s2) (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 
 #endif
