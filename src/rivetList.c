@@ -520,6 +520,9 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
  * Rivet_initList --
  *   Initialize the list commands in an interpreter.
  *
+ *   These routines have been examined and are believed to be safe in a safe
+ *   interpreter, as they only manipulate Tcl lists, strings, and arrays.
+ *
  * Parameters:
  *   o interp - Interpreter to add commands to.
  *-----------------------------------------------------------------------------

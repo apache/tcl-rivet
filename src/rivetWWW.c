@@ -337,6 +337,9 @@ TCL_CMD_HEADER( Rivet_EscapeShellCommandCmd )
  * Rivet_InitWWW --
  *
  *   Initialize the WWW functions.
+ *
+ *   These functions have been examined and are believed to be safe for use
+ *   in safe interpreters, as they process strings only.
  *-----------------------------------------------------------------------------
  */
 int

@@ -144,6 +144,18 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
 #endif /* ! crypt */
 }
 
+
+/*-----------------------------------------------------------------------------
+ * Rivet_initCrypt --
+ *   Initialize the encrypt, decrypt and crypt commands in an interpreter.
+ *
+ *   These routines have been examined and are believed to be safe in a safe
+ *   interpreter, as they only manipulate and return Tcl strings.
+ *
+ * Parameters:
+ *   o interp - Interpreter to add commands to.
+ *-----------------------------------------------------------------------------
+ */
 int
 Rivet_InitCrypt( Tcl_Interp *interp )
 {

@@ -1,0 +1,27 @@
+
+
+$Id$
+
+Building Rivet isn't 100% turnkey under Mac OS X, but it's getting better
+and hopefully it won't be too long until it builds without tweaking.
+
+In the meantime, here's what we do:
+
+Build and install tclsh8.4 and apache from darwinports, plus other stuff
+like postgres.  Go get Pgtcl off of gborg.postgresql.org and get it built
+and installed.  (If you want to use a SQL database, this is one way to go
+about it, and we've had good results with it.)
+
+Run the configure script:
+
+tclsh8.4 ./configure.tcl -prefix /opt/local -with-apxs /opt/local/sbin/apxs -verbose -with-tclconfig /opt/local/lib/tclConfig.sh
+
+It will complain about several undefined variables.
+
+Edit configs.tcl and change
+
+set ::configs::TCL_SHLIB_LD {}
+
+to be
+
+set ::configs::TCL_SHLIB_LD {cc -dynamiclib -undefined suppress -flat_namespace}

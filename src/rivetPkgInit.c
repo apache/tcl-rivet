@@ -21,6 +21,15 @@
 #include <tcl.h>
 #include "rivet.h"
 
+
+/*-----------------------------------------------------------------------------
+ * Rivet_Init --
+ *   Install the commands provided by librivet into an interpreter.
+ *
+ * Parameters:
+ *   o interp - Interpreter to add commands to.
+ *-----------------------------------------------------------------------------
+ */
 int
 Rivet_Init( Tcl_Interp *interp )
 {
@@ -32,3 +41,27 @@ Rivet_Init( Tcl_Interp *interp )
 
     return Tcl_PkgProvide( interp, "Rivet", "1.1" );
 }
+
+
+/*-----------------------------------------------------------------------------
+ * Rivet_SafeInit --
+ *   Install the commands provided by librivet that are believed to be
+ *   safe for use in safe interpreters, into a safe interpreter.
+ *
+ * Parameters:
+ *   o interp - Interpreter to add commands to.
+ *-----------------------------------------------------------------------------
+ */
+int
+Rivet_SafeInit( Tcl_Interp *interp )
+{
+    Rivet_InitList( interp );
+
+    Rivet_InitCrypt( interp );
+
+    Rivet_InitWWW( interp );
+
+    return Tcl_PkgProvide( interp, "Rivet", "1.1" );
+}
+
+

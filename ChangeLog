@@ -1,4 +1,15 @@
 2004-09-16  Karl Lehenbauer  <karl@sc.com>
+	* src/rivetPkgInit.c: Added a Rivet_SafeInit so lib can
+	be loaded from safe interpreters, which also makes it work
+	better under Mac OS X.
+
+	* src/rivetCrypt.c: Added function header to init routine.
+	* src/rivetList.c: (same)
+	* src/rivetWWW.c: (same)
+
+	* README.MacOSX: Temporary file to document Mac OS X build quirks.
+
+2004-09-16  Karl Lehenbauer  <karl@sc.com>
 
 	* src/configure.tcl: If a configuration variable in
 	  tclConfig.sh ever had an equal sign in the "value"
