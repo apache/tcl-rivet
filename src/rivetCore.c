@@ -40,6 +40,7 @@ Rivet_MakeURL(
     int objc,
     Tcl_Obj *CONST objv[])
 {
+    Tcl_Obj *result;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if (objc != 2)
@@ -47,9 +48,8 @@ Rivet_MakeURL(
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;
     }
-    Tcl_SetObjResult( interp, Tcl_NewStringObj(
-	ap_construct_url(POOL, Tcl_GetString(objv[1]), globals->r),
-	-1 ) );
+    TclWeb_MakeURL(result, Tcl_GetString(objv[1]), globals->req);
+    Tcl_SetObjResult(interp, result);
     return TCL_OK;
 }
 

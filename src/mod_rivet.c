@@ -502,7 +502,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
     if( Tcl_EvalFile( interp, ap_server_root_relative(p, RIVET_INIT) )
 	== TCL_ERROR ) {
-	ap_log_error( APLOG_MARK, APLOG_ERR, s, Tcl_GetStringResult(interp) );
+	ap_log_error( APLOG_MARK, APLOG_ERR, s, "init.tcl must be installed correctly for Apache Rivet to function: %s", Tcl_GetStringResult(interp) );
 	exit(1);
     }
 

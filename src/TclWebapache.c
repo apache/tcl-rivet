@@ -33,7 +33,7 @@ TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
     return TCL_OK;
 }
 
-int
+INLINE int
 TclWeb_SendHeaders(TclWebRequest *req)
 {
     ap_send_http_header(req->req);
@@ -107,6 +107,12 @@ TclWeb_SetStatus(int status, TclWebRequest *req)
     return TCL_OK;
 }
 
+int
+TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
+{
+    result = Tcl_NewStringObj(ap_construct_url(TCLWEBPOOL, filename, req->req), -1);
+    return TCL_OK;
+}
 
 int
 TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req)

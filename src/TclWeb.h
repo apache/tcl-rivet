@@ -78,6 +78,8 @@ int TclWeb_HeaderSet(char *header, char *val, TclWebRequest *req);
 
 int TclWeb_SetStatus(int status, TclWebRequest *req);
 
+int TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req);
+
 int TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req);
 
 int TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, TclWebRequest *req);

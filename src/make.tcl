@@ -169,8 +169,8 @@ AddNode libtesting.so {
 AddNode install {
     depends "$MOD_SHLIB $LIB_SHLIB"
     tclcommand "file copy -force $MOD_SHLIB $LIBEXECDIR"
-    tclcommand "file copy -force ../rivet $PREFIX"
-    tclcommand "file copy -force $LIB_SHLIB ../rivet/packages/rivet"
+    tclcommand "file copy -force [file join .. rivet] $PREFIX"
+    tclcommand "file copy -force $LIB_SHLIB [file join .. rivet packages rivet]"
 }
 
 Run
