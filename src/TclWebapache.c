@@ -562,7 +562,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
 	char *bytes = NULL;
 	Tcl_Channel chan = NULL;
 
-	bytes = Tcl_Alloc((unsigned)ApacheUpload_size(req->upload));
+	/* bytes = Tcl_Alloc((unsigned)ApacheUpload_size(req->upload)); */
 #ifdef __MINGW32__
 	chan = Tcl_MakeFileChannel(
 	    (ClientData)_get_osfhandle(

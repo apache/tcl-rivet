@@ -1,4 +1,10 @@
+2003-03-30  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Fixed example configuration directive.
+
 2003-03-27  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c (TclWeb_UploadData): Comment out unused alloc.
 
 	* src/rivetWWW.c (Rivet_UnescapeStringCmd): Free memory allocated
 	with Tcl_Alloc.

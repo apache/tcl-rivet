@@ -264,7 +264,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 		  is an actual Tcl script, so to run a file, you would
 		  do:
 
-		  <programlisting>Rivet_Script GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
+		  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
 		</para>
 	      </listitem>
 	    </varlistentry>
