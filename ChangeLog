@@ -1,3 +1,10 @@
+2005-03-12  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_SendContent): Use static objects for
+	scripts that are used for each request, in order to keep reusing
+	them.
+	(Rivet_PerInterpInit): Switch back to using Tcl_PkgRequire.
+
 2005-01-08  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* rivet/packages/dio/diodisplay.tcl: Accept arguments to the
@@ -17,6 +24,10 @@
 	  dup all of showform's functionality.
 
 	* rivet/packages/form/form.tcl: Commented the package.
+
+2005-01-03  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Use 'mail-archives' instead of nagoya.
 
 2004-12-22  David N. Welton  <davidw@dedasys.com>
 
@@ -44,13 +55,13 @@
 
 2004-12-03  Karl Lehenbauer  <karl-rivet@sc.com>
 
-        * rivet/packages/dio/dio.tcl: Cause fatal database errors such
+	* rivet/packages/dio/dio.tcl: Cause fatal database errors such
 	  as bad syntax, etc, to raise a Tcl error in many methods that
 	  used to just return 1 or 0 (like DIO store).
 
 	* configure.ac: Remove superfluous commented-out lines
 
-        * Add BUGS file.  Update STATUS and VERSION files.
+	* Add BUGS file.  Update STATUS and VERSION files.
 
 2004-12-02  David N. Welton  <davidw@dedasys.com>
 
@@ -64,9 +75,9 @@
 
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
 
-        * Collected some build notes in README.configure
+	* Collected some build notes in README.configure
 
-        * Clean up presentation of --with-apxs and --with-tclsh and
+	* Clean up presentation of --with-apxs and --with-tclsh and
 	  have them show up when configure --help is run.
 
 	* tclconfig/tcl.m4, configure.ac, config.h, src/*.c:
@@ -81,16 +92,16 @@
 	  as well as the technique for using automake to simplify
 	  the build)
 
-        * Move aclocal.m4 to acinclude.m4 -- we need the aclocal command
+	* Move aclocal.m4 to acinclude.m4 -- we need the aclocal command
 	  to generate acinclude.m4 based on aclocal.m4 and stuff it gleans
 	  from the configure.ac script, etc.
 
-        * configure.ac: A path to tclsh is automatically figured out by the 
+	* configure.ac: A path to tclsh is automatically figured out by the 
 	  TEA 3.1 build stuff.  However it is also possible to override
 	  with --with-tclsh, and the configure script also makes sure
 	  there at least is a file there as well.
 
-        * src/configure.ac et al: Get automake, aclocal, and autoconf to run 
+	* src/configure.ac et al: Get automake, aclocal, and autoconf to run 
 	  without complaint, generating the configure script, Makefile.in 
 	  files, etc.
 

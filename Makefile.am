@@ -14,6 +14,7 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 install-data-local:
-	cp -r rivet $(DESTDIR)/@TCL_PACKAGE_PATH@
+	$(mkinstalldirs) $(DESTDIR)@libdir@/rivet@VERSION@
+	cp -r rivet/* $(DESTDIR)@libdir@/rivet@VERSION@
 # This little bit of line noise generates the package index file (pkgIndex.tcl)
-	( cd $(DESTDIR)/@TCL_PACKAGE_PATH@/rivet ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	( cd  $(DESTDIR)@libdir@/rivet@VERSION@ ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )

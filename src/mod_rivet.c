@@ -1,6 +1,6 @@
 /* mod_rivet.c -- The apache module itself, for Apache 1.3. */
 
-/* Copyright 2000-2004 The Apache Software Foundation
+/* Copyright 2000-2005 The Apache Software Foundation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@
 
 /* Tcl includes */
 #include <tcl.h>
+/* There is code ifdef'ed out below which uses internal
+ * declerations. */
+/* #include <tclInt.h> */
 #include <string.h>
 
 /* Rivet Includes */
@@ -389,8 +392,8 @@ Rivet_SendContent(request_rec *r)
     int retval;
 
     Tcl_Interp	*interp;
-    Tcl_Obj	*request_init;
-    Tcl_Obj	*request_cleanup;
+    static Tcl_Obj	*request_init = NULL;
+    static Tcl_Obj	*request_cleanup = NULL;
 
     rivet_interp_globals *globals = NULL;
     rivet_server_conf *rsc = NULL;
@@ -441,24 +444,38 @@ Rivet_SendContent(request_rec *r)
     ap_chdir_file(r->filename);
 
     Rivet_PropagatePerDirConfArrays( interp, rdc );
-    request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
-    Tcl_IncrRefCount(request_init);
-    if (Tcl_EvalObjEx(interp, request_init, TCL_EVAL_DIRECT) == TCL_ERROR)
+
+    /* Initialize this the first time through and keep it around. */
+    if (request_init == NULL) {
+	request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+	Tcl_IncrRefCount(request_init);
+    }
+    if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
 			"Could not create request namespace\n");
 	retval = HTTP_BAD_REQUEST;
-	Tcl_DecrRefCount(request_init);
 	goto sendcleanup;
     }
-    Tcl_DecrRefCount(request_init);
 
+    /* Set the script name. */
     {
-	Tcl_Obj *infoscript = Tcl_NewStringObj("info script ", -1);
-	Tcl_IncrRefCount(infoscript);
-	Tcl_AppendToObj(infoscript, r->filename, -1);
-	Tcl_EvalObjEx(interp, infoscript, TCL_EVAL_DIRECT);
-	Tcl_DecrRefCount(infoscript);
+#if 1
+       Tcl_Obj *infoscript = Tcl_NewStringObj("info script ", -1);
+       Tcl_IncrRefCount(infoscript);
+       Tcl_AppendToObj(infoscript, r->filename, -1);
+       Tcl_EvalObjEx(interp, infoscript, TCL_EVAL_DIRECT);
+       Tcl_DecrRefCount(infoscript);
+#else
+       /* This speeds things up, but you have to use Tcl internal
+	* declerations, which is not so great... */
+	Interp *iPtr = (Interp *) interp;
+	if (iPtr->scriptFile != NULL) {
+	    Tcl_DecrRefCount(iPtr->scriptFile);
+	}
+	iPtr->scriptFile = Tcl_NewStringObj(r->filename, -1);
+	Tcl_IncrRefCount(iPtr->scriptFile);
+#endif
     }
 
     /* Apache Request stuff */
@@ -494,17 +511,16 @@ Rivet_SendContent(request_rec *r)
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
 
-    request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
-    Tcl_IncrRefCount(request_cleanup);
-    if(Tcl_EvalObjEx(interp, request_cleanup, TCL_EVAL_DIRECT) == TCL_ERROR) {
+    if (request_cleanup == NULL) {
+	request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+	Tcl_IncrRefCount(request_cleanup);
+    }
+    if(Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
-    Tcl_DecrRefCount(request_cleanup);
 
     /* Reset globals */
-
-
     Rivet_CleanupRequest( r );
 
     retval = OK;
@@ -647,8 +663,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
     globals = ap_pcalloc(p, sizeof(rivet_interp_globals));
     Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
-    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
-     if (Tcl_Eval (interp, "source $::server(RIVET_INIT)") == TCL_ERROR) {
+    /* Eval Rivet's init.tcl file to load in the Tcl-level
+    commands. */
+    if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
 	ap_log_error( APLOG_MARK, APLOG_ERR, s,
 		      "init.tcl must be installed correctly for Apache Rivet to function: %s",
 		      Tcl_GetStringResult(interp) );

@@ -3964,7 +3964,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </para>
       <para>
 	The mailing list archives are available at <ulink
-	  url="http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118"/>
+	  url="http://mail-archives.apache.org/eyebrowse/SummarizeList?listId=118"/>
       </para>
     </section>
 
@@ -4020,7 +4020,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <para>
 	Apache Rivet uses the Apache Bug Tracking system at <ulink
-	  url="http://nagoya.apache.org/bugzilla/"></ulink>.  Here,
+	  url="http://issues.apache.org/bugzilla/"></ulink>.  Here,
 	you can report problems, or check and see if existing issues
 	are already known and being dealt with.
       </para>
