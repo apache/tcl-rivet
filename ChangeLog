@@ -1,3 +1,8 @@
+2002-12-09  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_SendContent): Switched from EvalObj to
+	EvalObjEx.
+
 2002-12-04  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c (TclWeb_GetEnvVars): Put DecrRefCount back in

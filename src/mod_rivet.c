@@ -141,7 +141,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	    errscript = Tcl_NewStringObj(conf->rivet_error_script, -1);
 	}
 	Tcl_IncrRefCount(errscript);
-	if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
+	if (Tcl_EvalObjEx(interp, errscript, 0) == TCL_ERROR) {
 	    CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
 	    TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>", 1,
 				    globals->req);
@@ -417,7 +417,7 @@ Rivet_SendContent(request_rec *r)
     Rivet_PropagatePerDirConfArrays( interp, rdc );
 
     request_init = Tcl_NewStringObj("::Rivet::initialize_request\n",-1);
-    if (Tcl_EvalObj(interp, request_init) == TCL_ERROR)
+    if (Tcl_EvalObjEx(interp, request_init, TCL_EVAL_DIRECT) == TCL_ERROR)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
 			"Could not create request namespace\n");
@@ -464,7 +464,7 @@ Rivet_SendContent(request_rec *r)
     }
 
     request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
-    if(Tcl_EvalObj(interp, request_cleanup) == TCL_ERROR) {
+    if(Tcl_EvalObjEx(interp, request_cleanup, TCL_EVAL_DIRECT) == TCL_ERROR) {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
