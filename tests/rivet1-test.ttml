@@ -15,11 +15,11 @@ puts "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!\n"
 if { [ var number ] > 0 } {
     # get/post variables 1.1
     if { [ var exists foobar ] } {
-	puts "VARS(foobar) = [var get foobar]\n"
+	puts "\[var get foobar\] = [var get foobar]\n"
     }
     # get/post variables 1.{2,3}
     if { [ var exists Más ] } {
-	puts "VARS(Más) = [var get Más]\n"
+	puts "\[var get Más\] = [var get Más]\n"
     }
 }
 
