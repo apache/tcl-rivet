@@ -1,5 +1,8 @@
 2003-05-14  David N. Welton  <davidw@dedasys.com>
 
+	* src/make.tcl: Added PKGINDEX as list of dependencies for rolling
+	a distribution.  Updated STATUS file.
+
 	* rivet/packages/commserver/commserver.tcl: Added commserver
 	package as one potential IPC method.
 

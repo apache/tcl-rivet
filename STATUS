@@ -18,6 +18,3 @@ Work in progress:
    * Need a good thread strategy.
 
 *) Tcl code
-
-   * In make.tcl, create pkgIndex.tcl that includes all the
-     sub-packages.

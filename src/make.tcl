@@ -268,7 +268,7 @@ AddNode distdoc {
 # moment, as it uses the bourne shell and unix commands.
 
 AddNode dist {
-    depends {distclean distdoc ../VERSION}
+    depends distclean distdoc ../VERSION $PKGINDEX
     tcl {
 	set fl [open [file join .. VERSION]]
 	set VERSION [string trim [read $fl]]
