@@ -56,89 +56,95 @@ set LIB_OBJECTS "rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o"
 
 set TCL_LIBS "$TCL_LIBS -lcrypt"
 
+set XML_DOCS [glob [file join .. doc packages * *].xml]
+set HTML_DOCS [string map {.xml .html} $XML_DOCS]
+set XSL [file join .. doc rivet.xsl]
+
 # ------------
 
 # Verbose
 
 # AddNode adds a compile target
+
 # depends lists the nodes on which it depends
-# command is the command to compile
+
+# sh is the command to execute
 
 AddNode apache_multipart_buffer.o {
     depends "apache_multipart_buffer.c apache_multipart_buffer.h"
     set COMP [lremove $COMPILE -Wconversion]
-    command {$COMP apache_multipart_buffer.c}
+    sh {$COMP apache_multipart_buffer.c}
 }
 
 AddNode apache_request.o {
     depends "apache_request.c apache_request.h"
     set COMP [lremove $COMPILE -Wconversion]
-    command {$COMP apache_request.c}
+    sh {$COMP apache_request.c}
 }
 
 AddNode rivetChannel.o {
     depends "rivetChannel.c rivetChannel.h mod_rivet.h"
-    command {$COMPILE rivetChannel.c}
+    sh {$COMPILE rivetChannel.c}
 }
 
 AddNode rivetParser.o {
     depends "rivetParser.c rivetParser.h mod_rivet.h"
-    command {$COMPILE rivetParser.c}
+    sh {$COMPILE rivetParser.c}
 }
 
 AddNode rivetCore.o {
     depends "rivetCore.c rivet.h mod_rivet.h"
-    command {$COMPILE rivetCore.c}
+    sh {$COMPILE rivetCore.c}
 }
 
 AddNode rivetCrypt.o {
     depends "rivetCrypt.c"
-    command {$COMPILE rivetCrypt.c}
+    sh {$COMPILE rivetCrypt.c}
 }
 
 AddNode rivetList.o {
     depends "rivetList.c"
-    command {$COMPILE rivetList.c}
+    sh {$COMPILE rivetList.c}
 }
 
 AddNode rivetWWW.o {
     depends "rivetWWW.c"
-    command {$COMPILE rivetWWW.c}
+    sh {$COMPILE rivetWWW.c}
 }
 
 AddNode rivetPkgInit.o {
     depends "rivetPkgInit.c"
-    command {$COMPILE rivetPkgInit.c}
+    sh {$COMPILE rivetPkgInit.c}
 }
 
 AddNode mod_rivet.o {
     depends "mod_rivet.c mod_rivet.h apache_request.h parser.h"
-    command {$COMPILE mod_rivet.c}
+    sh {$COMPILE mod_rivet.c}
 }
 
 AddNode TclWebapache.o {
     depends "TclWebapache.c mod_rivet.h apache_request.h"
-    command {$COMPILE TclWebapache.c}
+    sh {$COMPILE TclWebapache.c}
 }
 
 AddNode librivet.a {
     depends $LIB_OBJECTS
-    command {$TCL_STLIB_LD $LIB_STLIB $LIB_OBJECTS}
+    sh {$TCL_STLIB_LD $LIB_STLIB $LIB_OBJECTS}
 }
 
 AddNode librivet.so {
     depends $LIB_OBJECTS
-    command {$TCL_SHLIB_LD -o $LIB_SHLIB $LIB_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
+    sh {$TCL_SHLIB_LD -o $LIB_SHLIB $LIB_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
 
 AddNode mod_rivet.a {
     depends $MOD_OBJECTS
-    command {$TCL_STLIB_LD $MOD_STLIB $MOD_OBJECTS}
+    sh {$TCL_STLIB_LD $MOD_STLIB $MOD_OBJECTS}
 }
 
 AddNode mod_rivet.so {
     depends $MOD_OBJECTS
-    command {$TCL_SHLIB_LD -o $MOD_SHLIB $MOD_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
+    sh {$TCL_SHLIB_LD -o $MOD_SHLIB $MOD_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
 
 AddNode all {
@@ -158,25 +164,37 @@ AddNode static {
 }
 
 AddNode clean {
-    command {rm -f [glob -nocomplain *.o]}
-    command {rm -f [glob -nocomplain *.so]}
-    command {rm -f [glob -nocomplain *.a]}
+    sh {rm -f [glob -nocomplain *.o]}
+    sh {rm -f [glob -nocomplain *.so]}
+    sh {rm -f [glob -nocomplain *.a]}
 }
 
-AddNode testing.o {
-    command {$COMPILE testing.c}
-}
+#AddNode testing.o {
+#    sh {$COMPILE testing.c}
+#}
 
-AddNode libtesting.so {
-    depends {parser.o testing.o}
-    command {$TCL_SHLIB_LD -o libtesting.so parser.o testing.o}
-}
+#AddNode libtesting.so {
+#    depends {parser.o testing.o}
+#    sh {$TCL_SHLIB_LD -o libtesting.so parser.o testing.o}
+#}
 
 AddNode install {
     depends "$MOD_SHLIB $LIB_SHLIB"
-    tclcommand "file copy -force $MOD_SHLIB $LIBEXECDIR"
-    tclcommand "file copy -force [file join .. rivet] $PREFIX"
-    tclcommand "file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]"
+    tcl "file copy -force $MOD_SHLIB $LIBEXECDIR"
+    tcl "file copy -force [file join .. rivet] $PREFIX"
+    tcl "file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]"
+}
+
+foreach doc $HTML_DOCS {
+    set xml [string map {.html .xml} $doc]
+    AddNode $doc {
+	depends "$XSL $xml"
+	sh "xsltproc --nonet -o $doc $XSL $xml"
+    }
+}
+
+AddNode distdoc {
+    depends "$XSL $HTML_DOCS"
 }
 
 Run
