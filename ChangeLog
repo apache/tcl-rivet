@@ -1,3 +1,15 @@
+2004-09-29  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (TestpanicCmd): Added command to test panics.
+
+	* src/mod_rivet.c (Rivet_Panic): Added panic proc that tries to
+	log the error to disk.
+
+2004-09-20  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/packages/rivet_ncgi/rivet_ncgi.tcl: Compatibility layer
+	for tcllib's ncgi package.
+
 2004-09-20  Karl Lehenbauer  <karl@sc.com>
 	* src/mod_rivet.c (Rivet_PerInterpInit): Load the init.tcl file
 	with an explicit path rather than using Tcl_PkgRequire.  Previously, 

@@ -38,6 +38,10 @@
 
 module MODULE_VAR_EXPORT rivet_module;
 
+/* This is used *only* in the PanicProc.  Otherwise, don't touch
+ * it! */
+static request_rec *globalrr;
+
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
 #define NESTED_INCLUDE_MAGIC	(&rivet_module)
 
@@ -389,6 +393,10 @@ Rivet_SendContent(request_rec *r)
 
     Tcl_MutexLock(&sendMutex);
 
+    /* Set the global request req to know what we are dealing with in
+     * case we have to call the PanicProc. */
+    globalrr = r;
+
     rsc = Rivet_GetConf(r);
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -650,6 +658,40 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_PanicProc --
+ *
+ * 	Called when Tcl panics, usually because of memory problems.
+ * 	We log the request, in order to be able to determine what went
+ * 	wrong later.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	Calls abort(), which does not return - the child exits.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static void
+Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
+{
+    va_list argList;
+    char *buf;
+    char *format;
+
+    format = TCL_VARARGS_START(char *,arg1,argList);
+    buf = ap_pvsprintf(globalrr->pool, format, argList);
+    ap_log_error(APLOG_MARK, APLOG_CRIT, globalrr->server,
+		 "Critical error in request: %s", globalrr->unparsed_uri);
+    ap_log_error(APLOG_MARK, APLOG_CRIT, globalrr->server, buf);
+
+    abort();
+}
+
 
 /*
  *-----------------------------------------------------------------------------
@@ -691,6 +733,8 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	ap_log_error(APLOG_MARK, APLOG_ERR, s, Tcl_GetStringResult(interp));
 	exit(1);
     }
+
+    Tcl_SetPanicProc(Rivet_Panic);
 
     rsc->server_interp = interp; /* root interpreter */
 

@@ -825,6 +825,47 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
     return TCL_OK;
 }
 
+#define TESTPANIC 0
+
+#ifdef TESTPANIC
+/*
+ *----------------------------------------------------------------------
+ *
+ * TestpanicCmd --
+ *
+ *	Calls the panic routine.
+ *
+ * Results:
+ *      Always returns TCL_OK. 
+ *
+ * Side effects:
+ *	May exit application.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+TestpanicCmd(dummy, interp, argc, argv)
+    ClientData dummy;			/* Not used. */
+    Tcl_Interp *interp;			/* Current interpreter. */
+    int argc;				/* Number of arguments. */
+    CONST char **argv;			/* Argument strings. */
+{
+    CONST char *argString;
+
+    /*
+     *  Put the arguments into a var args structure
+     *  Append all of the arguments together separated by spaces
+     */
+
+    argString = Tcl_Merge(argc-1, argv+1);
+    panic(argString);
+    ckfree((char *)argString);
+
+    return TCL_OK;
+}
+#endif /* TESTPANIC  */
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -904,6 +945,11 @@ Rivet_InitCore( Tcl_Interp *interp )
 			 Rivet_EnvCmd,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
+#ifdef TESTPANIC
+    Tcl_CreateCommand(interp, "testpanic", TestpanicCmd, (ClientData) 0,
+            (Tcl_CmdDeleteProc *) NULL);
+#endif
 
     TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
     TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
