@@ -1,7 +1,8 @@
 # aardvark make-like system
 # $Id$
 
-# Copyright (c) 2001 Apache Software Foundation.  All Rights reserved.
+# Copyright (c) 2001-2003 Apache Software Foundation.  All Rights
+# reserved.
 
 # See the LICENSE file for licensing terms.
 
@@ -17,15 +18,51 @@ namespace eval aardvark {
     variable buildinfo
     variable dependencies
     set vbose 0
-    # create a graph to use.
-    set grph [ ::struct::graph::graph ]
 }
 proc aardvark::Verbose { } {
     variable vbose
     set vbose 1
 }
 
-# creates one node, if it doesn't exist, and creates it's data
+# aardvark::Output --
+#
+#	This command is used to display output from the processing of
+#	nodes.
+#
+# Arguments:
+#	type - the type of thing to output.
+#	txt - text to be displayed
+
+proc aardvark::Output { type txt } {
+    switch -exact -- $type {
+	command {
+	    puts "Command $txt"
+	}
+	error {
+	    puts "Error: $txt"
+	}
+	output {
+	    puts "Output: $txt"
+	}
+	node {
+	    puts -nonewline "$txt-> "
+	}
+	result {
+	    puts "Result: $txt"
+	}
+    }
+}
+
+# aardvark::createnode --
+#
+#	Creates one node, if it doesn't exist, and creates its data.
+#
+# Arguments:
+#	name - node name.
+#
+# Side Effects:
+#	None.
+
 proc aardvark::createnode { name } {
     variable grph
     if { ! [ $grph node exists $name ] } {
@@ -64,52 +101,59 @@ proc aardvark::runbuildcommand { direction graphname node } {
     }
 
     if { $rebuild == 1 && [info exists buildinfo(cmds)] } {
+	Output node "$node"
 	foreach cmd $buildinfo(cmds) {
 	    if { [lindex $cmd 0] == "sh" } {
 		set sh [join [lrange $cmd 1 end]]
 		set result ""
-		puts -nonewline "$node :"
-		catch {
+		if { [catch {
 		    set sh [uplevel \#0 "subst {$sh}" ]
-		    puts ""
-		    puts "\tCommand: $sh"
-		} err
-		if { $err != "" } {
-		    puts "Sh was supposed to be: $sh"
-		    puts "This error occured: $err"
+		} err] } {
+		    set doerr 1
+		} else {
+		    set doerr 0
+		}
+		Output command "(sh): $sh"
+		if { $doerr } {
+		    Output error "$err"
 		    continue
 		}
 		if { [info exists ::errorCode] } {
 		    unset ::errorCode
 		}
 		set fd [eval [list open "| $sh" r]]
-		catch {
+		if { [catch {
 		    close $fd
-		} err
-		if { $err != "" } {
-		    puts "Output: $err"
-		}
-		if { [info exists ::errorCode] && $::errorCode != "NONE" } {
-		    puts "\tFatal Error ($::errorCode) ($::errorInfo)!"
-		    break
+		} err] } {
+		    # If there is an errorcode, that means that it is
+		    # really a problem, and not just something comming
+		    # out on stderr.
+		    if { [info exists ::errorCode] && \
+			     $::errorCode != "NONE" } {
+			if { $err != "" } {
+			    Output error "$err"
+			}
+			error "$cmd"
+		    } else {
+			if { $err != "" } {
+			    Output result "$err"
+			}
+		    }
 		}
 
 		if { $result != "" } {
-		    puts "\tResult: $result"
+		    Output result "$result"
 		}
 	    }
 	    if { [lindex $cmd 0] == "tcl" } {
 		set tcl [join [lrange $cmd 1 end]]
 		catch {
-		    puts -nonewline "$node :"
-		    puts ""
-		    puts "\tTcl Command: $tcl"
+		    Output command "(tcl): $tcl"
 		    uplevel \#0 $tcl
 		} err
 		if { $err != "" } {
-		    puts $err
+		    Output result  $err
 		}
-		puts ""
 	    }
 	}
     }
@@ -118,23 +162,25 @@ proc aardvark::runbuildcommand { direction graphname node } {
 # these are the commands of our mini build language
 
 # Adds a shell command to be executed.
-proc aardvark::sh { buildcmd } {
+proc aardvark::sh { args } {
     variable buildinfo
-    lappend buildinfo(cmds) [list sh $buildcmd]
+    set arg [join $args]
+    lappend buildinfo(cmds) [list sh $arg]
     return ""
 }
 
 # Adds a Tcl command to be evaluated.
-proc aardvark::tcl { tclcommand } {
+proc aardvark::tcl { args } {
     variable buildinfo
-    lappend buildinfo(cmds) [list tcl $tclcommand]
+    set arg [join $args]
+    lappend buildinfo(cmds) [list tcl $arg]
     return ""
 }
 
 # Adds a file dependency.
-proc aardvark::depends { deps } {
+proc aardvark::depends { args } {
     variable dependencies
-    set dependencies $deps
+    set dependencies [join $args]
     return ""
 }
 
@@ -143,6 +189,12 @@ proc aardvark::AddNode { name rest } {
     variable grph
     variable dependencies
     variable buildinfo
+
+    if { ! [info exists grph] } {
+	# Lazy graph creation.
+	set grph [ ::struct::graph::graph ]
+    }
+
     set dependencies {}
     array set buildinfo {cmds ""}
     set self $name
@@ -165,11 +217,17 @@ proc aardvark::Run { } {
     global ::argv
     variable grph
     set start [ lindex $::argv 0 ]
-    if { $start != "" } {
-	$grph walk $start -order post -command runbuildcommand
-    } else {
-	$grph walk all -order post -command runbuildcommand
+    if { [catch {
+	if { $start != "" } {
+	    $grph walk $start -order post -command runbuildcommand
+	} else {
+	    puts [$grph walk all -order post -command runbuildcommand]
+	}
+    } err] } {
+	puts "Compilation failed on command \"$err\""
     }
+    $grph destroy
+    unset grph
 }
 
 namespace eval aardvark {

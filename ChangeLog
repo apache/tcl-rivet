@@ -1,3 +1,16 @@
+2003-02-19  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.test: Add test script and files for
+	aardvark system.
+
+	* src/buildscripts/graph.tcl: Include latest 'graph.tcl' from
+	upstream.
+
+	* src/make.tcl: We no longer force 'tcl' and 'sh' to take only one
+	argument.  In the case where we aren't forcing evaluation later
+	with {}, this is nicer looking, as we don't have to quote
+	everything with "".
+
 2003-02-12  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c: Mirror Craig Huckabee's mod_dtcl.c changes:

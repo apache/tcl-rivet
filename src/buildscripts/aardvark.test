@@ -1,0 +1,79 @@
+# aardvark.test -- Tests for aardvark build system.
+
+# $Id$
+
+set auto_path ". $auto_path"
+package require aardvark
+package require tcltest
+
+# Override the display commands, so as to use them for testing.
+
+proc aardvark::Output { type txt } {
+    # puts "$type $txt"
+    set ::OUT "$type $txt"
+}
+
+namespace import aardvark::*
+
+tcltest::test aardvark-1.1 {compile a normal file} {
+    AddNode all {
+	sh gcc -o av1 av1.c
+    }
+    Run
+    set ::OUT
+} {command (sh): gcc -o av1 av1.c}
+
+tcltest::test aardvark-1.2 {compile a normal file} {
+    AddNode all {
+	sh {gcc -o av1 av1.c}
+    }
+    Run
+    set ::OUT
+} {command (sh): gcc -o av1 av1.c}
+
+tcltest::test aardvark-2.1 {compile a broken file} {
+    AddNode all {
+	sh gcc -o av2 av2.c
+    }
+    Run
+    set ::OUT
+} "error av2.c: In function `main':
+av2.c:5: parse error before `}'"
+
+tcltest::test aardvark-2.2 {compile a broken file - compilation should stop} {
+    AddNode all {
+	sh gcc -o av2 av2.c
+	sh gcc -o av1 av1.c
+    }
+    Run
+    set ::OUT
+} "error av2.c: In function `main':
+av2.c:5: parse error before `}'"
+
+tcltest::test aardvark-2.3 {compile a broken file w/ multiple nodes - compilation should stop} {
+    AddNode all {
+	depends av1
+    }
+    AddNode av2 {
+	sh gcc -o av2 av2.c
+    }
+    AddNode av1 {
+	depends av2
+	sh gcc -o av1 av1.c
+    }
+    Run
+    set ::OUT
+} "error av2.c: In function `main':
+av2.c:5: parse error before `}'"
+
+tcltest::test aardvark-3.1 {compile a file that generates a warning} {
+    AddNode all {
+	sh gcc -Wall -o av1 av1.c
+    }
+    Run
+    set ::OUT
+} {result av1.c: In function `main':
+av1.c:5: warning: control reaches end of non-void function}
+
+catch { file delete av1 }
+::tcltest::cleanupTests

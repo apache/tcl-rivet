@@ -82,59 +82,59 @@ set XML [file join .. doc rivet.xml]
 # "sh" is a shell command to execute
 
 AddNode apache_multipart_buffer.o {
-    depends "apache_multipart_buffer.c apache_multipart_buffer.h"
+    depends apache_multipart_buffer.c apache_multipart_buffer.h
     set COMP [lremove $COMPILE -Wconversion]
     sh {$COMP apache_multipart_buffer.c}
 }
 
 AddNode apache_request.o {
-    depends "apache_request.c apache_request.h"
+    depends apache_request.c apache_request.h
     set COMP [lremove $COMPILE -Wconversion]
     sh {$COMP apache_request.c}
 }
 
 AddNode rivetChannel.o {
-    depends "rivetChannel.c rivetChannel.h mod_rivet.h"
+    depends rivetChannel.c rivetChannel.h mod_rivet.h
     sh {$COMPILE rivetChannel.c}
 }
 
 AddNode rivetParser.o {
-    depends "rivetParser.c rivetParser.h mod_rivet.h"
+    depends rivetParser.c rivetParser.h mod_rivet.h
     sh {$COMPILE rivetParser.c}
 }
 
 AddNode rivetCore.o {
-    depends "rivetCore.c rivet.h mod_rivet.h"
+    depends rivetCore.c rivet.h mod_rivet.h
     sh {$COMPILE rivetCore.c}
 }
 
 AddNode rivetCrypt.o {
-    depends "rivetCrypt.c"
+    depends rivetCrypt.c
     sh {$COMPILE rivetCrypt.c}
 }
 
 AddNode rivetList.o {
-    depends "rivetList.c"
+    depends rivetList.c
     sh {$COMPILE rivetList.c}
 }
 
 AddNode rivetWWW.o {
-    depends "rivetWWW.c"
+    depends rivetWWW.c
     sh {$COMPILE rivetWWW.c}
 }
 
 AddNode rivetPkgInit.o {
-    depends "rivetPkgInit.c"
+    depends rivetPkgInit.c
     sh {$COMPILE rivetPkgInit.c}
 }
 
 AddNode mod_rivet.o {
-    depends "mod_rivet.c mod_rivet.h apache_request.h parser.h"
+    depends mod_rivet.c mod_rivet.h apache_request.h parser.h
     sh {$COMPILE mod_rivet.c}
 }
 
 AddNode TclWebapache.o {
-    depends "TclWebapache.c mod_rivet.h apache_request.h TclWeb.h"
+    depends TclWebapache.c mod_rivet.h apache_request.h TclWeb.h
     sh {$COMPILE TclWebapache.c}
 }
 
@@ -163,19 +163,19 @@ AddNode all {
 }
 
 AddNode module {
-    depends "shared"
+    depends shared
 }
 
 # Make a shared build.
 
 AddNode shared {
-    depends "$MOD_SHLIB $LIB_SHLIB"
+    depends $MOD_SHLIB $LIB_SHLIB
 }
 
 # Make a static build - incomplete at the moment.
 
 AddNode static {
-    depends "$MOD_STLIB $LIB_STLIB"
+    depends $MOD_STLIB $LIB_STLIB
 }
 
 # Clean up source directory.
@@ -198,17 +198,17 @@ AddNode clean {
 # Install everything.
 
 AddNode install {
-    depends "$MOD_SHLIB $LIB_SHLIB"
-    tcl "file copy -force $MOD_SHLIB $LIBEXECDIR"
-    tcl "file copy -force [file join .. rivet] $PREFIX"
-    tcl "file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]"
+    depends $MOD_SHLIB $LIB_SHLIB
+    tcl file copy -force $MOD_SHLIB $LIBEXECDIR
+    tcl file copy -force [file join .. rivet] $PREFIX
+    tcl file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]
 }
 
 foreach doc $HTML_DOCS {
     set xml [string map {.html .xml} $doc]
     AddNode $doc {
-	depends "$XSLNOCHUNK $xml"
-	sh "xsltproc --nonet -o $doc $XSLNOCHUNK $xml"
+	depends $XSLNOCHUNK $xml
+	sh xsltproc --nonet -o $doc $XSLNOCHUNK $xml
     }
 }
 
@@ -225,18 +225,18 @@ AddNode VERSION {
 
 AddNode distclean {
     depends clean
-    tcl { cd .. }
+    tcl cd ..
     sh { find . -name "*~" | xargs rm -f}
     sh { find . -name ".#*" | xargs rm -f}
     sh { find . -name "\#*" | xargs rm -f}
-    tcl { cd src }
+    tcl cd src
 }
 
 # Create the HTML documentation from the XML document.
 
 AddNode distdoc {
-    depends "$XML $XSL $HTML_DOCS"
-    sh "xsltproc --nonet -o $HTML $XSLCHUNK $XML"
+    depends $XML $XSL $HTML_DOCS
+    sh xsltproc --nonet -o $HTML $XSLCHUNK $XML
 }
 
 # Create the distribution.  This is a bit unix-specific for the
