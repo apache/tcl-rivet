@@ -352,11 +352,10 @@ Rivet_SendContent(request_rec *r)
     rivet_server_conf *rsc = NULL;
     rivet_server_conf *rdc;
     rsc = Rivet_GetConf(r);
-    globals = ap_pcalloc(r->pool, sizeof(rivet_interp_globals));
+    interp = rsc->server_interp;
+    globals = Tcl_GetAssocData(interp, "rivet", NULL);
     globals->r = r;
     globals->req = (TclWebRequest *)ap_pcalloc(r->pool, sizeof(TclWebRequest));
-    interp = rsc->server_interp;
-    Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
     rdc = RIVET_SERVER_CONF( r->per_dir_config );
 
@@ -502,6 +501,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 {
     int rslt;
     Tcl_Interp *interp;
+    rivet_interp_globals *globals = NULL;
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
     server_rec *sr;
 
@@ -539,6 +539,10 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     Rivet_InitServerVariables( interp, p );
 
     Rivet_PropagateServerConfArray( interp, rsc );
+
+    /* Set up interpreter associated data */
+    globals = ap_pcalloc(p, sizeof(rivet_interp_globals));
+    Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
     if( Tcl_EvalFile( interp, ap_server_root_relative(p, RIVET_INIT) )
@@ -588,8 +592,9 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	    myrsc = RIVET_NEW_CONF(p);
 	    ap_set_module_config(sr->module_config, &rivet_module, myrsc);
 	    Rivet_CopyConfig( rsc, myrsc );
-	    if (rsc->seperate_virtual_interps != 0)
+	    if (rsc->seperate_virtual_interps != 0) {
 		myrsc->server_interp = NULL;
+	    }
 	} else {
 	    myrsc = RIVET_SERVER_CONF( sr->module_config );
 	}
@@ -601,6 +606,8 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	    Tcl_SetChannelOption(myrsc->server_interp, *(rsc->outchannel),
 				    "-buffering", "none");
 	    Tcl_RegisterChannel(myrsc->server_interp, *(rsc->outchannel));
+	    globals = ap_pcalloc(p, sizeof(rivet_interp_globals));
+	    Tcl_SetAssocData(myrsc->server_interp, "rivet", NULL, globals);
 	}
 
 	myrsc->server_name = ap_pstrdup(p, sr->server_hostname);

@@ -1,3 +1,8 @@
+2002-03-13  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_InitTclStuff): Moved creation of "rivet"
+	AssocData here.
+
 2002-03-12  Damon J. Courtney <damon@unreality.com>
 
 	* src/mod_rivet.c
