@@ -215,8 +215,8 @@ AddNode debinstall {
     depends $MOD_SHLIB $LIB_SHLIB
     tcl {file delete -force [file join $DEBPREFIX/$LIBEXECDIR rivet]}
     tcl {file copy -force $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
-    tcl {file copy -force [file join .. rivet] "$DEBPREFIX/$PREFIX/lib"}
-    tcl {file copy -force $LIB_SHLIB "$DEBPREFIX/[file join $PREFIX/lib rivet packages rivet]"}
+    tcl {file copy -force [file join .. rivet] "$DEBPREFIX/$PREFIX"}
+    tcl {file copy -force $LIB_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
 }
 
 foreach doc $HTML_DOCS {

@@ -1,3 +1,8 @@
+2003-03-26  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/pkgIndex.tcl: Added index file for RivetTcl package -
+	i.e. init.tcl.
+
 2003-03-25  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetPkgInit.c (Rivet_Init): Bump version number to 1.1.
