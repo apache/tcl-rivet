@@ -803,10 +803,18 @@ Rivet_MergeDirConfigVars( pool *p, rivet_server_conf *new,
 	add->upload_dir : base->upload_dir;
 
     /* Merge the tables of dir and user variables. */
-    new->rivet_dir_vars =
-	ap_overlay_tables( p, base->rivet_dir_vars, add->rivet_dir_vars );
-    new->rivet_user_vars =
-	ap_overlay_tables( p, base->rivet_user_vars, add->rivet_user_vars );
+    if (base->rivet_dir_vars && add->rivet_dir_vars) {
+	new->rivet_dir_vars =
+	    ap_overlay_tables( p, base->rivet_dir_vars, add->rivet_dir_vars );
+    } else {
+	new->rivet_dir_vars = base->rivet_dir_vars;
+    }
+    if (base->rivet_user_vars && add->rivet_user_vars) {
+	new->rivet_user_vars =
+	    ap_overlay_tables( p, base->rivet_user_vars, add->rivet_user_vars );
+    } else {
+	new->rivet_user_vars = base->rivet_user_vars;
+    }
 }
 
 /* Function to get a config and merge the directory/server options  */
@@ -820,7 +828,9 @@ Rivet_GetConf( request_rec *r )
 
 
     /* If there is no per dir config, just return the server config */
-    if( dconf == NULL ) return rsc;
+    if (dconf == NULL) {
+	return rsc;
+    }
 
     rdc = RIVET_SERVER_CONF( dconf );
 
