@@ -16,19 +16,18 @@ source [ file join . buildscripts parsetclConfig.tcl ]
 
 # add variables
 
-set APACHE "/usr/include/apache-1.3"
-set INC "-I $APACHE/include"
+set APXS "/usr/local/apache-1.3/bin/apxs"
 
-set APACHE "/usr/local/apache"
-set INC "-I $APACHE/include -I /usr/local/TclPro1.4/include"
+set INC "-I[exec $APXS -q INCLUDEDIR] -I$TCL_PREFIX/include"
 
 set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS -c"
 
-set MOD_STATICLIB mod_rivet.a
-set MOD_SHLIB "mod_rivet[info sharedlibextension]"
+set MOD_STLIB mod_rivet.a
+set MOD_SHLIB mod_rivet[info sharedlibextension]
 set MOD_OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o mod_rivet.o"
 
-set LIB_SHLIB "librivet[info sharedlibextension]"
+set LIB_STLIB librivet.a
+set LIB_SHLIB librivet[info sharedlibextension]
 set LIB_OBJECTS "rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o"
 
 set TCL_LIBS "$TCL_LIBS -lcrypt"
@@ -67,7 +66,7 @@ AddNode parser.o {
 }
 
 AddNode rivetCore.o {
-    depends "rivetCore.c rivetCore.h mod_rivet.h"
+    depends "rivetCore.c rivet.h mod_rivet.h"
     command {$COMPILE rivetCore.c}
 }
 
@@ -77,7 +76,7 @@ AddNode rivetCrypt.o {
 }
 
 AddNode rivetList.o {
-    depends "rivetList.c rivetList.h rivetList.h"
+    depends "rivetList.c"
     command {$COMPILE rivetList.c}
 }
 
@@ -87,7 +86,7 @@ AddNode rivetWWW.o {
 }
 
 AddNode rivetPkgInit.o {
-    depends "rivetPkgInit.c mod_rivet.h"
+    depends "rivetPkgInit.c"
     command {$COMPILE rivetPkgInit.c}
 }
 
@@ -96,29 +95,42 @@ AddNode mod_rivet.o {
     command {$COMPILE mod_rivet.c}
 }
 
+AddNode librivet.a {
+    depends $LIB_OBJECTS
+    command {$TCL_STLIB_LD $LIB_STLIB $LIB_OBJECTS}
+}
+
 AddNode librivet.so {
     depends $LIB_OBJECTS
     command {$TCL_SHLIB_LD -o $LIB_SHLIB $LIB_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
 
-AddNode all {
-    depends {librivet.so shared}
+AddNode mod_rivet.a {
+    depends $MOD_OBJECTS
+    command {$TCL_STLIB_LD $MOD_STLIB $MOD_OBJECTS}
 }
 
-AddNode shared {
+AddNode mod_rivet.so {
     depends $MOD_OBJECTS
     command {$TCL_SHLIB_LD -o $MOD_SHLIB $MOD_OBJECTS $TCL_LIB_SPEC $TCL_LIBS}
 }
 
+AddNode all {
+    depends shared
+}
+
+AddNode shared {
+    depends "$MOD_SHLIB $LIB_SHLIB"
+}
+
 AddNode static {
-    depends $MOD_OBJECTS
-    command {$TCL_STLIB_LD $MOD_STATICLIB $MOD_OBJECTS}
+    depends "$MOD_STLIB $LIB_STLIB"
 }
 
 AddNode clean {
     command {rm -f [glob -nocomplain *.o]}
     command {rm -f [glob -nocomplain *.so]}
-    command {rm -f mod_rivet.a}
+    command {rm -f [glob -nocomplain *.a]}
 }
 
 AddNode testing.o {
@@ -131,9 +143,10 @@ AddNode libtesting.so {
 }
 
 AddNode install {
-    depends static
-    command {./cvsversion.tcl}
-    tclcommand {file copy -force ../rivet $APACHE}
+    depends "$MOD_SHLIB $LIB_SHLIB"
+    tclcommand "file copy -force $MOD_SHLIB [exec $APXS -q LIBEXECDIR]"
+    tclcommand "file copy -force ../rivet [exec $APXS -q PREFIX]"
+    tclcommand "file copy -force $LIB_SHLIB ../rivet/packages/rivet"
 }
 
 Run
