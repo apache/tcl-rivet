@@ -84,6 +84,7 @@ proc main {} {
 	}
 
 	set versionfile [ open VERSION "w" ]
+	if { [catch {
 	while { 1 } {
 	    puts -nonewline "Current version: $major.$minor.$point.  "
 	    puts -nonewline {Increment [M]ajor, m[I]nor, [P]oint release, or [A]bort? >>> }
@@ -112,6 +113,10 @@ proc main {} {
 	    }
 	}
 	puts $versionfile "$major.$minor.$point"
+	} err] } {
+	    puts stderr "Problem writing VERSION file: $err"
+	    puts $versionfile "$major.$minor.$point"
+	}
 	close $versionfile
 	puts "Done, version is $major.$minor.$point"
     }
