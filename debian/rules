@@ -8,13 +8,13 @@ package=rivet
 
 build:
 	$(checkdir)
-	( export C_INCLUDE_PATH=/usr/include/tcl$(TCL_VERSION)/ ; ./make.tcl shared )
+	( export C_INCLUDE_PATH=/usr/include/tcl$(TCL_VERSION)/ ; cd src ; ./make.tcl shared )
 	touch build
 
 clean:
 	$(checkdir)
 	-rm -f build
-	./make.tcl clean
+	( cd src ; ./make.tcl clean )
 	-rm -f `find . -name "*~"`
 	-rm -rf debian/tmp debian/files* core debian/substvars
 
@@ -29,9 +29,9 @@ binary-arch: checkroot build
 	-rm -rf debian/tmp
 	install -d debian/tmp
 	cd debian/tmp && install -d `cat ../dirs`
-	cp mod_rivet.so debian/tmp/usr/lib/apache/1.3/
-	cp debian/400mod_rivet.info debian/tmp/usr/lib/apache/1.3/
-	dh_installdocs docs/ contrib/
+	cp src/mod_rivet.so debian/tmp/usr/lib/apache/1.3/
+	cp debian/500mod_rivet.info debian/tmp/usr/lib/apache/1.3/
+	dh_installdocs doc/
 	dh_installchangelogs
 	dh_movefiles
 	dh_strip
