@@ -18,7 +18,7 @@ if { [var number] > 0 } {
     }
     puts "\[var get xst foo\] = [var get xst foo]"
 } else {
-    puts "[var get xst]"
+    puts "\[var get xst\] = [var get xst]"
 }
 
 ?>

@@ -1,3 +1,16 @@
+2002-11-04  David N. Welton  <davidw@dedasys.com>
+
+	* tests/get.test: Backed out changes to 'var get': no longer
+	throws an error if the variable does not exist, but instead
+	returns "".  Use 'var exists' to see if it really exists or not.
+
+	* src/mod_rivet.c (Rivet_ChildExit): Add call to Tcl_Finalize.
+	This still needs more investigation.
+
+	* tests/upload.test: Added proper end boundary to upload test.
+
+	* src/apache_*: New apache request code from upstream.
+
 2002-10-29  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetWWW.c (Rivet_EscapeStringCmd): Eliminate warning on

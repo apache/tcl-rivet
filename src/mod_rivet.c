@@ -1079,14 +1079,16 @@ Rivet_ChildExit(server_rec *s, pool *p)
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
 
-    if( rsc->rivet_child_exit_script == NULL ) return;
-
-    if ( Tcl_EvalObjEx(rsc->server_interp, rsc->rivet_child_exit_script, 0)
-	!= TCL_OK) {
-	ap_log_error(APLOG_MARK, APLOG_ERR, s,
-		     "Problem running child exit script: %s",
-		     Tcl_GetStringFromObj(rsc->rivet_child_exit_script, NULL));
+    if( rsc->rivet_child_exit_script != NULL ) {
+	if ( Tcl_EvalObjEx(rsc->server_interp, rsc->rivet_child_exit_script, 0)
+	     != TCL_OK) {
+	    ap_log_error(APLOG_MARK, APLOG_ERR, s,
+			 "Problem running child exit script: %s",
+			 Tcl_GetStringFromObj(rsc->rivet_child_exit_script, NULL));
+	}
     }
+    Tcl_Finalize();
+    return;
 }
 
 MODULE_VAR_EXPORT void

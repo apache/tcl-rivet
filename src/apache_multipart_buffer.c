@@ -1,5 +1,8 @@
 /* ====================================================================
- * Copyright (c) 1995-1999 The Apache Group.  All rights reserved.
+ * The Apache Software License, Version 1.1
+ *
+ * Copyright (c) 2000 The Apache Software Foundation.  All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -13,46 +16,44 @@
  *    the documentation and/or other materials provided with the
  *    distribution.
  *
- * 3. All advertising materials mentioning features or use of this
- *    software must display the following acknowledgment:
- *    "This product includes software developed by the Apache Group
- *    for use in the Apache HTTP server project (http://www.apache.org/)."
+ * 3. The end-user documentation included with the redistribution,
+ *    if any, must include the following acknowledgment:
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowledgment may appear in the software itself,
+ *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache Server" and "Apache Group" must not be used to
- *    endorse or promote products derived from this software without
- *    prior written permission. For written permission, please contact
- *    apache@apache.org.
+ * 4. The names "Apache" and "Apache Software Foundation" must
+ *    not be used to endorse or promote products derived from this
+ *    software without prior written permission. For written
+ *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Group.
+ * 5. Products derived from this software may not be called "Apache",
+ *    nor may "Apache" appear in their name, without prior written
+ *    permission of the Apache Software Foundation.
  *
- * 6. Redistributions of any form whatsoever must retain the following
- *    acknowledgment:
- *    "This product includes software developed by the Apache Group
- *    for use in the Apache HTTP server project (http://www.apache.org/)."
- *
- * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
- * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
  * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Group and was originally based
- * on public domain software written at the National Center for
- * Supercomputing Applications, University of Illinois, Urbana-Champaign.
- * For more information on the Apache Group and the Apache HTTP server
- * project, please see <http://www.apache.org/>.
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
  *
+ * Portions of this software are based upon public domain software
+ * originally written at the National Center for Supercomputing Applications,
+ * University of Illinois, Urbana-Champaign.
  */
 
 #include "apache_multipart_buffer.h"
@@ -72,12 +73,12 @@ void* my_memstr(char* haystack, int haystacklen, const char* needle,
     char *ptr = haystack;
 
     /* iterate through first character matches */
-    while( (ptr = memchr(ptr, needle[0], (size_t)len)) ) {
+    while( (ptr = memchr(ptr, needle[0], len)) ) {
 	/* calculate length after match */
 	len = haystacklen - (ptr - (char *)haystack);
 
 	/* done if matches up to capacity of buffer */
-	if(memcmp(needle, ptr, (size_t)(needlen < len ? needlen : len)) == 0 &&
+	if(memcmp(needle, ptr, needlen < len ? needlen : len) == 0 &&
 	   (partial || len >= needlen))
 	    break;
 
@@ -98,11 +99,18 @@ int fill_buffer(multipart_buffer *self)
 
     /* shift the existing data if necessary */
     if(self->bytes_in_buffer > 0 && self->buf_begin != self->buffer)
-	memmove(self->buffer, self->buf_begin, (size_t)self->bytes_in_buffer);
+	memmove(self->buffer, self->buf_begin, self->bytes_in_buffer);
     self->buf_begin = self->buffer;
 
     /* calculate the free space in the buffer */
     bytes_to_read = self->bufsize - self->bytes_in_buffer;
+
+    if (bytes_to_read >= self->r->remaining) {
+        bytes_to_read = self->r->remaining - strlen(self->boundary);
+#ifdef DEBUG
+        ap_log_rerror(MPB_ERROR, "mozilla 0.97 hack: '%ld'", self->r->remaining);
+#endif
+    }
 
     /* read the required number of bytes */
     if(bytes_to_read > 0) {
@@ -134,7 +142,7 @@ char* next_line(multipart_buffer *self)
 {
     /* look for LF in the data */
     char* line = self->buf_begin;
-    char* ptr = memchr(self->buf_begin, '\n', (size_t) self->bytes_in_buffer);
+    char* ptr = memchr(self->buf_begin, '\n', self->bytes_in_buffer);
 
     /* LF found */
     if(ptr) {
@@ -286,7 +294,7 @@ int multipart_buffer_read(multipart_buffer *self, char *buf, int bytes)
     /* if we read any data... */
     if(len > 0) {
 	/* copy the data */
-	memcpy(buf, self->buf_begin, (size_t)len);
+	memcpy(buf, self->buf_begin, len);
 	buf[len] = 0;
 	if(bound && len > 0 && buf[len-1] == '\r') buf[--len] = 0;
 

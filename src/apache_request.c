@@ -1,5 +1,8 @@
 /* ====================================================================
- * Copyright (c) 1995-1999 The Apache Group.  All rights reserved.
+ * The Apache Software License, Version 1.1
+ *
+ * Copyright (c) 2000 The Apache Software Foundation.  All rights
+ * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -13,50 +16,49 @@
  *    the documentation and/or other materials provided with the
  *    distribution.
  *
- * 3. All advertising materials mentioning features or use of this
- *    software must display the following acknowledgment:
- *    "This product includes software developed by the Apache Group
- *    for use in the Apache HTTP server project (http://www.apache.org/)."
+ * 3. The end-user documentation included with the redistribution,
+ *    if any, must include the following acknowledgment:
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowledgment may appear in the software itself,
+ *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache Server" and "Apache Group" must not be used to
- *    endorse or promote products derived from this software without
- *    prior written permission. For written permission, please contact
- *    apache@apache.org.
+ * 4. The names "Apache" and "Apache Software Foundation" must
+ *    not be used to endorse or promote products derived from this
+ *    software without prior written permission. For written
+ *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Group.
+ * 5. Products derived from this software may not be called "Apache",
+ *    nor may "Apache" appear in their name, without prior written
+ *    permission of the Apache Software Foundation.
  *
- * 6. Redistributions of any form whatsoever must retain the following
- *    acknowledgment:
- *    "This product includes software developed by the Apache Group
- *    for use in the Apache HTTP server project (http://www.apache.org/)."
- *
- * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
- * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
  * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  * ====================================================================
  *
  * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Group and was originally based
- * on public domain software written at the National Center for
- * Supercomputing Applications, University of Illinois, Urbana-Champaign.
- * For more information on the Apache Group and the Apache HTTP server
- * project, please see <http://www.apache.org/>.
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
  *
+ * Portions of this software are based upon public domain software
+ * originally written at the National Center for Supercomputing Applications,
+ * University of Illinois, Urbana-Champaign.
  */
 
 #include "apache_request.h"
 #include "apache_multipart_buffer.h"
+int fill_buffer(multipart_buffer *self); /* needed for mozilla hack */
 
 static void req_plustospace(char *str)
 {
@@ -216,36 +218,26 @@ static int urlword_dlm[] = {'&', ';', 0};
 
 static char *my_urlword(pool *p, const char **line)
 {
-    int i;
+    char *res = NULL;
+    const char *pos = *line;
+    char ch;
 
-    for (i = 0; urlword_dlm[i]; i++) {
-	int stop = urlword_dlm[i];
-	char *pos = strchr(*line, stop);
-	char *res;
-
-	if (!pos) {
-	    if (!urlword_dlm[i+1]) {
-		int len = strlen(*line);
-		res = ap_pstrndup(p, *line, len);
-		*line += len;
-		return res;
-	    }
-	    continue;
-	}
-
-	res = ap_pstrndup(p, *line, pos - *line);
-
-	while (*pos == stop) {
-	    ++pos;
-	}
-
-	*line = pos;
-
-	return res;
+    while ( (ch = *pos) != '\0' && ch != ';' && ch != '&') {
+	++pos;
     }
 
-    return NULL;
+    res = ap_pstrndup(p, *line, pos - *line);
+
+    while (ch == ';' || ch == '&') {
+	++pos;
+	ch = *pos;
+    }
+
+    *line = pos;
+
+    return res;
 }
+
 
 static void split_to_parms(ApacheRequest *req, const char *data)
 {
@@ -380,11 +372,6 @@ int ApacheRequest_parse_multipart(ApacheRequest *req)
     multipart_buffer *mbuff;
     ApacheUpload *upload = NULL;
 
-    if (req->disable_uploads) {
-	ap_log_rerror(REQ_ERROR, "[libapreq] file upload forbidden");
-	return HTTP_FORBIDDEN;
-    }
-
     if (!ct) {
 	ap_log_rerror(REQ_ERROR, "[libapreq] no Content-type header!");
 	return HTTP_INTERNAL_SERVER_ERROR;
@@ -418,6 +405,14 @@ int ApacheRequest_parse_multipart(ApacheRequest *req)
 	int blen, wlen;
 
 	if (!header) {
+#ifdef DEBUG
+            ap_log_rerror(REQ_ERROR,
+		      "[libapreq] silently drop remaining '%ld' bytes", r->remaining);
+#endif
+            ap_hard_timeout("[libapreq] parse_multipart", r);
+            while ( ap_get_client_block(r, buff, sizeof(buff)) > 0 )
+                /* wait for more input to ignore */ ;
+            ap_kill_timeout(r);
 	    return OK;
 	}
 
@@ -446,6 +441,12 @@ int ApacheRequest_parse_multipart(ApacheRequest *req)
 		continue;
 	    }
 	    if (!param) continue; /* shouldn't happen, but just in case. */
+
+            if (req->disable_uploads) {
+                ap_log_rerror(REQ_ERROR, "[libapreq] file upload forbidden");
+                return HTTP_FORBIDDEN;
+            }
+
 	    ap_table_add(req->parms, param, filename);
 
 	    if (upload) {
@@ -465,11 +466,19 @@ int ApacheRequest_parse_multipart(ApacheRequest *req)
 	    upload->filename = ap_pstrdup(req->r->pool, filename);
 	    upload->name = ap_pstrdup(req->r->pool, param);
 
+            /* mozilla empty-file (missing CRLF) hack */
+            fill_buffer(mbuff);
+            if( strEQN(mbuff->buf_begin, mbuff->boundary, 
+                      strlen(mbuff->boundary)) ) {
+                r->remaining -= 2;
+                continue; 
+            }
+
 	    while ((blen = multipart_buffer_read(mbuff, buff, sizeof(buff)))) {
 		if (req->upload_hook != NULL) {
 		    wlen = req->upload_hook(req->hook_data, buff, blen, upload);
 		} else {
-		    wlen = fwrite(buff, 1, (unsigned)blen, upload->fp);
+		    wlen = fwrite(buff, 1, blen, upload->fp);
 		}
 		if (wlen != blen) {
 		    return HTTP_INTERNAL_SERVER_ERROR;

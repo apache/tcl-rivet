@@ -1,14 +1,18 @@
 BUGS
 ====
 
-* Using user conf variables eats up memory.  Find a better way to create and
-  destroy them.
-
 TODO
 ====
 
-* Write commands after like 'open' and such in the request namespace
-  that keep track of open file pointers and close them in the cleanup.
+* getting the plain post data. I use mod_dtcl as an xml server and I
+  need to collect the broken xml (due to query string proccessing). if
+  the user enters in the xml "=" I am lost. (From yahalom emet).
+
+* session handling. this feature can not be added by a tcl package so
+  it is missing from the interface.  (From yahalom emet).
+
+* Write commands like 'open' and such in the request namespace that
+  keep track of open file pointers and close them in the cleanup.
 
 * Complete the NWS package.
 

@@ -6,4 +6,4 @@ dependencies and runs the C compiler and linker.
 To build mod_rivet.so, cd to the src/ directory, and run the make.tcl
 script, then copy that to your Apache libexec/ directory.
 
-For more detailed instructions, see the docs/ directory.
+For more detailed instructions, see 

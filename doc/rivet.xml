@@ -492,8 +492,10 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	</term>
 	<listitem>
 	  <para>
-	    The <command>var</command> command manipulates variables
-	    set by the user.
+	    The <command>var</command> command retrieves information
+	    about GET or POST variables sent to the script via client
+	    request.  It treats both GET and POST variables the same,
+	    regardless of their origin.
 	  </para>
 	  <variablelist>
 	    <varlistentry>

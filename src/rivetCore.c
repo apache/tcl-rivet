@@ -352,8 +352,7 @@ Rivet_Var(
 	if (TclWeb_GetVar(result, key, globals->req) != TCL_OK)
 	{
 	    if (deflt == NULL) {
-		Tcl_AppendResult(interp, key, " does not exist", NULL);
-		return TCL_ERROR;
+		Tcl_SetStringObj(result, "", -1);
 	    } else {
 		Tcl_SetStringObj(result, deflt, -1);
 	    }
