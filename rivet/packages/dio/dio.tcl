@@ -678,7 +678,7 @@ proc handle {interface args} {
 	    set obj [result Mysql -error 1 -errorinfo [::list $error]]
 	    return $obj
 	}
-	set fields [mysqlcol $conn -current name]
+	if {[catch {mysqlcol $conn -current name} fields]} { set fields "" }
 	set obj [result Mysql -resultid $conn \
 		-numrows $error -fields [::list $fields]]
 	return $obj
