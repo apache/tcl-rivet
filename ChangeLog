@@ -1,3 +1,17 @@
+2002-03-15  Damon J. Courtney <damon@unreality.com>
+
+	* src/apache_cookie.c
+	* src/apache_cookie.h
+	    Removed in favor of doing cookies through a Tcl interface.
+
+	* src/channel.c
+	* src/channel.h
+	    Renamed to rivetChannel.c and rivetChannel.h
+
+	* src/rivetCore.c
+	* src/TclWebapache.c
+	    Removed references to Apache cookie functions.
+
 2002-03-14  Damon J. Courtney <damon@unreality.com>
 
 	* src/TclWebapache.c

@@ -48,7 +48,7 @@ set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING 
 
 set MOD_STLIB mod_rivet.a
 set MOD_SHLIB mod_rivet[info sharedlibextension]
-set MOD_OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o rivetParser.o rivetCore.o mod_rivet.o TclWebapache.o"
+set MOD_OBJECTS "apache_multipart_buffer.o apache_request.o rivetChannel.o rivetParser.o rivetCore.o mod_rivet.o TclWebapache.o"
 
 set LIB_STLIB librivet.a
 set LIB_SHLIB librivet[info sharedlibextension]
@@ -64,12 +64,6 @@ set TCL_LIBS "$TCL_LIBS -lcrypt"
 # depends lists the nodes on which it depends
 # command is the command to compile
 
-AddNode apache_cookie.o {
-    depends "apache_cookie.c apache_cookie.h"
-    set COMP [lremove $COMPILE -Wconversion]
-    command {$COMP apache_cookie.c}
-}
-
 AddNode apache_multipart_buffer.o {
     depends "apache_multipart_buffer.c apache_multipart_buffer.h"
     set COMP [lremove $COMPILE -Wconversion]
@@ -82,9 +76,9 @@ AddNode apache_request.o {
     command {$COMP apache_request.c}
 }
 
-AddNode channel.o {
-    depends "channel.c channel.h mod_rivet.h"
-    command {$COMPILE channel.c}
+AddNode rivetChannel.o {
+    depends "rivetChannel.c rivetChannel.h mod_rivet.h"
+    command {$COMPILE rivetChannel.c}
 }
 
 AddNode rivetParser.o {

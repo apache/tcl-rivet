@@ -30,11 +30,7 @@ TODO
 MAYBE
 =====
 
-* Maybe write load_cookies in Tcl and try to get rid of the
-  apache_cookie.* stuff.
-
 * Maybe move ::request commands into a file called request.tcl.
-
 
 DONE
 ====

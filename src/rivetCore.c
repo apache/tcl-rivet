@@ -18,7 +18,6 @@
 #include <string.h>
 
 #include "apache_request.h"
-#include "apache_cookie.h"
 #include "mod_rivet.h"
 #include "rivet.h"
 #include "TclWeb.h"
@@ -154,41 +153,7 @@ Rivet_Headers(
     }
     opt = Tcl_GetStringFromObj(objv[1], NULL);
 
-    if (!strcmp("setcookie", opt)) /* ### setcookie ### */
-    {
-	int i;
-	ApacheCookie *cookie;
-	char *stringopts[12] = {NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, NULL, NULL, NULL};
-
-	if (objc < 4 || objc > 14)
-	{
-	    Tcl_WrongNumArgs(interp, 2, objv,
-			     "-name cookie-name -value cookie-value "
-			     "?-expires expires? ?-domain domain? "
-			     "?-path path? ?-secure on/off?");
-	    return TCL_ERROR;
-	}
-
-	/* SetCookie: foo=bar; EXPIRES=DD-Mon-YY HH:MM:SS;
-	 * DOMAIN=domain; PATH=path; SECURE
-	 */
-
-	for (i = 0; i < objc - 2; i++)
-	{
-	    stringopts[i] = Tcl_GetString(objv[i + 2]);
-	}
-	cookie = ApacheCookie_new(globals->r,
-				  stringopts[0], stringopts[1],
-				  stringopts[2], stringopts[3],
-				  stringopts[4], stringopts[5],
-				  stringopts[6], stringopts[7],
-				  stringopts[8], stringopts[9],
-				  stringopts[10], stringopts[11],
-				  NULL);
-	ApacheCookie_bake(cookie);
-    }
-    else if (!strcmp("redirect", opt)) /* ### redirect ### */
+    if (!strcmp("redirect", opt)) /* ### redirect ### */
     {
 	if (objc != 3)
 	{
@@ -262,30 +227,6 @@ Rivet_LoadEnv(
     }
 
     return TclWeb_GetEnvVars(ArrayObj, globals->req);
-}
-
-static int
-Rivet_LoadCookies(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
-{
-    Tcl_Obj *ArrayObj;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-
-    if( objc > 2 ) {
-	Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
-	return TCL_ERROR;
-    }
-
-    if( objc == 2 ) {
-	ArrayObj = objv[1];
-    } else {
-	ArrayObj = Tcl_NewStringObj( COOKIES_ARRAY_NAME, -1 );
-    }
-
-    return TclWeb_GetCookieVars(ArrayObj, globals->req);
 }
 
 /* Tcl command to return a particular variable.  */
@@ -601,11 +542,6 @@ Rivet_InitCore( Tcl_Interp *interp )
     Tcl_CreateObjCommand(interp,
 			"load_env",
 			Rivet_LoadEnv,
-			NULL,
-			(Tcl_CmdDeleteProc *)NULL);
-    Tcl_CreateObjCommand(interp,
-			"load_cookies",
-			Rivet_LoadCookies,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,

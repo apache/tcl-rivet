@@ -12,7 +12,6 @@
 #include <tcl.h>
 
 #include "apache_request.h"
-#include "apache_cookie.h"
 #include "mod_rivet.h"
 #include "TclWeb.h"
 
@@ -262,27 +261,6 @@ TclWeb_VarNumber(Tcl_Obj *result, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
 
     Tcl_SetIntObj(result, parmsarray->nelts);
-    return TCL_OK;
-}
-
-int
-TclWeb_GetCookieVars(Tcl_Obj *cookievar, TclWebRequest *req)
-{
-    int i;
-    ApacheCookieJar *cookies = ApacheCookie_parse(req->req, NULL);
-
-    for (i = 0; i < ApacheCookieJarItems(cookies); i++) {
-	ApacheCookie *c = ApacheCookieJarFetch(cookies, i);
-	int j;
-	for (j = 0; j < ApacheCookieItems(c); j++) {
-	    char *name = c->name;
-	    char *value = ApacheCookieFetch(c, j);
-	    Tcl_ObjSetVar2(req->interp, cookievar,
-			   Tcl_NewStringObj(name, -1),
-			   Tcl_NewStringObj(value, -1), 0);
-	}
-    }
-
     return TCL_OK;
 }
 
