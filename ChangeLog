@@ -1,3 +1,7 @@
+2005-03-23  David N. Welton  <davidw@dedasys.com>
+
+	* genconf.sh: Updated to use 1.8 autotools.
+
 2005-03-12  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_SendContent): Use static objects for

@@ -23,7 +23,7 @@ dnl
 #-----------------------------------------------------------------------
 
 AC_INIT([Rivet],[0.5.0])
-AC_CONFIG_HEADERS([config.h])
+# AC_CONFIG_HEADERS([config.h])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -234,7 +234,7 @@ if test x"${with_apxs}" = x ; then
     fi
 else
     AC_MSG_CHECKING([for apxs])
-    AC_MSG_RESULT([--with-apxs=${with_apxs}])
+    AC_MSG_RESULT([${with_apxs}])
 fi
 if test -x "${with_apxs}" ; then
     dnl It actually calls another script, so the PATH needs to be set.
@@ -257,7 +257,6 @@ if test -x "${with_apxs}" ; then
     AC_SUBST(APXS_SYSCONFDIR)
     APXS_PREFIX=`${with_apxs} -q PREFIX`
     AC_SUBST(APXS_PREFIX)
-
 else
     AC_MSG_ERROR([${with_apxs} is not an executable file])
 fi
