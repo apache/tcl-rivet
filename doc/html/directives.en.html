@@ -10,7 +10,7 @@
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex"><span style="font-family:monospace"><span><b class="command">RivetServerConf</b></span></span> specifies a global
 	    option that is valid for the whole server.
 	  </div><div class="variablelist"><dl><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">CacheSize</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>size</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">CacheSize</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>size</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Sets the size of the internal page cache, where
 		  <i class="replaceable"><tt>size</tt></i> is
@@ -19,7 +19,7 @@
 		  <span style="font-family:monospace"><span><b class="command">MaxRequestsPerChild</b></span></span> / 5, or 50,
 		  if <span style="font-family:monospace"><span><b class="command">MaxRequestsPerChild</b></span></span> is 0.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">GlobalInitScript</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">GlobalInitScript</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Tcl script that is run when each interpreter is
 		  initialized. <i class="replaceable"><tt>script</tt></i>
@@ -28,7 +28,7 @@
 
 		  <pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</pre>
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">ChildInitScript</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">ChildInitScript</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Script to be evaluated when each Apache child
 		  process is initialized.  This is the recommended
@@ -36,14 +36,14 @@
 		  connections to other facilities (such as databases)
 		  and so on.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">ChildExitScript</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">ChildExitScript</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Script to be evaluated when each Apache child
 		  process exits.  This is the logical place to clean
 		  up resources created in
 		  ChildInitScript.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">BeforeScript</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">BeforeScript</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Script to be evaluated before each server parsed
 		  (.rvt) page.  This can be used to create a standard
@@ -58,11 +58,11 @@
 		    evaluated.
 		  </td></tr></table></div>
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">AfterScript</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">AfterScript</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Script to be called after each server parsed (.rvt) page.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">ErrorScript</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">ErrorScript</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  When Rivet encounters an error in a script, it
 		  constructs an HTML page with some information about
@@ -72,11 +72,11 @@
 		  pages.  This may be useful if you want to make sure
 		  that users never view your source code.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">UploadDirectory</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>directory</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">UploadDirectory</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>directory</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Directory to place uploaded files.</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">UploadMaxSize</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>size</tt></i></span></div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">UploadMaxSize</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>size</tt></i></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Maximum size for uploaded files.</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">UploadFilesToVar</span> (<span style="font-family:monospace; font-weight: bold;">yes</span> | <span style="font-family:monospace; font-weight: bold;">no</span>)</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">UploadFilesToVar</span>  (<span style="font-family:monospace; font-weight: bold;">yes</span> | <span style="font-family:monospace; font-weight: bold;">no</span>)</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This option controls whether it is possible to
 		  upload files to a Tcl variable.  If you have a size
@@ -84,7 +84,7 @@
 		  might be more convenient than sending the data to a
 		  file on disk.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">SeperateVirtualInterps</span> (<span style="font-family:monospace; font-weight: bold;">yes</span> | <span style="font-family:monospace; font-weight: bold;">no</span>)</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">SeperateVirtualInterps</span>  (<span style="font-family:monospace; font-weight: bold;">yes</span> | <span style="font-family:monospace; font-weight: bold;">no</span>)</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  If on, Rivet will create a separate Tcl interpreter
 		  for each Apache virtual host.  This is useful in an

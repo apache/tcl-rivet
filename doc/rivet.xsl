@@ -244,7 +244,7 @@
 	<xsl:value-of select="$group.rep.repeat.str"/>
       </xsl:when>
       <xsl:when test="$rep='norepeat'">
-	<xsl:value-of select="$group.rep.norepeat.str"/>
+	<xsl:value-of select="$arg.rep.norepeat.str"/>
       </xsl:when>
       <xsl:otherwise>
 	<xsl:value-of select="$arg.rep.def.str"/>

@@ -8,7 +8,12 @@
 	  the only way to obtain Rivet.  In the future, we hope to
 	  have a FreeBSD port, Debian package, RPM's, and windows
 	  binaries.
-	</p></li><li><p class="title"><b>Get and Install Apache Sources</b></p><p style="width:90%">
+	</p></li><li><p class="title"><b>Install Tcl</b></p><p style="width:90%">
+	  If you don't have Tcl already, you need it!  If you already
+	  have it, you should just be able to use your system Tcl as
+	  long as it is recent.  You can tell Rivet where Tcl is via
+	  the -with-tclconfig option to
+	  <span style="font-family:monospace"><span><b class="command">configure.tcl</b></span></span> (see below).</p></li><li><p class="title"><b>Get and Install Apache Sources</b></p><p style="width:90%">
           Rivet needs some Apache include (.h) files in order to
 	  build.  The easiest way to get them is to download the
 	  source code of the Apache web server, although some systems
@@ -17,7 +22,13 @@
 	  to build Rivet statically (compiled into the Apache web
 	  server instead of loaded dynamically), you definitely need
 	  the sources.  We recommend that you build Rivet as a
-	  loadable shared library, for maximum flexibility.</p><p style="width:90%">
+	  loadable shared library, for maximum flexibility, meaning
+	  that you also build Apache to be able to load modules.
+	  Other than that, the default Apache install is fine.  We
+	  will tell Rivet where it is located via the
+	  -with-apxs option to
+	  <span style="font-family:monospace"><span><b class="command">configure.tcl</b></span></span> (see below).
+	</p><p style="width:90%">
           The source code for the Apache web server may be found by
           following the links here: <a href="http://httpd.apache.org/" target="_top">http://httpd.apache.org/</a>.
 	</p></li><li><p class="title"><b>Uncompress Sources</b></p><p style="width:90%">
@@ -43,8 +54,10 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
 		    Install Rivet Tcl packages to
 		    <i class="replaceable"><tt>directory</tt></i>.
 		  </div></div></dd><dt><span class="term">-with-apxs <i class="replaceable"><tt>file</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Use <i class="replaceable"><tt>file</tt></i> as apxs binary to
-		  gather information about the local Apache installation.</div></div></dd><dt><span class="term">-with-tclconfig <i class="replaceable"><tt>file</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
-		    Specify <i class="replaceable"><tt>file</tt></i> as tclConfig.sh.
+		  gather information about the local Apache installation.</div></div></dd><dt><span class="term">-with-tclconfig <i class="replaceable"><tt>path/to/tcl/tclConfig.sh</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		    Specify <i class="replaceable"><tt>file</tt></i> as the
+		    tclConfig.sh of the Tcl installation that you want
+		    to use with Rivet.
 		  </div></div></dd></dl></div><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
 ./configure.tcl
 Configuring

@@ -13,17 +13,17 @@
 <!--
    Copyright 2002-2004 The Apache Software Foundation
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License"); you
+   may not use this file except in compliance with the License.  You
+   may obtain a copy of the License at
 
    	http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied.  See the License for the specific language governing
+   permissions and limitations under the License.
 -->
 
 <!-- $Id$ -->
@@ -323,7 +323,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>CacheSize</arg>
+		  <arg choice="plain">CacheSize</arg>
 		  <arg><replaceable>size</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -342,7 +342,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>GlobalInitScript</arg>
+		  <arg choice="plain">GlobalInitScript</arg>
 		  <arg><replaceable>script</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -361,7 +361,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>ChildInitScript</arg>
+		  <arg choice="plain">ChildInitScript</arg>
 		  <arg><replaceable>script</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -379,7 +379,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>ChildExitScript</arg>
+		  <arg choice="plain">ChildExitScript</arg>
 		  <arg><replaceable>script</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -396,7 +396,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>BeforeScript</arg>
+		  <arg choice="plain">BeforeScript</arg>
 		  <arg><replaceable>script</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -421,7 +421,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>AfterScript</arg>
+		  <arg choice="plain">AfterScript</arg>
 		  <arg><replaceable>script</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -435,7 +435,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>ErrorScript</arg>
+		  <arg choice="plain">ErrorScript</arg>
 		  <arg><replaceable>script</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -455,7 +455,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>UploadDirectory</arg>
+		  <arg choice="plain">UploadDirectory</arg>
 		  <arg><replaceable>directory</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -467,7 +467,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>UploadMaxSize</arg>
+		  <arg choice="plain">UploadMaxSize</arg>
 		  <arg><replaceable>size</replaceable></arg>
 		</cmdsynopsis>
 	      </term>
@@ -479,7 +479,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>UploadFilesToVar</arg>
+		  <arg choice="plain">UploadFilesToVar</arg>
 		  <group choice="req"><arg>yes</arg><arg>no</arg></group>
 		</cmdsynopsis>
 	      </term>
@@ -497,7 +497,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>SeperateVirtualInterps</arg>
+		  <arg choice="plain">SeperateVirtualInterps</arg>
 		  <group choice="req">
 		    <arg>yes</arg>
 		    <arg>no</arg>
@@ -638,7 +638,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>get</arg>
+		<command>var</command>
+		<arg choice="plain">get</arg>
 		<arg><replaceable>varname</replaceable></arg>
 		<arg><replaceable><optional>default</optional></replaceable></arg>
 	      </cmdsynopsis>
@@ -660,7 +661,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>list</arg>
+		<command>var</command>
+		<arg choice="plain">list</arg>
 		<arg><replaceable>varname</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -676,7 +678,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>exists</arg>
+		<command>var</command>
+		<arg choice="plain">exists</arg>
 		<arg><replaceable>varname</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -692,7 +695,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>number</arg>
+		<command>var</command>
+		<arg choice="plain">number</arg>
 	      </cmdsynopsis>
 	    </term>
 	    <listitem>
@@ -705,7 +709,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>all</arg>
+		<command>var</command>
+		<arg choice="plain">all</arg>
 	      </cmdsynopsis>
 	    </term>
 	    <listitem>
@@ -755,7 +760,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>channel</arg>
+		<command>upload</command>
+		<arg choice="plain">channel</arg>
 		<arg><replaceable>uploadname</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -771,7 +777,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>save</arg>
+		<command>upload</command>
+		<arg choice="plain">save</arg>
 		<arg><replaceable>uploadname</replaceable></arg>
 		<arg><replaceable>filename</replaceable></arg>
 	      </cmdsynopsis>
@@ -788,7 +795,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>data</arg>
+		<command>upload</command>
+		<arg choice="plain">data</arg>
 		<arg><replaceable>uploadname</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -803,7 +811,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>size</arg>
+		<command>upload</command>
+		<arg choice="plain">size</arg>
 		<arg><replaceable>uploadname</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -816,7 +825,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>type</arg>
+		<command>upload</command>
+		<arg choice="plain">type</arg>
 	      </cmdsynopsis>
 	    </term>
 	    <listitem>
@@ -829,7 +839,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>filename</arg>
+		<command>upload</command>
+		<arg choice="plain">filename</arg>
 		<arg><replaceable>uploadname</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -842,7 +853,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>names</arg>
+		<command>upload</command>
+		<arg choice="plain">names</arg>
 	      </cmdsynopsis>
 	    </term>
 	    <listitem>
@@ -1059,7 +1071,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
 	  <varlistentry>
 	    <term><cmdsynopsis>
-		<arg>set</arg>
+		<command>headers</command>
+		<arg choice="plain">set</arg>
 		<arg><replaceable>headername</replaceable></arg>
 		<arg><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
@@ -1074,7 +1087,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>redirect</arg>
+		<command>headers</command>
+		<arg choice="plain">redirect</arg>
 		<arg><replaceable>uri</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -1090,7 +1104,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>add</arg>
+		<command>headers</command>
+		<arg choice="plain">add</arg>
 		<arg><replaceable>headername</replaceable></arg>
 		<arg><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
@@ -1103,7 +1118,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
 	  <varlistentry>
 	    <term><cmdsynopsis>
-		<arg>type</arg>
+		<command>headers</command>
+		<arg choice="plain">type</arg>
 		<arg><replaceable>content-type</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -1120,7 +1136,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<arg>numeric</arg>
+		<command>headers</command>
+		<arg choice="plain">numeric</arg>
 		<arg><replaceable>response code</replaceable></arg>
 	      </cmdsynopsis>
 	    </term>
@@ -1489,6 +1506,761 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </listitem>
     </itemizedlist>
   </section>
+
+  <section id="dio">
+    <title>DIO - Database Interface Objects</title>
+    <refentry>
+      <refnamediv>
+	<refname>DIO</refname>
+	<refpurpose>Database Interface Objects</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>::DIO::handle</command>
+	  <arg><replaceable>interface</replaceable></arg>
+	  <arg choice="opt"><replaceable>objectName</replaceable></arg>
+	  <group choice="opt">
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>...</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  <command>DIO</command> is designed to be a generic,
+	  object-oriented interface to SQL databases.  Its main goal
+	  is to be as generic as possible, but since not all SQL
+	  databases support the exact same syntaxes, keeping code
+	  generic between databases is left to the abilities of the
+	  programmer.  DIO simply provides a way to keep the Tcl
+	  interface generic.
+	</para>
+	<para>
+	  <option>interface</option> - The name of the database
+	  interface.  Currently supported interfaces are
+	  <option>Postgresql</option> and <option>Mysql</option>.
+	</para>
+	<para>If <option>objectName</option> is specified, DIO creates
+	  an object of that name.  If there is no
+	  <option><replaceable>objectName</replaceable></option>
+	  given, DIO will automatically generate a unique object ID
+	</para>
+      </refsect1>
+      <refsect1>
+	<title>Options</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-host</arg>
+		<arg choice="opt"><replaceable>hostname</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The hostname of the computer to connect to.  If none
+		is given, DIO assumes the local host.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-port</arg>
+		<arg><replaceable>portNumber</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The port number to connect to on <option>hostname</option>.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-user</arg>
+		<arg><replaceable>username</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The username you wish to login to the server as.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-pass</arg>
+		<arg><replaceable>password</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The password to login to the server with.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-db</arg>
+		<arg><replaceable>database</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The name of the database to connect to.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-table</arg>
+		<arg><replaceable>tableName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The default table to use when using built-in commands
+		for storing and fetching.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-keyfield</arg>
+		<arg><replaceable>keyFieldname</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The default field to use as the primary key when using
+		built-in commands for storing and fetching.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-autokey</arg>
+		<group>
+		  <arg>1</arg>
+		  <arg>0</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		If this option is set to 1, DIO will attempt to
+		determine an automatic key for
+		<option>keyField</option> when storing and fetching.
+		In most databases, this requires that the
+		<option>sequence</option> also be specified.  In the
+		case of MySQL, where sequences do not exist, autokey
+		must be used in conjunction with a table which has a
+		field specified as AUTO.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-sequence</arg>
+		<arg><replaceable>sequenceName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		If DIO is automatically generating keys, it will use
+		this sequence as a means to gain a unique number for
+		the stored key.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+      <refsect1>
+	<title>DIO Object Commands</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>array</arg>
+		<arg><replaceable>request</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		create an array from the first record found.  The
+		array is set with the fields of the table and the
+		values of the record found.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>autokey</arg>
+		<group choice="opt">
+		  <arg>value</arg>
+		  <arg>boolean</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Return the current autokey value.  If
+		<option>value</option> is specified, it sets a new
+		value for the autokey option.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>close</arg>
+	      </cmdsynopsis>
+	      <para>	      Close the current database connection.  This command is
+		automatically called when the DIO object is destroyed.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>db</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current database.  If
+		<option>value</option> is specified, it sets a new
+		value for the database.  In most cases, the DIO object
+		will automatically connect to the new database when
+		this option is changed.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>delete</arg>
+		<arg><replaceable>key</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Delete a record from the database where the primary
+		key matches <option>key</option>.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>destroy</arg>
+	      </cmdsynopsis>
+	      <para>
+		Destroy the DIO object.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>errorinfo</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para><option>errorinfo</option> contains the value of
+		the last error, if any, to occur while executing a
+		request.  When a request fails for any reason, this
+		variable is filled with the error message from the SQL
+		interface package.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>exec</arg>
+		<arg><replaceable>request</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as an SQL query.
+		When the exec command is called, the query is
+		executed, and a DIO result object is returned.  From
+		there, the result object can be used to obtain
+		information about the query status and records in a
+		generic way.  See <link linkend="resultobj">Result
+		  Object Commands</link>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>fetch</arg>
+		<arg><replaceable>key</replaceable></arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Fetch a record from the database where the primary key
+		matches <option>key</option> and store the result in
+		an array called <option>arrayName</option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>host</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current host value.  If
+		<option>value</option> is specified, it sets a new
+		value for the host.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>keyfield</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current keyfield.  If
+		<option>value</option> is specified, it sets a new
+		value for the keyfield.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>keys</arg>
+		<arg choice="opt"><replaceable>pattern</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Return a list of keys in the database.  If
+		<option>pattern</option> is specified, only the keys
+		matching will be returned.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>lastkey</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the last key that was used from
+		<option>sequence</option>.  If sequence has not been
+		specified, this command returns an empty string.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>list</arg>
+		<arg>request</arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		return a list of the first column of each record
+		found.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>nextkey</arg>
+	      </cmdsynopsis>
+	      <para>Increment <option>sequence</option> and return the
+		next key to be used.  If sequence has not been
+		specified, this command returns an empty
+		string.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>open</arg>
+	      </cmdsynopsis>
+	      <para>Open the connection to the current database.  This
+		command is automatically called from any command which
+		accesses the database.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>pass</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current pass value.  If
+		<option>value</option> is specified, it sets a new
+		value for the password.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>port</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>Return the current port value.  If <option>value</option> is
+		specified, it sets a new value for the port.</para>
+	    </listitem>
+	  </varlistentry>	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>sequence</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current sequence value.  If <option>value</option> is
+		specified, it sets a new value for the sequence.
+	      </para>
+	    </listitem>
+	  </varlistentry>	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>store</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Store <option>arrayName</option> in the database.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>string</arg>
+		<arg><replaceable>request</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		return a string containing the first record
+		found.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>table</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>Return the current table.  If
+		<option>value</option> is specified, it sets a new
+		value for the table.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>user</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current user value.  If
+		<option>value</option> is specified, it sets a new
+		value for the user.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+      <refsect1 id="resultobj">
+	<title>Result Object Commands</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>autocache</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current autocache value.  If
+		<option>value</option> is specified, it sets a new
+		value for autocache.
+	      </para>
+	      <para>
+		If autocache is true, the result object will
+		automatically cache rows as you use them.  This means
+		that the first time you execute a forall command, each
+		row is being cached in the result object itself and
+		will no longer need to access the SQL result.
+		<emphasis>Default is true</emphasis>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>cache</arg>
+	      </cmdsynopsis>
+	      <para>
+		Cache the results of the current SQL result in the
+		result object itself.  This means that even if the
+		database connection is closed and all the results of
+		the DIO object are lost, this result object will still
+		maintain a cached copy of its records.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>errorcode</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current errorcode value.  If <option>value</option>
+		is specified, it sets a new value for errorcode.
+	      </para>
+	      <para>
+		<option>errorcode</option> contains the current code from the
+		SQL database which specifies the result of the query
+		statement which created this object.  This variable
+		can be used to determine the success or failure of a
+		query.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>errorinfo</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current errorinfo value.  If <option>value</option>
+		is specified, it sets a new value for errorinfo.
+	      </para>
+	      <para>
+		If an error occurred during the SQL query, DIO
+		attempts to set the value of <option>errorinfo</option> to the
+		resulting error message.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>fields</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current fields value.  If
+		<option>value</option> is specified, it sets a new
+		value for fields.
+	      </para>
+	      <para>
+		<option>fields</option> contains the list of fields
+		used in this query.  The fields are in order of the
+		fields retrieved for each row.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>forall</arg>
+		<arg><replaceable>-type</replaceable></arg>
+		<arg><replaceable>varName</replaceable></arg>
+		<arg><replaceable>body</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>body</option> over each record in the
+		result object.
+	      </para>
+	      <para>Types:</para>
+	      <variablelist>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-array</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Create
+		      <option><replaceable>varName</replaceable></option>
+		      as an array where the indexes are the names of
+		      the fields in the table and the values are the
+		      values of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-keyvalue</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list containing key-value pairs of fields
+		      and values from the current row. (-field value
+		      -field value)
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-list</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list that contains the values of the
+		      current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>next</arg>
+		<arg><replaceable>-type</replaceable></arg>
+		<arg choice="opt"><replaceable>varName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Retrieve the next record in the result object.
+	      </para>
+	      <para>Types:</para>
+	      <variablelist>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-array</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Create
+		      <option><replaceable>varName</replaceable></option>
+		      as an array where the indexes are the names of
+		      the fields in the table and the values are the
+		      values of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-keyvalue</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list containing key-value pairs of fields
+		      and values from the current row. (-field value
+		      -field value)
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-list</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list that contains the values of the
+		      current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>numrows</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current numrows value.  If <option>value</option> is
+		specified, it sets a new value for numrows.
+	      </para>
+	      <para>
+		<option>numrows</option> is the number of rows in this result.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>resultid</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current resultid value.  If <option>value</option> is
+		specified, it sets a new value for resultid.
+	      </para>
+	      <para>
+		<option>resultid</option> in most databases is the result
+		pointer which was given us by the database.  This
+		variable is not generic and should not really be used,
+		but it's there if you want it.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>rowid</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current rowid value.  If <option>value</option> is
+		specified, it sets a new value for rowid.
+	      </para>
+	      <para>
+		<option>rowid</option> contains the number of the
+		current result record in the result object.  This
+		variable should not really be accessed outside of the
+		result object, but it's there if you want it.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+  </section>
+
 
   <section id="session_package">
     <title>Session Package</title>

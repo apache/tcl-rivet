@@ -1,3 +1,8 @@
+2004-02-25  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Initial cut at including DIO docs in the main set
+	of docs.
+
 2004-02-23  David N. Welton  <davidw@dedasys.com>
 
 	* LICENSE: Switch to Apache 2.0 License.
