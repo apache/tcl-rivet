@@ -425,6 +425,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     array_header *arr;
     table_entry  *elts;
     int i, nelts;
+    Tcl_Obj *arrayName;
 
     /* Make sure RivetDirConf doesn't exist from a previous request. */
     Tcl_UnsetVar( interp, "RivetDirConf", TCL_GLOBAL_ONLY );
@@ -434,11 +435,12 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     arr   = ap_table_elts( t );
     elts  = (table_entry *)arr->elts;
     nelts = arr->nelts;
+    arrayName = Tcl_NewStringObj( "RivetDirConf", -1 );
 
     for( i = 0; i < nelts; ++i )
     {
 	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj("RivetDirConf", -1),
+		       arrayName,
 		       Tcl_NewStringObj( elts[i].key, -1),
 		       Tcl_NewStringObj( elts[i].val, -1),
 		       TCL_GLOBAL_ONLY);
@@ -452,11 +454,12 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     arr   = ap_table_elts( t );
     elts  = (table_entry *)arr->elts;
     nelts = arr->nelts;
+    arrayName = Tcl_NewStringObj( "RivetUserConf", -1 );
 
     for( i = 0; i < nelts; ++i )
     {
 	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj("RivetUserConf", -1),
+		       arrayName,
 		       Tcl_NewStringObj( elts[i].key, -1),
 		       Tcl_NewStringObj( elts[i].val, -1),
 		       TCL_GLOBAL_ONLY);

@@ -16,7 +16,7 @@ source [ file join . buildscripts parsetclConfig.tcl ]
 
 # add variables
 
-set APXS "apxs"
+set APXS "/usr/local/apache/bin/apxs"
 
 set INC "-I[exec $APXS -q INCLUDEDIR] -I$TCL_PREFIX/include"
 

@@ -1,3 +1,8 @@
+Write commands after like 'open' and such in the request namespace that
+keep track of open file pointers and close them in the cleanup.
+
+Complete the NWS package.
+
 Swipe include_* from NWS and rework it like:
     include ?-virtual? ?-noparse? file
 
@@ -19,6 +24,8 @@ MAYBE
 Maybe write load_cookies in Tcl and try to get rid of the apache_cookie.* stuff.
 
 Maybe write the header command in Tcl.
+
+Maybe move ::request commands into a file called request.tcl.
 
 
 DONE

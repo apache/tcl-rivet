@@ -20,6 +20,7 @@
 #include "apache_request.h"
 #include "apache_cookie.h"
 #include "mod_rivet.h"
+#include "rivet.h"
 
 #define BUFSZ 4096
 
@@ -273,11 +274,11 @@ Rivet_LoadEnv(
     Tcl_Obj *CONST objv[])
 {
     char *timefmt = DEFAULT_TIME_FORMAT;
+    char *auth = NULL;
 #ifndef WIN32
     struct passwd *pw;
 #endif /* ndef WIN32 */
     char *t;
-    char *authorization = NULL;
 
     time_t date;
 
@@ -318,24 +319,22 @@ Rivet_LoadEnv(
     env     = (table_entry *) env_arr->elts;
 
     /* Get the user/pass info for Basic authentication */
-    (const char*)authorization =
-	ap_table_get(globals->r->headers_in, "Authorization");
-    if (authorization
-	&& !strcasecmp(ap_getword_nc(POOL, &authorization, ' '), "Basic"))
+    (const char*)auth = ap_table_get(globals->r->headers_in, "Authorization");
+    if ( auth && STREQU(ap_getword_nc(POOL, &auth, ' '), "Basic") )
     {
 	char *tmp;
 	char *user;
 	char *pass;
 
-	tmp = ap_pbase64decode(POOL, authorization);
+	tmp = ap_pbase64decode(POOL, auth);
 	user = ap_getword_nulls_nc(POOL, &tmp, ':');
 	pass = tmp;
- 	Tcl_ObjSetVar2(interp, Tcl_NewStringObj("::request::USER", -1),
-		       Tcl_NewStringObj("user", -1),
+ 	Tcl_ObjSetVar2(interp, ArrayObj,
+		       Tcl_NewStringObj("HTTP_USER", -1),
 		       STRING_TO_UTF_TO_OBJ(user, POOL),
 		       0);
- 	Tcl_ObjSetVar2(interp, Tcl_NewStringObj("::request::USER", -1),
-		       Tcl_NewStringObj("pass", -1),
+ 	Tcl_ObjSetVar2(interp, ArrayObj,
+		       Tcl_NewStringObj("HTTP_PASS", -1),
 		       STRING_TO_UTF_TO_OBJ(pass, POOL),
 		       0);
     }
@@ -883,6 +882,26 @@ Rivet_NoBody(
     return TCL_OK;
 }
 
+TCL_CMD_HEADER( Rivet_AbortPageCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    rivet_server_conf *rsc =
+	RIVET_SERVER_CONF( globals->r->server->module_config );
+
+    if (objc != 1)
+    {
+	Tcl_WrongNumArgs(interp, 1, objv, "");
+	return TCL_ERROR;
+    }
+
+    Rivet_PrintHeaders(globals->r);
+    Tcl_Flush(*(rsc->outchannel));
+
+    globals->r->connection->aborted = 1;
+
+    return TCL_OK;
+}
+
 int
 Rivet_InitCore( Tcl_Interp *interp )
 {
@@ -936,5 +955,8 @@ Rivet_InitCore( Tcl_Interp *interp )
 			Rivet_NoBody,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
+
+    TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
+
     return TCL_OK;
 }

@@ -1,5 +1,12 @@
 namespace eval ::Rivet {
 
+    ###
+    ## This routine gets called each time a new request comes in.
+    ## It sets up the request namespace and creates a global command
+    ## to replace the default global.  This ensures that when a user
+    ## uses global variables, they're actually contained within the
+    ## namespace.  So, everything gets deleted when the request is finished.
+    ###
     proc initialize_request {} {
 	catch { namespace delete ::request }
 
@@ -12,6 +19,10 @@ namespace eval ::Rivet {
 	}
     }
 
+    ###
+    ## This routine gets called each time a request is finished.  Any kind
+    ## of special cleanup can be placed here.
+    ###
     proc cleanup_request {} {
 
     }
@@ -47,4 +58,5 @@ namespace eval ::Rivet {
 
 } ;## namespace eval ::Rivet
 
+## Initialize Rivet.
 ::Rivet::init

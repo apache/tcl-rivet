@@ -1,3 +1,11 @@
+2002-01-19  Damon J. Courtney <damon@unreality.com>
+
+	* src/rivetCore.c
+	    Moved authorization from its own array into the env array as
+	    HTTP_USER and HTTP_PASS.
+
+	    Added an abort_page command which halts the sending of a request.
+
 2002-01-19  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c: Added individual functions for CGI variable
