@@ -46,6 +46,7 @@ Rivet_MakeURL(
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;
     }
+    result = Tcl_NewObj();
     TclWeb_MakeURL(result, Tcl_GetString(objv[1]), globals->req);
     Tcl_SetObjResult(interp, result);
     return TCL_OK;
@@ -480,9 +481,6 @@ Rivet_Upload(
 		    return TCL_ERROR;
 		}
 	    } else if (!strcmp(method, "data")) {
-		/* this sucks - we should use the hook, but I want to
-                   get everything fixed and working first */
-
 		if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
 		    return TCL_ERROR;
 		}

@@ -119,7 +119,8 @@ TclWeb_SetStatus(int status, TclWebRequest *req)
 INLINE int
 TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 {
-    result = Tcl_NewStringObj(ap_construct_url(TCLWEBPOOL, filename, req->req), -1);
+    Tcl_SetStringObj(result, ap_construct_url(TCLWEBPOOL,
+					       filename, req->req), -1);
     return TCL_OK;
 }
 
