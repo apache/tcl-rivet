@@ -6,19 +6,17 @@ proc import_keyvalue_pairs {arrayName argsList} {
 	return
     }
 
-    set endit 0
+    set index 0
     set looking 0
     set data(args) ""
     foreach arg $argsList {
-	if {$endit} {
-	    lappend data(args) $arg
-	} elseif {$looking} {
+	if {$looking} {
 	    set data($varName) $arg
 	    set looking 0
 	} elseif {[string index $arg 0] == "-"} {
 	    if {$arg == "--"} {
-		set endit 1
-		continue
+		set data(args) [lrange $argsList [expr $index + 1] end]
+		break
 	    }
 	    if {$arg == "-args"} {
 		return -code error "-args is a reserved value."
@@ -26,7 +24,9 @@ proc import_keyvalue_pairs {arrayName argsList} {
 	    set varName [string range $arg 1 end]
 	    set looking 1
 	} else {
-	    lappend data(args) $arg
+	    set data(args) [lrange $argsList $index end]
+	    break
 	}
+	incr index
     }
 }
