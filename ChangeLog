@@ -1,3 +1,8 @@
+2004-08-07  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/packages/dtcl/dtcl.tcl (hgetvars): Added code from Arnulf
+	Wiedemann <arnulf@wiedemann-pri.de> to set up VARS array.
+
 2004-08-03  Pat Thoyts  <patthoyts@users.sourceforge.net>
 
 	* win/Rivet.nsi: Added a NSIS script. This is used with the

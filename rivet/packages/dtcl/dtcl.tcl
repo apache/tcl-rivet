@@ -23,9 +23,15 @@ package provide Dtcl 1.0
 
 proc hgetvars {} {
     uplevel {
+        catch {unset VARS}
 	load_env ENVS
 	load_cookies COOKIES
     }
+    set vars [var all]
+    foreach {name val} $vars {
+	uplevel [list set VARS($name) "$val"]
+    }
+    unset vars
 }
 
 proc hputs {args} {
