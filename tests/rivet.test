@@ -29,11 +29,16 @@ set testgroup3 1
 # Run all tests against one server process.
 
 if { $testgroup1 } {
+    puts -nonewline "Running all tests against one server process."
+    flush stdout
     apachetest::start {} {
 	foreach Test $TestList {
+	    puts -nonewline "."
+	    flush stdout
 	    source $Test
 	}
     }
+    puts " done"
 }
 
 # Run each test in its own server
@@ -41,6 +46,7 @@ if { $testgroup1 } {
 if { $testgroup2 } {
     foreach Test $TestList {
 	apachetest::start {} {
+	    puts "Running $Test"
 	    source $Test
 	}
     }

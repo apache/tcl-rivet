@@ -12,7 +12,7 @@ package provide apachetest 0.1
 
 namespace eval apachetest {
 
-    set debug 1
+    set debug 0
 
     # Associate module names with their internal names.
     array set module_assoc {
@@ -33,13 +33,16 @@ namespace eval apachetest {
 # make sure we can connect to the server
 
 proc apachetest::connect { } {
-    while { 1 } {
+    set starttime [clock seconds]
+    set diff 0
+    while { $diff < 10 } {
 	if { ! [catch {
 	    set sk [socket localhost 8081]
 	} err]} {
 	    close $sk
 	    return
 	}
+	set diff [expr {[clock seconds] - $starttime}]
     }
 }
 
@@ -49,20 +52,28 @@ proc apachetest::connect { } {
 proc apachetest::start { options code } {
     variable serverpid 0
     variable binname
+    variable debug
 
     # There has got to be a better way to do this, aside from waiting.
     set serverpid [eval exec  $binname -X -f \
-		       [file join [pwd] server.conf] $options &]
+		       [file join [pwd] server.conf] $options >& apachelog.txt & ]
 
     apachetest::connect
-    puts "Apache started as PID $serverpid"
-    if { ! [catch {
+    if { $debug > 0 } {
+	puts "Apache started as PID $serverpid"
+    }
+    if { [catch {
 	uplevel $code
     } err] } {
 	puts $err
     }
     kill $serverpid
-    wait $serverpid
+    catch {
+	set waitres [wait $serverpid]
+	if { $debug > 0 } {
+	    puts $waitres
+	}
+    }
 }
 
 # startserver - start the server with 'options'.
@@ -74,10 +85,10 @@ proc apachetest::startserver { args } {
 	if { $debug } {
 	    puts "$binname -X -f [file join [pwd] server.conf] [concat $args]"
 	}
-	eval exec $binname -X -f \
-	    "[file join [pwd] server.conf]" [concat $args]
+	set serverpid [eval exec $binname -X -f \
+			   "[file join [pwd] server.conf]" [concat $args]]
     } err] } {
-	puts $err
+	puts "$err"
     }
 }
 

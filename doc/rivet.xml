@@ -514,7 +514,8 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 		  the variable doesn't exist as a GET or POST
 		  variable, the
 		  <option><replaceable><optional>default</optional></replaceable></option>
-		  value is returned, otherwise an error is thrown.
+		  value is returned, otherwise "" - an empty string -
+		  is returned.
 		</para>
 	      </listitem>
 	    </varlistentry>
