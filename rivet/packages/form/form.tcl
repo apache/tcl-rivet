@@ -5,15 +5,15 @@ package provide form 1.0
 ::itcl::class form {
 
     constructor {args} {
-	set arguments(METHOD) POST
-	set arguments(ACTION) [env DOCUMENT_URI]
+	set arguments(method) post
+	set arguments(action) [env DOCUMENT_URI]
 
 	import_data form $this arguments $args
 
-	if {[info exists arguments(DEFAULTS)]} {
-	    upvar 1 $arguments(DEFAULTS) defaults
+	if {[info exists arguments(defaults)]} {
+	    upvar 1 $arguments(defaults) defaults
 	    array set DefaultValues [array get defaults]
-	    unset arguments(DEFAULTS)
+	    unset arguments(defaults)
 	}
     }
 
@@ -33,7 +33,7 @@ package provide form 1.0
 	}
 
 	if {[info exists DefaultValues($name)]} {
-	    set data(VALUE) $DefaultValues($name)
+	    set data(value) $DefaultValues($name)
 	}
 
 	if {[expr [llength $list] % 2]} {
@@ -42,9 +42,9 @@ package provide form 1.0
 
 	set return ""
 	foreach {var val} $list {
-	    set var [string range [string toupper $var] 1 end]
+	    set var [string range [string tolower $var] 1 end]
 	    set data($var) $val
-	    if {$var == "VALUES"} { continue }
+	    if {$var == "values"} { continue }
 	    lappend return -$var $val
 	}
 	return $return
@@ -79,33 +79,34 @@ package provide form 1.0
     }
 
     method start {} {
-	puts "<FORM [argstring arguments]>"
+	html "<form [argstring arguments]>"
     }
 
     method end {} {
-	puts "</FORM>"
+	html "</form>"
     }
 
     method field {type name args} {
 	import_data $type $name data $args
-	set string "<INPUT TYPE=\"$type\" NAME=\"$name\""
+	set string "<input type=\"$type\" name=\"$name\""
 	append string [argstring data]
 	switch -- $type {
 	    "radio" -
 	    "checkbox" {
-		if {![info exists data(VALUE)]} { set data(VALUE) "" }
+		if {![info exists data(value)]} { set data(value) "" }
+		if {![info exists data(label)]} { set data(label) $data(value) }
 		if {[info exists DefaultValues($name)]} {
-		    if {$data(VALUE) == $DefaultValues($name)} {
-			append string " CHECKED"
+		    if {$data(value) == $DefaultValues($name)} {
+			append string { checked="checked"}
 		    }
 		}
 	    }
 	}
-	append string ">"
+	append string " />"
 	if {$type == "radio"} {
-	    puts $string$data(VALUE)
+	    html $string$data(label)
 	} else {
-	    puts $string
+	    html $string
 	}
     }
 
@@ -142,48 +143,57 @@ package provide form 1.0
     }
 
     method radiobuttons {name args} {
+	set data(values) [list]
+	set data(labels) [list]
 	set list [import_data radiobuttons $name data $args]
-	if {![info exists data(VALUES)]} {
-	    return -code error "No -values specified for radiobuttons"
-	}
-	foreach value $data(VALUES) {
-	    eval radio $name $list -value $value
+	if {[lempty $data(labels)]} { set data(labels) $data(values) }
+	foreach label $data(labels) value $data(values) {
+	    eval radio $name $list -label $label -value $value
 	}
     }
 
     method select {name args} {
+	set data(values) [list]
+	set data(labels) [list]
 	import_data select $name data $args
-	set values $data(VALUES)
-	unset data(VALUES)
+	set values $data(values)
+	set labels $data(labels)
+	unset data(values) data(labels)
 	set default ""
 	if {[info exists DefaultValues($name)]} {
 	    set default $DefaultValues($name)
 	}
-	puts "<SELECT NAME=\"$name\" [argstring data]>"
-	foreach value $values {
-	    if {$value == $default} {
-		set string "<OPTION SELECTED>"
-	    } else {
-		set string "<OPTION>"
-	    }
-	    puts $string$value
+	if {[info exists data(value)]} {
+	    set default $data(value)
+	    unset data(value)
 	}
-	puts "</SELECT>"
+	
+	if {[lempty $labels]} { set labels $values }
+
+	html "<select name=\"$name\" [argstring data]>"
+	foreach label $labels value $values {
+	    if {$value == $default} {
+		set string "<option value=\"$value\" selected=\"selected\">"
+	    } else {
+		set string "<option value=\"$value\">"
+	    }
+	    html $string$label
+	}
+	html "</select>"
     }
 
     method textarea {name args} {
 	import_data textarea $name data $args
 	set value ""
-	if {[info exists data(VALUE)]} {
-	    set value $data(VALUE)
-	    unset data(VALUE)
+	if {[info exists data(value)]} {
+	    set value $data(value)
+	    unset data(value)
 	}
-	puts "<TEXTAREA NAME=\"$name\" [argstring data]>$value</TEXTAREA>"
+	html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
     }
 
     public variable defaults "" {
 	upvar 1 $defaults array
-	unset array
 	array set DefaultValues [array get array]
     }
 
