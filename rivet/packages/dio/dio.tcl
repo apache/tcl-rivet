@@ -649,7 +649,7 @@ proc handle {interface args} {
 	set command "mysqlconnect"
 
 	if {![lempty $user]} { lappend command -user $user }
-	if {![lempty $pass]} { lappend command -pass $pass }
+	if {![lempty $pass]} { lappend command -password $pass }
 	if {![lempty $port]} { lappend command -port $port }
 	if {![lempty $host]} { lappend command $host }
 
