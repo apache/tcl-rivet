@@ -80,9 +80,9 @@ AddNode static {
 }
 
 AddNode clean {
-    command {rm [glob *.o]}
-    command {rm [glob *.so]}
-    command {rm mod_rivet.a}
+    command {rm -f [glob -nocomplain *.o]}
+    command {rm -f [glob -nocomplain *.so]}
+    command {rm -f mod_rivet.a}
 }
 
 AddNode install {

@@ -57,6 +57,8 @@ typedef struct {
     int seperate_virtual_interps;
     char *server_name;
     char *upload_dir;
+    table *rivet_dir_vars;
+    table *rivet_user_vars;
 
     char **objCacheList;     /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache; /* Objects cache - the key is the script name */
@@ -90,5 +92,7 @@ rivet_server_conf *rivet_get_conf(request_rec *r);
 
 /* Macro to Tcl Objectify StringToUtf stuff */
 #define STRING_TO_UTF_TO_OBJ(string, pool) Tcl_NewStringObj(StringToUtf(string, pool), -1)
+
+#define STREQU(s1, s2) (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 
 #endif

@@ -25,8 +25,12 @@ extern Tcl_Obj *uploadstorage[];
 #define POOL (globals->r->pool)
 
 /* Make a self-referencing URL  */
-
-int MakeURL(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_MakeURL(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     
@@ -35,13 +39,19 @@ int MakeURL(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST 
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;	
     }
-    Tcl_SetResult(interp, ap_construct_url(POOL, Tcl_GetString(objv[1]), globals->r), NULL);
+    Tcl_SetResult(interp,
+	ap_construct_url(POOL, Tcl_GetString(objv[1]), globals->r), NULL);
     return TCL_OK;
 }
 
 /* Include and parse a file */
 
-int Parse(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Parse(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *filename;
     struct stat finfo;
@@ -75,15 +85,21 @@ int Parse(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST ob
 
 /* Tcl command to include flat files */
 
-int Include(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Include(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     Tcl_Channel fd;
     int sz;
     char buf[BUFSZ];
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc =
-	(rivet_server_conf *)ap_get_module_config(globals->r->server->module_config,
-						 &rivet_module);
+	(rivet_server_conf *)ap_get_module_config(
+				globals->r->server->module_config,
+				&rivet_module);
     Tcl_Obj *outobj;
 
     if (objc != 2)
@@ -93,7 +109,8 @@ int Include(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST 
     }
 
     fd = Tcl_OpenFileChannel(interp,
-			     Tcl_GetStringFromObj(objv[1], (int *)NULL), "r", 0664);
+			     Tcl_GetStringFromObj(objv[1], (int *)NULL),
+			     "r", 0664);
 
     if (fd == NULL)
     {
@@ -130,7 +147,12 @@ int Include(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST 
 
 /* Command to *only* add to the output buffer */
 
-int Buffer_Add(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_BufferAdd(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_server_conf *rsc = (rivet_server_conf *)
@@ -148,7 +170,12 @@ int Buffer_Add(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CON
 
 /* Tcl command to output some text to the web server  */
 
-int Hputs(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Hputs(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *arg1;
     int length;
@@ -201,7 +228,12 @@ int Hputs(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST ob
 
 /* Tcl command to manipulate headers */
 
-int Headers(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Headers(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *opt;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -303,7 +335,12 @@ int Headers(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST 
 
 /* turn buffering on and off */
 
-int Buffered(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Buffered(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *opt = NULL;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -330,7 +367,12 @@ int Buffered(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST
 }
 /* Tcl command to flush the output stream */
 
-int HFlush(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Hflush(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
@@ -350,7 +392,12 @@ int HFlush(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST o
 /* Get the environmental variables, but do it from a tcl function, so
    we can decide whether we wish to or not */
 
-int HGetVars(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_HGetVars(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *timefmt = DEFAULT_TIME_FORMAT;
 #ifndef WIN32
@@ -505,7 +552,12 @@ int HGetVars(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST
    var all
   */
 
-int Var(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Var(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *command;
     int i;
@@ -690,7 +742,12 @@ upload names
 gets all the upload names.
 */
 
-int Upload(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Upload(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *command = NULL;
     Tcl_Obj *result = NULL;
@@ -778,7 +835,7 @@ int Upload(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST o
 		    char *bytes = NULL;
 		    Tcl_Channel chan = NULL;
 
-		    bytes = Tcl_Alloc(ApacheUpload_size(upload));
+		    bytes = Tcl_Alloc((unsigned)ApacheUpload_size(upload));
 		    chan = Tcl_MakeFileChannel((ClientData)fileno(
 			ApacheUpload_FILE(upload)), TCL_READABLE);
 		    Tcl_SetChannelOption(interp, chan, "-translation", "binary");
@@ -854,7 +911,12 @@ int Upload(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST o
 /* Tcl command to get, and print some information about the current
    state of affairs */
 
-int Rivet_Info(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int
+Rivet_Info(
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *CONST objv[])
 {
     char *tble;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -877,7 +939,7 @@ int Rivet_Info(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CON
 /* Tcl command to erase body, so that only header is returned.
    Necessary for 304 responses */
 
-int No_Body(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
+int Rivet_NoBody(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
 {
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -889,5 +951,76 @@ int No_Body(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST 
 
     print_headers(globals->r);
     Tcl_DStringInit(rsc->buffer);
+    return TCL_OK;
+}
+
+int
+Rivet_init( Tcl_Interp *interp )
+{
+    Tcl_CreateObjCommand(interp,
+			"makeurl",
+			Rivet_MakeURL,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+    			"hputs",
+			Rivet_Hputs,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"buffer_add",
+			Rivet_BufferAdd,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"buffered",
+			Rivet_Buffered,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+    			"headers",
+			Rivet_Headers,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"hgetvars",
+			Rivet_HGetVars,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+    			"var",
+			Rivet_Var,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"upload",
+			Rivet_Upload,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"include",
+			Rivet_Include,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"parse",
+			Rivet_Parse,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"hflush",
+			Rivet_Hflush,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"rivet_info",
+			Rivet_Info,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"no_body",
+			Rivet_NoBody,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
     return TCL_OK;
 }

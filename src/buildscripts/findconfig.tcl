@@ -50,4 +50,3 @@ proc FindTclConfig {} {
     }
     return -code error "tclConfig.sh not found"
 }
-
