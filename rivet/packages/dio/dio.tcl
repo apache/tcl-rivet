@@ -45,6 +45,11 @@ proc handle {interface args} {
 	close
     }
 
+    #
+    # result - generate a new DIO result object for the specified database
+    # interface, with key-value pairs that get configured into the new
+    # result object.
+    #
     protected method result {interface args} {
 	return [eval uplevel \#0 ::DIO::${interface}Result \#auto $args]
     }
@@ -227,6 +232,7 @@ proc handle {interface args} {
 	    return " WHERE $myKeyfield = '[quote $myKey]'"
 	}
 
+	# multiple fields, construct it as a where-and
 	set first 1
 	set req ""
 	foreach field $myKeyfield key $myKey {
@@ -288,9 +294,9 @@ proc handle {interface args} {
     	::itcl::delete object $this
     }
 
-    ###
-    ## Execute a request and only return a string of the row.
-    ###
+    #
+    # string - execute a SQL request and only return a string of one row.
+    #
     method string {req} {
 	set res [exec $req]
 	set val [$res next -list]
@@ -298,9 +304,10 @@ proc handle {interface args} {
 	return $val
     }
 
-    ###
-    ## Execute a request and return a list of the first element of each row.
-    ###
+    #
+    # list - execute a request and return a list of the first element of each 
+    # row returned.
+    #
     method list {req} {
 	set res [exec $req]
 	set list ""
@@ -311,9 +318,11 @@ proc handle {interface args} {
 	return $list
     }
 
-    ###
-    ## Execute a request and setup an array with the row fetched.
-    ###
+    #
+    # array - execute a request and setup an array containing elements
+    # with the field names as the keys and the first row results as
+    # the values
+    #
     method array {req arrayName} {
 	upvar 1 $arrayName $arrayName
 	set res [exec $req]
@@ -322,11 +331,14 @@ proc handle {interface args} {
 	return $ret
     }
 
-    ###
-    ## Execute a request and call body for each row returned in arrayName
-    ###
+    #
+    # forall - execute a SQL select and iteratively fill the named array 
+    # with elements named with the matching field names, containing the 
+    # matching values, executing the specified code body for each, in turn.
+    #
     method forall {req arrayName body} {
 	upvar 1 $arrayName $arrayName
+
 	set res [exec $req]
         set ret [$res numrows]
 	$res forall -array $arrayName {
@@ -336,6 +348,15 @@ proc handle {interface args} {
 	return $ret
     }
 
+    #
+    # table_check - internal method to populate the data array with
+    # a -table element containing the table name, a -keyfield element
+    # containing the key field or list of key fields, and a list of
+    # key-value pairs to get set into the data table.
+    #
+    # afterwards, it's an error if -table or -keyfield hasn't somehow been
+    # determined.
+    #
     protected method table_check {list {tableVar myTable} {keyVar myKeyfield}} {
 	upvar 1 $tableVar $tableVar $keyVar $keyVar
 	set data(-table) $table
@@ -353,6 +374,11 @@ proc handle {interface args} {
 	set $keyVar   $data(-keyfield)
     }
 
+    #
+    # key_check - given a list of key fields and a list of keys, it's
+    # an error if there aren't the same number of each, and if it's
+    # autokey, there can't be more than one key.
+    #
     protected method key_check {myKeyfield myKey} {
 	if {[llength $myKeyfield] < 2} { return }
 	if {$autokey} {
@@ -363,6 +389,11 @@ proc handle {interface args} {
 	}
     }
 
+    #
+    # fetch - given a key (or list of keys) an array name, and some
+    # extra key-value arguments like -table and -keyfield, fetch
+    # the key into the array
+    #
     method fetch {key arrayName args} {
 	table_check $args
 	key_check $myKeyfield $key
@@ -380,6 +411,11 @@ proc handle {interface args} {
 	return $return
     }
 
+    #
+    # store - given an array containing key-value pairs and optional
+    # arguments like -table and -keyfield, insert or update the
+    # corresponding table entry.
+    #
     method store {arrayName args} {
 	table_check $args
 	upvar 1 $arrayName $arrayName $arrayName array
@@ -411,6 +447,9 @@ proc handle {interface args} {
 	return $return
     }
 
+    #
+    # delete - delete matching record from the specified table
+    #
     method delete {key args} {
 	table_check $args
 	set req "delete from $myTable"
@@ -421,6 +460,9 @@ proc handle {interface args} {
 	return $return
     }
 
+    #
+    # keys - return all keys in a tbale
+    #
     method keys {args} {
 	table_check $args
 	set req "select * from $myTable"
@@ -435,11 +477,18 @@ proc handle {interface args} {
 	return $keys
     }
 
+    #
+    # search - construct and execute a SQL select statement using
+    # build_select_query style and return the result handle.
+    #
     method search {args} {
 	set req [eval build_select_query $args]
 	return [exec $req]
     }
 
+    #
+    # count - return a count of the specified (or current) table.
+    #
     method count {args} {
 	table_check $args
 	return [string "select count(*) from $myTable"]
@@ -447,7 +496,7 @@ proc handle {interface args} {
 
     ##
     ## These are methods which should be defined by each individual database
-    ## class.
+    ## interface class.
     ##
     method open    {args} {}
     method close   {args} {}
@@ -496,6 +545,9 @@ proc handle {interface args} {
 
 } ; ## ::itcl::class Database
 
+#
+# DIO Result object
+#
 ::itcl::class Result {
     constructor {args} {
 	eval configure $args
@@ -507,11 +559,22 @@ proc handle {interface args} {
 	::itcl::delete object $this
     }
 
+    #
+    # configure_variable - given a variable name and a string, if the
+    # string is empty return the variable name, otherwise set the
+    # variable to the string.
+    #
     protected method configure_variable {varName string} {
 	if {[lempty $string]} { return [cget -$varName] }
 	configure -$varName $string
     }
 
+    #
+    # lassign_array - given a list, an array name, and a variable number
+    # of arguments consisting of variable names, assign each element in
+    # the list, in turn, to elements corresponding to the variable
+    # arguments, into the named array.  From TclX.
+    #
     protected method lassign_array {list arrayName args} {
 	upvar 1 $arrayName array
 	foreach elem $list field $args {
@@ -519,6 +582,10 @@ proc handle {interface args} {
 	}
     }
 
+    #
+    # seek - set the current row ID (our internal row cursor, if you will)
+    # to the specified row ID
+    #
     method seek {newrowid} {
 	set rowid $newrowid
     }
@@ -543,6 +610,9 @@ proc handle {interface args} {
 	set cached 1
     }
 
+    #
+    # forall -- walk the result object, executing the code body over it
+    #
     method forall {type varName body} {
 	upvar 1 $varName $varName
 	set currrow $rowid
