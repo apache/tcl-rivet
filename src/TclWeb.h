@@ -18,6 +18,7 @@ typedef struct TclWebRequest {
     Tcl_Interp *interp;
     request_rec *req;
     ApacheRequest *apachereq;
+    ApacheUpload *upload;
     int headers_printed; 	/* has the header been printed yet? */
     int headers_set;       /* has the header been set yet? */
     int content_sent;
@@ -98,7 +99,120 @@ int TclWeb_GetCookieVars(Tcl_Obj *cookievar, TclWebRequest *req);
 
 int TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req);
 
-/* upload stuff goes here */
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_PrepareUpload --
+ *
+ * Do any preperation necessary for file uploads.  This must be
+ * performed before other upload operations.
+ *
+ * Results:
+ *
+ * Stores, if necessary, additional, initialized information in the
+ * TclWebRequest structure.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_PrepareUpload(char *varname, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_UploadChannel --
+ *
+ * Takes the address of a Tcl_Channel and uses it to create a channel
+ * pointing to the upload data.
+ *
+ * Results:
+ *
+ * 'chan' points to a FileChannel containing the uploaded data.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_UploadSave --
+ *
+ * Saves the uploaded file in 'filename'.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_UploadData --
+ *
+ * Fills in the 'data' Tcl_Obj with the uploaded data.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_UploadSize --
+ *
+ * Stores, in 'sz' the size of the data uploaded.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadSize(Tcl_Obj *sz, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_UploadType --
+ *
+ * Stores, in 'type' the mime type of the file uploaded.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadType(Tcl_Obj *type, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_UploadFilename --
+ *
+ * Get the original filename of the uploaded data, on the client side.
+ *
+ * Results:
+ *
+ * Stores the filename in 'filename'.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadFilename(Tcl_Obj *filename, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_UploadNames --
+ *
+ * Fetch names of all the uploaded variables.
+ *
+ * Results:
+ *
+ * Stores the names of the variables in the list 'names'.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req);
 
 int TclWeb_Escape(char *out, char *in, int len, void *var);
 

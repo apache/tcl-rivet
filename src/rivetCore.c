@@ -23,8 +23,6 @@
 #include "rivet.h"
 #include "TclWeb.h"
 
-#define BUFSZ 4096
-
 #define ENV_ARRAY_NAME "env"
 #define COOKIES_ARRAY_NAME "cookies"
 
@@ -436,10 +434,7 @@ Rivet_Upload(
 {
     char *command = NULL;
     Tcl_Obj *result = NULL;
-    ApacheUpload *upload;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc =
-	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc < 2 || objc > 5)
     {
@@ -455,95 +450,48 @@ Rivet_Upload(
 	if (objc < 4)
 	{
 	    Tcl_WrongNumArgs(interp, 2, objv,
-		"varname channel|save filename|var varname");
+			     "varname channel|save filename|var varname");
 	    return TCL_ERROR;
 	}
 	varname = Tcl_GetString(objv[2]);
-	upload = ApacheUpload_find(globals->req->apachereq->upload, varname);
-	if (upload != NULL) /* make sure we have an upload */
+
+	if (TclWeb_PrepareUpload(varname, globals->req) == TCL_OK)
 	{
 	    Tcl_Channel chan;
 	    char *method = Tcl_GetString(objv[3]);
+
 	    if (!strcmp(method, "channel"))
 	    {
-		if (ApacheUpload_FILE(upload) != NULL)
-		{
-		    /* create and return a file channel */
-		    char *channelname = NULL;
-		    chan = Tcl_MakeFileChannel(
-			(ClientData)fileno(ApacheUpload_FILE(upload)),
-			TCL_READABLE);
-		    Tcl_RegisterChannel(interp, chan);
-		    channelname = Tcl_GetChannelName(chan);
-		    Tcl_SetStringObj(result, channelname, -1);
+		char *channelname = NULL;
+
+		if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
+		    return TCL_ERROR;
 		}
+		channelname = Tcl_GetChannelName(chan);
+		Tcl_SetStringObj(result, channelname, -1);
 	    } else if (!strcmp(method, "save")) {
 		/* save data to a specified filename  */
-
-		int sz;
-		char savebuffer[BUFSZ];
-		Tcl_Channel savechan = NULL;
-		Tcl_Channel chan = NULL;
-		if (objc != 5)
-		{
+		if (objc != 5) {
 		    Tcl_WrongNumArgs(interp, 4, objv, "filename");
 		    return TCL_ERROR;
 		}
 
-		savechan = Tcl_OpenFileChannel(interp, Tcl_GetString(objv[4]),
-						"w", 0600);
-		if (savechan == NULL)
+		if (TclWeb_UploadSave(varname, objv[4], globals->req) != TCL_OK) {
 		    return TCL_ERROR;
-		else
-		    Tcl_SetChannelOption(interp, savechan,
-			"-translation", "binary");
-
-		chan = Tcl_MakeFileChannel(
-			(ClientData)fileno(ApacheUpload_FILE(upload)),
-			TCL_READABLE);
-		Tcl_SetChannelOption(interp, chan, "-translation", "binary");
-
-		while ((sz = Tcl_Read(chan, savebuffer, BUFSZ)))
-		{
-		    if (sz == -1)
-		    {
-			Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
-			return TCL_ERROR;
-		    }
-
-		    Tcl_Write(savechan, savebuffer, sz);
-		    if (sz < 4096)
-			break;
 		}
-		Tcl_Close(interp, savechan);
-		Tcl_SetIntObj(result, 1);
 	    } else if (!strcmp(method, "data")) {
 		/* this sucks - we should use the hook, but I want to
                    get everything fixed and working first */
-		if (rsc->upload_files_to_var)
-		{
-		    char *bytes = NULL;
-		    Tcl_Channel chan = NULL;
 
-		    bytes = Tcl_Alloc((unsigned)ApacheUpload_size(upload));
-		    chan = Tcl_MakeFileChannel(
-			(ClientData)fileno(ApacheUpload_FILE(upload)),
-			TCL_READABLE);
-		    Tcl_SetChannelOption(interp, chan,
-			"-translation", "binary");
-		    Tcl_SetChannelOption(interp, chan, "-encoding", "binary");
-		    /* Put data in a variable  */
-		    Tcl_ReadChars(chan, result, ApacheUpload_size(upload), 0);
-		} else {
-		    Tcl_AppendResult(interp,
-			"RivetServerConf UploadFilesToVar is not set", NULL);
+		if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
 		    return TCL_ERROR;
 		}
 	    }
 	} else {
-	    /* no variable found  */
-	    Tcl_SetStringObj(result, "", -1);
+	    Tcl_AddErrorInfo(interp, "variable doesn't exist");
+	    return TCL_ERROR;
 	}
+
     } else if (!strcmp(command, "info")) {
 	char *varname = NULL;
 	char *infotype = NULL;
@@ -556,25 +504,18 @@ Rivet_Upload(
 	varname = Tcl_GetString(objv[2]);
 	infotype = Tcl_GetString(objv[3]);
 
-	upload = ApacheUpload_find(globals->req->apachereq->upload, varname);
-	if (upload != NULL)
+	if (TclWeb_PrepareUpload(varname, globals->req) == TCL_OK)
 	{
 	    if (!strcmp(infotype, "exists"))
 	    {
+		/* if we've made it this far, it must exist */
 		Tcl_SetIntObj(result, 1);
 	    } else if (!strcmp(infotype, "size")) {
-		Tcl_SetIntObj(result, ApacheUpload_size(upload));
+		TclWeb_UploadSize(result, globals->req);
 	    } else if (!strcmp(infotype, "type")) {
-		char *type = NULL;
-		type = (char *)ApacheUpload_type(upload);
-		if (type)
-		    Tcl_SetStringObj(result, type, -1);
-		else
-		    Tcl_SetStringObj(result, "", -1);
+		TclWeb_UploadType(result, globals->req);
 	    } else if (!strcmp(infotype, "filename")) {
-		Tcl_SetStringObj(result,
-				 TclWeb_StringToUtf(upload->filename,
-						    globals->req), -1);
+		TclWeb_UploadFilename(result, globals->req);
 	    } else {
 		Tcl_AddErrorInfo(interp,"unknown upload info command, should "
 			"be exists|size|type|filename");
@@ -589,13 +530,7 @@ Rivet_Upload(
 	    }
 	}
     } else if (!strcmp(command, "names")) {
-	upload = ApacheRequest_upload(globals->req->apachereq);
-	while (upload)
-	{
-	    Tcl_ListObjAppendElement(interp, result,
-				     TclWeb_StringToUtfToObj(upload->name, globals->req));
-	    upload = upload->next;
-	}
+	TclWeb_UploadNames(result, globals->req);
     } else {
 	Tcl_WrongNumArgs(interp, 1, objv, "upload get|info|names");
 	return TCL_ERROR;

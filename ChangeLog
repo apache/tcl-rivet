@@ -1,3 +1,13 @@
+2002-02-23  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c: Added functions: TclWeb_PrepareUpload,
+	TclWeb_UploadChannel, TclWeb_UploadSave, TclWeb_UploadData,
+	TclWeb_UploadSize, TclWeb_UploadType, TclWeb_UploadFilename,
+	TclWeb_UploadNames.
+
+	* src/rivetCore.c (Rivet_Upload): Offloaded functionality to
+	TclWebApache.c.
+
 2002-02-17  Damon J. Courtney <damon@unreality.com>
 
 	* src/make.tcl

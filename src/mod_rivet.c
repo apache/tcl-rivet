@@ -119,7 +119,7 @@ Rivet_UploadHook(void *ptr, char *buf, int len, ApacheUpload *upload)
 #endif /* 0 */
 
 
-/* Calls Tcl_EvalObj() and checks for errors
+/* Calls Tcl_EvalObjEx() and checks for errors
  * Prints the error buffer if any.
  */
 
@@ -131,7 +131,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     conf = Rivet_GetConf(r);
-    if (Tcl_EvalObj(interp, outbuf) == TCL_ERROR)
+    if (Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR)
     {
 	Tcl_Obj *errscript =
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;

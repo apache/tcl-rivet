@@ -19,6 +19,8 @@
 extern module rivet_module;
 #define TCLWEBPOOL req->req->pool
 
+#define BUFSZ 4096
+
 int
 TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
 {
@@ -439,6 +441,136 @@ INLINE Tcl_Obj *
 TclWeb_StringToUtfToObj(char *in, TclWebRequest *req)
 {
     return Tcl_NewStringObj(TclWeb_StringToUtf(in, req), -1);
+}
+
+int TclWeb_PrepareUpload(char *varname, TclWebRequest *req)
+{
+    req->upload = ApacheUpload_find(req->apachereq->upload, varname);
+    if (req->upload == NULL) {
+	return TCL_ERROR;
+    } else {
+	return TCL_OK;
+    }
+}
+
+int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
+{
+    if (ApacheUpload_FILE(req->upload) != NULL)
+    {
+	/* create and return a file channel */
+	*chan = Tcl_MakeFileChannel(
+	    (ClientData)fileno(ApacheUpload_FILE(req->upload)),
+	    TCL_READABLE);
+	Tcl_RegisterChannel(req->interp, *chan);
+	return TCL_OK;
+    } else {
+	return TCL_ERROR;
+    }
+}
+
+int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
+{
+    int sz;
+    char savebuffer[BUFSZ];
+    Tcl_Channel chan;
+    Tcl_Channel savechan;
+
+   savechan = Tcl_OpenFileChannel(req->interp, Tcl_GetString(filename),
+				   "w", 0600);
+    if (savechan == NULL) {
+	return TCL_ERROR;
+    } else {
+	Tcl_SetChannelOption(req->interp, savechan,
+			     "-translation", "binary");
+    }
+
+    chan = Tcl_MakeFileChannel(
+	(ClientData)fileno(ApacheUpload_FILE(req->upload)),
+	TCL_READABLE);
+    Tcl_SetChannelOption(req->interp, chan, "-translation", "binary");
+
+    while ((sz = Tcl_Read(chan, savebuffer, BUFSZ)))
+    {
+	if (sz == -1)
+	{
+	    Tcl_AddErrorInfo(req->interp, Tcl_PosixError(req->interp));
+	    return TCL_ERROR;
+	}
+
+	Tcl_Write(savechan, savebuffer, sz);
+	if (sz < 4096) {
+	    break;
+	}
+    }
+    Tcl_Close(req->interp, savechan);
+    return TCL_OK;
+}
+
+int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
+{
+    rivet_server_conf *rsc = NULL;
+
+    rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
+    /* this sucks - we should use the hook, but I want to
+       get everything fixed and working first */
+    if (rsc->upload_files_to_var)
+    {
+	char *bytes = NULL;
+	Tcl_Channel chan = NULL;
+
+	bytes = Tcl_Alloc((unsigned)ApacheUpload_size(req->upload));
+	chan = Tcl_MakeFileChannel(
+	    (ClientData)fileno(ApacheUpload_FILE(req->upload)),
+	    TCL_READABLE);
+	Tcl_SetChannelOption(req->interp, chan,
+			     "-translation", "binary");
+	Tcl_SetChannelOption(req->interp, chan, "-encoding", "binary");
+	/* Put data in a variable  */
+	Tcl_ReadChars(chan, data, ApacheUpload_size(req->upload), 0);
+    } else {
+	Tcl_AppendResult(req->interp,
+			 "RivetServerConf UploadFilesToVar is not set", NULL);
+	return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+int TclWeb_UploadSize(Tcl_Obj *sz, TclWebRequest *req)
+{
+   Tcl_SetIntObj(sz, ApacheUpload_size(req->upload));
+   return TCL_OK;
+}
+
+int TclWeb_UploadType(Tcl_Obj *type, TclWebRequest *req)
+{
+   /* If there is a type, return it, if not, return blank. */
+   Tcl_SetStringObj(type, ApacheUpload_type(req->upload)
+		    ? ApacheUpload_type(req->upload) : "", -1);
+   return TCL_OK;
+}
+
+int TclWeb_UploadFilename(Tcl_Obj *filename, TclWebRequest *req)
+{
+   Tcl_SetStringObj(filename,
+		    TclWeb_StringToUtf(req->upload->filename,
+				       req), -1);
+   return TCL_OK;
+}
+
+int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req)
+{
+   ApacheUpload *upload;
+
+   upload = ApacheRequest_upload(req->apachereq);
+   while (upload)
+   {
+       Tcl_ListObjAppendElement(
+	   req->interp, names,
+	   TclWeb_StringToUtfToObj(upload->name,req));
+       upload = upload->next;
+   }
+
+   return TCL_OK;
 }
 
 

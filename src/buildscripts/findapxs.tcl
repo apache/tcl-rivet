@@ -1,6 +1,7 @@
 set apxsDirList {
     /usr/local/apache/bin
     /usr/local/etc/apache/bin
+    /usr/bin/
 }
 
 proc FindAPXS {{apxs ""}} {
