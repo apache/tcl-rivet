@@ -635,16 +635,17 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
     Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
-    if( Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL ) {
+     if (Tcl_Eval (interp, "source $::server(RIVET_INIT)") == TCL_ERROR) {
 	ap_log_error( APLOG_MARK, APLOG_ERR, s,
 		      "init.tcl must be installed correctly for Apache Rivet to function: %s",
 		      Tcl_GetStringResult(interp) );
 	exit(1);
     }
 
-    /* We use the largest allowed value, so that we shouldn't normally
-     * send anything unless the user flushes it, or the page is
-     * ready. */
+    /* Set the output buffer size to the largest allowed value, so that we 
+     * won't send any result packets to the browser unless the Rivet
+     * programmer does a "flush stdout" or the page is completed.
+     */
     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
 }

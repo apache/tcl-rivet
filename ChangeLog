@@ -1,3 +1,12 @@
+2004-09-20  Karl Lehenbauer  <karl@sc.com>
+	* src/mod_rivet.c (Rivet_PerInterpInit): Load the init.tcl file
+	with an explicit path rather than using Tcl_PkgRequire.  Previously, 
+	if Rivet was installed with a PREFIX/lib that wasn't already in
+	Tcl's package search path (auto_path, probably because it was the
+	same lib directory as Tcl used, typically /usr/local/lib), Tcl
+	startup is unable to find the RivetTcl package, and Rivet is
+	unable to start.  
+
 2004-09-17  Karl Lehenbauer  <karl@sc.com>
 	* rivet/packages/rivet/pkgIndex.tcl:  Removed.  It had a hard-coded
 	assumption about the shared library extensions (.so).  This file is
