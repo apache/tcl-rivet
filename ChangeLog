@@ -1,3 +1,13 @@
+2003-08-28  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xsl: Minor changes to look and feel.
+
+	* doc/rivet.xml: Added <indexterm> tags for commands, in order to
+	create the index.
+
+	* doc/rivet.xsl: Added XSL to parse <index>, needed to create an
+	index of commands on the index page.
+
 2003-08-26  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Added section to documentation about emacs and

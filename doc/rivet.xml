@@ -39,7 +39,6 @@
       </affiliation>
     </author>
   </articleinfo>
-
   <para>
     This document is also available in the following languages: <ulink
     url="index.html.it">Italian</ulink>, <ulink
@@ -541,14 +540,24 @@ AddType application/x-rivet-tcl .tcl</programlisting>
     </variablelist>
 
   </section>
+
   <section id="commands">
     <title>Rivet Tcl Commands and Variables</title>
-    <variablelist>
 
+    <index/>
+
+    <variablelist>
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>var</primary>
+	    <secondary>get the value of a form variable.</secondary>
+	    <tertiary>client input</tertiary>
+	  </indexterm>
 	  <cmdsynopsis>
-	    <command>var</command>
+	    <command>
+	      var
+	    </command>
 	    <group choice="req">
 	      <arg>get</arg>
 	      <arg>list</arg>
@@ -657,11 +666,14 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  </para>
 	</listitem>
       </varlistentry>
-    </variablelist>
 
-    <variablelist>
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>upload</primary>
+	    <secondary>handle a file uploaded by a client.</secondary>
+	    <tertiary>client input</tertiary>
+	  </indexterm>
 	  <cmdsynopsis>
 	    <command>upload</command>
 	    <group choice="req">
@@ -786,11 +798,35 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  </para>
 	</listitem>
       </varlistentry>
-    </variablelist>
 
-    <variablelist>
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>load_response</primary>
+	    <secondary>load form variables into an array.</secondary>
+	    <tertiary>user input</tertiary>
+	  </indexterm>
+
+	  <cmdsynopsis>
+	    <command>load_response</command>
+	    <arg><replaceable>arrayName</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Load any form variables passed to this page into an
+	    array.
+	  </para>
+	</listitem>
+      </varlistentry>
+    
+      <varlistentry>
+	<term>
+	  <indexterm>
+	    <primary>load_env</primary>
+	    <secondary>get the request's environment variables.</secondary>
+	    <tertiary>client input</tertiary>
+	  </indexterm>
 	  <cmdsynopsis>
 	    <command>load_env</command>
 	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
@@ -813,6 +849,11 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>load_headers</primary>
+	    <secondary>get client request's headers.</secondary>
+	    <tertiary>client input</tertiary>
+	  </indexterm>
 	  <cmdsynopsis>
 	    <command>load_headers</command>
 	    <arg><replaceable>array_name</replaceable></arg>
@@ -829,6 +870,11 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>load_cookies</primary>
+	    <secondary>get any cookie variables sent by the client.</secondary>
+	    <tertiary>client input</tertiary>
+	  </indexterm>
 	  <cmdsynopsis>
 	    <command>load_cookies</command>
 	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
@@ -845,6 +891,12 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>include</primary>
+	    <secondary>includes a file into the output stream without modification.</secondary>
+	    <tertiary>files</tertiary>
+	  </indexterm>
+
 	  <cmdsynopsis>
 	    <command>include</command>
 	    <arg><replaceable>filename_name</replaceable></arg>
@@ -858,8 +910,15 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  </para>
 	</listitem>
       </varlistentry>
+
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>parse</primary>
+	    <secondary>parses a Rivet template file.</secondary>
+	    <tertiary>files</tertiary>
+	  </indexterm>
+
 	  <cmdsynopsis>
 	    <command>parse</command>
 	    <arg><replaceable>filename</replaceable></arg>
@@ -873,8 +932,15 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  </para>
 	</listitem>
       </varlistentry>
+
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>headers</primary>
+	    <secondary>set and parse HTTP headers.</secondary>
+	    <tertiary>output</tertiary>
+	  </indexterm>
+
 	  <cmdsynopsis>
 	    <command>headers</command>
 	    <group choice="req">
@@ -975,6 +1041,11 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <varlistentry>
 	<term>
+	  <indexterm>
+	    <primary>makeurl</primary>
+	    <secondary>construct url's.</secondary>
+	    <tertiary>output</tertiary>
+	  </indexterm>
 	  <cmdsynopsis>
 	    <command>makeurl</command>
 	    <arg><replaceable>filename</replaceable></arg>
@@ -985,13 +1056,163 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    Create a self referencing URL from a filename.  For example:
 	    <programlisting>makeurl /tclp.gif</programlisting>
 	    returns
-	    <constant>http://[hostname]:[port]/tclp.gif</constant>.
+	    <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
 	    where hostname and port are the hostname and port of the
 	    server in question.
 	  </para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <indexterm>
+	    <primary>cookie</primary>
+	    <secondary>get and set cookies.</secondary>
+	    <tertiary>output</tertiary>
+	  </indexterm>
+
+	  <cmdsynopsis>
+	    <command>cookie</command>
+	    <arg>set</arg>
+	    <arg><replaceable>cookieName</replaceable></arg>
+	    <arg><replaceable><optional>cookiValue</optional></replaceable></arg>
+	      <arg>-days <replaceable>expireInDays</replaceable></arg>
+	      <arg>-hours <replaceable>expireInHours</replaceable></arg>
+	      <arg>-minutes <replaceable>expireInMinutes</replaceable></arg>
+	      <arg>-expires <replaceable>Wdy, DD-Mon-YYYY HH:MM:SS GMT</replaceable></arg>
+	      <arg>-path <replaceable>uriPathCookieAppliesTo</replaceable></arg>
+	      <arg>-secure <replaceable>1/0</replaceable></arg>
+	  </cmdsynopsis>
+	  <cmdsynopsis>
+	    <command>cookie</command>
+	    <arg>get</arg>
+	    <arg><replaceable>cookieName</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    <command>cookie</command> gets or sets a cookie.  When you
+	    get a cookie, the command returns the value of the cookie,
+	    or an empty string if no cookie exists.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <indexterm>
+	    <primary>clock_to_rfc850_gmt</primary>
+	    <secondary>create a rfc850 time from [clock seconds].</secondary>
+	    <tertiary>utility</tertiary>
+	  </indexterm>
+
+	  <cmdsynopsis>
+	    <command>clock_to_rfc850_gmt</command>
+	    <arg><replaceable>seconds</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Convert an integer-seconds-since-1970 click value to
+	    RFC850 format, with the additional requirement that it be
+	    GMT only.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <indexterm>
+	    <primary>html</primary>
+	    <secondary>construct html tagged text.</secondary>
+	    <tertiary>utility</tertiary>
+	  </indexterm>
+
+	  <cmdsynopsis>
+	    <command>html</command>
+	    <arg><replaceable>string</replaceable></arg>
+	    <arg rep="repeat"><replaceable>arg</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Print text with the added ability to pass HTML tags
+	    following the string.  Example:
+	    <programlisting>html "Test" b i</programlisting>
+	    produces: <computeroutput>&lt;b&gt;&lt;i&gt;Test&lt;/i&gt;&lt;/b&gt;</computeroutput>
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	  <indexterm>
+	    <primary>incro</primary>
+	    <secondary>increment a variable or set it to 1 nonexistant.</secondary>
+	    <tertiary>utility</tertiary>
+	  </indexterm>
+
+	<term>
+	  <cmdsynopsis>
+	    <command>incr0</command>
+	    <arg><replaceable>varname</replaceable></arg>
+	    <arg><replaceable>num</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Increment a variable
+	    <option><replaceable>varname</replaceable></option> by
+	    <option><replaceable>num</replaceable></option>.  If the
+	    variable doesn't exist, create it instead of returning an
+	    error.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <indexterm>
+	    <primary>parray</primary>
+	    <secondary>Tcl's <command>parray</command> with html formatting.</secondary>
+	    <tertiary>utility</tertiary>
+	  </indexterm>
+
+	  <cmdsynopsis>
+	    <command>parray</command>
+	    <arg><replaceable>arrayName</replaceable></arg>
+	    <arg><replaceable><optional>pattern</optional></replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    An html version of the standard Tcl
+	    <command>parray</command> command.  Displays the entire
+	    contents of an array in a sorted, nicely-formatted way.
+	    Mostly used for debugging purposes.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+
+<!--
+     <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command></command>
+	    <arg></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para></para>
+	</listitem>
+      </varlistentry>
+ -->
+
     </variablelist>
+
+
+
+
 
   </section>
 
@@ -1233,11 +1454,11 @@ list.
       <title>Editing Rivet Template Files</title>
       <para>
 	Rivet makes available code for two popular editors,
-	<command>emacs</command> and <command>vim</command> to
-	facilitate the editing of Rivet template files.  The key
-	concept is that the editor is aware of the &lt;? and ?&gt;
-	tags and switches back and forth between Tcl and HTML modes as
-	the cursor moves.  These files,
+	<application>emacs</application> and
+	<application>vim</application> to facilitate the editing of
+	Rivet template files.  The key concept is that the editor is
+	aware of the &lt;? and ?&gt; tags and switches back and forth
+	between Tcl and HTML modes as the cursor moves.  These files,
 	<filename>two-mode-mode.el</filename> and
 	<filename>rvt.vim</filename> are available in the
 	<filename>contrib/</filename> directory.

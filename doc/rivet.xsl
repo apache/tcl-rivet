@@ -84,7 +84,8 @@
   </xsl:template>
 
   <xsl:template match="option">
-    <xsl:call-template name="inline.monounderlineseq"/>
+<!--    <xsl:call-template name="inline.monounderlineseq"/> -->
+    <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template match="command">
@@ -95,11 +96,11 @@
 
   <xsl:template match="cmdsynopsis">
     <div class="{name(.)}" style="width:80%">
-      <span style="background:#bbbbff ; margin:1ex ; padding:.4ex ;
+      <div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;
 	word-spacing:1ex ">
 	<xsl:call-template name="anchor"/>
 	<xsl:apply-templates/>
-      </span>
+      </div>
     </div>
   </xsl:template>
 
@@ -109,6 +110,7 @@
     </span>
     <xsl:text> </xsl:text>
   </xsl:template>
+
 
   <xsl:template match="refnamediv">
     <div class="{name(.)}">
@@ -139,7 +141,7 @@
   </xsl:template>
 
   <xsl:template match="listitem/para">
-    <div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
+    <div style="margin-bottom:1.5ex ; padding .5ex">
       <xsl:apply-templates/>
     </div>
   </xsl:template>
@@ -172,7 +174,7 @@
 	<xsl:value-of select="$arg.choice.def.open.str"/>
       </xsl:otherwise>
     </xsl:choose>
-    <span style="font-family:monospace; text-decoration:underline">
+    <span style="font-family:monospace; font-weight: bold;">
       <xsl:apply-templates/>
     </span>
     <xsl:choose>
@@ -263,7 +265,7 @@
     <xsl:variable name="rep" select="@rep"/>
     <xsl:if test="position()>1"><xsl:value-of
 	select="$arg.or.sep"/></xsl:if>
-    <span style="font-family:monospace; text-decoration:underline">
+    <span style="font-family:monospace; font-weight: bold;">
       <xsl:apply-templates/>
     </span>
   </xsl:template>
@@ -315,6 +317,25 @@
 	<xsl:copy-of select="$content"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+<!-- This is to create the index of commands.  There should be a -->
+<!-- better way to do this, but I couldn't find it. -->
+
+  <xsl:template match="section/index">
+    <ul>
+      <xsl:for-each select="..//indexterm/primary">
+	<li>
+	  <span style="font-family:monospace; font-weight: bold;">
+	    <a href="#{generate-id(key('primary',.))}">
+	      <xsl:value-of select="."/>
+	    </a>
+	  </span>
+	  <xsl:text> - </xsl:text>
+	  <xsl:value-of select="../secondary"/>
+	</li>
+      </xsl:for-each>
+    </ul>
   </xsl:template>
 
   </xsl:stylesheet>

@@ -39,11 +39,11 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
 	      script included with many systems.  It's written in Tcl
 	      though, for increased speed and clarity.  It takes
 	      several arguments:
-	    </p><div class="variablelist"><dl><dt><span class="term">-help</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">Prints usage information.</div></div></dd><dt><span class="term">-enable-symbols</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">Compiles Rivet with debugging symbols.</div></div></dd><dt><span class="term">-prefix <i class="replaceable"><tt>directory</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
+	    </p><div class="variablelist"><dl><dt><span class="term">-help</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Prints usage information.</div></div></dd><dt><span class="term">-enable-symbols</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Compiles Rivet with debugging symbols.</div></div></dd><dt><span class="term">-prefix <i class="replaceable"><tt>directory</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Install Rivet Tcl packages to
 		    <i class="replaceable"><tt>directory</tt></i>.
-		  </div></div></dd><dt><span class="term">-with-apxs <i class="replaceable"><tt>file</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">Use <i class="replaceable"><tt>file</tt></i> as apxs binary to
-		  gather information about the local Apache installation.</div></div></dd><dt><span class="term">-with-tclconfig <i class="replaceable"><tt>file</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style=" margin:1ex ; margin-bottom:1.5ex ; padding .5ex">
+		  </div></div></dd><dt><span class="term">-with-apxs <i class="replaceable"><tt>file</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Use <i class="replaceable"><tt>file</tt></i> as apxs binary to
+		  gather information about the local Apache installation.</div></div></dd><dt><span class="term">-with-tclconfig <i class="replaceable"><tt>file</tt></i></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Specify <i class="replaceable"><tt>file</tt></i> as tclConfig.sh.
 		  </div></div></dd></dl></div><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
 ./configure.tcl
@@ -52,8 +52,8 @@ Configuring
 	      At this point, you are ready to run the build
 	      system:
 	    </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">./make.tcl <i class="replaceable"><tt>option</tt></i></pre><p style="width:90%">where <i class="replaceable"><tt>option</tt></i> can be
-	      either <tt><span style="text-decoration:underline">shared</span></tt> or
-	      <tt><span style="text-decoration:underline">static</span></tt>.
+	      either shared or
+	      static.
 	    </p></li><li><p class="title"><b>Install</b></p><p style="width:90%">
 	      Now, you are ready to run the <span style="font-family:monospace"><b class="command">./make.tcl
 		install</b></span> command to install the resulting

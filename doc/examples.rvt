@@ -23,7 +23,7 @@ These are some examples, rather limited ones, of what can be done with Rivet.
 <tr><td bgcolor=gray><pre>
 
 &lt;?
-headers setcookie "foo" "bar" # we have to put this before any 'puts' statements
+cookie "foo" "bar" # we have to put this before any 'puts' statements
 
 puts "Hello world"
 ?&gt;

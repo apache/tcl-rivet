@@ -43,8 +43,8 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
             </p></li><li><p style="width:90%"> &#1057;&#1077;&#1081;&#1095;&#1072;&#1089; &#1074;&#1099; &#1076;&#1086;&#1083;&#1078;&#1085;&#1099; &#1073;&#1099;&#1090;&#1100; &#1075;&#1086;&#1090;&#1086;&#1074;&#1099; &#1082; &#1089;&#1073;&#1086;&#1088;&#1082;&#1077; &#1074;&#1089;&#1077;&#1075;&#1086; &#1074;&#1084;&#1077;&#1089;&#1090;&#1077;:
              </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
 ./make.tcl <i class="replaceable"><tt>option</tt></i></pre><p style="width:90%">where <i class="replaceable"><tt>option</tt></i> can be
-              either <tt><span style="text-decoration:underline">shared</span></tt> or
-              <tt><span style="text-decoration:underline">static</span></tt>.
+              either shared or
+              static.
             </p></li><li><p class="title"><b>&#1059;&#1089;&#1090;&#1072;&#1085;&#1086;&#1074;&#1082;&#1072;</b></p><p style="width:90%">
               &#1057;&#1077;&#1081;&#1095;&#1072;&#1089; &#1089;&#1072;&#1084;&#1086;&#1077; &#1074;&#1088;&#1077;&#1084;&#1103; &#1079;&#1072;&#1087;&#1091;&#1089;&#1090;&#1080;&#1090;&#1100; 
                <span style="font-family:monospace"><b class="command">./make.tcl

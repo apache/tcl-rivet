@@ -46,8 +46,8 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
 	    </p></li><li><p style="width:90%">A questo punto, siete pronti ad eseguire la compilazione
 	       del sistema:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
 ./make.tcl <i class="replaceable"><tt>option</tt></i></pre><p style="width:90%">dove <i class="replaceable"><tt>option</tt></i> può essere
-	    <tt><span style="text-decoration:underline">shared</span></tt> (condivisa) o 
-	    <tt><span style="text-decoration:underline">static</span></tt> (statica).
+	    shared (condivisa) o 
+	    static (statica).
 	    </p></li><li><p class="title"><b>Installazione</b></p><p style="width:90%">
 	      Adesso siamo pronti ad eseguire il comando 
 	      <span style="font-family:monospace"><b class="command">./make.tcl install</b></span> per installare i 
