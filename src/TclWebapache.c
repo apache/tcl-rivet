@@ -40,6 +40,13 @@ TclWeb_SendHeaders(TclWebRequest *req)
     return TCL_OK;
 }
 
+INLINE int
+TclWeb_StopSending(TclWebRequest *req)
+{
+    req->req->connection->aborted = 1;
+    return TCL_OK;
+}
+
 /* Set up the content type header */
 
 int
@@ -93,21 +100,21 @@ TclWeb_PrintError(char *errstr, int htmlflag, TclWebRequest *req)
     return TCL_OK;
 }
 
-int
+INLINE int
 TclWeb_HeaderSet(char *header, char *val, TclWebRequest *req)
 {
     ap_table_set(req->req->headers_out, header, val);
     return TCL_OK;
 }
 
-int
+INLINE int
 TclWeb_SetStatus(int status, TclWebRequest *req)
 {
     req->req->status = status;
     return TCL_OK;
 }
 
-int
+INLINE int
 TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 {
     result = Tcl_NewStringObj(ap_construct_url(TCLWEBPOOL, filename, req->req), -1);

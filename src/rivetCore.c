@@ -40,7 +40,7 @@ Rivet_MakeURL(
     int objc,
     Tcl_Obj *CONST objv[])
 {
-    Tcl_Obj *result;
+    Tcl_Obj *result = NULL;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if (objc != 2)
@@ -65,8 +65,6 @@ Rivet_Parse(
     char *filename;
     struct stat finfo;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc =
-	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc != 2)
     {
@@ -86,7 +84,7 @@ Rivet_Parse(
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
 	return TCL_ERROR;
     }
-    if (Rivet_ParseExecFile(globals->req, rsc, filename, 0) == TCL_OK)
+    if (Rivet_ParseExecFile(globals->req, filename, 0) == TCL_OK)
 	return TCL_OK;
     else
 	return TCL_ERROR;
@@ -213,9 +211,7 @@ Rivet_Headers(
 	    Tcl_WrongNumArgs(interp, 2, objv, "headername value");
 	    return TCL_ERROR;
 	}
-	ap_table_set(globals->r->headers_out,
-		     Tcl_GetStringFromObj (objv[2], (int *)NULL),
-		     Tcl_GetStringFromObj (objv[3], (int *)NULL));
+	TclWeb_HeaderSet(Tcl_GetString(objv[2]), Tcl_GetString(objv[3]), globals->req);
     }
     else if (!strcmp("type", opt)) /* ### set ### */
     {
@@ -244,8 +240,6 @@ Rivet_Headers(
     }
     return TCL_OK;
 }
-
-/* Tcl command to get and parse any CGI and environmental variables */
 
 /* Get the environmental variables, but do it from a tcl function, so
    we can decide whether we wish to or not */
@@ -632,8 +626,6 @@ Rivet_NoBody(
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc =
-	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc != 1)
     {
@@ -642,11 +634,9 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
     }
 
     TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(*(rsc->outchannel));
-
-    globals->r->connection->aborted = 1;
-
-    return TCL_OK;
+    Tcl_Flush(Tcl_GetChannel(interp, "stdout", NULL));
+    TclWeb_StopSending(globals->req);
+    return TCL_RETURN;
 }
 
 int

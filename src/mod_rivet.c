@@ -159,8 +159,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
 /* This is a seperate function so that it may be called from 'Parse' */
 int
-Rivet_ParseExecFile(TclWebRequest *req, rivet_server_conf *rsc,
-			char *filename, int toplevel)
+Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 {
     char *hashKey = NULL;
     int isNew = 0;
@@ -172,7 +171,10 @@ Rivet_ParseExecFile(TclWebRequest *req, rivet_server_conf *rsc,
     time_t ctime;
     time_t mtime;
 
-    Tcl_Interp *interp = rsc->server_interp;
+    rivet_server_conf *rsc = NULL;
+    Tcl_Interp *interp = req->interp;
+
+    rsc = RIVET_SERVER_CONF( req->req->server->module_config );
 
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
@@ -378,7 +380,7 @@ Rivet_SendContent(request_rec *r)
 	return OK;
     }
 
-    if (Rivet_ParseExecFile(globals->req, rsc, r->filename, 1) != TCL_OK)
+    if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));

@@ -49,6 +49,8 @@ int TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg);
 
 int TclWeb_SendHeaders(TclWebRequest *req);
 
+INLINE int TclWeb_StopSending(TclWebRequest *req);
+
 int TclWeb_SetHeaderType(char *header, TclWebRequest *req);
 
 int TclWeb_PrintHeaders(TclWebRequest *req);

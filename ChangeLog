@@ -1,3 +1,13 @@
+2002-02-12  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c: Added some INLINE's.
+
+	* src/mod_rivet.c (Rivet_ParseExecFile): Tweaking of parameters to
+	enable the modification stated below.
+
+	* src/rivetCore.c (Rivet_Parse): Removed 'rsc' from this
+	function.
+
 2002-02-07  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c (TclWebMakeURL): New command, extracted out
