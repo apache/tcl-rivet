@@ -1,3 +1,11 @@
+rivet (0.3.0-1) unstable; urgency=low
+
+  * New upstream version.
+  * Bug fix: "apache complains about mod_rivet not compiled with -DEAPI",
+    thanks to Massimo Manghi (Closes: #215111).
+
+ -- David N. Welton <davidw@debian.org>  Fri,  6 Feb 2004 22:49:10 +0100
+
 rivet (0.2.0-1) unstable; urgency=low
 
   * New upstream version.
