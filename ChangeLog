@@ -1,3 +1,30 @@
+2003-06-12  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_ParseExecFile): Rework checks for
+	.htaccess file changes.  This code was causing an obscure bug
+	where a file would be in the cache twice, thus causing crashes.
+
+	* Moved russian translation around again.
+
+	* src/TclWebapache.c (TclWeb_GetEnvVars): Use TCL_NAMESPACE_ONLY
+	here and in TclWeb_GetHeaderVars in order to set the variable in
+	the correct place.
+
+	* src/make.tcl: Added changes to build Russian documentation.
+
+	* doc/rivet.xml: Added link to Russian translation.
+
+	* doc/rivet.ru_UTF.xml: Added link back to English version.
+
+2003-06-10  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet_utf_ru.xml: Added Russian translation of documentation
+	by Dmitry Zuryanovich.
+
+2003-06-09  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Cleaned up docs about fetching the httpd sources.
+
 2003-05-26  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetCore.c (Rivet_Headers): Change error message to better

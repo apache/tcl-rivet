@@ -180,6 +180,36 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 
     rsc = Rivet_GetConf( req->req );
 
+    /* If the user configuration has indeed been updated, I guess that
+     * pretty much invalidates anything that might have been
+     * cached. */
+
+    /* This is all horrendously slow, and means we should *also* be
+       doing caching on the modification time of the .htaccess files
+       that concern us. FIXME */
+
+    if (rsc->user_scripts_updated && *(rsc->cache_size) != 0) {
+	int ct;
+	Tcl_HashEntry *delEntry;
+	/* Clean out the list. */
+	ct = *(rsc->cache_free);
+	while (ct < *(rsc->cache_size)) {
+	    /* Free the corresponding hash entry. */
+	    delEntry = Tcl_FindHashEntry(
+		rsc->objCache,
+		rsc->objCacheList[ct]);
+	    if (delEntry != NULL)
+		Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+	    Tcl_DeleteHashEntry(delEntry);
+
+	    free(rsc->objCacheList[ct]);
+	    rsc->objCacheList[ct] = NULL;
+	    ct ++;
+	}
+	*(rsc->cache_free) = *(rsc->cache_size);
+    }
+
+
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
     if (toplevel == 0)
@@ -198,13 +228,14 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
      */
     if (*(rsc->cache_size))
     {
+
 	hashKey = ap_psprintf(req->req->pool, "%s%lx%lx%d", filename,
 			      mtime, ctime, toplevel);
 	entry = Tcl_CreateHashEntry(rsc->objCache, hashKey, &isNew);
     }
 
-    /* We don't have a compiled version.  Let's create one */
-    if (isNew || *(rsc->cache_size) == 0 || rsc->user_scripts_updated)
+    /* We don't have a compiled version.  Let's create one. */
+    if (isNew || *(rsc->cache_size) == 0)
     {
 	outbuf = Tcl_NewObj();
 	if (toplevel) {
@@ -245,9 +276,9 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	    rsc->objCacheList[-- *(rsc->cache_free) ] = strdup(hashKey);
 	} else if (*(rsc->cache_size)) { /* If it's zero, we just skip this. */
 	    Tcl_HashEntry *delEntry;
-	    delEntry =
-		Tcl_FindHashEntry(rsc->objCache,
-				  rsc->objCacheList[*(rsc->cache_size)-1]);
+	    delEntry = Tcl_FindHashEntry(
+		rsc->objCache,
+		rsc->objCacheList[*(rsc->cache_size) - 1]);
 	    Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
 	    Tcl_DeleteHashEntry(delEntry);
 	    free(rsc->objCacheList[*(rsc->cache_size) - 1]);
@@ -431,7 +462,7 @@ Rivet_SendContent(request_rec *r)
 
     Rivet_PropagatePerDirConfArrays( interp, rdc );
 
-    request_init = Tcl_NewStringObj("::Rivet::initialize_request\n",-1);
+    request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
     if (Tcl_EvalObjEx(interp, request_init, TCL_EVAL_DIRECT) == TCL_ERROR)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
@@ -439,7 +470,6 @@ Rivet_SendContent(request_rec *r)
 	retval = HTTP_BAD_REQUEST;
 	goto sendcleanup;
     }
-
 
     {
 	Tcl_Obj *infoscript[3];
@@ -888,6 +918,8 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 	return "Rivet Error: RivetUserConf requires two arguments";
     }
     /* We have modified these scripts. */
+    /* This is less than ideal though, because it will get set to 1
+     * every time - FIXME. */
     rdc->user_scripts_updated = 1;
 
     string = Rivet_SetScript( cmd->pool, rdc, var, val );
@@ -895,6 +927,7 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
     ap_table_set( rdc->rivet_user_vars, var, string );
     return( NULL );
 }
+
 
 /*
  * Merge the per-directory configuration options into a new configuration.
