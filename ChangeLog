@@ -1,3 +1,7 @@
+2002-10-02  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added 'Introduction' section.
+
 2002-09-29  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Reworked several elements to better utilize
