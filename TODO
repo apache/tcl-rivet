@@ -51,6 +51,10 @@ TODO
 
 * Integrate ncgi package, to help migration for people using it.
 
+* I think we need some kind of unified interface to launching tcl
+  'services'.  These are separate Tcl processes that most likely exist
+  to allow the Apache children to share data.
+
 MAYBE
 =====
 

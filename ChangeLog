@@ -1,3 +1,12 @@
+2003-09-24  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Mention the global command in the 'internals'
+	section.
+
+2003-08-30  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added var_qs and var_post cmdsynopsis's.
+
 2003-08-29  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Use refentry and sub-elements instead of
