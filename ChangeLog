@@ -1,3 +1,9 @@
+2004-01-15  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/rivet-tcl/load_response.tcl (load_response): Fixed a bug
+	in load_response that was tickled by calling it multiple times.
+	Thanks to Brad for catching it.
+
 2004-01-15  Brad Morrison  <brad@sc.com>
 
 	* rivet/rivet-tcl/load_response.tcl: Changed behavior from
