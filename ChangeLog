@@ -1,3 +1,8 @@
+2003-08-23  David N. Welton  <davidw@dedasys.com>
+
+	* src/configure.in.tcl: Remove test for broken Tcl installations
+	on FreeBSD and MacOS X.  Apparently, things work ok with 8.4.
+
 2003-08-22  David N. Welton  <davidw@dedasys.com>
 
 	* src/configure.in.tcl: Add test for broken Tcl installations on
