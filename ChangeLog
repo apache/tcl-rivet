@@ -1,3 +1,10 @@
+2004-04-21  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/packages/dio/pkgIndex.tcl: Add sqlite interface.
+
+	* rivet/packages/dio/dio_Sqlite.tcl: Added incomplete sqlite
+	interface to DIO.
+
 2004-04-14  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/packages/dio/dio.tcl: Removed mysql and postgres specific
