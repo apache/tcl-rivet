@@ -183,8 +183,11 @@ MOD_RIVET =  $(OUT_DIR)\mod_rivet.so
 RIVET_LIB =  $(OUT_DIR)\rivet.dll
 RIVETPARSER_LIB= $(OUT_DIR)\rivetparser.dll
 
-
+# Set path to Apache 1.3
+!ifndef APACHE_ROOT
 APACHE_ROOT        = c:\opt\apache
+!endif
+
 APACHE_LIB_DIR     = $(APACHE_ROOT)\libexec
 APACHE_INCLUDE_DIR = $(APACHE_ROOT)\include
 APACHE_MODULES_DIR = $(APACHE_ROOT)\modules
@@ -268,7 +271,8 @@ crt = -MT
 !endif
 !endif
 
-INCLUDES	= $(TCL_INCLUDES) -I"$(WINDIR)" -I"$(GENERICDIR)"
+INCLUDES	= $(TCL_INCLUDES) -I"$(WINDIR)" -I"$(GENERICDIR)" \
+		-FI$(TMP_DIR)\config-win.h
 BASE_CLFAGS	= $(cflags) $(cdebug) $(crt) $(INCLUDES) -I"$(APACHE_INCLUDE_DIR)" \
 		  -DWIN32 -D_WIN32 -D_WINDOWS -DNAMEOFEXECUTABLE="\"$(TCLSH:\=/)\""
 CON_CFLAGS	= $(cflags) $(cdebug) $(crt) -DCONSOLE
@@ -338,6 +342,10 @@ test: setup $(PROJECT)
 setup:
 	@if not exist $(OUT_DIR)\nul mkdir $(OUT_DIR)
 	@if not exist $(TMP_DIR)\nul mkdir $(TMP_DIR)
+	@type << >$(TMP_DIR)\config-win.h
+#define START_TAG "<?"
+#define END_TAG   "?>"
+<<
 
 $(MOD_RIVET): $(MOD_RIVET_OBJS)
 	$(link32) $(dlllflags) -out:$@ $(baselibs) $(APACHE_LIB) @<<

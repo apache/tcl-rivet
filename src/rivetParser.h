@@ -27,4 +27,7 @@ EXTERN int Rivet_GetRivetFile(char *filename, int toplevel,
 
 EXTERN int Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp);
 
+EXTERN int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
+
+
 #endif /* RIVETPARSER_H */

@@ -1,3 +1,9 @@
+rivet (0.4.0-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- David N. Welton <davidw@debian.org>  Fri, 28 May 2004 22:44:16 +0200
+
 rivet (0.3.0-1) unstable; urgency=low
 
   * New upstream version.

@@ -1,3 +1,18 @@
+2004-06-02  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.tcl: Use 'Output' instead of puts.  It
+	might be useful were we ever to do something like make an aardvark
+	GUI.
+
+2004-06-01  David N. Welton  <davidw@dedasys.com>
+
+	* Following changes by Pat Thoyts  <patthoyts@users.sourceforge.net>:
+	* win/makefile.vc: Updated to deal with the START_TAG END_TAG
+	macros.
+	* src/rivetParser.h: Declare missing prototype.
+	* tests/binary.rvt: The stdout channel under Windows needs to be
+	told to use translation binary for binary data.
+
 2004-05-18  David N. Welton  <davidw@dedasys.com>
 
 	* src/make.tcl: Quote Tcl argument.

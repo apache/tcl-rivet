@@ -5,6 +5,9 @@ if { [var exists test1] } {
     fconfigure $fl -encoding binary
     fconfigure $fl -translation binary
     fconfigure stdout -encoding binary
+    if {$::tcl_platform(platform) eq "windows"} {
+        fconfigure stdout  -translation binary
+    }
     puts -nonewline [read $fl]
     close $fl
 } else {

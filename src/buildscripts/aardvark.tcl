@@ -284,7 +284,7 @@ proc aardvark::AddNode { name body } {
 	uplevel #0 $body
     } err
     if { $err != "" } {
-	puts "Error: $err"
+	Output error $err
     }
     createnode $name
     $grph node set $name -key buildinfo [array get buildinfo]
@@ -335,7 +335,7 @@ proc aardvark::Run { } {
 	    puts [$grph walk all -order post -command runbuildcommand]
 	}
     } err] } {
-	puts "Compilation failed on command \"$err\""
+	Output error "Compilation failed on command \"$err\""
     }
     $grph destroy
     unset grph
@@ -360,7 +360,7 @@ proc aardvark::Run { } {
 proc aardvark::getconfigs { {filename configs.tcl} } {
     catch {namespace delete ::configs}
     if { [catch {source $filename}] } {
-	puts stderr "You must run ./configure.tcl before running ./make.tcl"
+	Output error "You must run ./configure.tcl before running ./make.tcl"
 	exit 1
     }
 
