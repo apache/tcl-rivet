@@ -6,8 +6,10 @@ namespace eval findapxs {
     set apxsDirList {
 	/usr/local/apache/bin
 	/usr/local/etc/apache/bin
-	/usr/bin/
-	/usr/sbin/
+	/usr/bin
+	/usr/sbin
+	/usr/local/bin
+	/usr/local/sbin
     }
 
     proc FindAPXS {{apxs ""}} {
