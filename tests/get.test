@@ -18,11 +18,17 @@
     set match
 } {[var get xst] = }
 
-::tcltest::test getvariables-1.3 {GET variables - default value} {
+::tcltest::test getvariables-1.4 {GET variables - default value} {
     set page [ ::http::geturl "${urlbase}get.rvt?defaulttest=1" ]
     regexp {^\[var get xst foo\] = foo} [ ::http::data $page ] match
     set match
 } {[var get xst foo] = foo}
+
+::tcltest::test getvariables-1.5 {GET variables - var_qs exists} {
+    set page [ ::http::geturl "${urlbase}get.rvt?xst=1" ]
+    regexp -line {\[var_qs exists xst\]\[var_qs exists noxst\] = 1 0$} [ ::http::data $page ] match
+    set match
+} {[var_qs exists xst][var_qs exists noxst] = 1 0}
 
 ::tcltest::test getvariables-2.1 {GET variables + I18N} {
     set page [ ::http::geturl "${urlbase}get.rvt?Más=Tú" ]
@@ -47,3 +53,9 @@
     regexp -line {\[var list lstvar2\] = a b {c d}$} [ ::http::data $page ] match
     set match
 } {[var list lstvar2] = a b {c d}}
+
+::tcltest::test getvariables-4.1 {var_qs} {
+    set page [ ::http::geturl "${urlbase}get.rvt?foobar=goober" ]
+    regexp -line {\[var_qs get foobar\] = goober$} [ ::http::data $page ] match
+    set match
+} {[var_qs get foobar] = goober}

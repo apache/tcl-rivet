@@ -4,6 +4,7 @@ if { [ var number ] > 0 } {
     # get/post variables 1.1
     if { [ var exists foobar ] } {
 	puts "\[var get foobar\] = [var get foobar]\n"
+	puts "\[var_post get foobar\] = [var_post get foobar]\n"
     }
     # get/post variables 1.{2,3}
     if { [ var exists Más ] } {

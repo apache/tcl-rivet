@@ -22,6 +22,12 @@ extern module rivet_module;
 
 #define BUFSZ 4096
 
+/* This is used below to determine what part of the parmsarray to
+ * parse. */
+#define PARMSARRAY_COORDINATES i = 0; j = parmsarray->nelts; \
+if (source == VAR_SRC_QUERYSTRING) { j = req->apachereq->nargs; } \
+else if (source == VAR_SRC_POST) { i = req->apachereq->nargs; }
+
 int
 TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
 {
@@ -141,18 +147,10 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
     table_entry *parms = (table_entry *)parmsarray->elts;
     int flag = 0;
 
-    /* determine which part of table to traverse */
-    if (source == VAR_SRC_QUERYSTRING) {
-	i = 0; j = req->apachereq->nargs;
-    } else if (source == VAR_SRC_POST) {
-	i = req->apachereq->nargs; j = parmsarray->nelts;
-    } else {
-	i = 0; j = parmsarray->nelts;
-    }
+    PARMSARRAY_COORDINATES;
 
-    /* This isn't real efficient - move to hash table later
-       on... */
-    for (; i < j; ++i)
+    /* This isn't real efficient - move to hash table later on... */
+    while (i < j)
     {
 	char *parmkey = TclWeb_StringToUtf(parms[i].key, req);
 	if (!strncmp(varname, parmkey,
@@ -175,6 +173,7 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
 		Tcl_SetStringObj(result, Tcl_GetString(tmpobj), -1);
 	    }
 	}
+	i++;
     }
 
     if (result->length == 0)
@@ -192,17 +191,10 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *r
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    /* determine which part of table to traverse */
-    if (source == VAR_SRC_QUERYSTRING) {
-	i = 0; j = req->apachereq->nargs;
-    } else if (source == VAR_SRC_POST) {
-	i = req->apachereq->nargs; j = parmsarray->nelts;
-    } else {
-	i = 0; j = parmsarray->nelts;
-    }
+    PARMSARRAY_COORDINATES;
 
     /* This isn't real efficient - move to hash table later on. */
-    for (; i < j; ++i)
+    while (i < j)
     {
 
 	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
@@ -212,6 +204,7 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *r
 	    Tcl_ListObjAppendElement(req->interp, result,
 				     TclWeb_StringToUtfToObj(parms[i].val, req));
 	}
+	i++;
     }
 
     if (result == NULL)
@@ -228,21 +221,15 @@ TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    /* determine which part of table to traverse */
-    if (source == VAR_SRC_QUERYSTRING) {
-	i = 0; j = req->apachereq->nargs;
-    } else if (source == VAR_SRC_POST) {
-	i = req->apachereq->nargs; j = parmsarray->nelts;
-    } else {
-	i = 0; j = parmsarray->nelts;
-    }
+    PARMSARRAY_COORDINATES;
 
-    for (; i < j; ++i)
+    while (i < j)
     {
 	Tcl_ListObjAppendElement(req->interp, result,
 				 TclWeb_StringToUtfToObj(parms[i].key, req));
 	Tcl_ListObjAppendElement(req->interp, result,
 				 TclWeb_StringToUtfToObj(parms[i].val, req));
+	i++;
     }
 
     if (result == NULL)
@@ -259,19 +246,13 @@ TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    /* determine which part of table to traverse */
-    if (source == VAR_SRC_QUERYSTRING) {
-	i = 0; j = req->apachereq->nargs;
-    } else if (source == VAR_SRC_POST) {
-	i = req->apachereq->nargs; j = parmsarray->nelts;
-    } else {
-	i = 0; j = parmsarray->nelts;
-    }
+    PARMSARRAY_COORDINATES;
 
-    for (; i < j; ++i)
+    while (i < j)
     {
 	Tcl_ListObjAppendElement(req->interp, result,
 				 TclWeb_StringToUtfToObj(parms[i].key, req));
+	i++;
     }
 
     if (result == NULL)
@@ -289,17 +270,10 @@ TclWeb_VarExists(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
     table_entry *parms = (table_entry *)parmsarray->elts;
 
-    /* determine which part of table to traverse */
-    if (source == VAR_SRC_QUERYSTRING) {
-	i = 0; j = req->apachereq->nargs;
-    } else if (source == VAR_SRC_POST) {
-	i = req->apachereq->nargs; j = parmsarray->nelts;
-    } else {
-	i = 0; j = parmsarray->nelts;
-    }
+    PARMSARRAY_COORDINATES;
 
     /* This isn't real efficient - move to hash table later on. */
-    for (; i < j; ++i)
+    while (i < j)
     {
 	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
 		     strlen(varname) < strlen(parms[i].key) ?
@@ -308,6 +282,7 @@ TclWeb_VarExists(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
 	    Tcl_SetIntObj(result, 1);
 	    return TCL_OK;
 	}
+	i++;
     }
     Tcl_SetIntObj(result, 0);
     return TCL_OK;

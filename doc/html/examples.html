@@ -1,10 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"><title>Examples and Usage</title><meta name="generator" content="DocBook XSL Stylesheets V1.50.0"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="commands.html" title="Rivet Tcl Commands and Variables"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr></table><hr></div><div class="section"><div class="titlepage"><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><meta name="generator" content="DocBook XSL Stylesheets V1.56.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="commands.html" title="Rivet Tcl Commands and Variables"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr></table><hr></div><div class="section"><div class="titlepage"><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div><p style="width:90%">
       Some examples of Rivet usage follow.  Some prior Tcl knowledge
       is assumed.  If you don't know much Tcl, don't worry, it's easy,
       and there are some good resources available on the web that will
       get you up to speed quickly.  Go to the <a href="help.html#websites" title="Web Sites">web sites</a> section and have a look.
-    </p><div class="example"><a name="hello world"></a><p class="title"><b>Example 1. Hello World</b></p><p style="width:90%">
+    </p><div class="example"><a name="hello world"></a><p class="title"><b>Example 1. Hello World</b></p><p style="width:90%">
 	As with any tool, it's always nice to see something work, so
 	let's create a small &quot;Hello World&quot; page.</p><p style="width:90%">
 	Assuming you have Apache configured correctly, create a file
@@ -17,7 +17,7 @@ puts &quot;Hello World&quot;
 	If you then access it with your browser, you should see a
 	blank page with the text &quot;Hello World&quot; (without the quotes) on
 	it.
-      </p></div><div class="example"><a name="table"></a><p class="title"><b>Example 2. Generate a Table</b></p><p style="width:90%">
+      </p></div><div class="example"><a name="table"></a><p class="title"><b>Example 2. Generate a Table</b></p><p style="width:90%">
 	In another simple example, we dynamically generate a table:
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;? puts &quot;&lt;table&gt;\n&quot;
 for {set i 1} { $i &lt;= 8 } {incr i} {
@@ -36,7 +36,7 @@ puts &quot;&lt;/table&gt;\n&quot; ?&gt;
 	would generate the same HTML!
       </p><p style="width:90%">
 	The result should look something like this:
-      </p><p><img src="table.png"></p></div><div class="example"><p class="title"><b>Example 3. Variable Access</b></p><p style="width:90%">
+      </p><div><img src="table.png"></div></div><div class="example"><a name="variable_access"></a><p class="title"><b>Example 3. Variable Access</b></p><p style="width:90%">
 	Here, we demonstrate how to access variables set by GET or
 	POST operations.
       </p><p style="width:90%">
@@ -115,7 +115,7 @@ if { [llength $errlist] != 0 } {
 	The script then checks to make sure that
 	<tt>errlist</tt> is empty (printing an error if it
 	is) and outputting a thankyou message.
-      </p></div><div class="example"><a name="upload"></a><p class="title"><b>Example 4. File Upload</b></p><p style="width:90%">
+      </p></div><div class="example"><a name="upload"></a><p class="title"><b>Example 4. File Upload</b></p><p style="width:90%">
 	The following HTML in one file, say,
 	<tt>upload.html</tt>
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;foo.ttml&quot; enctype=&quot;multipart/form-data&quot;

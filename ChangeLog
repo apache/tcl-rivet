@@ -1,3 +1,19 @@
+2002-12-18  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Noted the var_qs/var_post changes in the
+	documentation.
+
+2002-12-17  David N. Welton  <davidw@dedasys.com>
+
+	* tests/post.test:
+	* tests/post.rvt:
+	* tests/get.test:
+	* tests/get.rvt: Added tests for David Brancato's var_qs and
+	var_post improvements.
+
+	* src/TclWebapache.c: Made "ugly" for loops into while loops.
+	Created macro to set up loop parameters correctly.
+
 2002-12-14  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c: Redid indendation.

@@ -3,9 +3,11 @@
 if { [var number] > 0 } {
     if { [var exists foobar] } {
 	puts "\[var get foobar\] = [var get foobar]\n"
+	puts "\[var_qs get foobar\] = [var_qs get foobar]\n"
     }
     if { [var exists xst] } {
 	puts "\[var exists xst\]\[var exists noxst\] = [var exists xst] [var exists noxst]\n"
+	puts "\[var_qs exists xst\]\[var_qs exists noxst\] = [var_qs exists xst] [var_qs exists noxst]\n"
     }
     if { [var exists Más] } {
 	puts "\[var get Más\] = [var get Más]\n"

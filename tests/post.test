@@ -31,3 +31,9 @@ set testfilename1 post.rvt
     regexp -line {\[var list lstvar2\] = a b {c d}$} [ ::http::data $page ] match
     set match
 } {[var list lstvar2] = a b {c d}}
+
+::tcltest::test postvariables-4.1 {var_post} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" -query foobar=goober ]
+    regexp -line {^\[var_post get foobar\] = goober$} [ ::http::data $page ] match
+    set match
+} {[var_post get foobar] = goober}

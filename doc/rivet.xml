@@ -495,7 +495,12 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	    The <command>var</command> command retrieves information
 	    about GET or POST variables sent to the script via client
 	    request.  It treats both GET and POST variables the same,
-	    regardless of their origin.
+	    regardless of their origin.  Note that there are two
+	    additional forms of <command>var</command>:
+	    <command>var_qs</command> and <command>var_post</command>.
+	    These two restrict the retrieval of information to
+	    parameters arriving very the querystring
+	    (?foo=bar&amp;bee=bop) or POSTing, respectively.
 	  </para>
 	  <variablelist>
 	    <varlistentry>
@@ -580,7 +585,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	  </variablelist>
 
 	  <para>
-	    See the example.
+	    See the example: <xref linkend="variable_access"/>
 	  </para>
 	</listitem>
       </varlistentry>
@@ -968,7 +973,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 
     </example>
 
-    <example>
+    <example id="variable_access">
       <title>Variable Access</title>
       <para>
 	Here, we demonstrate how to access variables set by GET or
