@@ -57,9 +57,6 @@ typedef struct {
     char **objCacheList;   /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache; /* Objects cache - the key is the script name */
 
-    Tcl_Obj *request_init; /* initial bit of Tcl for namespace creation */
-    Tcl_Obj *request_cleanup; /* bit of Tcl for cleaning up after a request */
-
     /* stuff for buffering output */
     Tcl_Channel *outchannel;
 } rivet_server_conf;

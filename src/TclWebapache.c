@@ -146,7 +146,6 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req)
 		flag = 1;
 		Tcl_SetStringObj(result,
 				 TclWeb_StringToUtf(parms[i].val, req), -1);
-		Tcl_IncrRefCount(result);
 	    } else {
 		Tcl_Obj *tmpobj;
 		Tcl_Obj *tmpobjv[2];
@@ -247,12 +246,10 @@ TclWeb_VarExists(Tcl_Obj *result, char *varname, TclWebRequest *req)
 	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req), strlen(varname)))
 	{
 	    Tcl_SetIntObj(result, 1);
-	    Tcl_IncrRefCount(result);
 	    return TCL_OK;
 	}
     }
     Tcl_SetIntObj(result, 0);
-    Tcl_IncrRefCount(result);
     return TCL_OK;
 }
 
@@ -262,7 +259,6 @@ TclWeb_VarNumber(Tcl_Obj *result, TclWebRequest *req)
     array_header *parmsarray = ap_table_elts(req->apachereq->parms);
 
     Tcl_SetIntObj(result, parmsarray->nelts);
-    Tcl_IncrRefCount(result);
     return TCL_OK;
 }
 

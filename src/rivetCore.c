@@ -119,16 +119,13 @@ Rivet_Include(
     Tcl_SetChannelOption(interp, fd, "-translation", "binary");
 
     outobj = Tcl_NewObj();
-    Tcl_IncrRefCount(outobj);
     sz = Tcl_ReadChars(fd, outobj, -1, 0);
     if (sz == -1)
     {
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
-	Tcl_DecrRefCount(outobj);
 	return TCL_ERROR;
     }
     Tcl_WriteObj(Tcl_GetChannel(interp, "stdout", NULL), outobj);
-    Tcl_DecrRefCount(outobj);
     return Tcl_Close(interp, fd);
 }
 
@@ -264,8 +261,6 @@ Rivet_LoadEnv(
 	ArrayObj = Tcl_NewStringObj( ENV_ARRAY_NAME, -1 );
     }
 
-    Tcl_IncrRefCount( ArrayObj );
-
     return TclWeb_GetEnvVars(ArrayObj, globals->req);
 }
 
@@ -337,7 +332,6 @@ Rivet_Var(
 	if (TclWeb_GetVar(result, key, globals->req) != TCL_OK)
 	{
 	    result = Tcl_NewStringObj("", -1);
-	    Tcl_IncrRefCount(result);
 	}
     } else if(!strcmp(command, "exists")) {
 	char *key;
@@ -361,7 +355,6 @@ Rivet_Var(
 	if (TclWeb_GetVarAsList(result, key, globals->req) != TCL_OK)
 	{
 	    result = Tcl_NewStringObj("", -1);
-	    Tcl_IncrRefCount(result);
 	}
     } else if(!strcmp(command, "names")) {
 	if (objc != 2)
@@ -373,7 +366,6 @@ Rivet_Var(
 	if (TclWeb_GetVarNames(result, globals->req) != TCL_OK)
 	{
 	    result = Tcl_NewStringObj("", -1);
-	    Tcl_IncrRefCount(result);
 	}
     } else if(!strcmp(command, "number")) {
 	if (objc != 2)
@@ -392,7 +384,6 @@ Rivet_Var(
 	if (TclWeb_GetAllVars(result, globals->req) != TCL_OK)
 	{
 	    result = Tcl_NewStringObj("", -1);
-	    Tcl_IncrRefCount(result);
 	}
     } else {
 	/* bad command  */

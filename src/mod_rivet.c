@@ -86,7 +86,6 @@
 #include "rivet.h"
 #include "rivetParser.h"
 
-
 module MODULE_VAR_EXPORT rivet_module;
 
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
@@ -219,7 +218,6 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     {
 
 	outbuf = Tcl_NewObj();
-	Tcl_IncrRefCount(outbuf);
 	if (toplevel && rsc->rivet_before_script) {
 	    Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
 	}
@@ -242,6 +240,11 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	}
 
 	if (*(rsc->cache_size)) {
+	    /* We need to incr the reference count of outbuf because we want
+	     * it to outlive this function.  This allows it to stay alive
+	     * as long as it's in the object cache. 
+	     */
+	    Tcl_IncrRefCount( outbuf );
 	    Tcl_SetHashValue(entry, (ClientData)outbuf);
 	}
 
@@ -259,12 +262,29 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 		    sizeof(char *) * (*(rsc->cache_size) -1));
 	    rsc->objCacheList[0] = strdup(hashKey);
 	}
+
     } else {
 	/* We found a compiled version of this page. */
 	outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
     }
 
     return Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+}
+
+static void
+Rivet_CleanupRequest( request_rec *r )
+{
+    rivet_server_conf *rdc = RIVET_SERVER_CONF( r->per_dir_config );
+
+    if( rdc->rivet_before_script ) {
+	Tcl_DecrRefCount( rdc->rivet_before_script );
+    }
+    if( rdc->rivet_after_script ) {
+	Tcl_DecrRefCount( rdc->rivet_after_script );
+    }
+    if( rdc->rivet_error_script ) {
+	Tcl_DecrRefCount( rdc->rivet_error_script );
+    }
 }
 
 static void
@@ -324,7 +344,9 @@ Rivet_SendContent(request_rec *r)
     char timefmt[MAX_STRING_LEN];
     int errstatus;
 
-    Tcl_Interp *interp;
+    Tcl_Interp	*interp;
+    Tcl_Obj	*request_init;
+    Tcl_Obj	*request_cleanup;
 
     rivet_interp_globals *globals = NULL;
     rivet_server_conf *rsc = NULL;
@@ -362,7 +384,8 @@ Rivet_SendContent(request_rec *r)
 
     Rivet_PropagatePerDirConfArrays( interp, rdc );
 
-    if (Tcl_EvalObj(interp, rsc->request_init) == TCL_ERROR)
+    request_init = Tcl_NewStringObj("::Rivet::initialize_request\n",-1);
+    if (Tcl_EvalObj(interp, request_init) == TCL_ERROR)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
 			"Could not create request namespace\n");
@@ -399,13 +422,16 @@ Rivet_SendContent(request_rec *r)
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
 
-    if(Tcl_EvalObj(interp, rsc->request_cleanup) == TCL_ERROR) {
+    request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n",-1);
+    if(Tcl_EvalObj(interp, request_cleanup) == TCL_ERROR) {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
 
     /* Reset globals */
     globals->req->content_sent = 0;
+
+    Rivet_CleanupRequest( r );
 
     return OK;
 }
@@ -520,12 +546,6 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	ap_log_error( APLOG_MARK, APLOG_ERR, s, "init.tcl must be installed correctly for Apache Rivet to function: %s", Tcl_GetStringResult(interp) );
 	exit(1);
     }
-
-    rsc->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n",-1);
-    Tcl_IncrRefCount(rsc->request_init);
-
-    rsc->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n",-1);
-    Tcl_IncrRefCount(rsc->request_cleanup);
 
     if (rsc->rivet_global_init_script != NULL)
     {
@@ -841,8 +861,6 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->upload_dir = oldrsc->upload_dir;
     newrsc->objCacheList = oldrsc->objCacheList;
     newrsc->objCache = oldrsc->objCache;
-    newrsc->request_init = oldrsc->request_init;
-    newrsc->request_cleanup = oldrsc->request_cleanup;
 
     newrsc->outchannel = oldrsc->outchannel;
 }
@@ -872,8 +890,6 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->upload_dir = "/tmp";
     rsc->objCacheList = NULL;
     rsc->objCache = ap_pcalloc(p, sizeof(Tcl_HashTable));
-    rsc->request_init = NULL;
-    rsc->request_cleanup = NULL;
 
     rsc->outchannel = ap_pcalloc(p, sizeof(Tcl_Channel));
 
