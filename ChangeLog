@@ -1,3 +1,11 @@
+2001-11-21  David N. Welton  <davidw@dedasys.com>
+
+	* src/channel.c: Almost all output is based on the ApacheChan
+	channel, and uses Tcl's buffering, flushing, etc...
+
+	* tests/rivet.test: Updated testing scheme to work with lots of
+	test files/ttml files.
+
 2001-11-21  Damon J. Courtney <damon@unreality.com>
 
 	* src/mod_rivet.c
