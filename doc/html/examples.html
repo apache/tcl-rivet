@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type"><title>Examples and Usage</title><meta name="generator" content="DocBook XSL Stylesheets V1.50.0"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="previous" href="commands.html" title="Rivet Tcl Commands and Variables"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr></table><hr></div><div class="section"><div class="titlepage"><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div><p style="width:90%">
+      Some examples of Rivet usage follow.  Some prior Tcl knowledge
+      is assumed.  If you don't know much Tcl, don't worry, it's easy,
+      and there are some good resources available on the web that will
+      get you up to speed quickly.  Go to the <a href="help.html#websites" title="Web Sites">web sites</a> section and have a look.
+    </p><div class="example"><a name="hello world"></a><p class="title"><b>Example 1. Hello World</b></p><p style="width:90%">
+	As with any tool, it's always nice to see something work, so
+	let's create a small &quot;Hello World&quot; page.</p><p style="width:90%">
+	Assuming you have Apache configured correctly, create a file
+	called <tt>hello.rvt</tt> where Apache can find
+	it, with the following content:
+      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+puts &quot;Hello World&quot;
+?&gt;
+</div><p style="width:90%">
+	If you then access it with your browser, you should see a
+	blank page with the text &quot;Hello World&quot; (without the quotes) on
+	it.
+      </p></div><div class="example"><a name="table"></a><p class="title"><b>Example 2. Generate a Table</b></p><p style="width:90%">
+	In another simple example, we dynamically generate a table:
+      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;? puts &quot;&lt;table&gt;\n&quot;
+for {set i 1} { $i &lt;= 8 } {incr i} {
+    puts &quot;&lt;tr&gt;\n&quot;
+    for {set j 1} {$j &lt;= 8} {incr j} {
+        set num [ expr $i * $j * 4 - 1]
+        puts [ format &quot;&lt;td bgcolor=%2x%2x%2x &gt; $num $num $num &lt;/td&gt;\n&quot; \
+		   $num $num $num ]
+    }
+    puts &quot;&lt;/tr&gt;\n&quot;
+}
+puts &quot;&lt;/table&gt;\n&quot; ?&gt;
+</div><p style="width:90%">
+	If you read the code, you can see that this is pure Tcl.  We
+	could take the same code, run it outside of Rivet, and it
+	would generate the same HTML!
+      </p><p style="width:90%">
+	The result should look something like this:
+      </p><p><img src="table.png"></p></div><div class="example"><p class="title"><b>Example 3. Variable Access</b></p><p style="width:90%">
+	Here, we demonstrate how to access variables set by GET or
+	POST operations.
+      </p><p style="width:90%">
+	Given an HTML form like the following:
+      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;vars.rvt&quot;&gt;
+  &lt;p&gt;
+    &lt;input name=&quot;title&quot;&gt;
+    &lt;input name=&quot;salary&quot;&gt;
+    &lt;input name=&quot;boss&quot;&gt;
+    &lt;select name=&quot;skills&quot; multiple=&quot;multiple&quot;&gt;
+      &lt;option&gt;c&lt;/option&gt;
+      &lt;option&gt;java&lt;/option&gt;
+      &lt;option&gt;Tcl&lt;/option&gt;
+      &lt;option&gt;Perl&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/p&gt;
+&lt;/form&gt;
+</div><p style="width:90%">
+	We can use this Rivet script to get the variable values:
+      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+set errlist {}
+if { [var exists title] } {
+    set salary [var get title]
+} else {
+    set errlist &quot;You need to enter a title&quot;
+}
+
+if { [var exists salary] } {
+    set salary [var get salary]
+    if { ! [string is digit $salary] } {
+	lappend errlist &quot;Salary must be a number&quot;
+    }
+} else {
+    lappend errlist &quot;You need to enter a salary&quot;
+}
+
+if { [var exists boss] } {
+    set boss [var get boss]
+} else {
+    set boss &quot;Mr. Burns&quot;
+}
+
+if { [var exists skills] } {
+    set skills [var list skills]
+} else {
+    lappend errlist &quot;You need to enter some skills&quot;
+}
+
+if { [llength $errlist] != 0 } {
+    foreach err $errlist {
+	puts &quot;&lt;b&gt; $err &lt;/b&gt;&quot;
+    }
+} else {
+    puts &quot;Thanks for the information!&quot;
+}
+?&gt;</div><p style="width:90%">
+	The first statement checks to make sure that the
+	<tt>boss</tt> variable has been passed to the
+	script, and then does something with that information.  If
+	it's not present, an error is added to the list of errors.
+      </p><p style="width:90%">
+	In the second block of code, the variable
+	<tt>salary</tt> is fetched, with one more error
+	check - because it's a number, it needs to be composed of
+	digits.
+      </p><p style="width:90%">
+	The <tt>boss</tt> variable isn't required to have
+	been sent - we set it to &quot;Mr. Burns&quot; if it isn't among the
+	information we received.
+      </p><p style="width:90%">
+	The last bit of variable handing code is a bit trickier.
+	Because <tt>skills</tt> is a listbox, and can
+	potentially have multiple values, we opt to receive them as a
+	list, so that at some point, we could iterate over them.
+      </p><p style="width:90%">
+	The script then checks to make sure that
+	<tt>errlist</tt> is empty (printing an error if it
+	is) and outputting a thankyou message.
+      </p></div><div class="example"><a name="upload"></a><p class="title"><b>Example 4. File Upload</b></p><p style="width:90%">
+	The following HTML in one file, say,
+	<tt>upload.html</tt>
+      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;foo.ttml&quot; enctype=&quot;multipart/form-data&quot;
+method=&quot;post&quot;&gt;
+&lt;input type=&quot;file&quot; name=&quot;MyUpload&quot;&gt;&lt;/input&gt;
+&lt;/form&gt;</div><p style="width:90%">
+	Can be used with the following Tcl code, in a second file
+	(<tt>upload.rvt</tt> for instance)
+	in order to create a file upload form.
+      </p><div style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+upload save MyUpload /tmp/uploadfiles/file1
+puts &quot;Saved file [upload filename MyUpload] \
+	([upload size MyUpload] bytes) to server&quot;
+?&gt;</div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="commands.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="help.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Rivet Tcl Commands and Variables </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Resources - How to Get Help</td></tr></table></div></body></html>

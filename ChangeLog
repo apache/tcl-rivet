@@ -1,3 +1,8 @@
+2002-10-20  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: "make" needed to be "make.tcl".  Thanks to Makoto
+	SATOH.
+
 2002-10-18  David N. Welton  <davidw@dedasys.com>
 
 	* tests/get.test: Added tests for new "var get" behavior.
@@ -49,7 +54,8 @@
 	* src/rivetCore.c (Rivet_Include): "include" command now saves
 	channel encoding/translation, outputs the included file to stdout
 	with binary translation/encoding, and then resets the original
-	settings.  Fixes problem with EUC-JP characters in included files.
+	settings.  Fixes problem with EUC-JP characters in included
+	files.  Thanks to Makoto SATOH for his help in finding this.
 
 	* tests/lang.test: Added file to test LANG setting in server, to
 	check character encodings.

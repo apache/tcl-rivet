@@ -139,7 +139,7 @@
 	      system:</para>
 
 	    <programlisting>cd src/
-	      ./make.tcl <replaceable>option</replaceable></programlisting>
+./make.tcl <replaceable>option</replaceable></programlisting>
 
 	    <para>where <replaceable>option</replaceable> can be
 	      either <option>shared</option> or
@@ -149,7 +149,7 @@
 	  <step>
 	    <title>Install</title>
 	    <para>
-	      Now, you are ready to run the <command>./make
+	      Now, you are ready to run the <command>./make.tcl
 		install</command> command to install the resulting
 	      files.  This should copy the shared object (like
 	      <filename>mod_rivet.so</filename>, if one was

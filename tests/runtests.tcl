@@ -39,10 +39,10 @@ if { ! [file exists [file join rivet init.tcl]] } {
     file copy -force [file join .. rivet] .
 }
 
-# we do this to keep tcltest happy - it reads argv...
-set commandline [lindex $argv 1]
+# If 'startserver' is specified on the command line, just start up the
+# server without running tests.
 
-switch -exact $commandline {
+switch -exact -- [lindex $argv 1] {
     startserver {
 	apachetest::startserver
     }
