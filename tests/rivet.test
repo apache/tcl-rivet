@@ -15,7 +15,7 @@ set urlbase "http://localhost:8081/"
 
 # Use this to start and stop the server:
 
-set TestList {cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test makeurl.test}
+set TestList {headers.test cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test makeurl.test}
 
 # Test stanzas are created by giving the test a name and a
 # description.  The code is then executed, and the results compared

@@ -1,0 +1,13 @@
+# $Id$
+
+set testfilename1 headers.rvt
+
+::tcltest::test headers-1.1 {load_headers test} {
+    set page [::http::geturl "${urlbase}$testfilename1"]
+    regexp -all -lineanchor "(^hdrs.*?$\n){3}" [::http::data $page] match
+    set match [string trim $match]
+    ::http::cleanup $page
+    set match
+} {hdrs(Accept)     = */*
+hdrs(Host)       = localhost:8081
+hdrs(User-Agent) = Tcl http client package 2.4.4}

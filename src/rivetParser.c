@@ -95,12 +95,14 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
 
     inbuf = Tcl_NewObj();
+    Tcl_IncrRefCount(inbuf);
     sz = Tcl_ReadChars(rivetfile, inbuf, -1, 0);
 
     Tcl_Close(interp, rivetfile);
     if (sz == -1)
     {
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
+	Tcl_DecrRefCount(inbuf);
 	return TCL_ERROR;
     }
 
@@ -117,6 +119,7 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     }
     Tcl_AppendToObj(outbuf, "\n", -1);
 
+    Tcl_DecrRefCount(inbuf);
     /* END PARSER  */
     return TCL_OK;
 }

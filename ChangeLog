@@ -1,3 +1,23 @@
+2003-09-30  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetParser.c (Rivet_GetRivetFile): Add ref counting for
+	'inbuf'.
+
+	* src/mod_rivet.c (Rivet_ParseExecFile): Manage ref count for
+	outbuf better.
+	(Rivet_SendContent): Clean up 'info script' code.
+	(Rivet_InitTclStuff): Rework 'if' to eliminate double assignment.
+
+	* src/TclWebapache.c (TclWeb_GetEnvVars): Add ref counting for
+	envvar.
+	(TclWeb_GetHeaderVars): Fix ref counting for headersvar.
+
+	* tests/headers.test: Added test for load_headers.
+
+	* src/apache_request.h: Updates from httpd-apreq.
+
+	* src/apache_request.c: Updates from httpd-apreq.
+
 2003-09-29  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/packages/commserver/server.tcl: Exit 1 on failure.

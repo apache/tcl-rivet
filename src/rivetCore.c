@@ -282,6 +282,7 @@ Rivet_LoadEnv(
     } else {
 	ArrayObj = Tcl_NewStringObj( ENV_ARRAY_NAME, -1 );
     }
+
     return TclWeb_GetEnvVars(ArrayObj, globals->req);
 }
 
@@ -307,6 +308,7 @@ Rivet_LoadHeaders(
     } else {
 	ArrayObj = Tcl_NewStringObj( HEADERS_ARRAY_NAME, -1 );
     }
+
     return TclWeb_GetHeaderVars(ArrayObj, globals->req);
 }
 

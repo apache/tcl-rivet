@@ -491,7 +491,9 @@ FILE *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
     }
 
     if ( tries == 0  || (fp = ap_pfdopen(r->pool, fd, "w+" "b") ) == NULL ) {
-	ap_log_rerror(REQ_ERROR, "[libapreq] could not create/open temp file");
+	ap_log_rerror(REQ_ERROR, 
+                      "[libapreq] could not create/open temp file: %s",
+                      strerror(errno));
 	if ( fd >= 0 ) { remove(name); free(name); }
 	return NULL;
     }

@@ -60,19 +60,19 @@ struct ApacheUpload {
 };
 
 #ifndef strEQ
-#define strEQ(s1,s2) (!strcmp(s1,s2))
+#define strEQ(s1,s2) (!strcmp((s1),(s2)))
 #endif
 
 #ifndef strEQN
-#define strEQN(s1,s2,n) (!strncmp(s1,s2,n))
+#define strEQN(s1,s2,n) (!strncmp((s1),(s2),(n)))
 #endif
 
 #ifndef strcaseEQ
-#define strcaseEQ(s1,s2) (!strcasecmp(s1,s2))
+#define strcaseEQ(s1,s2) (!strcasecmp((s1),(s2)))
 #endif
 
 #ifndef strncaseEQ
-#define strncaseEQ(s1,s2,n) (!strncasecmp(s1,s2,n))
+#define strncaseEQ(s1,s2,n) (!strncasecmp((s1),(s2),(n)))
 #endif
 
 #define DEFAULT_TABLE_NELTS 10
@@ -99,7 +99,7 @@ array_header *ApacheRequest_params(ApacheRequest *req, const char *key);
 char *ApacheRequest_params_as_string(ApacheRequest *req, const char *key);
 int ApacheRequest___parse(ApacheRequest *req);
 #define ApacheRequest_parse(req) \
-    (req->status = req->parsed ? req->status : ApacheRequest___parse(req)) 
+    ((req)->status = (req)->parsed ? (req)->status : ApacheRequest___parse(req)) 
 table *ApacheRequest_query_params(ApacheRequest *req, ap_pool *p);
 table *ApacheRequest_post_params(ApacheRequest *req, ap_pool *p);
 
@@ -108,20 +108,20 @@ ApacheUpload *ApacheUpload_new(ApacheRequest *req);
 ApacheUpload *ApacheUpload_find(ApacheUpload *upload, char *name);
 
 #define ApacheRequest_upload(req) \
-    ((req->parsed || (ApacheRequest_parse(req) == OK)) ? req->upload : NULL)
+    (((req)->parsed || (ApacheRequest_parse(req) == OK)) ? (req)->upload : NULL)
 
-#define ApacheUpload_FILE(upload) (upload->fp)
+#define ApacheUpload_FILE(upload) ((upload)->fp)
 
-#define ApacheUpload_size(upload) (upload->size)
+#define ApacheUpload_size(upload) ((upload)->size)
 
 #define ApacheUpload_info(upload, key) \
-ap_table_get(upload->info, key)
+ap_table_get((upload)->info, (key))
 
 #define ApacheUpload_type(upload) \
-ApacheUpload_info(upload, "Content-Type")
+ApacheUpload_info((upload), "Content-Type")
 
-#define ApacheRequest_set_post_max(req, max) (req->post_max = max)
-#define ApacheRequest_set_temp_dir(req, dir) (req->temp_dir = dir)
+#define ApacheRequest_set_post_max(req, max) ((req)->post_max = (max))
+#define ApacheRequest_set_temp_dir(req, dir) ((req)->temp_dir = (dir))
 
 char *ApacheUtil_expires(pool *p, char *time_str, int type);
 #define EXPIRES_HTTP   1
@@ -135,7 +135,7 @@ char *ApacheRequest_expires(ApacheRequest *req, char *time_str);
 #define REQ_ERROR APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, req->r
 
 #ifdef REQDEBUG
-#define REQ_DEBUG(a) a
+#define REQ_DEBUG(a) (a)
 #else
 #define REQ_DEBUG(a)
 #endif

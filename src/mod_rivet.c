@@ -243,11 +243,14 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     if (isNew || *(rsc->cache_size) == 0)
     {
 	outbuf = Tcl_NewObj();
+	Tcl_IncrRefCount(outbuf);
+
 	if (toplevel) {
 	    if (rsc->rivet_before_script) {
 		Tcl_AppendObjToObj(outbuf, Tcl_NewStringObj(rsc->rivet_before_script, -1));
 	    }
 	}
+
 	if( STREQU( req->req->content_type, "application/x-httpd-rivet")
 	    || !toplevel )
 	{
@@ -258,8 +261,10 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	    /* It's a plain Tcl file */
 	    result = Rivet_GetTclFile(filename, outbuf, interp);
 	}
+
 	if (result != TCL_OK)
 	{
+	    Tcl_DecrRefCount(outbuf);
 	    return result;
 	}
 	if (toplevel) {
@@ -291,14 +296,18 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 		    sizeof(char *) * (*(rsc->cache_size) -1));
 	    rsc->objCacheList[0] = strdup(hashKey);
 	}
-
     } else {
 	/* We found a compiled version of this page. */
 	outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
+	Tcl_IncrRefCount(outbuf);
     }
     rsc->user_scripts_updated = 0;
-
-    return Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+    {
+	int res = 0;
+	res = Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+	Tcl_DecrRefCount(outbuf);
+	return res;
+    }
 }
 
 static void
@@ -477,11 +486,11 @@ Rivet_SendContent(request_rec *r)
     }
 
     {
-	Tcl_Obj *infoscript[3];
-	infoscript[0] = Tcl_NewStringObj("info", -1);
-	infoscript[1] = Tcl_NewStringObj("script", -1);
-	infoscript[2] = Tcl_NewStringObj(r->filename, -1);
-	Tcl_EvalObjv(interp, 3, infoscript, 0);
+	Tcl_Obj *infoscript = Tcl_NewStringObj("info script ", -1);
+	Tcl_IncrRefCount(infoscript);
+	Tcl_AppendToObj(infoscript, r->filename, -1);
+	Tcl_EvalObjEx(interp, infoscript, TCL_EVAL_DIRECT);
+	Tcl_DecrRefCount(infoscript);
     }
 
     /* Apache Request stuff */
@@ -518,10 +527,12 @@ Rivet_SendContent(request_rec *r)
     }
 
     request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+    Tcl_IncrRefCount(request_cleanup);
     if(Tcl_EvalObjEx(interp, request_cleanup, TCL_EVAL_DIRECT) == TCL_ERROR) {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
+    Tcl_DecrRefCount(request_cleanup);
 
     /* Reset globals */
 
@@ -704,15 +715,17 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	} else {
 	    *(rsc->cache_size) = 10; /* FIXME: Arbitrary number */
 	}
-	*(rsc->cache_free) = *(rsc->cache_size);
-    } else if (*(rsc->cache_size) > 0) {
+    }
+    if (*(rsc->cache_size) != 0) {
 	*(rsc->cache_free) = *(rsc->cache_size);
     }
 
     /* Initializing cache structures */
-    rsc->objCacheList = ap_pcalloc(p,
-				(signed)(*(rsc->cache_size) * sizeof(char *)));
-    Tcl_InitHashTable(rsc->objCache, TCL_STRING_KEYS);
+    if (*(rsc->cache_size)) {
+	rsc->objCacheList = ap_pcalloc(
+	    p, (signed)(*(rsc->cache_size) * sizeof(char *)));
+	Tcl_InitHashTable(rsc->objCache, TCL_STRING_KEYS);
+    }
 
     sr = s;
     while (sr)
