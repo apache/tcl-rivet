@@ -158,12 +158,12 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 {
     char *next;
     char *cur;
-    const char *strstart = STARTING_SEQUENCE;
-    const char *strend = ENDING_SEQUENCE;
+    const char *strstart = START_TAG;
+    const char *strend = END_TAG;
 
 
-    int endseqlen = strlen(ENDING_SEQUENCE);
-    int startseqlen = strlen(STARTING_SEQUENCE);
+    int endseqlen = strlen(END_TAG);
+    int startseqlen = strlen(START_TAG);
     int inside = 0, p = 0;
     int inLen = 0;
 

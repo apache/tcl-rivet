@@ -1,5 +1,10 @@
 2004-02-25  David N. Welton  <davidw@dedasys.com>
 
+	* src/rivetParser.h: start/end tags removed from here.
+
+	* src/make.tcl: START_TAG and END_TAG are now defined here, so
+	that they are easier to configure at build time.
+
 	* doc/rivet.xml: Initial cut at including DIO docs in the main set
 	of docs.
 

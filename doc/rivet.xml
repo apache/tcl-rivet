@@ -1518,7 +1518,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       <refsynopsisdiv>
 	<cmdsynopsis>
 	  <command>::DIO::handle</command>
-	  <arg><replaceable>interface</replaceable></arg>
+	  <arg choice="plain"><replaceable>interface</replaceable></arg>
 	  <arg choice="opt"><replaceable>objectName</replaceable></arg>
 	  <group choice="opt">
 	    <arg>-option</arg>
@@ -1545,9 +1545,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  interface.  Currently supported interfaces are
 	  <option>Postgresql</option> and <option>Mysql</option>.
 	</para>
-	<para>If <option>objectName</option> is specified, DIO creates
-	  an object of that name.  If there is no
-	  <option><replaceable>objectName</replaceable></option>
+	<para>
+	  If <option><replaceable>objectName</replaceable></option> is
+	  specified, DIO creates an object of that name.  If there is
+	  no <option><replaceable>objectName</replaceable></option>
 	  given, DIO will automatically generate a unique object ID
 	</para>
       </refsect1>
