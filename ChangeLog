@@ -1,3 +1,8 @@
+2003-07-07  David N. Welton  <davidw@dedasys.com>
+
+	* doc/examples/upload.html: Added submit button to file upload
+	example.
+
 2003-07-05  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetWWW.c (snprintf): Added snprintf define from Pat.

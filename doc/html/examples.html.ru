@@ -159,10 +159,11 @@ if { [llength $errlist] != 0 } {
       </p></div><div class="example"><a name="upload"></a><p class="title"><b>Example 4. &#1047;&#1072;&#1082;&#1072;&#1095;&#1082;&#1072; &#1092;&#1072;&#1081;&#1083;&#1086;&#1074; (Upload)</b></p><p style="width:90%">
         &#1055;&#1091;&#1089;&#1090;&#1100; &#1077;&#1089;&#1090;&#1100; &#1090;&#1072;&#1082;&#1086;&#1081; HTML &#1082;&#1086;&#1076;
         <tt class="filename">upload.html</tt>
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;foo.rvt&quot; enctype=&quot;multipart/form-data&quot;
-method=&quot;post&quot;&gt;
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action=&quot;foo.rvt&quot; enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
 &lt;input type=&quot;file&quot; name=&quot;MyUpload&quot;&gt;&lt;/input&gt;
-&lt;/form&gt;</pre><p style="width:90%">
+&lt;input type=&quot;submit&quot; value=&quot;Send File&quot;&gt;&lt;/input&gt;
+&lt;/form&gt;
+</pre><p style="width:90%">
         &#1048;&#1079; &#1090;&#1072;&#1082;&#1086;&#1075;&#1086; Tcl &#1082;&#1086;&#1076;&#1072;, &#1085;&#1072;&#1087;&#1088;&#1080;&#1084;&#1077;&#1088;, 
         (&#1087;&#1086;&#1076; &#1085;&#1072;&#1079;&#1074;&#1072;&#1085;&#1080;&#1077;&#1084; <tt class="filename">upload.rvt</tt>)
         &#1084;&#1099; &#1087;&#1086;&#1083;&#1091;&#1095;&#1072;&#1077;&#1084; &#1076;&#1086;&#1089;&#1090;&#1091;&#1087; &#1082; &#1079;&#1072;&#1075;&#1088;&#1091;&#1078;&#1077;&#1085;&#1085;&#1086;&#1084;&#1091; &#1092;&#1072;&#1081;&#1083;&#1091;.
