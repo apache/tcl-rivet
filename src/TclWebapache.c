@@ -576,10 +576,10 @@ int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req)
 char *
 TclWeb_GetEnvVar( TclWebRequest *req, char *key )
 {
-    const char *val;
+    char *val;
 
     /* Check to see if it's a header variable first. */
-    val = ap_table_get( req->req->headers_in, key );
+    (const char *)val = ap_table_get( req->req->headers_in, key );
 
     if( !val ) {
 	/* Ensure that the system area which holds the cgi variables is empty */
@@ -589,7 +589,7 @@ TclWeb_GetEnvVar( TclWebRequest *req, char *key )
 	ap_add_cgi_vars( req->req );
 	ap_add_common_vars( req->req );
 
-	val = ap_table_get( req->req->subprocess_env, key );
+	(const char *)val = ap_table_get( req->req->subprocess_env, key );
     }
 
     return val;
