@@ -30,13 +30,23 @@ extern module rivet_module;
 
 #define POOL (globals->r->pool)
 
-/* Make a self-referencing URL  */
-static int
-Rivet_MakeURL(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_MakeURL --
+ *
+ * 	Make a self-referencing URL.
+ *
+ * Results:
+ *	Standard Tcl result.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_MakeURL )
 {
     Tcl_Obj *result = NULL;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -52,14 +62,23 @@ Rivet_MakeURL(
     return TCL_OK;
 }
 
-/* Include and parse a file */
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_Parse --
+ *
+ * 	Include and parse a Rivet file.
+ *
+ * Results:
+ *	Standard Tcl result.
+ *
+ * Side Effects:
+ *	Whatever occurs in the Rivet page parsed.
+ *
+ *-----------------------------------------------------------------------------
+ */
 
-static int
-Rivet_Parse(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+TCL_CMD_HEADER( Rivet_Parse )
 {
     char *filename;
     Tcl_StatBuf buf;
@@ -107,14 +126,24 @@ Rivet_Parse(
     }
 }
 
-/* Tcl command to include flat files */
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_Include --
+ *
+ * 	Includes a file literally in the output stream.  Useful for
+ * 	images, plain HTML and the like.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	Adds to the output stream.
+ *
+ *-----------------------------------------------------------------------------
+ */
 
-static int
-Rivet_Include(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+TCL_CMD_HEADER( Rivet_Include )
 {
     int sz;
     Tcl_Channel fd;
@@ -179,14 +208,23 @@ Rivet_Include(
     return Tcl_Close(interp, fd);
 }
 
-/* Tcl command to manipulate headers */
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_Headers --
+ *
+ * 	Command to manipulate HTTP headers from Tcl.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
 
-static int
-Rivet_Headers(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+TCL_CMD_HEADER( Rivet_Headers )
 {
     char *opt;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -262,15 +300,26 @@ Rivet_Headers(
     return TCL_OK;
 }
 
-/* Get the environmental variables, but do it from a tcl function, so
-   we can decide whether we wish to or not. */
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_LoadEnv --
+ *
+ * 	Load the "environmental variables" - those variables that are
+ * 	set in the environment in a standard CGI program.  If no array
+ * 	name is supplied, they are loaded into an array whose name is
+ * 	the value of the ENV_ARRAY_NAME #define.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
 
-static int
-Rivet_LoadEnv(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+TCL_CMD_HEADER( Rivet_LoadEnv )
 {
     Tcl_Obj *ArrayObj;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -289,14 +338,25 @@ Rivet_LoadEnv(
     return TclWeb_GetEnvVars(ArrayObj, globals->req);
 }
 
-/* Get the headers set by the client. */
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_LoadHeaders --
+ *
+ * 	Load the HTTP headers supplied by the client into a Tcl array,
+ * 	whose name defaults to the value of the HEADERS_ARRAY_NAME
+ * 	#define.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	Creates an array variable if none exists.
+ *
+ *-----------------------------------------------------------------------------
+ */
 
-static int
-Rivet_LoadHeaders(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+TCL_CMD_HEADER ( Rivet_LoadHeaders )
 {
     Tcl_Obj *ArrayObj;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -318,19 +378,31 @@ Rivet_LoadHeaders(
 /* Tcl command to return a particular variable.  */
 
 /* Use:
-   var get foo ?default?
-   var list foo
-   var names
-   var number
-   var all
 */
 
-static int
-Rivet_Var(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+/*
+ *-----------------------------------------------------------------------------
+ *
+ *  Rivet_Var --
+ *
+ * 	Returns information about GET or POST variables:
+ *
+ * 	var get foo ?default?
+ *	var list foo
+ *	var names
+ *	var number
+ *	var all
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER ( Rivet_Var )
 {
     char *cmd;
     char *command;
@@ -441,22 +513,35 @@ Rivet_Var(
 }
 
 /*
-  upload channel uploadname
-  upload save name uploadname
-  upload data uploadname
-  upload exists uploadname
-  upload size uploadname
-  upload type uploadname
-  upload filename uploadname
-  upload names
 */
 
-static int
-Rivet_Upload(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_Upload --
+ *
+ * 	Deals with file uploads (multipart/form-data) like so:
+ *
+ *	upload channel uploadname
+ *	upload save name uploadname
+ *	upload data uploadname
+ *	upload exists uploadname
+ *	upload size uploadname
+ *	upload type uploadname
+ *	upload filename uploadname
+ *	upload names
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	Has the potential to create files on the file system, or work
+ *	with large amounts of data.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_Upload )
 {
     char *varname = NULL;
     char *command = NULL;
@@ -589,7 +674,6 @@ Rivet_Upload(
     return TCL_OK;
 }
 
-
 /*
  *-----------------------------------------------------------------------------
  *
@@ -620,6 +704,25 @@ TCL_CMD_HEADER( Rivet_NoBody )
     return TCL_OK;
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_AbortPageCmd --
+ *
+ * 	Similar in purpose to PHP's "die" command, which halts all
+ * 	further output to the user.  Like an "exit" for web pages, but
+ * 	without actually exiting the apache child.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	Flushes the standard (apache) output channel, and tells apache
+ *	to stop sending data.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -636,9 +739,23 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
     return TCL_RETURN;
 }
 
-/* Get a single environment variable.  This saves us from having to load
- * the entire environment when all we need is one variable.
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_EnvCmd --
+ *
+ * 	Loads a single environmental variable, to avoid the overhead
+ * 	of storing all of them when only one is needed.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
  */
+
 TCL_CMD_HEADER( Rivet_EnvCmd )
 {
     rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
@@ -658,6 +775,23 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
     return TCL_OK;
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_VirtualFilenameCmd --
+ *
+ * 	Gets file according to its relationship with the request's
+ * 	root. (FIXME - check this).
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
 TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
 {
     rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
@@ -675,6 +809,22 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
     Tcl_SetObjResult(interp, Tcl_NewStringObj( filename, -1 ) );
     return TCL_OK;
 }
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_InitCore --
+ *
+ * 	Creates the core rivet commands.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	Creates new commands.
+ *
+ *-----------------------------------------------------------------------------
+ */
 
 int
 Rivet_InitCore( Tcl_Interp *interp )
@@ -704,12 +854,12 @@ Rivet_InitCore( Tcl_Interp *interp )
 			 Rivet_Var,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,
+    Tcl_CreateObjCommand(interp,
 			 "var_qs",
 			 Rivet_Var,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
-	Tcl_CreateObjCommand(interp,
+    Tcl_CreateObjCommand(interp,
 			 "var_post",
 			 Rivet_Var,
 			 NULL,
