@@ -1,3 +1,8 @@
+2004-12-22  David N. Welton  <davidw@dedasys.com>
+
+	* Makefile.am (install-data-local): Added this target to install
+	the Tcl packages and generate a pkgIndex.tcl file.
+
 2004-12-16  David N. Welton  <davidw@dedasys.com>
 
 	* src/Makefile.am (lib_libexecdir): Did some rearanging of things

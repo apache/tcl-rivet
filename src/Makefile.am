@@ -18,12 +18,12 @@
 
 
 # The weird and wild magic of auto* associates these two.
-apxs_libexecdir = @prefix@@APXS_LIBEXECDIR@
+apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
-lib_libexecdir = @prefix@@TCL_PACKAGE_PATH@/rivet
+lib_libexecdir = @TCL_PACKAGE_PATH@/rivet
 lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
 
 #
@@ -52,12 +52,3 @@ librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
 librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
 librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
-
-
-# librivet.so
-# librivetparser.so
-# ld -shared -x -o librivetparser.so rivetParser.o parserPkgInit.o -L/usr/local/lib -ltcl84 -lm
-# ld -shared -x -o librivet.so rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o -L/usr/local/lib -ltcl84 -lm -lcrypt
-
-
-#
