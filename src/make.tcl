@@ -28,8 +28,8 @@ set RIVETLIB_OBJECTS {rivetList.o rivetCrypt.o rivetWWW.o rivetPkgInit.o}
 set PARSER_SHLIB librivetparser[info sharedlibextension]
 set PARSER_OBJECTS {rivetParser.o parserPkgInit.o}
 
-set XML_DOCS [glob [file join .. doc packages * *].xml]
-set HTML_DOCS [string map {.xml .html} $XML_DOCS]
+#set XML_DOCS [glob [file join .. doc packages * *].xml]
+#set HTML_DOCS [string map {.xml .html} $XML_DOCS]
 set HTML "[file join .. doc html]/"
 set XSLNOCHUNK [file join .. doc rivet-nochunk.xsl]
 set XSLCHUNK [file join .. doc rivet-chunk.xsl]
@@ -198,13 +198,13 @@ AddNode install {
     tcl fileutil::install -m o+r $PARSER_SHLIB [file join $PREFIX rivet packages rivet]
 }
 
-foreach doc $HTML_DOCS {
-    set xml [string map {.html .xml} $doc]
-    AddNode $doc {
-	depends $XSLNOCHUNK $xml
-	sh xsltproc --stringparam html.stylesheet rivet.css --nonet -o $doc $XSLNOCHUNK $xml
-    }
-}
+#foreach doc $HTML_DOCS {
+#    set xml [string map {.html .xml} $doc]
+#    AddNode $doc {
+#	depends $XSLNOCHUNK $xml
+#	sh xsltproc --stringparam html.stylesheet rivet.css --nonet -o $doc $XSLNOCHUNK $xml
+#    }
+#}
 
 AddNode [file join .. VERSION] {
     tcl cd ..
@@ -225,12 +225,36 @@ AddNode distclean {
 
 # Create the HTML documentation from the XML document.
 
-AddNode distdoc {
-    depends $XML $XSL
+# Chunked english version of docs.
+AddNode [file join $HTML index.en.html] {
+    depends $XML $XSL $XSLCHUNK
     sh xsltproc --stringparam html.stylesheet rivet.css --stringparam html.ext ".en.html" --nonet -o $HTML $XSLCHUNK $XML
-    foreach tr $TRANSLATIONS {
+}
+
+# No chunk english version.
+AddNode [file join $HTML rivet.en.html] {
+    depends $XML $XSL $XSLNOCHUNK
+    sh xsltproc --stringparam html.stylesheet rivet.css  --nonet -o [file join $HTML rivet.en.html] $XSLNOCHUNK $XML
+}
+
+# Create targets for all translations.
+foreach tr $TRANSLATIONS {
+    # No chunk docs.
+    AddNode [file join $HTML rivet.${tr}.html] {
+	depends [string map [list .xml ".${tr}.xml"] $XML] $XSLNOCHUNK
+	sh xsltproc --stringparam html.stylesheet rivet.css  --nonet -o [file join $HTML rivet.${tr}.html] $XSLNOCHUNK [string map [list .xml ".${tr}.xml"] $XML]
+    }
+
+    # Chunked docs.
+    AddNode [file join $HTML index.${tr}.html] {
+	depends [string map [list .xml ".${tr}.xml"] $XML] $XSLCHUNK
 	sh xsltproc --stringparam html.stylesheet rivet.css  --stringparam html.ext ".${tr}.html" --nonet -o $HTML $XSLCHUNK [string map [list .xml ".${tr}.xml"] $XML]
     }
+}
+
+# Use this to create all the docs.
+AddNode distdoc {
+    depends [file join $HTML index.en.html] [file join $HTML rivet.en.html]
 }
 
 # Create the distribution.  This is a bit unix-specific for the

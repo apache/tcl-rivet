@@ -1,3 +1,12 @@
+2004-02-17  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Created better dependency system for DocBook docs.
+
+	* doc/html/rivet.*.html: Added non-chunked versions of the docs.
+
+	* doc/rivet-nochunk.xsl: Change include of docbook.xsl to an
+	import at the top of the file.  Seems to make things work ok.
+
 2004-02-11  David N. Welton  <davidw@dedasys.com>
 
 	* src/make.tcl: Don't delete rivet packages directory during
