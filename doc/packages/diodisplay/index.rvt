@@ -1,0 +1,485 @@
+<?
+
+rivet_command_document {
+
+name DIODisplay
+
+package DIO
+
+short "Database Interface Objects Display Class"
+
+arguments "[objectName | #auto] ?-option option -option option ...?"
+
+description {
+<B>DIODisplay</B> is an HTML display class that uses a
+<a href="../dio/">DIO</A> object to do the database work and a form object
+to do the displaying.
+<P>
+<B>Options</B>:
+<P>
+
+<B>-DIO <I>object</I></B>
+<UL>
+The DIO object to be used in conjunction with this display object.  This
+is a required field.
+</UL>
+
+<B>-cleanup <I>[0 | 1]</I></B>
+<UL>
+If cleanup is true, when the display object is shown, it will automatically
+destroy the DIO object, the form object and itself. <B>Default is true</B>.
+</UL>
+
+<B>-confirmdelete <I>[0 | 1]</I></B>
+<UL>
+If confirmdelete is true, attempting to delete a record from the database
+first requires that the user confirm that they wish to delete it.  If it
+is false, deletion occurs without prompting the user. <B>Default is true</B>.
+</UL>
+
+<B>-errorhandler <I>procName</I></B>
+<UL>
+The name of a procedure to handle errors when they occur.  During the
+processing of requests and pages, sometimes unexpected errors can occur.
+This procedure will handle any errors.  It is called with a single argument,
+the error string.  Use of the Tcl errorInfo and errorCode variables is also
+recommended though.
+<P>
+If no errorhandler is specified, the handle_error method within the Display
+object will handle the error.
+</UL>
+
+<B>-fields <I>fieldList</I></B>
+<UL>
+Specify a list of fields to be used in this object.  The fields list is
+actually created by using the <B>field</B> command to add fields to the
+display, but this option can be useful to sometimes over-set the list of
+fields created.
+</UL>
+
+<B>-form <I>formObject</I></B>
+<UL>
+A Rivet form object to use when displaying a form.  If one is not specified,
+the display object will automatically create one when it is necessary.
+</UL>
+
+<B>-functions <I>functionList</I></B>
+<UL>
+A list of functions to be displayed in the main menu.  This is a list of
+functions the user is allowed to execute.
+</UL>
+
+<B>-pagesize <I>pageSize</I></B>
+<UL>
+How many records to show per page on a search or list. <B>Default is 25</B>.
+</UL>
+
+<B>-rowfields <I>fieldList</I></B>
+<UL>
+A list of fields to display in each row of a search or list.  When a search
+or list is conducted and the resulting rows are displayed, this list will
+limit which fields are displayed.  <B>Default is all fields</B>.
+</UL>
+
+<B>-rowfunctions <I>functionList</I></B>
+<UL>
+A list of functions to display in each row of a search or list.
+</UL>
+
+<B>-searchfields <I>fieldList</I></B>
+<UL>
+A list of fields to allow a user to search by.  This list will appear in
+the main screen as a drop-down box of fields the user can search on.
+</UL>
+
+<B>-title <I>title</I></B>
+<UL>
+The title of the display object.  This will be output as the title of the
+HTML document.
+</UL>
+
+<P>
+<B>DIO Display Object Commands</B>:
+<P>
+
+<I>objectName</I> <B>cleanup</B> <I>?value?</I>
+<UL>
+Return the current cleanup value.  If <I>value</I> is specified, it sets
+a new value for the cleanup option.
+</UL>
+
+<I>objectName</I> <B>delete</B> <I>key</I>
+<UL>
+Delete the specified <I>key</I> from the database.
+<P>
+The default of this method is to call the DIO object's delete command.
+This method can be overridden.
+</UL>
+
+<I>objectName</I> <B>destroy</B>
+<UL>
+Destroy the object.
+</UL>
+
+<I>objectName</I> <B>DIO</B> <I>?value?</I>
+<UL>
+Return the current DIO value.  If <I>value</I> is specified, it sets
+a new value for DIO.
+</UL>
+
+<I>objectName</I> <B>errorhandler</B> <I>?value?</I>
+<UL>
+Return the current errorhandler value.  If <I>value</I> is specified, it sets
+a new value for errorhandler.
+</UL>
+
+<I>objectName</I> <B>fetch</B> <I>key arrayName</I>
+<UL>
+Fetch the specified <I>key</I> from the database and store it as an array in
+<I>arrayName</I>.
+<P>
+The default of this method is to call the DIO object's fetch command.
+This method can be overridden.
+<P>
+</UL>
+
+<I>objectName</I> <B>field</B> <I>fieldName ?-arg arg -arg arg ...?</I>
+<UL>
+Create a new field object and add it to the display.  When a field is added
+to the display, a new object of the DIODisplayField class is created with
+its values.  See <A HREF="#fields">DIO Display Fields</A> for options and
+values.
+</UL>
+
+<I>objectName</I> <B>fields</B> <I>value</I>
+<UL>
+Return the current fields value.  If <I>value</I> is specified, it sets
+a new value for fields.
+<P>
+</UL>
+
+<I>objectName</I> <B>form</B> <I>value</I>
+<UL>
+Return the current form value.  If <I>value</I> is specified, it sets
+a new value for form.
+<P>
+</UL>
+
+<I>objectName</I> <B>function</B> <I>functionName</I>
+<UL>
+Add a new function to the list of possible functions.  The display object
+will only execute methods and procs which are defined as functions by the
+object.  This is to protect the program from executing a different procedure
+other than what is allowed.  The <I>function</I> command adds a new function
+to the list of allowable functions.
+<P>
+</UL>
+
+<I>objectName</I> <B>functions</B> <I>value</I>
+<UL>
+Return the current functions value.  If <I>value</I> is specified, it sets
+a new value for functions.  See <A HREF="#functions">DIO Display Functions</A>
+for a list of default functions.
+<P>
+</UL>
+
+<I>objectName</I> <B>pagesize</B> <I>value</I>
+<UL>
+Return the current form pagesize.  If <I>value</I> is specified, it sets
+a new value for pagesize.
+<P>
+</UL>
+
+<I>objectName</I> <B>rowfields</B> <I>value</I>
+<UL>
+Return the current form rowfields.  If <I>value</I> is specified, it sets
+a new value for rowfields.
+<P>
+</UL>
+
+<I>objectName</I> <B>rowfooter</B>
+<UL>
+Output the footer of a list of rows to the web page.
+<P>
+This method can be overridden.
+<P>
+</UL>
+
+<I>objectName</I> <B>rowfunctions</B> <I>value</I>
+<UL>
+Return the current rowfunctions value.  If <I>value</I> is specified, it sets
+a new value for rowfunctions.
+<P>
+</UL>
+
+<I>objectName</I> <B>rowheader</B>
+<UL>
+Output the header of a list of rows to the web page.  By default, this is an
+HTML table with a top row listing the fields in the table.
+<P>
+This method can be overridden.
+<P>
+</UL>
+
+<I>objectName</I> <B>searchfields</B> <I>value</I>
+<UL>
+Return the current searchfields value.  If <I>value</I> is specified, it sets
+a new value for searchfields.
+<P>
+</UL>
+
+<I>objectName</I> <B>show</B>
+<UL>
+Show the display object.
+<P>
+This is the main method of the display class.  It
+looks for a variable called <B>mode</B> to be passed in through a form
+response and uses that mode to execute the appropriate function.  If mode
+is not given, the <B>Main</B> function is called.
+<P>
+This function should be called for every page.
+<P>
+</UL>
+
+<I>objectName</I> <B>showform</B>
+<UL>
+Display the form of the object.
+<P>
+This method displays the form for this display object.  It is used in the
+<B>Add</B> and <B>Edit</B> methods but can be called separately if needed.
+<P>
+This method can be overridden if the default look of a form needs to be
+changed.  By default, the form displayed is simply the fields in a table,
+in order.
+<P>
+</UL>
+
+<I>objectName</I> <B>showrow</B> <I>arrayName</I>
+<UL>
+Display a single row of a resulting list or search.
+<P>
+This method is used to display a single row while displaying the result
+of a list or search.  <I>arrayName</I> is a fetched array of the record.
+<P>
+This method can be overriden if the default look of a row needs to be changed.
+By default, each row is output as a table row with each field as a table
+data cell.
+<P>
+</UL>
+
+<I>objectName</I> <B>showview</B>
+<UL>
+Display the view of the object.
+<P>
+This method displays the view for this display object.  It is used in the
+<B>Details</B> methods but can be called separately if needed.
+<P>
+This method can be overridden if the default look of a view needs to be
+changed.  By default, the view displayed is simply the fields in a table,
+in order.
+<P>
+</UL>
+
+<I>objectName</I> <B>store</B> <I>arrayName</I>
+<UL>
+Store the specified <I>arrayName</I> in the database.
+<P>
+The default of this method is to call the DIO object's store command.
+This method can be overridden.
+<P>
+</UL>
+
+<I>objectName</I> <B>text</B> <I>value</I>
+<UL>
+Return the current text value.  If <I>value</I> is specified, it sets
+a new value for text.
+<P>
+</UL>
+
+<I>objectName</I> <B>title</B> <I>value</I>
+<UL>
+Return the current title value.  If <I>value</I> is specified, it sets
+a new value for title.
+<P>
+</UL>
+
+<I>objectName</I> <B>type</B> <I>value</I>
+<UL>
+Return the current type value.  If <I>value</I> is specified, it sets
+a new value for type.
+<P>
+</UL>
+
+<I>objectName</I> <B>value</B> <I>value</I>
+<UL>
+Return the current value value.  If <I>value</I> is specified, it sets
+a new value for value.
+<P>
+</UL>
+
+<BR>
+<BR>
+<B><A NAME="functions" HREF="#functions">DIO Display Functions</A></B>
+<P>
+These functions are called from the <B>show</B> method when a form response
+variable called <B>mode</B> is set.  If no mode has been set, the default
+mode is <B>Main</B>.  The show method will handle the necessary switching
+of functions.  The show method also handles checking to make sure the function
+given is a true function.  If not, an error message is displayed.
+New functions can be added as methods or by use of the <I>function</I>
+command, and any of the default functions can be overridden with new
+methods to create an entirely new class.
+These are the default functions provided.
+<P>
+
+<B>Add</B>
+<UL>
+Show a form that allows the user to add a new entry to the database.  This
+function calls <B>showform</B> to display the form for adding the entry.
+</UL>
+
+<B>Cancel</B>
+<UL>
+The <B>Cancel</B> function does nothing but redirect back to the <B>Main</B>
+function.  This is handy for forms which have a cancel button to point to.
+</UL>
+
+<B>Delete</B>
+<UL>
+If <I>confirmdelete</I> is true (the default), the <B>Delete</B> function will
+ask the user if they're sure they want to delete the record from the
+database.  If <I>confirmdelete</I> is false, or if the user confirms they
+wish to delete, this function calls the <B>DoDelete</B> function to do the
+actual deletion of a record.
+</UL>
+
+<B>Details</B>
+<UL>
+Display the view of a single record from the database.  This function calls
+the <B>showview</B> method to display a single record from the database.
+</UL>
+
+<B>DoDelete</B>
+<UL>
+This function actually deletes a record from the database.  Once it has
+deleted the record, it redirects the user back to the <B>Main</B> function.
+</UL>
+
+<B>Edit</B>
+<UL>
+Show a form that allows the user to edit an existing entry to the database.
+This function calls <B>showform</B> to display the form for editing the
+entry and fills in the fields with the values retrieved from the database.
+</UL>
+
+<B>List</B>
+<UL>
+This function lists the entires contents of the database.  Each record is
+output in a row using the <B>showrow</B> method.
+</UL>
+
+<B>Main</B>
+<UL>
+This function is the main function of the display object.  If there is no
+mode, or once most commands complete, the user will be redirected to this
+function.  The default <B>Main</B> function displays a list of
+<I>functions</I> the user can execute, a list of <I>searchfields</I> the
+user can search on, and a query field.  This query field is used by all
+of the other functions to determine what the user is trying to find.
+<P>
+In the case of a <B>search</B>, query specifies what string the user is looking
+for in the specified search field.  In the case of <B>delete</B>,
+<B>details</B> or <B>edit</B>, the query specifies the database key to access.
+</UL>
+
+<B>Save</B>
+<UL>
+This function saves any data passed to using the <B>store</B> method.  This
+is primarily used by the <B>add</B> and <B>edit</B> commands to store the
+results of the form the user has filled out.
+</UL>
+
+<B>Search</B>
+<UL>
+This function searches the database for any row whose <I>searchBy</I> field
+matches <I>query</I>. Once any number of records are found, <B>Search</B>
+displays the results in rows.
+</UL>
+
+<BR>
+<BR>
+<B><A NAME="fields" HREF="#fields">DIO Display Fields</A></B>
+<P>
+Display fields are created with the <I>field</I> command of the DIODisplay
+object.  Each field is created as a new DIODisplayField object or as a
+subclass of DIODisplayField.  The standard form fields use the standard
+field class, while specialized field types use a class with different
+options but still supports all of the same commands and values a generic
+field does.
+<P>
+<I>displayObject</I> <B>field</B>
+<I>fieldName ?-option option -option option ...?</I>"
+<P>
+<B>Standard Field Options</B>:
+<P>
+These options are supported by field types.
+<P>
+
+<B>-formargs <I>arguments</I></B>
+<UL>
+When a field is created, any argument which is not a standard option is
+assumed to be an argument passed to the form object when the field is
+shown in a form.  These arguments are all appended to the <I>formargs</I>
+variable.  You can use this option to override or add options after the
+initial creation of an object
+</UL>
+
+<B>-readonly <I>[0 | 1]</I></B>
+<UL>
+If <I>readonly</I> is set to true, the field will not display a form entry
+when displaying in a form.
+</UL>
+
+<B>-text <I>text</I></B>
+<UL>
+<P>
+The text displayed next to the form or view field.  By default, DIODisplay
+tries to figure out a pretty way to display the field name.  This text
+will override that default and display whatever is specified.
+</UL>
+
+<B>-type <I>fieldType</I></B>
+<UL>
+<P>
+The type of field this is.  This type is used when creating the field in
+the form object.  <I>fieldType</I> can be any of the accepted form field
+types.  See <A HREF="#fieldtypes">DIO Field Types</A> for a list of types
+available.
+</UL>
+
+<P>
+<B>All other arguments</B>, unless specified in an individual field type,
+are passed directly to the form object when the field is created.  So, you
+can pass -size or -maxsize to specify the length and maximum length of the
+field entry.  Or, if type were textarea, you could define -rows and -cols to
+specify its row and column count.
+
+<BR>
+<BR>
+<B><A NAME="fieldtypes" HREF="#fieldtypes">DIO Display Field Types</A></B>
+<P>
+The following is a list of recognized field types by DIODisplay.  Some are
+standard HTML form fields, and others are DIODisplay fields which execute
+special actions and functions.
+<P>
+
+}
+
+seealso {
+<A HREF="../dio/">DIO</A>,
+<A HREF="../form/">form</A>
+}
+
+}
+
+?>
