@@ -1,5 +1,9 @@
 2002-01-19  David N. Welton  <davidw@dedasys.com>
 
+	* src/TclWebapache.c: Added individual functions for CGI variable
+	access.  Much simpler than trying to devise a data structure to
+	pass them around with.
+
 	* src/rivetCore.c (Rivet_LoadEnv): Roll back authorization
 	information command.
 

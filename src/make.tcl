@@ -95,6 +95,11 @@ AddNode mod_rivet.o {
     command {$COMPILE mod_rivet.c}
 }
 
+AddNode TclWebapache.o {
+    depends "TclWebapache.c mod_rivet.h apache_request.h"
+    command {$COMPILE TclWebapache.c}
+}
+
 AddNode librivet.a {
     depends $LIB_OBJECTS
     command {$TCL_STLIB_LD $LIB_STLIB $LIB_OBJECTS}
@@ -116,7 +121,11 @@ AddNode mod_rivet.so {
 }
 
 AddNode all {
-    depends shared
+    depends module
+}
+
+AddNode module {
+    depends "TclWebapache.o shared"
 }
 
 AddNode shared {

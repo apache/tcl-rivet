@@ -56,4 +56,4 @@ TclWeb_EscapeShellCommand(char *out, char *in, TclWebRequest *req);
 
 /* output/write/flush?  */
 
-/* error (log) ? */
+/* error (log) ? send to stderr with some information. */

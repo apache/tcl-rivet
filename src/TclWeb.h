@@ -3,7 +3,6 @@
  * 	Common API layer.
  */
 
-
 /*
  *-----------------------------------------------------------------------------
  *
@@ -64,23 +63,16 @@ int TclWeb_SetStatus(int status, TclWebRequest *req);
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_Cookie(Tcl_Obj *list, TclWebRequest *req);
 
-int TclWeb_GetCookie(Tcl_Obj *list, TclWebRequest *req);
+int TclWeb_GetCookieVars(Tcl_Obj *cookievar, TclWebRequest *req);
 
-int TclWeb_GetCGIVars(Tcl_Obj *list, TclWebRequest *req);
-
-int TclWeb_GetEnvVars(Tcl_HashTable *envs, TclWebRequest *req);
+int TclWeb_GetEnvVars(Tcl_Obj *envs, TclWebRequest *req);
 
 /* upload stuff goes here */
 
 int TclWeb_Escape(char *out, char *in, int len, void *var);
 
 int TclWeb_UnEscape(char *out, char *in, int len, void *var);
-
-int TclWeb_Base64Encode(char *out, char *in, int len, TclWebRequest *req);
-
-int TclWeb_Base64Decode(char *out, char *in, int len, TclWebRequest *req);
 
 int TclWeb_EscapeShellCommand(char *out, char *in, TclWebRequest *req);
 
