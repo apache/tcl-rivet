@@ -1,3 +1,19 @@
+2003-08-05  David N. Welton  <davidw@dedasys.com>
+
+	* contrib/rvt.vim: Added contributed vim mode for editing Rivet
+	files.
+
+	* contrib/two-mode-mode.el: Added emacs mode for editing Rivet
+	files.
+
+2003-07-22  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.ru.xml: Added lang=ru to article, so that markup like
+	<note> produces the correct language.
+
+	* doc/rivet.it.xml: Added Italian translation of Rivet docs by
+	Fabio Zanotti <zendune@virgilio.it>.
+
 2003-07-16  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Explain example script just a bit more clearly.

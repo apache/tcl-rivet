@@ -73,7 +73,7 @@ set XSLCHUNK [file join .. doc rivet-chunk.xsl]
 set XSL [file join .. doc rivet.xsl]
 set XML [file join .. doc rivet.xml]
 # Existing translations.
-set TRANSLATIONS ru
+set TRANSLATIONS {ru it}
 set PKGINDEX [file join .. rivet pkgIndex.tcl]
 
 # ------------
