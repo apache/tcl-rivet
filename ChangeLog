@@ -1,3 +1,12 @@
+2004-10-29  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * rivet/packages/dio/dio_Mysql.tcl: The "DIO handle" method, which
+	  returns the underlying database's connection handle, now forces
+	  the database connection to be made, if it hasn't already been
+	  made, just like DIO exec.
+
+        * rivet/packages/dio/dio_Postgresql.tcl: (same)
+
 2004-09-29  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetCore.c (TestpanicCmd): Added command to test panics.
@@ -10,7 +19,7 @@
 	* rivet/packages/rivet_ncgi/rivet_ncgi.tcl: Compatibility layer
 	for tcllib's ncgi package.
 
-2004-09-20  Karl Lehenbauer  <karl@sc.com>
+2004-09-20  Karl Lehenbauer  <karl-rivet@sc.com>
 	* src/mod_rivet.c (Rivet_PerInterpInit): Load the init.tcl file
 	with an explicit path rather than using Tcl_PkgRequire.  Previously, 
 	if Rivet was installed with a PREFIX/lib that wasn't already in
@@ -19,7 +28,7 @@
 	startup is unable to find the RivetTcl package, and Rivet is
 	unable to start.  
 
-2004-09-17  Karl Lehenbauer  <karl@sc.com>
+2004-09-17  Karl Lehenbauer  <karl-rivet@sc.com>
 	* rivet/packages/rivet/pkgIndex.tcl:  Removed.  It had a hard-coded
 	assumption about the shared library extensions (.so).  This file is
 	now generated in the target directory by the install node of make.tcl.
@@ -33,7 +42,7 @@
 	causing all Tcl-defined and shared-library-defined packages to be 
 	discovered and generated into the pkgIndex.tcl.
 
-2004-09-16  Karl Lehenbauer  <karl@sc.com>
+2004-09-16  Karl Lehenbauer  <karl-rivet@sc.com>
 	* src/parserPkgInit.c: Added a Rivetparser_SafeInit so the
 	C-based standalone Rivet parser library can be loaded
 	from safe interpreters.  After inspection, we believe that
@@ -111,14 +120,14 @@
 	* doc/rivet.xml: Added clearer instructions for mailing list
 	subscription.
 
-2004-05-05  Karl Lehenbauer  <karl@sc.com>
+2004-05-05  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* src/rivetWWW.c: Made the escape_string command map spaces
 	to plus signs (+) rather than %20.  They're equivalent and
 	unescape the same, but the plus signs are visually easier
 	to take.
 
-2004-05-05  Karl Lehenbauer  <karl@sc.com>
+2004-05-05  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* /rivet/packages/dio/diodisplay.tcl: Got "-type boolean"
 	working.  There's some problem with using a method that
@@ -127,25 +136,25 @@
 	the variable.  I had to substitute "cget -varName" style
 	to get it to work.
 
-2004-05-05  Karl Lehenbauer  <karl@sc.com>
+2004-05-05  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* /rivet/packages/dio/diodisplay.tcl: Added "-type select"
 	option to DIOdisplay fields, and a new option, "-values $list"
 	which takes a list of values to be made available with a form
 	selector.
 
-2004-05-05  Karl Lehenbauer  <karl@sc.com>
+2004-05-05  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* /rivet/packages/dio/diodisplay.tcl: When adding a new record,
 	if they've typed anything into the "is" field, set the default
 	value of the field specified in the "where" part to match.
 
-2004-05-05  Karl Lehenbauer  <karl@sc.com>
+2004-05-05  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* doc/rivet.xml: Documented the escape_string, unescape_string,
 	escape_sgml_chars, and escape_shell_command functions.
 
-2004-05-04  Karl Lehenbauer  <karl@sc.com>
+2004-05-04  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* rivet/packages/dio/diodisplay.tcl: Added enhancements from 
 	Peter da Silva (peter@taronga.com): Add support for hidden variables.
@@ -298,7 +307,7 @@
 
 	* src/make.tcl: Create directory before installing.
 
-2004-01-20  Karl Lehenbauer  <karl@sc.com>
+2004-01-20  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* rivet/packages/dio/diodisplay.tcl: Removed calls to abort_page
 	when relatively benign conditions like no records matching a
@@ -332,14 +341,14 @@
 	* src/make.tcl: Added warning to default make.tcl target in order
 	to encourage people to run ./make.tcl install.
 
-2004-01-08  Karl Lehenbauer  <karl@sc.com>
+2004-01-08  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	*  src/buildscripts/findapxs.tcl: When the apxs program cannot
 	be located, the message now mentions that the location of apxs
 	can also be specified using the "-with-apxs" option on the
 	command line.
 
-2004-01-05  Karl Lehenbauer  <karl@sc.com>
+2004-01-05  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	*  rivet/packages/session/*: Checkin of session management code.
 	This is a from-scratch rewrite of Superconnect's session
@@ -347,7 +356,7 @@
 	Apache Software License. See rivet/packages/session/README.txt 
 	for details of what it does and how it works.
 
-2004-01-02  Karl Lehenbauer  <karl@sc.com>
+2004-01-02  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	*  src/buildscripts/findapxs.tcl: Added /usr/local/bin and
 	/usr/local/sbin to the directories that Rivet configuration
