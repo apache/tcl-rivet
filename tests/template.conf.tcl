@@ -20,7 +20,7 @@ MaxRequestsPerChild 100
 
 $LOADMODULES
 
-LoadModule rivet_module $CWD/../mod_rivet[info sharedlibextension]
+LoadModule rivet_module $CWD/../src/mod_rivet[info sharedlibextension]
 
 Port 8080
 

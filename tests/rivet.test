@@ -13,7 +13,12 @@ package require http 2.1
 
 set urlbase "http://localhost:8080/"
 set testfilename1 "rivet1-test.ttml"
-set testfilename2 "rivet2-test.ttml"
+set testfilename2 "rivet2-test.tcl"
+
+# Test stanzas are created by giving the test a name and a
+# description.  The code is then executed, and the results compared
+# with the desired result, which is placed after the block of code.
+# See man tcltest for more information.
 
 ::tcltest::test hello-1.1 {hello world test} {
     set page [ ::http::geturl "${urlbase}$testfilename1" ]
