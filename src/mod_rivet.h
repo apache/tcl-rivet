@@ -43,6 +43,7 @@ typedef struct {
     Tcl_Obj *rivet_before_script;        /* script run before each page */
     Tcl_Obj *rivet_after_script;         /*            after            */
     Tcl_Obj *rivet_error_script;         /*            for errors */
+    Tcl_Obj *rivet_default_error_script;         /*            for errors */
     int *cache_size;
     int *cache_free;
     int upload_max;

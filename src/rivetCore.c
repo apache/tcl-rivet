@@ -225,7 +225,6 @@ Rivet_LoadEnv(
     } else {
 	ArrayObj = Tcl_NewStringObj( ENV_ARRAY_NAME, -1 );
     }
-
     return TclWeb_GetEnvVars(ArrayObj, globals->req);
 }
 

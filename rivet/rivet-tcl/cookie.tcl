@@ -12,22 +12,26 @@ proc make_cookie_attributes {paramsArray} {
     set cookieParams ""
     set expiresIn 0
 
-    foreach {time num} [list days 86400 hours 3600 minutes 60] {
-        if [info exists params($time)] {
-	    incr expiresIn [expr $params($time) * $num]
+    if { [info exists params(expires)] } {
+	append cookieParams "; expires=$params(expires)"
+    } else {
+	foreach {time num} [list days 86400 hours 3600 minutes 60] {
+	    if [info exists params($time)] {
+		incr expiresIn [expr $params($time) * $num]
+	    }
+	}
+	if {$expiresIn != 0} {
+	    set secs [expr [clock seconds] + $expiresIn]
+	    append cookieParams "; expires=[clock_to_rfc850_gmt $secs]"
 	}
     }
-    if {$expiresIn != 0} {
-	set secs [expr [clock seconds] + $expiresIn]
-	append cookieParams "; expires=[clock_to_rfc850_gmt $secs]"
-    }
-    if [info exists params(path)] {
+    if { [info exists params(path)] } {
         append cookieParams "; path=$params(path)"
     }
-    if [info exists params(domain)] {
+    if { [info exists params(domain)] } {
         append cookieParams "; domain=$params(domain)"
     }
-    if {[info exists params(secure)] && $params(secure) == 1} {
+    if { [info exists params(secure)] && $params(secure) == 1} {
         append cookieParams "; secure"
     }
 
@@ -36,6 +40,7 @@ proc make_cookie_attributes {paramsArray} {
 
 ## cookie [set|get] cookieName ?cookieValue? [-days expireInDays]
 ##    [-hours expireInHours] [-minutes expireInMinutes]
+##    [-expires  Wdy, DD-Mon-YYYY HH:MM:SS GMT]
 ##    [-path uriPathCookieAppliesTo]
 ##    [-secure 1|0]
 ##
@@ -57,7 +62,7 @@ proc cookie {cmd name args} {
 		    "value may not contain semicolons, spaces, or tabs"
 	    }
 
-	    set cookieKey "Set-cookie"
+	    set cookieKey "Set-Cookie"
 	    set cookieValue "$name=$value"
 
 	    append cookieValue [make_cookie_attributes params]

@@ -113,18 +113,18 @@ proc copyinit { } {
 # dump out a config
 
 proc makeconf { binname outfile } {
-    set CWD [ pwd ]
+    set CWD [pwd]
 
     # replace with determinemodules
-    set LOADMODULES [ determinemodules $binname ]
+    set LOADMODULES [determinemodules $binname]
 
-    set fl [ open "template.conf.tcl" r ]
-    set template [ read $fl ]
+    set fl [open "template.conf.tcl" r]
+    set template [read $fl]
     close $fl
 
-    set out [ subst $template ]
+    set out [subst $template]
 
-    set of [ open $outfile w ]
+    set of [open $outfile w]
     puts $of "$out"
     close $of
     copyinit

@@ -1,0 +1,23 @@
+# $Id$
+
+set testfilename1 broken.rvt
+
+::tcltest::test broken-1.1 {error page test} {
+    server::start {-c "RivetUserConf ErrorScript 'puts \"Page broken\"'"} {
+	set page [::http::geturl "${urlbase}$testfilename1"]
+	set match [string trim [::http::data $page]]
+    }
+    set match
+} {Page broken}
+
+::tcltest::test broken-1.2 {error page test} {
+    server::start {
+	-c "RivetUserConf ErrorScript 'puts \"Page broken\"'" -c "AccessFileName test-htaccess"
+    } {
+	set page [::http::geturl "${urlbase}$testfilename1"]
+	set match [string trim [::http::data $page]]
+    }
+    set match
+} {this page is BROKEN}
+
+

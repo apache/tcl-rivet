@@ -9,12 +9,12 @@ set testfilename1 upload.rvt
     set data [read $fl]
     close $fl
 
-    set outputData "--$bound\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\n\n$data\n${bound}--"
+    set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n"
 
-    set page [ ::http::geturl "${urlbase}$testfilename1" \
-		   -type "multipart/form-data; boundary=$bound" -query $outputData ]
+    set page [::http::geturl "${urlbase}$testfilename1" \
+		  -type "multipart/form-data; boundary=$bound" -query $outputData]
 
-    set ret [string trim [ ::http::data $page ]]
+    set ret [string trim [::http::data $page]]
     set ret
-} {uploadtest 1 42781  AngeloFish.jpg}
+} {uploadtest 1 42747  AngeloFish.jpg}
 

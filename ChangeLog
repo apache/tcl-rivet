@@ -1,3 +1,14 @@
+2002-03-15  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.h: Add a default error script.
+
+	* src/TclWebapache.c (TclWeb_GetEnvVars): DecrRef for the name of
+	the environment variable.
+
+	* rivet/rivet-tcl/cookie.tcl (make_cookie_attributes): Add an
+	interface to add the 'expire' field directly.
+	(cookie): "Set-Cookie" is uppercase for both words.
+
 2002-03-15  Damon J. Courtney <damon@unreality.com>
 
 	* src/apache_cookie.c

@@ -57,3 +57,5 @@ AddLanguage es .es
 AddType application/x-httpd-rivet .rvt
 AddType application/x-rivet-tcl .tcl
 </IfModule>
+
+RivetServerConf UploadFilesToVar on

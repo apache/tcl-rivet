@@ -128,8 +128,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
-	Tcl_Obj *errscript =
-	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
+	Tcl_Obj *errscript = conf->rivet_error_script;
 
 	Tcl_SetVar( interp, "errorOutbuf",
 			Tcl_GetStringFromObj( outbuf, NULL ),
@@ -137,7 +136,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
 	/* If we don't have an error script, use the default error handler. */
 	if( !errscript ) {
-	    errscript = Tcl_NewStringObj( "::Rivet::handle_error", -1 );
+	    errscript = conf->rivet_default_error_script;
 	}
 
 	if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
@@ -844,6 +843,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_before_script = oldrsc->rivet_before_script;
     newrsc->rivet_after_script = oldrsc->rivet_after_script;
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
+    newrsc->rivet_default_error_script = oldrsc->rivet_default_error_script;
 
     /* these are pointers so that they can be passed around...  */
     newrsc->cache_size = oldrsc->cache_size;
@@ -873,6 +873,8 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->rivet_before_script = NULL;
     rsc->rivet_after_script = NULL;
     rsc->rivet_error_script = NULL;
+    rsc->rivet_default_error_script = Tcl_NewStringObj("::Rivet::handle_error", -1);
+    Tcl_IncrRefCount(rsc->rivet_default_error_script);
 
     /* these are pointers so that they can be passed around...  */
     rsc->cache_size = ap_pcalloc(p, sizeof(int));

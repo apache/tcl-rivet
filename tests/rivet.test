@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using tclsh \
-exec tclsh "$0" "$@"
+    exec tclsh "$0" "$@"
 
 # Rivet test suite, by David N. Welton <davidw@apache.org>
 
@@ -25,8 +25,8 @@ proc server::start { options code } {
     variable binname
     after 200
     set serverpid [eval exec $binname -X -f "[file join [pwd] server.conf]" $options &]
+    after 100
     puts "Apache started as PID $serverpid"
-    after 200
     if { ! [catch {
 	uplevel $code
     } err] } {
@@ -36,14 +36,40 @@ proc server::start { options code } {
     exec kill $serverpid
 }
 
+set TestList {cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test makeurl.test}
 
 # Test stanzas are created by giving the test a name and a
 # description.  The code is then executed, and the results compared
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
-foreach Test {cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test makeurl.test} {
+set testgroup1 1
+set testgroup2 1
+set testgroup3 1
+
+if { $testgroup1 } {
+    foreach Test $TestList {
+	server::start {} {
+	    source $Test
+	}
+    }
+}
+
+# Now run them all against one server process, just to change things
+# around some.
+
+if { $testgroup2 } {
     server::start {} {
+	foreach Test $TestList {
+	    source $Test
+	}
+    }
+}
+
+# These tests start the server on their own
+
+if { $testgroup3 } {
+    foreach Test {broken.test config.test} {
 	source $Test
     }
 }

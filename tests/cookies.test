@@ -3,14 +3,14 @@
 set testfilename1 cookies.rvt
 
 ::tcltest::test cookies-1.1 {Cookies} {
-    set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "foo=bar"} ]
+    set page [::http::geturl "${urlbase}$testfilename1" -headers {Cookie "foo=bar"}]
     regexp -line {^cookies\(foo\) = bar$} [ ::http::data $page ] match
     set match
 } {cookies(foo) = bar}
 
 ::tcltest::test cookies-1.2 {Cookies + I18N} {
-    set page [ ::http::geturl "${urlbase}$testfilename1" -headers {Cookie "Más=Tú"} ]
-    regexp -line {^cookies\(Más\) = Tú$} [ ::http::data $page ] match
+    set page [::http::geturl "${urlbase}$testfilename1" -headers {Cookie "Más=Tú"}]
+    regexp -line {^cookies\(Más\) = Tú$} [::http::data $page] match
     set match
 } {cookies(Más) = Tú}
 
@@ -37,5 +37,5 @@ set testfilename1 cookies.rvt
     set page [ ::http::geturl "${urlbase}$testfilename1" ]
     upvar 0 $page state
     array set statehash $state(meta)
-    regexp -line {mod=rivet; path=[^;]*; expires=01-01-2003} $statehash(Set-Cookie)
+    regexp -line {mod=rivet; expires=01-01-2003} $statehash(Set-Cookie)
 } 1
