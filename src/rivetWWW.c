@@ -159,7 +159,7 @@ TCL_CMD_HEADER( Rivet_EscapeStringCmd )
 	origStringP++) {
 	char c = *origStringP;
 
-        if (isalnum (c)) {
+        if (isalnum ((int)c)) {
 	    *newStringP++ = c;
 	} else {
 	    *newStringP++ = '%';

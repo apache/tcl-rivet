@@ -1,3 +1,8 @@
+2002-10-29  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetWWW.c (Rivet_EscapeStringCmd): Eliminate warning on
+	Solaris by casting a char to an int.
+
 2002-10-28  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetCore.c (Rivet_Include): Changed Tcl_Channel name to
