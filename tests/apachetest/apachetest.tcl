@@ -1,6 +1,6 @@
 # $Id$
 
-# Tcl based Apache test suite, by David N. Welton <davidw@dedasys.com>
+# Tcl-based Apache test suite, by David N. Welton <davidw@dedasys.com>
 
 # This test suite provides a means to create configuration files, and
 # start apache with user-specified options.  All it needs to run is
@@ -178,9 +178,19 @@ proc apachetest::determinemodules { binname } {
     }
 }
 
-# dump out a config
-# outfile is the file to write to.
-# extra is for extra config things we want to tack on.
+# apachetest::makeconf --
+
+#	Creates a config file and writes it to disk.
+
+# Arguments:
+#	outfile - the file to create/write to.
+#	extra - extra config options to add.
+
+# Side Effects:
+#	Creates a new config file.
+
+# Results:
+#	None.
 
 proc apachetest::makeconf { outfile {extra ""} } {
     variable binname

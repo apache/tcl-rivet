@@ -111,8 +111,11 @@ Rivet_Include(
 {
     int sz;
     Tcl_Channel fd;
+    Tcl_Channel stdout;
     Tcl_Obj *outobj;
     char *filename;
+    Tcl_DString transoptions;
+    Tcl_DString encoptions;
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
@@ -148,7 +151,21 @@ Rivet_Include(
 	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
 	return TCL_ERROR;
     }
-    Tcl_WriteObj(Tcl_GetChannel(interp, "stdout", NULL), outobj);
+
+    /* What we are doing is saving the translation and encoding
+     * options, setting them both to binary, and the restoring the
+     * previous settings. */
+    Tcl_DStringInit(&transoptions);
+    Tcl_DStringInit(&encoptions);
+    stdout = Tcl_GetChannel(interp, "stdout", NULL);
+    Tcl_GetChannelOption(interp, stdout, "-translation", &transoptions);
+    Tcl_GetChannelOption(interp, stdout, "-encoding", &encoptions);
+    Tcl_SetChannelOption(interp, stdout, "-translation", "binary");
+    Tcl_WriteObj(stdout, outobj);
+    Tcl_SetChannelOption(interp, stdout, "-translation", Tcl_DStringValue(&transoptions));
+    Tcl_SetChannelOption(interp, stdout, "-encoding", Tcl_DStringValue(&encoptions));
+    Tcl_DStringFree(&transoptions);
+    Tcl_DStringFree(&encoptions);
     return Tcl_Close(interp, fd);
 }
 

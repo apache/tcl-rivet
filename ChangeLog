@@ -1,3 +1,19 @@
+2002-09-27  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_Include): "include" command now saves
+	channel encoding/translation, outputs the included file to stdout
+	with binary translation/encoding, and then resets the original
+	settings.  Fixes problem with EUC-JP characters in included files.
+
+	* tests/lang.test: Added file to test LANG setting in server, to
+	check character encodings.
+
+	* tests/parse.test: Added EUC-JP characters to test that they come
+	through ok.
+
+	* tests/include.test: Added EUC-JP characters to test that they come
+	through ok.
+
 2002-09-11  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c (TclWeb_InitEnvVars): Don't do an

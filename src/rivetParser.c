@@ -64,7 +64,7 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, TclWebRequest *req)
  * Rivet_GetRivetFile --
  *
  * Takes a filename, a flag to indicate whether we are operating at
- * the top level (not from within the "parse" command, a buffer to
+ * the top level (not from within the "parse" command), a buffer to
  * fill in, and a TclWebRequest.  Fills in outbuf with a parsed Rivet
  * .rvt file, creating a Tcl script ready for execution.
  *

@@ -169,20 +169,43 @@
       <varlistentry>
 	<term>
 	  <cmdsynopsis>
-	    <command>Rivet_Script</command>
-	    <arg>GlobalInitScript</arg>
-	    <arg><replaceable>script</replaceable></arg>
+	    <command>RivetServerConf</command>
+	    <group choice="req">
+	      <arg>CacheSize</arg>
+	      <arg>GlobalInitScript</arg>
+	      <arg>ChildInitScript</arg>
+	      <arg>ChildExitScript</arg>
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>UploadDirectory</arg>
+	      <arg>UploadMaxSize</arg>
+	      <arg>UploadFilesToVar</arg>
+	      <arg>SeperateVirtualInterps</arg>
+	    </group>
 	  </cmdsynopsis>
 	</term>
 	<listitem>
-	  <para>
-	    Tcl script that is run when each interpreter is
-	    initialized.  <option>script</option> is an actual Tcl
-	    script, so to run a file, you would do:
+	  <para><command>RivetServerConf</command> specifies a global
+	    option that is valid for the whole server.
 	  </para>
-	  <programlisting>
-	    Rivet_Script GlobalInitScript "source /var/www/foobar.tcl"
-	  </programlisting>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		  <cmdsynopsis>
+		    <command>CacheSize</command>
+		    <arg><replaceable>size</replaceable></arg>
+		  </cmdsynopsis>
+		</term>
+		<listitem>
+		  <para>
+		    Sets the size of the internal page cache, where
+		    <option><replaceable>size</replaceable></option>
+		    is the number of byte-compiled pages to be cached
+		    for future use.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
 	</listitem>
       </varlistentry>
       <varlistentry>
