@@ -1,3 +1,8 @@
+2004-05-05  Karl Lehenbauer  <karl@sc.com>
+
+	* doc/rivet.xml: Documented the escape_string, unescape_string,
+	escape_sgml_chars, and escape_shell_command functions.
+
 2004-05-04  Karl Lehenbauer  <karl@sc.com>
 
 	* rivet/packages/dio/diodisplay.tcl: Added enhancements from 

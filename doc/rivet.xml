@@ -1398,6 +1398,117 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
+    <refentry>
+      <refnamediv>
+	<refname>escape_string</refname>
+	<refpurpose>convert a string into escaped characters.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>escape_string</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Scans through each character in the specified string looking
+	  for special characters, escaping them as needed, mapping
+	  special characters to a quoted hexadecimal equivalent,
+	  returning the result.
+	</para>
+	<para>
+	This is useful for quoting strings that are going to be
+	part of a URL.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>escape_sgml_chars</refname>
+	<refpurpose>escape special SGML characters in a string.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>escape_sgml_chars</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Scans through each character in the specified string looking
+	  for any special (with respect to SGML, and hence HTML) characters
+	  from the specified string, and returns the result.  
+	  For example, the right angle
+	  bracket is escaped to the corrected ampersand gt symbol.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>escape_shell_command</refname>
+	<refpurpose>escape shell metacharacters in a string.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>escape_shell_command</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Scans through each character in the specified string looking
+	  for any shell metacharacters, such as asterisk, less than and
+	  greater than, parens, square brackets, curly brackets, angle 
+	  brackets, dollar signs, backslashes, semicolons, ampersands,
+	  vertical bars, etc.
+	</para>
+	<para>
+	  For each metacharacter found, it is quoted in the result by
+	  prepending it with a backslash, returning the result.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry>
+      <refnamediv>
+	<refname>unescape_string</refname>
+	<refpurpose>unescape escaped characters in a string.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>unescape_string</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Scans through each character in the specified string looking
+	  for escaped character sequences (characters containing a
+	  percent sign and two hexadecimal characters, unescaping them 
+	  back to their original character values, as needed, also mapping
+	  plus signs to spaces, and returning the result.
+	</para>
+	<para>
+	This is useful for unquoting strings that have been quoted to
+	be part of a URL.
+	</para>
+      </refsect1>
+    </refentry>
+
   </section>
 
   <section id="examples">
