@@ -712,8 +712,28 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     }
 }
 
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Rivet_SetScript --
+ *
+ *	Add the text from an apache directive, such as UserConf, to
+ *	the corresponding variable in the rivet_server_conf structure.
+ *	In most cases, we append the new value to any previously
+ *	existing value, but Before, After and Error scripts override
+ *	the old directive completely.
+ *
+ * Results:
+ *
+ *	Returns the string representation of the current value for the
+ *	directive.
+ *
+ *----------------------------------------------------------------------
+ */
+
 static char *
-Rivet_AppendToScript( ap_pool *pool, rivet_server_conf *rsc, char *script, char *string )
+Rivet_SetScript( ap_pool *pool, rivet_server_conf *rsc, char *script, char *string )
 {
     Tcl_Obj *objarg = NULL;
 
@@ -751,26 +771,11 @@ Rivet_AppendToScript( ap_pool *pool, rivet_server_conf *rsc, char *script, char 
 	    Tcl_AppendToObj( objarg, "\n", 1 );
 	}
     } else if( STREQU( script, "BeforeScript" ) ) {
-	if( rsc->rivet_before_script == NULL ) {
-	    rsc->rivet_before_script = ap_pstrcat(pool, string, "\n", NULL);
-	} else {
-	    rsc->rivet_before_script = ap_pstrcat(pool, rsc->rivet_before_script,
-						  string, "\n", NULL);
-	}
+	rsc->rivet_before_script = ap_pstrcat(pool, string, "\n", NULL);
     } else if( STREQU( script, "AfterScript" ) ) {
-	if( rsc->rivet_after_script == NULL ) {
-	    rsc->rivet_after_script = ap_pstrcat(pool, string, "\n", NULL);
-	} else {
-	    rsc->rivet_after_script = ap_pstrcat(pool, rsc->rivet_after_script,
-						  string, "\n", NULL);
-	}
+	rsc->rivet_after_script = ap_pstrcat(pool, string, "\n", NULL);
     } else if( STREQU( script, "ErrorScript" ) ) {
-	if( rsc->rivet_error_script == NULL ) {
-	    rsc->rivet_error_script = ap_pstrcat(pool, string, "\n", NULL);
-	} else {
-	    rsc->rivet_error_script = ap_pstrcat(pool, rsc->rivet_error_script,
-						 string, "\n", NULL);
-	}
+	rsc->rivet_error_script = ap_pstrcat(pool, string, "\n", NULL);
     }
 
     if( !objarg ) return string;
@@ -827,7 +832,7 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 	    rsc->seperate_virtual_interps = 0;
 	}
     } else {
-	string = Rivet_AppendToScript( cmd->pool, rsc, var, val);
+	string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }
 
     ap_table_set( rsc->rivet_server_vars, var, string );
@@ -857,7 +862,7 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
     if( STREQU( var, "UploadDirectory" ) ) {
 	rdc->upload_dir = val;
     } else {
-	string = Rivet_AppendToScript( cmd->pool, rdc, var, val );
+	string = Rivet_SetScript( cmd->pool, rdc, var, val );
     }
 
     ap_table_set( rdc->rivet_dir_vars, var, string );
@@ -885,13 +890,7 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
     /* We have modified these scripts. */
     rdc->user_scripts_updated = 1;
 
-    if( STREQU( var, "BeforeScript" ) ) {
-	rdc->rivet_before_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
-    } else if( STREQU( var, "AfterScript" ) ) {
-	rdc->rivet_after_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
-    } else if( STREQU( var, "ErrorScript" ) ) {
-	rdc->rivet_error_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
-    }
+    string = Rivet_SetScript( cmd->pool, rdc, var, val );
     /* XXX Need to figure out what to do about setting the table.  */
     ap_table_set( rdc->rivet_user_vars, var, string );
     return( NULL );
