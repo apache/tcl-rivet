@@ -1967,6 +1967,23 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <listitem>
 	      <cmdsynopsis>
 		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>insert</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Insert fields from <option>arrayName</option> into the specified table in the database.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
 		<arg>keyfield</arg>
 		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
@@ -2095,7 +2112,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		</group>
 	      </cmdsynopsis>
 	      <para>
-		Store <option>arrayName</option> in the database.
+		Store <option>arrayName</option> in the database, inserting it if the corresponding record isn't there, or updating it if it is.
 	      </para>
 	    </listitem>
 	  </varlistentry>
