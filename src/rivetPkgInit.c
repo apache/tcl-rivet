@@ -14,5 +14,5 @@ Rivet_Init( Tcl_Interp *interp )
 
     Rivet_InitWWW( interp );
 
-    return Tcl_PkgProvide( interp, "Rivet", "1.0" );
+    return Tcl_PkgProvide( interp, "Rivet", "1.1" );
 }

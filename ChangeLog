@@ -1,5 +1,16 @@
 2003-03-25  David N. Welton  <davidw@dedasys.com>
 
+	* src/rivetPkgInit.c (Rivet_Init): Bump version number to 1.1.
+
+	* src/mod_rivet.c (Rivet_InitTclStuff): Use Tcl_PkgRequire to load
+	Rivet's init.tcl.
+
+	* src/make.tcl: Use Tcl file location instead of Apache-based file
+	location, in order to use Tcl_PkgRequire to load Rivet's init.tcl.
+
+	* rivet/init.tcl: Provide 'RivetTcl' package.
+	(init): Use [info script] instead of server(RIVET_DIR) variable.
+
 	* src/make.tcl: Add a debinstall target as a temporary way to
 	build .deb files.
 

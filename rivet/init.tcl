@@ -1,3 +1,5 @@
+package provide RivetTcl 1.1
+
 namespace eval ::Rivet {
 
     ###
@@ -53,17 +55,17 @@ namespace eval ::Rivet {
 	## We insert it at the head of the list because we want any of
 	## our procs named the same as Tcl's procs to be overridden.
 	## Example: parray
-	set tclpath [file join $server(RIVET_DIR) rivet-tcl]
+	set tclpath [file join [file dirname [info script]] rivet-tcl]
 	set auto_path [linsert $auto_path 0 $tclpath]
 
 	## Add the packages directory to the auto_path.
 	## If we have a packages$tcl_version directory
 	## (IE: packages8.3, packages8.4) append that as well.
-	set pkgpath [file join $server(RIVET_DIR) packages]
+	set pkgpath [file join [file dirname [info script]] packages]
 	lappend auto_path $pkgpath
 	lappend auto_path ${pkgpath}-local
 
-	if {[file exists ${pkgpath}$::tcl_version]} {
+	if { [file exists ${pkgpath}$::tcl_version] } {
 	    lappend auto_path ${pkgpath}$::tcl_version
 	}
 

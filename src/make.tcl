@@ -47,7 +47,7 @@ if { ![string length $APXS] } {
 
 set INCLUDEDIR [exec $APXS -q INCLUDEDIR]
 set LIBEXECDIR [exec $APXS -q LIBEXECDIR]
-set PREFIX [exec $APXS -q PREFIX]
+set PREFIX [lindex $auto_path end]
 
 set INC "-I$INCLUDEDIR -I$TCL_PREFIX/include"
 
@@ -199,6 +199,8 @@ AddNode clean {
 
 AddNode install {
     depends $MOD_SHLIB $LIB_SHLIB
+    tcl file delete -force [file join $LIBEXECDIR rivet]
+    tcl file delete -force [file join $PREFIX rivet]
     tcl file copy -force $MOD_SHLIB $LIBEXECDIR
     tcl file copy -force [file join .. rivet] $PREFIX
     tcl file copy -force $LIB_SHLIB [file join $PREFIX rivet packages rivet]
@@ -211,6 +213,7 @@ AddNode install {
 set DEBPREFIX [file join [pwd] .. debian tmp]
 AddNode debinstall {
     depends $MOD_SHLIB $LIB_SHLIB
+    tcl {file delete -force [file join $DEBPREFIX/$LIBEXECDIR rivet]}
     tcl {file copy -force $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
     tcl {file copy -force [file join .. rivet] "$DEBPREFIX/$PREFIX/lib"}
     tcl {file copy -force $LIB_SHLIB "$DEBPREFIX/[file join $PREFIX/lib rivet packages rivet]"}
