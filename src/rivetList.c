@@ -2,6 +2,23 @@
  * rivetList.c - Rivet commands that manipulate lists.
  */
 
+/* Copyright 2002-2004 The Apache Software Foundation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   	http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+/* Code originally from TclX by Karl Lehenbauer and others. */
+
 #include <tcl.h>
 #include <string.h>
 #include "rivet.h"
@@ -71,7 +88,6 @@ Rivet_LremoveObjCmd( clientData, interp, objc, objv )
 				(char *)NULL);
 	    return TCL_ERROR;
 	}
-	    
     }
 
     if( list >= objc - 1 )  {
@@ -95,9 +111,9 @@ Rivet_LremoveObjCmd( clientData, interp, objc, objv )
 		matchedListPtr = Tcl_NewListObj(0, NULL);
 	    }
 	    if (Tcl_ListObjAppendElement(interp, matchedListPtr,
-					 listObjv[i]) != TCL_OK)
+					 listObjv[i]) != TCL_OK) {
 		goto errorExit;
-	    
+	    }
 	    continue;
 	}
 
@@ -167,7 +183,7 @@ Rivet_LremoveObjCmd( clientData, interp, objc, objv )
         Tcl_SetObjResult(interp, matchedListPtr);
     }
     return TCL_OK;
-    
+
   errorExit:
     if(matchedListPtr != NULL)
         Tcl_DecrRefCount(matchedListPtr);

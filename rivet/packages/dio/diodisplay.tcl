@@ -1,3 +1,19 @@
+# diodisplay.tcl --
+
+# Copyright 2002-2004 The Apache Software Foundation
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#	http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 package require Itcl
 package require DIO
 package require form
@@ -274,7 +290,7 @@ catch { ::itcl::delete class DIODisplay }
 		(![lempty $sortfields] && [lsearch $sortfields $field] < 0)} {
 		set html $text
 	    } else {
-		set html {<A HREF="}
+		set html "<A HREF=\""
 		append html "$document?mode=$response(mode)"
 		foreach var {query searchBy numResults} {
 		    if {[info exists response($var)]} {
@@ -489,10 +505,10 @@ catch { ::itcl::delete class DIODisplay }
 	}
 	return [$DIO sql_limit_syntax $pagesize $offset]
     }
-	
+
 
     method Search {} {
-	set searchField $FieldTextMap($response(searchBy))	
+	set searchField $FieldTextMap($response(searchBy))
 
 	set query "-$searchField $response(query)"
 
@@ -914,7 +930,7 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 	if {[lsearch -exact $values $val] > -1} { return 1 }
 	return 0
     }
-    
+
     public variable true	"Yes"
     public variable false	"No"
     public variable values	"1 y yes t true on"

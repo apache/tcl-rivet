@@ -1,3 +1,7 @@
+2004-02-23  David N. Welton  <davidw@dedasys.com>
+
+	* LICENSE: Switch to Apache 2.0 License.
+
 2004-02-20  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c (TclWeb_SetHeaderType): strdup object's

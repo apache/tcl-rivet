@@ -1,10 +1,20 @@
-# aardvark make-like system
+# aardvark.tcl -- aardvark make-like system
+
 # $Id$
 
-# Copyright (c) 2001-2003 Apache Software Foundation.  All Rights
-# reserved.
+# Copyright 2001-2004 The Apache Software Foundation
 
-# See the LICENSE file for licensing terms.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#	http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 package provide aardvark 0.1
 source [file join [file dirname [info script]] graph.tcl]
@@ -71,7 +81,22 @@ proc aardvark::createnode { name } {
     }
 }
 
-# the command that gets run when we walk the graph.
+
+# aardvark::runbuildcommand --
+#
+#	This command is run when we walk the dependency graph.
+#
+# Arguments:
+#	direction - which way the graph is being walked.
+#	graphname - the graph in question.
+#	node - the node in question.
+#
+# Side Effects:
+#	Runs the build command.
+#
+# Results:
+#	None.
+
 proc aardvark::runbuildcommand { direction graphname node } {
     variable grph
     set rebuild 0
@@ -159,9 +184,21 @@ proc aardvark::runbuildcommand { direction graphname node } {
     }
 }
 
-# these are the commands of our mini build language
+# These are the commands of our mini build language.
 
-# Adds a shell command to be executed.
+# aardvark::sh --
+#
+#	Adds a shell command to be run.
+#
+# Arguments:
+#	The command and its arguments.
+#
+# Side Effects:
+#	Adds it to the processing instructions for the node.
+#
+# Results:
+#	None.
+
 proc aardvark::sh { args } {
     variable buildinfo
     set arg [join $args]
@@ -169,7 +206,19 @@ proc aardvark::sh { args } {
     return ""
 }
 
-# Adds a Tcl command to be evaluated.
+# aardvark::tcl --
+#
+#	Adds a tcl command to be evaluated.
+#
+# Arguments:
+#	The tcl script.
+#
+# Side Effects:
+#	Adds the script to the processing instructions for the node.
+#
+# Results:
+#	None.
+
 proc aardvark::tcl { args } {
     variable buildinfo
     set arg [join $args]
@@ -177,15 +226,44 @@ proc aardvark::tcl { args } {
     return ""
 }
 
-# Adds a file dependency.
+# aardvark::depends --
+#
+#	Adds dependencies for the node.
+#
+# Arguments:
+#	A list of dependencies.
+#
+# Side Effects:
+#	The node will depend on the nodes listed to be run before it
+#	can be run.
+#
+# Results:
+#	None.
+
 proc aardvark::depends { args } {
     variable dependencies
     set dependencies [join $args]
     return ""
 }
 
-# Add a node to the dependency tree.
-proc aardvark::AddNode { name rest } {
+# aardvark::AddNode --
+#
+#	Adds a node, its dependencies and processing instructions to
+#	the graph.
+#
+# Arguments:
+#	name - name of the node.
+#	body - the script to add dependencies, build instructions and
+#	so on.
+#
+# Side Effects:
+#	Creates a node in the dependency graph with the associated
+#	build instructions.
+#
+# Results:
+#	None.
+
+proc aardvark::AddNode { name body } {
     variable grph
     variable dependencies
     variable buildinfo
@@ -199,7 +277,7 @@ proc aardvark::AddNode { name rest } {
     array set buildinfo {cmds ""}
     set self $name
     catch {
-	uplevel #0 $rest
+	uplevel #0 $body
     } err
     if { $err != "" } {
 	puts "Error: $err"
@@ -222,7 +300,6 @@ proc aardvark::AddNode { name rest } {
 #
 # Results:
 #	List of all the nodes.
-
 
 proc aardvark::Nodes { } {
     variable grph
