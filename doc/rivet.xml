@@ -501,13 +501,18 @@
 		<cmdsynopsis>
 		  <arg>get</arg>
 		  <arg><replaceable>varname</replaceable></arg>
+		  <arg><replaceable><optional>default</optional></replaceable></arg>
 		</cmdsynopsis>
 	      </term>
 	      <listitem>
 		<para>
 		  Returns the value of variable
-		  <option><replaceable>varname</replaceable></option> as a
-		  string (even if there are multiple values).
+		  <option><replaceable>varname</replaceable></option>
+		  as a string (even if there are multiple values).  If
+		  the variable doesn't exist as a GET or POST
+		  variable, the
+		  <option><replaceable><optional>default</optional></replaceable></option>
+		  value is returned, otherwise an error is thrown.
 		</para>
 	      </listitem>
 	    </varlistentry>

@@ -1,5 +1,12 @@
 2002-10-18  David N. Welton  <davidw@dedasys.com>
 
+	* tests/get.test: Added tests for new "var get" behavior.
+
+	* doc/rivet.xml: Documented new "var get" behavior.
+
+	* src/rivetCore.c (Rivet_Var): Added ?default? option to "var
+	get".
+
 	* doc/examples/: Added examples for XML document.
 
 	* doc/rivet.xml: Several examples of how to use Rivet.

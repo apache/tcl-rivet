@@ -306,7 +306,7 @@ Rivet_LoadHeaders(
 /* Tcl command to return a particular variable.  */
 
 /* Use:
-   var get foo
+   var get foo ?default?
    var list foo
    var names
    var number
@@ -324,7 +324,7 @@ Rivet_Var(
     Tcl_Obj *result = NULL;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    if (objc < 2 || objc > 3)
+    if (objc < 2 || objc > 4)
     {
 	Tcl_WrongNumArgs(interp, 1, objv,
 			 "(get varname|list varname|exists varname|names"
@@ -337,16 +337,26 @@ Rivet_Var(
     if (!strcmp(command, "get"))
     {
 	char *key = NULL;
-	if (objc != 3)
+	char *deflt = NULL;
+	if (objc != 3 && objc != 4)
 	{
-	    Tcl_WrongNumArgs(interp, 2, objv, "variablename");
+	    Tcl_WrongNumArgs(interp, 2, objv, "variablename ?defaultval?");
 	    return TCL_ERROR;
 	}
 	key = Tcl_GetStringFromObj(objv[2], NULL);
+	if (objc == 4)
+	{
+	    deflt = Tcl_GetStringFromObj(objv[3], NULL);
+	}
 
 	if (TclWeb_GetVar(result, key, globals->req) != TCL_OK)
 	{
-	    result = Tcl_NewStringObj("", -1);
+	    if (deflt == NULL) {
+		Tcl_AppendResult(interp, key, " does not exist", NULL);
+		return TCL_ERROR;
+	    } else {
+		Tcl_SetStringObj(result, deflt, -1);
+	    }
 	}
     } else if(!strcmp(command, "exists")) {
 	char *key;
@@ -402,8 +412,8 @@ Rivet_Var(
 	}
     } else {
 	/* bad command  */
-	Tcl_AddErrorInfo(interp, "bad option: must be one of "
-			 "'get, list, names, number, all'");
+	Tcl_AppendResult(interp, "bad option: must be one of ",
+			 "'get, list, names, number, all'", NULL);
 	return TCL_ERROR;
     }
     Tcl_SetObjResult(interp, result);

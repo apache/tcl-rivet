@@ -12,6 +12,18 @@
     set match
 } {[var exists xst][var exists noxst] = 1 0}
 
+::tcltest::test getvariables-1.3 {GET variables - doesn't exist} {
+    set page [ ::http::geturl "${urlbase}get.rvt" ]
+    regexp -line {<HR>xst does not exist} [ ::http::data $page ] match
+    set match
+} {<HR>xst does not exist}
+
+::tcltest::test getvariables-1.3 {GET variables - default value} {
+    set page [ ::http::geturl "${urlbase}get.rvt?defaulttest=1" ]
+    regexp {^\[var get xst foo\] = foo} [ ::http::data $page ] match
+    set match
+} {[var get xst foo] = foo}
+
 ::tcltest::test getvariables-2.1 {GET variables + I18N} {
     set page [ ::http::geturl "${urlbase}get.rvt?Más=Tú" ]
     regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match

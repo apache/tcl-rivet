@@ -16,6 +16,9 @@ if { [var number] > 0 } {
     if { [var exists lstvar2] } {
 	puts "\[var list lstvar2\] = [var list lstvar2]\n"
     }
+    puts "\[var get xst foo\] = [var get xst foo]"
+} else {
+    puts "[var get xst]"
 }
 
 ?>

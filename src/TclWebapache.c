@@ -168,7 +168,7 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, TclWebRequest *req)
 	}
     }
 
-    if (result == NULL)
+    if (result->length == 0)
     {
 	return TCL_ERROR;
     }

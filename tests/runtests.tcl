@@ -41,13 +41,13 @@ if { ! [file exists [file join rivet init.tcl]] } {
 
 # we do this to keep tcltest happy - it reads argv...
 set commandline [lindex $argv 1]
-set argv {}
 
 switch -exact $commandline {
     startserver {
 	apachetest::startserver
     }
     default {
+	set argv [lrange $argv 1 end]
 	source [file join . rivet.test]
     }
 }
