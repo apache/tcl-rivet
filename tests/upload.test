@@ -1,0 +1,20 @@
+# $Id$
+
+set testfilename1 upload.rvt
+
+::tcltest::test upload-1.1 {multipart/form-data} {
+    set bound "-----NEXT_PART_[clock seconds].[pid]"
+    set fl [open AngeloFish.jpg r]
+    fconfigure $fl -translation binary
+    set data [read $fl]
+    close $fl
+
+    set outputData "--$bound\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\n\n$data\n${bound}--"
+
+    set page [ ::http::geturl "${urlbase}$testfilename1" \
+		   -type "multipart/form-data; boundary=$bound" -query $outputData ]
+
+    set ret [string trim [ ::http::data $page ]]
+    set ret
+} {uploadtest 1 42781  AngeloFish.jpg}
+

@@ -1,0 +1,5 @@
+<?
+
+puts "[ upload names ] [ upload info uploadtest exists ] [ upload info uploadtest size ] [ upload info uploadtest type ] [ upload info uploadtest filename ]"
+
+?>
