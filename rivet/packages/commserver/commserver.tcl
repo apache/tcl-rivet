@@ -1,7 +1,13 @@
+# $Id$
+
+# commserver --
+
+# This forks off an external server process with 'comm' loaded in it,
+# for use as an IPC system.
+
 package provide commserver 0.1
 
 namespace eval ::commserver {
-    # This has to be the same as in server.tcl.
     set Port 35100
 }
 

@@ -1,6 +1,8 @@
 # This is a server that is detached from the main Apache process, in
 # order to provide inter-process comunication via Tcl's comm package.
 
+# $Id$
+
 # TODO:
 # Add some code for serializing variables between sessions.
 # Possibilities for keeping sync'ed include: catching signals and

@@ -1,5 +1,8 @@
 2003-05-14  David N. Welton  <davidw@dedasys.com>
 
+	* rivet/packages/commserver/commserver.tcl: Added commserver
+	package as one potential IPC method.
+
 	* src/make.tcl: Target ../VERSION node correctly.
 	New target $PKGINDEX to automatically generate a top-level (which
 	is where Tcl searches) package index for all the sub-packages in
