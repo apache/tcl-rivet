@@ -10,14 +10,6 @@
       <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
 ]>
 
-<!--
-
-This translation is based on rivet.xml version FIXME.
-
-Please update this when you update the translation!
-
--->
-
 <article>
   <articleinfo>
     <title>Apache Rivet</title>
@@ -59,6 +51,11 @@ Please update this when you update the translation!
     This document is also available in the following languages: <ulink
     url="index.html.en">English</ulink>
   </para>
+
+  <!-- IMPORTANT: update the number below whenever you update this
+  document! -->
+  <para>This document is based on version 1.20 of the original English
+  version.</para>
 
   <section>
     <title>Введение в  Apache Rivet</title>

@@ -1,3 +1,10 @@
+2003-06-23  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.ru.xml: Updated Russian version to indicate which
+	version of the original it was based on.
+
+	* doc/rivet.xml: Added version string to English version.
+
 2003-06-14  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Added CVS Id tag.

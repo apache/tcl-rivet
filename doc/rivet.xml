@@ -10,6 +10,8 @@
       <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
 ]>
 
+<!-- $Id$ -->
+
 <article>
   <articleinfo>
     <title>Apache Rivet</title>
@@ -41,6 +43,10 @@
   <para>
     This document is also available in the following languages: <ulink
     url="index.html.ru">Russian</ulink>
+  </para>
+
+  <para>
+    Document reversion: $Revision$, last modified $Date$ by $Author$.
   </para>
 
   <section>
@@ -1219,13 +1225,13 @@ list.
 	not run afoul of local variables created by other scripts,
 	because they will be deleted automatically when the namespace
 	goes away after Apache finishes handling the request.
-      </para>
       <note>
-	One current problem with this system is that while variables
-	are garbage collected, file handles are not, so that it is
-	very important that Rivet script authors make sure to close
-	all the files they open.
+	    One current problem with this system is that while
+	    variables are garbage collected, file handles are not, so
+	    that it is very important that Rivet script authors make
+	    sure to close all the files they open.
       </note>
+      </para>
       <para>
 	After a script has been loaded and parsed into it's "pure Tcl"
 	form, it is also cached, so that it may be used in the future
