@@ -125,45 +125,40 @@ Rivet_UploadHook(void *ptr, char *buf, int len, ApacheUpload *upload)
 static int
 Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 {
-    char *errorinfo;
-    rivet_server_conf *conf = NULL;
+    rivet_server_conf *conf = Rivet_GetConf(r);
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    conf = Rivet_GetConf(r);
-    if (Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR)
-    {
+    if( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
+	int newString = 0;
 	Tcl_Obj *errscript =
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
 
-	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj( "errorOutbuf", -1),
-		       NULL, outbuf, TCL_GLOBAL_ONLY);
+	Tcl_SetVar( interp, "errorOutbuf",
+			Tcl_GetStringFromObj( outbuf, NULL ),
+			TCL_GLOBAL_ONLY );
 
-        TclWeb_PrintHeaders(globals->req);
-	Tcl_Flush(*(conf->outchannel));
-        if (errscript)
-        {
-	    if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
-		errorinfo = Tcl_GetVar(interp, "errorInfo", 0);
-                TclWeb_PrintError("<b>Tcl_ErrorScript failed!</b>", 1,
-					globals->req);
-                TclWeb_PrintError( errorinfo, 0, globals->req );
-	    }
-        } else {
-            /* default action  */
-            errorinfo = Tcl_GetVar(interp, "errorInfo", 0);
-	    TclWeb_PrintError(errorinfo, 0, globals->req);
-            TclWeb_PrintError("<p><b>OUTPUT BUFFER:</b></p>", 1, globals->req);
-            TclWeb_PrintError("<PRE>", 1, globals->req);
-            TclWeb_PrintError(Tcl_GetStringFromObj(outbuf, (int *)NULL), 1,
-				globals->req);
-            TclWeb_PrintError("</PRE>", 1, globals->req);
-        }
-    } else {
-        /* Make sure to flush the output if buffer_add was the only output */
-        TclWeb_PrintHeaders(globals->req);
-	Tcl_Flush(*(conf->outchannel));
+	/* If we don't have an error script, use the default error handler. */
+	if( !errscript ) {
+	    errscript = Tcl_NewStringObj( "::Rivet::handle_error", -1 );
+	    ++newString;
+	}
+
+	if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
+	    char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+	    TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>", 1,
+				    globals->req);
+	    TclWeb_PrintError( errorinfo, 0, globals->req );
+	}
+
+	if( newString ) {
+	    Tcl_DecrRefCount( errscript );
+	}
     }
+
+    /* Make sure to flush the output if buffer_add was the only output */
+    TclWeb_PrintHeaders(globals->req);
+    Tcl_Flush(*(conf->outchannel));
+
     return TCL_OK;
 }
 
