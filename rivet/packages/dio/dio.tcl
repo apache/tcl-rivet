@@ -227,6 +227,20 @@ proc handle {interface args} {
 	return $ret
     }
 
+    ###
+    ## Execute a request and call body for each row returned in arrayName
+    ###
+    method forall {req arrayName body} {
+	upvar 1 $arrayName $arrayName
+	set res [exec $req]
+        set ret [$res numrows]
+	$res forall -array $arrayName {
+	    uplevel 1 $body
+        }
+	$res destroy
+	return $ret
+    }
+
     protected method table_check {list {tableVar myTable} {keyVar myKeyfield}} {
 	upvar 1 $tableVar $tableVar $keyVar $keyVar
 	set data(-table) $table
