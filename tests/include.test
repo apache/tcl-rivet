@@ -4,10 +4,7 @@ set testfilename1 include.rvt
 
 ::tcltest::test include-1.1 {Include command} {
     set page [ ::http::geturl "${urlbase}$testfilename1" ]
-    set fl [open /tmp/foobar w]
-    set foo [::http::data $page]
-    puts -nonewline $fl $foo
-    set foo
+    ::http::data $page
 } {<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
