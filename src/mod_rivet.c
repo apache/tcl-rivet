@@ -385,6 +385,7 @@ Rivet_SendContent(request_rec *r)
     rivet_server_conf *rdc;
 
     Tcl_MutexLock(sendMutex);
+
     rsc = Rivet_GetConf(r);
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -594,8 +595,17 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
     server_rec *sr;
 
-    /* Initialize TCL stuff  */
+    /* Apache actually loads all the modules twice, just to see if it
+     * can. This is a pain, because things don't seem to get
+     * completely cleaned up on the Tcl side. So this little hack
+     * should make us *really* load only the second time around. */
 
+    if (getenv("RIVET_INIT") == NULL) {
+	setenv("RIVET_INIT", "1", 0);
+	return;
+    }
+
+    /* Initialize TCL stuff  */
     Tcl_FindExecutable(NULL);
     interp = Tcl_CreateInterp();
 

@@ -79,6 +79,7 @@ typedef struct {
 
     /* stuff for buffering output */
     Tcl_Channel *outchannel;
+
 } rivet_server_conf;
 
 /* eventually we will transfer 'global' variables in here and
