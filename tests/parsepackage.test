@@ -1,0 +1,63 @@
+# $Id$
+
+puts stderr "Auto path is $auto_path"
+
+
+package require tcltest
+package require tclrivetparser
+
+load [file join [pwd] .. src librivetparser[info sharedlibext]]
+
+::tcltest::test parserivetdata-1.1 {parserivetdata command} {
+    set fl [open hello.rvt]
+    set data [rivet::parserivetdata [read $fl]]
+    close $fl
+    set data
+} {puts -nonewline ""
+
+
+# hello-1.1
+puts "Hello, World\n"
+
+# i18n-1.1
+puts "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!\n"
+
+
+puts -nonewline "
+<p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>
+"
+}
+
+::tcltest::test parserivet-1.1 {parserivet command} {
+    rivet::parserivet hello.rvt
+} {namespace eval request {
+puts -nonewline ""
+
+
+# hello-1.1
+puts "Hello, World\n"
+
+# i18n-1.1
+puts "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!\n"
+
+
+puts -nonewline "
+<p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>
+"
+
+}
+}
+
+# Make sure that the Tcl version is identical to the C version.
+::tcltest::test tclrivetparser-1.1 {tclparsedata command} {
+    set fl [open hello.rvt]
+    set data1 [tclrivetparser::parserivetdata [read $fl]]
+    close $fl
+
+    set fl [open hello.rvt]
+    set data2 [rivet::parserivetdata [read $fl]]
+    close $fl
+    set data2
+
+    string compare $data1 $data2
+} {0}

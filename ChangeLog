@@ -1,5 +1,24 @@
 2003-12-20  David N. Welton  <davidw@dedasys.com>
 
+	* tests/parsepackage.test: Added tests for the Rivet parser
+	standalone package and pure Tcl Rivet parser.
+
+	* INSTALL: Added basic configuration directives to INSTALL file.
+
+	* rivet/packages/tclrivet/tclrivetparser.tcl: Added pure Tcl Rivet
+	parser.  This doesn't have all the Rivet commands available, it
+	just parses a <? ?> style Rivet file into the corresponding Tcl
+	script.
+
+	* src/parserPkgInit.c (Parse_RivetData): We no longer
+	automatically add the namespace.  The user ought to be able to add
+	that should they so choose.  This makes the command more flexible.
+
+	* src/rivetParser.c (Rivet_Parser): Removed an unnecessary
+	Tcl_UtfNext from the parser.
+	(Rivet_GetRivetFile): Removed useless 'inside' variable from this
+	function.
+
 	* doc/rivet.xml: Add abort_page, no_body and env commands,
 	reordered the load_* commands.
 

@@ -1,3 +1,8 @@
+			  Rivet Installation
+			  ==================
+
+For more detailed instructions, see the docs/html/ directory.
+
 The only thing you need to install Rivet is a C compiler, linker, and
 of course, Tcl (8.4 or newer).
 
@@ -14,4 +19,11 @@ tclsh ./configure.tcl
 tclsh ./make.tcl shared
 tclsh ./make.tcl install
 
-For more detailed instructions, see the docs/html/ directory.
+Basic Apache configuration directives that are needed:
+
+# Loads the module.
+LoadModule rivet_module	/path/to/your/copy/of/mod_rivet.so
+
+# Let the module handle .rvt and .tcl files.
+AddType application/x-httpd-rivet .rvt
+AddType application/x-rivet-tcl .tcl

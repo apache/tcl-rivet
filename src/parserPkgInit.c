@@ -47,11 +47,27 @@ Parse_Rivet(
     return TCL_OK;
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Parse_RivetData --
+ *
+ * 	Takes a Rivet script as an argument, and returns the parsed
+ * 	tcl script version.
+ *
+ * Results:
+ *	A normal Tcl result.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
 static int
 Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
 		int objc, Tcl_Obj *CONST objv[])
 {
-    int inside = 0;
     Tcl_Obj *outbuf;
 
     outbuf = Tcl_NewObj();
@@ -63,22 +79,19 @@ Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
     }
     Tcl_IncrRefCount(outbuf);
 
-    Tcl_AppendToObj(outbuf, "namespace eval request {\n", -1);
     Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
 
-    inside = Rivet_Parser(outbuf, objv[1]);
-
-    if (inside == 0)
+    if (Rivet_Parser(outbuf, objv[1]) == 0)
     {
 	Tcl_AppendToObj(outbuf, "\"\n", 2);
     }
-
-    Tcl_AppendToObj(outbuf, "\n}\n", -1);
 
     Tcl_SetObjResult(interp, outbuf);
     Tcl_DecrRefCount(outbuf);
     return TCL_OK;
 }
+
+/* Package init for standalone parser package.  */
 
 EXTERN int
 Rivetparser_Init( Tcl_Interp *interp )

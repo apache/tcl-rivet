@@ -75,7 +75,6 @@ int
 Rivet_GetRivetFile(char *filename, int toplevel,
 		   Tcl_Obj *outbuf, Tcl_Interp *interp)
 {
-    int inside = 0;	/* are we inside the starting/ending delimiters  */
     int sz = 0;
     Tcl_Obj *inbuf;
     Tcl_Channel rivetfile;
@@ -106,9 +105,8 @@ Rivet_GetRivetFile(char *filename, int toplevel,
 	return TCL_ERROR;
     }
 
-    inside = Rivet_Parser(outbuf, inbuf);
-
-    if (inside == 0)
+    /* If we are not inside a <? ?> section, add the closing ". */
+    if (Rivet_Parser(outbuf, inbuf) == 0)
     {
 	Tcl_AppendToObj(outbuf, "\"\n", 2);
     }
@@ -174,7 +172,6 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 		    Tcl_AppendToObj(outbuf, "\"\n", 2);
 		    inside = 1;
 		    p = 0;
-		    cur = (char *)Tcl_UtfNext(cur);
 		    continue;
 		}
 	    } else {

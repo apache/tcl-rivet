@@ -11,6 +11,7 @@
 package require tcltest
 package require http
 
+lappend auto_path [file join [pwd] rivet]
 set urlbase "http://localhost:8081/"
 
 # Use this to start and stop the server:
@@ -41,7 +42,7 @@ if { $testgroup1 } {
     puts " done"
 }
 
-# Run each test in its own server
+# Run each test in its own server.
 
 if { $testgroup2 } {
     foreach Test $TestList {
@@ -53,10 +54,12 @@ if { $testgroup2 } {
 }
 
 
-# These tests start the server on their own
+# These tests start the server on their own, or don't need the server
+# at all.
 
 if { $testgroup3 } {
-    foreach Test {broken.test config.test lang.test} {
+    foreach Test {broken.test config.test lang.test parsepackage.test} {
+	puts "Running $Test"
 	source $Test
     }
 }
