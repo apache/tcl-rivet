@@ -11,7 +11,6 @@
 #include <tcl.h>
 #include <string.h>
 
-#include "tcl_commands.h"
 #include "apache_request.h"
 #include "apache_cookie.h"
 #include "mod_rivet.h"
@@ -26,7 +25,7 @@ extern module rivet_module;
 #define POOL (globals->r->pool)
 
 /* Make a self-referencing URL  */
-int
+static int
 Rivet_MakeURL(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -48,7 +47,7 @@ Rivet_MakeURL(
 
 /* Include and parse a file */
 
-int
+static int
 Rivet_Parse(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -87,7 +86,7 @@ Rivet_Parse(
 
 /* Tcl command to include flat files */
 
-int
+static int
 Rivet_Include(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -145,7 +144,7 @@ Rivet_Include(
 
 /* Tcl command to manipulate headers */
 
-int
+static int
 Rivet_Headers(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -260,7 +259,7 @@ Rivet_Headers(
 /* Get the environmental variables, but do it from a tcl function, so
    we can decide whether we wish to or not */
 
-int
+static int
 Rivet_LoadEnv(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -408,7 +407,7 @@ Rivet_LoadEnv(
     return TCL_OK;
 }
 
-int
+static int
 Rivet_LoadCookies(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -460,7 +459,7 @@ Rivet_LoadCookies(
    var all
   */
 
-int
+static int
 Rivet_Var(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -652,7 +651,7 @@ upload names
 gets all the upload names.
 */
 
-int
+static int
 Rivet_Upload(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -832,7 +831,7 @@ Rivet_Upload(
 /* Tcl command to get, and print some information about the current
    state of affairs */
 
-int
+static int
 Rivet_Info(
     ClientData clientData,
     Tcl_Interp *interp,
@@ -859,7 +858,7 @@ Rivet_Info(
 /* Tcl command to erase body, so that only header is returned.
    Necessary for 304 responses */
 
-int
+static int
 Rivet_NoBody(
     ClientData clientData,
     Tcl_Interp *interp,

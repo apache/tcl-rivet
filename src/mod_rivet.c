@@ -80,11 +80,11 @@
 #include <string.h>
 
 /* Rivet includes */
-#include "tcl_commands.h"
 #include "parser.h"
 #include "channel.h"
 #include "apache_request.h"
 #include "mod_rivet.h"
+#include "rivet.h"
 
 module MODULE_VAR_EXPORT rivet_module;
 

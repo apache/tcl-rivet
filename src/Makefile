@@ -14,7 +14,7 @@ STATICLIB=mod_rivet.a
 SHLIB=mod_rivet$(TCL_SHLIB_SUFFIX)
 
 APREQ_OBJECTS=apache_cookie.o apache_multipart_buffer.o apache_request.o
-OBJECTS=mod_rivet.o tcl_commands.o parser.o channel.o $(APREQ_OBJECTS)
+OBJECTS=mod_rivet.o rivetCore.o parser.o channel.o $(APREQ_OBJECTS)
 
 # The following TCL_* variables are all exported from builddtcl.sh
 
@@ -37,9 +37,9 @@ apache_multipart_buffer.o: apache_multipart_buffer.c apache_multipart_buffer.h
 	$(COMPILE)
 apache_request.o: apache_request.c apache_request.h
 	$(COMPILE)
-mod_rivet.o: mod_rivet.c mod_rivet.h tcl_commands.h apache_request.h parser.h parser.h
+mod_rivet.o: mod_rivet.c mod_rivet.h rivetCore.h apache_request.h parser.h parser.h
 	$(COMPILE) -DDTCL_VERSION=`cat VERSION`
-tcl_commands.o: tcl_commands.c tcl_commands.h mod_rivet.h
+rivetCore.o: rivetCore.c rivetCore.h mod_rivet.h
 	$(COMPILE)
 parser.o: parser.c mod_rivet.h parser.h
 	$(COMPILE)

@@ -17,11 +17,11 @@ source [ file join . buildscripts parsetclConfig.tcl ]
 # add variables
 
 set APACHE "/usr/include/apache-1.3"
-set INC "-I$APACHE"
+set INC "-I$APACHE/include"
 set STATICLIB mod_rivet.a
 set SHLIB "mod_rivet[ info sharedlibextension ]"
 set COMPILE "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC  $TCL_EXTRA_CFLAGS -c"
-set OBJECTS "apache_cookie.o apache_request.o mod_rivet.o tcl_commands.o apache_multipart_buffer.o channel.o parser.o"
+set OBJECTS "apache_cookie.o apache_multipart_buffer.o apache_request.o channel.o parser.o rivetCore.o mod_rivet.o"
 
 # ------------
 
@@ -47,13 +47,13 @@ AddNode apache_request.o {
 }
 
 AddNode mod_rivet.o {
-    depends "mod_rivet.c mod_rivet.h tcl_commands.h apache_request.h parser.h parser.h"
+    depends "mod_rivet.c mod_rivet.h rivetCore.h apache_request.h parser.h parser.h"
     command {$COMPILE mod_rivet.c}
 }
 
-AddNode tcl_commands.o {
-    depends "tcl_commands.c tcl_commands.h mod_rivet.h"
-    command {$COMPILE tcl_commands.c}
+AddNode rivetCore.o {
+    depends "rivetCore.c rivetCore.h mod_rivet.h"
+    command {$COMPILE rivetCore.c}
 }
 
 AddNode parser.o {
