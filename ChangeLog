@@ -1,6 +1,9 @@
 2001-11-20  Damon J. Courtney <damon@unreality.com>
 
 	* src/tcl_commands.c
+	    load_env and load_cookies now accept an optional argument of
+	    ?arrayName?.
+	* src/tcl_commands.c
 	    Renamed a lot of the commands into a standard naming scheme.
 
 2001-11-20  Damon J. Courtney <damon@unreality.com>

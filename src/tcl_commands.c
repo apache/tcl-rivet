@@ -281,10 +281,20 @@ Rivet_LoadEnv(
     table_entry *hdrs;
     array_header *env_arr;
     table_entry  *env;
-    Tcl_Obj *EnvsObj = NULL;
+    Tcl_Obj *ArrayObj;
 
-    EnvsObj = Tcl_NewStringObj("::request::env", -1);
-    Tcl_IncrRefCount(EnvsObj);
+    if( objc > 2 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
+	return TCL_ERROR;
+    }
+
+    if( objc == 2 ) {
+	ArrayObj = objv[1];
+    } else {
+	ArrayObj = Tcl_NewStringObj( "::request::env", -1 );
+    }
+
+    Tcl_IncrRefCount( ArrayObj );
     date = globals->r->request_time;
     /* ensure that the system area which holds the cgi variables is empty */
     ap_clear_table(globals->r->subprocess_env);
@@ -323,45 +333,45 @@ Rivet_LoadEnv(
     }
 
     /* These were the "include vars"  */
-    Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DATE_LOCAL", -1),
+    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DATE_LOCAL", -1),
 		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
 					date, timefmt, 0), POOL), 0);
-    Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DATE_GMT", -1),
+    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DATE_GMT", -1),
 		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
 					date, timefmt, 1), POOL), 0);
-    Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("LAST_MODIFIED", -1),
+    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("LAST_MODIFIED", -1),
 		   STRING_TO_UTF_TO_OBJ(ap_ht_time(POOL,
 					globals->r->finfo.st_mtime,
 					timefmt, 0), POOL), 0);
-    Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DOCUMENT_URI", -1),
+    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_URI", -1),
 		   STRING_TO_UTF_TO_OBJ(globals->r->uri, POOL), 0);
-    Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DOCUMENT_PATH_INFO", -1),
+    Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_PATH_INFO", -1),
 		   STRING_TO_UTF_TO_OBJ(globals->r->path_info, POOL), 0);
 
 #ifndef WIN32
     pw = getpwuid(globals->r->finfo.st_uid);
     if (pw)
-	Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("USER_NAME", -1),
+	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("USER_NAME", -1),
 	       STRING_TO_UTF_TO_OBJ(ap_pstrdup(POOL, pw->pw_name), POOL), 0);
     else
-	Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("USER_NAME", -1),
+	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("USER_NAME", -1),
 		       STRING_TO_UTF_TO_OBJ(
 			   ap_psprintf(POOL, "user#%lu",
 			   (unsigned long)globals->r->finfo.st_uid), POOL), 0);
 #endif
 
     if ((t = strrchr(globals->r->filename, '/')))
-	Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DOCUMENT_NAME", -1),
+	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_NAME", -1),
 		       STRING_TO_UTF_TO_OBJ(++t, POOL), 0);
     else
-	Tcl_ObjSetVar2(interp, EnvsObj, Tcl_NewStringObj("DOCUMENT_NAME", -1),
+	Tcl_ObjSetVar2(interp, ArrayObj, Tcl_NewStringObj("DOCUMENT_NAME", -1),
 		       STRING_TO_UTF_TO_OBJ(globals->r->uri, POOL), 0);
 
     if (globals->r->args)
     {
 	char *arg_copy = ap_pstrdup(POOL, globals->r->args);
 	ap_unescape_url(arg_copy);
-	Tcl_ObjSetVar2(interp, EnvsObj,
+	Tcl_ObjSetVar2(interp, ArrayObj,
 	   Tcl_NewStringObj("QUERY_STRING_UNESCAPED", -1),
 	   STRING_TO_UTF_TO_OBJ(ap_escape_shell_cmd(POOL, arg_copy), POOL), 0);
     }
@@ -374,7 +384,7 @@ Rivet_LoadEnv(
 	if (!hdrs[i].key)
 	    continue;
 	else {
-	    Tcl_ObjSetVar2(interp, EnvsObj,
+	    Tcl_ObjSetVar2(interp, ArrayObj,
 			   STRING_TO_UTF_TO_OBJ(hdrs[i].key, POOL),
 			   STRING_TO_UTF_TO_OBJ(hdrs[i].val, POOL), 0);
 	}
@@ -385,7 +395,7 @@ Rivet_LoadEnv(
     {
 	if (!env[i].key)
 	    continue;
-	Tcl_ObjSetVar2(interp, EnvsObj, STRING_TO_UTF_TO_OBJ(env[i].key, POOL),
+	Tcl_ObjSetVar2(interp, ArrayObj, STRING_TO_UTF_TO_OBJ(env[i].key, POOL),
 		       STRING_TO_UTF_TO_OBJ(env[i].val, POOL), 0);
     }
 
@@ -404,10 +414,21 @@ Rivet_LoadCookies(
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     int i;
+    Tcl_Obj *ArrayObj;
+
+    if( objc > 2 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
+	return TCL_ERROR;
+    }
+
+    if( objc == 2 ) {
+	ArrayObj = objv[1];
+    } else {
+	ArrayObj = Tcl_NewStringObj( "::request::cookies", -1 );
+    }
 
     do { /* I do this because I want some 'local' variables */
 	ApacheCookieJar *cookies = ApacheCookie_parse(globals->r, NULL);
-	Tcl_Obj *cookieobj = Tcl_NewStringObj("::request::cookies", -1);
 
 	for (i = 0; i < ApacheCookieJarItems(cookies); i++) {
 	    ApacheCookie *c = ApacheCookieJarFetch(cookies, i);
@@ -415,7 +436,7 @@ Rivet_LoadCookies(
 	    for (j = 0; j < ApacheCookieItems(c); j++) {
 		char *name = c->name;
 		char *value = ApacheCookieFetch(c, j);
-		Tcl_ObjSetVar2(interp, cookieobj,
+		Tcl_ObjSetVar2(interp, ArrayObj,
 			       Tcl_NewStringObj(name, -1),
 			       Tcl_NewStringObj(value, -1), 0);
 	    }
