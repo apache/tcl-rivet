@@ -245,6 +245,53 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     #
+    # showform_prolog - emit a form for inserting a new record
+    #
+    # response(by) will contain whatever was in the "where" field
+    # response(query) will contain whatever was in the "is" field
+    #
+    method showform_prolog {} {
+	get_field_values array
+
+	set save [button_image_src DIOFormSaveButton]
+	set cancel [button_image_src DIOFormCancelButton]
+
+	$form start
+	foreach fld [array names hidden] {
+	    $form hidden $fld -value $hidden($fld)
+        }
+	$form hidden mode -value Save
+	$form hidden DIODfromMode -value $response(mode)
+	$form hidden DIODkey -value [$DIO makekey array]
+	puts {<TABLE CLASS="DIOForm">}
+    }
+
+    method showform_epilog {} {
+	puts "</TABLE>"
+
+	puts "<TABLE>"
+	puts "<TR>"
+	puts "<TD>"
+	if {![lempty $save]} {
+	    $form image save -src $save -class DIOFormSaveButton
+	} else {
+	    $form submit save.x -value "Save" -class DIOFormSaveButton
+	}
+	puts "</TD>"
+	puts "<TD>"
+	if {![lempty $cancel]} {
+	    $form image cancel -src $cancel -class DIOFormSaveButton
+	} else {
+	    $form submit cancel.x -value "Cancel" -class DIOFormCancelButton
+	}
+	puts "</TD>"
+	puts "</TR>"
+	puts "</TABLE>"
+
+	$form end
+    }
+
+    #
     # showform - emit a form for inserting a new record
     #
     # response(by) will contain whatever was in the "where" field
