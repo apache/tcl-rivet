@@ -1,3 +1,9 @@
+2003-12-13  David N. Welton  <davidw@dedasys.com>
+
+	* src/configure.in.tcl: Merge apxs and Tcl CFLAGS in order to
+	include what we need from both.  Hopefully there won't be any
+	conflicts.
+
 2003-11-27  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Added information about debugging Apache/Rivet.

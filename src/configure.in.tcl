@@ -24,6 +24,25 @@ configure::test APXS {
     findapxs::FindAPXS
 }
 
+# Merge apxs and Tcl CFLAGS.
+configure::test CFLAGS {
+    set apachecflags [exec $APXS -q CFLAGS]
+    if { $DEBUGSYMBOLS } {
+	set tclcflags [concat $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING \
+			   $TCL_EXTRA_CFLAGS]
+    } else {
+	set tclcflags [concat $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE \
+			   $TCL_CFLAGS_WARNING $TCL_EXTRA_CFLAGS]
+    }
+    set res $apachecflags
+    foreach f $tclcflags {
+	if { [lsearch $apachecflags $f] == -1 } {
+	    lappend res $f
+	}
+    }
+    set res
+}
+
 configure::test TCL_THREADED {
     set tmp "-DTCL_THREADED=[info exists tcl_platform(threaded)]"
 }
@@ -45,11 +64,7 @@ configure::test INC {
 }
 
 configure::test COMPILE {
-    if { $DEBUGSYMBOLS } {
-	set tmp "$TCL_CC $TCL_CFLAGS_DEBUG $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
-    } else {
-	set tmp "$TCL_CC $TCL_CFLAGS_OPTIMIZE $TCL_CFLAGS_WARNING $TCL_SHLIB_CFLAGS $INC $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
-    }
+    set tmp "$TCL_CC $CFLAGS $TCL_SHLIB_CFLAGS $INC $TCL_EXTRA_CFLAGS $TCL_THREADED -c"
 }
 
 configure::test CRYPT_LIB {
