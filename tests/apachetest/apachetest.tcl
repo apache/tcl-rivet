@@ -7,6 +7,7 @@
 # the name of the Apache executable, which must, however, be compiled
 # with the right options.
 
+package require Tclx
 package provide apachetest 0.1
 
 namespace eval apachetest {
@@ -27,6 +28,19 @@ namespace eval apachetest {
 			       template.conf.tcl]
 }
 
+# make sure we can connect to the server
+
+proc apachetest::connect { } {
+    while { 1 } {
+	if { ! [catch {
+	    set sk [socket localhost 8081]
+	} err]} {
+	    close $sk
+	    return
+	}
+    }
+}
+
 # start - start the server in the background with 'options' and then
 # run 'code'.
 
@@ -35,26 +49,30 @@ proc apachetest::start { options code } {
     variable binname
 
     # There has got to be a better way to do this, aside from waiting.
-    after 200
     set serverpid [eval exec $binname -X -f \
 		       "[file join [pwd] server.conf]" $options &]
-    after 100
+
+    apachetest::connect
     puts "Apache started as PID $serverpid"
     if { ! [catch {
 	uplevel $code
     } err] } {
 	puts $err
     }
-    after 100
-    exec kill $serverpid
+    kill $serverpid
+    wait $serverpid
 }
 
 # startserver - start the server with 'options'.
 
 proc apachetest::startserver { options } {
     variable binname
-    eval exec $binname -X -f \
-	"[file join [pwd] server.conf]" $options
+    if { [catch {
+	eval exec $binname -X -f \
+	    "[file join [pwd] server.conf]" $options
+    } err] } {
+	puts $err
+    }
 }
 
 # getbinname - get the name of the apache binary, and check to make

@@ -26,7 +26,19 @@ set testgroup1 1
 set testgroup2 1
 set testgroup3 1
 
+# Run all tests against one server process.
+
 if { $testgroup1 } {
+    apachetest::start {} {
+	foreach Test $TestList {
+	    source $Test
+	}
+    }
+}
+
+# Run each test in its own server
+
+if { $testgroup2 } {
     foreach Test $TestList {
 	apachetest::start {} {
 	    source $Test
@@ -34,16 +46,6 @@ if { $testgroup1 } {
     }
 }
 
-# Now run them all against one server process, just to change things
-# around some.
-
-if { $testgroup2 } {
-    apachetest::start {} {
-	foreach Test $TestList {
-	    source $Test
-	}
-    }
-}
 
 # These tests start the server on their own
 
