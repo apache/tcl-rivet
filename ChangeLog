@@ -1,3 +1,10 @@
+<<<<<<< ChangeLog
+2004-01-15  Brad Morrison  <brad@sc.com>
+
+	* rivet/rivet-tcl/load_response.tcl: Changed behavior from
+	appending discovered values to existing elements in the
+	response array to simple assignment.
+
 2004-01-15  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/packages/simpledb/simpledb.tcl (simpledb::synctostorage):
