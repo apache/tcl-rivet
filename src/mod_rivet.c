@@ -94,11 +94,11 @@ module MODULE_VAR_EXPORT rivet_module;
 static void Rivet_InitTclStuff(server_rec *s, pool *p);
 static void Rivet_CopyConfig( rivet_server_conf *oldrsc,
 				rivet_server_conf *newrsc);
-static int get_rvt_file(request_rec *r, rivet_server_conf *rsc,
+static int Rivet_GetRivetFile(request_rec *r, rivet_server_conf *rsc,
 			 Tcl_Interp *interp, char *filename, int toplevel,
 			 Tcl_Obj *outbuf);
 static int Rivet_SendContent(request_rec *);
-static int execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf,
+static int Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf,
 				request_rec *r);
 
 /* Set up the content type header */
@@ -174,7 +174,7 @@ Rivet_StringToUtf(char *input, ap_pool *pool)
 
 #if 0
 int
-rivet_upload_hook(void *ptr, char *buf, int len, ApacheUpload *upload)
+Rivet_UploadHook(void *ptr, char *buf, int len, ApacheUpload *upload)
 {
     Tcl_Interp *interp = ptr;
     static int usenum = 0;
@@ -185,32 +185,25 @@ rivet_upload_hook(void *ptr, char *buf, int len, ApacheUpload *upload)
     } else {
     }
 
-#if USE_ONLY_UPLOAD_COMMAND == 0
-
-    Tcl_ObjSetVar2(interp,
-		   Tcl_NewStringObj("::request::UPLOAD", -1),
-		   Tcl_NewStringObj("data", -1),
-		   Tcl_DuplicateObj(uploadstorage[usenum]),
-		   0);
-#endif /* USE_ONLY_UPLOAD_COMMAND  */
     return len;
 }
 #endif /* 0 */
 
-
 /* Load, cache and eval a Tcl file  */
 
 static int
-get_tcl_file(request_rec *r, Tcl_Interp *interp,
+Rivet_GetTclFile(request_rec *r, Tcl_Interp *interp,
 		char *filename, Tcl_Obj *outbuf)
 {
     int result = 0;
-#if 1
-    /* Taken, in part, from tclIOUtil.c out of the Tcl
-       distribution, and modified */
 
-    /* Basically, what we are doing here is a Tcl_EvalFile, but
-       with the addition of caching code. */
+    /* Taken, in part, from tclIOUtil.c out of the Tcl distribution,
+     * and modified.
+     */
+
+    /* Basically, what we are doing here is a Tcl_EvalFile but with the
+     * addition of caching code.
+     */
     Tcl_Channel chan = Tcl_OpenFileChannel(interp, r->filename, "r", 0644);
     if (chan == (Tcl_Channel) NULL)
     {
@@ -232,15 +225,12 @@ get_tcl_file(request_rec *r, Tcl_Interp *interp,
 	return TCL_ERROR;
 
     return TCL_OK;
-#else
-    Tcl_EvalFile(interp, r->filename);
-#endif /* 1 */
 }
 
-/* Parse and execute an rvt file */
+/* Parse and execute a Rivet file */
 
 static int
-get_rvt_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
+Rivet_GetRivetFile(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 			 char *filename, int toplevel, Tcl_Obj *outbuf)
 {
     /* BEGIN PARSER  */
@@ -307,7 +297,7 @@ get_rvt_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
  */
 
 static int
-execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
+Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 {
     char *errorinfo;
     rivet_server_conf *conf = NULL;
@@ -371,14 +361,17 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
 	mtime = r->finfo.st_mtime;
     }
 
-    /* Look for the script's compiled version. If it's not found,
-       create it. */
+    /* Look for the script's compiled version.  * If it's not found,
+     * create it.
+     */
     if (*(rsc->cache_size))
     {
 	hashKey = ap_psprintf(r->pool, "%s%lx%lx%d", filename,
 			      mtime, ctime, toplevel);
 	entry = Tcl_CreateHashEntry(rsc->objCache, hashKey, &isNew);
     }
+
+    /* We don't have a compiled version.  Let's create one */
     if (isNew || *(rsc->cache_size) == 0)
     {
 	outbuf = Tcl_NewObj();
@@ -386,12 +379,13 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
 
 	if( STREQU( r->content_type, "application/x-httpd-rivet") || !toplevel )
 	{
-	    /* It's a TTML file - which we always are if toplevel is
-               0, meaning we are in the Parse command */
-	    result = get_rvt_file(r, rsc, interp, filename, toplevel, outbuf);
+	    /* It's a Rivet file - which we always are if toplevel is 0,
+	     * meaning we are in the Parse command.
+	     */
+	    result = Rivet_GetRivetFile(r,rsc,interp,filename,toplevel,outbuf);
 	} else {
 	    /* It's a plain Tcl file */
-	    result = get_tcl_file(r, interp, filename, outbuf);
+	    result = Rivet_GetTclFile(r, interp, filename, outbuf);
 	}
 	if (result != TCL_OK)
 	    return result;
@@ -413,9 +407,12 @@ Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc,
 	    rsc->objCacheList[0] = strdup(hashKey);
 	}
     } else {
+	/* We found a compiled version of this page. */
 	outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
     }
-    execute_and_check(interp, outbuf, r);
+
+    Rivet_ExecuteAndCheck(interp, outbuf, r);
+
     return TCL_OK;
 }
 
@@ -455,14 +452,10 @@ Rivet_SendContent(request_rec *r)
     if ((errstatus = ap_meets_conditions(r)) != OK)
 	return errstatus;
 
-    /* We need to send it as html */
-    /*     r->content_type = DEFAULT_HEADER_TYPE;  */
-
     if (r->header_only)
     {
 	Rivet_SetHeaderType(r, DEFAULT_HEADER_TYPE);
 	Rivet_PrintHeaders(r);
-
 	return OK;
     }
 
@@ -470,7 +463,7 @@ Rivet_SendContent(request_rec *r)
     ap_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
     ap_chdir_file(r->filename);
 
-    if (Tcl_EvalObj(interp, rsc->namespacePrologue) == TCL_ERROR)
+    if (Tcl_EvalObj(interp, rsc->request_init) == TCL_ERROR)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
 			"Could not create request namespace\n");
@@ -488,110 +481,107 @@ Rivet_SendContent(request_rec *r)
     if (upload_files_to_var)
     {
 	globals->req->hook_data = interp;
-	globals->req->upload_hook = rivet_upload_hook;
+	globals->req->upload_hook = Rivet_UploadHook;
     }
 #endif
 
     if ((errstatus = ApacheRequest___parse(globals->req)) != OK)
 	return errstatus;
 
-    /* take results and create tcl variables from them */
-#if USE_ONLY_VAR_COMMAND == 0
-    if (globals->req->parms)
-    {
-	int i;
-	array_header *parmsarray = ap_table_elts(globals->req->parms);
-	table_entry *parms = (table_entry *)parmsarray->elts;
-	Tcl_Obj *varsobj = Tcl_NewStringObj("::request::VARS", -1);
-	for (i = 0; i < parmsarray->nelts; ++i)
-	{
-	    if (!parms[i].key)
-		continue;
-	    else {
-		/* All this is so that a query like x=1&x=2&x=3 will
-                   produce a variable that is a list */
-		Tcl_Obj *newkey = STRING_TO_UTF_TO_OBJ(parms[i].key, r->pool);
-		Tcl_Obj *newval = STRING_TO_UTF_TO_OBJ(parms[i].val, r->pool);
-		Tcl_Obj *oldval = Tcl_ObjGetVar2(interp, varsobj, newkey, 0);
-
-		if (oldval == NULL)
-		{
-		    Tcl_ObjSetVar2(interp, varsobj, newkey, newval, 0);
-		} else {
-		    Tcl_Obj *concat[2];
-		    concat[0] = oldval;
-		    concat[1] = newval;
-		    Tcl_ObjSetVar2(interp, varsobj, newkey,
-					Tcl_ConcatObj(2, concat), 0);
-		}
-	    }
-	}
-
-    }
-#endif
-#if USE_ONLY_UPLOAD_COMMAND == 1
-    upload = req->upload;
-    /* Loop through uploaded files */
-    while (upload)
-    {
-	char *type = NULL;
-	char *channelname = NULL;
-	Tcl_Channel chan;
-
-	/* The name of the file uploaded  */
-	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj("::request::UPLOAD", -1),
-		       Tcl_NewStringObj("filename", -1),
-		       Tcl_NewStringObj(upload->filename, -1),
-		       TCL_LIST_ELEMENT|TCL_APPEND_VALUE);
-
-	/* The variable name of the file upload */
-	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj("::request::UPLOAD", -1),
-		       Tcl_NewStringObj("name", -1),
-		       Tcl_NewStringObj(upload->name, -1),
-		       TCL_LIST_ELEMENT|TCL_APPEND_VALUE);
-	Tcl_ObjSetVar2(interp,
-		       Tcl_NewStringObj("::request::UPLOAD", -1),
-		       Tcl_NewStringObj("size", -1),
-		       Tcl_NewIntObj(upload->size),
-		       TCL_LIST_ELEMENT|TCL_APPEND_VALUE);
-	type = (char *)ap_table_get(upload->info, "Content-type");
-	if (type)
-	{
-	    Tcl_ObjSetVar2(interp,
-			   Tcl_NewStringObj("::request::UPLOAD", -1),
-			   Tcl_NewStringObj("type", -1),
-			   Tcl_NewStringObj(type, -1), /* kill end of line */
-			   TCL_LIST_ELEMENT|TCL_APPEND_VALUE);
-	}
-	if (!upload_files_to_var)
-	{
-	    if (upload->fp != NULL)
-	    {
-		chan = Tcl_MakeFileChannel((ClientData)fileno(upload->fp),
-						TCL_READABLE);
-		Tcl_RegisterChannel(interp, chan);
-		channelname = Tcl_GetChannelName(chan);
-		Tcl_ObjSetVar2(interp,
-			       Tcl_NewStringObj("::request::UPLOAD", -1),
-			       Tcl_NewStringObj("channelname", -1),
-			       Tcl_NewStringObj(channelname, -1), /* kill end of line */
-			       TCL_LIST_ELEMENT|TCL_APPEND_VALUE);
-	    }
-	}
-
-	upload = upload->next;
-    }
-#endif /* USE_ONLY_UPLOAD_COMMAND == 1 */
-
     Rivet_ParseExecFile(r, rsc, r->filename, 1);
-    /* reset globals  */
+
+    if( Tcl_EvalObj( interp, rsc->request_cleanup ) == TCL_ERROR ) {
+	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
+		     Tcl_GetVar(interp, "errorInfo", 0));
+    }
+
+    /* Unset the RivetUserConf array so that the next request gets a new,
+     * clean array.
+     */
+    Tcl_UnsetVar( interp, "RivetUserConf", TCL_GLOBAL_ONLY );
+
+    /* Reset globals */
     *(rsc->headers_printed) = 0;
     *(rsc->headers_set) = 0;
     *(rsc->content_sent) = 0;
 
     return OK;
+}
+
+/*
+ * Setup an array in each interpreter to tell us things about Apache.
+ * This saves us from having to do any real call to load an entire
+ * environment.  This routine only gets called once, when the child process
+ * is created.
+ *
+ * SERVER_ROOT - Apache's root location
+ * SERVER_CONF - Apache's configuration file
+ * RIVET_DIR   - Rivet's Tcl source directory
+ * RIVET_INIT  - Rivet's init.tcl file
+ */
+static void
+Rivet_InitServerVariables( Tcl_Interp *interp, pool *p )
+{
+    Tcl_ObjSetVar2(interp,
+		   Tcl_NewStringObj("server", -1),
+		   Tcl_NewStringObj("SERVER_ROOT", -1),
+		   Tcl_NewStringObj(ap_server_root, -1),
+		   TCL_GLOBAL_ONLY);
+    Tcl_ObjSetVar2(interp,
+		   Tcl_NewStringObj("server", -1),
+		   Tcl_NewStringObj("SERVER_CONF", -1),
+		   Tcl_NewStringObj(
+			ap_server_root_relative(p, ap_server_confname), -1),
+		   TCL_GLOBAL_ONLY);
+    Tcl_ObjSetVar2(interp,
+		   Tcl_NewStringObj("server", -1),
+		   Tcl_NewStringObj("RIVET_DIR", -1),
+		   Tcl_NewStringObj(ap_server_root_relative(p, RIVET_DIR), -1),
+		   TCL_GLOBAL_ONLY);
+    Tcl_ObjSetVar2(interp,
+		   Tcl_NewStringObj("server", -1),
+		   Tcl_NewStringObj("RIVET_INIT", -1),
+		   Tcl_NewStringObj(ap_server_root_relative(p, RIVET_INIT), -1),
+		   TCL_GLOBAL_ONLY);
+}
+
+static void
+Rivet_PropagateConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
+{
+    table *t;
+    array_header *arr;
+    table_entry  *elts;
+    int i, nelts;
+
+    /* Propagate all of the ServerConf variables into an array. */
+    t = rsc->rivet_server_vars;
+    arr   = ap_table_elts( t );
+    elts  = (table_entry *)arr->elts;
+    nelts = arr->nelts;
+
+    for( i = 0; i < nelts; ++i )
+    {
+	Tcl_ObjSetVar2(interp,
+		       Tcl_NewStringObj("RivetServerConf", -1),
+		       Tcl_NewStringObj( elts[i].key, -1),
+		       Tcl_NewStringObj( elts[i].val, -1),
+		       TCL_GLOBAL_ONLY);
+    }
+
+    /* Propagate all of the DirConf variables into an array. */
+    t = rsc->rivet_dir_vars;
+    arr   = ap_table_elts( t );
+    elts  = (table_entry *)arr->elts;
+    nelts = arr->nelts;
+
+    for( i = 0; i < nelts; ++i )
+    {
+	Tcl_ObjSetVar2(interp,
+		       Tcl_NewStringObj("RivetDirConf", -1),
+		       Tcl_NewStringObj( elts[i].key, -1),
+		       Tcl_NewStringObj( elts[i].val, -1),
+		       TCL_GLOBAL_ONLY);
+    }
 }
 
 static void
@@ -606,17 +596,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 
     Tcl_FindExecutable(NULL);
     interp = Tcl_CreateInterp();
-    rsc->server_interp = interp; /* root interpreter */
 
-    /* Create TCL commands to deal with Apache's BUFFs. */
-    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc,
-					    TCL_WRITABLE);
-
-    Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
-/*     Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffering", "none");  */
-    Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
-
-    Tcl_RegisterChannel(interp, *(rsc->outchannel));
     if (interp == NULL)
     {
 	ap_log_error(APLOG_MARK, APLOG_ERR, s,
@@ -629,21 +609,36 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	exit(1);
     }
 
+    rsc->server_interp = interp; /* root interpreter */
+
+    /* Create TCL commands to deal with Apache's BUFFs. */
+    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc,
+					    TCL_WRITABLE);
+
+    Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
+    Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
+    Tcl_RegisterChannel(interp, *(rsc->outchannel));
+
+    /* Initialize the interpreter with Rivet's Tcl commands */
     Rivet_init( interp );
 
-    rsc->namespacePrologue = Tcl_NewStringObj(
-	"catch { namespace delete request }\n"
-	"namespace eval request { }\n"
-	"proc ::request::global { args } { "
-	"foreach arg $args { uplevel \"::global ::request::$arg\" } }\n", -1);
-    Tcl_IncrRefCount(rsc->namespacePrologue);
+    /* Create a global array with information about the server. */
+    Rivet_InitServerVariables( interp, p );
 
-#if DBG
-    ap_log_error(APLOG_MARK, APLOG_ERR, s, "Config string = \"%s\"",
-		 Tcl_GetStringFromObj(rsc->rivet_global_init_script, NULL));
-    ap_log_error(APLOG_MARK, APLOG_ERR, s, "Cache size = \"%d\"",
-		*(rsc->cache_size));
-#endif
+    Rivet_PropagateConfArrays( interp, rsc );
+
+    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
+    if( Tcl_EvalFile( interp, ap_server_root_relative(p, RIVET_INIT) )
+	== TCL_ERROR ) {
+	ap_log_error( APLOG_MARK, APLOG_ERR, s, Tcl_GetStringResult(interp) );
+	exit(1);
+    }
+
+    rsc->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n",-1);
+    Tcl_IncrRefCount(rsc->request_init);
+
+    rsc->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n",-1);
+    Tcl_IncrRefCount(rsc->request_cleanup);
 
     if (rsc->rivet_global_init_script != NULL)
     {
@@ -655,17 +650,22 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	}
     }
 
-    /* This is what happens if it is not set by the user */
+    /* If the user didn't set a cache size in their configuration, we
+     * will assume an arbitrary size for them.
+     *
+     * If the cache size is 0, the user has requested not to cache documents.
+     */
     if(*(rsc->cache_size) < 0)
     {
 	if (ap_max_requests_per_child != 0)
 	    *(rsc->cache_size) = ap_max_requests_per_child / 2;
 	else
-	    *(rsc->cache_size) = 10; /* Arbitrary number FIXME */
+	    *(rsc->cache_size) = 10; /* FIXME: Arbitrary number */
 	*(rsc->cache_free) = *(rsc->cache_size);
     } else if (*(rsc->cache_size) > 0) {
 	*(rsc->cache_free) = *(rsc->cache_size);
     }
+
     /* Initializing cache structures */
     rsc->objCacheList = ap_pcalloc(p,
 				(signed)(*(rsc->cache_size) * sizeof(char *)));
@@ -675,8 +675,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     while (sr)
     {
 	rivet_server_conf *myrsc = NULL;
-	/* This should set up slave interpreters for other virtual
-           hosts */
+	/* This should set up slave interpreters for other virtual hosts */
 	if (sr != s) /* not the first one  */
 	{
 	    myrsc = ap_pcalloc(p, sizeof(rivet_server_conf));
@@ -780,13 +779,26 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 	}
     }
 
+    ap_table_set( rsc->rivet_server_vars, var, val );
+
     return( NULL );
 }
 
+/*
+ * Implements the RivetDirConf Apache Directive
+ *
+ * Command Arguments:
+ * 	RivetDirConf BeforeScript <script>
+ * 	RivetDirConf AfterScript <script>
+ * 	RivetDirConf ErrorScript <script>
+ * 	RivetDirConf UploadDirectory <directory>
+*/
 static const char *
 Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
     Tcl_Obj *objarg;
+    server_rec *s = cmd->server;
+    rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
 
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetDirConf requires two arguments";
@@ -811,18 +823,61 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 	rdc->upload_dir = val;
     }
 
-    ap_table_set( rdc->rivet_dir_vars, var, val );
+    ap_table_set( rsc->rivet_dir_vars, var, val );
     return( NULL );
 }
 
+/*
+ * Implements the RivetUserConf Apache Directive
+ *
+ * Command Arguments:
+ * 	RivetUserConf BeforeScript <script>
+ * 	RivetUserConf AfterScript <script>
+ * 	RivetUserConf ErrorScript <script>
+*/
 static const char *
 Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
+    Tcl_Obj *objarg;
+    server_rec *s = cmd->server;
+    rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
+    Tcl_Interp *interp = rsc->server_interp;
+
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetUserConf requires two arguments";
     }
 
-    ap_table_set( rdc->rivet_user_vars, var, val );
+    if( STREQU( var, "BeforeScript" ) ) {
+	objarg = Tcl_NewStringObj(val, -1);
+	Tcl_IncrRefCount(objarg);
+	Tcl_AppendToObj(objarg, "\n", 1);
+	rdc->rivet_before_script = objarg;
+    } else if( STREQU( var, "AfterScript" ) ) {
+	objarg = Tcl_NewStringObj(val, -1);
+	Tcl_IncrRefCount(objarg);
+	Tcl_AppendToObj(objarg, "\n", 1);
+	rdc->rivet_after_script = objarg;
+    } else if( STREQU( var, "ErrorScript" ) ) {
+	objarg = Tcl_NewStringObj(val, -1);
+	Tcl_IncrRefCount(objarg);
+	Tcl_AppendToObj(objarg, "\n", 1);
+	rdc->rivet_error_script = objarg;
+    }
+
+    /* Set the variables in a Tcl array so that we can use them in Tcl-level
+     * code but also so the user can access them.
+     *
+     * We do this here instead of setting another table of variables like
+     * rivet_server_vars and rivet_dir_vars because user variables can
+     * change without a reboot of the server.  By setting them here, we
+     * always insure that the array is being generated with each page load.
+     */
+    Tcl_ObjSetVar2(interp,
+		   Tcl_NewStringObj("RivetUserConf", -1),
+		   Tcl_NewStringObj( var, -1),
+		   Tcl_NewStringObj( val, -1),
+		   TCL_GLOBAL_ONLY);
+
     return( NULL );
 }
 
@@ -884,7 +939,8 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->upload_dir = oldrsc->upload_dir;
     newrsc->objCacheList = oldrsc->objCacheList;
     newrsc->objCache = oldrsc->objCache;
-    newrsc->namespacePrologue = oldrsc->namespacePrologue;
+    newrsc->request_init = oldrsc->request_init;
+    newrsc->request_cleanup = oldrsc->request_cleanup;
 
     newrsc->headers_printed = oldrsc->headers_printed;
     newrsc->headers_set = oldrsc->headers_set;
@@ -918,7 +974,8 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->upload_dir = "/tmp";
     rsc->objCacheList = NULL;
     rsc->objCache = ap_pcalloc(p, sizeof(Tcl_HashTable));
-    rsc->namespacePrologue = NULL;
+    rsc->request_init = NULL;
+    rsc->request_cleanup = NULL;
 
     rsc->headers_printed = ap_pcalloc(p, sizeof(int));
     rsc->headers_set = ap_pcalloc(p, sizeof(int));
@@ -927,6 +984,10 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     *(rsc->headers_set) = 0;
     *(rsc->content_sent) = 0;
     rsc->outchannel = ap_pcalloc(p, sizeof(Tcl_Channel));
+
+    rsc->rivet_dir_vars = ap_make_table( p, 4 );
+    rsc->rivet_server_vars = ap_make_table( p, 4 );
+
     return rsc;
 }
 
@@ -935,6 +996,10 @@ Rivet_CreateDirConfig(pool *p, char *dir)
 {
     rivet_server_conf *rdc =
 	(rivet_server_conf *) ap_pcalloc(p, sizeof(rivet_server_conf));
+
+    rdc->rivet_dir_vars = ap_make_table( p, 4 );
+    rdc->rivet_server_vars = ap_make_table( p, 4 );
+
     return rdc;
 }
 

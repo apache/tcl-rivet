@@ -4,12 +4,13 @@
 #include <tcl.h>
 #include "apache_request.h"
 
+/* init.tcl file relative to the server root directory */
+#define RIVET_DIR "rivet"
+#define RIVET_INIT RIVET_DIR"/init.tcl"
+
 /* Error wrappers  */
 #define ER1 "<hr><p><code><pre>\n"
 #define ER2 "</pre></code><hr>\n"
-
-/* Enable debugging */
-#define DBG 0
 
 /* Configuration options  */
 
@@ -26,10 +27,6 @@
    Otherwise, set this to 1 to hide the version from potential
    troublemakers.  */
 #define HIDE_RIVET_VERSION 1
-
-/* Turn off 'old-style' $UPLOAD variable, and use only the 'upload'
-   command.  */
-#define USE_ONLY_UPLOAD_COMMAND 0
 
 /* End Configuration options  */
 
@@ -58,12 +55,13 @@ typedef struct {
     char *server_name;
     char *upload_dir;
     table *rivet_dir_vars;
-    table *rivet_user_vars;
+    table *rivet_server_vars;
 
-    char **objCacheList;     /* Array of cached objects (for priority handling) */
+    char **objCacheList;   /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache; /* Objects cache - the key is the script name */
 
-    Tcl_Obj *namespacePrologue; /* initial bit of Tcl for namespace creation */
+    Tcl_Obj *request_init; /* initial bit of Tcl for namespace creation */
+    Tcl_Obj *request_cleanup; /* bit of Tcl for cleaning up after a request */
 
     /* stuff for buffering output */
     int *headers_printed; 	/* has the header been printed yet? */

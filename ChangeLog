@@ -1,3 +1,59 @@
+2002-01-08  Damon J. Courtney <damon@unreality.com>
+	* src/channel.c
+	    Just a text change.
+
+	* src/make.tcl
+	    Added a command to install that will copy the contents of the
+	    rivet/ directory into Apache's install location.
+
+	* src/mod_rivet.h
+	    Removed some superfluous code and deprecated options.
+
+	* src/mod_rivet.c
+	    Finished renaming the rest of the remaining commands into the
+	    standard Rivet_ naming scheme.  This will prevent any further
+	    interferance with other modules.
+
+	    Renamed namespacePrologue to request_init and re-coded the
+	    namespace initialization code in Tcl.
+
+	    Removed leftover references to the ::request::UPLOAD array.
+
+	    Added an array called 'server' to the global namespace which
+	    briefly contains important information about Apache and Rivet.
+
+	    Propagated RivetServerConf, RivetDirConf and RivetUserConf arrays
+	    at the tcl level.
+
+	    Gave RivetUserConf the ability to set BeforeScript, AfterScript
+	    and ErrorScript.
+
+	* src/tcl_commands.c
+	    Updated makeurl to use Tcl objects instead of the old Tcl_SetResult
+	    command.
+
+	* rivet/
+	    Added a rivet/ directory of Tcl code.
+
+	    Added init.tcl to rivet/.  This file contains initialization code
+	    in a ::Rivet namespace that is called when the server starts up.
+
+	* rivet/init.tcl
+	    Added a command for cleanup after each request.  It currently
+	    does nothing but could come in handy later.
+
+	* rivet/packages
+	    Created a rivet/packages directory for future Rivet packages.
+
+	* rivet/rivet-tcl
+	    Created a rivet/rivet-tcl directory containing a few procs.
+
+	* rivet/rivet-tcl/load_response.tcl
+	    Added 'load_response' command to rivet-tcl/.
+
+	* rivet/rivet-tcl/parray.tcl
+	    Added 'parray' command to rivet-tcl/.
+
 2002-01-06  David N. Welton  <davidw@dedasys.com>
 
 	* Documentation: Big cleanup, updating everything from mod_dtcl.

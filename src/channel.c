@@ -23,7 +23,8 @@ static int
 outputproc(ClientData instancedata, char *buf, int toWrite, int *errorCodePtr)
 {
     rivet_server_conf *rsc = (rivet_server_conf *)instancedata;
-    rivet_interp_globals *globals = Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
+    rivet_interp_globals *globals =
+	Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
 
     Rivet_PrintHeaders(globals->r);
     if (*(rsc->content_sent) == 0)

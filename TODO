@@ -1,4 +1,24 @@
-* Kill 'old style vars and use only command'.
+Swipe include_* from NWS and rework it like:
+    include ?-virtual? ?-noparse? file
 
 Add a '-virtual' option to include and parse.  This will include or parse
 a file based on the server root.
+
+Re-write load_file.  This basically loads an entire .tcl file into the
+current document instead of sourcing it.  This will allow us to cache
+even pages which only source a huge .tcl file.  load_virtual should do the
+same but relative to the document root.
+
+Create escape_string and unescape_string using Apache conventions.
+
+Add a PackageRequire Server directive that will load packages on start-up.
+
+
+MAYBE
+
+Maybe write load_cookies in Tcl and try to get rid of the apache_cookie.* stuff.
+
+Maybe write the header command in Tcl.
+
+
+DONE

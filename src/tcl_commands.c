@@ -23,8 +23,6 @@
 
 extern module rivet_module;
 
-extern Tcl_Obj *uploadstorage[];
-
 #define POOL (globals->r->pool)
 
 /* Make a self-referencing URL  */
@@ -42,8 +40,9 @@ Rivet_MakeURL(
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;
     }
-    Tcl_SetResult(interp,
-	ap_construct_url(POOL, Tcl_GetString(objv[1]), globals->r), NULL);
+    Tcl_SetObjResult( interp, Tcl_NewStringObj(
+	ap_construct_url(POOL, Tcl_GetString(objv[1]), globals->r),
+	-1 ) );
     return TCL_OK;
 }
 
