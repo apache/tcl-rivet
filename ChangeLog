@@ -1,3 +1,10 @@
+2002-09-11  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c (TclWeb_InitEnvVars): Don't do an
+	ap_clear_table on the environmental variables.  The include module
+	no longer does this, and neither does PHP, so I guess it's safe to
+	remove, and it's useful for users of modules like mod_uniqe_id.
+
 2002-09-08  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c: Fix up ObjSetVar2 use.

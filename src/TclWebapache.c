@@ -297,9 +297,6 @@ TclWeb_InitEnvVars( TclWebRequest *req )
 
     rsc = RIVET_SERVER_CONF( req->req->server->module_config );
 
-    /* Ensure that the system area which holds the cgi variables is empty. */
-    ap_clear_table( req->req->subprocess_env );
-
     /* Retrieve cgi variables. */
     ap_add_cgi_vars( req->req );
     ap_add_common_vars( req->req );

@@ -70,13 +70,11 @@ set XSL [file join .. doc rivet.xsl]
 
 # ------------
 
-# Verbose
+# "AddNode" adds a compile target
 
-# AddNode adds a compile target
+# "depends" lists the nodes on which it depends
 
-# depends lists the nodes on which it depends
-
-# sh is the command to execute
+# "sh" is the command to execute
 
 AddNode apache_multipart_buffer.o {
     depends "apache_multipart_buffer.c apache_multipart_buffer.h"
@@ -163,13 +161,19 @@ AddNode module {
     depends "shared"
 }
 
+# Make a shared build.
+
 AddNode shared {
     depends "$MOD_SHLIB $LIB_SHLIB"
 }
 
+# Make a static build - incomplete at the moment.
+
 AddNode static {
     depends "$MOD_STLIB $LIB_STLIB"
 }
+
+# Clean up source directory.
 
 AddNode clean {
     sh {rm -f [glob -nocomplain *.o]}
@@ -185,6 +189,8 @@ AddNode clean {
 #    depends {parser.o testing.o}
 #    sh {$TCL_SHLIB_LD -o libtesting.so parser.o testing.o}
 #}
+
+# Install everything.
 
 AddNode install {
     depends "$MOD_SHLIB $LIB_SHLIB"
@@ -207,6 +213,8 @@ AddNode VERSION {
     tcl { cd src/ }
 }
 
+# Clean up everything for distribution.
+
 AddNode distclean {
     depends clean
     tcl { cd .. }
@@ -216,9 +224,14 @@ AddNode distclean {
     tcl { cd src }
 }
 
+# Create the HTML documentation from the XML document.
+
 AddNode distdoc {
     depends "$XSL $HTML_DOCS"
 }
+
+# Create the distribution.  This is a bit unix-specific for the
+# moment, as it uses the bourne shell and unix commands.
 
 AddNode dist {
     depends {distclean distdoc VERSION}
