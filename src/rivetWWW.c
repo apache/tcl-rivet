@@ -183,6 +183,8 @@ TCL_CMD_HEADER( Rivet_EscapeStringCmd )
 
         if (isalnum ((int)c)) {
 	    *newStringP++ = c;
+	} else if (c == ' ') {
+	    *newStringP++ = '+';
 	} else {
 	    *newStringP++ = '%';
 	    *newStringP++ = Rivet_DigitToHex((c >> 4) & 0x0f);
