@@ -1,3 +1,10 @@
+2004-06-25  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* src/rivetCrypt.c: Fix const-ness of resultBuffer to match 
+	apache's crypt function.
+	* win/makefile.vc: Fixed the version string to match rivet project
+	version. Support use of MSVC.NET or VC++Toolkit compilers.
+
 2004-06-04  David N. Welton  <davidw@dedasys.com>
 
 	* contrib/two-mode-mode.el: Updated two-mode-mode.
