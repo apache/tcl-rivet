@@ -6,8 +6,12 @@
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
-# 
+#
 # RCS: @(#) $Id$
+
+# We use this to provide the 'struct' package, from which we only use
+# 'graph'.
+package provide struct 1.2.1
 
 namespace eval ::struct {}
 

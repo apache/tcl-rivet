@@ -9,3 +9,4 @@
 # full path name of this file's directory.
 
 package ifneeded aardvark 0.1 [list source [file join $dir aardvark.tcl]]
+package ifneeded struct 1.2.1 [list source [file join $dir graph.tcl]]
