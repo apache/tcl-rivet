@@ -37,37 +37,42 @@ proc handle {interface args} {
     protected method build_select_query {args} {
 	set bool AND
 	set first 1
-	set waiting 0
-	set req "select * from $table"
-	if {[lempty $args]} { return $req }
-	append req " WHERE"
-	foreach elem $args {
-	    switch -nocase -- $elem {
+	set req ""
+	set myTable $table
+	for {set i 0} {$i < [llength $args]} {incr i} {
+	    set elem [lindex $args $i]
+
+	    switch -- [::string tolower $elem] {
 		"-and" { set bool AND }
 		"-or"  { set bool OR }
 
+		"-table" { set myTable [lindex $args [incr i]] }
+
 		default {
-		    if {$waiting} {
+		    if {[::string index $elem 0] == "-"} {
+			set field [::string range $elem 1 end]
+			set elem [lindex $args [incr i]]
+
 			if {$first} {
+			    append req " WHERE"
 			    set first 0
 			} else {
 			    append req " $bool"
 			}
-			append req " $switch='[quote $elem]'"
-			set waiting 0
-			continue
-		    }
-		    if {[cindex $elem 0] == "-"} {
-			set switch [crange $elem 1 end]
-			set waiting 1
-			continue
-		    }
+			regsub -all {\*} $elem {%} elem
+			if {[::string first {%} $elem] != -1} {
+			    append req " $field LIKE '[quote $elem]'"
+			} else {
+			    append req " $field='[quote $elem]'"
+			}
 
+			continue
+		    }
 		    append req " $elem"
 		}
 	    }
 	}
-	return $req
+	return "select * from $myTable $req"
     }
 
     protected method build_insert_query {arrayName fields {myTable ""}} {
@@ -168,11 +173,6 @@ proc handle {interface args} {
     	::itcl::delete object $this
     }
 
-    method search {args} {
-	set req [eval build_select_query $args]
-	return [exec $req]
-    }
-
     ###
     ## Execute a request and only return a string of the row.
     ###
@@ -189,7 +189,7 @@ proc handle {interface args} {
     method list {req} {
 	set res [exec $req]
 	set list ""
-	while {[$res next -list line]} {
+	$res forall -list line {
 	    lappend list [lindex $line 0]
 	}
 	$res destroy
@@ -304,6 +304,16 @@ proc handle {interface args} {
 	$obj destroy
 
 	return $keys
+    }
+
+    method search {args} {
+	set req [eval build_select_query $args]
+	return [exec $req]
+    }
+
+    method count {args} {
+	table_check $args
+	return [string "select count(*) from $myTable"]
     }
 
     ##
@@ -680,7 +690,7 @@ proc handle {interface args} {
 	}
 	if {[catch {mysqlcol $conn -current name} fields]} { set fields "" }
 	set obj [result Mysql -resultid $conn \
-		-numrows $error -fields [::list $fields]]
+		-numrows [::list $error] -fields [::list $fields]]
 	return $obj
     }
 

@@ -84,7 +84,6 @@ package provide form 1.0
 
     method end {} {
 	puts "</FORM>"
-	destroy
     }
 
     method field {type name args} {

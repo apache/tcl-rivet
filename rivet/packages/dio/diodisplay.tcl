@@ -1,6 +1,6 @@
 package require Itcl
 package require DIO
-catch { package require form }
+package require form
 
 package provide DIODisplay 1.0
 
@@ -20,6 +20,13 @@ catch { ::itcl::delete class DIODisplay }
 	}
 
 	set document [env DOCUMENT_NAME]
+
+	if {[info exists response(numResults)] \
+	    && ![lempty $response(numResults)]} {
+	    set pagesize $response(numResults)
+	}
+
+	read_css_file
     }
 
     destructor {
@@ -30,7 +37,7 @@ catch { ::itcl::delete class DIODisplay }
 	::itcl::delete object $this
     }
 
-    method configure_variable {varName string} {
+    method configvar {varName string} {
 	if {[lempty $string]} { return [set $varName] }
 	configure -$varName $string
     }
@@ -46,38 +53,92 @@ catch { ::itcl::delete class DIODisplay }
 	foreach field $allfields { catch { $field destroy } }
 
 	## Destroy the DIO object.
-	$DIO destroy
+	catch { $DIO destroy }
 
 	## Destroy the form object.
-	$form destroy
+	catch { $form destroy }
     }
 
     method handle_error {error} {
-	global errorCode
-	global errorInfo
-
+	puts "<B>An error has occurred processing your request</B>"
 	puts "<PRE>"
-	puts "ERROR: $errorInfo"
+	puts "$error"
 	puts "</PRE>"
+    }
+
+    method read_css_file {} {
+	if {[lempty $css]} { return }
+	if {[catch {open [virtual_filename $css]} fp]} { return }
+	set contents [read $fp]
+	close $fp
+	array set tmpArray $contents
+	foreach class [array names tmpArray] {
+	    set cssArray([string toupper $class]) $tmpArray($class)
+	}
+    }
+
+    ## Figure out which CSS class we want to use.  If class exists, we use
+    ## that.  If not, we use default.
+    method get_css_class {tag default class} {
+	if {[info exists cssArray([string toupper $tag.$class])]} {
+	    return $class
+	}
+	if {[info exists cssArray([string toupper .$class])]} { return $class }
+	return $default
+    }
+
+    method parse_css_class {class arrayName} {
+	if {![info exists cssArray($class)]} { return }
+	upvar 1 $arrayName array
+	foreach line [split $cssArray($class) \;] {
+	    set line [string trim $line]
+	    lassign [split $line :] property value
+	    set property [string trim [string tolower $property]]
+	    set value [string trim $value]
+	    set array($property) $value
+	}
+    }
+
+    method button_image_src {class} {
+	set class [string toupper input.$class]
+	parse_css_class $class array
+	if {![info exists array(image-src)]} { return }
+	return $array(image-src)
     }
 
     method show {} {
 	set mode Main
 	if {[info exists response(mode)]} { set mode $response(mode) }
+
+	if {![lempty $css]} {
+	    puts "<LINK REL=\"stylesheet\" TYPE=\"text/css\" HREF=\"$css\">"
+	}
+
+	puts {<TABLE WIDTH="100%" CLASS="DIO">}
+	puts "<TR>"
+	puts {<TD VALIGN="center" CLASS="DIO">}
+
+	if {$mode != "Main" && $persistentmain} { Main }
+
 	if {![is_function $mode]} {
 	    puts "In-valid function"
 	    abort_page
 	    return
 	}
-	catch $mode error
+
+	if {[catch "$this $mode" error]} {
+	    handle_error $error
+	}
+
+	puts "</TD>"
+	puts "</TR>"
+	puts "</TABLE>"
 
 	if {$cleanup} { destroy }
-
-	if {![lempty $error]} { $errorhandler $error }
     }
 
     method showview {} {
-	puts "<TABLE>"
+	puts {<TABLE CLASS="DIOView">}
 	foreach field $fields {
 	    $field showview
 	}
@@ -87,10 +148,14 @@ catch { ::itcl::delete class DIODisplay }
     method showform {} {
 	get_field_values array
 
+	set save [button_image_src DIOFormSaveButton]
+	set cancel [button_image_src DIOFormCancelButton]
+
 	$form start
+	$form hidden mode -value Save
 	$form hidden DIODfromMode -value $response(mode)
 	$form hidden DIODkey -value [$DIO makekey array]
-	puts "<TABLE>"
+	puts {<TABLE CLASS="DIOForm">}
 	foreach field $fields {
 	    $field showform
 	}
@@ -99,78 +164,91 @@ catch { ::itcl::delete class DIODisplay }
 	puts "<TABLE>"
 	puts "<TR>"
 	puts "<TD>"
-	$form submit mode -value "Save"
+	if {![lempty $save]} {
+	    $form image save -src $save -class DIOFormSaveButton
+	} else {
+	    $form submit save.x -value "Save" -class DIOFormSaveButton
+	}
 	puts "</TD>"
 	puts "<TD>"
-	$form submit mode -value "Cancel"
+	if {![lempty $cancel]} {
+	    $form image cancel -src $cancel -class DIOFormSaveButton
+	} else {
+	    $form submit cancel.x -value "Cancel" -class DIOFormCancelButton
+	}
 	puts "</TD>"
 	puts "</TR>"
 	puts "</TABLE>"
+
+	$form end
     }
 
-    method showrow {arrayName} {
-	upvar 1 $arrayName a
-
-	set fieldList $fields
-	if {![lempty $rowfields]} { set fieldList $rowfields }
-
-	puts "<TR>"
-	foreach field $fieldList {
-	    if {![info exists a($field)]} {
-		puts "<TD></TD>"
-	    } else {
-		puts "<TD>$a($field)</TD>"
-	    }
-	}
-
-	if {![lempty $rowfunctions]} {
-	    puts "<TD NOWRAP>"
-	    set f [::form #auto]
-	    $f start
-	    $f hidden query -value [$DIO makekey a]
-	    $f select mode -values $rowfunctions
-	    $f submit submit -value "Go"
-	    $f end
-	    puts "</TD>"
-	}
-
-	puts "</TR>"
-    }
-
-    method page_buttons {} {
+    method page_buttons {side} {
 	if {$pagesize <= 0} { return }
 
-	if {![info exists response(page)]} { set response(page) 0 }
+	if {![info exists response(page)]} { set response(page) 1 }
 
-	puts "<TABLE WIDTH=\"$rowwidth\">"
+	set pref DIO$side
+	set count [$DIOResult numrows]
+
+	set class [get_css_class TABLE DIONavButtons ${pref}NavButtons]
+	puts "<TABLE WIDTH=\"100%\" CLASS=\"$class\">"
 	puts "<TR>"
-	if {$response(page) != 0} {
-	    puts "<TD ALIGN=LEFT>"
+	set class [get_css_class TD DIOBackButton ${pref}BackButton]
+	if {$response(page) != 1} {
+	    set back [button_image_src $class]
+
+	    puts "<TD ALIGN=LEFT CLASS=\"$class\">"
 	    set f [::form #auto -defaults response]
 	    $f start
 	    $f hidden mode
 	    $f hidden query
+	    $f hidden searchBy
 	    $f hidden sortBy
+	    $f hidden numResults
 	    $f hidden page -value [expr $response(page) - 1]
-	    $f submit submit -value "Back"
+	    set class [get_css_class INPUT DIOBackButton ${pref}BackButton]
+	    if {![lempty $back]} {
+		$f image back -src $back -class $class
+	    } else {
+		$f submit back -value "Back" -class $class
+	    }
 	    $f end
+	    $f destroy
 	    puts "</TD>"
 	} else {
-	    puts "<TD></TD>"
+	    puts "<TD CLASS=\"$class\">&nbsp;</TD>"
 	}
-	if {[$DIOResult numrows] >= $pagesize} {
-	    puts "<TD ALIGN=RIGHT>"
+
+	## As long as count == pagesize, we fetched exactly the limit of
+	## records.  This may sometimes lead to a next button when there
+	## are actually no more records if the number of records is a clean
+	## divisible of pagesize.
+
+	set class [get_css_class TD DIONextButton ${pref}NextButton]
+	if {$count == $pagesize} {
+	    set next [button_image_src $class]
+
+	    puts "<TD ALIGN=RIGHT CLASS=\"$class\">"
 	    set f [::form #auto -defaults response]
 	    $f start
 	    $f hidden mode
 	    $f hidden query
+	    $f hidden searchBy
 	    $f hidden sortBy
+	    $f hidden numResults
 	    $f hidden page -value [expr $response(page) + 1]
-	    $f submit submit -value "Next"
+	    set class [get_css_class INPUT DIONextButton ${pref}NextButton]
+	    if {![lempty $next]} {
+		$f image next -src $next -class $class
+	    } else {
+		$f submit next -value "Next" -class $class
+	    }
 	    $f end
+	    $f destroy
 	    puts "</TD>"
 	} else {
-	    puts "<TD></TD>"
+	    puts "<TD CLASS=\"$class\">&nbsp;</TD>"
 	}
 	puts "</TR>"
 	puts "</TABLE>"
@@ -181,11 +259,13 @@ catch { ::itcl::delete class DIODisplay }
 	set fieldList $fields
 	if {![lempty $rowfields]} { set fieldList $rowfields }
 
+	set rowcount 0
+
 	puts <P>
 
-	if {$topnav} { page_buttons }
+	if {$topnav} { page_buttons Top }
 
-	puts "<TABLE BORDER WIDTH=\"$rowwidth\">"
+	puts {<TABLE BORDER WIDTH="100%" CLASS="DIORowHeader">}
 	puts "<TR>"
 	foreach field $fieldList {
 	    set text [$field text]
@@ -197,20 +277,59 @@ catch { ::itcl::delete class DIODisplay }
 	    } else {
 		set html {<A HREF="}
 		append html "$document?mode=$response(mode)"
-		append html "&query=$response(query)"
+		foreach var {query searchBy numResults} {
+		    if {[info exists response($var)]} {
+			append html "&$var=$response($var)"
+		    }
+		}
 		append html "&sortBy=$field\">$text</A>"
 	    }
-	    puts "<TD><B>$html</TD>"
+	    set class [get_css_class TH DIORowHeader DIORowHeader-$field]
+	    puts "<TH CLASS=\"$class\">$html</TH>"
 	}
 
-	puts "<TD><CENTER><B>Functions</TD>"
+	puts {<TH CLASS="DIORowHeaderFunctions">Functions</TH>}
+	puts "</TR>"
+    }
+
+    method showrow {arrayName} {
+	upvar 1 $arrayName a
+
+	incr rowcount
+	set alt ""
+	if {$alternaterows && ![expr $rowcount % 2]} { set alt Alt }
+
+	set fieldList $fields
+	if {![lempty $rowfields]} { set fieldList $rowfields }
+
+	puts "<TR>"
+	foreach field $fieldList {
+	    set class [get_css_class TD DIORowField$alt DIORowField$alt-$field]
+	    if {![info exists a($field)]} {
+		puts "<TD CLASS=\"$class\"></TD>"
+	    } else {
+		puts "<TD CLASS=\"$class\">$a($field)</TD>"
+	    }
+	}
+
+	if {![lempty $rowfunctions]} {
+	    puts "<TD NOWRAP CLASS=\"DIORowFunctions$alt\">"
+	    set f [::form #auto]
+	    $f start
+	    $f hidden query -value [$DIO makekey a]
+	    $f select mode -values $rowfunctions -class DIORowFunctionSelect$alt
+	    $f submit submit -value "Go" -class DIORowFunctionButton$alt
+	    $f end
+	    puts "</TD>"
+	}
+
 	puts "</TR>"
     }
 
     method rowfooter {} {
 	puts "</TABLE>"
 
-	if {$bottomnav} { page_buttons }
+	if {$bottomnav} { page_buttons Bottom }
     }
 
     ## Define a new function.
@@ -232,22 +351,31 @@ catch { ::itcl::delete class DIODisplay }
 
 	}
 
-	eval $class $name -name $name -form $form $args
+	eval $class $name -name $name -display $this -form $form $args
 	set FieldTextMap([$name text]) $name
     }
 
     method fetch {key arrayName} {
 	upvar 1 $arrayName $arrayName
-	return [$DIO fetch $key $arrayName]
+	set result [$DIO fetch $key $arrayName]
+	set error  [$DIO errorinfo]
+	if {![lempty $error]} { return -code error $error }
+	return $result
     }
 
     method store {arrayName} {
 	upvar 1 $arrayName $arrayName
-	return [$DIO store $arrayName]
+	set result [$DIO store $arrayName]
+	set error  [$DIO errorinfo]
+	if {![lempty $error]} { return -code error $error }
+	return $result
     }
 
     method delete {key} {
-	return [$DIO delete $key]
+	set result [$DIO delete $key]
+	set error  [$DIO errorinfo]
+	if {![lempty $error]} { return -code error $error }
+	return $result
     }
 
     method pretty_fields {list} {
@@ -273,8 +401,8 @@ catch { ::itcl::delete class DIODisplay }
 	}
     }
 
-    method DisplayRequest {req} {
-	set DIOResult [$DIO exec $req]
+    method DisplayRequest {query} {
+	set DIOResult [eval $DIO search $query]
 
 	if {[$DIOResult numrows] <= 0} {
 	    puts "Could not find any matching records."
@@ -297,12 +425,12 @@ catch { ::itcl::delete class DIODisplay }
     method Main {} {
 	$form start
 
-	puts "<TABLE>"
+	puts {<TABLE CLASS="DIOMain">}
 
 	puts "<TR>"
-	puts "<TD>Functions:</TD>"
-	puts "<TD>"
-	$form select mode -values $functions
+	puts {<TD CLASS="DIOMainFunctionsHeader">Functions:</TD>}
+	puts {<TD CLASS="DIOMainFunctions">}
+	$form select mode -values $functions -class DIOMainFunctionsSelect
 	puts "</TD>"
 	puts "</TR>"
 
@@ -310,31 +438,47 @@ catch { ::itcl::delete class DIODisplay }
 	if {![lempty $searchfields]} { set useFields $searchfields }
 
 	puts "<TR>"
-	puts "<TD>Search By:</TD>"
-	puts "<TD>"
-	$form select searchBy -values [pretty_fields $useFields]
+	puts {<TD CLASS="DIOMainSearchByHeader">Search By:</TD>}
+	puts {<TD CLASS="DIOMainSearchBy">}
+	$form select searchBy -values [pretty_fields $useFields] \
+	    -class DIOMainSearchBy
 	puts "</TD>"
 	puts "</TR>"
 
 	puts "<TR>"
-	puts "<TD>Query:</TD>"
-	puts "<TD>"
-	$form text query
+	puts {<TD CLASS="DIOMainQueryHeader">Query:</TD>}
+	puts {<TD CLASS="DIOMainQuery">}
+	$form text query -value "" -class DIOMainQuery
 	puts "</TD>"
 	puts "</TR>"
 
+	if {![lempty $numresults]} {
+	    puts "<TR>"
+	    puts {<TD CLASS="DIOMainNumResultsHeader">Results Per Page:</TD>}
+	    puts {<TD CLASS="DIOMainNumResults">}
+	    $form select numResults -values $numresults -class DIOMainNumResults
+	    puts "</TD>"
+	    puts "</TR>"
+	}
+
 	puts "<TR>"
-	puts "<TD COLSPAN=2>"
-	$form submit submit
+	puts {<TD COLSPAN=2 CLASS="DIOMainSubmitButton">}
+	$form submit submit -value "Submit Request" -class DIOMainSubmitButton
 	puts "</TD>"
 	puts "</TR>"
 
 	puts "</TABLE>"
+
+	$form end
     }
 
     method sql_order_by_syntax {} {
 	if {[info exists response(sortBy)] && ![lempty $response(sortBy)]} {
 	    return " ORDER BY $response(sortBy)"
+	}
+
+	if {![lempty $defaultsortfield]} {
+	    return " ORDER BY $defaultsortfield"
 	}
     }
 
@@ -343,7 +487,7 @@ catch { ::itcl::delete class DIODisplay }
 
 	set offset ""
 	if {[info exists response(page)]} {
-	    set offset [expr $response(page) * $pagesize]
+	    set offset [expr ($response(page) - 1) * $pagesize]
 	}
 	return [$DIO sql_limit_syntax $pagesize $offset]
     }
@@ -351,28 +495,20 @@ catch { ::itcl::delete class DIODisplay }
 
     method Search {} {
 	set searchField $FieldTextMap($response(searchBy))	
-	set table [$DIO table]
 
-	set req "SELECT * FROM $table
-		WHERE $searchField LIKE '[$DIO quote $response(query)]'"
+	set query "-$searchField $response(query)"
 
-	append req [sql_order_by_syntax]
+	append query [sql_order_by_syntax]
+	append query [sql_limit_syntax]
 
-	append req [sql_limit_syntax]
-
-	DisplayRequest $req
+	DisplayRequest $query
     }
 
     method List {} {
-	set table [$DIO table]
+	set query [sql_order_by_syntax]
+	append query [sql_limit_syntax]
 
-	set req "SELECT * FROM $table"
-
-	append req [sql_order_by_syntax]
-
-	append req [sql_limit_syntax]
-
-	DisplayRequest $req
+	DisplayRequest $query
     }
 
     method Add {} {
@@ -399,6 +535,11 @@ catch { ::itcl::delete class DIODisplay }
     ## we get the right value.
     ##
     method Save {} {
+	if {[info exists response(cancel.x)]} {
+	    Cancel
+	    return
+	}
+
 	## We need to see if the key exists.  If they are adding a new
 	## entry, we just want to see if the key exists.  If they are
 	## editing an entry, we need to see if they changed the keyfield
@@ -446,27 +587,25 @@ catch { ::itcl::delete class DIODisplay }
 	}
 
 	puts "<CENTER>"
-	puts "<TABLE>"
+	puts {<TABLE CLASS="DIODeleteConfirm">}
 	puts "<TR>"
-	puts "<TD COLSPAN=2>"
+	puts {<TD COLSPAN=2 CLASS="DIODeleteConfirm">}
 	puts "Are you sure you want to delete this record from the database?"
 	puts "</TD>"
 	puts "</TR>"
 	puts "<TR>"
-	puts "<TD>"
-	puts "<CENTER>"
+	puts {<TD ALIGN="center" CLASS="DIODeleteConfirmYesButton">}
 	set f [::form #auto]
 	$f start
 	$f hidden mode -value DoDelete
 	$f hidden query -value $response(query)
-	$f submit submit -value Yes
+	$f submit submit -value Yes -class DIODeleteConfirmYesButton
 	$f end
 	puts "</TD>"
-	puts "<TD>"
-	puts "<CENTER>"
+	puts {<TD ALIGN="center" CLASS="DIODeleteConfirmNoButton">}
 	set f [::form #auto]
 	$f start
-	$f submit submit -value No
+	$f submit submit -value No -class "DIODeleteConfirmNoButton"
 	$f end
 	puts "</TD>"
 	puts "</TR>"
@@ -492,7 +631,7 @@ catch { ::itcl::delete class DIODisplay }
 	showview
     }
 
-    proc Cancel {} {
+    method Cancel {} {
 	headers redirect $document
     }
 
@@ -530,33 +669,32 @@ catch { ::itcl::delete class DIODisplay }
 	set rowfields $list
     }
 
-    method DIO {{string ""}} { configure_variable DIO $string }
-    method DIOResult {{string ""}} { configure_variable DIOResult $string }
-    method errorhandler {{string ""}} {configure_variable errorhandler $string }
+    method DIO {{string ""}} { configvar DIO $string }
+    method DIOResult {{string ""}} { configvar DIOResult $string }
 
-    method title {{string ""}} { configure_variable title $string }
-    method functions {{string ""}} { configure_variable functions $string }
-    method pagesize {{string ""}} { configure_variable pagesize $string }
-    method form {{string ""}} { configure_variable form $string }
-    method cleanup {{string ""}} { configure_variable cleanup $string }
-    method confirmdelete {{string ""}} {
-	configure_variable confirmdelete $string
-    }
+    method title {{string ""}} { configvar title $string }
+    method functions {{string ""}} { configvar functions $string }
+    method pagesize {{string ""}} { configvar pagesize $string }
+    method form {{string ""}} { configvar form $string }
+    method cleanup {{string ""}} { configvar cleanup $string }
+    method confirmdelete {{string ""}} { configvar confirmdelete $string }
 
-    method allowsort {{string ""}} { configure_variable allowsort $string }
-    method sortfields {{string ""}} { configure_variable sortfields $string }
-    method background {{string ""}} { configure_variable background $string }
-    method border {{string ""}} { configure_variable border $string }
-    method bordercolor {{string ""}} { configure_variable bordercolor $string }
-    method topnav {{string ""}} { configure_variable topnav $string }
-    method bottomnav {{string ""}} { configure_variable bottomnav $string }
+    method css {{string ""}} { configvar css $string }
+    method persistentmain {{string ""}} { configvar persistentmain $string }
+    method alternaterows {{string ""}} { configvar alternaterows $string }
+    method allowsort {{string ""}} { configvar allowsort $string }
+    method sortfields {{string ""}} { configvar sortfields $string }
+    method topnav {{string ""}} { configvar topnav $string }
+    method bottomnav {{string ""}} { configvar bottomnav $string }
+    method numresults {{string ""}} { configvar numresults $string }
+    method defaultsortfield {{string ""}} { configvar defaultsortfield $string }
 
-    method rowfunctions {{string ""}} {configure_variable rowfunctions $string}
-    method rowwidth {{string ""}} {configure_variable rowwidth $string}
+    method rowfunctions {{string ""}} { configvar rowfunctions $string }
+
+    ## OPTIONS ##
 
     public variable DIO		 ""
     public variable DIOResult	 ""
-    public variable errorhandler "handle_error"
 
     public variable title	 ""
     public variable fields	 ""
@@ -567,23 +705,31 @@ catch { ::itcl::delete class DIODisplay }
     public variable cleanup	 1
     public variable confirmdelete 1
 
-    public variable allowsort	 1
-    public variable sortfields	 ""
-    public variable background	 "white"
-    public variable border	 0
-    public variable bordercolor	 "black"
-    public variable topnav	 1
-    public variable bottomnav	 1
+    public variable css			"diodisplay.css" {
+	if {![lempty $css]} {
+	    catch {unset cssArray}
+	    read_css_file
+	}
+    }
+
+    public variable persistentmain	1
+    public variable alternaterows	1
+    public variable allowsort		1
+    public variable sortfields		""
+    public variable topnav		1
+    public variable bottomnav		1
+    public variable numresults		""
+    public variable defaultsortfield	""
 
     public variable rowfields	 ""
     public variable rowfunctions "Details Edit Delete"
-    public variable rowwidth	 "100%"
 
-    private variable response
-    private variable document	 ""
-    private variable allfields    ""
-    private variable FieldTextMap
-    private variable allfunctions {
+    public variable response
+    public variable cssArray
+    public variable document	 ""
+    public variable allfields    ""
+    public variable FieldTextMap
+    public variable allfunctions {
 	Search
 	List
 	Add
@@ -595,6 +741,8 @@ catch { ::itcl::delete class DIODisplay }
 	DoDelete
 	Cancel
     }
+
+    private variable rowcount
 
 } ; ## ::itcl::class DIODisplay
 
@@ -626,6 +774,24 @@ catch { ::itcl::delete class ::DIODisplayField }
 	::itcl::delete object $this
     }
 
+    method get_css_class {tag default class} {
+	return [$display get_css_class $tag $default $class]
+    }
+
+    method get_css_tag {} {
+	switch -- $type {
+	    "select" {
+		set tag select
+	    }
+	    "textarea" {
+		set tag textarea
+	    }
+	    default {
+		set tag input
+	    }
+	}
+    }
+
     method pretty {string} {
 	set words ""
 	foreach w $string {
@@ -635,39 +801,52 @@ catch { ::itcl::delete class ::DIODisplayField }
 	return [join $words " "]
     }
 
-    method configure_variable {varName string} {
+    method configvar {varName string} {
 	if {[lempty $string]} { return [set $varName] }
 	configure -$varName $string
     }
 
     method showview {} {
 	puts "<TR>"
-	puts "<TD><B>$text</B>:</TD>"
-	puts "<TD>$value</TD>"
+
+	set class [get_css_class TD DIOViewHeader DIOViewHeader-$name]
+	puts "<TD CLASS=\"$class\">$text:</TD>"
+
+	set class [get_css_class TD DIOViewField DIOViewField-$name]
+	puts "<TD CLASS=\"$class\">$value</TD>"
+
 	puts "</TR>"
     }
 
     method showform {} {
 	puts "<TR>"
-	puts "<TD ALIGN=RIGHT><B>$text</B>:</TD>"
-	puts "<TD>"
+
+	set class [get_css_class TD DIOFormHeader DIOFormHeader-$name]
+	puts "<TD CLASS=\"$class\">$text:</TD>"
+
+	set class [get_css_class TD DIOFormField DIOFormField-$name]
+	puts "<TD CLASS=\"$class\">"
 	if {$readonly} {
 	    puts "$value"
 	} else {
-	    eval $form $type $name -value [list $value] $formargs
+	    set tag [get_css_tag]
+	    set class [get_css_class $tag DIOFormField DIOFormField-$name]
+	    eval $form $type $name -value [list $value] $formargs -class $class
 	}
 	puts "</TD>"
 	puts "</TR>"
     }
 
-    method form  {{string ""}} { configure_variable form $string }
-    method formargs  {{string ""}} { configure_variable formargs $string }
-    method name  {{string ""}} { configure_variable name $string }
-    method text  {{string ""}} { configure_variable text $string }
-    method type  {{string ""}} { configure_variable type $string }
-    method value {{string ""}} { configure_variable value $string }
-    method readonly {{string ""}} { configure_variable readonly $string }
+    method display  {{string ""}} { configvar display $string }
+    method form  {{string ""}} { configvar form $string }
+    method formargs  {{string ""}} { configvar formargs $string }
+    method name  {{string ""}} { configvar name $string }
+    method text  {{string ""}} { configvar text $string }
+    method type  {{string ""}} { configvar type $string }
+    method value {{string ""}} { configvar value $string }
+    method readonly {{string ""}} { configvar readonly $string }
 
+    public variable display		""
     public variable form		""
     public variable formargs		""
     public variable name		""
@@ -693,8 +872,12 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 
     method showform {} {
 	puts "<TR>"
-	puts "<TD ALIGN=RIGHT><B>$text</B>:</TD>"
-	puts "<TD>"
+
+	set class [get_css_class TD DIOFormHeader DIOFormHeader-$name]
+	puts "<TD CLASS=\"$class\">$text:</TD>"
+
+	set class [get_css_class TD DIOFormField DIOFormField-$name]
+	puts "<TD CLASS=\"$class\">"
 	if {$readonly} {
 	    if {[boolean_value]} {
 		puts $true
@@ -716,14 +899,19 @@ catch { ::itcl::delete class ::DIODisplayField_boolean }
 
     method showview {} {
 	puts "<TR>"
-	puts "<TD><B>$text</B>:</TD>"
-	puts "<TD>"
+
+	set class [get_css_class TD DIOViewHeader DIOViewHeader-$name]
+	puts "<TD CLASS=\"$class\">$text:</TD>"
+
+	set class [get_css_class TD DIOViewField DIOViewField-$name]
+	puts "<TD CLASS=\"$class\">"
 	if {[boolean_value]} {
 	    puts $true
 	} else {
 	    puts $false
 	}
 	puts "</TD>"
+
 	puts "</TR>"
     }
 
