@@ -1,0 +1,10 @@
+# $Id$
+
+set testfilename1 makeurl.rvt
+
+::tcltest::test makeurl-1.1 {makeurl} {
+    set page [ ::http::geturl "${urlbase}$testfilename1" ]
+    set match [string trim [ ::http::data $page ]]
+    set match
+} {http://localhost:8081/foo}
+

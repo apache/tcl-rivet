@@ -1,0 +1,6 @@
+<?
+
+# makeurl-1.1
+puts [makeurl /foo]
+
+?>

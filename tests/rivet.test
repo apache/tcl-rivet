@@ -42,7 +42,7 @@ proc server::start { options code } {
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
-foreach Test {cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test} {
+foreach Test {cookies.test get.test post.test tclfile.test env.test hello.test include.test binary.test parse.test upload.test makeurl.test} {
     server::start {} {
 	source $Test
     }
