@@ -159,7 +159,7 @@ package require Itcl
     #
     method do_garbage_collection {} {
 	debug "do_garbage_collection: performing garbage collection"
-	set result [DIO exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
+	set result [$dioObject exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
 	$result destroy
     }
 
