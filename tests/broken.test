@@ -22,7 +22,7 @@ puts -nonewline ""
 # non-existant command
 broken
 
- puts -nonewline "
+puts -nonewline "
 "
 
 }"<HR>
@@ -33,7 +33,7 @@ puts -nonewline ""
 # non-existant command
 broken
 
- puts -nonewline "
+puts -nonewline "
 "
 
 }

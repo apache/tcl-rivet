@@ -1,5 +1,8 @@
 2003-12-13  David N. Welton  <davidw@dedasys.com>
 
+	* tests/broken.test: Updated test results for what is actually
+	returned on error.
+
 	* src/rivetParser.c (Rivet_Parser): "export" function in that it's
 	no longer static.
 
