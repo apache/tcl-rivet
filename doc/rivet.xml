@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd">
+
+<article>
+  <articleinfo>
+    <title>Apache Rivet</title>
+    <releaseinfo>
+      $Id$
+    </releaseinfo>
+    <copyright>
+      <year>2002</year>
+      <holder>Apache Software Foundation</holder>
+    </copyright>
+  </articleinfo>
+
+  <section>
+    <title>Rivet Apache Directives</title>
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>Rivet_Script</command>
+	    <arg>GlobalInitScript</arg>
+	    <arg><replaceable>script</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Tcl script that is run when each interpreter is
+	    initialized.  <option>script</option> is an actual Tcl
+	    script, so to run a file, you would do:
+	  </para>
+	  <programlisting>
+	    Rivet_Script GlobalInitScript "source /var/www/foobar.tcl"
+	  </programlisting>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>Rivet_Script</command>
+	    <arg>ChildInitScript</arg>
+	    <arg><replaceable>script</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Script to be evaluated when each Apache child process is
+	    initialized.  This is the recommended place to load modules.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>Rivet_Script</command>
+	    <arg>ChildExitScript</arg>
+	    <arg><replaceable>script</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Script to be evaluated when each Apache child process exits.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>Rivet_Script</command>
+	    <arg>BeforeScript</arg>
+	    <arg><replaceable>script</replaceable></arg>
+	  </cmdsynopsis></term>
+	<listitem>
+	  <para>
+	    Script to be evaluated before each server parsed (.rvt) page.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>Rivet_Script</command>
+	    <arg>AfterScript</arg>
+	    <arg><replaceable>script</replaceable></arg>
+	  </cmdsynopsis></term>
+	<listitem>
+	  <para>
+	    Script to be called after each server parsed (.rvt) page.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>Rivet_Script</command>
+	    <arg>ErrorScript</arg>
+	    <arg><replaceable>script</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    This code is called in place of the standard 'error' pages
+	    generated for Rivet.  This directive may be useful if you
+	    have sensitive logic that you wish to protect.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>Rivet_CacheSize</command>
+	    <arg><replaceable>cachesize</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Number of rvt scripts to cache as Tcl Objects.  Default is
+	    <command>MaxRequestsPerChild</command> / 2, or 50, if
+	    <command>MaxRequestsPerChild</command> is 0.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </section>
+  <section>
+    <title>Rivet Tcl Commands and Variables</title>
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>var</command>
+	    <arg>get</arg>
+	    <arg><replaceable>varname</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns the value of variable <option>varname</option> as a
+	    string (even if there are multiple values).
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>var</command>
+	    <arg>list</arg>
+	    <arg><replaceable>varname</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns the value of variable <option>varname</option> as
+	    a list, if there are multiple values.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>var</command>
+	    <arg>exists</arg>
+	    <arg><replaceable>varname</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns 1 if <option>varname</option> exists, 0 if it
+	    doesn't.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>var</command>
+	    <arg>number</arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns the number of variables.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>var</command>
+	    <arg>all</arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Return a list of variable names and values.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <arg>channel</arg>
+	    <arg><replaceable>uploadname</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    When given the name of a file upload
+	    <option><replaceable>uploadname</replaceable></option>,
+	    returns a Tcl channel that can be used to access the
+	    uploaded file.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <arg>save</arg>
+	    <arg><replaceable>uploadname</replaceable></arg>
+	    <arg><replaceable>filename</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Saves the
+	    <option><replaceable>uploadname</replaceable></option> in
+	    the file
+	    <option><replaceable>filename</replaceable></option>.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <arg>data</arg>
+	    <arg><replaceable>uploadname</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns data uploaded to the server.  This is binary clean
+	    - in other words, it will work even with files like
+	    images, executables, compressed files, and so on.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <arg>size</arg>
+	    <arg><replaceable>uploadname</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns the size of the file uploaded.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <arg>type</arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    If the Content-type is set, it is returned, otherwise, an
+	    empty string.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <arg>filename</arg>
+	    <arg><replaceable>uploadname</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns the filename on the remote host that uploaded the file.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>upload</command>
+	    <arg>names</arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Returns the variable names, as a list, of all the files
+	    uploaded.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <example>
+      <title>upload</title>
+      The following HTML:
+      <programlisting>
+	&lt;form action="foo.ttml" enctypee="multipart/form-data"
+	  method="post"&gt;
+	  &lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
+	&lt;/form&gt;
+      </programlisting>
+
+      Can be used with the following Tcl code in order to create a
+      file upload form.
+
+      <programlisting>
+	upload save MyUpload /tmp/uploadfiles/file1
+
+	puts "Saved file [upload filename MyUpload]
+	([upload size MyUploadto] bytes) to server"
+      </programlisting>
+    </example>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>load_env</command>
+	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Load the array of environment variables into the specified
+	    array name.  Uses array <option>::request::env</option> by
+	    default.
+	  </para>
+	  <para>
+	    As Rivet pages are run in the <option>::request</option>
+	    namespace, it isn't necessary to qualify the array name
+	    for most uses - it's ok to access it as
+	    <option>env</option>.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>load_headers</command>
+	    <arg><replaceable>array_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Load the headers that come from a client request into the
+	    provided array name, or use <option>headers</option> if no
+	    name is provided.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>load_cookies</command>
+	    <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Load the array of cookie variables into the specified
+	    array name.  Uses array <option>cookies</option> by
+	    default.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>include</command>
+	    <arg><replaceable>filename_name</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Include a file without parsing it for processing tags &lt;?
+	    and ?&gt;.  This is the best way to include an HTML file or
+	    any other static content.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>parse</command>
+	    <arg><replaceable>filename</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Like the Tcl <command>source</command> command, but also
+	    parses for Rivet &lt;?  and ?&gt; processing tags.  Using
+	    this command, you can use one <filename>.rvt</filename>
+	    file from another.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>headers</command>
+	    <arg>redirect</arg>
+	    <arg><replaceable>uri</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Redirect from the current page to a new
+	    URI. <emphasis>Must</emphasis> be done in the first block
+	    of TCL code.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>headers</command>
+	    <arg>setcookie</arg>
+	    <arg>-name</arg>
+	    <arg><replaceable>cookie-name</replaceable></arg>
+	    <arg>-value</arg>
+	    <arg><replaceable>cookie-value</replaceable></arg>
+	    <group choice="opt">
+	      <arg>-expires</arg>
+	      <arg><replaceable>date/time</replaceable></arg>
+	    </group>
+	    <group choice="opt">
+	      <arg>-domain</arg>
+	      <arg><replaceable>domain</replaceable></arg>
+	    </group>
+	    <group choice="opt">
+	      <arg>-path</arg>
+	      <arg><replaceable>path</replaceable></arg>
+	    </group>
+	    <arg choice="opt">-secure</arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    This command is for setting cookies for the server to send
+	    to the client.  <option>cookie-name</option> is the name
+	    of the cookie, <option>cookie-value</option> is the data
+	    associated with the cookie.  <option>-expires</option>
+	    sets an expiration date for the cookie, and must be in the
+	    format <constant>'DD-Mon-YY HH:MM:SS'</constant>,
+	    <option>-path</option> sets the path for which the cookie
+	    is valid, and <option>-secure</option> specifies that the
+	    cookie is only to be transmitted if the connection is
+	    secure (HTTPS).
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><cmdsynopsis>
+	    <command>headers</command>
+	    <arg>type</arg>
+	    <arg><replaceable>content-type</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    This command sets the <constant>Content-type</constant>
+	    header returned by the script, which is useful if you wish
+	    to send content other than HTML with Rivet - PNG or jpeg
+	    images, for example.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><cmdsynopsis>
+	    <command>headers</command>
+	    <arg>set</arg>
+	    <arg><replaceable>headername</replaceable></arg>
+	    <arg><replaceable>value</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Set arbitrary header names and values.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><cmdsynopsis>
+	    <command>makeurl</command>
+	    <arg><replaceable>filename</replaceable></arg>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    Create a self referencing URL from a filename.  For example:
+	    <programlisting>makeurl /tclp.gif</programlisting>
+	    returns
+	    <constant>http://[hostname]:[port]/tclp.gif</constant>.
+	    where hostname and port are the hostname and port of the
+	    server in question.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </section>
+</article>

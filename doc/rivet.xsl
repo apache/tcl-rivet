@@ -45,7 +45,7 @@
       <xsl:call-template name="anchor"/>
       <xsl:apply-templates/>
     </xsl:param>
-    <span class="text-decoration:underline">
+    <span style="text-decoration:underline">
       <xsl:copy-of select="$content"/>
     </span>
   </xsl:template>
@@ -83,6 +83,21 @@
       <xsl:call-template name="inline.monoseq"/>
     </span>
     <xsl:text> </xsl:text>
+  </xsl:template>
+
+  <xsl:template match="refnamediv">
+    <div class="{name(.)}">
+      <xsl:call-template name="anchor"/>
+      <h2 align="center">
+	<xsl:apply-templates/>
+      </h2>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="refsect1/para">
+    <blockquote>
+      <xsl:apply-templates/>
+    </blockquote>
   </xsl:template>
 
   <xsl:template match="varlistentry">
