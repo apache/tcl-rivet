@@ -46,7 +46,7 @@ if { ![string length $APXS] } {
 
 set INCLUDEDIR [exec $APXS -q INCLUDEDIR]
 set LIBEXECDIR [exec $APXS -q LIBEXECDIR]
-set PREFIX [lindex $auto_path end]
+set PREFIX $TCL_PACKAGE_PATH
 
 set INC "-I$INCLUDEDIR -I$TCL_PREFIX/include"
 
@@ -228,10 +228,10 @@ AddNode install {
     depends $MOD_SHLIB $RIVETLIB_SHLIB $PARSER_SHLIB
     tcl file delete -force [file join $LIBEXECDIR rivet]
     tcl file delete -force [file join $PREFIX rivet]
-    tcl file copy -force $MOD_SHLIB $LIBEXECDIR
-    tcl file copy -force [file join .. rivet] $PREFIX
-    tcl file copy -force $RIVETLIB_SHLIB [file join $PREFIX rivet packages rivet]
-    tcl file copy -force $PARSER_SHLIB [file join $PREFIX rivet packages rivet]
+    tcl fileutil::install -m o+r $MOD_SHLIB $LIBEXECDIR
+    tcl fileutil::install -m o+r [file join .. rivet] $PREFIX
+    tcl fileutil::install -m o+r $RIVETLIB_SHLIB [file join $PREFIX rivet packages rivet]
+    tcl fileutil::install -m o+r $PARSER_SHLIB [file join $PREFIX rivet packages rivet]
 }
 
 # Install everything when creating a deb.  We need to find a better
@@ -242,10 +242,9 @@ set DEBPREFIX [file join [pwd] .. debian tmp]
 AddNode debinstall {
     depends $MOD_SHLIB $RIVETLIB_SHLIB $PARSER_SHLIB
     tcl {file delete -force [file join $DEBPREFIX/$LIBEXECDIR rivet]}
-    tcl {file copy -force $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
-    tcl {file copy -force [file join .. rivet] "$DEBPREFIX/$PREFIX"}
-    tcl {file copy -force $RIVETLIB_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
-    tcl {file copy -force $PARSER_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
+    tcl {fileutil::install -m o+r $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
+    tcl {fileutil::install -m o+r [file join .. rivet] "$DEBPREFIX/$PREFIX"}    tcl {fileutil::install -m o+r $RIVETLIB_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
+    tcl {fileutil::install -m o+r $PARSER_SHLIB "$DEBPREFIX/[file join $PREFIX rivet packages rivet]"}
 }
 
 foreach doc $HTML_DOCS {
