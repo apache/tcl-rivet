@@ -1,4 +1,12 @@
 2004-09-16  Karl Lehenbauer  <karl@sc.com>
+	* src/parserPkgInit.c: Added a Rivetparser_SafeInit so the
+	C-based standalone Rivet parser library can be loaded
+	from safe interpreters.  After inspection, we believe that
+	rivet::parserivetdata can be loaded into safe interpreters
+	without compromising their security.  rivet::parserivet
+	definitely cannot be made available to a safe interpreter --
+	it could be manipulated to read files.
+
 	* src/rivetPkgInit.c: Added a Rivet_SafeInit so lib can
 	be loaded from safe interpreters, which also makes it work
 	better under Mac OS X.
@@ -8,8 +16,6 @@
 	* src/rivetWWW.c: (same)
 
 	* README.MacOSX: Temporary file to document Mac OS X build quirks.
-
-2004-09-16  Karl Lehenbauer  <karl@sc.com>
 
 	* src/configure.tcl: If a configuration variable in
 	  tclConfig.sh ever had an equal sign in the "value"

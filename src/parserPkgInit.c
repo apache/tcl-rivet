@@ -126,3 +126,25 @@ Rivetparser_Init( Tcl_Interp *interp )
 
     return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }
+
+EXTERN int
+Rivetparser_SafeInit( Tcl_Interp *interp )
+{
+    /* rivet::parserivet is DEFINITELY unsafe -- it takes a filename,
+     * and code in safe interpreters could possibly manipulate it
+     * to read files */
+
+    /* but after inspect we find that rivet::parserivetdata appears
+     * to be safe -- it reads a string and returns a new string derived
+     * from the string it read, using Tcl C calls to construct the
+     * target string, which should by design prevent buffer overflow
+     * attacks, etc.
+     */
+    Tcl_CreateObjCommand(interp,
+			 "rivet::parserivetdata",
+			 Parse_RivetData,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+
+    return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
+}
