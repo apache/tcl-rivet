@@ -136,58 +136,59 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>array</arg>
 		<arg>request</arg>
 	      </cmdsynopsis>
-	      Execute <option>request</option> as a SQL query and
-	      create an array from the first record found.  The array
-	      is set with the fields of the table and the values of
-	      the record found.
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		create an array from the first record found.  The
+		array is set with the fields of the table and the
+		values of the record found.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>autokey</arg>
 		<group choice="opt">
 		  <arg>value</arg>
 		  <arg>boolean</arg>
 		</group>
 	      </cmdsynopsis>
-	      Return the current autokey value.  If
-	      <option>value</option> is specified, it sets a new value
-	      for the autokey option.
+	      <para>	      Return the current autokey value.  If
+		<option>value</option> is specified, it sets a new value
+		for the autokey option.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>close</arg>
 	      </cmdsynopsis>
-	      Close the current database connection.  This command is
-	      automatically called when the DIO object is destroyed.
+	      <para>	      Close the current database connection.  This command is
+		automatically called when the DIO object is destroyed.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>db</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
-	      Return the current database.  If <option>value</option> is
-	      specified, it sets a new value for the database.  In
-	      most cases, the DIO object will automatically connect to
-	      the new database when this option is changed.
+	      <para>	      Return the current database.  If <option>value</option> is
+		specified, it sets a new value for the database.  In
+		most cases, the DIO object will automatically connect to
+		the new database when this option is changed.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>delete</arg>
 		<arg>key</arg>
 		<group choice="opt">
@@ -196,37 +197,37 @@
 		  <arg>...</arg>
 		</group>
 	      </cmdsynopsis>
-	      Delete a record from the database where the primary key
-	      matches <option>key</option>.
+	      <para>	      Delete a record from the database where the primary key
+		matches <option>key</option>.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>destroy</arg>
 	      </cmdsynopsis>
-	      Destroy the DIO object.
+	      <para>	      Destroy the DIO object.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>errorinfo</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
-	      <option>errorinfo</option> contains the value of the
-	      last error, if any, to occur while executing a request.
-	      When a request fails for any reason, this variable is
-	      filled with the error message from the SQL interface
-	      package.
+	      <para><option>errorinfo</option> contains the value of
+		the last error, if any, to occur while executing a
+		request.  When a request fails for any reason, this
+		variable is filled with the error message from the SQL
+		interface package.</para>
 	    </listitem>
 	  </varlistentry>
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>exec</arg>
 		<arg>request</arg>
 	      </cmdsynopsis>
@@ -244,7 +245,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>fetch</arg>
 		<arg>key</arg>
 		<arg>arrayName</arg>
@@ -264,7 +265,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>host</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
@@ -278,7 +279,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>keyfield</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
@@ -292,7 +293,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>keys</arg>
 		<arg choice="opt">pattern</arg>
 		<group choice="opt">
@@ -311,7 +312,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>lastkey</arg>
 	      </cmdsynopsis>
 	      <para>
@@ -324,7 +325,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>list</arg>
 		<arg>request</arg>
 	      </cmdsynopsis>
@@ -338,7 +339,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>nextkey</arg>
 	      </cmdsynopsis>
 	      <para>Increment <option>sequence</option> and return the
@@ -350,7 +351,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>open</arg>
 	      </cmdsynopsis>
 	      <para>Open the connection to the current database.  This
@@ -360,7 +361,7 @@
 	  </varlistentry>	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>pass</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
@@ -371,7 +372,7 @@
 	  </varlistentry>	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>port</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
@@ -381,7 +382,7 @@
 	  </varlistentry>	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>sequence</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
@@ -393,7 +394,7 @@
 	  </varlistentry>	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>store</arg>
 		<arg>arrayName</arg>
 		<group choice="opt">
@@ -410,7 +411,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>string</arg>
 		<arg>request</arg>
 	      </cmdsynopsis>
@@ -423,7 +424,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>table</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
@@ -435,7 +436,7 @@
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
-		<command>objectName</command>
+		<arg>objectName</arg>
 		<arg>user</arg>
 		<arg choice="opt">value</arg>
 	      </cmdsynopsis>
