@@ -161,15 +161,13 @@ Rivet_Headers(
 {
     char *opt;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc =
-	RIVET_SERVER_CONF( globals->r->server->module_config );
 
     if (objc < 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "option arg ?arg ...?");
 	return TCL_ERROR;
     }
-    if (*(rsc->headers_printed) != 0)
+    if (globals->req->headers_printed != 0)
     {
 	Tcl_AddObjErrorInfo(interp,
 		"Cannot manipulate headers - already sent", -1);
@@ -241,8 +239,7 @@ Rivet_Headers(
 	    Tcl_WrongNumArgs(interp, 2, objv, "mime/type");
 	    return TCL_ERROR;
 	}
-	Rivet_SetHeaderType(globals->r,
-				Tcl_GetStringFromObj(objv[2],(int *)NULL));
+	TclWeb_SetHeaderType(Tcl_GetStringFromObj(objv[2],(int *)NULL), globals->req);
     } else if (!strcmp("numeric", opt)) /* ### numeric ### */
     {
 	int st = 200;
@@ -689,7 +686,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
 	return TCL_ERROR;
     }
 
-    Rivet_PrintHeaders(globals->r);
+    TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(rsc->outchannel));
 
     globals->r->connection->aborted = 1;

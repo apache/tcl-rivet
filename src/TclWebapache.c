@@ -27,6 +27,7 @@ TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
     req->req = r;
     req->apachereq = ApacheRequest_new(r);
     req->headers_printed = 0;
+    req->headers_set = 0;
     return TCL_OK;
 }
 
@@ -34,6 +35,59 @@ int
 TclWeb_SendHeaders(TclWebRequest *req)
 {
     ap_send_http_header(req->req);
+    return TCL_OK;
+}
+
+/* Set up the content type header */
+
+int
+TclWeb_SetHeaderType(char *header, TclWebRequest *req)
+{
+    if(req->headers_set)
+	return 0;
+
+    req->req->content_type = header;
+    req->headers_set = 1;
+    return TCL_OK;
+}
+
+/* Printer headers if they haven't been printed yet */
+int
+TclWeb_PrintHeaders(TclWebRequest *req)
+{
+    if (req->headers_printed)
+	return TCL_ERROR;
+
+    if (req->headers_set == 0)
+	TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
+
+    ap_send_http_header(req->req);
+    req->headers_printed = 1;
+    return TCL_OK;
+}
+
+/* Print nice HTML formatted errors */
+int
+TclWeb_PrintError(char *errstr, int htmlflag, TclWebRequest *req)
+{
+    TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
+    TclWeb_PrintHeaders(req);
+
+    if (htmlflag != 1)
+	ap_rputs(ER1, req->req);
+
+    if (errstr != NULL)
+    {
+	if (htmlflag != 1)
+	{
+	    ap_rputs(ap_escape_html(TCLWEBPOOL, errstr), req->req);
+	} else {
+	    ap_rputs(errstr, req->req);
+	}
+    }
+    if (htmlflag != 1)
+	ap_rputs(ER2, req->req);
+
     return TCL_OK;
 }
 

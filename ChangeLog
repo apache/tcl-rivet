@@ -1,5 +1,16 @@
 2002-01-22  David N. Welton  <davidw@dedasys.com>
 
+	* src/mod_rivet.c, src/channel.c, src/rivetCore.c: Switched to
+	TclWeb functions for error, headers.
+
+	* src/mod_rivet.h: Moved headers_set and headers_printed out of
+	the rivet_server_conf struct and into the TclWebRequest struct.
+
+	* src/TclWebapache.c: Moved PrintHeaders, PrintError and
+	SetHeaderType from mod_rivet.c.
+
+	* src/TclWeb.h: Added ER1, ER2 and DEFAULT_HEADER_TYPE here.
+
 	* tests/get.test: Added some tests related to [var *].
 
 	* tests/post.test: Added some tests related to [var *].

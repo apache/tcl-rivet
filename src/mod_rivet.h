@@ -9,10 +9,6 @@
 #define RIVET_DIR "rivet"
 #define RIVET_INIT RIVET_DIR"/init.tcl"
 
-/* Error wrappers  */
-#define ER1 "<hr><p><code><pre>\n"
-#define ER2 "</pre></code><hr>\n"
-
 /* Configuration options  */
 
 /* If you do not have a threaded Tcl, you can define this to 0.  This
@@ -36,7 +32,6 @@
 
 #define DEFAULT_ERROR_MSG "[an error occurred while processing this directive]"
 #define DEFAULT_TIME_FORMAT "%A, %d-%b-%Y %H:%M:%S %Z"
-#define DEFAULT_HEADER_TYPE "text/html"
 #define MULTIPART_FORM_DATA 1
 /* #define RIVET_VERSION "X.X.X" */
 
@@ -66,8 +61,6 @@ typedef struct {
     Tcl_Obj *request_cleanup; /* bit of Tcl for cleaning up after a request */
 
     /* stuff for buffering output */
-    int *headers_printed; 	/* has the header been printed yet? */
-    int *headers_set;       /* has the header been set yet? */
     int *content_sent;      /* make sure something gets sent */
     Tcl_Channel *outchannel;
 } rivet_server_conf;
@@ -81,9 +74,6 @@ typedef struct {
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(request_rec *r, rivet_server_conf *rsc, char *filename, int toplevel);
-int Rivet_SetHeaderType(request_rec *, char *);
-int Rivet_PrintHeaders(request_rec *);
-int Rivet_PrintError(request_rec *, int, char *);
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)

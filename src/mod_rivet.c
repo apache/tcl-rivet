@@ -101,61 +101,6 @@ static int Rivet_SendContent(request_rec *);
 static int Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf,
 				request_rec *r);
 
-/* Set up the content type header */
-
-int
-Rivet_SetHeaderType(request_rec *r, char *header)
-{
-    rivet_server_conf *rsc = Rivet_GetConf(r);
-
-    if( *(rsc->headers_set) ) return 0;
-
-    r->content_type = header;
-    *(rsc->headers_set) = 1;
-    return 1;
-}
-
-/* Printer headers if they haven't been printed yet */
-int
-Rivet_PrintHeaders(request_rec *r)
-{
-    rivet_server_conf *rsc = Rivet_GetConf(r);
-
-    if( *(rsc->headers_printed) ) return 0;
-
-    if (*(rsc->headers_set) == 0)
-	Rivet_SetHeaderType(r, DEFAULT_HEADER_TYPE);
-
-    ap_send_http_header(r);
-    *(rsc->headers_printed) = 1;
-    return 1;
-}
-
-/* Print nice HTML formatted errors */
-int
-Rivet_PrintError(request_rec *r, int htmlflag, char *errstr)
-{
-    Rivet_SetHeaderType(r, DEFAULT_HEADER_TYPE);
-    Rivet_PrintHeaders(r);
-
-    if (htmlflag != 1)
-	ap_rputs(ER1, r);
-
-    if (errstr != NULL)
-    {
-	if (htmlflag != 1)
-	{
-	    ap_rputs(ap_escape_html(r->pool, errstr), r);
-	} else {
-	    ap_rputs(errstr, r);
-	}
-    }
-    if (htmlflag != 1)
-	ap_rputs(ER2, r);
-
-    return 0;
-}
-
 /* Function to be used should we desire to upload files to a variable */
 
 #if 0
@@ -289,6 +234,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 {
     char *errorinfo;
     rivet_server_conf *conf = NULL;
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     conf = Rivet_GetConf(r);
     if (Tcl_EvalObj(interp, outbuf) == TCL_ERROR)
@@ -296,22 +242,22 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	Tcl_Obj *errscript =
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
 
-        Rivet_PrintHeaders(r);
+        TclWeb_PrintHeaders(globals->req);
 	Tcl_Flush(*(conf->outchannel));
         if (errscript)
         {
 	    if (Tcl_EvalObj(interp, errscript) == TCL_ERROR)
-                Rivet_PrintError(r, 1, "<b>Tcl_ErrorScript failed!</b>");
+                TclWeb_PrintError("<b>Tcl_ErrorScript failed!</b>", 1, globals->req);
         } else {
             /* default action  */
             errorinfo = Tcl_GetVar(interp, "errorInfo", 0);
-            Rivet_PrintError(r, 0, errorinfo);
-            Rivet_PrintError(r, 1, "<p><b>OUTPUT BUFFER:</b></p>");
-            Rivet_PrintError(r, 0, Tcl_GetStringFromObj(outbuf, (int *)NULL));
+	    TclWeb_PrintError(errorinfo, 0, globals->req);
+            TclWeb_PrintError("<p><b>OUTPUT BUFFER:</b></p>", 1, globals->req);
+            TclWeb_PrintError(Tcl_GetStringFromObj(outbuf, (int *)NULL), 1, globals->req);
         }
     } else {
         /* Make sure to flush the output if buffer_add was the only output */
-        Rivet_PrintHeaders(r);
+        TclWeb_PrintHeaders(globals->req);
 	Tcl_Flush(*(conf->outchannel));
     }
     return OK;
@@ -495,8 +441,8 @@ Rivet_SendContent(request_rec *r)
 
     if (r->header_only)
     {
-	Rivet_SetHeaderType(r, DEFAULT_HEADER_TYPE);
-	Rivet_PrintHeaders(r);
+	TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
+	TclWeb_PrintHeaders(globals->req);
 	return OK;
     }
 
@@ -538,8 +484,6 @@ Rivet_SendContent(request_rec *r)
     }
 
     /* Reset globals */
-    *(rsc->headers_printed) = 0;
-    *(rsc->headers_set) = 0;
     *(rsc->content_sent) = 0;
 
     return OK;
@@ -976,8 +920,6 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->request_init = oldrsc->request_init;
     newrsc->request_cleanup = oldrsc->request_cleanup;
 
-    newrsc->headers_printed = oldrsc->headers_printed;
-    newrsc->headers_set = oldrsc->headers_set;
     newrsc->content_sent = oldrsc->content_sent;
     newrsc->outchannel = oldrsc->outchannel;
 }
@@ -1010,11 +952,7 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->request_init = NULL;
     rsc->request_cleanup = NULL;
 
-    rsc->headers_printed = ap_pcalloc(p, sizeof(int));
-    rsc->headers_set = ap_pcalloc(p, sizeof(int));
     rsc->content_sent = ap_pcalloc(p, sizeof(int));
-    *(rsc->headers_printed) = 0;
-    *(rsc->headers_set) = 0;
     *(rsc->content_sent) = 0;
     rsc->outchannel = ap_pcalloc(p, sizeof(Tcl_Channel));
 

@@ -7,6 +7,7 @@
 
 #include "apache_request.h"
 #include "mod_rivet.h"
+#include "TclWeb.h"
 
 /* This file describes the mod_rivet Tcl output channel. */
 
@@ -26,7 +27,7 @@ outputproc(ClientData instancedata, char *buf, int toWrite, int *errorCodePtr)
     rivet_interp_globals *globals =
 	Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
 
-    Rivet_PrintHeaders(globals->r);
+    TclWeb_PrintHeaders(globals->req);
     if (*(rsc->content_sent) == 0)
     {
 	ap_rwrite(buf, toWrite, globals->r);
