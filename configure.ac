@@ -270,6 +270,6 @@ AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh
 # which require substituting th AC variables in.  Include these here.
 #--------------------------------------------------------------------
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
 AC_OUTPUT
 

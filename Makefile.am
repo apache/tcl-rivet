@@ -7,8 +7,8 @@
 #
 #foreign -- need to set this somehow
 
-EXTRA_DIST=LICENSE doc
-SUBDIRS = src
+EXTRA_DIST=LICENSE
+SUBDIRS = src doc
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck

@@ -1,3 +1,7 @@
+2004-12-08  David N. Welton  <davidw@dedasys.com>
+
+	* Makefile.am, configure.ac: Added the doc/ directory.
+
 2004-12-03  Karl Lehenbauer  <karl-rivet@sc.com>
 
         * rivet/packages/dio/dio.tcl: Cause fatal database errors such

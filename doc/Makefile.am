@@ -14,3 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+html/index.en.html: rivet.xml rivet-chunk.xsl
+	xsltproc --stringparam html.stylesheet rivet.css --stringparam html.ext ".en.html" --nonet -o html/ rivet-chunk.xsl rivet.xml
+
+html/rivet.en.html: rivet.xml rivet-nochunk.xsl
+	xsltproc --stringparam html.stylesheet rivet.css --stringparam html.ext ".en.html" --nonet -o html/rivet.en.html rivet-nochunk.xsl rivet.xml
