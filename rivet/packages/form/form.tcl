@@ -304,24 +304,45 @@ package provide form 1.0
     # it'll select it too.
     #
     method select {name args} {
+	# start with empty values and labels so they'll exist even if not set
 	set data(values) [list]
 	set data(labels) [list]
+
+	# import any default data and key-value pairs from the method args
 	import_data select $name data $args
+
+	# pull the values and labels into scalar variables and remove them
+	# from the data array
 	set values $data(values)
 	set labels $data(labels)
 	unset data(values) data(labels)
+
+	# get the default value, use an empty string if there isn't one
 	set default ""
 	if {[info exists DefaultValues($name)]} {
 	    set default $DefaultValues($name)
 	}
+
+	# if there is a value set in the value field of the data array,
+	# use that instead (that way if we're putting up a form with
+	# data already, the data'll show up)
 	if {[info exists data(value)]} {
 	    set default $data(value)
 	    unset data(value)
 	}
 
-	if {[lempty $labels]} { set labels $values }
+	#
+	# if there are no separate labels defined, use the list of
+	# values for the labels
+	#
+	if {[lempty $labels]} { 
+	    set labels $values 
+	}
 
+	# emit the selector
 	html "<select name=\"$name\" [argstring data]>"
+
+	# emit each label-value pair
 	foreach label $labels value $values {
 	    if {$value == $default} {
 		set string "<option value=\"$value\" selected=\"selected\">"
