@@ -1,0 +1,69 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.62.4"><link rel="home" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="previous" href="help.en.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.en.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div><div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.en.html#id5419745">Initialization</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420201">RivetChan</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420232">The global Command</a></span></dt><dt><span class="section"><a href="internals.en.html#id5420282">Page Parsing, Execution and Caching</a></span></dt></dl></div><p style="width:90%">
+      This section easily falls out of date, as new code is added, old
+      code is removed, and changes are made.  The best place to look
+      is the source code itself.  If you are interested in the changes
+      themselves, <span style="font-family:monospace"><span><b class="command">cvs</b></span></span> can provide you with
+      information about what has been happening with the code.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5419745"></a>Initialization</h3></div></div><div></div></div><p style="width:90%">
+	When Apache is started, (or when child Apache processes are
+	started if a threaded Tcl is used),
+	<tt class="function">Rivet_InitTclStuff</tt> is called, which
+	creates a new interpreter, or one interpreter per virtual
+	host, depending on the configuration. It also initializes
+	various things, like the <span class="structname">RivetChan</span>
+	channel system, creates the Rivet-specific Tcl commands, and
+	executes Rivet's <tt class="filename">init.tcl</tt>.  The caching
+	system is also set up, and if there is a
+	<span style="font-family:monospace"><span><b class="command">GlobalInitScript</b></span></span>, it is run.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5420201"></a>RivetChan</h3></div></div><div></div></div><p style="width:90%">
+	The <span class="structname">RivetChan</span> system was created in
+	order to have an actual Tcl channel that we could redirect
+	standard output to.  This lets us use, for instance, the
+	regular <span style="font-family:monospace"><span><b class="command">puts</b></span></span> command in .rvt pages.  It
+	works by creating a channel that buffers output, and, at
+	predetermined times, passes it on to Apache's IO system.
+	Tcl's regular standard output is replaced with an instance of
+	this channel type, so that, by default, output will go to the
+	web page.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5420232"></a>The <span style="font-family:monospace"><span><b class="command">global</b></span></span> Command</h3></div></div><div></div></div><p style="width:90%">
+	Rivet aims to run standard Tcl code with as few surprises as
+	possible.  At times this involves some compromises - in this
+	case regarding the <span style="font-family:monospace"><span><b class="command">global</b></span></span> command.  The
+	problem is that the command will create truly global
+	variables.  If the user is just cut'n'pasting some Tcl code
+	into Rivet, they most likely just want to be able to share the
+	variable in question with other procs, and don't really care
+	if the variable is actually persistant between pages.  The
+	solution we have created is to create a proc
+	<span style="font-family:monospace"><span><b class="command">::request::global</b></span></span> that takes the place of
+	the <span style="font-family:monospace"><span><b class="command">global</b></span></span> command in Rivet templates.  If
+	you really need a true global variable, use either
+	<span style="font-family:monospace"><span><b class="command">::global</b></span></span> or add the :: namespace qualifier
+	to variables you wish to make global.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5420282"></a>Page Parsing, Execution and Caching</h3></div></div><div></div></div><p style="width:90%">
+	When a Rivet page is requested, it is transformed into an
+	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
+	processing instruction tags.  Everything outside these tags
+	becomes a large <span style="font-family:monospace"><span><b class="command">puts</b></span></span> statement, and
+	everything inside them remains Tcl code.
+      </p><p style="width:90%">
+	Each .rvt file is evaluated in its own
+	<tt class="constant">::request</tt> namespace, so that it is not
+	necessary to create and tear down interpreters after each
+	page.  By running in its own namespace, though, each page will
+	not run afoul of local variables created by other scripts,
+	because they will be deleted automatically when the namespace
+	goes away after Apache finishes handling the request.
+      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td colspan="2" align="left" valign="top">
+	    One current problem with this system is that while
+	    variables are garbage collected, file handles are not, so
+	    that it is very important that Rivet script authors make
+	    sure to close all the files they open.
+      </td></tr></table></div><p style="width:90%">
+      </p><p style="width:90%">
+	After a script has been loaded and parsed into it's "pure Tcl"
+	form, it is also cached, so that it may be used in the future
+	without having to reload it (and re-parse it) from the disk.
+	The number of scripts stored in memory is configurable.  This
+	feature can significantly improve performance.
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.en.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Resources - How to Get Help </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Upgrading from mod_dtcl or NeoWebScript</td></tr></table></div></body></html>

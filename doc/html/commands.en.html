@@ -1,0 +1,175 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Tcl Commands and Variables</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.62.4"><link rel="home" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="previous" href="directives.en.html" title="Rivet Apache Directives"><link rel="next" href="examples.en.html" title="Examples and Usage"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Tcl Commands and Variables</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="directives.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="examples.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="commands"></a>Rivet Tcl Commands and Variables</h2></div></div><div></div></div><div class="toc"><dl><dt><a href="commands.en.html#id5417261">var</a> - get the value of a form variable.</dt><dt><a href="commands.en.html#id5417670">upload</a> - handle a file uploaded by a client.</dt><dt><a href="commands.en.html#id5418039">load_response</a> - load form variables into an array.</dt><dt><a href="commands.en.html#id5418089">load_env</a> - get the request's environment variables.</dt><dt><a href="commands.en.html#id5418168">load_headers</a> - get client request's headers.</dt><dt><a href="commands.en.html#id5418228">load_cookies</a> - get any cookie variables sent by the client.</dt><dt><a href="commands.en.html#id5418291">include</a> - includes a file into the output stream without modification.</dt><dt><a href="commands.en.html#id5418352">parse</a> - parses a Rivet template file.</dt><dt><a href="commands.en.html#id5418416">headers</a> - set and parse HTTP headers.</dt><dt><a href="commands.en.html#id5418704">makeurl</a> - construct url's based on hostname, port.</dt><dt><a href="commands.en.html#id5418770">cookie</a> - get and set cookies.</dt><dt><a href="commands.en.html#id5418910">clock_to_rfc850_gmt</a> - create a rfc850 time from [clock seconds].</dt><dt><a href="commands.en.html#id5418966">html</a> - construct html tagged text.</dt><dt><a href="commands.en.html#id5419040">incr0</a> - increment a variable or set it to 1 if nonexistant.</dt><dt><a href="commands.en.html#id5419113">parray</a> - Tcl's parray with html formatting.</dt></dl></div><div class="refentry" lang="en"><a name="id5417261"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">var, var_qs, var_post &#8212; get the value of a form variable.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">
+	    var
+	  </span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">
+	    var_qs
+	  </span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">
+	    var_post
+	  </span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  The <span style="font-family:monospace"><span><b class="command">var</b></span></span> command retrieves information
+	  about GET or POST variables sent to the script via client
+	  request.  It treats both GET and POST variables the same,
+	  regardless of their origin.  Note that there are two
+	  additional forms of <span style="font-family:monospace"><span><b class="command">var</b></span></span>:
+	  <span style="font-family:monospace"><span><b class="command">var_qs</b></span></span> and <span style="font-family:monospace"><span><b class="command">var_post</b></span></span>.
+	  These two restrict the retrieval of information to
+	  parameters arriving via the querystring
+	  (?foo=bar&amp;bee=bop) or POSTing, respectively.
+	</p><div class="variablelist"><dl><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">get</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the value of variable
+		<i class="replaceable"><tt>varname</tt></i>
+		as a string (even if there are multiple values).  If
+		the variable doesn't exist as a GET or POST
+		variable, the
+		<i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i>
+		value is returned, otherwise "" - an empty string -
+		is returned.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">list</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the value of variable
+		<i class="replaceable"><tt>varname</tt></i> as a
+		list, if there are multiple values.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">exists</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns 1 if
+		<i class="replaceable"><tt>varname</tt></i>
+		exists, 0 if it doesn't.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">number</span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the number of variables.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">all</span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return a list of variable names and values.
+	      </div></div></dd></dl></div><p style="width:90%">
+	  See <a href="examples.en.html#variable_access" title="Example 3. Variable Access">Example 3, &#8220;Variable Access&#8221;</a>.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5417670"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">upload &#8212; handle a file uploaded by a client.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">upload</span>  (<span style="font-family:monospace; font-weight: bold;">channel</span> | <span style="font-family:monospace; font-weight: bold;">save</span> | <span style="font-family:monospace; font-weight: bold;">data</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">size</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">filename</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">The upload command is for file upload manipulation.
+	  See the relevant Apache Directives to further configure the
+	  behavior of this Rivet feature.</p><div class="variablelist"><dl><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">channel</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		When given the name of a file upload
+		<i class="replaceable"><tt>uploadname</tt></i>,
+		returns a Tcl channel that can be used to access the
+		uploaded file.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">save</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Saves the
+		<i class="replaceable"><tt>uploadname</tt></i> in
+		the file
+		<i class="replaceable"><tt>filename</tt></i>.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">data</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns data uploaded to the server.  This is binary clean
+		- in other words, it will work even with files like
+		images, executables, compressed files, and so on.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">size</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the size of the file uploaded.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">type</span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		If the <tt class="varname">Content-type</tt> is set, it is
+		returned, otherwise, an empty string.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">filename</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the filename on the remote host that uploaded the file.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">names</span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the variable names, as a list, of all the files
+		uploaded.
+	      </div></div></dd></dl></div><p style="width:90%">
+	  See <a href="examples.en.html#upload" title="Example 4. File Upload">Example 4, &#8220;File Upload&#8221;</a>.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418039"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_response &#8212; load form variables into an array.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_response</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3>
+	Load any form variables passed to this page into an
+	array.
+      </div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418089"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_env &#8212; get the request's environment variables.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_env</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Load the array of environment variables into the specified
+	  array name.  Uses array ::request::env by
+	  default.
+	</p><p style="width:90%">
+	  As Rivet pages are run in the ::request
+	  namespace, it isn't necessary to qualify the array name
+	  for most uses - it's ok to access it as
+	  env.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418168"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_headers &#8212; get client request's headers.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_headers</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Load the headers that come from a client request into the
+	  provided array name, or use headers if no
+	  name is provided.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418228"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">load_cookies &#8212; get any cookie variables sent by the client.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_cookies</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div></div><div class="refsect1" lang="en"><h3>Description</h3></div><p style="width:90%">
+	Load the array of cookie variables into the specified
+	array name.  Uses array cookies by
+	default.
+      </p></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418291"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">include &#8212; includes a file into the output stream without modification.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">include</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename_name</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Include a file without parsing it for processing tags &lt;?
+	  and ?&gt;.  This is the best way to include an HTML file or
+	  any other static content.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418352"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">parse &#8212; parses a Rivet template file.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parse</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Like the Tcl <span style="font-family:monospace"><span><b class="command">source</b></span></span> command, but also
+	  parses for Rivet &lt;?  and ?&gt; processing tags.  Using
+	  this command, you can use one .rvt file from another.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418416"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">headers &#8212; set and parse HTTP headers.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>  (<span style="font-family:monospace; font-weight: bold;">set</span> | <span style="font-family:monospace; font-weight: bold;">redirect</span> | <span style="font-family:monospace; font-weight: bold;">add</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">numeric</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  The <span style="font-family:monospace"><span><b class="command">headers</b></span></span> command is for setting and
+	  parsing HTTP headers.
+	</p><div class="variablelist"><dl><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">set</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Set arbitrary header names and values.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">redirect</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uri</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Redirect from the current page to a new
+		URI. <span class="emphasis"><em>Must</em></span> be done in the first block
+		of TCL code.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">add</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Add text to header
+		<tt class="varname">headername</tt>.</div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">type</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>content-type</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		This command sets the <tt class="constant">Content-type</tt>
+		header returned by the script, which is useful if you wish
+		to send content other than HTML with Rivet - PNG or jpeg
+		images, for example.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-family:monospace; font-weight: bold;">numeric</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>response code</tt></i></span></div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Set a numeric response code, such as 200, 404 or 500.
+	      </div></div></dd></dl></div></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418704"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">makeurl &#8212; construct url's based on hostname, port.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Create a self referencing URL from a filename.  For example:
+	  </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">makeurl /tclp.gif</pre><p style="width:90%">
+	  returns
+	  <tt class="computeroutput">http://[hostname]:[port]/tclp.gif</tt>.
+	  where hostname and port are the hostname and port of the
+	  server in question.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418770"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">cookie &#8212; get and set cookies.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">cookie</span>  <span style="font-family:monospace; font-weight: bold;">set</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>cookieName</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">cookiValue</span>?</tt></i></span> <span style="font-family:monospace; font-weight: bold;">-days <i class="replaceable"><tt>expireInDays</tt></i></span> <span style="font-family:monospace; font-weight: bold;">-hours <i class="replaceable"><tt>expireInHours</tt></i></span> <span style="font-family:monospace; font-weight: bold;">-minutes <i class="replaceable"><tt>expireInMinutes</tt></i></span> <span style="font-family:monospace; font-weight: bold;">-expires <i class="replaceable"><tt>Wdy, DD-Mon-YYYY HH:MM:SS GMT</tt></i></span> <span style="font-family:monospace; font-weight: bold;">-path <i class="replaceable"><tt>uriPathCookieAppliesTo</tt></i></span> <span style="font-family:monospace; font-weight: bold;">-secure <i class="replaceable"><tt>1/0</tt></i></span></div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">cookie</span>  <span style="font-family:monospace; font-weight: bold;">get</span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>cookieName</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  <span style="font-family:monospace"><span><b class="command">cookie</b></span></span> gets or sets a cookie.  When you
+	  get a cookie, the command returns the value of the cookie,
+	  or an empty string if no cookie exists.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418910"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">clock_to_rfc850_gmt &#8212; create a rfc850 time from [clock seconds].</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">clock_to_rfc850_gmt</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>seconds</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Convert an integer-seconds-since-1970 click value to
+	  RFC850 format, with the additional requirement that it be
+	  GMT only.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5418966"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">html &#8212; construct html tagged text.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">html</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>string</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arg</tt></i></span>...</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Print text with the added ability to pass HTML tags
+	  following the string.  Example:
+	  </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">html "Test" b i</pre><p style="width:90%">
+	  produces: <tt class="computeroutput">&lt;b&gt;&lt;i&gt;Test&lt;/i&gt;&lt;/b&gt;</tt>
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5419040"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">incr0 &#8212; increment a variable or set it to 1 if nonexistant.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">incr0</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>num</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  Increment a variable
+	  <i class="replaceable"><tt>varname</tt></i> by
+	  <i class="replaceable"><tt>num</tt></i>.  If the
+	  variable doesn't exist, create it instead of returning an
+	  error.
+	</p></div></div><div class="refentry" lang="en"><div class="refentry.separator"><hr></div><a name="id5419113"></a><div class="titlepage"><div></div><div></div></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">parray &#8212; Tcl's <span style="font-family:monospace"><span><b class="command">parray</b></span></span> with html formatting.</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parray</span>  <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>arrayName</tt></i></span> <span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">pattern</span>?</tt></i></span></div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+	  An html version of the standard Tcl
+	  <span style="font-family:monospace"><span><b class="command">parray</b></span></span> command.  Displays the entire
+	  contents of an array in a sorted, nicely-formatted way.
+	  Mostly used for debugging purposes.
+	</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="directives.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.en.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="examples.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Rivet Apache Directives </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Examples and Usage</td></tr></table></div></body></html>

@@ -226,9 +226,9 @@ AddNode distclean {
 
 AddNode distdoc {
     depends $XML $XSL
-    sh xsltproc --stringparam html.stylesheet rivet.css --stringparam html.ext ".html.en" --nonet -o $HTML $XSLCHUNK $XML
+    sh xsltproc --stringparam html.stylesheet rivet.css --stringparam html.ext ".en.html" --nonet -o $HTML $XSLCHUNK $XML
     foreach tr $TRANSLATIONS {
-	sh xsltproc --stringparam html.stylesheet rivet.css  --stringparam html.ext ".html.${tr}" --nonet -o $HTML $XSLCHUNK [string map [list .xml ".${tr}.xml"] $XML]
+	sh xsltproc --stringparam html.stylesheet rivet.css  --stringparam html.ext ".${tr}.html" --nonet -o $HTML $XSLCHUNK [string map [list .xml ".${tr}.xml"] $XML]
     }
 }
 

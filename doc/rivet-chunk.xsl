@@ -49,7 +49,8 @@
     </div>
   </xsl:template>
 
-  <xsl:include href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/manifest.xsl"/>
+<!--  <xsl:include -->
+<!--  href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/manifest.xsl"/> -->
 
   <xsl:include href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/chunk.xsl"/>
 

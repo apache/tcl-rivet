@@ -1,3 +1,15 @@
+2003-11-20  David N. Welton  <davidw@dedasys.com>
+
+	* src/make.tcl: Changed xsltproc lines to deal with new link
+	styles.
+
+	* doc/rivet.xml: Changed links as in Russian translation.
+
+	* doc/rivet.it.xml: Changed links as in Russian translation.
+
+	* doc/rivet.ru.xml: Changed links to use "en.html" style instead
+	of "html.en".  This will make google pick up the pages.
+
 2003-10-22  David N. Welton  <davidw@dedasys.com>
 
 	* win/: Numerous updates from Pat Thoyts
