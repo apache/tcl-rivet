@@ -250,10 +250,10 @@ catch { ::itcl::delete class DIODisplay }
     # response(by) will contain whatever was in the "where" field
     # response(query) will contain whatever was in the "is" field
     #
-    method showform_prolog {} {
+    method showform_prolog {{args ""}} {
 	get_field_values array
 
-	$form start
+	eval $form start $args
 	foreach fld [array names hidden] {
 	    $form hidden $fld -value $hidden($fld)
         }
