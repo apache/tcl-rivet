@@ -1,10 +1,8 @@
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
 
-        * The configure scirpt is building the .so files properly, it
-	  appears.  However the install isn't quite right yet.  For
-	  example, the mod_rivet.so file needs to go into APXS_LIBEXECDIR,
-	  and the other .so files need to go where mod_*.so is currently
-	  going.
+        * The configure scirpt is building the .so files but they are
+	  causing a segmentation violation upon an apachectl configtest, it
+	  appears.  Orhters parts of the install aren't quite right yet.  
 
         * Move aclocal.m4 to acinclude.m4 -- we need the aclocal command
 	  to generate acinclude.m4 based on aclocal.m4 and stuff it gleans
