@@ -8,6 +8,7 @@
 # system.
 
 set scripts {
+    graph.tcl
     aardvark.tcl
     parsetclConfig.tcl
     findapxs.tcl

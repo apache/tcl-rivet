@@ -1530,3 +1530,5 @@ proc ::struct::graph::Union {args} {
 	}
     }
 }
+
+package provide struct 1.0

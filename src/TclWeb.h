@@ -224,6 +224,8 @@ char *TclWeb_StringToUtf(char *in, TclWebRequest *req);
 
 Tcl_Obj * TclWeb_StringToUtfToObj(char *in, TclWebRequest *req);
 
+char *TclWeb_GetEnvVar( TclWebRequest *req, char * );
+
 /* output/write/flush?  */
 
 /* error (log) ? */

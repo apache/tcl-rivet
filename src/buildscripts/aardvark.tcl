@@ -19,7 +19,7 @@ namespace eval aardvark {
     variable dependencies
     set vbose 0
     # create a graph to use.
-    set grph [ ::struct::graph ]
+    set grph [ ::struct::graph::graph ]
 }
 proc aardvark::Verbose { } {
     variable vbose

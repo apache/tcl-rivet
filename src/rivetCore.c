@@ -574,6 +574,28 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
     return TCL_RETURN;
 }
 
+/* Get a single environment variable.  This saves us from having to load
+ * the entire environment when all we need is one variable.
+ */
+TCL_CMD_HEADER( Rivet_EnvCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    char *key;
+    char *val;
+
+    if( objc != 2 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "variable" );
+	return TCL_ERROR;
+    }
+
+    key = Tcl_GetStringFromObj( objv[1], NULL );
+
+    val = TclWeb_GetEnvVar( globals->req, key );
+
+    Tcl_SetObjResult(interp, Tcl_NewStringObj( val, -1 ) );
+    return TCL_OK;
+}
+
 int
 Rivet_InitCore( Tcl_Interp *interp )
 {
@@ -620,6 +642,11 @@ Rivet_InitCore( Tcl_Interp *interp )
     Tcl_CreateObjCommand(interp,
 			"no_body",
 			Rivet_NoBody,
+			NULL,
+			(Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			"env",
+			Rivet_EnvCmd,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
 

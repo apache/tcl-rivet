@@ -1,3 +1,24 @@
+2002-03-11  Damon J. Courtney <damon@unreality.com>
+
+	* src/TclWeb.h
+	    Added declaration for TclWeb_GetEnvVar.
+
+	* src/TclWebapache.c
+	    Added command TclWeb_GetEnvVar.  Gets a single environment
+	    variable.
+
+	* src/mod_rivet.c
+	    Added some extra stuff to the default error functions.
+	    If the error_script fails, we output the failure.
+
+	* src/rivetCore.c
+	    Added Tcl 'env' command to get a single environment variable.
+
+	* src/make.tcl
+	* src/buildscripts/aardvark.tcl
+	* src/buildscripts/graph.tcl
+	    Cleaning up a bug with the struct package.
+
 2002-03-10  Damon J. Courtney <damon@unreality.com>
 
 	* src/mod_rivet.c

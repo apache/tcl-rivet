@@ -136,21 +136,29 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	Tcl_Obj *errscript =
 	    conf->rivet_error_script ? conf->rivet_error_script : NULL;
 
+	Tcl_ObjSetVar2(interp,
+		       Tcl_NewStringObj( "errorOutbuf", -1),
+		       NULL, outbuf, TCL_GLOBAL_ONLY);
+
         TclWeb_PrintHeaders(globals->req);
 	Tcl_Flush(*(conf->outchannel));
         if (errscript)
         {
 	    if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
+		errorinfo = Tcl_GetVar(interp, "errorInfo", 0);
                 TclWeb_PrintError("<b>Tcl_ErrorScript failed!</b>", 1,
 					globals->req);
+                TclWeb_PrintError( errorinfo, 0, globals->req );
 	    }
         } else {
             /* default action  */
             errorinfo = Tcl_GetVar(interp, "errorInfo", 0);
 	    TclWeb_PrintError(errorinfo, 0, globals->req);
             TclWeb_PrintError("<p><b>OUTPUT BUFFER:</b></p>", 1, globals->req);
+            TclWeb_PrintError("<PRE>", 1, globals->req);
             TclWeb_PrintError(Tcl_GetStringFromObj(outbuf, (int *)NULL), 1,
 				globals->req);
+            TclWeb_PrintError("</PRE>", 1, globals->req);
         }
     } else {
         /* Make sure to flush the output if buffer_add was the only output */
@@ -766,7 +774,7 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 /*
  * Merge the per-directory configuration options into a new configuration.
  */
-static void *
+static void
 Rivet_MergeDirConfigVars( pool *p, rivet_server_conf *new,
 			  rivet_server_conf *base, rivet_server_conf *add )
 {
