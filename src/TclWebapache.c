@@ -187,7 +187,9 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, TclWebRequest *req)
     for (i = 0; i < parmsarray->nelts; ++i)
     {
 
-	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req), strlen(varname)))
+	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req), strlen(varname)
+		     strlen(varname) < strlen(parms[i].key) ?
+		     strlen(parms[i].key) : strlen(varname)))
 	{
 	    Tcl_ListObjAppendElement(req->interp, result,
 				     TclWeb_StringToUtfToObj(parms[i].val, req));
@@ -254,7 +256,9 @@ TclWeb_VarExists(Tcl_Obj *result, char *varname, TclWebRequest *req)
     /* This isn't real efficient - move to hash table later on. */
     for (i = 0; i < parmsarray->nelts; ++i)
     {
-	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req), strlen(varname)))
+	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
+		     strlen(varname) < strlen(parms[i].key) ?
+		     strlen(parms[i].key) : strlen(varname)))
 	{
 	    Tcl_SetIntObj(result, 1);
 	    return TCL_OK;

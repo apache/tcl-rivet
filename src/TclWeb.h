@@ -107,8 +107,6 @@ int TclWeb_GetVarNames(Tcl_Obj *result, TclWebRequest *req);
 
 int TclWeb_GetAllVars(Tcl_Obj *result, TclWebRequest *req);
 
-int TclWeb_GetCookieVars(Tcl_Obj *cookievar, TclWebRequest *req);
-
 int TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req);
 
 /*

@@ -49,8 +49,8 @@ proc apachetest::start { options code } {
     variable binname
 
     # There has got to be a better way to do this, aside from waiting.
-    set serverpid [eval exec $binname -X -f \
-		       "[file join [pwd] server.conf]" $options &]
+    set serverpid [eval exec  $binname -X -f \
+		       [file join [pwd] server.conf] $options &]
 
     apachetest::connect
     puts "Apache started as PID $serverpid"

@@ -361,8 +361,9 @@ Rivet_SendContent(request_rec *r)
 	return HTTP_NOT_FOUND;
     }
 
-    if ((errstatus = ap_meets_conditions(r)) != OK)
+    if ((errstatus = ap_meets_conditions(r)) != OK) {
 	return errstatus;
+    }
 
     ap_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
     ap_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
