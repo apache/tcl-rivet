@@ -21,7 +21,7 @@ makeconf $binname server.conf
 set commandline [lindex $argv 1]
 set argv {}
 
-switch -exact [lindex $commandline 1] {
+switch -exact $commandline {
     startserver {
 	if { [catch {
 	    exec $binname -X -f "[file join [pwd] server.conf]"
