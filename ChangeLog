@@ -1,3 +1,8 @@
+2003-05-11  David N. Welton  <davidw@dedasys.com>
+
+	* src/apache_request.c: Updated to the latest from the httpd-apreq
+	package.
+
 2003-04-07  David N. Welton  <davidw@dedasys.com>
 
 	* src/make.tcl: Make sure that auto_path gets extra stuff at the
