@@ -242,7 +242,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	if (*(rsc->cache_size)) {
 	    /* We need to incr the reference count of outbuf because we want
 	     * it to outlive this function.  This allows it to stay alive
-	     * as long as it's in the object cache. 
+	     * as long as it's in the object cache.
 	     */
 	    Tcl_IncrRefCount( outbuf );
 	    Tcl_SetHashValue(entry, (ClientData)outbuf);
@@ -296,6 +296,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     int i, nelts;
     Tcl_Obj *arrayName;
 
+
     /* Make sure RivetDirConf doesn't exist from a previous request. */
     Tcl_UnsetVar( interp, "RivetDirConf", TCL_GLOBAL_ONLY );
 
@@ -314,6 +315,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
 		       Tcl_NewStringObj( elts[i].val, -1),
 		       TCL_GLOBAL_ONLY);
     }
+    Tcl_DecrRefCount(arrayName);
 
     /* Make sure RivetUserConf doesn't exist from a previous request. */
     Tcl_UnsetVar( interp, "RivetUserConf", TCL_GLOBAL_ONLY );
@@ -333,7 +335,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
 		       Tcl_NewStringObj( elts[i].val, -1),
 		       TCL_GLOBAL_ONLY);
     }
-
+    Tcl_DecrRefCount(arrayName);
 }
 
 /* Set things up to execute a file, then execute */
@@ -390,7 +392,6 @@ Rivet_SendContent(request_rec *r)
 			"Could not create request namespace\n");
 	return HTTP_BAD_REQUEST;
     }
-
     /* Apache Request stuff */
 
     TclWeb_InitRequest(globals->req, interp, r);
@@ -405,8 +406,9 @@ Rivet_SendContent(request_rec *r)
     }
 #endif
 
-    if ((errstatus = ApacheRequest___parse(globals->req->apachereq)) != OK)
+    if ((errstatus = ApacheRequest___parse(globals->req->apachereq)) != OK) {
 	return errstatus;
+    }
 
     if (r->header_only)
     {
@@ -421,7 +423,7 @@ Rivet_SendContent(request_rec *r)
 		     Tcl_GetVar(interp, "errorInfo", 0));
     }
 
-    request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n",-1);
+    request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
     if(Tcl_EvalObj(interp, request_cleanup) == TCL_ERROR) {
 	ap_log_error(APLOG_MARK, APLOG_ERR, r->server, "%s",
 		     Tcl_GetVar(interp, "errorInfo", 0));
@@ -568,10 +570,11 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
      */
     if(*(rsc->cache_size) < 0)
     {
-	if (ap_max_requests_per_child != 0)
+	if (ap_max_requests_per_child != 0) {
 	    *(rsc->cache_size) = ap_max_requests_per_child / 2;
-	else
+	} else {
 	    *(rsc->cache_size) = 10; /* FIXME: Arbitrary number */
+	}
 	*(rsc->cache_free) = *(rsc->cache_size);
     } else if (*(rsc->cache_size) > 0) {
 	*(rsc->cache_free) = *(rsc->cache_size);
@@ -843,6 +846,7 @@ Rivet_GetConf( request_rec *r )
     Rivet_MergeDirConfigVars( r->pool, newconfig, rsc, rdc );
 
     return newconfig;
+    return rsc;
 }
 
 static void

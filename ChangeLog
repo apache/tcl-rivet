@@ -1,5 +1,8 @@
 2002-03-13  David N. Welton  <davidw@dedasys.com>
 
+	* src/mod_rivet.c (Rivet_PropagatePerDirConfArrays): Clean up
+	arrayName object after we're done with it.
+
 	* src/TclWebapache.c (TclWeb_GetVar): Make sure to compare all of
 	the variable key.
 
