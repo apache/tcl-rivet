@@ -584,13 +584,14 @@
 		<arg choice="opt"><replaceable>value</replaceable></arg>
 	      </cmdsynopsis>
 	      <para>
-		Return the current fields value.  If <option>value</option> is specified, it sets
-		a new value for fields.
+		Return the current fields value.  If
+		<option>value</option> is specified, it sets a new
+		value for fields.
 	      </para>
 	      <para>
-		<option>fields</option> contains the list of fields used in this
-		query.  The fields are in order of the fields
-		retrieved for each row.
+		<option>fields</option> contains the list of fields
+		used in this query.  The fields are in order of the
+		fields retrieved for each row.
 	      </para>
 	    </listitem>
 	  </varlistentry>

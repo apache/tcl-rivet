@@ -1,3 +1,7 @@
+2002-07-14  David N. Welton  <davidw@dedasys.com>
+
+	* doc/directives.xml: New file - XML version of directives.html.
+
 2002-07-12  David N. Welton  <davidw@dedasys.com>
 
 	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand):

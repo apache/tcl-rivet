@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd">
+
+<article>
+  <articleinfo>
+    <title>Rivet Apache Directives</title>
+    <releaseinfo>
+      $Id$
+    </releaseinfo>
+    <copyright>
+      <year>2002</year>
+      <holder>Apache Software Foundation</holder>
+    </copyright>
+  </articleinfo>
+
+  <section>
+    <title>Directives</title>
+    <section>
+      <title>Rivet_Script</title>
+      <cmdsynopsis>
+	<command>Rivet_Script</command>
+	<arg>GlobalInitScript</arg>
+	<arg>script</arg>
+      </cmdsynopsis>
+      <para>
+	Tcl script that is run when each interpreter is initialized.
+	<arg>script</arg> is an actual Tcl script, so to run a file, you
+	would do:
+	<programlisting>
+	  Rivet_Script GlobalInitScript "source /var/www/foobar.tcl"
+	</programlisting>
+      </para>
+
+      <cmdsynopsis>
+	<command>Rivet_Script</command>
+	<arg>ChildInitScript</arg>
+	<arg>script</arg>
+      </cmdsynopsis>
+      <para>
+	Script to be evaluated when each Apache child process is
+	initialized.  This is the recommended place to load modules.
+      </para>
+
+      <cmdsynopsis>
+	<command>Rivet_Script</command>
+	<arg>ChildExitScript</arg>
+	<arg>script</arg>
+      </cmdsynopsis>
+      <para>
+	Script to be evaluated when each Apache child process exits.
+      </para>
+
+      <cmdsynopsis>
+	<command>Rivet_Script</command>
+	<arg>BeforeScript</arg>
+	<arg>script</arg>
+      </cmdsynopsis>
+      <para>
+	Script to be evaluated before each server parsed (.rvt) page.
+      </para>
+
+
+      <cmdsynopsis>
+	<command>Rivet_Script</command>
+	<arg>AfterScript</arg>
+	<arg>script</arg>
+      </cmdsynopsis>
+      <para>
+	Script to be called after each server parsed (.rvt) page.
+      </para>
+
+      <cmdsynopsis>
+	<command>Rivet_Script</command>
+	<arg>ErrorScript</arg>
+	<arg>script</arg>
+      </cmdsynopsis>
+      <para>
+	This code is called in place of the standard 'error' pages
+	generated for Rivet.  This directive may be useful if you
+	have sensitive logic that you wish to protect.
+      </para>
+
+    </section>
+  </section>
+</article>
