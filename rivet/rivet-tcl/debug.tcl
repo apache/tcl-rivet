@@ -24,8 +24,8 @@ proc debug {args} {
 
     ## We want to save the REMOTE_ADDR for any subsequent calls to debug.
     if {![info exists ::RivetUserConf(REMOTE_ADDR)]} {
-	load_env
-	set ::RivetUserConf(REMOTE_ADDR) $env(REMOTE_ADDR)
+	set REMOTE_ADDR [env REMOTE_ADDR]
+	set ::RivetUserConf(REMOTE_ADDR) $REMOTE_ADDR
     }
 
 
@@ -44,29 +44,7 @@ proc debug {args} {
 	set data(separator) $::RivetUserConf(DebugSeparator)
     }
 
-    set looking 0
-    set endit 0
-    foreach arg $args {
-	if $endit {
-	    lappend list $arg
-	    continue
-	}
-	if $looking {
-	    set data($varName) $arg
-	    set looking 0
-	    continue
-	}
-	if {[string index $arg 0] == "-"} {
-	    if {$arg == "--"} {
-		set endit 1
-		continue
-	    }
-	    set varName [string range $arg 1 end]
-	    set looking 1
-	    continue
-	}
-	lappend list $arg
-    }
+    import_keyvalue_pairs data $args
 
     if {[info exists data(ip)]} {
 	set can_see 0
@@ -80,12 +58,12 @@ proc debug {args} {
     }
 
     if {[string tolower $data(subst)] != "on"} {
-	html [join $list]
+	html [join $data(args)]
 	return
     }
 
     set lastWasArray 0
-    foreach varName $list {
+    foreach varName $data(args) {
 	upvar $varName var
 	if {[array exists var]} {
 	    parray $varName

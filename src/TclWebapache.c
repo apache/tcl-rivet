@@ -32,6 +32,7 @@ TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
     req->apachereq = ApacheRequest_new(r);
     req->headers_printed = 0;
     req->headers_set = 0;
+    req->environment_set = 0;
     return TCL_OK;
 }
 
@@ -285,6 +286,25 @@ TclWeb_GetCookieVars(Tcl_Obj *cookievar, TclWebRequest *req)
     return TCL_OK;
 }
 
+/*
+ * Load the Apache environment and CGI variables into the request.  If we
+ * have already done so, we don't need to do it again.
+ */
+static void
+TclWeb_InitEnvVars( TclWebRequest *req )
+{
+    if( req->environment_set ) return;
+
+    /* Ensure that the system area which holds the cgi variables is empty. */
+    ap_clear_table(req->req->subprocess_env);
+
+    /* Retrieve cgi variables. */
+    ap_add_cgi_vars(req->req);
+    ap_add_common_vars(req->req);
+
+    req->environment_set = 1;
+}
+
 int
 TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 {
@@ -303,12 +323,8 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     rivet_server_conf *rsc = NULL;
 
     date = req->req->request_time;
-    /* ensure that the system area which holds the cgi variables is empty */
-    ap_clear_table(req->req->subprocess_env);
 
-    /* retrieve cgi variables */
-    ap_add_cgi_vars(req->req);
-    ap_add_common_vars(req->req);
+    TclWeb_InitEnvVars( req );
 
     hdrs_arr = ap_table_elts(req->req->headers_in);
     hdrs = (table_entry *) hdrs_arr->elts;
@@ -581,13 +597,7 @@ TclWeb_GetEnvVar( TclWebRequest *req, char *key )
     (const char *)val = ap_table_get( req->req->headers_in, key );
 
     if( !val ) {
-	/* Ensure that the system area which holds the cgi variables is empty */
-	ap_clear_table( req->req->subprocess_env );
-
-	/* Retrieve cgi variables */
-	ap_add_cgi_vars( req->req );
-	ap_add_common_vars( req->req );
-
+	TclWeb_InitEnvVars( req );
 	(const char *)val = ap_table_get( req->req->subprocess_env, key );
     }
 

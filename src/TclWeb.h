@@ -19,9 +19,10 @@ typedef struct TclWebRequest {
     request_rec *req;
     ApacheRequest *apachereq;
     ApacheUpload *upload;
-    int headers_printed; 	/* has the header been printed yet? */
-    int headers_set;       /* has the header been set yet? */
+    int headers_printed;	/* has the header been printed yet? */
+    int headers_set;		/* has the header been set yet? */
     int content_sent;
+    int environment_set;	/* have we setup the environment variables? */
 } TclWebRequest;
 
 /*

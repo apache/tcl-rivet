@@ -1,10 +1,9 @@
 proc load_cookies {{arrayName cookies}} {
     upvar 1 $arrayName cookies
 
-    load_env
-    if {![info exists env(HTTP_COOKIE)]} { return }
+    set HTTP_COOKIES [env HTTP_COOKIES]
 
-    foreach pair [split $env(HTTP_COOKIE) ";"] {
+    foreach pair [split $HTTP_COOKIE ";"] {
 	set pair [split [string trim $pair] "="]
 	set key [lindex $pair 0]
 	set value [lindex $pair 1]

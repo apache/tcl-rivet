@@ -1,3 +1,25 @@
+2002-03-14  Damon J. Courtney <damon@unreality.com>
+
+	* src/TclWebapache.c
+	    Added a routine to setup the environment variables and mark
+	    that they have been set.  This will save us from having to
+	    reload them all the time.  Once they're loaded, they don't
+	    load again.
+
+	* rivet/rivet-tcl/cookie.tcl
+	    Added a new 'cookie' command for setting and getting cookies.
+
+	* rivet/rivet-tcl/import_keyvalue_pairs.tcl
+	    Added a command to import keyvalue pairs from arguments.
+
+	* rivet/rivet-tcl/load_cookies.tcl
+	    Made load_cookies use the env command to get the one variable
+	    it needs instead of load_env, which gets a bunch it doesn't
+	    need.
+
+	* rivet/rivet-tcl/debug.tcl
+	    Made debug use the env and import_keyvalue_pairs commands.
+
 2002-03-13  Damon J. Courtney <damon@unreality.com>
 
 	* src/mod_rivet.c
