@@ -26,6 +26,7 @@ TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
     req->interp = interp;
     req->req = r;
     req->apachereq = ApacheRequest_new(r);
+    req->headers_printed = 0;
     return TCL_OK;
 }
 

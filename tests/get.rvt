@@ -1,13 +1,20 @@
 <?
 
-if { [ var number ] > 0 } {
-    # get/post variables 1.1
-    if { [ var exists foobar ] } {
+if { [var number] > 0 } {
+    if { [var exists foobar] } {
 	puts "\[var get foobar\] = [var get foobar]\n"
     }
-    # get/post variables 1.{2,3}
-    if { [ var exists Más ] } {
+    if { [var exists xst] } {
+	puts "\[var exists xst\]\[var exists noxst\] = [var exists xst] [var exists noxst]\n"
+    }
+    if { [var exists Más] } {
 	puts "\[var get Más\] = [var get Más]\n"
+    }
+    if { [var exists lstvar1] } {
+	puts "\[var get lstvar1\] = [var get lstvar1]\n"
+    }
+    if { [var exists lstvar2] } {
+	puts "\[var list lstvar2\] = [var list lstvar2]\n"
     }
 }
 

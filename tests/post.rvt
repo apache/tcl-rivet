@@ -9,6 +9,12 @@ if { [ var number ] > 0 } {
     if { [ var exists Más ] } {
 	puts "\[var get Más\] = [var get Más]\n"
     }
+    if { [var exists lstvar1] } {
+	puts "\[var get lstvar1\] = [var get lstvar1]\n"
+    }
+    if { [var exists lstvar2] } {
+	puts "\[var list lstvar2\] = [var list lstvar2]\n"
+    }
 }
 
 ?>

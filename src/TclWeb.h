@@ -13,6 +13,7 @@ typedef struct TclWebRequest {
     Tcl_Interp *interp;
     request_rec *req;
     ApacheRequest *apachereq;
+    int headers_printed;
 } TclWebRequest;
 
 /*

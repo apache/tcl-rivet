@@ -6,16 +6,32 @@
     set match
 } {[var get foobar] = goober}
 
-::tcltest::test getvariables-1.2 {GET variables + I18N} {
+::tcltest::test getvariables-1.2 {GET variables - exists} {
+    set page [ ::http::geturl "${urlbase}get.rvt?xst=1" ]
+    regexp -line {\[var exists xst\]\[var exists noxst\] = 1 0$} [ ::http::data $page ] match
+    set match
+} {[var exists xst][var exists noxst] = 1 0}
+
+::tcltest::test getvariables-2.1 {GET variables + I18N} {
     set page [ ::http::geturl "${urlbase}get.rvt?Más=Tú" ]
     regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
     set match
 } {[var get Más] = Tú}
 
-::tcltest::test getvariables-1.3 {GET variables + I18N + encoding} {
+::tcltest::test getvariables-2.2 {GET variables + I18N + encoding} {
     set page [ ::http::geturl [ format "${urlbase}get.rvt?%s" [ ::http::formatQuery Más Tú ] ] ]
     regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
     set match
 } {[var get Más] = Tú}
 
+::tcltest::test getvariables-3.1 {GET multi-value variable} {
+    set page [ ::http::geturl "${urlbase}get.rvt?lstvar1=a&lstvar1=b&lstvar1=c+d" ]
+    regexp -line {\[var get lstvar1\] = a b c d$} [ ::http::data $page ] match
+    set match
+} {[var get lstvar1] = a b c d}
 
+::tcltest::test getvariables-3.2 {GET multi-value variable as list} {
+    set page [ ::http::geturl "${urlbase}get.rvt?lstvar2=a&lstvar2=b&lstvar2=c+d" ]
+    regexp -line {\[var list lstvar2\] = a b {c d}$} [ ::http::data $page ] match
+    set match
+} {[var list lstvar2] = a b {c d}}

@@ -1,5 +1,9 @@
 2002-01-22  David N. Welton  <davidw@dedasys.com>
 
+	* tests/get.test: Added some tests related to [var *].
+
+	* tests/post.test: Added some tests related to [var *].
+
 	* src/rivetList.c (Rivet_LassignArrayObjCmd): Use -1 instead of
 	NULL when doing NewStringObj.
 
