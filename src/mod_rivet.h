@@ -61,15 +61,6 @@ typedef struct {
     char *rivet_after_script;         /*            after            */
     char *rivet_error_script;         /*            for errors */
 
-
-    /* These three are like the ones above, except that they are
-       filled in via UserConf directives, which reside in .htaccess
-       files.  This means they could change from one request to the
-       next, so we can't associate them with the stable ones above. */
-    char *user_before_script;
-    char *user_after_script;
-    char *user_error_script;
-
     /* This flag is used with the above directives.  If any of them
        have changed, it gets set. */
     int user_scripts_updated;

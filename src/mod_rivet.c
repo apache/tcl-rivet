@@ -137,9 +137,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 			TCL_GLOBAL_ONLY );
 
 	/* If we don't have an error script, use the default error handler. */
-	if( conf->user_error_script ) {
-	    errscript = Tcl_NewStringObj(conf->user_error_script, -1);
-	} else if (conf->rivet_error_script ) {
+	if (conf->rivet_error_script ) {
 	    errscript = Tcl_NewStringObj(conf->rivet_error_script, -1);
 	} else {
 	    errscript = conf->rivet_default_error_script;
@@ -210,9 +208,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     {
 	outbuf = Tcl_NewObj();
 	if (toplevel) {
-	    if (rsc->user_before_script) {
-		Tcl_AppendObjToObj(outbuf, Tcl_NewStringObj(rsc->user_before_script, -1));
-	    } else if (rsc->rivet_before_script) {
+	    if (rsc->rivet_before_script) {
 		Tcl_AppendObjToObj(outbuf, Tcl_NewStringObj(rsc->rivet_before_script, -1));
 	    }
 	}
@@ -231,9 +227,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	    return result;
 	}
 	if (toplevel) {
-	    if (rsc->user_after_script) {
-		Tcl_AppendObjToObj(outbuf, Tcl_NewStringObj(rsc->user_after_script, -1));
-	    } else if (rsc->rivet_after_script) {
+	    if (rsc->rivet_after_script) {
 		Tcl_AppendObjToObj(outbuf, Tcl_NewStringObj(rsc->rivet_after_script, -1));
 	    }
 	}
@@ -892,11 +886,11 @@ Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
     rdc->user_scripts_updated = 1;
 
     if( STREQU( var, "BeforeScript" ) ) {
-	rdc->user_before_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
+	rdc->rivet_before_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
     } else if( STREQU( var, "AfterScript" ) ) {
-	rdc->user_after_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
+	rdc->rivet_after_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
     } else if( STREQU( var, "ErrorScript" ) ) {
-	rdc->user_error_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
+	rdc->rivet_error_script = ap_pstrcat(cmd->pool, val, "\n", NULL);
     }
     /* XXX Need to figure out what to do about setting the table.  */
     ap_table_set( rdc->rivet_user_vars, var, string );
@@ -918,13 +912,6 @@ Rivet_MergeDirConfigVars( pool *p, rivet_server_conf *new,
 	add->rivet_after_script : base->rivet_after_script;
     new->rivet_error_script = add->rivet_error_script ?
 	add->rivet_error_script : base->rivet_error_script;
-
-    new->user_before_script = add->user_before_script ?
-	add->user_before_script : base->user_before_script;
-    new->user_after_script = add->user_after_script ?
-	add->user_after_script : base->user_after_script;
-    new->user_error_script = add->user_error_script ?
-	add->user_error_script : base->user_error_script;
 
     new->user_scripts_updated = add->user_scripts_updated ?
 	add->user_scripts_updated : base->user_scripts_updated;
@@ -988,10 +975,6 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_after_script = oldrsc->rivet_after_script;
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
 
-    newrsc->user_before_script = oldrsc->user_before_script;
-    newrsc->user_after_script = oldrsc->user_after_script;
-    newrsc->user_error_script = oldrsc->user_error_script;
-
     newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
 
     newrsc->rivet_default_error_script = oldrsc->rivet_default_error_script;
@@ -1026,9 +1009,6 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->rivet_before_script = NULL;
     rsc->rivet_after_script = NULL;
     rsc->rivet_error_script = NULL;
-    rsc->user_before_script = NULL;
-    rsc->user_after_script = NULL;
-    rsc->user_error_script = NULL;
 
     rsc->user_scripts_updated = 0;
 
