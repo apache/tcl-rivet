@@ -37,6 +37,7 @@
     </author>
     <othercredit>
       <firstname>Dmitry</firstname>
+      <othername>the</othername>
       <surname>Zuryanovich</surname>
       <contrib>Russian Translation</contrib>
       <affiliation>
@@ -183,8 +184,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
           добавим сам модуль:
         </para>
 
-        <programlisting>LoadModule rivet_module <replaceable>/usr/lib/apache/1.3/mod_rivet.so</replacea
-ble></programlisting>
+        <programlisting>LoadModule rivet_module <replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable></programlisting>
 
         <para>
           После этого Apache должен знать что ему надо загрузить 
@@ -281,8 +281,7 @@ ble></programlisting>
                   Tcl скрипт который должен быть запущен для каждого
                   интерпретатора.<replaceable><option>script</option></replaceable>
                   - обычный Tcl скрипт, поэтому чтобы запустить файл - 
-                  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</progra
-mlisting>
+                  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
                 </para>
               </listitem>
             </varlistentry>
@@ -392,8 +391,7 @@ mlisting>
                 </cmdsynopsis>
               </term>
               <listitem>
-                <para>Директория в которую надо складывать загруженые (uploaded) пользователем файлы.</
-para>
+                <para>Директория в которую надо складывать загруженые (uploaded) пользователем файлы.</para>
               </listitem>
             </varlistentry>
 
