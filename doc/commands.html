@@ -10,19 +10,6 @@
     <h2 align="center">Rivet specific Tcl commands and variables</h2>
 
     <ul>
-      <li>
-	<code><b>buffer_add <i>string</i></b></code><br>	      
-	Add text to output_buffer for later printing. Used
-	internally.
-      </li>
-
-      <li>
-	<code><b>hputs <i>?-error? text</i></b></code><br>
-	The Rivet version of "puts".  Outputs to the
-	client, instead of to stdout.
-	The error option permits you to send an 'error message' to the
-	apache log file, at the NOTICE level.
-      </li>
       <li><code><b>var</b></code><br> These commands retrieve or
 	retrieve information about "CGI" variables that are passed to
 	the rivet script via GET or POST operations.  
@@ -106,11 +93,6 @@
 	<code><b>parse <i>filename</i></b></code><br>	      
 	"Source" a .ttml file.  This is the way to include
 	other .ttml files.
-      </li>
-      <li>
-	<code><b>hflush</b></code><br>	      
-	Flush the output buffers to the client.  Use this if
-	you want to incrementally update a page.
       </li>
       <li>
 	<code><b>headers redirect <i>uri</i></b></code><br>	      

@@ -23,13 +23,9 @@ These are some examples, rather limited ones, of what can be done with Rivet.
 <tr><td bgcolor=gray><pre>
 
 &lt;?
-headers setcookie "foo" "bar" # we have to put this before any 'hputs' statements
+headers setcookie "foo" "bar" # we have to put this before any 'puts' statements
 
-# once buffering is switched off, it is no longer possible to
-# maninuplate headers
-buffered off
-
-hputs "Hello world"
+puts "Hello world"
 ?&gt;
 
 </pre>
@@ -42,11 +38,7 @@ Produces:
 <?
 headers setcookie "foo" "bar"
 
-# once buffering is switched off, it is no longer possible to
-# maninuplate headers
-buffered off
-
-hputs "hello world" 
+puts "hello world" 
 ?>
 
 <p>
@@ -87,7 +79,7 @@ Produces:
 &lt;? 
 set x 0 
 while { $x &lt; 5 } { 
- hputs "\$x = $x&lt;br>"
+ puts "\$x = $x&lt;br>"
  incr x
 ?&gt;
 
@@ -102,7 +94,7 @@ LOOP&lt;br>
 <?
 set x 0
 while { $x < 5 } { 
- hputs "\$x = $x<br>"
+ puts "\$x = $x<br>"
  incr x
 ?>
 LOOP<BR>
@@ -116,29 +108,29 @@ LOOP<BR>
 &lt;? 
  hgetvars
 if { [ array exists VARS ] } {
-    hputs "&lt; ul>"
+    puts "&lt; ul>"
     foreach { vr } [ array names VARS ]  {
-        hputs "&lt;li>(VARS) $vr = $VARS($vr)"
+        puts "&lt;li>(VARS) $vr = $VARS($vr)"
     }
-    hputs "&lt;/ul>"
+    puts "&lt;/ul>"
 }
 
 if { [ array exists ENVS ] } {
     
-    hputs "&lt;ul>"
+    puts "&lt;ul>"
     foreach { vr } [ array names ENVS ]  {
-        hputs "&lt;li>(ENVS) $vr = $ENVS($vr)"
+        puts "&lt;li>(ENVS) $vr = $ENVS($vr)"
     }
-    hputs "&lt;/ul>"
+    puts "&lt;/ul>"
 }
 
 if { [ array exists COOKIES ] } {
     
-    hputs "&lt;ul>"
+    puts "&lt;ul>"
     foreach { vr } [ array names COOKIES ]  {
-        hputs "&lt;li>(COOKIES) $vr = $COOKIES($vr)"
+        puts "&lt;li>(COOKIES) $vr = $COOKIES($vr)"
     }
-    hputs "&lt;/ul>"
+    puts "&lt;/ul>"
 }
 
 ?&gt;
@@ -150,28 +142,28 @@ if { [ array exists COOKIES ] } {
 <?
 hgetvars
 if { [ array exists VARS ] } {
-    hputs "<ul>"
+    puts "<ul>"
     foreach { vr } [ array names VARS ]  {
-        hputs "<li>(VARS) $vr = $VARS($vr)"
+        puts "<li>(VARS) $vr = $VARS($vr)"
     }
-    hputs "</ul>"
+    puts "</ul>"
 }
 
 if { [ array exists ENVS ] } {
-    hputs "<ul>"
+    puts "<ul>"
     foreach { vr } [ array names ENVS ]  {
-        hputs "<li>(ENVS) $vr = $ENVS($vr)"
+        puts "<li>(ENVS) $vr = $ENVS($vr)"
     }
-    hputs "</ul>"
+    puts "</ul>"
 }
 
 if { [ array exists COOKIES ] } {
     
-    hputs "<ul>"
+    puts "<ul>"
     foreach { vr } [ array names COOKIES ]  {
-        hputs "<li>(COOKIES) $vr = $COOKIES($vr)"
+        puts "<li>(COOKIES) $vr = $COOKIES($vr)"
     }
-    hputs "</ul>"
+    puts "</ul>"
 }
 
 ?>
@@ -183,19 +175,19 @@ if { [ array exists COOKIES ] } {
 
 &lt;?
 set i 1
-hputs "&lt;table&gt;\n"
+puts "&lt;table&gt;\n"
 
 while { $i &lt;= 8 } {
-    hputs "&lt;tr&gt;\n"
+    puts "&lt;tr&gt;\n"
     for {set j 1} {$j &lt;= 8} {incr j} {
 	set num [ expr $i * $j * 4 - 1]
-	hputs [ format "&lt;td bgcolor=%2x%2x%2x &gt; $num $num $num &lt;/td&gt;\n" $num $num $num ]
+	puts [ format "&lt;td bgcolor=%2x%2x%2x &gt; $num $num $num &lt;/td&gt;\n" $num $num $num ]
     }
     incr i
-    hputs "&lt;/tr&gt;\n"
+    puts "&lt;/tr&gt;\n"
 }
 
-hputs "&lt;/table&gt;\n"
+puts "&lt;/table&gt;\n"
 ?&gt;
 </pre>
 </td></tr>
@@ -203,19 +195,19 @@ hputs "&lt;/table&gt;\n"
 <tr><td>Produces:<p>
 <?
 set i 1
-hputs "<table>\n"
+puts "<table>\n"
 
 while { $i <= 8 } {
-    hputs "<tr>\n"
+    puts "<tr>\n"
     for {set j 1} {$j <= 8} {incr j} {
 	set num [ expr {$i * $j * 4 - 1} ]
-	hputs [ format "<td bgcolor=%2x%2x%2x > $num $num $num </td>\n" $num $num $num ]
+	puts [ format "<td bgcolor=%2x%2x%2x > $num $num $num </td>\n" $num $num $num ]
     }
     incr i
-    hputs "</tr>\n"
+    puts "</tr>\n"
 }
 
-hputs "</table>\n"
+puts "</table>\n"
 ?>
 </td></tr>
 

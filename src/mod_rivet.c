@@ -275,10 +275,10 @@ get_ttml_file(request_rec *r, rivet_server_conf *rsc, Tcl_Interp *interp,
 	if (rsc->rivet_before_script) {
 	    Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
 	}
-	Tcl_AppendToObj(outbuf, "buffer_add \"", -1);
+	Tcl_AppendToObj(outbuf, "puts \"", -1);
     }
     else
-	Tcl_SetStringObj(outbuf, "hputs \"\n", -1);
+	Tcl_SetStringObj(outbuf, "puts \"\n", -1);
 
     /* if inside < 0, it's an error  */
     inside = rivet_parser(outbuf, f);

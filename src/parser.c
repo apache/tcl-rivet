@@ -107,7 +107,7 @@ int rivet_parser(Tcl_Obj *outbuf, FILE *openfile)
 		int nextchar = getc(openfile);
 		if (nextchar == '>')
 		{
-		    Tcl_DStringAppend(&dstr, "\n hputs \"", -1);
+		    Tcl_DStringAppend(&dstr, "\n puts \"", -1);
 		    inside = 0;
 		    p = 0;
 		    continue;
@@ -121,7 +121,7 @@ int rivet_parser(Tcl_Obj *outbuf, FILE *openfile)
 	    {
 		if ((++p) == startseqlen)
 		{
-		    Tcl_DStringAppend(&dstr, "\n hputs \"", -1);
+		    Tcl_DStringAppend(&dstr, "\n puts \"", -1);
 		    inside = 0;
 		    p = 0;
 		    continue;

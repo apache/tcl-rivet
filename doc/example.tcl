@@ -31,17 +31,17 @@ if { ! [ info exists footer ] } {
 
 namespace eval request {
     hgetvars
-    hputs $header
-    hputs {
+    puts $header
+    puts {
 	<p>This is an example of a .tcl file being processed in Rivet</p>
 	<p>Here is the source code:</p>
 	<hr>
 	<pre>
     }
-    hputs [ getcode $ENVS(SCRIPT_FILENAME) ]
-    hputs {
+    puts [ getcode $ENVS(SCRIPT_FILENAME) ]
+    puts {
 	</pre>
 	<hr>
     }
-    hputs $footer
+    puts $footer
 }

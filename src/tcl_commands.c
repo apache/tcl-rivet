@@ -145,87 +145,6 @@ Rivet_Include(
     return Tcl_Close(interp, fd);
 }
 
-/* Command to *only* add to the output buffer */
-
-int
-Rivet_BufferAdd(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
-{
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(globals->r->server->module_config, &rivet_module);
-
-    if (objc < 2)
-    {
-	Tcl_WrongNumArgs(interp, 1, objv, "string");
-	return TCL_ERROR;
-    }
-    Tcl_WriteObj(*(rsc->outchannel), objv[1]);
-    *(rsc->content_sent) = 0;
-    return TCL_OK;
-}
-
-/* Tcl command to output some text to the web server  */
-
-int
-Rivet_Hputs(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
-{
-    char *arg1;
-    int length;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(globals->r->server->module_config, &rivet_module);
-
-    if (objc < 2)
-    {
-	Tcl_WrongNumArgs(interp, 1, objv, "?-error? string");
-	return TCL_ERROR;
-    }
-
-    arg1 = Tcl_GetStringFromObj(objv[1], &length);
-
-    if (!strncmp("-error", arg1, 6))
-    {
-	if (objc != 3)
-	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "?-error? string");
-	    return TCL_ERROR;
-	}
-	ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_NOTICE,
-		     globals->r->server, "Mod_Rivet Error: %s",
-		     Tcl_GetStringFromObj (objv[2], (int *)NULL));
-    } else {
-	Tcl_DString outstring;
-	if (objc != 2)
-	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "?-error? string");
-	    return TCL_ERROR;
-	}
-	/* transform it from UTF to External representation */
-	Tcl_UtfToExternalDString(NULL, arg1, length, &outstring);
- 	arg1 = Tcl_DStringValue(&outstring);
-	length = Tcl_DStringLength(&outstring);
-	if (*(rsc->buffer_output) == 1)
-	{
-	    Tcl_DStringAppend(rsc->buffer, arg1, length);
-	} else {
-	    print_headers(globals->r);
-	    flush_output_buffer(globals->r);
-	    ap_rwrite(arg1, length, globals->r);
-	}
-	Tcl_DStringFree(&outstring);
-    }
-
-    return TCL_OK;
-}
-
 /* Tcl command to manipulate headers */
 
 int
@@ -330,60 +249,6 @@ Rivet_Headers(
 	/* XXX	Tcl_WrongNumArgs(interp, 1, objv, "headers option arg ?arg ...?");  */
 	return TCL_ERROR;
     }
-    return TCL_OK;
-}
-
-/* turn buffering on and off */
-
-int
-Rivet_Buffered(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
-{
-    char *opt = NULL;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_server_conf *rsc = (rivet_server_conf *)
-	ap_get_module_config(globals->r->server->module_config, &rivet_module);
-
-    if (objc != 2)
-    {
-	Tcl_WrongNumArgs(interp, 1, objv, "on/off");
-	return TCL_ERROR;
-    }
-    opt = Tcl_GetStringFromObj(objv[1], NULL);
-    if (!strncmp(opt, "on", 2))
-    {
-	*(rsc->buffer_output) = 1;
-    } else if (!strncmp(opt, "off", 3)) {
-	*(rsc->buffer_output) = 0;
-	print_headers(globals->r);
-	flush_output_buffer(globals->r);
-    } else {
-	return TCL_ERROR;
-    }
-    return TCL_OK;
-}
-/* Tcl command to flush the output stream */
-
-int
-Rivet_Hflush(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
-{
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-
-    if (objc != 1)
-    {
-	Tcl_WrongNumArgs(interp, 1, objv, NULL);
-	return TCL_ERROR;
-    }
-    print_headers(globals->r);
-    flush_output_buffer(globals->r);
-    ap_rflush(globals->r);
     return TCL_OK;
 }
 
@@ -963,21 +828,6 @@ Rivet_init(Tcl_Interp *interp)
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,
-    			"hputs",
-			Rivet_Hputs,
-			NULL,
-			(Tcl_CmdDeleteProc *)NULL);
-    Tcl_CreateObjCommand(interp,
-			"buffer_add",
-			Rivet_BufferAdd,
-			NULL,
-			(Tcl_CmdDeleteProc *)NULL);
-    Tcl_CreateObjCommand(interp,
-			"buffered",
-			Rivet_Buffered,
-			NULL,
-			(Tcl_CmdDeleteProc *)NULL);
-    Tcl_CreateObjCommand(interp,
     			"headers",
 			Rivet_Headers,
 			NULL,
@@ -1005,11 +855,6 @@ Rivet_init(Tcl_Interp *interp)
     Tcl_CreateObjCommand(interp,
 			"parse",
 			Rivet_Parse,
-			NULL,
-			(Tcl_CmdDeleteProc *)NULL);
-    Tcl_CreateObjCommand(interp,
-			"hflush",
-			Rivet_Hflush,
 			NULL,
 			(Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,

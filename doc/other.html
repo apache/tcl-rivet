@@ -33,19 +33,17 @@
 
       <li><b>Page parsing/execution</b><br>
 
-	In <code>send_parsed_file</code> Each .ttml file is
-	loaded and run within its own namespace.  No new
-	interpreter is created for each page.  This lets you
-	share variables, and most importantly, loaded modules,
-	from a common parent (such as one of the InitScripts).
-	When a file is loaded, it is transformed into a Tcl
-	script by putting everything outside of &lt;? and
-	?&gt; into large hputs statements.  When the script is
-	complete, it is then inserted into the cache, for
-	future use.  In fact, if the file modification
-	information doesn't change, Rivet will execute the
-	cached version of the script the next time it is
-	encountered.
+	In <code>send_parsed_file</code> Each .ttml file is loaded and
+	run within its own namespace.  No new interpreter is created
+	for each page.  This lets you share variables, and most
+	importantly, loaded modules, from a common parent (such as one
+	of the InitScripts).  When a file is loaded, it is transformed
+	into a Tcl script by putting everything outside of &lt;? and
+	?&gt; into large <code>puts</code> statements.  When the
+	script is complete, it is then inserted into the cache, for
+	future use.  In fact, if the file modification information
+	doesn't change, Rivet will execute the cached version of the
+	script the next time it is encountered.
       </li>
       <li><b>Binary data</b><br>
 	Rivet is capable of outputing binary data, such as

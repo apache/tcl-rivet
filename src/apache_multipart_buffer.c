@@ -72,12 +72,12 @@ void* my_memstr(char* haystack, int haystacklen, const char* needle,
     char *ptr = haystack;
 
     /* iterate through first character matches */
-    while( (ptr = memchr(ptr, needle[0], len)) ) {
+    while( (ptr = memchr(ptr, needle[0], (size_t)len)) ) {
 	/* calculate length after match */
 	len = haystacklen - (ptr - (char *)haystack);
 
 	/* done if matches up to capacity of buffer */
-	if(memcmp(needle, ptr, needlen < len ? needlen : len) == 0 &&
+	if(memcmp(needle, ptr, (size_t)(needlen < len ? needlen : len)) == 0 &&
 	   (partial || len >= needlen))
 	    break;
 
@@ -98,7 +98,7 @@ int fill_buffer(multipart_buffer *self)
 
     /* shift the existing data if necessary */
     if(self->bytes_in_buffer > 0 && self->buf_begin != self->buffer)
-	memmove(self->buffer, self->buf_begin, self->bytes_in_buffer);
+	memmove(self->buffer, self->buf_begin, (size_t)self->bytes_in_buffer);
     self->buf_begin = self->buffer;
 
     /* calculate the free space in the buffer */
@@ -134,7 +134,7 @@ char* next_line(multipart_buffer *self)
 {
     /* look for LF in the data */
     char* line = self->buf_begin;
-    char* ptr = memchr(self->buf_begin, '\n', self->bytes_in_buffer);
+    char* ptr = memchr(self->buf_begin, '\n', (size_t) self->bytes_in_buffer);
 
     /* LF found */
     if(ptr) {
@@ -286,7 +286,7 @@ int multipart_buffer_read(multipart_buffer *self, char *buf, int bytes)
     /* if we read any data... */
     if(len > 0) {
 	/* copy the data */
-	memcpy(buf, self->buf_begin, len);
+	memcpy(buf, self->buf_begin, (size_t)len);
 	buf[len] = 0;
 	if(bound && len > 0 && buf[len-1] == '\r') buf[--len] = 0;
 
