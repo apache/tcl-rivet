@@ -1,21 +1,21 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
 <html>
 <!-- $Id$ -->
-<title>mod_dtcl examples</title>
+<title>Rivet examples</title>
 <body bgcolor=white>
 
 <table bgcolor=black width=100%>
 <tr>
 <td align=center>
 <font size=40 color=#ffffff>
-<b>mod_dtcl examples</b>
+<b>Rivet examples</b>
 </font>
 </td>
 </tr>
 </table>
 
 <p>
-These are some examples, rather limited ones, of what can be done with mod_dtcl.
+These are some examples, rather limited ones, of what can be done with Rivet.
 
 <p>
 <table>
@@ -221,7 +221,7 @@ hputs "</table>\n"
 
 <tr><td><hr> <b>In addition</b><br> 
 
-There are many, many other things you can do with mod_dtcl.  You can,
+There are many, many other things you can do with Rivet.  You can,
 if everything is compiled right, load tcl modules, like libpgtcl.so
 (the Postgresql interface), so that you can interact with a database!
 
@@ -231,11 +231,11 @@ if everything is compiled right, load tcl modules, like libpgtcl.so
 
 </table>
 
-<? dtcl_info ?>
+<? rivet_info ?>
 
 
 <p>
-<a href="index.ttml">Return to the mod_dtcl homepage</a>
+<a href="index.ttml">Return to the Rivet homepage</a>
 </p>
 
 </body>

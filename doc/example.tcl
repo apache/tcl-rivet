@@ -33,7 +33,7 @@ namespace eval request {
     hgetvars
     hputs $header
     hputs {
-	<p>This is an example of a .tcl file being processed in mod_dtcl</p>
+	<p>This is an example of a .tcl file being processed in Rivet</p>
 	<p>Here is the source code:</p>
 	<hr>
 	<pre>

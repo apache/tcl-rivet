@@ -1,9 +1,9 @@
 
    A bit of information from Craig Huckabee (huck@nosc.mil) regarding
-   building mod_dtcl on HPUX:
+   building Rivet on HPUX:
    
    I had to tweak the makefile to get everything to build (adding some
-   include and library paths and -DEAPI) Apparently that mod_dtcl_module
+   include and library paths and -DEAPI) Apparently that Rivet_module
    [this is from an error he was getting - davidw] came from one of the
    steps described in the Apache documentation for installing a DSO. I
    rebuilt and redid the steps and now it appears to work OK. My next

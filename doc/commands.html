@@ -2,12 +2,12 @@
     <!-- $Id$ -->
 <html>
   <head>
-    <title>mod_dtcl tcl commands</title>
+    <title>Rivet tcl commands</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
 
-    <h2 align="center">mod_dtcl specific Tcl commands and variables</h2>
+    <h2 align="center">Rivet specific Tcl commands and variables</h2>
 
     <ul>
       <li>
@@ -18,14 +18,14 @@
 
       <li>
 	<code><b>hputs <i>?-error? text</i></b></code><br>
-	The mod_dtcl version of "puts".  Outputs to the
+	The Rivet version of "puts".  Outputs to the
 	client, instead of to stdout.
 	The error option permits you to send an 'error message' to the
 	apache log file, at the NOTICE level.
       </li>
       <li><code><b>var</b></code><br> These commands retrieve or
 	retrieve information about "CGI" variables that are passed to
-	the dtcl script via GET or POST operations.  
+	the rivet script via GET or POST operations.  
       </li>
       <li>
 	<code><b>var get <i>varname</i></b></code><br> Returns the
@@ -138,7 +138,7 @@
 
 	This command sets the "Content-type:" header returned
 	by the script, which is useful if you wish to create a
-	PNG (image), for example, with mod_dtcl.
+	PNG (image), for example, with Rivet.
       </li>
       <li>
 	<code><b>headers set <i>headername value</i></b></code><br>
@@ -147,7 +147,7 @@
       </li>
 
       <li>
-	<code><b>dtcl_info</b></code><br>	      
+	<code><b>rivet_info</b></code><br>	      
 
 	Prints information on the internals of the module in
 	HTML.  Currently, only the PID and size of the object
@@ -171,13 +171,13 @@
 
 	<code><b>$::request::UPLOAD(channelname)</b></code><br> The
 	name of a Tcl channel which may be used to manipulate the
-	uploaded file.  If Dtcl_UploadFilesToVar is set, this
+	uploaded file.  If Rivet_UploadFilesToVar is set, this
 	variable doesn't get created.  If no file is passed to the
 	server, this variable does not exist!  Be sure to check for
 	this.<br>
 
 	<code><b>$::request::UPLOAD(data)</b></code><br>
-	Contents of the uploaded file, if Dtcl_UploadFilesToVar is
+	Contents of the uploaded file, if Rivet_UploadFilesToVar is
 	set.<br>
       </li>
 -->

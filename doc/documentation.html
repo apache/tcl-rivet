@@ -9,29 +9,29 @@
     
 
     <!-- $Id$ -->
-    <h2 align="center">mod_dtcl Installation</h2>
+    <h2 align="center">Rivet Installation</h2>
     
     <ol>
       <li><b>Check dependencies</b><br>
 	
-	To install mod_dtcl, you will need <b>Tcl 8.2</b> or greater
+	To install Rivet, you will need <b>Tcl 8.2</b> or greater
 	and <b>Apache 1.3.xx</b>.  It is known to run on Linux,
 	FreeBSD, OpenBSD, and Solaris and HPUX.  NT is also possible -
 	please see the directions in the distribution.
       </li>
 
-      <li><b>Get mod_dtcl</b><br>
+      <li><b>Get Rivet</b><br>
 	If you are running a Debian or FreeBSD system, there
 	are pre-built packages available at:
-	<a target="_top" href="http://www.debian.org/Packages/unstable/web/libapache-mod-dtcl.html">http://www.debian.org/Packages/unstable/web/libapache-mod-dtcl.html</a> 
+	<a target="_top" href="http://www.debian.org/Packages/unstable/web/libapache-mod-rivet.html">http://www.debian.org/Packages/unstable/web/libapache-mod-rivet.html</a> 
 
 	or
 	
 	<a
-	  target="_top" href="http://www.freebsd.org/cgi/ports.cgi?query=mod_dtcl">http://www.freebsd.org/cgi/ports.cgi?query=mod_dtcl</a>.<br>
+	  target="_top" href="http://www.freebsd.org/cgi/ports.cgi?query=Rivet">http://www.freebsd.org/cgi/ports.cgi?query=Rivet</a>.<br>
 
 	Otherwise, download the sources at <a target="_top"
-	href="download/">http://tcl.apache.org/mod_dtcl/download/</a>.
+	href="download/">http://tcl.apache.org/Rivet/download/</a>.
 	<br>
       </li>
       <li><b>Uncompress the sources</b><br>
@@ -44,14 +44,14 @@
 	Some systems, such as Debian GNU/Linux, provide these
 	independently - otherwise, you probably still need the sources.<br>
 	<code>
-	  gunzip mod_dtcl-X.X.X.tar.gz<br>
-	  tar -xvf mod_dtcl-X.X.X.tar.gz<br>
+	  gunzip Rivet-X.X.X.tar.gz<br>
+	  tar -xvf Rivet-X.X.X.tar.gz<br>
 	</code>
       </li>
 
-      <li><b>Configuring, builddtcl.sh, etc...</b><br> 
+      <li><b>Configuring, buildrivet.sh, etc...</b><br> 
 
-	Do you want to build mod_dtcl as a shared object (such as a
+	Do you want to build Rivet as a shared object (such as a
 	.so file on Linux, or a .dll on windows), or compile it
 	directly as a part of the Apache executable?  The Apache
 	Software Foundation has put together a nice <a target="_top"
@@ -61,8 +61,8 @@
 	<ul>
 	  <li><b>For shared objects</b><br>
 	    
-	    <code>cd ../mod_dtcl/<br></code>
-	    Edit the <code>builddtcl.sh</code> script.  The 3
+	    <code>cd ../Rivet/<br></code>
+	    Edit the <code>buildrivet.sh</code> script.  The 3
 	    variables you may need to change are: 
 	    <ul>
 	      <li><code>TCLSH</code><br>
@@ -78,11 +78,11 @@
 	    </ul>
 
 	    <code>
-	      ./builddtcl.sh shared
+	      ./buildrivet.sh shared
 	    </code><br>
 
 	    <code>
-	      cp mod_dtcl.so
+	      cp Rivet.so
 	      /usr/lib/apache/wherever/the/other/shared/objects/reside
 	    </code> For shared object builds, you need to copy the
 	    object into the directory where the other shared
@@ -98,8 +98,8 @@
 	      ./configure<br>
 	    </code>
 
-	    <code>cd ../mod_dtcl/<br></code>
-	    Edit the <code>builddtcl.sh</code> script.  The 3
+	    <code>cd ../Rivet/<br></code>
+	    Edit the <code>buildrivet.sh</code> script.  The 3
 	    variables you may need to change are: 
 	    <ul>
 	      <li><code>TCLSH</code><br>
@@ -115,16 +115,16 @@
 	    </ul>
 
 	    <code>
-	      ./builddtcl.sh static
+	      ./buildrivet.sh static
 	    </code><br>
 
 	    <code>
-	      ./builddtcl.sh install
+	      ./buildrivet.sh install
 	    </code><br>
 
 	    <code>cd ../apache-1.3.X<br></code>
 	    <code>./configure
-	      --activate-module=src/modules/mod_dtcl/mod_dtcl.a [ other configure
+	      --activate-module=src/modules/Rivet/Rivet.a [ other configure
 	      options ]<br></code>
 	    <code>export EXTRA_LIBS="-ltcl8.X -lm"</code><br>
 	    <code>make -e<br></code>
@@ -136,47 +136,47 @@
       <li><b>Configure Apache<br></b>		
 	<ul>
 	  <li>
-	    <b>http.conf</b><br> <code>LoadModule dtcl_module
-	      /usr/lib/apache/1.3/mod_dtcl.so</code><br> 
+	    <b>http.conf</b><br> <code>LoadModule rivet_module
+	      /usr/lib/apache/1.3/Rivet.so</code><br> 
 	    This points Apache to the shared object if
-	    mod_dtcl is being used as a loadable module.
+	    Rivet is being used as a loadable module.
 	  </li>
 	  <li>
 	    <b>srm.conf</b><br> 
 	    <code>AddType application/x-httpd-tcl .ttml</code><br>
-	    <code>AddType application/x-dtcl-tcl .tcl</code>
+	    <code>AddType application/x-rivet-tcl .tcl</code>
 	    (optional)<br>
 	    These add the .ttml and .tcl (if desired) types to
-	    Apache, so that they are processed by mod_dtcl.
+	    Apache, so that they are processed by Rivet.
 	  </li>
 	</ul>
       </li>
     </ol>
     
-    <h2 align="center">mod_dtcl Apache directives</h2>
+    <h2 align="center">Rivet Apache directives</h2>
 
     <ul>
       <li>
-	<code><b>Dtcl_Script GlobalInitScript <i>"script"</i></code></b><br>
+	<code><b>Rivet_Script GlobalInitScript <i>"script"</i></code></b><br>
 	Tcl script that is run when each interpreter is
 	initialized.  <code>"script"</code> is actual Tcl
 	script, so to run a file, you would do
-	<code>Dtcl_Script GlobalInitScript "source /var/www/foobar.tcl"</code>.
+	<code>Rivet_Script GlobalInitScript "source /var/www/foobar.tcl"</code>.
       </li>
 
       <li>
-	<code><b>Dtcl_Script ChildInitScript <i>"script"</i></b></code><br>		
+	<code><b>Rivet_Script ChildInitScript <i>"script"</i></b></code><br>		
 	Script to be evaluated when each apache child is
 	initialized. This is the best place to load modules.
       </li>
 
       <li>
-	<code><b>Dtcl_Script ChildExitScript <i>"script"</i></b></code><br>	      
+	<code><b>Rivet_Script ChildExitScript <i>"script"</i></b></code><br>	      
 	Script to be evaluated when each apache child exits.
       </li>
 
       <li>
-	<code><b>Dtcl_Script BeforeScript <i>"script"</i></b></code><br>		
+	<code><b>Rivet_Script BeforeScript <i>"script"</i></b></code><br>		
 	Script to be evaluated before each .ttml page.
 	<strong>Note</strong> that you cannot use
 	<code>hputs</code> in the BeforeScript, but must
@@ -184,39 +184,39 @@
       </li>
 
       <li>
-	<code><b>Dtcl_Script AfterScript <i>"script"</i></b></code><br>	      
+	<code><b>Rivet_Script AfterScript <i>"script"</i></b></code><br>	      
 	Script to be called after each .ttml page.
       </li>
 
       <li>
-	<code><b>Dtcl_Script ErrorScript <i>"script"</i></b></code><br>	      
+	<code><b>Rivet_Script ErrorScript <i>"script"</i></b></code><br>	      
 	This code is called in place of the standard 'error' pages
-	generated for mod_dtcl.  This directive may be useful if you
+	generated for Rivet.  This directive may be useful if you
 	have sensitive logic that you wish to protect.
       </li>
       
       <li>
-	<code><b>Dtcl_CacheSize <i>cachesize</i></b></code><br> 
+	<code><b>Rivet_CacheSize <i>cachesize</i></b></code><br> 
 	Number of ttml scripts to cache as Tcl Objects.
 	Default is MaxRequestsPerChild / 2, or 50, if
 	MaxRequestsPerChild is 0.
       </li>
 
       <li>
-	<code><b>Dtcl_UploadFilesToVar <i>on/off</i></b></code><br> If
+	<code><b>Rivet_UploadFilesToVar <i>on/off</i></b></code><br> If
 	on, files will be uploaded to the variable UPLOAD(data).  Be
 	careful with this, as large files could use up your memory.
       </li>
 
       <li>
-	<code><b>Dtcl_SeperateVirtualInterps
+	<code><b>Rivet_SeperateVirtualInterps
 	<i>on/off</i></b></code><br> If on, each VirtualHost will have
 	its own Tcl interpreter.
       </li>
 
     </ul>
 
-    <h2 align="center">mod_dtcl specific Tcl commands and variables</h2>
+    <h2 align="center">Rivet specific Tcl commands and variables</h2>
 
     <ul>
       <li>
@@ -227,14 +227,14 @@
 
       <li>
 	<code><b>hputs <i>?-error? text</i></b></code><br>
-	The mod_dtcl version of "puts".  Outputs to the
+	The Rivet version of "puts".  Outputs to the
 	client, instead of to stdout.
 	The error option permits you to send an 'error message' to the
 	apache log file, at the NOTICE level.
       </li>
       <li><code><b>var</b></code><br> These commands retrieve or
 	retrieve information about "CGI" variables that are passed to
-	the dtcl script via GET or POST operations.  
+	the rivet script via GET or POST operations.  
       </li>
       <li>
 	<code><b>var get <i>varname</i></b></code><br> Returns the
@@ -347,7 +347,7 @@
 
 	This command sets the "Content-type:" header returned
 	by the script, which is useful if you wish to create a
-	PNG (image), for example, with mod_dtcl.
+	PNG (image), for example, with Rivet.
       </li>
       <li>
 	<code><b>headers set <i>headername value</i></b></code><br>
@@ -356,7 +356,7 @@
       </li>
 
       <li>
-	<code><b>dtcl_info</b></code><br>	      
+	<code><b>rivet_info</b></code><br>	      
 
 	Prints information on the internals of the module in
 	HTML.  Currently, only the PID and size of the object
@@ -380,18 +380,18 @@
 
 	<code><b>$::request::UPLOAD(channelname)</b></code><br> The
 	name of a Tcl channel which may be used to manipulate the
-	uploaded file.  If Dtcl_UploadFilesToVar is set, this
+	uploaded file.  If Rivet_UploadFilesToVar is set, this
 	variable doesn't get created.  If no file is passed to the
 	server, this variable does not exist!  Be sure to check for
 	this.<br>
 
 	<code><b>$::request::UPLOAD(data)</b></code><br>
-	Contents of the uploaded file, if Dtcl_UploadFilesToVar is
+	Contents of the uploaded file, if Rivet_UploadFilesToVar is
 	set.<br>
       </li>
 -->
     </ul>
-    <h2>Other mod_dtcl Documentation</h2>
+    <h2>Other Rivet Documentation</h2>
         
     <h3>Internals</h3>
     <ul>
@@ -429,24 +429,24 @@
 	?&gt; into large hputs statements.  When the script is
 	complete, it is then inserted into the cache, for
 	future use.  In fact, if the file modification
-	information doesn't change, mod_dtcl will execute the
+	information doesn't change, Rivet will execute the
 	cached version of the script the next time it is
 	encountered.
       </li>
       <li><b>Binary data</b><br>
-	mod_dtcl is capable of outputing binary data, such as
+	Rivet is capable of outputing binary data, such as
 	images, or loading binary data with 'include'.
       </li>
     </ul>
 
     <h3>Upgrading From Older (< 0.9.3) Versions</h3>
     <ul>
-      <li><b>New tags</b><br> As of version 0.9.4, mod_dtcl uses
+      <li><b>New tags</b><br> As of version 0.9.4, Rivet uses
 	&lt;? and ?&gt; instead of &lt;+ and +&gt; to delimit
-	sections of Tcl code.  By default, dtcl is still compiled
+	sections of Tcl code.  By default, rivet is still compiled
 	with code to parse the &lt;?  ?&gt; tags, but it will run
 	faster if <code>USE_OLD_TAGS</code> is set to 0 in
-	<code>mod_dtcl.h</code>.  You can automatically change your
+	<code>Rivet.h</code>.  You can automatically change your
 	.ttml files to the new format by using the
 	<code>newtags.sh</code> script in the contrib/ directory.
 	Run it at the top level of your DocumentRoot.
