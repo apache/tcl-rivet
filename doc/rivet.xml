@@ -1169,6 +1169,15 @@ list.
       </para>
     </section>
 
+    <section>
+      <title>IRC</title>
+
+      <para>
+        Occassionally, someone from the Rivet team is on IRC at
+        irc.freenode.net, channel #tcl.
+      </para>
+    </section>
+
   </section>
 
   <section id="internals">

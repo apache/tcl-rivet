@@ -1,3 +1,8 @@
+2003-06-29  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Add IRC reference to the help section of the
+	  manual.
+
 2003-06-23  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.ru.xml: Updated Russian version to indicate which

@@ -36,4 +36,7 @@ list.
 	Apache Rivet uses the Apache Bug Tracking system at <a href="http://nagoya.apache.org/bugzilla/" target="_top">http://nagoya.apache.org/bugzilla/</a>.  Here,
 	you can report problems, or check and see if existing issues
 	are already known and being dealt with.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id5396683"></a>IRC</h3></div></div><div></div></div><p style="width:90%">
+        Occassionally, someone from the Rivet team is on IRC at
+        irc.freenode.net, channel #tcl.
       </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="tcl_packages.html.en"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.html.en"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="internals.html.en"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Rivet Tcl Packages </td><td width="20%" align="center"><a accesskey="h" href="index.html.en"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Internals</td></tr></table></div></body></html>
