@@ -955,7 +955,7 @@ int Rivet_NoBody(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *C
 }
 
 int
-Rivet_init( Tcl_Interp *interp )
+Rivet_init(Tcl_Interp *interp)
 {
     Tcl_CreateObjCommand(interp,
 			"makeurl",

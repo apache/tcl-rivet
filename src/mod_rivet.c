@@ -1006,14 +1006,15 @@ rivet_child_init(server_rec *s, pool *p)
     sr = s;
     while(sr)
     {
-	rsc = RIVET_SERVER_CONF( sr );
-	if( rsc->rivet_child_init_script == NULL ) continue;
-
-	if (Tcl_EvalObjEx(rsc->server_interp, rsc->rivet_child_init_script, 0)
-	    != TCL_OK) {
-	    ap_log_error(APLOG_MARK, APLOG_ERR, s,
-			 "Problem running child init script: %s",
-			 Tcl_GetString(rsc->rivet_child_init_script));
+	rsc = RIVET_SERVER_CONF(sr->module_config);
+	if( rsc->rivet_child_init_script != NULL ) 
+	{
+	    if (Tcl_EvalObjEx(rsc->server_interp, rsc->rivet_child_init_script, 0)
+		!= TCL_OK) {
+		ap_log_error(APLOG_MARK, APLOG_ERR, s,
+			     "Problem running child init script: %s",
+			     Tcl_GetString(rsc->rivet_child_init_script));
+	    }
 	}
 	sr = sr->next;
     }

@@ -1,3 +1,8 @@
+2001-11-08  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (rivet_child_init): Fix loop, pass correct
+	parameter to RIVET_SERVER_CONF.
+
 2001-10-19  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (get_parse_exec_file): Fixed up problems with
