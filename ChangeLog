@@ -1,11 +1,30 @@
 2004-12-02  Karl Lehenbauer  <karl-rivet@sc.com>
-        * Remove the --with-tclsh option.  A path to tclsh is automatically
-	  figured out by the TEA 3.1 build stuff -- it looks at tclConfig.sh
 
-        * Get automake, aclocal, and autoconf to run without complaint,
-	  generating the configure script, Makefile.in files, etc.
+        * Move aclocal.m4 to acinclude.m4 -- we need the aclocal command
+	  to generate acinclude.m4 based on aclocal.m4 and stuff it gleans
+	  from the configure.ac script, etc.
 
-	* Propagate the NAMEOFEXECUTABLE define via the autoconf scripts
+        * configure.ac: Remove the --with-tclsh option.  A path to tclsh is 
+	  automatically figured out by the TEA 3.1 build stuff -- it looks at 
+	  tclConfig.sh
+
+        * src/configure.ac et al: Get automake, aclocal, and autoconf to run 
+	  without complaint, generating the configure script, Makefile.in 
+	  files, etc.
+
+	* configure.ac: Propagate the NAMEOFEXECUTABLE define via the 
+	  autoconf scripts
+	  src/Makefile.am: (same)
+
+	* configure: check in configure script, it's hard to make unless
+	  you have everything just right.  We will probably revisit this
+	  later.
+	* src/Makefile.in: (same)
+	* Makefile.in: (same)
+
+	* libtool:  Added libtool and friends in tclconfig dir using
+	  libtoolize -- this is what figures out how to build shared
+	  libraries, etc.
 
 2004-12-01  Karl Lehenbauer  <karl-rivet@sc.com>
 
