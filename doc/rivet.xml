@@ -3940,11 +3940,13 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	The Rivet mailing list is the first place you should turn for
 	help, if you haven't found the solution to your problem in the
 	documentation.  Send email to
-	<email>rivet-user@tcl.apache.org</email>.  If you have a
+	<email>rivet-dev@tcl.apache.org</email>.  If you have a
 	question, idea, or comment about the Rivet code itself, please
 	send us email at <email>rivet-dev@tcl.apache.org</email>.  To
 	subscribe to either list, post email to
-	<email>rivet-<replaceable>list</replaceable>-subscribe@tcl.apache.org</email>.
+	<email>rivet-<replaceable>list</replaceable>-subscribe@tcl.apache.org</email>,
+	where <replaceable>list</replaceable> is either dev or user.
+	Currently, dev is the preferred list to use.
       </para>
       <para>
 	The mailing list archives are available at <ulink

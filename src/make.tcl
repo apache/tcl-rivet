@@ -224,12 +224,6 @@ AddNode install {
 #    }
 #}
 
-AddNode [file join .. VERSION] {
-    tcl cd ..
-    sh ./cvsversion.tcl
-    tcl cd src
-}
-
 # Clean up everything for distribution.
 
 AddNode distclean {
@@ -280,7 +274,7 @@ AddNode distdoc {
 # moment, as it uses the bourne shell and unix commands.
 
 AddNode dist {
-    depends distclean distdoc [file join .. VERSION] $PKGINDEX
+    depends distclean distdoc $PKGINDEX
     tcl {
 	set fl [open [file join .. VERSION]]
 	set VERSION [string trim [read $fl]]
