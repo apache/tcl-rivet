@@ -7,7 +7,7 @@ package require Tcl 8.4
 
 # Add some command-line configuration options specific to Rivet.
 configure::AddOption -flag with-apxs -var APXS \
-    -desc "Location of the apxs binary" -arg -default apxs
+    -desc "Location of the apxs binary" -arg
 configure::AddOption -flag with-tclconfig -var TCL_CONFIG \
     -desc "Location of tclConfig.sh" -arg
 
@@ -21,7 +21,7 @@ configure::parsetclconfig $::configs::TCL_CONFIG
 
 configure::test APXS {
     source [file join [file dirname [info script]] buildscripts findapxs.tcl]
-    findapxs::FindAPXS [set APXS]
+    findapxs::FindAPXS
 }
 
 configure::test TCL_THREADED {

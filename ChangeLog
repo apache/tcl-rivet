@@ -1,3 +1,9 @@
+2003-08-26  David N. Welton  <davidw@dedasys.com>
+
+	* src/configure.in.tcl: -with-apxs option no longer takes a
+	default.  It should work that out on its own using the
+	findapxs.tcl script.
+
 2003-08-23  David N. Welton  <davidw@dedasys.com>
 
 	* src/configure.in.tcl: Remove test for broken Tcl installations
