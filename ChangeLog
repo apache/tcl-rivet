@@ -1,5 +1,7 @@
 2004-05-18  David N. Welton  <davidw@dedasys.com>
 
+	* src/make.tcl: Quote Tcl argument.
+
 	* doc/rivet.xml: Added clearer instructions for mailing list
 	subscription.
 
