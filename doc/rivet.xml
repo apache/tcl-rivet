@@ -1456,7 +1456,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="session_package">
     <title>Session Package</title>
     <section>
       <title>Introduction</title>

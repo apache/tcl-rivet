@@ -1,5 +1,7 @@
 2004-02-06  David N. Welton  <davidw@dedasys.com>
 
+	* doc/rivet.xml: Add section for session package.
+
 	* doc/rivet.xml: Added SESSION documentation.
 
 	* rivet/packages/session/README.txt: Removed text, indicate
