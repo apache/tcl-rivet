@@ -438,7 +438,7 @@ char *TclWeb_StringToUtf(char *in, TclWebRequest *req)
     char *tmp;
     Tcl_DString dstr;
     Tcl_DStringInit(&dstr);
-    Tcl_ExternalToUtfDString(NULL, in, (signed)strlen(in), &dstr);
+    Tcl_ExternalToUtfDString(NULL, (CONST84 char*)in, (signed)strlen(in), &dstr);
 
     tmp = ap_pstrdup(TCLWEBPOOL, Tcl_DStringValue(&dstr));
     Tcl_DStringFree(&dstr);

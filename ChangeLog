@@ -1,3 +1,8 @@
+2002-10-22  David N. Welton  <davidw@dedasys.com>
+
+	* src/TclWebapache.c (TclWeb_StringToUtf): One more CONST84 - now
+	we pass the tests!
+
 2002-10-21  David N. Welton  <davidw@dedasys.com>
 
 	* src/*.c: "CONST"ification.  See http://mini.net/tcl/3669 for
