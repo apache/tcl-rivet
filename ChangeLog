@@ -1,3 +1,13 @@
+2002-03-10  Damon J. Courtney <damon@unreality.com>
+
+	* src/mod_rivet.c
+	    The Scripts output to the UserConf arrays now properly display
+	    the scripts in their entirety.
+
+	    Cleaned up the handling of directory configuration merging.
+
+	    Fixed a bug where Rivet_GetRivetFile was stomping the BeforeScript.
+
 2002-02-23  David N. Welton  <davidw@dedasys.com>
 
 	* src/TclWebapache.c: Added functions: TclWeb_PrepareUpload,

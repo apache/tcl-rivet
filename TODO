@@ -1,3 +1,6 @@
+BUGS
+====
+
 TODO
 ====
 
@@ -21,9 +24,6 @@ TODO
 
 * Create escape_string and unescape_string using Apache conventions.
 
-* Add a PackageRequire Server directive that will load packages on
-  start-up.
-
 * Free all Rivet commands of apache dependencies, which are moved into
   the TclWebapache.c file.  Compatible file, for CGI only operating,
   TclWebcgi.c needs to be created.
@@ -34,9 +34,6 @@ MAYBE
 
 * Maybe write load_cookies in Tcl and try to get rid of the
   apache_cookie.* stuff.
-
-* Maybe write the header command in Tcl.
-  - basic API is in C... difficult to do.
 
 * Maybe move ::request commands into a file called request.tcl.
 

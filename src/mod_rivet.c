@@ -140,14 +140,17 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	Tcl_Flush(*(conf->outchannel));
         if (errscript)
         {
-	    if (Tcl_EvalObj(interp, errscript) == TCL_ERROR)
-                TclWeb_PrintError("<b>Tcl_ErrorScript failed!</b>", 1, globals->req);
+	    if (Tcl_EvalObj(interp, errscript) == TCL_ERROR) {
+                TclWeb_PrintError("<b>Tcl_ErrorScript failed!</b>", 1,
+					globals->req);
+	    }
         } else {
             /* default action  */
             errorinfo = Tcl_GetVar(interp, "errorInfo", 0);
 	    TclWeb_PrintError(errorinfo, 0, globals->req);
             TclWeb_PrintError("<p><b>OUTPUT BUFFER:</b></p>", 1, globals->req);
-            TclWeb_PrintError(Tcl_GetStringFromObj(outbuf, (int *)NULL), 1, globals->req);
+            TclWeb_PrintError(Tcl_GetStringFromObj(outbuf, (int *)NULL), 1,
+				globals->req);
         }
     } else {
         /* Make sure to flush the output if buffer_add was the only output */
@@ -174,7 +177,8 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     rivet_server_conf *rsc = NULL;
     Tcl_Interp *interp = req->interp;
 
-    rsc = RIVET_SERVER_CONF( req->req->server->module_config );
+    /* rsc = RIVET_SERVER_CONF( req->req->server->module_config ); */
+    rsc = Rivet_GetConf( req->req );
 
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
@@ -205,6 +209,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     /* We don't have a compiled version.  Let's create one */
     if (isNew || *(rsc->cache_size) == 0)
     {
+
 	outbuf = Tcl_NewObj();
 	Tcl_IncrRefCount(outbuf);
 	if (toplevel && rsc->rivet_before_script) {
@@ -575,10 +580,10 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     }
 }
 
-static void
+static char *
 Rivet_AppendToScript( rivet_server_conf *rsc, char *script, char *string )
 {
-    Tcl_Obj *objarg;
+    Tcl_Obj *objarg = NULL;
 
     if( STREQU( script, "GlobalInitScript" ) ) {
 	if( rsc->rivet_global_init_script == NULL ) {
@@ -647,6 +652,10 @@ Rivet_AppendToScript( rivet_server_conf *rsc, char *script, char *string )
 	    Tcl_AppendToObj( objarg, "\n", 1 );
 	}
     }
+
+    if( !objarg ) return string;
+
+    return Tcl_GetStringFromObj( objarg, NULL );
 }
 
 /*
@@ -671,24 +680,13 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 {
     server_rec *s = cmd->server;
     rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
+    char *string = val;
 
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetServerConf requires two arguments";
     }
 
-    if( STREQU( var, "GlobalInitScript" ) ) {
-	Rivet_AppendToScript( rsc, var, val );
-    } else if( STREQU( var, "ChildInitScript" ) ) {
-	Rivet_AppendToScript( rsc, var, val );
-    } else if( STREQU( var, "ChildExitScript" ) ) {
-	Rivet_AppendToScript( rsc, var, val );
-    } else if( STREQU( var, "BeforeScript" ) ) {
-	Rivet_AppendToScript( rsc, var, val );
-    } else if( STREQU( var, "AfterScript" ) ) {
-	Rivet_AppendToScript( rsc, var, val );
-    } else if( STREQU( var, "ErrorScript" ) ) {
-	Rivet_AppendToScript( rsc, var, val );
-    } else if( STREQU( var, "CacheSize" ) ) {
+    if( STREQU( var, "CacheSize" ) ) {
 	*(rsc->cache_size) = strtol( val, NULL, 10 );
     } else if( STREQU( var, "UploadDirectory" ) ) {
 	rsc->upload_dir = val;
@@ -706,9 +704,11 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 	} else {
 	    rsc->seperate_virtual_interps = 0;
 	}
+    } else {
+	string = Rivet_AppendToScript( rsc, var, val );
     }
 
-    ap_table_set( rsc->rivet_server_vars, var, val );
+    ap_table_set( rsc->rivet_server_vars, var, string );
     return( NULL );
 }
 
@@ -724,20 +724,19 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 static const char *
 Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
+    char *string = val;
+
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetDirConf requires two arguments";
     }
 
-    if( STREQU( var, "BeforeScript" ) ) {
-	Rivet_AppendToScript( rdc, var, val );
-    } else if( STREQU( var, "AfterScript" ) ) {
-	Rivet_AppendToScript( rdc, var, val );
-    } else if( STREQU( var, "ErrorScript" ) ) {
-	Rivet_AppendToScript( rdc, var, val );
-    } else if( STREQU( var, "UploadDirectory" ) ) {
+    if( STREQU( var, "UploadDirectory" ) ) {
 	rdc->upload_dir = val;
+    } else {
+	string = Rivet_AppendToScript( rdc, var, val );
     }
-    ap_table_set( rdc->rivet_dir_vars, var, val );
+
+    ap_table_set( rdc->rivet_dir_vars, var, string );
     return( NULL );
 }
 
@@ -752,20 +751,39 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 static const char *
 Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
 {
+    char *string = val;
+
     if ( var == NULL || val == NULL ) {
 	return "Rivet Error: RivetUserConf requires two arguments";
     }
 
-    if( STREQU( var, "BeforeScript" ) ) {
-	Rivet_AppendToScript( rdc, var, val );
-    } else if( STREQU( var, "AfterScript" ) ) {
-	Rivet_AppendToScript( rdc, var, val );
-    } else if( STREQU( var, "ErrorScript" ) ) {
-	Rivet_AppendToScript( rdc, var, val );
-    }
+    string = Rivet_AppendToScript( rdc, var, val );
 
-    ap_table_set( rdc->rivet_user_vars, var, val );
+    ap_table_set( rdc->rivet_user_vars, var, string );
     return( NULL );
+}
+
+/*
+ * Merge the per-directory configuration options into a new configuration.
+ */
+static void *
+Rivet_MergeDirConfigVars( pool *p, rivet_server_conf *new,
+			  rivet_server_conf *base, rivet_server_conf *add )
+{
+    new->rivet_before_script = add->rivet_before_script ?
+	add->rivet_before_script : base->rivet_before_script;
+    new->rivet_after_script = add->rivet_after_script ?
+	add->rivet_after_script : base->rivet_after_script;
+    new->rivet_error_script = add->rivet_error_script ?
+	add->rivet_error_script : base->rivet_error_script;
+    new->upload_dir = add->upload_dir ?
+	add->upload_dir : base->upload_dir;
+
+    /* Merge the tables of dir and user variables. */
+    new->rivet_dir_vars =
+	ap_overlay_tables( p, base->rivet_dir_vars, add->rivet_dir_vars );
+    new->rivet_user_vars =
+	ap_overlay_tables( p, base->rivet_user_vars, add->rivet_user_vars );
 }
 
 /* Function to get a config and merge the directory/server options  */
@@ -784,20 +802,10 @@ Rivet_GetConf( request_rec *r )
     rdc = RIVET_SERVER_CONF( dconf );
 
     newconfig = RIVET_NEW_CONF( r->pool );
-    newconfig->server_interp = rsc->server_interp;
 
     Rivet_CopyConfig( rsc, newconfig );
 
-    /* List here things that can be per-directory. */
-
-    newconfig->rivet_before_script = rdc->rivet_before_script ?
-	rdc->rivet_before_script : rsc->rivet_before_script;
-
-    newconfig->rivet_after_script = rdc->rivet_after_script ?
-	rdc->rivet_after_script : rsc->rivet_after_script;
-
-    newconfig->rivet_error_script = rdc->rivet_error_script ?
-	rdc->rivet_error_script : rsc->rivet_error_script;
+    Rivet_MergeDirConfigVars( r->pool, newconfig, rsc, rdc );
 
     return newconfig;
 }
@@ -887,19 +895,7 @@ Rivet_MergeDirConfig( pool *p, void *basev, void *addv )
     rivet_server_conf *add  = (rivet_server_conf *)addv;
     rivet_server_conf *new  = RIVET_NEW_CONF(p);
 
-    /* Merge the allowed directory options. */
-    new->rivet_before_script = add->rivet_before_script ?
-	add->rivet_before_script : base->rivet_before_script;
-    new->rivet_after_script = add->rivet_after_script ?
-	add->rivet_after_script : base->rivet_after_script;
-    new->rivet_error_script = add->rivet_error_script ?
-	add->rivet_error_script : base->rivet_error_script;
-
-    /* Merge the tables of dir and user variables. */
-    new->rivet_dir_vars =
-	ap_overlay_tables( p, base->rivet_dir_vars, add->rivet_dir_vars );
-    new->rivet_user_vars =
-	ap_overlay_tables( p, base->rivet_user_vars, add->rivet_user_vars );
+    Rivet_MergeDirConfigVars( p, new, base, add );
 
     return new;
 }

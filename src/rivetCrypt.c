@@ -5,7 +5,6 @@
 #include <tcl.h>
 #include "rivet.h"
 #include <unistd.h>
-#include <crypt.h>
 
 #define MODE_DECRYPT 0
 #define MODE_ENCRYPT 1

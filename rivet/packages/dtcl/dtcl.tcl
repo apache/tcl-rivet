@@ -33,6 +33,4 @@ proc hflush {} {
     flush stdout
 }
 
-proc dtcl_info {} {
-    rivet_info
-}
+proc dtcl_info {} { }

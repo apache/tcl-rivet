@@ -87,7 +87,7 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     }
 
     if (toplevel) {
-	Tcl_SetStringObj(outbuf, "namespace eval request {\n", -1);
+	Tcl_AppendToObj(outbuf, "namespace eval request {\n", -1);
     } else {
 	Tcl_SetStringObj(outbuf, "", -1);
     }
