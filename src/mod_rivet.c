@@ -346,7 +346,7 @@ static int execute_and_check(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r
 
 /* This is a seperate function so that it may be called from 'Parse' */
 
-int get_parse_exec_file(request_rec *r, rivet_server_conf *rsc, int toplevel)
+int get_parse_exec_file(request_rec *r, rivet_server_conf *rsc, char *filename, int toplevel)
 {
     char *hashKey = NULL;
     int isNew = 0;
@@ -356,12 +356,31 @@ int get_parse_exec_file(request_rec *r, rivet_server_conf *rsc, int toplevel)
     Tcl_HashEntry *entry = NULL;
     Tcl_Interp *interp = rsc->server_interp;
 
+    time_t ctime;
+    time_t mtime;
+
+    /* If toplevel is 0, we are being called from Parse, which means
+       we need to get the information about the file ourselves. */
+    if (toplevel == 0) 
+    {
+	int ret = 0;
+	struct stat stat;
+	ret = Tcl_Stat(filename, &stat);
+	if (ret < 0)
+	    return TCL_ERROR;
+	ctime = stat.st_ctime;
+	mtime = stat.st_mtime;
+    } else {
+	ctime = r->finfo.st_ctime;
+	mtime = r->finfo.st_mtime;
+    }
+
     /* Look for the script's compiled version. If it's not found,
        create it. */
     if (*(rsc->cache_size))
     {
-	hashKey = ap_psprintf(r->pool, "%s%lx%lx%d", r->filename,
-			      r->finfo.st_mtime, r->finfo.st_ctime, toplevel);
+	hashKey = ap_psprintf(r->pool, "%s%lx%lx%d", filename,
+			      mtime, ctime, toplevel);
 	entry = Tcl_CreateHashEntry(rsc->objCache, hashKey, &isNew);
     }
     if (isNew || *(rsc->cache_size) == 0)
@@ -369,13 +388,14 @@ int get_parse_exec_file(request_rec *r, rivet_server_conf *rsc, int toplevel)
 	outbuf = Tcl_NewObj();
 	Tcl_IncrRefCount(outbuf);
 
-	if(!strcmp(r->content_type, "application/x-httpd-tcl"))
+	if(!strcmp(r->content_type, "application/x-httpd-tcl") || toplevel == 0)
 	{
-	    /* It's a TTML file  */
-	    result = get_ttml_file(r, rsc, interp, r->filename, 1, outbuf);
+	    /* It's a TTML file - which we always are if toplevel is
+               0, meaning we are in the Parse command */
+	    result = get_ttml_file(r, rsc, interp, filename, toplevel, outbuf);
 	} else {
 	    /* It's a plain Tcl file */
-	    result = get_tcl_file(r, interp, r->filename, outbuf);
+	    result = get_tcl_file(r, interp, filename, outbuf);
 	}
 	if (result != TCL_OK)
 	    return result;
@@ -566,7 +586,7 @@ static int send_content(request_rec *r)
     }
 #endif /* USE_ONLY_UPLOAD_COMMAND == 1 */
 
-    get_parse_exec_file(r, rsc, 1);
+    get_parse_exec_file(r, rsc, r->filename, 1);
     /* reset globals  */
     *(rsc->buffer_output) = 0;
     *(rsc->headers_printed) = 0;
