@@ -408,9 +408,6 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     Tcl_ObjSetVar2(req->interp, envvar, Tcl_NewStringObj("RIVET_CACHE_SIZE", -1),
 		   Tcl_NewIntObj(*(rsc->cache_size)), 0);
 
-    /* cleanup system cgi variables */
-    ap_clear_table(req->req->subprocess_env);
-
     return TCL_OK;
 }
 
