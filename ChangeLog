@@ -1,3 +1,14 @@
+2004-11-05  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * rivet/packages/session/session-class.tcl: Quote backslashes when
+	  storing so they won't be stripped by the database.  Needs to
+	  be tested for MySQL and SQLlite.
+
+2004-11-04  Karl Lehenbauer  <karl-rivet@sc.com>
+
+        * rivet/packages/dio/*.tcl: Documented the code for
+	  DIO and DIOdisplay.
+
 2004-11-04  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_ServerConf): Use Tcl_GetBoolean, at
