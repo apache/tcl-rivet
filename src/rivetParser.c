@@ -12,7 +12,7 @@
 #include <tcl.h>
 #include "rivetParser.h"
 
-static int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
+int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
 
 /*
  *-----------------------------------------------------------------------------
@@ -140,7 +140,7 @@ Rivet_GetRivetFile(char *filename, int toplevel,
  *-----------------------------------------------------------------------------
  */
 
-static int
+int
 Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 {
     char *next;
@@ -219,7 +219,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 	    {
 		if ((++p) == endseqlen)
 		{
-		    Tcl_AppendToObj(outbuf, "\n puts -nonewline \"", -1);
+		    Tcl_AppendToObj(outbuf, "\nputs -nonewline \"", -1);
 		    inside = 0;
 		    p = 0;
 		}

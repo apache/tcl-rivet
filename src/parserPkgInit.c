@@ -47,6 +47,38 @@ Parse_Rivet(
     return TCL_OK;
 }
 
+static int
+Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
+		int objc, Tcl_Obj *CONST objv[])
+{
+    int inside = 0;
+    Tcl_Obj *outbuf;
+
+    outbuf = Tcl_NewObj();
+
+    if (objc != 2)
+    {
+	Tcl_WrongNumArgs(interp, 1, objv, "data");
+	return TCL_ERROR;
+    }
+    Tcl_IncrRefCount(outbuf);
+
+    Tcl_AppendToObj(outbuf, "namespace eval request {\n", -1);
+    Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
+
+    inside = Rivet_Parser(outbuf, objv[1]);
+
+    if (inside == 0)
+    {
+	Tcl_AppendToObj(outbuf, "\"\n", 2);
+    }
+
+    Tcl_AppendToObj(outbuf, "\n}\n", -1);
+
+    Tcl_SetObjResult(interp, outbuf);
+    Tcl_DecrRefCount(outbuf);
+    return TCL_OK;
+}
 
 EXTERN int
 Rivetparser_Init( Tcl_Interp *interp )
@@ -57,5 +89,11 @@ Rivetparser_Init( Tcl_Interp *interp )
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
 
-    return Tcl_PkgProvide( interp, "rivetparser", "0.1" );
+    Tcl_CreateObjCommand(interp,
+			 "rivet::parserivetdata",
+			 Parse_RivetData,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+
+    return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }

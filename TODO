@@ -57,6 +57,8 @@ TODO
 
 * Find a way of integrating the Tcl event loop?
 
+* Document parser commands.
+
 MAYBE
 =====
 
