@@ -6,7 +6,7 @@
 #
 # This file is responsible for the top-level "make" style processing.
 
-set auto_path "$auto_path [file join [file dirname [info script]] buildscripts]"
+set auto_path "[file join [file dirname [info script]] buildscripts] $auto_path"
 package require aardvark
 
 foreach script {

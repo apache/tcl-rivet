@@ -1,5 +1,9 @@
 2003-04-07  David N. Welton  <davidw@dedasys.com>
 
+	* src/make.tcl: Make sure that auto_path gets extra stuff at the
+ 	  beginning, so as not to create problems when using it to fetch
+	  the prefix.
+
 	* VERSION: Bump point number for new release.
 
 	* src/make.tcl: Use package require to load aardvark.
