@@ -160,7 +160,7 @@ AddNode all {
 
 AddNode module {
     depends shared
-    puts "mod_rivet[info sharedlibextension] built - now run $argv0 install to complete installation."
+    tcl puts "mod_rivet[info sharedlibextension] built - now run $argv0 install to complete installation."
 }
 
 # Make a shared build.
@@ -239,6 +239,7 @@ AddNode distclean {
     sh { find . -name ".#*" | xargs rm -f }
     sh { find . -name "\#*" | xargs rm -f }
     tcl cd src
+    tcl file delete -force configs.tcl
 }
 
 # Create the HTML documentation from the XML document.

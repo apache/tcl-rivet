@@ -99,6 +99,8 @@ proc aardvark::createnode { name } {
 
 proc aardvark::runbuildcommand { direction graphname node } {
     variable grph
+    variable vbose
+
     set rebuild 0
     set mtime 0
     set deps [$grph nodes -out $node]
@@ -107,23 +109,25 @@ proc aardvark::runbuildcommand { direction graphname node } {
     # check file time
     if { [file exists $node] } {
 	set mtime [file mtime $node]
-    }
-
-    # rebuild if dependencies are newer than file
-    if { [llength $deps] > 0 } {
-	foreach dep $deps {
-	    if { [file exists $dep] } {
-		set depmtime [file mtime $dep]
-	    } else {
-		set depmtime 0
+	# rebuild if dependencies are newer than file
+	if { [llength $deps] > 0 } {
+	    foreach dep $deps {
+		if { [file exists $dep] } {
+		    set depmtime [file mtime $dep]
+		} else {
+		    set depmtime 0
+		}
+		if { $depmtime > $mtime } {
+		    set rebuild 1
+		}
 	    }
-	    if { $depmtime > $mtime } {
-		set rebuild 1
-	    }
+	} else {
+	    set rebuild 1
 	}
     } else {
 	set rebuild 1
     }
+
 
     if { $rebuild == 1 && [info exists buildinfo(cmds)] } {
 	Output node "$node"

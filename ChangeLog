@@ -1,3 +1,11 @@
+2004-04-24  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.tcl (aardvark::runbuildcommand): If
+	the node doesn't exist, always "rebuild" it.
+
+	* src/make.tcl: Make sure make install message is only printed
+	when the correct target is called.
+
 2004-04-21  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/packages/dio/pkgIndex.tcl: Add sqlite interface.
@@ -19,7 +27,7 @@
 
 2004-04-12  Andy Doerr	    <andydoerr@swbell.net>
 
-	* rivet/packages/dio/diodisplay.tcl: 
+	* rivet/packages/dio/diodisplay.tcl:
 	- Modified searchBy form field to use the -labels and -values
 	parallel lists in form.tcl class method (select).
 	- Modified Search proc to not use FieldTextMap as the search
