@@ -1,3 +1,25 @@
+2003-05-23  David N. Welton  <davidw@dedasys.com>
+
+	* src/buildscripts/aardvark.test: Do a version check on gcc.  We
+	used that for the tests, so we might as well be sure we're using
+	the same version.
+
+	* src/make.tcl: Use buildscripts.tcl to load up all the other
+	scripts we need.  Add PARSER_SHLIB as a dependency for the shared
+	build.
+
+	* src/buildscripts/aardvark.test: Updated aardvark tests to
+	current GCC.
+
+	* src/buildscripts/buildscripts.tcl: New file: use this file to
+	load up all the other scripts.
+
+	* src/buildscripts/findconfig.tcl: Moved all the functionality
+	into parsetclConfig.tcl.
+
+	* src/buildscripts/aardvark.tcl: Just source the graph.tcl file
+	directly instead of dealing with packages.  Thanks to Pat Thoyts.
+
 2003-05-22  David N. Welton  <davidw@dedasys.com>
 
 	* src/rivetParser.c (Rivet_GetRivetFile): API Change: instead of

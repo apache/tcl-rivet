@@ -7,7 +7,7 @@
 # See the LICENSE file for licensing terms.
 
 package provide aardvark 0.1
-package require struct
+source [file join [file dirname [info script]] graph.tcl]
 
 namespace eval aardvark {
     # the graph 'object' we use throughout.

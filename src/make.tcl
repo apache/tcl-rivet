@@ -6,20 +6,10 @@
 #
 # This file is responsible for the top-level "make" style processing.
 
-set auto_path "[file join [file dirname [info script]] buildscripts] $auto_path"
-package require aardvark
-
-foreach script {
-    helpers.tcl
-    graph.tcl
-    parsetclConfig.tcl
-    findapxs.tcl
-} {
-    source [file join [file dirname [info script]] buildscripts $script]
-}
+# Source the other scripts we need.
+source [file join [file dirname [info script]] buildscripts buildscripts.tcl]
 
 # Do we have a threaded Tcl?
-
 if { [info exists tcl_platform(threaded)] } {
     set TCL_THREADED "-DTCL_THREADED=1"
 } else {
@@ -185,7 +175,7 @@ AddNode module {
 # Make a shared build.
 
 AddNode shared {
-    depends $MOD_SHLIB $RIVETLIB_SHLIB
+    depends $MOD_SHLIB $RIVETLIB_SHLIB $PARSER_SHLIB
 }
 
 # Make a static build - incomplete at the moment.
@@ -224,7 +214,7 @@ AddNode $PKGINDEX {
 # Install everything.
 
 AddNode install {
-    depends $MOD_SHLIB $RIVETLIB_SHLIB
+    depends $MOD_SHLIB $RIVETLIB_SHLIB $PARSER_SHLIB
     tcl file delete -force [file join $LIBEXECDIR rivet]
     tcl file delete -force [file join $PREFIX rivet]
     tcl file copy -force $MOD_SHLIB $LIBEXECDIR
@@ -239,7 +229,7 @@ AddNode install {
 
 set DEBPREFIX [file join [pwd] .. debian tmp]
 AddNode debinstall {
-    depends $MOD_SHLIB $RIVETLIB_SHLIB
+    depends $MOD_SHLIB $RIVETLIB_SHLIB $PARSER_SHLIB
     tcl {file delete -force [file join $DEBPREFIX/$LIBEXECDIR rivet]}
     tcl {file copy -force $MOD_SHLIB "$DEBPREFIX/$LIBEXECDIR"}
     tcl {file copy -force [file join .. rivet] "$DEBPREFIX/$PREFIX"}

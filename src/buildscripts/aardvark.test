@@ -15,6 +15,14 @@ proc aardvark::Output { type txt } {
 
 namespace import aardvark::*
 
+set gccversion [exec gcc --version]
+set line [lindex [split $gccversion \n] 0]
+if { ! [string match "gcc (GCC) 3.*" $line] } {
+    puts stderr $line
+    puts stderr "gcc version does not match that tested."
+    exit 1
+}
+
 tcltest::test aardvark-1.1 {compile a normal file} {
     AddNode all {
 	sh gcc -o av1 av1.c
@@ -38,7 +46,7 @@ tcltest::test aardvark-2.1 {compile a broken file} {
     Run
     set ::OUT
 } "error av2.c: In function `main':
-av2.c:5: parse error before `}'"
+av2.c:5: syntax error before '}' token"
 
 tcltest::test aardvark-2.2 {compile a broken file - compilation should stop} {
     AddNode all {
@@ -48,7 +56,7 @@ tcltest::test aardvark-2.2 {compile a broken file - compilation should stop} {
     Run
     set ::OUT
 } "error av2.c: In function `main':
-av2.c:5: parse error before `}'"
+av2.c:5: syntax error before '}' token"
 
 tcltest::test aardvark-2.3 {compile a broken file w/ multiple nodes - compilation should stop} {
     AddNode all {
@@ -64,7 +72,7 @@ tcltest::test aardvark-2.3 {compile a broken file w/ multiple nodes - compilatio
     Run
     set ::OUT
 } "error av2.c: In function `main':
-av2.c:5: parse error before `}'"
+av2.c:5: syntax error before '}' token"
 
 tcltest::test aardvark-3.1 {compile a file that generates a warning} {
     AddNode all {
