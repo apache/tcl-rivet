@@ -10,6 +10,14 @@
 	* rivet/packages/dio/dio_Postgresql.tcl: Added new package to
 	separate postgres DIO interface.
 
+2004-04-12  Andy Doerr	    <andydoerr@swbell.net>
+
+	* rivet/packages/dio/diodisplay.tcl: 
+	- Modified searchBy form field to use the -labels and -values
+	parallel lists in form.tcl class method (select).
+	- Modified Search proc to not use FieldTextMap as the search
+	now does not need to look up the db field name.
+
 2004-04-05  David N. Welton  <davidw@dedasys.com>
 
 	* tests/docroot1/ tests/docroot2/: Files used to test virtual
