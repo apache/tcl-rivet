@@ -105,7 +105,8 @@ proc determinemodules { binname } {
 # copy the rivet init files.
 
 proc copyinit { } {
-    file copy -force [file join .. rivet init.tcl] rivet
+    if {[file exists rivet/init.tcl]} { return }
+    file copy -force [file join .. rivet] .
 }
 
 

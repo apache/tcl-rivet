@@ -11,7 +11,7 @@ exec tclsh "$0" "$@"
 package require tcltest
 package require http
 
-set urlbase "http://localhost:8080/"
+set urlbase "http://localhost:8081/"
 
 # Test stanzas are created by giving the test a name and a
 # description.  The code is then executed, and the results compared

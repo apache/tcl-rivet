@@ -9,11 +9,6 @@ ServerRoot "$CWD"
 
 PidFile "$CWD/httpd.pid"
 
-# ScoreBoardFile "$CWD/apache_runtime_status"
-
-ResourceConfig "$CWD/srm.conf"
-AccessConfig "$CWD/access.conf"
-
 Timeout 300
 
 MaxRequestsPerChild 100
@@ -22,7 +17,7 @@ $LOADMODULES
 
 LoadModule rivet_module $CWD/../src/mod_rivet[info sharedlibextension]
 
-Port 8080
+Port 8081
 
 ServerName localhost
 
