@@ -1,8 +1,6 @@
 catch {package require Tclx}
 package require Itcl
 
-package provide DIO 1.0
-
 namespace eval ::DIO {
 
 proc handle {interface args} {
@@ -321,6 +319,7 @@ proc handle {interface args} {
     ##
     ## Functions to get and set public variables.
     ##
+    method interface {{string ""}} { configure_variable interface $string }
     method errorinfo {{string ""}} { configure_variable errorinfo $string }
     method db {{string ""}} { configure_variable db $string }
     method table {{string ""}} { configure_variable table $string }
@@ -332,6 +331,7 @@ proc handle {interface args} {
     method host {{string ""}} { configure_variable host $string }
     method port {{string ""}} { configure_variable port $string }
 
+    public variable interface	""
     public variable errorinfo	""
 
     public variable db		""
@@ -566,6 +566,12 @@ proc handle {interface args} {
 	return [$this string "select last_value from $sequence"]
     }
 
+    method sql_limit_syntax {limit {offset ""}} {
+	set sql " LIMIT $limit"
+	if {![lempty $offset]} { append sql " OFFSET $offset" }
+	return $sql
+    }
+
     ## If they change DBs, we need to close the connection and re-open it.
     public variable db "" {
 	if {[info exists conn]} {
@@ -574,6 +580,7 @@ proc handle {interface args} {
 	}
     }
 
+    public variable interface	"Postgresql"
     private variable conn
 
 } ; ## ::itcl::class Postgresql
@@ -619,7 +626,11 @@ proc handle {interface args} {
     inherit Database
 
     constructor {args} {eval configure $args} {
-	package require Mysqltcl
+	if {[catch {package require Mysqltcl}] \
+	    && [catch {package require mysql}]} {
+	    return -code error "No MySQL Tcl package available"
+	}
+
 	eval configure $args
 
 	if {[lempty $db]} {
@@ -639,8 +650,8 @@ proc handle {interface args} {
 
 	if {![lempty $user]} { lappend command -user $user }
 	if {![lempty $pass]} { lappend command -pass $pass }
-	if {![lempty $host]} { lappend command -host $host }
 	if {![lempty $port]} { lappend command -port $port }
+	if {![lempty $host]} { lappend command $host }
 
 	if {[catch $command error]} { return -code error $error }
 
@@ -684,12 +695,20 @@ proc handle {interface args} {
 	return $string
     }
 
+    method sql_limit_syntax {limit {offset ""}} {
+	if {[lempty $offset]} {
+	    return " LIMIT $limit"
+	}
+	return " LIMIT [expr $offset - 1],$limit"
+    }
+
     public variable db "" {
 	if {[info exists conn]} {
 	    mysqluse $conn $db
 	}
     }
 
+    public variable interface	"Mysql"
     private variable conn
 
 } ; ## ::itcl::class Mysql
@@ -712,3 +731,5 @@ proc handle {interface args} {
 } ; ## ::itcl::class MysqlResult
 
 } ; ## namespace eval DIO
+
+package provide DIO 1.0
