@@ -86,25 +86,32 @@ proc handle {interface args} {
 	    set elem [lindex $args $i]
 
 	    switch -- [::string tolower $elem] {
-		# -and -- switch to AND-style processing
-		"-and" { set bool AND }
+		"-and" { 
+		    # -and -- switch to AND-style processing
+		    set bool AND 
+		}
 
-		# -or -- switch to OR-style processing
-		"-or"  { set bool OR }
+		"-or"  { 
+		    # -or -- switch to OR-style processing
+		    set bool OR 
+		}
 
-		# -table -- identify which table the query is about
-		"-table" { set myTable [lindex $args [incr i]] }
+		"-table" { 
+		    # -table -- identify which table the query is about
+		    set myTable [lindex $args [incr i]] 
+		}
 
-		# -select - 
 		"-select" {
+		    # -select - 
 		    set what [lindex $args [incr i]]
 		}
 
-		# it wasn't -and, -or, -table, or -select...
 		default {
+		    # it wasn't -and, -or, -table, or -select...
 
 		    # if the first character of the element is a dash,
 		    # it's a field name and a value
+
 		    if {[::string index $elem 0] == "-"} {
 			set field [::string range $elem 1 end]
 			set elem [lindex $args [incr i]]
