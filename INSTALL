@@ -1,5 +1,5 @@
 The only thing you need to install Rivet is a C compiler, linker, and
-of course, Tcl!
+of course, Tcl (8.4 or newer).
 
 Rivet is built by means of Tcl based configure and make like scripts
 which calculate dependencies and run the C compiler and linker.
