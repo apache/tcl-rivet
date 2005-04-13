@@ -1,3 +1,8 @@
+2005-04-14  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* win/Makefile.vc: Update the makefile and installer script
+	* win/Rivet.nsi:   for the 0.5.0 release.
+
 2005-03-24  David N. Welton  <davidw@dedasys.com>
 
 	* Makefile.am (EXTRA_DIST): Added the doc, rivet and debian

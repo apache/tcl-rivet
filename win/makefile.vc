@@ -156,7 +156,7 @@ Please `cd` to its location first.
 PROJECT = rivet
 !include "rules.vc"
 
-DOTVERSION      = 0.4.0
+DOTVERSION      = 0.5.0
 VERSION         = $(DOTVERSION:.=)
 STUBPREFIX      = $(PROJECT)stub
 
@@ -405,7 +405,7 @@ Default topic=html\index.en.html
 
 # Create the Windows Nullsoft installer file.
 MAKENSIS="C:\Program Files\NSIS\MakeNSIS.exe"
-installer: $(PROJECT)
+installer: $(PROJECT) pkgIndex
 	$(MAKENSIS) $(PROJECT).nsi
 
 #---------------------------------------------------------------------
@@ -451,6 +451,18 @@ $<
 #
 #---------------------------------------------------------------------
 
+pkgIndex:
+	@echo Creating package index script
+	@tclsh <<
+cd [file join $(ROOT) rivet]
+eval pkg_mkIndex . init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]
+set f [open pkgIndex.tcl a+]
+puts $$f {
+package ifneeded Rivet 1.1 [list load [file join $$dir packages rivet rivet.dll]]
+package ifneeded rivetparser 0.2 [list load [file join $$dir packages rivet rivetparser.dll]]
+}
+<<
+
 install-binaries:
 	@echo Installing to '$(SCRIPT_INSTALL_DIR)'
 	@if not exist $(SCRIPT_INSTALL_DIR)\nul mkdir $(SCRIPT_INSTALL_DIR)
@@ -463,11 +475,9 @@ install-binaries:
 	@echo Installing $(MOD_RIVET) to $(APACHE_MODULES_DIR)
 	@$(CPY) $(MOD_RIVET) $(APACHE_MODULES_DIR)
 
-install-libraries:
+install-libraries: pkgIndex
 	@echo Installing to '$(SCRIPT_INSTALL_DIR)'
 	@if exist $(LIBDIR)\nul $(CPY) /s $(LIBDIR) $(SCRIPT_INSTALL_DIR)
-	@cd $(SCRIPT_INSTALL_DIR)\packages\rivet
-	@echo pkg_mkIndex -verbose . | $(TCLSH)
 
 install-docs:
 
