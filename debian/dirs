@@ -1,2 +1,3 @@
-usr/lib/apache/1.3
-usr/bin/
+/usr/lib/apache/1.3
+/usr/bin/
+/etc/apache/conf.d

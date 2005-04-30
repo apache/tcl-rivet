@@ -7,7 +7,7 @@ Standards-Version: 3.5.8
 
 Package: rivet
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, apache
 Description: Server-side Tcl programming system combining ease of use and power
  Apache Rivet is a system for creating dynamic web content via a
  programming language integrated with Apache Web Server. It is

@@ -32,6 +32,11 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+	cp debian/500mod_rivet.info \
+                debian/tmp/`apxs -q LIBEXECDIR`/500mod_rivet.info
+	cp debian/rivet.conf \
+                debian/tmp/etc/apache/conf.d/rivet.conf
+
 
 binary-indep: build install
 
