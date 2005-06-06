@@ -347,6 +347,10 @@ proc handle {interface args} {
 
 	set res [exec $req]
 
+	$res forall -array $arrayName {
+	    uplevel 1 $body
+        }
+
 	if {[$res error]} {
 	    set errinf [$res errorinfo]
 	    $res destroy
@@ -354,9 +358,6 @@ proc handle {interface args} {
 	}
 
         set ret [$res numrows]
-	$res forall -array $arrayName {
-	    uplevel 1 $body
-        }
 	$res destroy
 	return $ret
     }
