@@ -6,6 +6,9 @@
 	  the forall on the result handle prior to checking for an error,
 	  in case an error occurs inside the forall.  From Peter da Silva.
 
+	* rivet/packages/dio/dioSQLite.tcl: SQLite implementation for DIO.
+	  From Peter da Silva.
+
 2005-04-14  Pat Thoyts  <patthoyts@users.sourceforge.net>
 
 	* win/Makefile.vc: Update the makefile and installer script
