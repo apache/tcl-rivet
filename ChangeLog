@@ -1,3 +1,11 @@
+2005-06-06  Karl Lehenbauer  <karl-rivet@sc.com>
+
+	* rivet/packages/dio/dio.tcl: Delete now returns the number of
+	  records that were deleted rather than just a 1 if it deleted
+	  one or more and a 0 if it didn't.  The forall method now does
+	  the forall on the result handle prior to checking for an error,
+	  in case an error occurs inside the forall.  From Peter da Silva.
+
 2005-04-14  Pat Thoyts  <patthoyts@users.sourceforge.net>
 
 	* win/Makefile.vc: Update the makefile and installer script

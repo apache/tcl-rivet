@@ -37,11 +37,10 @@ you gotta use automake 1.9 (and with it, aclocal 1.9)
 
 you gotta use autoconf 2.59 (and with it, autoheader 2.59)
 
-you need to build and install /usr/ports/devel/gnu-autoconf
-(actually i'm not sure if you do or not, read the pkg-descr
-and decide for yourself i guess)
+You need to build and install /usr/ports/devel/gnu-autotools
+to get a libtoolize that has no special adaptations to FreeBSD.
 
-PATH=/usr/local/gnu-autoconf/bin:$PATH
+PATH=/usr/local/gnu-autotools/bin:$PATH
 
 aclocal19
 automake19
