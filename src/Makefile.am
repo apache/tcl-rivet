@@ -34,7 +34,7 @@ rivetChannel.c rivetChannel.h rivetParser.c rivetParser.h rivetCore.c	\
 mod_rivet.c TclWebapache.c mod_rivet.h TclWeb.h rivet.h			\
 apache_multipart_buffer.h apache_request.h
 
-mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
+mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
@@ -44,7 +44,7 @@ mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_T
 # Rivet Library
 #
 librivet_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
-librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
+librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 librivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 librivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
@@ -52,6 +52,6 @@ librivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TA
 # Rivet Parser Library
 #
 librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
-librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -no-undefined -module -avoid-version
+librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'

@@ -1,3 +1,9 @@
+
+2005-06-14  Karl Lehenbauer  <karl-rivet@sc.com>
+	* configure.ac, src/Makefile.am, tclconfig/config.guess, 
+	  config.sub, ltmain.sh: Updated with libtoolize 1.5.18 -- Rivet 
+	  now builds cleanly under Mac OS X.
+
 2005-06-06  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* rivet/packages/dio/dio.tcl: Delete now returns the number of

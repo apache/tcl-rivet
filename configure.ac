@@ -23,7 +23,7 @@ dnl
 #-----------------------------------------------------------------------
 
 AC_INIT([Rivet],[0.5.0])
-# AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
