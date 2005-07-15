@@ -943,9 +943,9 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
     } else if( STREQU( var, "UploadMaxSize" ) ) {
 	rsc->upload_max = strtol( val, NULL, 10 );
     } else if( STREQU( var, "UploadFilesToVar" ) ) {
-	Tcl_GetBoolean (NULL, var, &rsc->upload_files_to_var);
+	Tcl_GetBoolean (NULL, val, &rsc->upload_files_to_var);
     } else if( STREQU( var, "SeparateVirtualInterps" ) ) {
-	Tcl_GetBoolean (NULL, var, &rsc->separate_virtual_interps);
+	Tcl_GetBoolean (NULL, val, &rsc->separate_virtual_interps);
     } else {
 	string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }

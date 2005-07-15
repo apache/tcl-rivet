@@ -1,3 +1,7 @@
+2005-07-15  David N. Welton  <davidw@dedasys.com>
+
+	* src/mod_rivet.c (Rivet_ServerConf): Use Tcl_GetBoolean on the
+	*val*, not the *var*.  Big difference!
 
 2005-06-14  Karl Lehenbauer  <karl-rivet@sc.com>
 	* configure.ac, src/Makefile.am, tclconfig/config.guess, 
