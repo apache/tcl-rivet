@@ -100,6 +100,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
 	/* There was an error, see if it's from Rivet and it was caused
 	 * by abort_page.
+	 */
 
 	errorCodeListObj = Tcl_GetVar2Ex (interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
 	/* errorCode is guaranteed to be set to NONE, but let's make sure
