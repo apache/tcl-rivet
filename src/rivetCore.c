@@ -745,7 +745,7 @@ TCL_CMD_HEADER( Rivet_NoBody )
 
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    static char *errorMessage = "Page generation terminated by abort_page directive";
 
     if (objc != 1)
     {
@@ -753,10 +753,9 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
 	return TCL_ERROR;
     }
 
-    TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(Tcl_GetChannel(interp, "stdout", NULL));
-    TclWeb_StopSending(globals->req);
-    return TCL_RETURN;
+    Tcl_AddErrorInfo (interp, errorMessage);
+    Tcl_SetErrorCode (interp, "RIVET", "ABORTPAGE", errorMessage, (char *)NULL);
+    return TCL_ERROR;
 }
 
 /*

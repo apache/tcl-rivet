@@ -1,3 +1,26 @@
+2005-08-01  Karl Lehenbauer  <karl-rivet@sc.com>
+	* abort_page was, for all intents and purposes, completely and utterly 
+	  broken -- it forced a return from whatever called it, as if it was 
+	  a "return" statement, but it didn't stop evaluating Tcl beyond that, 
+	  which was broken, and it discarded output by setting an "aborted"
+	  flag in Apache which, under certain circumstances caused browsers 
+	  to render blank pages, apparently related to keep-alive connections.
+	  It now works correctly by causing the interpreter to stop 
+	  interpreting, and doesn't mess up keep-alive connections, etc.  
+	  How it does this is it unwinds the interpreter by generating an 
+	  error with the errorCode set to "RIVET ABORTPAGE".  The error 
+	  handling code in Rivet checks for this, and if this is received, it 
+	  completes the page in the normal manner without executing the 
+	  user-registered or built-in error handlers.
+
+	  One potential incompatibility is that abort_page's execution
+	  can now be caught with Tcl's "catch" routine, although this could
+	  also be considered a feature -- Rivet coders who use "catch"
+	  should check errorCode to see if the first element of the list
+	  is RIVET and the second is ABORTPAGE and either regenerate the 
+	  abort_page, pass the error up, or handle it in some custom manner
+	  in their catch handler.
+
 2005-07-15  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_ServerConf): Use Tcl_GetBoolean on the

@@ -94,6 +94,41 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
     if( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
 	Tcl_Obj *errscript;
+	Tcl_Obj *errorCodeListObj;
+	Tcl_Obj *errorCodeElementObj;
+	char *errorCodeSubString;
+
+	/* There was an error, see if it's from Rivet and it was caused
+	 * by abort_page.
+
+	errorCodeListObj = Tcl_GetVar2Ex (interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
+	/* errorCode is guaranteed to be set to NONE, but let's make sure
+	 * anyway rather than causing a SIGSEGV
+	 */
+	ap_assert (errorCodeListObj != (Tcl_Obj *)NULL);
+
+	/* dig the first element out of the errorCode list and see if it
+	 * says Rivet -- this shouldn't fail either, but let's assert
+	 * success so we don't get a SIGSEGV afterwards */
+	ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 0, &errorCodeElementObj) == TCL_OK);
+
+	/* if the error was thrown by Rivet, see if it's abort_page and,
+	 * if so, don't treat it as an error, i.e. don't execute the
+	 * installed error handler or the default one, just let the
+	 * page emit as normal
+	 */
+	if (strcmp (Tcl_GetString (errorCodeElementObj), "RIVET") == 0) {
+
+	    /* dig the second element out of the errorCode list, make sure
+	     * it succeeds -- it should always
+	     */
+	    ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
+
+	    errorCodeSubString = Tcl_GetString (errorCodeElementObj);
+	    if (strcmp (errorCodeSubString, "ABORTPAGE") == 0) {
+		goto good;
+	    }
+	}
 
 	Tcl_SetVar( interp, "errorOutbuf",
 			Tcl_GetStringFromObj( outbuf, NULL ),
@@ -105,6 +140,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	} else {
 	    errscript = conf->rivet_default_error_script;
 	}
+
 	Tcl_IncrRefCount(errscript);
 	if (Tcl_EvalObjEx(interp, errscript, 0) == TCL_ERROR) {
 	    CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
@@ -112,12 +148,14 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 				    globals->req);
 	    TclWeb_PrintError( errorinfo, 0, globals->req );
 	}
+
 	/* This shouldn't make the default_error_script go away,
 	 * because it gets a Tcl_IncrRefCount when it is created. */
 	Tcl_DecrRefCount(errscript);
     }
 
     /* Make sure to flush the output if buffer_add was the only output */
+    good:
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(conf->outchannel));
 
