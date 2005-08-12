@@ -1,3 +1,11 @@
+2005-08-12  David N. Welton  <davidw@dedasys.com>
+
+	* configure.ac: Bump the version to 0.6.0.
+
+	* src/apache_request.c (ApacheRequest_parse_multipart): Added code
+	from httpd-apreq that supposedly deals with a problem in Opera
+	file uploads.
+
 2005-08-01  Karl Lehenbauer  <karl-rivet@sc.com>
 	* abort_page was, for all intents and purposes, completely and utterly 
 	  broken -- it forced a return from whatever called it, as if it was 

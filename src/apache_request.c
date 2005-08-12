@@ -494,7 +494,17 @@ int ApacheRequest_parse_multipart(ApacheRequest *req)
 	return HTTP_REQUEST_ENTITY_TOO_LARGE;
     }
 
-    (void)ap_getword(r->pool, &ct, '=');
+    do {
+        int blen;
+        boundary = ap_getword(r->pool, &ct, '=');
+        if (boundary == NULL)
+            return DECLINED;
+        blen = strlen(boundary);
+        if (blen == 0 || blen < strlen("boundary"))
+            return DECLINED;
+        boundary += blen - strlen("boundary");
+    } while (strcasecmp(boundary,"boundary") != 0);
+
     boundary = ap_getword_conf(r->pool, &ct);
 
     if (!(mbuff = multipart_buffer_new(boundary, length, r))) {

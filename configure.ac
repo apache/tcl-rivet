@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[0.5.0])
+AC_INIT([Rivet],[0.6.0])
 AC_CONFIG_HEADERS([config.h])
 
 #--------------------------------------------------------------------
