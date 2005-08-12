@@ -193,6 +193,7 @@ ApacheRequest *ApacheRequest_new(request_rec *r)
     req->upload_hook = NULL;
     req->hook_data = NULL;
     req->temp_dir = NULL;
+    req->raw_post = NULL;
     req->parsed = 0;
     req->r = r;
     req->nargs = 0;
@@ -407,6 +408,7 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
 	    return rc;
 	}
 	if (data) {
+	    req->raw_post = data; /* Give people a way of getting at the raw data. */
 	    split_to_parms(req, data);
 	}
     }

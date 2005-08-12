@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Be sure to use a recent autotools set.  1.8 works for me.
+# Be sure to use a recent autotools set.  1.9 works for me.
 
-VERSION="1.8"
+VERSION="1.9"
 
 if [ "$VERSION" != "" ]
     then
@@ -10,6 +10,4 @@ if [ "$VERSION" != "" ]
     VERSION="-$VERSION"
 fi
 
-aclocal${VERSION}
-autoconf
-automake${VERSION} --add-missing
+libtoolize -f -c && aclocal${VERSION} && automake${VERSION} --add-missing && autoconf

@@ -17,4 +17,4 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)@libdir@/rivet@VERSION@
 	cp -r rivet/* $(DESTDIR)@libdir@/rivet@VERSION@
 # This little bit of line noise generates the package index file (pkgIndex.tcl)
-	( cd  $(DESTDIR)@libdir@/rivet@VERSION@ ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	-( cd  $(DESTDIR)@libdir@/rivet@VERSION@ ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )

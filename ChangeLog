@@ -1,3 +1,17 @@
+2005-08-13  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_RawPost): Tcl command implementation to
+	fetch raw POST data or an empty string if none is available.
+
+	* src/apache_request.h: Added element to struct, and accessor
+	function.
+
+	* src/apache_request.c (ApacheRequest_parse_urlencoded): Save a
+	pointer to the raw data.
+
+	* src/TclWebapache.c (TclWeb_GetRawPost): Added a raw POST data
+	fetcher here.
+
 2005-08-12  David N. Welton  <davidw@dedasys.com>
 
 	* configure.ac: Bump the version to 0.6.0.

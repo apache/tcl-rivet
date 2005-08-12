@@ -589,7 +589,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
        get everything fixed and working first */
     if (rsc->upload_files_to_var)
     {
-	char *bytes = NULL;
+	/* char *bytes = NULL; */
 	Tcl_Channel chan = NULL;
 
 	/* bytes = Tcl_Alloc((unsigned)ApacheUpload_size(req->upload)); */
@@ -660,10 +660,10 @@ TclWeb_GetEnvVar( TclWebRequest *req, char *key )
     TclWeb_InitEnvVars( req );
 
     /* Check to see if it's a header variable first. */
-    (const char *)val = ap_table_get( req->req->headers_in, key );
+    val = (char *)ap_table_get( req->req->headers_in, key );
 
     if( !val ) {
-	(const char *)val = ap_table_get( req->req->subprocess_env, key );
+	val = (char *)ap_table_get( req->req->subprocess_env, key );
     }
 
     return val;
@@ -682,4 +682,26 @@ TclWeb_GetVirtualFile( TclWebRequest *req, char *virtualname )
     }
     if( apreq != NULL ) ap_destroy_sub_req( apreq );
     return( filename );
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * TclWeb_GetRawPost --
+ *
+ * 	Fetch the raw POST data from the request.
+ *
+ * Results:
+ *	The data, or NULL if it's not a POST or there is no data.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+char *
+TclWeb_GetRawPost ( TclWebRequest *req )
+{
+    return ApacheRequest_get_raw_post(req->apachereq);
 }

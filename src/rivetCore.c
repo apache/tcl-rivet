@@ -697,6 +697,38 @@ TCL_CMD_HEADER( Rivet_Upload )
 /*
  *-----------------------------------------------------------------------------
  *
+ * Rivet_RawPost --
+ *
+ * 	Returns the raw POST data.
+ *
+ * Results:
+ *	The raw post data, or an empty string if there is none.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER ( Rivet_RawPost )
+{
+    char *data;
+    Tcl_Obj *retval;
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    data = TclWeb_GetRawPost(globals->req);
+
+    if (!data) {
+	data = "";
+    }
+    retval = Tcl_NewStringObj(data, -1);
+    Tcl_SetObjResult(interp, retval);
+    return TCL_OK;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
  * Rivet_NoBody --
  *
  * 	Tcl command to erase body, so that only header is returned.
@@ -922,6 +954,11 @@ Rivet_InitCore( Tcl_Interp *interp )
     Tcl_CreateObjCommand(interp,
 			 "var_post",
 			 Rivet_Var,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			 "raw_post",
+			 Rivet_RawPost,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,
