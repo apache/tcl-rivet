@@ -1,6 +1,6 @@
 # apachetest.tcl -- Tcl-based Apache test suite
 
-# Copyright 2001-2004 The Apache Software Foundation
+# Copyright 2001-2005 The Apache Software Foundation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@
 
 set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 package require Tclx
-package require http 2.4.5
 package provide apachetest 0.1
+
+#package require http 2.4.5
+source [file join [file dirname [info script]] http.tcl]
 
 namespace eval apachetest {
 

@@ -1,5 +1,9 @@
 2005-08-13  David N. Welton  <davidw@dedasys.com>
 
+	* tests/apachetest/apachetest.tcl: Make sure we get our own
+	version of http.tcl.  Tcl Feature request 928154 means that we
+	need our own copy of http.tcl for now.
+
 	* tests/runtests.tcl (runtests_usage): Print out an error message
 	if the arguments aren't right. Fixed paths to load .so files, as
 	the auto tools put them in a different place.
