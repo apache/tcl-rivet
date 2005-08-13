@@ -84,6 +84,9 @@ struct ApacheUpload {
 #define MULTIPART_ENCTYPE "multipart/form-data"
 #define MULTIPART_ENCTYPE_LENGTH 19
 
+#define TEXT_XML_ENCTYPE "text/xml"
+#define TEXT_XML_ENCTYPE_LENGTH 8
+
 #ifdef  __cplusplus
  extern "C" {
 #endif 

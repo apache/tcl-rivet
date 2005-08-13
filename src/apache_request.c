@@ -372,11 +372,11 @@ int ApacheRequest___parse(ApacheRequest *req)
 	const char *ct = ap_table_get(r->headers_in, "Content-type");
 	if (ct && strncaseEQ(ct, DEFAULT_ENCTYPE, DEFAULT_ENCTYPE_LENGTH)) {
 	    result = ApacheRequest_parse_urlencoded(req);
-	}
-	else if (ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) {
-	   result = ApacheRequest_parse_multipart(req);
-	}
-	else {
+	} else if (ct && strncaseEQ(ct, TEXT_XML_ENCTYPE, TEXT_XML_ENCTYPE_LENGTH)) {
+	    result = ApacheRequest_parse_urlencoded(req);
+	} else if (ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) {
+	    result = ApacheRequest_parse_multipart(req);
+	} else {
 	    ap_log_rerror(REQ_ERROR,
 			  "[libapreq] unknown content-type: `%s'", ct);
 	    result = HTTP_INTERNAL_SERVER_ERROR;
@@ -401,7 +401,8 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
 
 	type = ap_table_get(r->headers_in, "Content-Type");
 
-	if (!strncaseEQ(type, DEFAULT_ENCTYPE, DEFAULT_ENCTYPE_LENGTH)) {
+	if (!strncaseEQ(type, DEFAULT_ENCTYPE, DEFAULT_ENCTYPE_LENGTH) &&
+	    !strncaseEQ(type, TEXT_XML_ENCTYPE, TEXT_XML_ENCTYPE_LENGTH)) {
 	    return DECLINED;
 	}
 	if ((rc = util_read(req, &data)) != OK) {

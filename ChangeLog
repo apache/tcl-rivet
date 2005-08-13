@@ -1,5 +1,15 @@
 2005-08-13  David N. Welton  <davidw@dedasys.com>
 
+	* tests/runtests.tcl (runtests_usage): Print out an error message
+	if the arguments aren't right. Fixed paths to load .so files, as
+	the auto tools put them in a different place.
+
+	* tests/apachetest/apachetest.tcl (apachetest::getbinname): Check
+	to make sure the server is executable.
+
+	* src/apache_request.c (ApacheRequest_parse_urlencoded): Patch
+	from Arnulf Wiedemann to allow XML POST data.
+
 	* src/rivetCore.c (Rivet_RawPost): Tcl command implementation to
 	fetch raw POST data or an empty string if none is available.
 

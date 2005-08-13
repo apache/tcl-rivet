@@ -3,7 +3,7 @@
 package require tcltest
 package require tclrivetparser
 
-load [file join [pwd] .. src librivetparser[info sharedlibext]]
+load [file join [pwd] .. src .libs librivetparser[info sharedlibext]]
 
 ::tcltest::test parserivetdata-1.1 {parserivetdata command} {
     set fl [open hello.rvt]

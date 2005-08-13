@@ -2,7 +2,7 @@
 # the next line restarts using tclsh \
 	exec tclsh "$0" "$@"
 
-# Copyright 2001-2004 The Apache Software Foundation
+# Copyright 2001-2005 The Apache Software Foundation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,20 @@
 set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] apachetest]]
 package require apachetest
 
-apachetest::getbinname $argv
+proc runtests_usage {} {
+    puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver?"
+    exit 1
+}
+
+if { [llength $argv] < 1 } {
+    runtests_usage
+}
+if { [catch {
+    apachetest::getbinname $argv
+} err ] } {
+    puts stderr $err
+    runtests_usage
+}
 
 apachetest::need_modules {
     {mod_log_config	  config_log_module}
@@ -33,7 +46,7 @@ apachetest::need_modules {
 }
 
 apachetest::makeconf server.conf {
-    LoadModule rivet_module [file join $CWD .. src mod_rivet[info sharedlibextension]]
+    LoadModule rivet_module [file join $CWD .. src .libs mod_rivet[info sharedlibextension]]
 
     <IfModule mod_mime.c>
     TypesConfig $CWD/mime.types
@@ -69,6 +82,7 @@ file copy -force [file join .. rivet] .
 
 # If 'startserver' is specified on the command line, just start up the
 # server without running tests.
+
 
 switch -exact -- [lindex $argv 1] {
     startserver {

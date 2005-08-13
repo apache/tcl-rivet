@@ -155,7 +155,7 @@ proc apachetest::startserver { args } {
 proc apachetest::getbinname { argv } {
     variable binname
     set binname [lindex $argv 0]
-    if { $binname == "" || ! [file exists $binname] } {
+    if { $binname == "" || ! [file executable $binname] } {
 	error "Please supply the full name and path of the Apache executable on the command line."
     }
     return $binname
