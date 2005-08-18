@@ -853,9 +853,12 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
 	if (sr != s) /* not the first one  */
 	{
 	    if (rsc->separate_virtual_interps != 0) {
+		char *slavename = ap_psprintf(p, "%s_%d", 
+					      sr->server_hostname, 
+					      sr->port);
 		/* Separate virtual interps. */
 		myrsc->server_interp = Tcl_CreateSlave(interp,
-						       sr->server_hostname, 0);
+						       slavename, 0);
 		Rivet_PerInterpInit(s, myrsc, p);
 	    } else {
 		myrsc->server_interp = rsc->server_interp;
