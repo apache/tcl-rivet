@@ -1,5 +1,7 @@
 2005-08-21  David N. Welton  <davidw@dedasys.com>
 
+	* doc/html/rivet.css: CSS tweaks for documentation.
+
 	* doc/rivet.xml: Updated build directions to ./configure ; make ;
 	make install.
 
