@@ -1,5 +1,8 @@
 2005-08-21  David N. Welton  <davidw@dedasys.com>
 
+	* doc/rivet.xml: Updated build directions to ./configure ; make ;
+	make install.
+
 	* src/rivetCore.c (Rivet_Upload): Fixed a line that is complained
 	about in newer GCC's (casting lvalues).
 

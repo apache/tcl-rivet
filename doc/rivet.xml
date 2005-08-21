@@ -94,10 +94,11 @@
       <step>
 	<title>Check Dependencies</title>
 	<para>
-	  To install Rivet, you will need Tcl 8.2 or greater and
+	  To install Rivet, you will need Tcl 8.4 or greater and
 	  Apache 1.3.xx.  It is known to run on Linux, FreeBSD,
 	  OpenBSD, and Solaris and HPUX.  Windows NT is also possible
-	  - please see the directions in the distribution.
+	  - please see the directions in the distribution.  Note that
+	  Rivet does not currently work with Apache 2.
 	</para>
       </step>
       <step>
@@ -157,91 +158,67 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
       </step>
       <step>
 	<title>Building Rivet</title>
-	<para>
-	  On Linux or Unix systems, Rivet uses the standard
-	  ./configure ; make ; make install technique.
-	</para>
 	<substeps>
 	  <step>
-	    <title>Run ./configure.tcl</title>
 	    <para>
-	      This is similar to the <filename>configure</filename>
-	      script included with many systems.  It's written in Tcl
-	      though, for increased speed and clarity.  It takes
-	      several arguments:
+	      On Linux or Unix systems, Rivet uses the standard
+	      ./configure ; make ; make install technique.
+	    </para>
+	    <para>
+	      There are several options to configure that might be useful
+	      or necessary:
+	      <variablelist>
+		<varlistentry>
+		  <term>--with-tcl</term>
+		  <listitem>
+		    <para>
+		      This points to the directory where the
+		      <filename>tclConfig.sh</filename> file is located.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-tclsh</term>
+		  <listitem>
+		    <para>This points to the location of the
+		      <filename>tclsh</filename> executable.</para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-apxs</term>
+		  <listitem>
+		    <para>The location of the <filename>apxs</filename>
+		      program that provides information about the
+		      configuration and compilation of Apache modules.</para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
 	    </para>
 
-	    <variablelist>
-	      <varlistentry>
-		<term>-help</term>
-		<listitem>
-		  <para>Prints usage information.</para>
-		</listitem>
-	      </varlistentry>
-	      <varlistentry>
-		<term>-enable-symbols</term>
-		<listitem>
-		  <para>Compiles Rivet with debugging symbols.</para>
-		</listitem>
-	      </varlistentry>
-	      <varlistentry>
-		<term>-prefix <replaceable>directory</replaceable></term>
-		<listitem>
-		  <para>
-		    Install Rivet Tcl packages to
-		    <replaceable>directory</replaceable>.
-		  </para>
-		</listitem>
-	      </varlistentry>
-	      <varlistentry>
-		<term>-with-apxs <replaceable>file</replaceable></term>
-		<listitem>
-		  <para>Use <replaceable>file</replaceable> as apxs binary to
-		  gather information about the local Apache installation.</para>
-		</listitem>
-	      </varlistentry>
-	      <varlistentry>
-		<term>-with-tclconfig <replaceable>path/to/tcl/tclConfig.sh</replaceable></term>
-		<listitem>
-		  <para>
-		    Specify <replaceable>file</replaceable> as the
-		    tclConfig.sh of the Tcl installation that you want
-		    to use with Rivet.
-		  </para>
-		</listitem>
-	      </varlistentry>
-	    </variablelist>
-
-	    <programlisting>cd src/
-./configure.tcl
-Configuring
-.........done.</programlisting>
+	<programlisting>cd src/
+./configure --with-tcl=/usr/lib/tcl8.4/ --with-tclsh=/usr/bin/tclsh8.4 \
+	    --with-apxs=/usr/bin/apxs
+</programlisting>
 
 	  </step>
 	  <step>
-	    <title>Run make.tcl</title>
+	    <title>Run make</title>
 	    <para>
-	      At this point, you are ready to run the build
-	      system:
-	    </para>
-
-	    <programlisting>./make.tcl <replaceable>option</replaceable></programlisting>
-
-	    <para>where <replaceable>option</replaceable> can be
-	      either <option>shared</option> or
-	      <option>static</option>.
+	      At this point, you are ready to run make, which should
+	      run to completion without any errors (a warning or two
+	      is ok, generally).
 	    </para>
 	  </step>
 	  <step>
 	    <title>Install</title>
 	    <para>
-	      Now, you are ready to run the <command>./make.tcl
-		install</command> command to install the resulting
-	      files.  This should copy the shared object (like
-	      <filename>mod_rivet.so</filename>, if one was
-	      successfully created, into Apache's
-	      <filename>libexec</filename> directory, as well as
-	      install some support scripts and various code.
+	      Now, you are ready to run the <command>make
+		install</command> to install the resulting files.
+		This should copy the shared object (like
+		<filename>mod_rivet.so</filename>, if one was
+		successfully created, into Apache's
+		<filename>libexec</filename> directory, as well as
+		install some support scripts and various code.
 	    </para>
 	  </step>
 	</substeps>
@@ -270,6 +247,9 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  <filename>.rvt</filename> and <filename>.tcl</filename>
 	  extensions as Rivet files.
 	</para>
+	<para>You may also wish to use Rivet files as index files for
+	directories.  In that case, you would do the following:</para>
+	<programlisting>DirectoryIndex index.html index.htm index.shtml index.cgi index.tcl index.rvt</programlisting>
 	<para>
 	  For other directives that Rivet provides for Apache
 	  configuration, please see <xref linkend="directives"/>.
