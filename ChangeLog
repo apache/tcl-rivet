@@ -1,3 +1,8 @@
+2005-08-21  David N. Welton  <davidw@dedasys.com>
+
+	* src/rivetCore.c (Rivet_Upload): Fixed a line that is complained
+	about in newer GCC's (casting lvalues).
+
 2005-08-19  David N. Welton  <davidw@dedasys.com>
 
 	* src/mod_rivet.c (Rivet_InitTclStuff): Use both the hostname and

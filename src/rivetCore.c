@@ -640,7 +640,7 @@ TCL_CMD_HEADER( Rivet_Upload )
 	if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	(CONST84 char *)channelname = Tcl_GetChannelName(chan);
+	channelname = (char *)Tcl_GetChannelName(chan);
 	Tcl_SetStringObj(result, channelname, -1);
 	break;
     }
