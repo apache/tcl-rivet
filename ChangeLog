@@ -1,3 +1,12 @@
+2005-09-22  Karl Lehenbauer  <karl-rivet@sc.com>
+        * rivet/packages/dio/dio.tcl: "DIO insert" method is much more 
+	efficient than "DIO store" when you know you want an insert and
+	not an update and now actually works.
+
+	* README.MacOSX:  GNU autoconf/configure script does not actually 
+	work to make the Rivet module on Mac OS X so the README has been
+	reverted to show it the old-school way using the Tcl build scripts.
+
 2005-08-21  David N. Welton  <davidw@dedasys.com>
 
 	* doc/html/rivet.css: CSS tweaks for documentation.

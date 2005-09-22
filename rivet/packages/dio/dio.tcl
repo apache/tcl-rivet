@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+# $Id$
 
 catch {package require Tclx}
 package require Itcl
@@ -474,10 +474,9 @@ proc handle {interface args} {
     # efforts to see if it needs to be an update rather than
     # an insert -- this shouldn't require fields, it's broken
     #
-    method insert {arrayName fields args} {
-	table_check $args
+    method insert {table arrayName} {
 	upvar 1 $arrayName $arrayName $arrayName array
-	set req [build_insert_query array $fields $myTable]
+	set req [build_insert_query array [::array names array] $myTable]
 
 	set res [exec $req]
 	if {[$res error]} {
