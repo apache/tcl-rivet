@@ -48,8 +48,9 @@ html/rivet.it.html: rivet.it.xml rivet-nochunk.xsl
 	html.ext ".it.html" --nonet -o html/rivet.it.html rivet-nochunk.xsl \
 	rivet.it.xml
 
-# Is this the right way to do this, having these be dependencies of
-# the all target?
-all: html/index.en.html html/rivet.en.html \
+# FIXME - this means these are not build automatically, but at least
+# people aren't forced to build them either.
+
+docs: html/index.en.html html/rivet.en.html \
 	html/index.ru.html html/rivet.ru.html \
 	html/index.it.html html/rivet.it.html

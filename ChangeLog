@@ -1,5 +1,13 @@
+2005-09-23  David N. Welton  <davidw@dedasys.com>
+
+	* genconf.sh: Added autoheaders.
+
+	* doc/Makefile.am (docs): Documentation is now its own target -
+	this means it doesn't get run as part of 'all'.
+
 2005-09-22  Karl Lehenbauer  <karl-rivet@sc.com>
-        * rivet/packages/dio/dio.tcl: "DIO insert" method is much more 
+
+	* rivet/packages/dio/dio.tcl: "DIO insert" method is much more 
 	efficient than "DIO store" when you know you want an insert and
 	not an update and now actually works.
 

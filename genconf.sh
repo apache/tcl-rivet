@@ -10,4 +10,4 @@ if [ "$VERSION" != "" ]
     VERSION="-$VERSION"
 fi
 
-libtoolize -f -c && aclocal${VERSION} && automake${VERSION} --add-missing && autoconf
+libtoolize -f -c && aclocal${VERSION} && autoheader && automake${VERSION} --add-missing && autoconf
