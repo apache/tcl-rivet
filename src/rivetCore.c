@@ -913,7 +913,8 @@ TestpanicCmd(dummy, interp, argc, argv)
  *	A standard Tcl result.
  *
  * Side Effects:
- *	Creates new commands.
+ *	Adds core Rivet commands to the specified Tcl interpreter, such
+ *      as makeurl, headers, load_env, load_headers, var, etc.
  *
  *-----------------------------------------------------------------------------
  */

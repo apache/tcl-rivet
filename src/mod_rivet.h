@@ -54,26 +54,26 @@
  * Rivet_CreateConfig, Rivet_MergeConfig and so on. */
 
 typedef struct {
-    Tcl_Interp *server_interp;           /* per server Tcl interpreter */
-    Tcl_Obj *rivet_global_init_script;   /* run once when apache is started */
-    Tcl_Obj *rivet_child_init_script;
-    Tcl_Obj *rivet_child_exit_script;
-    char *rivet_before_script;        /* script run before each page */
-    char *rivet_after_script;         /*            after            */
-    char *rivet_error_script;         /*            for errors */
+    Tcl_Interp *server_interp;         /* per server Tcl interpreter */
+    Tcl_Obj *rivet_global_init_script; /* run once when apache is started */
+    Tcl_Obj *rivet_child_init_script;  /* run each time an httpd child starts */
+    Tcl_Obj *rivet_child_exit_script;  /* run each time an httpd child exits */
+    char *rivet_before_script;         /* script run before each page */
+    char *rivet_after_script;          /*            after            */
+    char *rivet_error_script;          /*            for errors */
 
     /* This flag is used with the above directives.  If any of them
        have changed, it gets set. */
     int user_scripts_updated;
 
     Tcl_Obj *rivet_default_error_script;         /*            for errors */
-    int *cache_size;
-    int *cache_free;
-    int upload_max;
-    int upload_files_to_var;
-    int separate_virtual_interps;
-    char *server_name;
-    char *upload_dir;
+    int *cache_size;                  /* # of compiled rivet pages to cache */
+    int *cache_free;                  /* # of free compiled page cache slots */
+    int upload_max;                   /* max allowable upload filesize */
+    int upload_files_to_var;          /* true if files are uploaded to a var */
+    int separate_virtual_interps;     /* true if one-interp-per-page enabled */
+    char *server_name;                /* server_hostname from apache (used?) */
+    char *upload_dir;                 /* dir to upload files to */
     table *rivet_server_vars;
     table *rivet_dir_vars;
     table *rivet_user_vars;
