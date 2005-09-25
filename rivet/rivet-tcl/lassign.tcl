@@ -3,6 +3,9 @@
 ##
 ##    Assign a <list> of values to a list of variables.  This command emulates
 ##    the TclX lassign command.
+##
+## $Id$
+##
 ###
 
 proc lassign {list args} {

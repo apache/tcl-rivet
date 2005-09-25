@@ -1,9 +1,16 @@
 ###
+##
 ## lmatch ?-exact|-glob|-regexp? <list> <pattern>
 ##
 ##    Look for elements in <list> that match <pattern>.  This command emulates
 ##    the TclX lmatch command, but if TclX isn't available, it's a decent
 ##    substitute.
+##
+## Note: Native Tcl's "lsearch" has been greatly enhanced since lmatch was
+## written -- programmers should consider using lmatch instead.
+##
+## $Id$
+##
 ###
 
 proc lmatch {args} {

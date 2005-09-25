@@ -1,3 +1,12 @@
+###
+##
+## load_cookies - Read the cookies out of the web environment HTTP_COOKIE
+## variable, parse it, and store them as key-value pairs into the named
+## array.
+##
+## $Id$
+##
+###
 proc load_cookies {{arrayName cookies}} {
     upvar 1 $arrayName cookies
 

@@ -1,3 +1,14 @@
+###
+##
+## rivet_command_document - Given a list of key-value pairs, emit HTML in
+## to document a command -- required keys are "name", "package",
+## "short" and "command".  
+##
+## Optional keys are "command", "arguments", and "seealso"
+##
+## $Id$
+##
+###
 proc rivet_command_document {list} {
     array set info $list
 

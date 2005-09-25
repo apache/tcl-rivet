@@ -9,6 +9,9 @@
 ##
 ##    string - A text string to be displayed.
 ##    args   - A list of HTML tags (without <>) to surround <string> in.
+##
+## $Id$
+##
 ###
 
 proc html {string args} {

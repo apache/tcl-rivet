@@ -4,6 +4,13 @@
 	code comments.  In particular, every function in src/mod_rivet.c
 	now has a standard header.
 
+	* rivet/rivet-tcl: README, cookie.tcl, debug.tcl, html.tcl,
+	import_keyvalue_pairs.tcl, import_switch_args.tcl, incr0.tcl,
+        lassign.tcl, lempty.tcl, lmatch.tcl, load_cookies.tcl,
+        load_response.tcl, parray.tcl, random.tcl, read_file.tcl,
+        rivet_command_document.tcl, wrap.tcl: Updated code comments
+	and added subversion "Id" tags where they weren't present.
+
 2005-09-23  David N. Welton  <davidw@dedasys.com>
 
 	* genconf.sh: Added autoheaders.

@@ -4,8 +4,14 @@
 ##    Generate a random number using only Tcl code.  This proc tries to
 ##    emulate what the TclX random function does.  If we don't have TclX
 ##    though, this is a decent substitute.
+##
+## Note: random predates the existence of Tcl's built-in rand() function,
+## that is a part of the expr command -- programmers should consider using
+## Tcl's built-in rand() function as an alternative to this command.
+##
+## $Id$
+##
 ###
-
 proc random {args} {
     global _ran
 

@@ -3,6 +3,9 @@
 ##
 ##    Returns 1 if <list> is empty or 0 if it has any elements.  This command
 ##    emulates the TclX lempty command.
+##
+## $Id$
+##
 ###
 
 proc lempty {list} {

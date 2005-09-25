@@ -1,6 +1,8 @@
 ###
 ## rivet/rivet-tcl - Tcl code for use with the Rivet Apache module.
 ##
+## $Id$
+##
 ###
 
 This directory contains an individual .tcl file for each proc in Rivet and

@@ -1,10 +1,14 @@
 ###
+##
 ## incr0 ?varName? ?num?
 ##    Increment a variable by <num>.  If the variable doesn't exist, create
 ##    it instead of returning an error.
 ##
 ##    varName - Name of the variable to increment.
 ##    num     - Number to increment by.
+##
+## $Id$
+##
 ###
 
 proc incr0 {varName {num 1}} {

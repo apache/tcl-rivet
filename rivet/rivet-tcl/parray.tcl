@@ -6,6 +6,9 @@
 ##
 ##    arrayName - Name of the array to display.
 ##    pattern   - A wildcard pattern of variables within the array to display.
+##
+## $Id$
+##
 ###
 
 proc parray {arrayName {pattern *}} {

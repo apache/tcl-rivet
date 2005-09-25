@@ -1,7 +1,13 @@
+###
+##
+## import_switch_args
 ##
 ## Detect switches from a string (e.g. "-all -regexp -- foo bar args")
 ## and extract them into an array.
 ##
+## $Id$
+##
+###
 proc import_switch_args {arrayName argsList {switchList ""}} {
     upvar 1 $arrayName array
     set index 0
