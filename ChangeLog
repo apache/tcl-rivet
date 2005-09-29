@@ -1,3 +1,7 @@
+
+2005-09-29  Karl Lehenbauer  <karl-rivet@sc.com>
+	* rivet/packages/dio/dio.tcl: Fix typo in "DIO insert" method
+
 2005-09-25  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* src/rivetCore.c, src/mod_rivet.c, src/mod_rivet.h: Updated

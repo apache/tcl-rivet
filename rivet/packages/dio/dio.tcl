@@ -476,7 +476,7 @@ proc handle {interface args} {
     #
     method insert {table arrayName} {
 	upvar 1 $arrayName $arrayName $arrayName array
-	set req [build_insert_query array [::array names array] $myTable]
+	set req [build_insert_query array [::array names array] $table]
 
 	set res [exec $req]
 	if {[$res error]} {
