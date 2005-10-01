@@ -74,11 +74,14 @@ apachetest::makeconf server.conf {
     # We can use this to include our own stuff for each test.
     Include test.conf
 
+    # For testing, we want core dumps.
+    CoreDumpDirectory $CWD
 }
 
 # Copy the rivet init files.
 file delete -force rivet
 file copy -force [file join .. rivet] .
+set env(TCLLIBPATH) [file normalize [file join [file dirname [info script]] rivet]]
 
 # If 'startserver' is specified on the command line, just start up the
 # server without running tests.

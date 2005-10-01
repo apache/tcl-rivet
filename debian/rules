@@ -17,6 +17,7 @@ build: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
 	$(MAKE)
+	( cd doc/ $(MAKE) docs )
 	touch build-stamp
 
 clean:

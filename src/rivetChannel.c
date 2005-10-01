@@ -48,6 +48,12 @@ outputproc(ClientData instancedata, CONST84 char *buf,
     rivet_interp_globals *globals =
 	Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
 
+    /* If this is true, we're in the process of shutting down - just
+     * throw it away. */
+    if (globals == NULL) {
+	return toWrite;
+    }
+
     TclWeb_PrintHeaders(globals->req);
     if (globals->req->content_sent == 0)
     {

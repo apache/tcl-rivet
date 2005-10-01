@@ -333,7 +333,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	}
 
 	if (*(rsc->cache_free)) {
-	    rsc->objCacheList[-- *(rsc->cache_free) ] = strdup(hashKey);
+	    rsc->objCacheList[-- *(rsc->cache_free) ] = (char *)strdup(hashKey);
 	} else if (*(rsc->cache_size)) { /* If it's zero, we just skip this. */
 	    Tcl_HashEntry *delEntry;
 	    delEntry = Tcl_FindHashEntry(
@@ -344,7 +344,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	    free(rsc->objCacheList[*(rsc->cache_size) - 1]);
 	    memmove((rsc->objCacheList) + 1, rsc->objCacheList,
 		    sizeof(char *) * (*(rsc->cache_size) -1));
-	    rsc->objCacheList[0] = strdup(hashKey);
+	    rsc->objCacheList[0] = (char *)strdup(hashKey);
 	}
     } else {
 	/* We found a compiled version of this page. */
@@ -896,6 +896,32 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
 /*
  *-----------------------------------------------------------------------------
  *
+ * Rivet_PerInterpExit --
+ *
+ * 	Called to shut down anything that needs closing out on a per-interp basis.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static void
+Rivet_PerInterpExit(server_rec *s, rivet_server_conf *rsc, pool *p) {
+    Tcl_Interp *interp = rsc->server_interp;
+
+    /* Let's try setting this to NULL so that the channel's outputproc
+     * realizes that it had better not do anything at this point. */
+
+    Tcl_SetAssocData(interp, "rivet", NULL, NULL);
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
  * Rivet_PanicProc --
  *
  * 	Called when Tcl panics, usually because of memory problems.
@@ -918,7 +944,7 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
     char *buf;
     char *format;
 
-    format = TCL_VARARGS_START(char *,arg1,argList);
+    format = (char *) TCL_VARARGS_START(char *,arg1,argList);
     buf = ap_pvsprintf(globalrr->pool, format, argList);
     ap_log_error(APLOG_MARK, APLOG_CRIT, globalrr->server,
 		 "Critical error in request: %s", globalrr->unparsed_uri);
@@ -1767,7 +1793,28 @@ Rivet_ChildInit(server_rec *s, pool *p)
 void
 Rivet_ChildExit(server_rec *s, pool *p)
 {
+    server_rec *sr;
+    rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
+    rivet_server_conf *myrsc;
+
+    /* Do the user defined stuff... */
     Rivet_ChildHandlers(s, p, 0);
+
+    /* Then tear down anything that needs doing. */
+    Rivet_PerInterpExit(s, rsc, p);
+
+    /* Walk through the others and shut them down too. */
+    for (sr = s; sr; sr = sr->next) {
+	if (sr != s)  {
+	    /* not the first one  */
+	    if (rsc->separate_virtual_interps != 0) {
+		myrsc = RIVET_SERVER_CONF(sr->module_config);
+		Rivet_PerInterpExit(s, myrsc, p);
+	    }
+	}
+    }
+
+
     Tcl_Finalize();
     return;
 }
