@@ -286,7 +286,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <arg>UploadDirectory</arg>
 	      <arg>UploadMaxSize</arg>
 	      <arg>UploadFilesToVar</arg>
-	      <arg>SeperateVirtualInterps</arg>
+	      <arg>SeparateVirtualInterps</arg>
 	    </group>
 	  </cmdsynopsis>
 	</term>
@@ -511,7 +511,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg choice="plain">SeperateVirtualInterps</arg>
+		  <arg choice="plain">SeparateVirtualInterps</arg>
 		  <group choice="req">
 		    <arg>yes</arg>
 		    <arg>no</arg>

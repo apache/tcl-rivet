@@ -261,7 +261,7 @@ mod_rivet.so</replaceable></programlisting>
 	      <arg>UploadDirectory</arg>
 	      <arg>UploadMaxSize</arg>
 	      <arg>UploadFilesToVar</arg>
-	      <arg>SeperateVirtualInterps</arg>
+	      <arg>SeparateVirtualInterps</arg>
 	    </group>
 	  </cmdsynopsis>
 	</term>
@@ -456,7 +456,7 @@ foobar.tcl"</programlisting>
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
-		  <arg>SeperateVirtualInterps</arg>
+		  <arg>SeparateVirtualInterps</arg>
 		  <group choice="req">
 		    <arg>yes</arg>
 		    <arg>no</arg>

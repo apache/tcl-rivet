@@ -306,7 +306,7 @@ Configuring
               <arg>UploadDirectory</arg>
               <arg>UploadMaxSize</arg>
               <arg>UploadFilesToVar</arg>
-              <arg>SeperateVirtualInterps</arg>
+              <arg>SeparateVirtualInterps</arg>
             </group>
           </cmdsynopsis>
         </term>
@@ -495,7 +495,7 @@ Configuring
             <varlistentry>
               <term>
                 <cmdsynopsis>
-                  <arg>SeperateVirtualInterps</arg>
+                  <arg>SeparateVirtualInterps</arg>
                   <group choice="req">
                     <arg>yes</arg>
                     <arg>no</arg>
