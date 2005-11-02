@@ -1,0 +1,173 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to define the BUILD_rivet define (?) */
+#undef BUILD_rivet
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define if you have <limits.h> */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define if you have net/errno.h */
+#undef HAVE_NET_ERRNO_H
+
+/* Define to 1 if you have the `pthread_attr_setstacksize' function. */
+#undef HAVE_PTHREAD_ATTR_SETSTACKSIZE
+
+/* Define to 1 if you have the `readdir_r' function. */
+#undef HAVE_READDIR_R
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define if sys/types.h defines struct dirent64 */
+#undef HAVE_STRUCT_DIRENT64
+
+/* Define if your machines defines struct stat64 */
+#undef HAVE_STRUCT_STAT64
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define if your sys/types.h defines off64_t */
+#undef HAVE_TYPE_OFF64_T
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* The path to a working tclsh executable */
+#undef NAMEOFEXECUTABLE
+
+/* Define if your system does not have dirent.h */
+#undef NO_DIRENT_H
+
+/* Define if your system doesn't have <dlfcn.h> */
+#undef NO_DLFCN_H
+
+/* Define if your system does not have an errno.h */
+#undef NO_ERRNO_H
+
+/* Define if you do not have <float.h> */
+#undef NO_FLOAT_H
+
+/* Define if you have no <limits.h> */
+#undef NO_LIMITS_H
+
+/* Define if your system does not have <stdlib.h> */
+#undef NO_STDLIB_H
+
+/* Define if your system does not have <string.h> */
+#undef NO_STRING_H
+
+/* Define if your system does not have <sys/wait.h> */
+#undef NO_SYS_WAIT_H
+
+/* Define if your system does not have <values.h> */
+#undef NO_VALUES_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define if you want to build static libraries */
+#undef STATIC_BUILD
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to enable Tcl memory leak debugging */
+#undef TCL_MEM_DEBUG
+
+/* Define to build with Tcl thread support */
+#undef TCL_THREADS
+
+/* Define if wide ints are long */
+#undef TCL_WIDE_INT_IS_LONG
+
+/* How Tcl defines a wide int */
+#undef TCL_WIDE_INT_TYPE
+
+/* Windows CE version */
+#undef UNDER_CE
+
+/* Define if your system has a.out.h */
+#undef USE_A_OUT_H
+
+/* Define if your machines uses deltas for TZ (AIX) */
+#undef USE_DELTA_FOR_TZ
+
+/* Define if your machine has <sys/exec_aout.h> */
+#undef USE_SYS_EXEC_AOUT_H
+
+/* Set to one to use <sys/exec.h> */
+#undef USE_SYS_EXEC_H
+
+/* Define to use the special threaded alloc (Windows) */
+#undef USE_THREAD_ALLOC
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef WORDS_BIGENDIAN
+
+/* something tcl.m4 does, shrug */
+#undef _ISOC99_SOURCE
+
+/* something tcl.m4 does, shrug */
+#undef _LARGEFILE64_SOURCE
+
+/* Define to define _OE_SOCKETS, needed in sys/socket.h (OS/390) */
+#undef _OE_SOCKETS
+
+/* Define if your machine uses Posix pthread semantics */
+#undef _POSIX_PTHREAD_SEMANTICS
+
+/* Define to use thread-safe library routines */
+#undef _REENTRANT
+
+/* Define to build thread safe (Windows) */
+#undef _THREAD_SAFE
+
+/* The version of Windows CE */
+#undef _WIN32_WCE
+
+/* Define to use updated header definitions where possible (HP-UX) */
+#undef _XOPEN_SOURCE_EXTENDED
