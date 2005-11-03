@@ -1,3 +1,10 @@
+2005-11-03  David N. Welton  <davidw@dedasys.com>
+
+	* tests/runtests.tcl (runtests_usage): Check for utf-8 environment
+	- this causes some problems with a number of tests.  I'm not sure
+	precisely why, but it causes a large portion of otherwise
+	successful tests to choke.
+
 2005-10-31  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Woops, fix spelling error: Seperate->Separate.

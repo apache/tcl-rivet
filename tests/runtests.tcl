@@ -29,6 +29,16 @@ proc runtests_usage {} {
 if { [llength $argv] < 1 } {
     runtests_usage
 }
+
+if { [encoding system] eq "utf-8" } {
+    puts stderr {
+	System encoding is utf-8 - this is known to cause problems
+	with the test environment!  Continuing with tests in 5 seconds
+	using the iso8859-1 encoding.
+    }
+    after 5000
+}
+
 if { [catch {
     apachetest::getbinname $argv
 } err ] } {
