@@ -1,5 +1,8 @@
 2005-11-03  David N. Welton  <davidw@dedasys.com>
 
+	* src/Makefile.am (lib_libexecdir): Install everything to
+	rivet@VERSION@.
+
 	* tests/runtests.tcl (runtests_usage): Check for utf-8 environment
 	- this causes some problems with a number of tests.  I'm not sure
 	precisely why, but it causes a large portion of otherwise
