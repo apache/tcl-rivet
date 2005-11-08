@@ -881,11 +881,7 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
  */
 
 static int
-TestpanicCmd(dummy, interp, argc, argv)
-    ClientData dummy;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    CONST char **argv;			/* Argument strings. */
+TestpanicCmd(ClientData dummy, Tcl_Interp *interp, int argc, CONST char **argv)
 {
     CONST char *argString;
 

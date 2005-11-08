@@ -29,7 +29,7 @@
 !include "MUI.nsh"
 
 Name "Rivet"
-OutFile "Rivet050.exe"
+OutFile "Rivet070.exe"
 SetCompressor lzma
 CRCCheck on
 ShowInstDetails hide
@@ -41,11 +41,11 @@ InstallDir "$PROGRAMFILES\Tcl"
 ;; -------------------------------------------------------------------------
 ;; Version resource
 ;;
-ViProductVersion "0.5.0.0"
+ViProductVersion "0.7.0.0"
 VIAddVersionKey ProductName "Rivet"
 VIAddVersionKey CompanyName "Apache Software Foundation"
-VIAddVersionKey FileVersion "0.5.0.1"
-VIAddVersionKey ProductVersion "0.5.0.0"
+VIAddVersionKey FileVersion "0.7.0.0"
+VIAddVersionKey ProductVersion "0.7.0.0"
 VIAddVersionKey LegalCopyright "Copyright (c) 2004 The Apache Software Foundation"
 VIAddVersionKey FileDescription "Apache Rivet Installer"
 
@@ -142,15 +142,15 @@ Section "Rivet" SecRivet
     DetailPrint "Adjusting INSTDIR to point at the library folder."
   TclFalse:
 
-    SetOutPath "$INSTDIR\rivet0.5.0"
+    SetOutPath "$INSTDIR\rivet0.7.0"
     File /r "..\rivet\rivet-tcl"
     File /r "..\rivet\packages"
     File "..\rivet\init.tcl"
     File "..\rivet\pkgIndex.tcl"
     File "..\rivet\README"
-    RMDir /r "$INSTDIR\rivet0.5.0\packages\CVS"
-    RMDir /r "$INSTDIR\rivet0.5.0\rivet-tcl\CVS"
-    SetOutPath "$INSTDIR\rivet0.5.0\packages\rivet"
+    RMDir /r "$INSTDIR\rivet0.7.0\packages\CVS"
+    RMDir /r "$INSTDIR\rivet0.7.0\rivet-tcl\CVS"
+    SetOutPath "$INSTDIR\rivet0.7.0\packages\rivet"
     File "Release\rivet.dll"
     File "Release\rivetparser.dll"
     FileOpen $R6 "pkgIndex.tcl" "w"
@@ -159,11 +159,11 @@ Section "Rivet" SecRivet
     FileClose $R6
     SetOutPath "$APACHE_DIR\modules"
     File "Release\mod_rivet.so"
-    WriteUninstaller "$INSTDIR\rivet0.5.0\Uninstall.exe"
+    WriteUninstaller "$INSTDIR\rivet0.7.0\Uninstall.exe"
 SectionEnd
 
 Section "Documentation" SecDocs
-    SetOutPath "$INSTDIR\rivet0.5.0"
+    SetOutPath "$INSTDIR\rivet0.7.0"
     File "..\doc\Rivet.chm"
 SectionEnd
 
@@ -177,8 +177,8 @@ Section /o "Modify httpd.conf" SecConfig
     FileWrite $R6 "    RivetServerConf CacheSize 50$\r$\n"
     FileWrite $R6 "    AddType application/x-httpd-rivet .rvt$\r$\n"
     FileWrite $R6 "    AddType application/x-rivet-tcl .tcl$\r$\n$\r$\n"
-    FileWrite $R6 "    Alias /rivet/ $\"$INSTDIR/rivet0.5.0/tests/$\"$\r$\n"
-    FileWrite $R6 "    <Directory $\"$INSTDIR/rivet0.5.0/tests/$\">$\r$\n"
+    FileWrite $R6 "    Alias /rivet/ $\"$INSTDIR/rivet0.7.0/tests/$\"$\r$\n"
+    FileWrite $R6 "    <Directory $\"$INSTDIR/rivet0.7.0/tests/$\">$\r$\n"
     FileWrite $R6 "        Options Indexes FollowSymlinks MultiViews$\r$\n"
     FileWrite $R6 "        AllowOverride None$\r$\n"
     FileWrite $R6 "        Order allow,deny$\r$\n"
@@ -195,7 +195,7 @@ Section /o "Modify httpd.conf" SecConfig
 SectionEnd
 
 Section /o "Test files" SecTests
-    SetOutPath "$INSTDIR\rivet0.5.0\tests"
+    SetOutPath "$INSTDIR\rivet0.7.0\tests"
     File "..\tests\*.*"
 SectionEnd
 

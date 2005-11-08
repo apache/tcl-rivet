@@ -409,7 +409,8 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
 	    return rc;
 	}
 	if (data) {
-	    req->raw_post = data; /* Give people a way of getting at the raw data. */
+	    /* Give people a way of getting at the raw data. */
+	    req->raw_post = (char *)data;
 	    split_to_parms(req, data);
 	}
     }
@@ -498,7 +499,7 @@ int ApacheRequest_parse_multipart(ApacheRequest *req)
     }
 
     do {
-        int blen;
+        size_t blen;
         boundary = ap_getword(r->pool, &ct, '=');
         if (boundary == NULL)
             return DECLINED;

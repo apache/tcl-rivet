@@ -245,6 +245,8 @@ char *TclWeb_GetEnvVar( TclWebRequest *req, char * );
 
 char *TclWeb_GetVirtualFile( TclWebRequest *req, char *virtualname );
 
+char *TclWeb_GetRawPost( TclWebRequest *req );
+
 /* output/write/flush?  */
 
 /* error (log) ? */

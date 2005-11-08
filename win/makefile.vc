@@ -156,7 +156,7 @@ Please `cd` to its location first.
 PROJECT = rivet
 !include "rules.vc"
 
-DOTVERSION      = 0.5.0
+DOTVERSION      = 0.7.0
 VERSION         = $(DOTVERSION:.=)
 STUBPREFIX      = $(PROJECT)stub
 
@@ -283,7 +283,7 @@ crt = -MT
 INCLUDES	= $(TCL_INCLUDES) -I"$(WINDIR)" -I"$(GENERICDIR)" \
 		-FI$(TMP_DIR)\config-win.h
 BASE_CLFAGS	= $(cflags) $(cdebug) $(crt) $(INCLUDES) -I"$(APACHE_INCLUDE_DIR)" \
-		  -DWIN32 -D_WIN32 -D_WINDOWS -DNAMEOFEXECUTABLE="\"$(TCLSH:\=/)\""
+		  -DWIN32 -D_WIN32 -D_WINDOWS -DNAMEOFEXECUTABLE="\"$(TCLSH:\=/)\"" -DTCL_THREADS
 CON_CFLAGS	= $(cflags) $(cdebug) $(crt) -DCONSOLE
 TCL_CFLAGS	= -DVERSION="\"$(DOTVERSION)\"" $(BASE_CLFAGS) $(OPTDEFINES)
 
