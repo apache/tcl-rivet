@@ -453,6 +453,13 @@ proc handle {interface args} {
 	$res destroy
 
 	if {$numrows} {
+	    # remove fields that are part of the key from the fields to
+	    # be updated because they's superfluous -- they can't be updated 
+	    # if they're part of the where clause anyway
+	    foreach field $myKeyfield {
+		unset -nocomplain array($field)
+	    }
+
 	    set req [build_update_query array $fields $myTable]
 	    append req [build_key_where_clause $myKeyfield $key]
 	} else {
@@ -470,9 +477,45 @@ proc handle {interface args} {
     }
 
     #
+    # update - a pure update, without store's somewhat clumsy
+    # efforts to see if it needs to be an update rather than
+    # an insert 
+    #
+    method update {arrayName args} {
+	table_check $args
+	upvar 1 $arrayName $arrayName $arrayName array
+
+	set key [makekey $arrayName $myKeyfield]
+
+	# remove fields that are part of the key from the fields to
+	# be updated because they's superfluous -- they can't be updated 
+	# if they're part of the where clause anyway
+        foreach field $myKeyfield {
+	    unset -nocomplain array($field)
+	}
+
+	set fields [::array names array]
+	set req [build_update_query array $fields $myTable]
+	append req [build_key_where_clause $myKeyfield $key]
+
+	set res [exec $req]
+	if {[$res error]} {
+	    set errinf [$res errorinfo]
+	    $res destroy
+	    return -code error "Got '$errinf' executing '$req'"
+	}
+
+	# this doesn't work on postgres, you've got to use cmdRows,
+	# we need to figure out what to do with this
+	set numrows [$res numrows]
+	$res destroy
+	return $numrows
+    }
+
+    #
     # insert - a pure insert, without store's somewhat clumsy
     # efforts to see if it needs to be an update rather than
-    # an insert -- this shouldn't require fields, it's broken
+    # an insert
     #
     method insert {table arrayName} {
 	upvar 1 $arrayName $arrayName $arrayName array

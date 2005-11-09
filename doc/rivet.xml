@@ -1703,6 +1703,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <para>The port number to connect to on <option>hostname</option>.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1712,6 +1713,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <para>The username you wish to login to the server as.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1721,6 +1723,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <para>The password to login to the server with.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1732,6 +1735,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1743,6 +1747,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		for storing and fetching.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1754,6 +1759,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		built-in commands for storing and fetching.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1774,6 +1780,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		field specified as AUTO.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1786,6 +1793,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		the stored key.</para>
 	    </listitem>
 	  </varlistentry>
+
 	</variablelist>
       </refsect1>
       <refsect1>
@@ -1805,6 +1813,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		values of the record found.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1821,6 +1830,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		value for the autokey option.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1831,6 +1841,18 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		automatically called when the DIO object is destroyed.</para>
 	    </listitem>
 	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>count</arg>
+	      </cmdsynopsis>
+	      <para>	      Return a count of the number of rows in the
+		specified (or current) table.</para>
+	    </listitem>
+	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1846,6 +1868,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		this option is changed.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1863,6 +1886,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		key matches <option>key</option>.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1874,6 +1898,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1888,6 +1913,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		interface package.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1906,6 +1932,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1926,6 +1953,27 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>forall</arg>
+		<arg><replaceable>request</replaceable></arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		  <arg><replaceable>body</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+	       Execute an SQL select <option>request</option> and iteratively 
+	       fill the array named <option>arrayName</option>
+	       with elements named with the matching field names, and
+	       values containing the matching values, repeatedly executing 
+	       the specified code <option>body</option>
+	       for each row returned.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1940,6 +1988,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1957,6 +2006,20 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>interface</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the database interface type, such as 
+		<literal>Postgresql</literal> or <literal>Mysql</literal>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1967,10 +2030,13 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <para>
 		Return the current keyfield.  If
 		<option>value</option> is specified, it sets a new
-		value for the keyfield.
+		value for the keyfield.  <option>Value</option> can contain
+		multiple key fields as a Tcl list, if the table has multiple
+		key fields.
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -1990,6 +2056,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2003,6 +2070,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2017,6 +2085,27 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>makekey</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<arg choice="opt"><replaceable>keyfield</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Given an array containing key-value pairs and an optional
+		list of key fields (we use the object's keyfield if
+		none is specified), if we're doing auto keys, create
+		and return a new key, otherwise if it's a single key,
+		just return its value from the array, else if there are
+		multiple keys, return all the keys' values from the
+		array as a list.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2029,6 +2118,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		string.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2040,6 +2130,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		accesses the database.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2054,6 +2145,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2064,7 +2156,47 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <para>Return the current port value.  If <option>value</option> is
 		specified, it sets a new value for the port.</para>
 	    </listitem>
-	  </varlistentry>	  <varlistentry>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>quote</arg>
+		<arg><replaceable>string</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>Return the specified <option>string</option> quoted in
+	      a way that makes it acceptable as a value in a SQL statement.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>search</arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Search the current table, or the specified table if
+		-table tableName is specified, for rows matching
+		one or more fields as key-value pairs, and return
+		a query result handle.
+		See <link linkend="resultobj">Result Object Commands</link>
+		</para>
+		<para>
+		For example,
+	<programlisting>set res [DIO search -table people -firstname Bob]</programlisting>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
 		<arg choice="plain"><replaceable>objectName</replaceable></arg>
@@ -2076,7 +2208,9 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		specified, it sets a new value for the sequence.
 	      </para>
 	    </listitem>
-	  </varlistentry>	  <varlistentry>
+	  </varlistentry>
+
+	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
 		<arg choice="plain"><replaceable>objectName</replaceable></arg>
@@ -2089,10 +2223,30 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		</group>
 	      </cmdsynopsis>
 	      <para>
-		Store <option>arrayName</option> in the database, inserting it if the corresponding record isn't there, or updating it if it is.
+		Store the contents of <option>arrayName</option> in the 
+		database, where the keys are the field names and the
+		array's values are the corresponding values.  Do an SQL insert 
+		if the corresponding row doesn't exist, or an update 
+		if it does.
+	      </para>
+	      <para>
+		The table name must have been previously set
+		or specified with <arg>-table</arg>, and the key field(s) must
+		have been previously set or specified with
+		<arg>-keyfield</arg>.
+	      </para>
+	      <para>
+		Please note that the store method has significantly higher 
+		overhead than
+		the update or insert methods, so if you know you are
+		inserting a row rather than updating one, it is advisable
+		to use the insert method and, likewise, if you know you
+		are updating rather than inserting, to use the
+		update method.
 	      </para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2106,6 +2260,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		found.</para>
 	    </listitem>
 	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>
@@ -2118,6 +2273,30 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		value for the table.</para>
 	    </listitem>
 	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>update</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Updates the row matching the contents of 
+		<option>arrayName</option> in the database.  The matching
+		row must already exist.  The table can have already been
+		set or can be specified with <arg>-table</arg>, and
+		the key field(s) must either have been set or
+		specified with <arg>-keyfield</arg>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
 	  <varlistentry>
 	    <listitem>
 	      <cmdsynopsis>

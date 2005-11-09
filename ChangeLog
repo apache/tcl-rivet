@@ -1,3 +1,17 @@
+2005-11-08  Karl Lehenbauer  <karl-rivet@sc.com>
+
+	* rivet/packages/dio/dio.tcl: Add new "update" method that works
+	  just like "store" except that it assumes you're doing an update
+	  and, unlike store, does not check to see if the row is already
+	  there or not.  
+
+	  Also modified the "store" method, when doing an update, to not 
+	  attempt to change row fields that are specified in the where clause.
+
+	* doc/rivet.xml: Documented all undocumented public DIO methods, such 
+	  as count, db, forall, interface, insert, makekey, quote, search
+	  and update.
+
 2005-11-08  Pat Thoyts  <patthoyts@users.sourceforge.net>
 
 	* win/makefile.vc:      Update for new version.
