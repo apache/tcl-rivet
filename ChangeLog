@@ -1,3 +1,13 @@
+2005-12-12  Karl Lehenbauer  <karl-rivet@sc.com>
+	* rivet/packages/dio/dio.tcl: Reverted change to "store" method
+	  that removed fields from the store array that were part of the
+	  key and took out this behaviour from the update method.
+
+	  The problem was that "DIO store" or "DIO update" could cause
+	  fields to disappear from the data array as a side effect, and
+	  the caller had no reason to expect that, hence it broke some
+	  code.
+
 2005-11-08  Karl Lehenbauer  <karl-rivet@sc.com>
 
 	* rivet/packages/dio/dio.tcl: Add new "update" method that works

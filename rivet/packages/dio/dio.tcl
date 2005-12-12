@@ -453,13 +453,6 @@ proc handle {interface args} {
 	$res destroy
 
 	if {$numrows} {
-	    # remove fields that are part of the key from the fields to
-	    # be updated because they's superfluous -- they can't be updated 
-	    # if they're part of the where clause anyway
-	    foreach field $myKeyfield {
-		unset -nocomplain array($field)
-	    }
-
 	    set req [build_update_query array $fields $myTable]
 	    append req [build_key_where_clause $myKeyfield $key]
 	} else {
@@ -486,13 +479,6 @@ proc handle {interface args} {
 	upvar 1 $arrayName $arrayName $arrayName array
 
 	set key [makekey $arrayName $myKeyfield]
-
-	# remove fields that are part of the key from the fields to
-	# be updated because they's superfluous -- they can't be updated 
-	# if they're part of the where clause anyway
-        foreach field $myKeyfield {
-	    unset -nocomplain array($field)
-	}
 
 	set fields [::array names array]
 	set req [build_update_query array $fields $myTable]
