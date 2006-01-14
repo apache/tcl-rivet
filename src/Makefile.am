@@ -18,25 +18,32 @@
 
 
 # The weird and wild magic of auto* associates these two.
-apxs_libexecdir = @APXS_LIBEXECDIR@
-apxs_libexec_LTLIBRARIES = mod_rivet.la
+##apxs_libexecdir = @APXS_LIBEXECDIR@
+##apxs_libexec_LTLIBRARIES = mod_rivet.la
+
+INCLUDES = -I@apache_include@ -I@apr_include@
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
-lib_libexecdir = @TCL_PACKAGE_PATH@/rivet@VERSION@
+lib_libexecdir = @TCL_PACKAGE_PATH@/rivet
 lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
 
 #
 # Apache Rivet Module, mod_rivet.so / mod_rivet.dll
 #
-mod_rivet_la_SOURCES = apache_multipart_buffer.c apache_request.c	\
-rivetChannel.c rivetChannel.h rivetParser.c rivetParser.h rivetCore.c	\
-mod_rivet.c TclWebapache.c mod_rivet.h TclWeb.h rivet.h			\
-apache_multipart_buffer.h apache_request.h
+##mod_rivet_la_SOURCES = @apache_version_dir@/apache_request.c \
+##	rivetChannel.c \
+##	rivetChannel.h \
+##	rivetParser.c \
+##	rivetParser.h \
+##	TclWeb.h \
+##	rivet.h
 
-mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
-mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
-mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
+
+##mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
+##mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
+##mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 # APXS_CPPFLAGS_SHLIB
 
@@ -55,3 +62,5 @@ librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
 librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+
+SUBDIRS = @apache_version_dir@

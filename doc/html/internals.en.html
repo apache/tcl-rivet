@@ -1,60 +1,61 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.66.1"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="help.en.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.en.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.en.html#id2537406">Initialization</a></span></dt><dt><span class="section"><a href="internals.en.html#id2537444">RivetChan</a></span></dt><dt><span class="section"><a href="internals.en.html#id2537471">The <span style="font-family:monospace"><span><b class="command">global</b></span></span> Command</a></span></dt><dt><span class="section"><a href="internals.en.html#id2537523">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="internals.en.html#id2537573">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.68.1"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="help.en.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.en.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.en.html#id2526750">Initialization</a></span></dt><dt><span class="section"><a href="internals.en.html#id2526788">RivetChan</a></span></dt><dt><span class="section"><a href="internals.en.html#id2526815">The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</a></span></dt><dt><span class="section"><a href="internals.en.html#id2526867">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="internals.en.html#id2526916">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
       This section easily falls out of date, as new code is added, old
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
-      themselves, <span style="font-family:monospace"><span><b class="command">cvs</b></span></span> can provide you with
-      information about what has been happening with the code.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537406"></a>Initialization</h3></div></div></div><p style="width:90%">
+      themselves, the Subversion revision control system
+      (<span style="font-family:monospace"><span><strong class="command">svn</strong></span></span>) can provide you with information about
+      what has been happening with the code.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2526750"></a>Initialization</h3></div></div></div><p style="width:90%">
 	When Apache is started, (or when child Apache processes are
 	started if a threaded Tcl is used),
-	<tt class="function">Rivet_InitTclStuff</tt> is called, which
+	<code class="function">Rivet_InitTclStuff</code> is called, which
 	creates a new interpreter, or one interpreter per virtual
 	host, depending on the configuration. It also initializes
 	various things, like the <span class="structname">RivetChan</span>
 	channel system, creates the Rivet-specific Tcl commands, and
-	executes Rivet's <tt class="filename">init.tcl</tt>.  The caching
+	executes Rivet's <code class="filename">init.tcl</code>.  The caching
 	system is also set up, and if there is a
-	<span style="font-family:monospace"><span><b class="command">GlobalInitScript</b></span></span>, it is run.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537444"></a>RivetChan</h3></div></div></div><p style="width:90%">
+	<span style="font-family:monospace"><span><strong class="command">GlobalInitScript</strong></span></span>, it is run.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2526788"></a>RivetChan</h3></div></div></div><p style="width:90%">
 	The <span class="structname">RivetChan</span> system was created in
 	order to have an actual Tcl channel that we could redirect
 	standard output to.  This lets us use, for instance, the
-	regular <span style="font-family:monospace"><span><b class="command">puts</b></span></span> command in .rvt pages.  It
+	regular <span style="font-family:monospace"><span><strong class="command">puts</strong></span></span> command in .rvt pages.  It
 	works by creating a channel that buffers output, and, at
 	predetermined times, passes it on to Apache's IO system.
 	Tcl's regular standard output is replaced with an instance of
 	this channel type, so that, by default, output will go to the
 	web page.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537471"></a>The <span style="font-family:monospace"><span><b class="command">global</b></span></span> Command</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2526815"></a>The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</h3></div></div></div><p style="width:90%">
 	Rivet aims to run standard Tcl code with as few surprises as
 	possible.  At times this involves some compromises - in this
-	case regarding the <span style="font-family:monospace"><span><b class="command">global</b></span></span> command.  The
+	case regarding the <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> command.  The
 	problem is that the command will create truly global
 	variables.  If the user is just cut'n'pasting some Tcl code
 	into Rivet, they most likely just want to be able to share the
 	variable in question with other procs, and don't really care
 	if the variable is actually persistant between pages.  The
 	solution we have created is to create a proc
-	<span style="font-family:monospace"><span><b class="command">::request::global</b></span></span> that takes the place of
-	the <span style="font-family:monospace"><span><b class="command">global</b></span></span> command in Rivet templates.  If
+	<span style="font-family:monospace"><span><strong class="command">::request::global</strong></span></span> that takes the place of
+	the <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> command in Rivet templates.  If
 	you really need a true global variable, use either
-	<span style="font-family:monospace"><span><b class="command">::global</b></span></span> or add the :: namespace qualifier
+	<span style="font-family:monospace"><span><strong class="command">::global</strong></span></span> or add the :: namespace qualifier
 	to variables you wish to make global.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537523"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2526867"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
 	processing instruction tags.  Everything outside these tags
-	becomes a large <span style="font-family:monospace"><span><b class="command">puts</b></span></span> statement, and
+	becomes a large <span style="font-family:monospace"><span><strong class="command">puts</strong></span></span> statement, and
 	everything inside them remains Tcl code.
       </p><p style="width:90%">
 	Each .rvt file is evaluated in its own
-	<tt class="constant">::request</tt> namespace, so that it is not
+	<code class="constant">::request</code> namespace, so that it is not
 	necessary to create and tear down interpreters after each
 	page.  By running in its own namespace, though, each page will
 	not run afoul of local variables created by other scripts,
 	because they will be deleted automatically when the namespace
 	goes away after Apache finishes handling the request.
-      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td colspan="2" align="left" valign="top">
+      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
 	    One current problem with this system is that while
 	    variables are garbage collected, file handles are not, so
 	    that it is very important that Rivet script authors make
@@ -66,7 +67,7 @@
 	without having to reload it (and re-parse it) from the disk.
 	The number of scripts stored in memory is configurable.  This
 	feature can significantly improve performance.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537573"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2526916"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
 	If you are interested in hacking on Rivet, you're welcome to
 	contribute!  Invariably, when working with code, things go
 	wrong, and it's necessary to do some debugging.  In a server
@@ -79,14 +80,14 @@
 	-X argument:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">httpd -X</pre>.
       <p style="width:90%">
 	On Linux, one of the first things to try is the system call
-	tracer, <span style="font-family:monospace"><span><b class="command">strace</b></span></span>.  You don't even have to
+	tracer, <span style="font-family:monospace"><span><strong class="command">strace</strong></span></span>.  You don't even have to
 	recompile Rivet or Apache for this to work.
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">strace -o /tmp/outputfile -S 1000 httpd -X</pre><p style="width:90%">This command will run httpd in the system call tracer,
 	which leaves its output (there is potentially a lot of it) in
-	<tt class="filename">/tmp/outputfile</tt>.  The -S
-	option tells <span style="font-family:monospace"><span><b class="command"></b></span></span>strace to only record the
+	<code class="filename">/tmp/outputfile</code>.  The -S
+	option tells <span style="font-family:monospace"><span><strong class="command"></strong></span></span>strace to only record the
 	first 1000 bytes of a syscall.  Some calls such as
-	<tt class="function">write</tt> can potentially be much longer than
+	<code class="function">write</code> can potentially be much longer than
 	this, so you may want to increase this number.  The results
 	are a list of all the system calls made by the program.  You
 	want to look at the end, where the failure presumably occured,
@@ -94,10 +95,10 @@
 	you're not sure what to make of the results, you can always
 	ask on the Rivet development mailing list.
       </p><p style="width:90%">
-	If <span style="font-family:monospace"><span><b class="command">strace</b></span></span> (or its equivalent on your
+	If <span style="font-family:monospace"><span><strong class="command">strace</strong></span></span> (or its equivalent on your
 	operating system) doesn't answer your question, it may be time
 	to debug Apache and Rivet.  To do this, you will need to run
-	the <span style="font-family:monospace"><span><b class="command">./configure.tcl</b></span></span> script with the
+	the <span style="font-family:monospace"><span><strong class="command">./configure.tcl</strong></span></span> script with the
 	-enable-symbols option, and recompile.
       </p><p style="width:90%">
 	Since it's easier to debug a single process, we'll still run
@@ -121,5 +122,5 @@ Starting program: /usr/sbin/apache.dbg -X
 	When your apache session is up and running, you can request a
 	web page with the browser, and see where things go wrong (if
 	you are dealing with a crash, for instance).  A helpful
-	<span style="font-family:monospace"><span><b class="command">gdb</b></span></span> tutorial is available here: <a href="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html" target="_top">http://www.delorie.com/gnu/docs/gdb/gdb_toc.html</a>
-      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.en.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Resources - How to Get Help </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Upgrading from mod_dtcl or NeoWebScript</td></tr></table></div></body></html>
+	<span style="font-family:monospace"><span><strong class="command">gdb</strong></span></span> tutorial is available here: <a href="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html" target="_top">http://www.delorie.com/gnu/docs/gdb/gdb_toc.html</a>
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Resources - How to Get Help </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Upgrading from mod_dtcl or NeoWebScript</td></tr></table></div></body></html>

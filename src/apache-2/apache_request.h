@@ -1,5 +1,4 @@
 #ifndef _APACHE_REQUEST_H
-
 #define _APACHE_REQUEST_H
 
 #include "httpd.h"
@@ -34,8 +33,9 @@ extern Sfio_t*  _stdopen _ARG_((int, const char*)); /*1999*/
 
 typedef struct ApacheUpload ApacheUpload;
 
-typedef struct {
-    table *parms;
+typedef struct _ApacheRequest {
+    //table *parms;
+    apr_table_t *parms;
     ApacheUpload *upload;
     int status;
     int parsed;
@@ -54,7 +54,8 @@ struct ApacheUpload {
     char *filename;
     char *name;
     char *tempname;
-    table *info;
+    //table *info;
+    apr_table_t *info;
     FILE *fp;
     long size;
     ApacheRequest *req;
@@ -99,13 +100,15 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req);
 char *ApacheRequest_script_name(ApacheRequest *req);
 char *ApacheRequest_script_path(ApacheRequest *req);
 const char *ApacheRequest_param(ApacheRequest *req, const char *key);
-array_header *ApacheRequest_params(ApacheRequest *req, const char *key);
+apr_array_header_t *ApacheRequest_params(ApacheRequest *req, const char *key);
 char *ApacheRequest_params_as_string(ApacheRequest *req, const char *key);
 int ApacheRequest___parse(ApacheRequest *req);
 #define ApacheRequest_parse(req) \
     ((req)->status = (req)->parsed ? (req)->status : ApacheRequest___parse(req)) 
-table *ApacheRequest_query_params(ApacheRequest *req, ap_pool *p);
-table *ApacheRequest_post_params(ApacheRequest *req, ap_pool *p);
+apr_table_t *ApacheRequest_query_params(ApacheRequest *req, apr_pool_t *p);
+apr_table_t *ApacheRequest_post_params(ApacheRequest *req, apr_pool_t *p);
+apr_table_t *ApacheRequest_query_params(ApacheRequest *req, apr_pool_t *p);
+apr_table_t *ApacheRequest_post_params(ApacheRequest *req, apr_pool_t *p);
 
 FILE *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload);
 ApacheUpload *ApacheUpload_new(ApacheRequest *req);
@@ -119,7 +122,7 @@ ApacheUpload *ApacheUpload_find(ApacheUpload *upload, char *name);
 #define ApacheUpload_size(upload) ((upload)->size)
 
 #define ApacheUpload_info(upload, key) \
-ap_table_get((upload)->info, (key))
+apr_table_get((upload)->info, (key))
 
 #define ApacheUpload_type(upload) \
 ApacheUpload_info((upload), "Content-Type")
@@ -129,7 +132,7 @@ ApacheUpload_info((upload), "Content-Type")
 
 #define ApacheRequest_get_raw_post(req) ((req)->raw_post)
 
-char *ApacheUtil_expires(pool *p, char *time_str, int type);
+char *ApacheUtil_expires(apr_pool_t *p, char *time_str, int type);
 #define EXPIRES_HTTP   1
 #define EXPIRES_COOKIE 2
 char *ApacheRequest_expires(ApacheRequest *req, char *time_str);

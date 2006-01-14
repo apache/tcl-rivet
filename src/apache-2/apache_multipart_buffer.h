@@ -11,7 +11,7 @@
  extern "C" {
 #endif 
 
-typedef struct {
+typedef struct _multipart_buffer {
     /* request info */
     request_rec *r;
     long request_length;
@@ -28,9 +28,8 @@ typedef struct {
     char *boundary_end;
 } multipart_buffer;
 
-multipart_buffer *
-    multipart_buffer_new(char *boundary, long length, request_rec *r);
-table *multipart_buffer_headers(multipart_buffer *self);
+multipart_buffer * multipart_buffer_new(char *boundary, long length, request_rec *r);
+///*table*/apr_table_t *multipart_buffer_headers(multipart_buffer *self);
 int multipart_buffer_read(multipart_buffer *self, char *buf, int bytes);
 char *multipart_buffer_read_body(multipart_buffer *self); 
 int multipart_buffer_eof(multipart_buffer *self);

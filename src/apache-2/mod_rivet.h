@@ -1,3 +1,4 @@
+
 #ifndef MOD_RIVET_H
 #define MOD_RIVET_H 1
 
@@ -53,31 +54,32 @@
  * you need to make the appropriate modifications to Rivet_CopyConfig,
  * Rivet_CreateConfig, Rivet_MergeConfig and so on. */
 
-typedef struct {
-    Tcl_Interp *server_interp;         /* per server Tcl interpreter */
-    Tcl_Obj *rivet_global_init_script; /* run once when apache is started */
-    Tcl_Obj *rivet_child_init_script;  /* run each time an httpd child starts */
-    Tcl_Obj *rivet_child_exit_script;  /* run each time an httpd child exits */
-    char *rivet_before_script;         /* script run before each page */
-    char *rivet_after_script;          /*            after            */
-    char *rivet_error_script;          /*            for errors */
+module AP_MODULE_DECLARE_DATA rivet_module;
+
+typedef struct _rivet_server_conf {
+    Tcl_Interp *server_interp;           /* per server Tcl interpreter */
+    Tcl_Obj *rivet_global_init_script;   /* run once when apache is started */
+    Tcl_Obj *rivet_child_init_script;
+    Tcl_Obj *rivet_child_exit_script;
+    char *rivet_before_script;        /* script run before each page */
+    char *rivet_after_script;         /*            after            */
+    char *rivet_error_script;         /*            for errors */
 
     /* This flag is used with the above directives.  If any of them
        have changed, it gets set. */
     int user_scripts_updated;
 
     Tcl_Obj *rivet_default_error_script;         /*            for errors */
-    int *cache_size;                  /* # of compiled rivet pages to cache */
-    int *cache_free;                  /* # of free compiled page cache slots */
-    int upload_max;                   /* max allowable upload filesize */
-    int upload_files_to_var;          /* true if files are uploaded to a var */
-    int separate_virtual_interps;     /* true if one-interp-per-page enabled */
-    char *server_name;                /* server_hostname from apache (used?) */
-    char *upload_dir;                 /* dir to upload files to */
-    table *rivet_server_vars;
-    table *rivet_dir_vars;
-    table *rivet_user_vars;
-
+    int *cache_size;
+    int *cache_free;
+    int upload_max;
+    int upload_files_to_var;
+    int separate_virtual_interps;
+    char *server_name;
+    char *upload_dir;
+    apr_table_t *rivet_server_vars;
+    apr_table_t *rivet_dir_vars;
+    apr_table_t *rivet_user_vars;
     char **objCacheList;   /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache; /* Objects cache - the key is the script name */
 
@@ -88,7 +90,7 @@ typedef struct {
 /* eventually we will transfer 'global' variables in here and
    'de-globalize' them */
 
-typedef struct {
+typedef struct _rivet_interp_globals {
     request_rec *r;             /* request rec */
     TclWebRequest *req;         /* TclWeb API request */
 } rivet_interp_globals;
@@ -97,10 +99,19 @@ int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
+#ifdef ap_get_module_config
+#undef ap_get_module_config
+#endif
+#ifdef ap_set_module_config
+#undef ap_set_module_config
+#endif
+
 #define RIVET_SERVER_CONF(module) \
 	(rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 
 #define RIVET_NEW_CONF(p) \
-	(rivet_server_conf *)ap_pcalloc(p, sizeof(rivet_server_conf))
+	(rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
 
-#endif
+
+#endif /* MOD_RIVET_H */
+

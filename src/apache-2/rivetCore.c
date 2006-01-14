@@ -17,12 +17,14 @@
    limitations under the License.
 */
 
-/* $Id$ */
+/* $Id: rivetCore.c,v 1.45 2005/08/21 15:31:38 davidw Exp $ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+
+#include <sys/stat.h>
 
 #include "httpd.h"
 #include "http_config.h"
@@ -32,10 +34,13 @@
 #include "http_log.h"
 #include "http_main.h"
 #include "util_script.h"
-#include "http_conf_globals.h"
+//#include "http_conf_globals.h"
+#include "http_config.h"
+
 
 #include <tcl.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "apache_request.h"
 #include "mod_rivet.h"
@@ -108,25 +113,25 @@ TCL_CMD_HEADER( Rivet_Parse )
 
     if( objc < 2 || objc > 3 )
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "?-virtual? filename");
-	return TCL_ERROR;
+        Tcl_WrongNumArgs(interp, 1, objv, "?-virtual? filename");
+        return TCL_ERROR;
     }
 
     if( objc == 2 ) {
-	filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
+        filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
     } else {
-	if( !STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual") ) {
-	    Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
-	    return TCL_ERROR;
-	}
-	filename = TclWeb_GetVirtualFile( globals->req,
-					  Tcl_GetStringFromObj(objv[2], (int *)NULL) );
+        if( !STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual") ) {
+            Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
+            return TCL_ERROR;
+        }
+        filename = TclWeb_GetVirtualFile( globals->req,
+                Tcl_GetStringFromObj(objv[2], (int *)NULL) );
     }
 
     if (!strcmp(filename, globals->r->filename))
     {
-	Tcl_AddErrorInfo(interp, "Cannot recursively call the same file!");
-	return TCL_ERROR;
+        Tcl_AddErrorInfo(interp, "Cannot recursively call the same file!");
+        return TCL_ERROR;
     }
 
     fnobj = Tcl_NewStringObj(filename, -1);
@@ -135,14 +140,14 @@ TCL_CMD_HEADER( Rivet_Parse )
     Tcl_DecrRefCount(fnobj);
     if (retval != 0)
     {
-	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
-	return TCL_ERROR;
+        Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
+        return TCL_ERROR;
     }
 
     if (Rivet_ParseExecFile(globals->req, filename, 0) == TCL_OK) {
-	return TCL_OK;
+        return TCL_OK;
     } else {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 }
 
@@ -269,7 +274,7 @@ TCL_CMD_HEADER( Rivet_Headers )
 	    Tcl_WrongNumArgs(interp, 2, objv, "new-url");
 	    return TCL_ERROR;
 	}
-	ap_table_set(globals->r->headers_out, "Location",
+	apr_table_set(globals->r->headers_out, "Location",
 		     Tcl_GetStringFromObj (objv[2], (int *)NULL));
 	TclWeb_SetStatus(301, globals->req);
 	return TCL_RETURN;

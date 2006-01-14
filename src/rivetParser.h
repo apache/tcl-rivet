@@ -16,6 +16,9 @@
 #ifndef RIVETPARSER_H
 #define RIVETPARSER_H 1
 
+#define START_TAG "<?"
+#define END_TAG "?>"
+
 /* This bit is for windows. */
 #ifdef BUILD_rivet
 #undef TCL_STORAGE_CLASS

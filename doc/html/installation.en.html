@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet Installation</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.66.1"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="index.en.html" title="Apache Rivet"><link rel="next" href="directives.en.html" title="Rivet Apache Directives"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Apache Rivet Installation</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="index.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="directives.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="installation"></a>Apache Rivet Installation</h2></div></div></div><div class="procedure"><ol type="1"><li><p class="title"><b>Check Dependencies</b></p><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet Installation</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.68.1"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="index.en.html" title="Apache Rivet"><link rel="next" href="directives.en.html" title="Rivet Apache Directives"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Apache Rivet Installation</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="index.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="directives.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="installation"></a>Apache Rivet Installation</h2></div></div></div><div class="procedure"><ol type="1"><li><p class="title"><b>Check Dependencies</b></p><p style="width:90%">
 	  To install Rivet, you will need Tcl 8.4 or greater and
 	  Apache 1.3.xx.  It is known to run on Linux, FreeBSD,
 	  OpenBSD, and Solaris and HPUX.  Windows NT is also possible
@@ -14,7 +14,7 @@
 	  have it, you should just be able to use your system Tcl as
 	  long as it is recent.  You can tell Rivet where Tcl is via
 	  the -with-tclconfig option to
-	  <span style="font-family:monospace"><span><b class="command">configure.tcl</b></span></span> (see below).</p></li><li><p class="title"><b>Get and Install Apache Sources</b></p><p style="width:90%">
+	  <span style="font-family:monospace"><span><strong class="command">configure.tcl</strong></span></span> (see below).</p></li><li><p class="title"><b>Get and Install Apache Sources</b></p><p style="width:90%">
           Rivet needs some Apache include (.h) files in order to
 	  build.  The easiest way to get them is to download the
 	  source code of the Apache web server, although some systems
@@ -28,7 +28,7 @@
 	  Other than that, the default Apache install is fine.  We
 	  will tell Rivet where it is located via the
 	  -with-apxs option to
-	  <span style="font-family:monospace"><span><b class="command">configure.tcl</b></span></span> (see below).
+	  <span style="font-family:monospace"><span><strong class="command">configure.tcl</strong></span></span> (see below).
 	</p><p style="width:90%">
           The source code for the Apache web server may be found by
           following the links here: <a href="http://httpd.apache.org/" target="_top">http://httpd.apache.org/</a>.
@@ -48,9 +48,9 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
 	      or necessary:
 	      </p><div class="variablelist"><dl><dt><span class="term">--with-tcl</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		      This points to the directory where the
-		      <tt class="filename">tclConfig.sh</tt> file is located.
+		      <code class="filename">tclConfig.sh</code> file is located.
 		    </div></div></dd><dt><span class="term">--with-tclsh</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">This points to the location of the
-		      <tt class="filename">tclsh</tt> executable.</div></div></dd><dt><span class="term">--with-apxs</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">The location of the <tt class="filename">apxs</tt>
+		      <code class="filename">tclsh</code> executable.</div></div></dd><dt><span class="term">--with-apxs</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">The location of the <code class="filename">apxs</code>
 		      program that provides information about the
 		      configuration and compilation of Apache modules.</div></div></dd></dl></div><p style="width:90%">
 	    </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
@@ -61,17 +61,17 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
 	      run to completion without any errors (a warning or two
 	      is ok, generally).
 	    </p></li><li><p class="title"><b>Install</b></p><p style="width:90%">
-	      Now, you are ready to run the <span style="font-family:monospace"><span><b class="command">make
-		install</b></span></span> to install the resulting files.
+	      Now, you are ready to run the <span style="font-family:monospace"><span><strong class="command">make
+		install</strong></span></span> to install the resulting files.
 		This should copy the shared object (like
-		<tt class="filename">mod_rivet.so</tt>, if one was
+		<code class="filename">mod_rivet.so</code>, if one was
 		successfully created, into Apache's
-		<tt class="filename">libexec</tt> directory, as well as
+		<code class="filename">libexec</code> directory, as well as
 		install some support scripts and various code.
 	    </p></li></ol></li><li><p class="title"><b>Apache Configuration Files</b></p><p style="width:90%">
 	  Rivet is relatively easy to configure - we start off by
 	  adding the module itself:
-	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">LoadModule rivet_module	<i class="replaceable"><tt>/usr/lib/apache/1.3/mod_rivet.so</tt></i></pre><p style="width:90%">
+	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">LoadModule rivet_module	<em class="replaceable"><code>/usr/lib/apache/1.3/mod_rivet.so</code></em></pre><p style="width:90%">
 	  This tells Apache to load the Rivet shared object, wherever
 	  it happens to reside on your file system.  Now we have to
 	  tell Apache what kind of files are "Rivet" files and how to
@@ -79,10 +79,10 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
 	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">AddType application/x-httpd-rivet .rvt
 AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 	  These tell Apache to process files with the
-	  <tt class="filename">.rvt</tt> and <tt class="filename">.tcl</tt>
+	  <code class="filename">.rvt</code> and <code class="filename">.tcl</code>
 	  extensions as Rivet files.
 	</p><p style="width:90%">You may also wish to use Rivet files as index files for
 	directories.  In that case, you would do the following:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">DirectoryIndex index.html index.htm index.shtml index.cgi index.tcl index.rvt</pre><p style="width:90%">
 	  For other directives that Rivet provides for Apache
 	  configuration, please see <a href="directives.en.html" title="Rivet Apache Directives">the section called &#8220;Rivet Apache Directives&#8221;</a>.
-	</p></li></ol></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="index.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.en.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="directives.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Apache Rivet </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Apache Directives</td></tr></table></div></body></html>
+	</p></li></ol></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="index.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="directives.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Apache Rivet </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Apache Directives</td></tr></table></div></body></html>

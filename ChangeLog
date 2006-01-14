@@ -1,3 +1,21 @@
+2006-01-14 Eckhard Lehmann  <ecky.l@gmx.de>
+
+	* configure.ac: edited for 2 directories src/apache-1 and
+	src/apache-2 to be the source directory for either Apache1.x or
+	Apache2.x. Added new autoconf macros to check for apache base
+	directory, apache/apr include directories (on debian for instance,
+	they are in /usr/include/apache1.3 resp. /usr/include/apache2 and
+	/usr/include/apr-0) and apache version ( --apache-version=1 or
+	--apache-version=2). According to the macros, the sources either
+	in src/apache-1 or src/apache-2 are compiled.
+
+	* src/: put all sources for rivet for Apache1.x into a
+	subdirectory apache-1, left the Makefile.am unchanged. Copied the
+	files to a subdirectory apache-2 and started port of rivet to
+	Apache2.2 with these files.
+
+	* Checked in by davidw.
+
 2005-12-12  Karl Lehenbauer  <karl-rivet@sc.com>
 	* rivet/packages/dio/dio.tcl: Reverted change to "store" method
 	  that removed fields from the store array that were part of the

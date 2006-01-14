@@ -1,5 +1,9 @@
 #ifndef TCLWEB_H
 #define TCLWEB_H
+
+#include <tcl.h>
+#include "apache_request.h"
+
 /*
  * TclWeb.c --
  * 	Common API layer.
@@ -244,8 +248,6 @@ Tcl_Obj * TclWeb_StringToUtfToObj(char *in, TclWebRequest *req);
 char *TclWeb_GetEnvVar( TclWebRequest *req, char * );
 
 char *TclWeb_GetVirtualFile( TclWebRequest *req, char *virtualname );
-
-char *TclWeb_GetRawPost( TclWebRequest *req );
 
 /* output/write/flush?  */
 

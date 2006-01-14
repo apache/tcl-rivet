@@ -13,6 +13,8 @@
    limitations under the License.
 */
 
+xxx
+
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
 #include <config.h>

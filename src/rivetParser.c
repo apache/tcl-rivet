@@ -93,7 +93,7 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
 
 int
 Rivet_GetRivetFile(char *filename, int toplevel,
-		   Tcl_Obj *outbuf, Tcl_Interp *interp)
+        Tcl_Obj *outbuf, Tcl_Interp *interp)
 {
     int sz = 0;
     Tcl_Obj *inbuf;
@@ -101,15 +101,15 @@ Rivet_GetRivetFile(char *filename, int toplevel,
 
     rivetfile = Tcl_OpenFileChannel(interp, filename, "r", 0664);
     if (rivetfile == NULL) {
-	/* Don't need to adderrorinfo - Tcl_OpenFileChannel takes care
-	   of that for us. */
+        /* Don't need to adderrorinfo - Tcl_OpenFileChannel takes care
+           of that for us. */
         return TCL_ERROR;
     }
 
     if (toplevel) {
-	Tcl_AppendToObj(outbuf, "namespace eval request {\n", -1);
+        Tcl_AppendToObj(outbuf, "namespace eval request {\n", -1);
     } else {
-	Tcl_SetStringObj(outbuf, "", -1);
+        Tcl_SetStringObj(outbuf, "", -1);
     }
     Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
 
@@ -120,20 +120,20 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     Tcl_Close(interp, rivetfile);
     if (sz == -1)
     {
-	Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
-	Tcl_DecrRefCount(inbuf);
-	return TCL_ERROR;
+        Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
+        Tcl_DecrRefCount(inbuf);
+        return TCL_ERROR;
     }
 
     /* If we are not inside a <? ?> section, add the closing ". */
     if (Rivet_Parser(outbuf, inbuf) == 0)
     {
-	Tcl_AppendToObj(outbuf, "\"\n", 2);
+        Tcl_AppendToObj(outbuf, "\"\n", 2);
     }
 
     if (toplevel)
     {
-	Tcl_AppendToObj(outbuf, "\n}", -1);
+        Tcl_AppendToObj(outbuf, "\n}", -1);
     }
     Tcl_AppendToObj(outbuf, "\n", -1);
 
@@ -166,7 +166,6 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
     const char *strstart = START_TAG;
     const char *strend = END_TAG;
 
-
     int endseqlen = strlen(END_TAG);
     int startseqlen = strlen(START_TAG);
     int inside = 0, p = 0;
@@ -175,81 +174,85 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
     next = Tcl_GetStringFromObj(inbuf, &inLen);
 
     if (inLen == 0)
-	return 0;
+        return 0;
 
     while (*next != 0)
     {
-	cur = next;
-	next = (char *)Tcl_UtfNext(cur);
-	if (!inside)
-	{
-	    /* Outside the delimiting tags. */
-	    if (*cur == strstart[p])
-	    {
-		if ((++p) == startseqlen)
-		{
-		    /* We have matched the whole ending sequence. */
-		    Tcl_AppendToObj(outbuf, "\"\n", 2);
-		    inside = 1;
-		    p = 0;
-		    continue;
-		}
-	    } else {
-		if (p > 0) {
-		    Tcl_AppendToObj(outbuf, (char *)strstart, p);
-		    p = 0;
-		}
-		/* or else just put the char in outbuf  */
-		switch (*cur)
-		{
-		case '{':
-		    Tcl_AppendToObj(outbuf, "\\{", 2);
-		    break;
-		case '}':
-		    Tcl_AppendToObj(outbuf, "\\}", 2);
-		    break;
-		case '$':
-		    Tcl_AppendToObj(outbuf, "\\$", 2);
-		    break;
-		case '[':
-		    Tcl_AppendToObj(outbuf, "\\[", 2);
-		    break;
-		case ']':
-		    Tcl_AppendToObj(outbuf, "\\]", 2);
-		    break;
-		case '"':
-		    Tcl_AppendToObj(outbuf, "\\\"", 2);
-		    break;
-		case '\\':
-		    Tcl_AppendToObj(outbuf, "\\\\", 2);
-		    break;
-		default:
-		    Tcl_AppendToObj(outbuf, cur, next - cur);
-		    break;
-		}
-		continue;
-	    }
-	} else {
-	    /* Inside the delimiting tags. */
+        cur = next;
+        next = (char *)Tcl_UtfNext(cur);
+        if (!inside)
+        {
+            /* Outside the delimiting tags. */
+            if (*cur == strstart[p])
+            {
+                if ((++p) == startseqlen)
+                {
+                    /* We have matched the whole ending sequence. */
+                    Tcl_AppendToObj(outbuf, "\"\n", 2);
+                    inside = 1;
+                    p = 0;
+                    continue;
+                }
+            } else {
+                if (p > 0) {
+                    Tcl_AppendToObj(outbuf, (char *)strstart, p);
+                    p = 0;
+                }
+                /* or else just put the char in outbuf  */
+                switch (*cur)
+                {
+                    case '{':
+                        Tcl_AppendToObj(outbuf, "\\{", 2);
+                        break;
+                    case '}':
+                        Tcl_AppendToObj(outbuf, "\\}", 2);
+                        break;
+                    case '$':
+                        Tcl_AppendToObj(outbuf, "\\$", 2);
+                        break;
+                    case '[':
+                        Tcl_AppendToObj(outbuf, "\\[", 2);
+                        break;
+                    case ']':
+                        Tcl_AppendToObj(outbuf, "\\]", 2);
+                        break;
+                    case '"':
+                        Tcl_AppendToObj(outbuf, "\\\"", 2);
+                        break;
+                    case '\\':
+                        Tcl_AppendToObj(outbuf, "\\\\", 2);
+                        break;
+                    default:
+                        Tcl_AppendToObj(outbuf, cur, next - cur);
+                        break;
+                }
+                continue;
+            }
+        } else {
+            /* Inside the delimiting tags. */
 
-	    if (*cur == strend[p])
-	    {
-		if ((++p) == endseqlen)
-		{
-		    Tcl_AppendToObj(outbuf, "\nputs -nonewline \"", -1);
-		    inside = 0;
-		    p = 0;
-		}
-	    } else {
-		/* Plop stuff into outbuf, which we will then eval. */
-		if (p > 0) {
-		    Tcl_AppendToObj(outbuf, (char *)strend, p);
-		    p = 0;
-		}
-		Tcl_AppendToObj(outbuf, cur, next - cur);
-	    }
-	}
+            if (*cur == strend[p])
+            {
+                if ((++p) == endseqlen)
+                {
+                    Tcl_AppendToObj(outbuf, "\nputs -nonewline \"", -1);
+                    inside = 0;
+                    p = 0;
+                }
+            } else {
+                /* Plop stuff into outbuf, which we will then eval. */
+                if (p > 0) {
+                    Tcl_AppendToObj(outbuf, (char *)strend, p);
+                    p = 0;
+                }
+                Tcl_AppendToObj(outbuf, cur, next - cur);
+            }
+        }
     }
+
+    //fprintf (stderr, "content:\n%s\n", Tcl_GetString(outbuf));
+    //fflush (stderr);
 
     return inside;
 }
+

@@ -27,7 +27,7 @@
 #include <tcl.h>
 #include <errno.h>
 
-#include "apache_request.h"
+//#include "apache_request.h"
 #include "mod_rivet.h"
 #include "TclWeb.h"
 
@@ -46,19 +46,13 @@ outputproc(ClientData instancedata, CONST84 char *buf,
 {
     rivet_server_conf *rsc = (rivet_server_conf *)instancedata;
     rivet_interp_globals *globals =
-	Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
-
-    /* If this is true, we're in the process of shutting down - just
-     * throw it away. */
-    if (globals == NULL) {
-	return toWrite;
-    }
+        Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
 
     TclWeb_PrintHeaders(globals->req);
     if (globals->req->content_sent == 0)
     {
-	ap_rwrite(buf, toWrite, globals->r);
-	ap_rflush(globals->r);
+        ap_rwrite(buf, toWrite, globals->r);
+        ap_rflush(globals->r);
     }
     return toWrite;
 }
@@ -103,3 +97,4 @@ Tcl_ChannelType RivetChan = {
     NULL,
     NULL
 };
+
