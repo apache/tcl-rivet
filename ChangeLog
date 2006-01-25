@@ -1,3 +1,7 @@
+2006-01-25  Karl Lehenbauer  <karl-rivet@sc.com>
+	* rivet/packages/dio/diodisplay.tcl: When editing, made select boxes
+	  have the current value selected by default.
+
 2006-01-14 Eckhard Lehmann  <ecky.l@gmx.de>
 
 	* configure.ac: edited for 2 directories src/apache-1 and
