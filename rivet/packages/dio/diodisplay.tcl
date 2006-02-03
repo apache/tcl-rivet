@@ -582,6 +582,14 @@ catch { ::itcl::delete class DIODisplay }
 	return $result
     }
 
+    method update_with_explicit_key {key arrayName} {
+	upvar 1 $arrayName array
+	set result [$DIO update_with_explicit_key $key array]
+	set error [$DIO errorinfo]
+	if {![lempty $error]} {return -code error $error}
+	return $result
+    }
+
     method delete {key} {
 	set result [$DIO delete $key]
 	set error  [$DIO errorinfo]
@@ -810,11 +818,19 @@ catch { ::itcl::delete class DIODisplay }
 	    ## need to delete the old key.
 	    if {$key != $newkey} {
 		if {![fetch $newkey a]} {
-		    delete $key
+		    # no record already exists with the new key,
+		    # do a special update
+		    set_field_values response
+		    get_field_values updateArray
+		    update_with_explicit_key $key updateArray
+		    headers redirect $document
+		    return
 		}
 	    }
 	}
 
+	# if we got here and array "a" exists, they're trying to alter a key 
+	# to a key that already exists
 	if {[array exists a]} {
 	    puts "That record already exists in the database."
 	    return

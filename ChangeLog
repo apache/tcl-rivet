@@ -1,3 +1,17 @@
+
+2006-02-03  Karl Lehenbauer  <karl-rivet@sc.com>
+	* rivet/packages/dio/[dio,diodisplay].tcl: Uncovered a serious flaw
+	  in DIO -- there is no way to update a row in a way that changes
+	  the key value.  As a result, DIOdisplay punts and deletes the
+	  row then reinserts it with the new key.  This is not the same
+	  thing as the delete can trigger integrity checks that fail because
+	  of constraints from other tables.  Added the somewhat kludgey
+	  update_with_explicit_key method to let us specify the key rather
+	  than having the key always be dug out of the data array (so that
+	  the key in the data array can be different) and altered the
+	  row edit code in DIOdisplay to use this rather than doing the
+	  delete/insert thing.
+
 2006-01-25  Karl Lehenbauer  <karl-rivet@sc.com>
 	* rivet/packages/dio/diodisplay.tcl: When editing, made select boxes
 	  have the current value selected by default.

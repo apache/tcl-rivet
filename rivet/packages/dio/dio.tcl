@@ -499,6 +499,37 @@ proc handle {interface args} {
     }
 
     #
+    # update_with_explicit_key - an update where the key is specified
+    # as an argument to the proc rather than being dug out of the array
+    #
+    # this is a kludge until we come up with a better way to
+    # solve the problem of updating a row where we actually
+    # want to change the value of a key field
+    #
+    method update_with_explicit_key {key arrayName args} {
+	table_check $args
+	key_check $myKeyfield $key
+	upvar 1 $arrayName $arrayName $arrayName array
+
+	set fields [::array names array]
+	set req [build_update_query array $fields $myTable]
+	append req [build_key_where_clause $myKeyfield $key]
+
+	set res [exec $req]
+	if {[$res error]} {
+	    set errinf [$res errorinfo]
+	    $res destroy
+	    return -code error "Got '$errinf' executing '$req'"
+	}
+
+	# this doesn't work on postgres, you've got to use cmdRows,
+	# we need to figure out what to do with this
+	set numrows [$res numrows]
+	$res destroy
+	return $numrows
+    }
+
+    #
     # insert - a pure insert, without store's somewhat clumsy
     # efforts to see if it needs to be an update rather than
     # an insert
