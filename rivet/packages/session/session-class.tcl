@@ -102,6 +102,8 @@ package require Itcl
 
     constructor {args} {
 	eval configure $args
+    	$dioObject registerSpecialField rivet_session session_update_time NOW
+	$dioObject registerSpecialField rivet_session session_start_time NOW
     }
 
     method status {args} {
@@ -149,7 +151,7 @@ package require Itcl
 
 	set sessionIdKey "$uniqueID[clock clicks][pid]$args[clock seconds]$scrambleCode[get_entropy_bytes]"
 	debug "gen_session_id - feeding this to md5: '$sessionIdKey'"
-	return [::md5::md5 $sessionIdKey]
+	return [::md5::md5 -hex -- $sessionIdKey]
     }
 
     #
@@ -159,7 +161,13 @@ package require Itcl
     #
     method do_garbage_collection {} {
 	debug "do_garbage_collection: performing garbage collection"
-	set result [$dioObject exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
+#	set result [$dioObject exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
+	set del_cmd "delete from $sessionTable where "
+	append del_cmd [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS]
+	append del_cmd " - [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
+	append del_cmd " > $gcMaxLifetime"
+	debug "do_garbage_collection: > $del_cmd  <"
+	set result [$dioObject exec $del_cmd]
 	$result destroy
     }
 
@@ -294,14 +302,14 @@ package require Itcl
     #
     method store {packageName key data} {
 	set a(session_id) [id]
-	set a(package) $packageName
-	set a(key) $key
+	set a(package_) $packageName
+	set a(key_) $key
 
 	regsub -all {\\} $data {\\\\} data
 	set a(data) $data
 
-	debug "store session data, package '$packageName', key '$key', data '$data'"
-	set kf [list session_id package key]
+	debug "store session data, package_ '$packageName', key_ '$key', data '$data'"
+	set kf [list session_id package_ key_]
 
 	if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
 	    puts "Failed to store $sessionCacheTable '$kf'"
@@ -315,21 +323,21 @@ package require Itcl
     #   for this session
     #
     method fetch {packageName key} {
-	set kf [list session_id package key]
+	set kf [list session_id package_ key_]
 
 	set a(session_id) [id]
-	set a(package) $packageName
-	set a(key) $key
+	set a(package_) $packageName
+	set a(key_) $key
 
 	set key [$dioObject makekey a $kf]
 	if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
 	    status [$dioObject errorinfo]
 	    puts "error: [$dioObject errorinfo]"
-	    debug "fetch session data failed, package '$packageName', key '$key', error '[$dioObject errorinfo]'"
+	    debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
 	    return ""
 	}
 
-	debug "fetch session data succeeded, package '$packageName', key '$key', result '$a(data)'"
+	debug "fetch session data succeeded, package_ '$packageName', key_ '$key', result '$a(data)'"
 
 	return $a(data)
     }
@@ -443,6 +451,7 @@ package require Itcl
     method debug {message} {
 	if {$debugMode} {
 	    puts $debugFile "$this (debug) $message<br>"
+	    flush $debugFile
 	}
     }
 }
