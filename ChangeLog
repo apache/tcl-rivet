@@ -1,3 +1,11 @@
+2006-06-07  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/packages/session/session-create-mysql.sql: Minor update
+	from Massimo Manghi for Mysql 4.
+
+	* rivet/packages/session/session-class.tcl: Minor update from
+	Massimo Manghi.
+
 2006-05-14  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/packages/session/, rivet/packages/dio/: Added Mysql and

@@ -332,7 +332,7 @@ package require Itcl
 	set key [$dioObject makekey a $kf]
 	if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
 	    status [$dioObject errorinfo]
-	    puts "error: [$dioObject errorinfo]"
+	    debug "error: [$dioObject errorinfo]"
 	    debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
 	    return ""
 	}
