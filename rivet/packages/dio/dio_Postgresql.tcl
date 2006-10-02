@@ -134,6 +134,16 @@ namespace eval DIO {
 	    set errorcode [pg_result $resultid -status]
 	    set errorinfo [pg_result $resultid -error]
 
+	    # if numrows is zero, see if cmdrows returned anything and if it
+	    # did, put that in in place of numrows, hiding a postgresql
+	    # idiosyncracy from DIO
+	    if {$numrows == 0} {
+	        set cmdrows [pg_result $resultId -cmdTuples]
+		if {$cmdrows != ""} {
+		    set numrows $cmdrows
+		}
+	    }
+
 	    if {$errorcode != "PGRES_COMMAND_OK" \
 		    && $errorcode != "PGRES_TUPLES_OK"} { set error 1 }
 

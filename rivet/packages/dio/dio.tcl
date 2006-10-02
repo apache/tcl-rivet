@@ -138,7 +138,7 @@ proc handle {interface args} {
 			# is appended with a "field LIKE value"
 
 			if {[::string first {%} $elem] != -1} {
-			    append req " $field LIKE '[quote $elem]'"
+			    append req " $field LIKE [makeDBFieldValue $myTable $field $elem]"
 		        } elseif {[regexp {^([<>]) *([0-9.]*)$} $elem _ fn val]} {
 			    # value starts with <, or >, then space, 
 			    # and a something
@@ -148,7 +148,7 @@ proc handle {interface args} {
 			    append req " $field$fn$val"
 			} else {
 			    # otherwise it's a straight key=value comparison
-			    append req " $field='[quote $elem]'"
+			    append req " $field=[makeDBFieldValue $myTable $field $elem]"
 			}
 
 			continue
@@ -171,14 +171,14 @@ proc handle {interface args} {
 	upvar 1 $arrayName array
 
 	if {[lempty $myTable]} { set myTable $table }
+	set vals [::list]
+	set vars [::list]
 	foreach field $fields {
 	    if {![info exists array($field)]} { continue }
-	    append vars "$field,"
-	    append vals "'[quote $array($field)]',"
+	    lappend vars "$field"
+	    lappend vals "[makeDBFieldValue $myTable $field $array($field)]"
 	}
-	set vals [::string range $vals 0 end-1]
-	set vars [::string range $vars 0 end-1]
-	return "insert into $myTable ($vars) VALUES ($vals)"
+	return "insert into $myTable ([join $vars {,}]) VALUES ([join $vals {,}])"
     }
 
     #
@@ -194,12 +194,12 @@ proc handle {interface args} {
     protected method build_update_query {arrayName fields {myTable ""}} {
 	upvar 1 $arrayName array
 	if {[lempty $myTable]} { set myTable $table }
+	set string [::list]
 	foreach field $fields {
 	    if {![info exists array($field)]} { continue }
-	    append string "$field='[quote $array($field)]',"
+	    lappend string "$field=[makeDBFieldValue $myTable $field $array($field)]"
 	}
-	set string [::string range $string 0 end-1]
-	return "update $myTable SET $string"
+	return "update $myTable SET [join $string {,}]"
     }
 
     #
@@ -235,19 +235,13 @@ proc handle {interface args} {
 	## If we're not using multiple keyfields, just return a simple
 	## where clause.
 	if {[llength $myKeyfield] < 2} {
-	    return " WHERE $myKeyfield = '[quote $myKey]'"
+	    return " WHERE $myKeyfield = [makeDBFieldValue $table $myKeyfield $myKey]"
 	}
 
 	# multiple fields, construct it as a where-and
-	set first 1
-	set req ""
+	set req " WHERE 1 = 1"
 	foreach field $myKeyfield key $myKey {
-	    if {$first} {
-		append req " WHERE $field='[quote $key]'"
-		set first 0
-	    } else {
-		append req " AND $field='[quote $key]'"
-	    }
+	    append req " AND $field=[makeDBFieldValue $table $field $key]"
 	}
 	return $req
     }
@@ -499,9 +493,40 @@ proc handle {interface args} {
     }
 
     #
+    # update_with_explicit_key - an update where the key is specified
+    # as an argument to the proc rather than being dug out of the array
+    #
+    # this is a kludge until we come up with a better way to
+    # solve the problem of updating a row where we actually
+    # want to change the value of a key field
+    #
+    method update_with_explicit_key {key arrayName args} {
+	table_check $args
+	key_check $myKeyfield $key
+	upvar 1 $arrayName $arrayName $arrayName array
+
+	set fields [::array names array]
+	set req [build_update_query array $fields $myTable]
+	append req [build_key_where_clause $myKeyfield $key]
+
+	set res [exec $req]
+	if {[$res error]} {
+	    set errinf [$res errorinfo]
+	    $res destroy
+	    return -code error "Got '$errinf' executing '$req'"
+	}
+
+	# this doesn't work on postgres, you've got to use cmdRows,
+	# we need to figure out what to do with this
+	set numrows [$res numrows]
+	$res destroy
+	return $numrows
+    }
+
+    #
     # insert - a pure insert, without store's somewhat clumsy
     # efforts to see if it needs to be an update rather than
-    # an insert
+    # an insert -- this shouldn't require fields, it's broken
     #
     method insert {table arrayName} {
 	upvar 1 $arrayName $arrayName $arrayName array
@@ -571,6 +596,14 @@ proc handle {interface args} {
 	return [string "select count(*) from $myTable"]
     }
 
+    method makeDBFieldValue {table_name field_name val} {
+    	return "'[quote $val]'"
+    }
+
+    method registerSpecialField {table_name field_name type} {
+    	set specialFields(${table_name}@${field_name}) $type
+    }
+
     ##
     ## These are methods which should be defined by each individual database
     ## interface class.
@@ -580,6 +613,7 @@ proc handle {interface args} {
     method exec    {args} {}
     method nextkey {args} {}
     method lastkey {args} {}
+    method now {} {}
 
     ##
     ## Functions to get and set public variables.
@@ -595,6 +629,8 @@ proc handle {interface args} {
     method pass {{string ""}} { configure_variable pass $string }
     method host {{string ""}} { configure_variable host $string }
     method port {{string ""}} { configure_variable port $string }
+
+    protected variable specialFields
 
     public variable interface	""
     public variable errorinfo	""

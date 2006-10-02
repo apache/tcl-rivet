@@ -9,20 +9,20 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define if you have <limits.h> */
+/* Do we have <limits.h>? */
 #undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the `lseek64' function. */
+#undef HAVE_LSEEK64
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define if you have net/errno.h */
+/* Do we have <net/errno.h>? */
 #undef HAVE_NET_ERRNO_H
 
-/* Define to 1 if you have the `pthread_attr_setstacksize' function. */
-#undef HAVE_PTHREAD_ATTR_SETSTACKSIZE
-
-/* Define to 1 if you have the `readdir_r' function. */
-#undef HAVE_READDIR_R
+/* Define to 1 if you have the `open64' function. */
+#undef HAVE_OPEN64
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -36,10 +36,10 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define if sys/types.h defines struct dirent64 */
+/* Is 'struct dirent64' in <sys/types.h>? */
 #undef HAVE_STRUCT_DIRENT64
 
-/* Define if your machines defines struct stat64 */
+/* Is 'struct stat64' in <sys/stat.h>? */
 #undef HAVE_STRUCT_STAT64
 
 /* Define to 1 if you have the <sys/param.h> header file. */
@@ -51,7 +51,7 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* Define if your sys/types.h defines off64_t */
+/* Is off64_t in <sys/types.h>? */
 #undef HAVE_TYPE_OFF64_T
 
 /* Define to 1 if you have the <unistd.h> header file. */
@@ -60,31 +60,31 @@
 /* The path to a working tclsh executable */
 #undef NAMEOFEXECUTABLE
 
-/* Define if your system does not have dirent.h */
+/* Do we have <dirent.h>? */
 #undef NO_DIRENT_H
 
-/* Define if your system doesn't have <dlfcn.h> */
+/* Do we have <dlfcn.h>? */
 #undef NO_DLFCN_H
 
-/* Define if your system does not have an errno.h */
+/* Do we have <errno.h>? */
 #undef NO_ERRNO_H
 
-/* Define if you do not have <float.h> */
+/* Do we have <float.h>? */
 #undef NO_FLOAT_H
 
-/* Define if you have no <limits.h> */
+/* Do we have <limits.h>? */
 #undef NO_LIMITS_H
 
-/* Define if your system does not have <stdlib.h> */
+/* Do we have <stdlib.h>? */
 #undef NO_STDLIB_H
 
-/* Define if your system does not have <string.h> */
+/* Do we have <string.h>? */
 #undef NO_STRING_H
 
-/* Define if your system does not have <sys/wait.h> */
+/* Do we have <sys/wait.h>? */
 #undef NO_SYS_WAIT_H
 
-/* Define if your system does not have <values.h> */
+/* Do we have <values.h>? */
 #undef NO_VALUES_H
 
 /* Name of package */
@@ -105,40 +105,31 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define if you want to build static libraries */
+/* Is this a static build? */
 #undef STATIC_BUILD
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Define to enable Tcl memory leak debugging */
+/* Is memory debugging enabled? */
 #undef TCL_MEM_DEBUG
 
-/* Define to build with Tcl thread support */
+/* Are we building with threads enabled? */
 #undef TCL_THREADS
 
-/* Define if wide ints are long */
+/* Are wide integers to be implemented with C 'long's? */
 #undef TCL_WIDE_INT_IS_LONG
 
-/* How Tcl defines a wide int */
+/* What type should be used to define wide integers? */
 #undef TCL_WIDE_INT_TYPE
 
-/* Windows CE version */
+/* UNDER_CE version */
 #undef UNDER_CE
 
-/* Define if your system has a.out.h */
-#undef USE_A_OUT_H
-
-/* Define if your machines uses deltas for TZ (AIX) */
+/* Do we need a special AIX hack for timezones? */
 #undef USE_DELTA_FOR_TZ
 
-/* Define if your machine has <sys/exec_aout.h> */
-#undef USE_SYS_EXEC_AOUT_H
-
-/* Set to one to use <sys/exec.h> */
-#undef USE_SYS_EXEC_H
-
-/* Define to use the special threaded alloc (Windows) */
+/* Do we want to use the threaded memory allocator? */
 #undef USE_THREAD_ALLOC
 
 /* Version number of package */
@@ -148,26 +139,29 @@
    first (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
 
-/* something tcl.m4 does, shrug */
+/* Add the _ISOC99_SOURCE flag when building */
 #undef _ISOC99_SOURCE
 
-/* something tcl.m4 does, shrug */
+/* Add the _LARGEFILE64_SOURCE flag when building */
 #undef _LARGEFILE64_SOURCE
 
-/* Define to define _OE_SOCKETS, needed in sys/socket.h (OS/390) */
+/* Add the _LARGEFILE_SOURCE64 flag when building */
+#undef _LARGEFILE_SOURCE64
+
+/* # needed in sys/socket.h Should OS/390 do the right thing with sockets? */
 #undef _OE_SOCKETS
 
-/* Define if your machine uses Posix pthread semantics */
+/* Do we really want to follow the standard? Yes we do! */
 #undef _POSIX_PTHREAD_SEMANTICS
 
-/* Define to use thread-safe library routines */
+/* Do we want the reentrant OS API? */
 #undef _REENTRANT
 
-/* Define to build thread safe (Windows) */
+/* Do we want the thread-safe OS API? */
 #undef _THREAD_SAFE
 
-/* The version of Windows CE */
+/* _WIN32_WCE version */
 #undef _WIN32_WCE
 
-/* Define to use updated header definitions where possible (HP-UX) */
+/* Do we want to use the XOPEN network library? */
 #undef _XOPEN_SOURCE_EXTENDED

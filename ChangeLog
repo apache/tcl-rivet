@@ -1,3 +1,7 @@
+2006-10-02  David N. Welton  <davidw@dedasys.com>
+
+	* Added Massimo Manghi's backport of session and dio improvements.
+
 2006-09-25  David N. Welton  <davidw@dedasys.com>
 
 	* Added new tclconfig/ stuff from Tcl's CVS.

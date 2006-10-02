@@ -16,15 +16,16 @@
 
 # $Id$
 
-package provide dio_Mysql 0.1
+package provide dio_Mysql 0.2
 
 namespace eval DIO {
     ::itcl::class Mysql {
 	inherit Database
 
 	constructor {args} {eval configure $args} {
-	    if {[catch {package require Mysqltcl}] \
-		    && [catch {package require mysql}]} {
+	    if {       [catch {package require Mysqltcl}]   \
+	    	    && [catch {package require mysqltcl}]   \
+		    && [catch {package require mysql}   ] } {
 		return -code error "No MySQL Tcl package available"
 	    }
 
@@ -48,8 +49,9 @@ namespace eval DIO {
 	    if {![lempty $user]} { lappend command -user $user }
 	    if {![lempty $pass]} { lappend command -password $pass }
 	    if {![lempty $port]} { lappend command -port $port }
-	    if {![lempty $host]} { lappend command $host }
-
+	    if {![lempty $host]} { lappend command -host $host }
+	    
+#	    puts "i'm going to connect mysql: >$command< ($this) <br/>"
 	    if {[catch $command error]} { return -code error $error }
 
 	    set conn $error
@@ -105,6 +107,51 @@ namespace eval DIO {
 	    return $conn
 	}
 
+	method makeDBFieldValue {table_name field_name val {convert_to {}}} {
+		if {[info exists specialFields(${table_name}@${field_name})]} {
+		    switch $specialFields(${table_name}@${field_name}) {
+			DATE {
+			  	set secs [clock scan $val]
+				set my_val [clock format $secs -format {%Y-%m-%d}]
+				return "DATE_FORMAT('$my_val', '%Y-%m-%d')"
+			  }
+			DATETIME {
+			  	set secs [clock scan $val]
+				set my_val [clock format $secs -format {%Y-%m-%d %T}]
+				return "DATE_FORMAT('$my_val', '%Y-%m-%d %T')"
+			  }
+			NOW {
+			    switch $convert_to {
+				SECS {
+				    if {[::string compare $val "now"] == 0} {
+					set	secs    [clock seconds]
+					set	my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+					return	$my_val
+				    } else {
+					return  "DATE_FORMAT(session_update_time,'%Y%m%d%H%i%S')"
+				    }
+				}
+				default {
+				    if {[::string compare $val, "now"] == 0} {
+			  		set secs [clock seconds]
+				    } else {
+					set secs [clock scan $val]
+				    }
+				    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+				    return "DATE_FORMAT('$my_val', '%Y-%m-%d %T')"
+				}
+			    }
+			}
+			default {
+			  	# no special code for that type!!
+				return "'[quote $val]'"
+			}
+		    }
+		} else {
+			return "'[quote $val]'"
+		}
+	}
+
 	public variable db "" {
 	    if {[info exists conn]} {
 		mysqluse $conn $db
@@ -130,7 +177,7 @@ namespace eval DIO {
 	method nextrow {} {
 	    return [mysqlnext $resultid]
 	}
-
+	
     } ; ## ::itcl::class MysqlResult
 
 }
