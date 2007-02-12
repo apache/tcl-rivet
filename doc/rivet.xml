@@ -828,6 +828,23 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <term>
 	      <cmdsynopsis>
 		<command>upload</command>
+		<arg choice="plain">exists</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns true if an upload named <arg>uploadname</arg>
+		exists.  This can be used in scripts that are meant to
+		be run by different forms that send over uploads that
+		might need specific processing.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
 		<arg choice="plain">size</arg>
 		<arg><replaceable>uploadname</replaceable></arg>
 	      </cmdsynopsis>
@@ -1583,16 +1600,50 @@ AddType application/x-rivet-tcl .tcl</programlisting>
     <example id="upload">
       <title>File Upload</title>
       <para>
-	The following HTML in one file, say,
-	<filename>upload.html</filename>
+	The <command>upload</command> command endows Rivet with an
+	interface to access files transferred over http as parts of a
+	multipart form.  The following HTML in one file, say,
+	<filename>upload.html</filename> creates a form with a text
+	input entry. By clicking the file chooser button the file
+	browser shows up and the user selects the file to be uploaded
+	(the file path will appear in the text input).  In order make
+	sure you're uploading the whole file you must combine the
+	action of the enctype and method attributes of the
+	&lt;form...&gt; tag in the way shown in the example.  Failure
+	to do so would result in the client sending only the file's
+	path, rather than the actual contents.
       </para>
       <programlisting>&upload.html;</programlisting>
       <para>
-	Can be used with the following Tcl code, in a second file
-	(<filename>upload.rvt</filename> for instance)
-	in order to create a file upload form.
+	In the script invoked by the form
+	(<filename>upload.rvt</filename>) <command>upload</command>
+	<arg>argument ...</arg> commands can be used to manipulate the
+	various files uploaded.
       </para>
       <programlisting>&upload.rvt;</programlisting>
+      <para>
+	Don't forget that the apache server must have write access to
+	the directory where files are being created.  The Rivet Apache
+	directives have a substantial impact on the upload process,
+	you have to carefully read the docs in order to set the
+	appropriate directives values that would match your
+	requirements.
+      </para>
+      <para>
+	It is also important to understand that some
+	<command>upload</command> commands are effective only when
+	used in a mutually exclusive way.  Apache stores the data in
+	temporary files which are read by the <command>upload save
+	<arg>upload name</arg><arg>filename</arg> </command> or by the
+	<command>upload data <arg>upload name</arg> </command>
+	command. Subsequent calls to these 2 commands using the same
+	<arg>upload name</arg> argument will return no data on the
+	second call.  Likewise <command>upload channel <arg>upload
+	name</arg></command> will return a Tcl file channel that you
+	can use in regular Tcl scripts only if you haven't already
+	read the data, for example with a call to the <command>upload
+	data <arg>upload name</arg></command> command.
+      </para>
     </example>
 
   </section>
