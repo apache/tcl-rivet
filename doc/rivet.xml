@@ -8,6 +8,7 @@
       <!ENTITY vars.rvt SYSTEM "examples/vars.rvt" >
       <!ENTITY upload.html SYSTEM "examples/upload.html" >
       <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
+      <!ENTITY download.tcl SYSTEM "examples/download.tcl" >
 ]>
 
 <!--
@@ -1507,7 +1508,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
   <section id="examples">
     <title>Examples and Usage</title>
-
     <para>
       Some examples of Rivet usage follow.  Some prior Tcl knowledge
       is assumed.  If you don't know much Tcl, don't worry, it's easy,
@@ -1606,7 +1606,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	<filename>upload.html</filename> creates a form with a text
 	input entry. By clicking the file chooser button the file
 	browser shows up and the user selects the file to be uploaded
-	(the file path will appear in the text input).  In order make
+	(the file path will appear in the text input).  In order to make
 	sure you're uploading the whole file you must combine the
 	action of the enctype and method attributes of the
 	&lt;form...&gt; tag in the way shown in the example.  Failure
@@ -1645,7 +1645,73 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	data <arg>upload name</arg></command> command.
       </para>
     </example>
-
+    <example id="file_download">
+      <title>File Download</title>
+      <para>
+	In general setting up a data file to be sent over http is as
+	easy as determining the file's URI and letting Apache's
+	standard download mechanism do all that is neeed. If this
+	approach fits your design all you have to do is to keep the
+	downloadable files somewhere within Apache's DocumentRoot (or
+	in any of the directories that you can configure and register
+	using the Alias definitions or the Virtual Hosts mechanism).
+      </para>
+      <para>
+	When a client sends a request for a file's uri Apache takes
+	care of determining the filetype, sends appropriate headers to
+	the client and then the file content.  If the client is a
+	browser capable of displaying the content of the file a
+	representation is shown in browser's window. When the browser
+	hasn't a valid builtin method or plugin registered for the
+	file's content type it pops the typical download dialog asking
+	for directions from the user.
+      </para>
+      <para>
+	Rivet can help if you have more sofisticated needs too.  For
+	instance you may be developing an application that uses
+	webpages as user interface that collects input parameters and
+	passes them on to scripts or programs that generate the file
+	content on demand. In these cases the file itself doesn't
+	exists on the server and a URI cannot be defined. In other
+	circumstances you may need to dynamically inhibit the download
+	of a specific file and hide it away, even to those clients
+	that might have already saved the file's URI to the file in
+	their bookmarks.  Your scripts may expunge from the pages
+	every reference to the file (your pages are dynamical, aren't
+	they?)  and move the file out of way, but it looks like a
+	cumbersome solution.
+      </para>
+      <para>
+	Putting Tcl and Rivet in charge of the whole download
+	mechanism helps in building cleaner and safer approaches to
+	the download problem.
+      </para>
+      <para>
+	In this example a procedure checks for the existence of a
+	parameter passed in by the browser. The parameter is the name
+	(without extension) of a pdf file name that has to be
+	downloaded. Pdf files are stored in a directory whose path is
+	in the <command>pdf_repository</command> variable.
+      </para>
+      <programlisting>&download.tcl;</programlisting>
+      <para>
+	Before the pdf is sent the procedure uses the
+	<constant>Content-Type</constant>, Content-Disposition,
+	<constant>Content-Description</constant> and
+	<constant>Content-Length</constant> headers in order to inform
+	the client about the file type, name and size.  Notice that in
+	order to set the Content-Type header Rivet uses a specialiezed
+	form of the <command>headers</command> command. Headers must
+	be sent before data gets sent down the output channel. Messing
+	with this prescription causes an error to be raised (in fact
+	the protocol itself is been violated)
+      </para>
+      <para>
+	More information about the meaning of the mime headers in the
+	http context can be found at <ulink
+	url="http://www.w3.org/Protocols/rfc2616/rfc2616.html"/>
+      </para>
+    </example>
   </section>
 
   <section id="tcl_packages">

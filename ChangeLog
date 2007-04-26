@@ -1,3 +1,10 @@
+2007-04-26  David N. Welton  <davidw@dedasys.com>
+
+	* doc/download.tcl: Example from Massimo Manghi.
+
+	* doc/rivet.xml, doc/rivet.it.xml: Information about generating
+	files to send out.
+
 2006-10-05  David N. Welton  <davidw@dedasys.com>
 
 	* rivet/packages/dio/dio_Oracle.tcl: Backported from trunk.

@@ -8,6 +8,7 @@
       <!ENTITY vars.rvt SYSTEM "examples/vars.rvt" >
       <!ENTITY upload.html SYSTEM "examples/upload.html" >
       <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
+      <!ENTITY download.tcl SYSTEM "examples/download.tcl" >
 ]>
 
 <!--
@@ -697,6 +698,7 @@ foobar.tcl"</programlisting>
 		</para>
 	      </listitem>
 	    </varlistentry>
+
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
@@ -713,6 +715,25 @@ foobar.tcl"</programlisting>
 		</para>
 	      </listitem>
 	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg>exists</arg>
+		  <arg><replaceable>uploadname</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		    Restituisce 1 se esiste un upload chiamato 
+		    <arg>uploadname</arg>. Questo comando può essere utile
+		    negli script che si vuole usare nell'elaborazione di
+		    più pagine che inviano upload differenti che quindi
+		    necessitano di elaborazione specifica.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>
@@ -1088,18 +1109,127 @@ foobar.tcl"</programlisting>
     <example id="upload">
       <title>Caricare file</title>
       <para>
-	Il seguente HTML in un file, detto,
-	<filename>upload.html</filename>
+	Il comando <command>upload</command> fornisce a Rivet la
+	possibilità di accedere ai file trasferiti tramite http come
+	parti di una form "multipart". Per esempio il seguente 
+	frammento HTML (<filename>upload.html</filename>)
       </para>
       <programlisting>&upload.html;</programlisting>
       <para>
-	Può essere usato con il seguente codice Tcl in un secondo file
-	(<filename>upload.rvt</filename> per esempio) per creare una 
-	form che carica un file.
+	crea una form con una text input entry associata ad un bottone
+	per l'esplorazione del file system locale. 
+	Cliccando sul bottone appare un file browser con
+	il quale l'utente può scegliere il file da inviare (nella
+	text input entry apparirà il path al file scelto). 
+	Per essere certi di inviare
+	il contentuto del file è necessario combinare l'azione degli 
+	attributi enctype e method nel tag &lt;form...&gt; nel modo 
+	specificato nell'esempio. Se non viene fatto la form invierà la
+	definizione del path del file, non il suo contenuto.
+      </para>
+      <para>
+	Nello script invocato nell'azione della form (<filename>upload.rvt</filename>)
+	i comandi <command>upload</command> <arg>argument ...</arg> possono
+	essere usati per manipolare i file inviati al webserver
       </para>
       <programlisting>&upload.rvt;</programlisting>
+      <para>
+	Non dimenticate che il server Apache deve aver accesso 
+	in scrittura nella directory specificata per l'upload. Le 
+	direttive di configurazione di Rivet per 
+	per l'upload hanno un impatto considerevole sul funzionamento
+	del meccanismo di upload. Controllate la parte della documentazione
+	relativa a queste direttive in modo da scegliere i valori
+	che meglio soddisfano le vostre necessità.
+      </para>
+      <para>
+	E' anche importante capire che alcuni comandi <command>upload</command>
+	sono effettivi se usati in modo mutuamente esclusivo. Apache
+	memorizza i dati in file temporanei che vengono letti da comandi come
+	<command>upload save <arg>upload name</arg><arg>filename</arg></command>
+	oppure <command>upload data <arg>upload name</arg></command>. 
+	Due chiamate successive che si riferiscono allo stesso upload 
+	ritornerebbero un file vuoto alla seconda chiamata perchè la prima
+	consumerebbe i dati presenti.
+	In modo analogo la chiamata <command>upload channel <arg>upload name</arg>
+	</command> ritorna un canale Tcl al file (che può essere usato
+	in funzioni Tcl ordinarie di accesso ai file) solo se non avete già
+	letto o salvato i dati usando rispettivamente <command>upload data 
+	<arg>upload name</arg></command> o <command>upload save 
+	<arg>filename</arg></command>
+      </para>
     </example>
-
+    <example id="file_download">
+	<title>File Download</title>
+	<para>
+	    In generale mettere un file nelle condizioni di essere scaricato
+	    con http &egrave; facile quanto stabilire la URI del file stesso
+	    e lasciare che i meccanismi di download standard di Apache 
+	    facciano quello che &egrave; necessario. Se un simile approccio
+	    &egrave; adeguato al vostro progetto non c'è altro da
+	    fare che posizionare i vostri file destinati al download in una
+	    directory all'interno dell'albero definito dalla DocumentRoot (o
+	    in una qualsiasi delle directory che potete configurare con
+	    il parametro Alias di Apache o con un Virtual Host)
+	</para>
+	<para>
+	    Quando un client invia una uri per scaricare un certo file Apache
+	    determina il tipo di contenuto sulla base dell'estensione
+	    del file, invia gli header necessari ad informare il client 
+	    e quindi invia il contenuto stesso del file. Se il client è
+	    un browser in grado di rappresentare il
+	    contenuto del file questo apparirà all'utente nella finestra
+	    del browser stesso. Diversamente, se il browser non ha 
+	    metodi "builtin" o dei plugin registrati per quel tipo di file, 
+	    apparirà la tipica finestra di download che chiede istruzioni 
+	    all'utente.
+	</para>
+	<para>
+	    Rivet è però di aiuto nel caso abbiato esigenze più sofisticate.
+	    Immaginate per esempio di sviluppare un applicazione web based
+	    che raccogliere informazioni di input da passare a programmi
+	    esterni o altre procedure Tcl che generano il contenuto di
+	    un file a richiesta. In questi casi il file stesso non esiste
+	    e non è possibile definire per esso una URI. In altre 
+	    circostanze il vostro file esiste, ma potreste aver bisogno 
+	    di inibirne dinamicamente il download 
+	    e nasconderlo dal web, non solo per i nuovi visitatori del sito, 
+	    ma anche per quelli che potrebbero aver salvato nei loro bookmarks
+	    un riferimento a quel file. Naturalmente potreste eliminare dalle
+	    vostre pagine ogni riferimento a quella risorsa (le vostre pagine
+	    sono generate dinamicamente, non è vero?) e constestualmente
+	    spostare il file in una directory inaccessibile, ma sembra una
+	    soluzione tortuosa e poco elegante.
+	</para>
+	<para>
+	    Mettere Tcl e Rivet nella condizione di controllare completamente il 
+	    processo di download aiuta a costruire meccanismi di download 
+	    più eleganti e sicuri
+	</para>
+	<para> 
+	    Ecco un esempio di una procedura Tcl che valuta una richiesta 
+	    di download di un file PDF sulla base del valore di un parametro
+	    passato dal client. Il parametro è il nome (senza estensione)
+	    del file pdf da scaricare. I file pdf sono tenuti in una
+	    directory definita dalla variabile <command>pdf_repository</command>
+	</para>
+	<programlisting>&download.tcl;</programlisting>
+	<para> 
+	    Prima che il file PDF venga inviato la procedura usa gli header
+	    Content-Type, Content-Disposition, Content-Description e Content-Length 
+	    in modo da informare il client su tipo di file, il nome (proposto)
+	    e la sua dimensione. Notate che per impostare il Content-Type Rivet
+	    usa una forma specializzata del comando <command>headers</command>.
+	    Gli header devono essere inviati prima che i dati siano spediti verso
+	    il canale di output. Fare confusione in questo schema causa un errore
+	    poichè in quel caso il protocollo stesso viene violato.
+	</para>
+	<para>
+	    Altre informazioni sul significato dei "mime headers" nel contesto
+	    del protocoll http posso venir trovati alla pagina
+	    <ulink url="http://www.w3.org/Protocols/rfc2616/rfc2616.html"/>
+	</para>
+    </example>
   </section>
 
   <section id="tcl_packages">
