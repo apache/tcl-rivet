@@ -9,6 +9,7 @@
       <!ENTITY upload.html SYSTEM "examples/upload.html" >
       <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
       <!ENTITY download.tcl SYSTEM "examples/download.tcl" >
+      <!ENTITY rivet_web_service.tcl SYSTEM "examples/rivet_web_service.tcl" >
 ]>
 
 <!--
@@ -1229,6 +1230,89 @@ foobar.tcl"</programlisting>
 	    del protocoll http posso venir trovati alla pagina
 	    <ulink url="http://www.w3.org/Protocols/rfc2616/rfc2616.html"/>
 	</para>
+    </example>
+    <example id="ajax_xml_messaging">
+      <title>Messagi XML e Ajax</title>
+      <para>
+	Il comando <command>headers</command> &egrave; fondamentale
+	per generare messaggi in formato XML che devono essere compresi
+	dal codice JavaScript usato in applicazioni Ajax.
+      </para>
+      <para>
+	Ajax è una tecnica di <quote>web programming</quote> che usa
+	intensamente la capacit&agrave; di JavaScript (e di altri
+	linguaggi di scripting come VBScript) di manipolare dinamicamente
+	la struttura HTML di una pagina. Nei browser moderni il codice
+	JavaScript pu&ograve; inviare richieste http POST e GET verso
+	il webserver. Queste richieste posso chiedere al webserver di
+	lanciare script (per esempio script Tcl basati su Rivet) che,
+	a loro volta, costruiscono risposte che vengono inviate al
+	browser. JavaScript solitamente usa un handler che gestisce
+	in modo asincrono la comunicazione. Quando un messaggio di
+	risposta viene ricevuto l'handler elabora il contenuto della
+	risposta e modifica il contenuto della pagina corrente con
+	i nuovi dati. Ajax aiuta a sviluppare applicazioni web più
+	pronte e flessibili: invece di passare attraverso il ciclo
+	di richiesta-generazione-trasferimento di un pagina, Ajax
+	permette al programmatore di richiedere e trasmettere solo
+	i dati essenziali, contribuendo cos&igrave; a soddisfare il
+	generale requisito della separazione tra dati e interfaccia
+	utente (risparmiando altres&igrave; al server di inviare
+	lo stesso codice html and gli stessi elementi grafici ogni
+	volta che i dati di una pagina vengono aggiornati).
+      </para>
+      <para>
+	Nelle applicazioni Ajax la comunicazione tra client e server viene
+	controllata da una istanza di una classe specializzata che, nel 
+	mondo non-IE si chiama XMLHttpRequest, mentre per il mondo IE
+	si chiama ActiveXObject. Attraverso un istanza di questa classe
+	una richiesta tipo GET o POST viene inviata e il server risponde
+	con un messaggio che viene immagazzinato come stringa nella
+	propriet&agrave; <command>returnedText</command> dell'instanza
+	di XMLHttpRequest. Nonostante questo canale di comunicazione
+	non implichi affatto che la comunicazione su di esso si effettui
+	con un protocollo specifico, &egrave; diventato ampiamente
+	comune sfruttare XML come linguaggio per questi messaggi. Un
+	certo numero di specificazioni di protocollo basate su XML vengono
+	usate per queste applicazioni, tra queste SOAP e XML-RPC (l'ultima
+	&egrave; una raccomandazione del consorzio W3C. Comunque sia
+	voi potete inventare anche il vostro protocollo (basato su XML, ma
+	anche in altro formato). E' utile tuttavia sapere che se gli
+	headers http sono opportunamente specificati e se il messaggio
+	di ritorno &egrave; scritto in XML <quote>well formed</quote>, allora
+	anche la propriet&agrave; 
+	<ulink url="http://www.w3schools.com/ajax/ajax_responsexml.asp">
+	XMLResponse</ulink> di XMLHttpRequest viene definita con una 
+	con un oggetto che &egrave; un'istanza di una classe che 
+	possiede i metodi e le propriet&agrave; dell'
+	<ulink url="http://www.w3schools.com/dom/default.asp">
+	XML W3C DOM</ulink>, permettendo al codice JavaScript di manipolare
+	i dati contenuti nel messaggio con questo modello di DOM.
+      </para>
+      <para>
+	In questo esempio uno script Rivet inizializza un array con 
+	i dati essenziali riguardanti alcuni dei maggiori compositori
+	della musica europea. Questo array ha il ruolo di un database
+	che, in una caso reale, pu&ograve; contenere grosse tabelle
+	con migliaia di righe, le quali possono avere dati pi&ugrave;
+	completi ed estesi. Lo script &egrave; ideato per inviare al
+	client 2 tipi di risposte: un <quote>catalogo</quote> dei
+	compositori oppure un recordo singolo con le informazioni di
+	un compositore
+      </para>
+      <programlisting>&rivet_web_service.tcl;</programlisting>
+      <para>
+	Per brevit&agrave; il JavaScript e l'HTML non verranno riportati
+	qui. Possono essere scaricati (assieme allo script Tcl) nell'archivio
+	<ulink url="http://www.biol.unipr.it/rivet/rivet-ajax.tar.gz">
+	rivet-ajax.tar.gz</ulink> archive. Semplicemente
+	aprendo questo archivio in una directory accessibile dal vostro
+	server Apache e puntando con un browser alla pagina rivetService.html
+	dovreste essere in grado di far girare l'esempio. Ogni volta
+	che scegliete il nome di un compositore una nuova query viene
+	inviata e registrata nel log di apache, anche se la pagina html 
+	non viene mai ricaricata, ma solo aggiornata con i nuovi dati.
+      </para>
     </example>
   </section>
 
