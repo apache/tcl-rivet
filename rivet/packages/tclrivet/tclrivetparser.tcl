@@ -98,21 +98,21 @@ proc tclrivetparser::parse { data outbufvar } {
 		    append outbuf [string range $starttag 0 [expr {$p - 1}]]
 		    set p 0
 		}
-		switch -exact -- $cur {
-		    "\{" {
+		switch -exact -- "$cur" {
+		    {\{} {
 			append outbuf "\\{"
 		    }
-		    "\}" {
+		    {\}} {
 			append outbuf "\\}"
 		    }
 		    "\$" {
 			append outbuf "\\$"
 		    }
-		    "\[" {
-			append outbuf "\\["
+		    {[} {
+			append outbuf {\[}
 		    }
-		    "\]" {
-			append outbuf "\\]"
+		    {]} {
+			append outbuf {\]}
 		    }
 		    "\"" {
 			append outbuf "\\\""
@@ -144,6 +144,7 @@ proc tclrivetparser::parse { data outbufvar } {
 	    }
 	}
     }
+
     return $inside
 }
 

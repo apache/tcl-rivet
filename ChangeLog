@@ -1,3 +1,8 @@
+2007-07-31  David N. Welton  <davidw@dedasys.com>
+
+	* rivet/packages/tclrivet/tclrivetparser.tcl
+	(tclrivetparser::parse): Fiddled with quoting to make things work.
+
 2007-04-26  David N. Welton  <davidw@dedasys.com>
 
 	* doc/download.tcl: Example from Massimo Manghi.

@@ -18,8 +18,27 @@
 
 package provide tclrivet 0.1
 
-load [file join [file dirname [info script]] .. .. .. src \
-	  librivetparser[info sharedlibextension]]
+source [file join [file dirname [info script]] tclrivetparser.tcl]
+
+# rivet --
+#
+#	The rivet command runs a file in Rivet-like environment.
+#
+# Arguments:
+#	filename - the name of the file to run.
+#
+# Side Effects:
+#	Many, potentially.  Output is sent to stdout.
+#
+# Results:
+#	None.
+
+proc rivet { filename } {
+    set fl [open $filename]
+    set parsed [tclrivetparser::parserivetdata [read $fl]]
+    close $fl
+    eval $parsed
+}
 
 proc include { filename } {
     set fl [ open $filename ]
