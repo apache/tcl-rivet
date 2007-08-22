@@ -1,4 +1,4 @@
-#!/bin/bash -norc
+#!/bin/sh 
 dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run when building Rivet
 dnl	to configure the system for the local environment.
@@ -235,10 +235,14 @@ AC_DEFUN([APACHE],[
     )
 
     AC_MSG_CHECKING(for Apache base directory)
-    if test -e $with_apache/bin/apachectl; then
-        with_apxs=$with_apache/bin/apxs
+    if test -e $with_apache/bin/apachectl ; then
+        with_apxs_found=$with_apache/bin/apxs
         apache_base=$with_apache
         AC_MSG_RESULT(Apache base directory found)
+    elif test -e $with_apache/sbin/apachectl; then
+	    with_apxs_found=$with_apache/sbin/apxs
+            apache_base=$with_apache
+	    AC_MSG_RESULT(Apache base directory found)
     else
         AC_MSG_ERROR(Apache base directory not found. Specify --with-apache)
     fi
@@ -249,7 +253,11 @@ AC_DEFUN([CHECK_APXS],[
     AC_ARG_WITH(
         apxs,
         [  --with-apxs=FILE        location of Apache's apxs tool], 
-        with_apxs=$apache_base/bin/apxs
+	if test x"${with_apxs_found}" = x; then
+	    with_apxs=$apache_base/bin/apxs
+	else
+	    with_apxs=$with_apxs_found
+	fi
     )
 
 dnl First check to see if --with-apxs was specified.
@@ -308,7 +316,7 @@ AC_DEFUN([APACHE_INCLUDES],[
     # make sure that a well known include file exists
     if test -e $with_apache_include/httpd.h; then
       apache_include=$with_apache_include
-      AC_MSG_RESULT(APACHE INCLUDES found!)
+      AC_MSG_RESULT(Apache includes found!)
     else
       AC_MSG_ERROR( $with_apache_include not found. )
     fi
@@ -332,7 +340,7 @@ AC_DEFUN([APR_INCLUDES],[
     # make sure that a well known include file exists
     if test -e $with_apr_include/apr.h; then
       apr_include=$with_apr_include
-      AC_MSG_RESULT(APR INCLUDES found!)
+      AC_MSG_RESULT(Apr includes found!)
     else
       AC_MSG_ERROR( $with_apr_include not found. )
     fi
@@ -341,19 +349,20 @@ AC_DEFUN([APR_INCLUDES],[
 
 AC_DEFUN([APACHE_VERSION],[
     AC_ARG_WITH(
-        apache_version_dir,
-        [  --apache-version[=VER]  build for apache 1.x or 2.x],
-        ,
-        [apache_version="2"]
+        apache_version,
+        [  --with-apache-version[=VER]  build for apache 1.x or 2.x],
+        ,[apache_version="2"]
     )
 
     AC_MSG_CHECKING(for apache version)
-    if test "$apache_version" = "1"; then
-        apache_version_dir="apache-1"
+    if test "$with_apache_version" = "1"; then
         AC_MSG_RESULT( building for apache 1.x )
+	AC_CONFIG_FILES([src/apache-1/Makefile])   
+	apache_version_dir="apache-1"
     else
-        apache_version_dir="apache-2"
         AC_MSG_RESULT( building for apache 2.x )
+	AC_CONFIG_FILES([src/apache-2/Makefile])
+	apache_version_dir="apache-2"
     fi
         
 ])
@@ -380,6 +389,11 @@ AC_SUBST(TCL_PACKAGE_PATH)
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting th AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile src/Makefile src/${apache_version_dir}/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
+
+#case $apache_version_dir in
+#    apache-1) AC_CONFIG_FILES([Makefile src/Makefile src/apache-1/Makefile doc/Makefile]) ;;
+#    apache-2) AC_CONFIG_FILES([Makefile src/Makefile src/apache-2/Makefile doc/Makefile]) ;;
+#esac
 AC_OUTPUT
 

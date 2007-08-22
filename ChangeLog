@@ -1,3 +1,8 @@
+2007-08-22  David N. Welton  <davidw@dedasys.com>
+
+	* configure.ac: Added patch from Valery Masiutsin
+	<val.masutin@gmail.com> improving the configure setup.
+
 2006-07-03  Karl Lehenbauer  <karl-rivet@sc.com>
         * rivet/packages/dio/dio_Postgresql.tcl: when handling a PostgreSQL
 	  result, if numrows is zero, see if cmdTuples
