@@ -1,5 +1,7 @@
 2007-08-27  David N. Welton  <davidw@dedasys.com>
 
+	* configure.ac: Added missing quote.
+
 	* configure.ac: Another patch from Valery, making compilation
 	smoother on Debian.
 

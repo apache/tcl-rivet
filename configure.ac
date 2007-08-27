@@ -383,7 +383,7 @@ AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
     # If we have multiple pathes, pull the first one, add end slash if needed
 	res=`echo ${TCL_PACKAGE_PATH} | \
              grep '[[^\]] ' | \
-             sed -e 's/\([[^\]]\)\( \)\(.*\)$/\1/'  -e 's/\([[^\/]]\)$/\1\//`
+             sed -e 's/\([[^\]]\)\( \)\(.*\)$/\1/'  -e 's/\([[^\/]]\)$/\1\//' `
 	if test x"${res}" != x; then
 	    TCL_PACKAGE_PATH=${res}
             AC_SUBST(TCL_PACKAGE_PATH)
