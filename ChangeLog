@@ -1,3 +1,7 @@
+2007-08-27  David N. Welton  <davidw@dedasys.com>
+
+	* tclconfig/tcl.m4: Moved to latest tcl.m4 at Valery's suggestion.
+
 2007-08-22  David N. Welton  <davidw@dedasys.com>
 
 	* configure.ac: Added patch from Valery Masiutsin
