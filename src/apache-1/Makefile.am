@@ -21,7 +21,7 @@
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-INCLUDES = -I@apache_include@ -I@apr_include@
+INCLUDES = -I@apache_include@ -I@apr_include@  -I"../"
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
@@ -34,12 +34,12 @@ INCLUDES = -I@apache_include@ -I@apr_include@
 mod_rivet_la_SOURCES = \
 	apache_multipart_buffer.c \
 	apache_request.c	\
-	rivetCore.c	\
 	mod_rivet.c \
 	TclWebapache.c \
 	mod_rivet.h TclWeb.h \
 	apache_multipart_buffer.h \
-	apache_request.h
+	apache_request.h \
+	../rivetCore.c
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
