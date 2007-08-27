@@ -243,6 +243,10 @@ AC_DEFUN([APACHE],[
 	    with_apxs_found=$with_apache/sbin/apxs
             apache_base=$with_apache
 	    AC_MSG_RESULT(Apache base directory found)
+    elif test -e $with_apache/sbin/httpsdctl; then
+	    with_apxs_found=$with_apache/sbin/apxs
+            apache_base=$with_apache
+	    AC_MSG_RESULT(Apache base directory found)
     else
         AC_MSG_ERROR(Apache base directory not found. Specify --with-apache)
     fi
@@ -367,6 +371,26 @@ AC_DEFUN([APACHE_VERSION],[
         
 ])
 
+AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
+    # shamelessly stolen from TEA_LOAD_TCLCONFIG
+    AC_MSG_CHECKING([Debian TCL_PACKAGE_PATH workaround])
+        if test -f "${TCL_BIN_DIR}/tclConfig.sh" ; then
+           AC_MSG_RESULT([loading])
+           . "${TCL_BIN_DIR}/tclConfig.sh"
+        else
+           AC_MSG_RESULT([could not find ${TCL_BIN_DIR}/tclConfig.sh])
+        fi
+    # If we have multiple pathes, pull the first one, add end slash if needed
+	res=`echo ${TCL_PACKAGE_PATH} | \
+             grep '[[^\]] ' | \
+             sed -e 's/\([[^\]]\)\( \)\(.*\)$/\1/'  -e 's/\([[^\/]]\)$/\1\//`
+	if test x"${res}" != x; then
+	    TCL_PACKAGE_PATH=${res}
+            AC_SUBST(TCL_PACKAGE_PATH)
+        fi
+						     
+])
+
 APACHE
 CHECK_APXS
 APACHE_INCLUDES
@@ -379,10 +403,11 @@ AC_SUBST(apache_version_dir)
 
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
 
-# We need to use the package path for the installation procedure.
+# We need to use the package path for the installation procedure.  On
+#Debian linux TCL_PACKAGE_PATH may have more than one path in the
+#TCL_PACKAGE_PATH variable, so we have to handle this
+HANDLE_TCL_PACKAGE_PATH
 AC_SUBST(TCL_PACKAGE_PATH)
-
-
 
 
 # Finally, substitute all of the various values into the Makefile.

@@ -1,5 +1,8 @@
 2007-08-27  David N. Welton  <davidw@dedasys.com>
 
+	* configure.ac: Another patch from Valery, making compilation
+	smoother on Debian.
+
 	* src/apache-1/Makefile.am: Accepted patch from Valery for
 	improved compilation.
 
