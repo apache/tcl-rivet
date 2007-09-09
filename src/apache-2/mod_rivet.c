@@ -1,4 +1,4 @@
-/* mod_rivet.c -- The apache module itself, for Apache 1.3. */
+/* mod_rivet.c -- The apache module itself, for Apache 2.x. */
 
 /* Copyright 2000-2005 The Apache Software Foundation
 
@@ -134,40 +134,31 @@ Rivet_IsRivetFile (char *filepath)
  * argument and stored in the *file pointer.
  */
 static int
-Rivet_ParseFileArgString (const char *szDocRoot, const char *szArgs, char **file,
+Rivet_ParseFileArgString (const char *szDocRoot, const char *szArgs, char **file,apr_pool_t *p, 
         Tcl_HashTable *argTbl)
 {
-    int flen = 1, newEntry, i;
+    int flen = 1, argslen, newEntry, i;
     const char *rootPtr = szDocRoot, *argsPtr = szArgs, *argPos;
-    char *fn = (char*)malloc((strlen(szArgs)+1)*sizeof(char));
-    char *filePtr = fn;
+    char *filePtr; 
     char *argument, *value;
     Tcl_HashEntry *entryPtr;
     
     /* 
      * parse filename, that is everything before ? in the args string.
-     * Append it to the document root, if this is not NULL. We don't use
-     * strcat() here, just for fun...
+     * Append it to the document root, if this is not NULL. 
      */
-    while (*argsPtr && (*filePtr++ = *argsPtr++) != '?')
-        ;
-    if (*(filePtr-1) == '?')
-        *(filePtr-1) = '\0';
-    else
-        *filePtr = '\0';
 
-    flen += strlen (fn);
-    if (szDocRoot != NULL)
-        flen += strlen (szDocRoot);
-
-    *file = (char*) malloc (flen * sizeof(char));
-    filePtr = *file;
-    while ((*filePtr++ = *rootPtr++))
-        ;
-    filePtr--;
-    rootPtr = fn;
-    while ((*filePtr++ = *rootPtr++))
-        ;
+	while (*argsPtr != '?' && *argsPtr != '\0') {
+		argsPtr++;
+	}
+	if (*argsPtr == '?') 
+		argslen = argsPtr-szArgs ;
+	else
+		argslen = 0;
+	flen += strlen(szDocRoot) + argslen ;
+	*file = (char*)apr_palloc(p,flen);
+	strcat(*file,szDocRoot);
+	strncat(*file,szArgs,argslen);
 
     if (argTbl == NULL)
         return RIVET_OK;
@@ -1468,13 +1459,13 @@ Rivet_TranslateUri (request_rec *r)
         filename = r->filename;
     
     if (r->main) {
-        res = Rivet_ParseFileArgString (ap_document_root(r), r->args, 
-                &r->main->filename, NULL);
+        res = Rivet_ParseFileArgString (ap_document_root(r), r->unparsed_uri, 
+                &r->main->filename, r->pool, NULL);
         filename = r->main->filename;
     }
     else {
-        res = Rivet_ParseFileArgString (ap_document_root(r), r->args, 
-                &r->filename, NULL);
+        res = Rivet_ParseFileArgString (ap_document_root(r), r->unparsed_uri, 
+                &r->filename, r->pool, NULL);
         filename = r->filename;
     }
 

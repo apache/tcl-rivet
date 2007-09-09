@@ -235,32 +235,51 @@ AC_DEFUN([APACHE],[
     )
 
     AC_MSG_CHECKING(for Apache base directory)
-    if test -e $with_apache/bin/apachectl ; then
-        with_apxs_found=$with_apache/bin/apxs
-        apache_base=$with_apache
-        AC_MSG_RESULT(Apache base directory found)
-    elif test -e $with_apache/sbin/apachectl; then
-	    with_apxs_found=$with_apache/sbin/apxs
-            apache_base=$with_apache
-	    AC_MSG_RESULT(Apache base directory found)
-    elif test -e $with_apache/sbin/httpsdctl; then
-	    with_apxs_found=$with_apache/sbin/apxs
-            apache_base=$with_apache
-	    AC_MSG_RESULT(Apache base directory found)
-    else
+	if test $with_apache_version = "1"; then
+		if test -e $with_apache/bin/apachectl ; then
+			with_apxs_found=$with_apache/bin/apxs
+			apache_base=$with_apache
+			AC_MSG_RESULT(Apache base directory found)
+		elif test -e $with_apache/sbin/apachectl; then
+			with_apxs_found=$with_apache/sbin/apxs
+				apache_base=$with_apache
+			AC_MSG_RESULT(Apache base directory found)
+		elif test -e $with_apache/sbin/httpsdctl; then
+			with_apxs_found=$with_apache/sbin/apxs
+				apache_base=$with_apache
+			AC_MSG_RESULT(Apache base directory found)
+    	else
         AC_MSG_ERROR(Apache base directory not found. Specify --with-apache)
-    fi
+    	fi
+    elif   test $with_apache_version = "2"; then
+		# OpenBSD apache2 layout
+		if test -e $with_apache/sbin/apachectl2; then
+			with_apxs_found=$with_apache/sbin/apxs2
+			apache_base=$with_apache
+			AC_MSG_RESULT(Apache base directory found)
+		# Debian folks calling it apache2ctl
+		elif test -e $with_apache/sbin/apache2ctl ; then
+			with_apxs_found=$with_apache/bin/apxs2
+			apache_base=$with_apache
+			AC_MSG_RESULT(Apache base directory found)
+		#so called "generic" unix
+		elif test -e $with_apache/bin/apachectl; then
+			with_apxs_found=$with_apache/bin/apxs
+			apache_base=$with_apache
+			AC_MSG_RESULT(Apache base directory found)
+    	else
+       	 AC_MSG_ERROR(Apache base directory not found. Specify --with-apache)
+    	fi
+	fi
 ])
 
 # We have to either find apxs or be told where it is using --with-apxs
 AC_DEFUN([CHECK_APXS],[
     AC_ARG_WITH(
         apxs,
-        [  --with-apxs=FILE        location of Apache's apxs tool], 
-	if test x"${with_apxs_found}" = x; then
-	    with_apxs=$apache_base/bin/apxs
-	else
-	    with_apxs=$with_apxs_found
+        [  --with-apxs=FILE        location of Apache's apxs tool], ,
+	if test -e $apache_base/bin/apxs ; then
+		with_apxs=$apache_base/bin/apxs
 	fi
     )
 
@@ -327,28 +346,31 @@ AC_DEFUN([APACHE_INCLUDES],[
   fi
 ])
 
-AC_DEFUN([APR_INCLUDES],[
-
+AC_DEFUN([APR_HANDLING],[
   AC_ARG_WITH(
-    apr_include,
-    [  --with-apr-include[=DIR]     apr portable runtime library headers],
-    ,
-    [with_apr_include=${apache_base}/include]
+   apr_config,
+   	[  --with-apr-config=FILE     apr portable apr-1-config path],
+	,
+	 if test -x ${apache_base}/bin/apr-1-config ; then
+		with_apr_config=${apache_base}/bin/apr-1-config 
+        AC_MSG_RESULT([${with_apr_config}])
+	 else
+    	AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config)
+	 fi
+	 
   )
-
-  AC_MSG_CHECKING(for apr includes directory)
-
-  if test "$with_apr_include" = "no"; then
-    AC_MSG_ERROR( Specify the apache using --with-apr-include)
-  else
-    # make sure that a well known include file exists
-    if test -e $with_apr_include/apr.h; then
-      apr_include=$with_apr_include
-      AC_MSG_RESULT(Apr includes found!)
-    else
-      AC_MSG_ERROR( $with_apr_include not found. )
-    fi
-  fi
+     AC_MSG_CHECKING([for apr])
+	 if test -x ${with_apr_config} ; then
+        export PATH=$PATH:`dirname ${with_apr_config}`
+        AC_MSG_RESULT([${with_apr_config}])
+		APR_CPPFLAGS=`${with_apr_config} --cppflags`
+        AC_SUBST(APR_CPPFLAGS)
+		APR_INCLUDES=`${with_apr_config} --includes`
+        AC_SUBST(APR_INCLUDES)
+	 else
+    	AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config)
+	 fi
+	 
 ])
 
 AC_DEFUN([APACHE_VERSION],[
@@ -368,7 +390,6 @@ AC_DEFUN([APACHE_VERSION],[
 	AC_CONFIG_FILES([src/apache-2/Makefile])
 	apache_version_dir="apache-2"
     fi
-        
 ])
 
 AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
@@ -391,11 +412,18 @@ AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
 						     
 ])
 
+
+AC_DEFUN([GET_RIVET_BASE], [
+	RIVET_BASE_INCLUDE=`pwd`/src	
+	AC_SUBST(RIVET_BASE_INCLUDE)
+])
+
+GET_RIVET_BASE
+APACHE_VERSION
 APACHE
 CHECK_APXS
 APACHE_INCLUDES
-APR_INCLUDES
-APACHE_VERSION
+APR_HANDLING
 AC_SUBST(apache_include)
 AC_SUBST(apr_include)
 AC_SUBST(apache_version_dir)

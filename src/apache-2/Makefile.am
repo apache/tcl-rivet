@@ -21,7 +21,7 @@
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-INCLUDES = -I@apache_include@ -I@apr_include@ -I..
+INCLUDES = -I@apache_include@ -I@RIVET_BASE_INCLUDE@ 
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
@@ -37,18 +37,13 @@ mod_rivet_la_SOURCES = apache_multipart_buffer.c \
 	../rivetParser.c \
 	rivetCore.c	\
 	mod_rivet.c \
-	TclWebapache.c \
-	mod_rivet.h \
-	TclWeb.h \
-	rivet.h \
-	apache_multipart_buffer.h \
-	apache_request.h
+	TclWebapache.c 
 
 ##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
-mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@  @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@  @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 # APXS_CPPFLAGS_SHLIB
 

@@ -1,3 +1,32 @@
+2007-09-09  David N. Welton  <davidw@dedasys.com>
+
+	* src/apache-2/Makefile.am: Another patch from Valery Masiutsin
+	<val.masutin@gmail.com>: Propagated variables from configure.ac,
+	did some cleanups.
+
+	* src/apache-1/Makefile.am: More of Valery's patch: Propogate
+	variables from configure.ac.
+
+	* configure.ac: More of Valery's patch: Separated cases for
+	apache-1 and apache-2 in APACHE function.  Added handling for
+	apache-2 for platforms i am developing on.  Probably it will need
+	to be unified later.  Touched CHECK_APXS a bit.  Replaced
+	APR_INCLUDES function with APR_HANDLING, now we are requiring full
+	path for apr-1-config and getting cppflags and includes from
+	it. APR tool has platform specific set of cppflags, just includes
+	is not enough.  Added GET_RIVET_BASE function, which allows us to
+	get rid of relative pathes in include flags.  Rearranged functions
+	a bit - mostly to find out version of apache we are building for,
+	before doing any substitutions.
+
+	* src/Makefile.am: More of Valery's patch: Propagated variables
+	introduced in configure.ac.
+
+	* src/apache-2/mod_rivet.c (Rivet_TranslateUri): More of Valery's
+	patch: Changed a bit Rivet_ParseFileArgString a bit, it fixed
+	segfaults, but still needs some work. I've added apr_pool_t
+	pointer to parameters we are passing to function.
+
 2007-08-29  David N. Welton  <davidw@dedasys.com>
 
 	* src/apache-1/Makefile.am: Another patch from Valery correcting
