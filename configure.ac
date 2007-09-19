@@ -31,7 +31,7 @@ AM_CONFIG_HEADER(config.h)
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-TEA_INIT([3.1])
+TEA_INIT([3.6])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -224,160 +224,140 @@ fi
 
 #TEA_PROG_WISH
 
-
 # apache base directory
 
 AC_DEFUN([APACHE],[
+    AC_MSG_CHECKING(for Apache base)
     AC_ARG_WITH(
-        apache_base,
+        apache,
         [  --with-apache[=DIR]    Apache server base directory],
-        [with_apache="/usr/local/apache2"]
+	, [with_apache="/usr/local/apache"]
     )
-
-    AC_MSG_CHECKING(for Apache base directory)
-	if test $with_apache_version = "1"; then
-		if test -e $with_apache/bin/apachectl ; then
-			with_apxs_found=$with_apache/bin/apxs
-			apache_base=$with_apache
-			AC_MSG_RESULT(Apache base directory found)
-		elif test -e $with_apache/sbin/apachectl; then
-			with_apxs_found=$with_apache/sbin/apxs
-				apache_base=$with_apache
-			AC_MSG_RESULT(Apache base directory found)
-		elif test -e $with_apache/sbin/httpsdctl; then
-			with_apxs_found=$with_apache/sbin/apxs
-				apache_base=$with_apache
-			AC_MSG_RESULT(Apache base directory found)
-    	else
-        AC_MSG_ERROR(Apache base directory not found. Specify --with-apache)
-    	fi
-    elif   test $with_apache_version = "2"; then
-		# OpenBSD apache2 layout
-		if test -e $with_apache/sbin/apachectl2; then
-			with_apxs_found=$with_apache/sbin/apxs2
-			apache_base=$with_apache
-			AC_MSG_RESULT(Apache base directory found)
-		# Debian folks calling it apache2ctl
-		elif test -e $with_apache/sbin/apache2ctl ; then
-			with_apxs_found=$with_apache/bin/apxs2
-			apache_base=$with_apache
-			AC_MSG_RESULT(Apache base directory found)
-		#so called "generic" unix
-		elif test -e $with_apache/bin/apachectl; then
-			with_apxs_found=$with_apache/bin/apxs
-			apache_base=$with_apache
-			AC_MSG_RESULT(Apache base directory found)
-    	else
-       	 AC_MSG_ERROR(Apache base directory not found. Specify --with-apache)
-    	fi
-	fi
+	apache_base="${with_apache}"
+        AC_MSG_RESULT([$apache_base])
 ])
 
-# We have to either find apxs or be told where it is using --with-apxs
+#
+# We have to either find apxs or be told where it is using --with-apxs 
+#
 AC_DEFUN([CHECK_APXS],[
+    AC_MSG_CHECKING(for Apache apxs)
     AC_ARG_WITH(
         apxs,
-        [  --with-apxs=FILE        location of Apache's apxs tool], ,
-	if test -e $apache_base/bin/apxs ; then
-		with_apxs=$apache_base/bin/apxs
-	fi
-    )
-
-dnl First check to see if --with-apxs was specified.
-    if test x"${with_apxs}" = x ; then
-        AC_PATH_PROGS(APXS, apxs)
-        if test x"${APXS}" = x ; then
-	        AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
-        else
-	        with_apxs=${APXS}
+        [  --with-apxs=FILE        location of Apache's apxs tool],  
+    	[if test -x "${with_apxs}" ; then
+		apxs_found="${with_apxs}"
+	fi]
+        ,
+        [ 
+        APXS_NAMES=apxs
+        if test "${apache_version}"="2"; then
+            APXS_NAMES="$APXS_NAMES apxs2"
         fi
-    else
-        AC_MSG_CHECKING([for apxs])
-        AC_MSG_RESULT([${with_apxs}])
-    fi
-    if test -x "${with_apxs}" ; then
-    dnl It actually calls another script, so the PATH needs to be set.
-        export PATH=$PATH:`dirname ${with_apxs}`
-        APXS_CPPFLAGS=`${with_apxs} -q CFLAGS`
-        AC_SUBST(APXS_CPPFLAGS)
-        APXS_LDFLAGS=`${with_apxs} -q LDFLAGS_SHLIB`
-        AC_SUBST(APXS_LDFLAGS)
-        APXS_LIBS=`${with_apxs} -q LIBS_SHLIB`
-        AC_SUBST(APXS_LIBS)
-        APXS_INCLUDES=-I`${with_apxs} -q INCLUDEDIR`
-        AC_SUBST(APXS_INCLUDES)
-        APXS_CPPFLAGS_SHLIB=`${with_apxs} -q CFLAGS_SHLIB`
-        AC_SUBST(APXS_CPPFLAGS_SHLIB)
-        APXS_LD_SHLIB=`${with_apxs} -q LD_SHLIB`
-        AC_SUBST(APXS_LD_SHLIB)
-        APXS_LIBEXECDIR=`${with_apxs} -q LIBEXECDIR`
-        AC_SUBST(APXS_LIBEXECDIR)
-        APXS_SYSCONFDIR=`${with_apxs} -q SYSCONFDIR`
-        AC_SUBST(APXS_SYSCONFDIR)
-        APXS_PREFIX=`${with_apxs} -q PREFIX`
-        AC_SUBST(APXS_PREFIX)
-    else
-        AC_MSG_ERROR([${with_apxs} is not an executable file])
-    fi
+        for apxs_file in ${APXS_NAMES}; do 
+            for apxs_path in bin sbin; do 
+                 if test -x "${apache_base}"/"${apxs_path}"/"${apxs_file}"; then
+                        apxs_found="${apache_base}"/"${apxs_path}"/"${apxs_file}" 
+                        break 2
+                  fi
+            done
+        done
+        if test x"$apxs_found" = x; then
+            AC_PATH_PROGS(with_apxs, apxs)
+            if test "${with_apxs+set}" = set ; then
+                apxs_found="${with_apxs}"
+            fi
+        fi
+        if test x"${apxs_found}" = x; then
+            AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
+        fi
+       ]
+    )
+	if test "${apxs_found+set}" = set ; then
+		dnl At this point we already have apr sorted out
+		export PATH=$PATH:`dirname $apxs_found`
+		APXS_CPPFLAGS=`${apxs_found} -q CFLAGS`
+		AC_SUBST(APXS_CPPFLAGS)
+		APXS_LDFLAGS=`${apxs_found} -q LDFLAGS_SHLIB`
+		AC_SUBST(APXS_LDFLAGS)
+		APXS_LIBS=`${apxs_found} -q LIBS_SHLIB`
+		AC_SUBST(APXS_LIBS)
+		APXS_INCLUDES=-I`${apxs_found} -q INCLUDEDIR`
+		AC_SUBST(APXS_INCLUDES)
+		APXS_CPPFLAGS_SHLIB=`${apxs_found} -q CFLAGS_SHLIB`
+		AC_SUBST(APXS_CPPFLAGS_SHLIB)
+		APXS_LD_SHLIB=`${apxs_found} -q LD_SHLIB`
+		AC_SUBST(APXS_LD_SHLIB)
+		APXS_LIBEXECDIR=`${apxs_found} -q LIBEXECDIR`
+		AC_SUBST(APXS_LIBEXECDIR)
+		APXS_SYSCONFDIR=`${apxs_found} -q SYSCONFDIR`
+		AC_SUBST(APXS_SYSCONFDIR)
+		APXS_PREFIX=`${apxs_found} -q PREFIX`
+		AC_SUBST(APXS_PREFIX)
+        else 
+            AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
+        fi
 ])
 
 
 AC_DEFUN([APACHE_INCLUDES],[
-
   AC_ARG_WITH(
     apache_include,
     [  --with-apache-include[=DIR]     Apache server directory],
-    ,
-    [with_apache_include=${apache_base}/include]
+    ,[apache_include="${APXS_INCLUDES}"]
   )
-
-  AC_MSG_CHECKING(for Apache includes directory)
-
-  if test "$with_apache_include" = "no"; then
-    AC_MSG_ERROR( Specify the apache using --with-apache-include)
-  else
-    # make sure that a well known include file exists
-    if test -e $with_apache_include/httpd.h; then
-      apache_include=$with_apache_include
-      AC_MSG_RESULT(Apache includes found!)
-    else
-      AC_MSG_ERROR( $with_apache_include not found. )
-    fi
-  fi
 ])
 
 AC_DEFUN([APR_HANDLING],[
+  AC_MSG_CHECKING(for Apache apr)
   AC_ARG_WITH(
    apr_config,
    	[  --with-apr-config=FILE     apr portable apr-1-config path],
-	,
-	 if test -x ${apache_base}/bin/apr-1-config ; then
-		with_apr_config=${apache_base}/bin/apr-1-config 
-        AC_MSG_RESULT([${with_apr_config}])
-	 else
-    	AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config)
-	 fi
-	 
-  )
-     AC_MSG_CHECKING([for apr])
-	 if test -x ${with_apr_config} ; then
-        export PATH=$PATH:`dirname ${with_apr_config}`
-        AC_MSG_RESULT([${with_apr_config}])
-		APR_CPPFLAGS=`${with_apr_config} --cppflags`
-        AC_SUBST(APR_CPPFLAGS)
-		APR_INCLUDES=`${with_apr_config} --includes`
-        AC_SUBST(APR_INCLUDES)
-	 else
-    	AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config)
-	 fi
-	 
+	 [if test -x "${with_apr_config}"; then
+	     apr_found="${with_apr_config}"
+	 fi]
+         ,
+	 [if test -x "${apache_base}/bin/apr-1-config" ; then
+	     apr_found="${apache_base}/bin/apr-1-config" 
+	 elif test -x "${apache_base}/sbin/apr-1-config" ; then
+	     apr_found="${apache_base}/sbin/apr-1-config" 
+         elif test "${apache_base+set}" = set; then 
+             AC_PATH_PROGS(with_apr_config, apr-1-config)
+             if test "${with_apr_config+set}" = set ; then
+                 apr_found="${with_apr_config}"
+             fi
+         else 
+    	      AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config, 1)
+	 fi]
+)
+	if test "${apr_found+set}" = set ; then
+            AC_MSG_RESULT([$apr_found])
+	    dnl At this point we already have apr sorted out
+	    dnl It actually calls another script, so the PATH needs to be set.
+	    export PATH=$PATH:`dirname ${apr_found}`
+	    APR_CPPFLAGS=`${apr_found} --cppflags`
+	    AC_SUBST(APR_CPPFLAGS)
+	    APR_INCLUDES=`${apr_found} --includes`
+	    AC_SUBST(APR_INCLUDES)
+	    APR_LDLFAGS=`${apr_found} --link-libtool --libs`
+	    AC_SUBST(APR_LDFLAGS)
+        else
+            AC_MSG_ERROR([Could not find apr-1-config.  apr-1-config must be in your PATH or you must specify the location of the apr script using --with-apr-config])
+        fi
 ])
+
+# apache version
+#
+# let's determine whether we are building for apache1.x or apache2.x.
+# This variable has consequences on the default values for the remaining 
+# site options. We try to guess some of them. 
+#
 
 AC_DEFUN([APACHE_VERSION],[
     AC_ARG_WITH(
         apache_version,
-        [  --with-apache-version[=VER]  build for apache 1.x or 2.x],
-        ,[apache_version="2"]
+        [  --with-apache-version[=VER]  build for apache 1.x or 2.x],,
+        ,[with_apache_version="2"]
     )
 
     AC_MSG_CHECKING(for apache version)
@@ -401,7 +381,7 @@ AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
         else
            AC_MSG_RESULT([could not find ${TCL_BIN_DIR}/tclConfig.sh])
         fi
-    # If we have multiple pathes, pull the first one, add end slash if needed
+    # If we have multiple paths, pull the first one, add end slash if needed
 	res=`echo ${TCL_PACKAGE_PATH} | \
              grep '[[^\]] ' | \
              sed -e 's/\([[^\]]\)\( \)\(.*\)$/\1/'  -e 's/\([[^\/]]\)$/\1\//' `
@@ -409,7 +389,7 @@ AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
 	    TCL_PACKAGE_PATH=${res}
             AC_SUBST(TCL_PACKAGE_PATH)
         fi
-						     
+	     
 ])
 
 
@@ -418,16 +398,15 @@ AC_DEFUN([GET_RIVET_BASE], [
 	AC_SUBST(RIVET_BASE_INCLUDE)
 ])
 
-GET_RIVET_BASE
+
 APACHE_VERSION
+GET_RIVET_BASE
 APACHE
 CHECK_APXS
 APACHE_INCLUDES
 APR_HANDLING
 AC_SUBST(apache_include)
-AC_SUBST(apr_include)
 AC_SUBST(apache_version_dir)
-
 
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
 

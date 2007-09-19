@@ -995,5 +995,12 @@ Rivet_InitCore( Tcl_Interp *interp )
     TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
     TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
 
+/*
+ * Temporary workaround to inizialize the commands
+ * in rivetWWW.c
+ */
+
+    Rivet_InitWWW( interp );
+
     return TCL_OK;
 }

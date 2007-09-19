@@ -51,7 +51,7 @@ lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
 # Rivet Library
 #
 librivet_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
-librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
+librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 librivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 librivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 

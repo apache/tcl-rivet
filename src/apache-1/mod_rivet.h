@@ -31,7 +31,7 @@
 
    Otherwise, set this to 1 to hide the version from potential
    troublemakers.  */
-#define HIDE_RIVET_VERSION 1
+#undef HIDE_RIVET_VERSION 
 
 /* End Configuration options  */
 
