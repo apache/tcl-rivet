@@ -1,9 +1,9 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.66.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="it"><div class="titlepage"><div><div><h1 class="title"><a name="id2511209"></a>Apache Rivet</h1></div><div><div class="author"><h3 class="author"><span class="firstname">The Rivet Team</span></h3><div class="affiliation"><span class="orgname">The Apache Software Foundation<br></span><div class="address"><p><br>
-	  <tt class="email">&lt;<a href="mailto:rivet-dev@tcl.apache.org">rivet-dev@tcl.apache.org</a>&gt;</tt><br>
-	</p></div></div></div></div><div><p class="othercredit"><span class="contrib">Italian Translation</span>: <span class="firstname">Fabio</span> <span class="surname">Zanotti</span></p><div class="affiliation"><span class="orgname">Italian Linux Documentation Project<br></span><div class="address"><p><tt class="email">&lt;<a href="mailto:zendune@virgilio.it">zendune@virgilio.it</a>&gt;</tt></p></div></div></div><div><p class="copyright">Copyright © 2002, 2003 Apache Software Foundation</p></div></div><hr></div><div class="toc"><p><b>Sommario</b></p><dl><dt><span class="section"><a href="#id2454204">Introduzione ad Apache Rivet</a></span></dt><dt><span class="section"><a href="#installation">Installazione di Apache Rivet</a></span></dt><dt><span class="section"><a href="#directives">Direttive di Apache</a></span></dt><dt><span class="section"><a href="#commands">Comandi e variabili Tcl di Rivet</a></span></dt><dt><span class="section"><a href="#examples">Esempi ed uso</a></span></dt><dt><span class="section"><a href="#tcl_packages">Pacchetti Tcl per Rivet</a></span></dt><dt><span class="section"><a href="#help">Risorse - Come ottenere aiuto</a></span></dt><dd><dl><dt><span class="section"><a href="#id2513301">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2513344">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Siti Web</a></span></dt><dt><span class="section"><a href="#id2513441">Bug Tracking System</a></span></dt></dl></dd><dt><span class="section"><a href="#internals">Rivet Internals</a></span></dt><dd><dl><dt><span class="section"><a href="#id2513487">Inizializzazione</a></span></dt><dt><span class="section"><a href="#id2513528">RivetChan</a></span></dt><dt><span class="section"><a href="#id2513561">Parsing delle pagine, Esecuzione e Cacheing</a></span></dt></dl></dd><dt><span class="section"><a href="#upgrading">Aggiornamenti da mod_dtcl o NeoWebScript</a></span></dt><dd><dl><dt><span class="section"><a href="#id2513850">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2513866">NeoWebScript</a></span></dt></dl></dd></dl></div><p style="width:90%">
-    Questo documento è anche disponibile nelle seguenti lingue: <a href="index.en.html" target="_top">Inglese</a>, <a href="index.ru.html" target="_top">Russo</a>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="it"><div class="titlepage"><div><div><h2 class="title"><a name="id2517554"></a>Apache Rivet</h2></div><div><div class="author"><h3 class="author"><span class="firstname">The Rivet Team</span></h3><div class="affiliation"><span class="orgname">The Apache Software Foundation<br></span><div class="address"><p><br>
+	  <code class="email">&lt;<a class="email" href="mailto:rivet-dev@tcl.apache.org">rivet-dev@tcl.apache.org</a>&gt;</code><br>
+	</p></div></div></div></div><div><div class="othercredit"><h3 class="othercredit"><span class="firstname">Fabio</span> <span class="surname">Zanotti</span></h3><span class="contrib">Italian Translation</span> <div class="affiliation"><span class="orgname">Italian Linux Documentation Project<br></span><div class="address"><p><code class="email">&lt;<a class="email" href="mailto:zendune@virgilio.it">zendune@virgilio.it</a>&gt;</code></p></div></div></div></div><div><p class="copyright">Copyright © 2002, 2003 Apache Software Foundation</p></div></div><hr></div><div class="toc"><p><b>Sommario</b></p><dl><dt><span class="section"><a href="#id2509078">Introduzione ad Apache Rivet</a></span></dt><dt><span class="section"><a href="#installation">Installazione di Apache Rivet</a></span></dt><dt><span class="section"><a href="#directives">Direttive di Apache</a></span></dt><dt><span class="section"><a href="#commands">Comandi e variabili Tcl di Rivet</a></span></dt><dt><span class="section"><a href="#examples">Esempi ed uso</a></span></dt><dt><span class="section"><a href="#tcl_packages">Pacchetti Tcl per Rivet</a></span></dt><dt><span class="section"><a href="#help">Risorse - Come ottenere aiuto</a></span></dt><dd><dl><dt><span class="section"><a href="#id2556818">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2557531">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Siti Web</a></span></dt><dt><span class="section"><a href="#id2557628">Bug Tracking System</a></span></dt></dl></dd><dt><span class="section"><a href="#internals">Rivet Internals</a></span></dt><dd><dl><dt><span class="section"><a href="#id2557675">Inizializzazione</a></span></dt><dt><span class="section"><a href="#id2557717">RivetChan</a></span></dt><dt><span class="section"><a href="#id2557749">Parsing delle pagine, Esecuzione e Cacheing</a></span></dt></dl></dd><dt><span class="section"><a href="#upgrading">Aggiornamenti da mod_dtcl o NeoWebScript</a></span></dt><dd><dl><dt><span class="section"><a href="#id2557849">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2557865">NeoWebScript</a></span></dt></dl></dd></dl></div><p style="width:90%">
+    Questo documento è anche disponibile nelle seguenti lingue: <a class="ulink" href="index.en.html" target="_top">Inglese</a>, <a class="ulink" href="index.ru.html" target="_top">Russo</a>
   </p><p style="width:90%">Questo documento è basato sulla versione 1.27 dell'originale
-  in inglese.</p><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="id2454204"></a>Introduzione ad Apache Rivet</h2></div></div></div><p style="width:90%">
+  in inglese.</p><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="id2509078"></a>Introduzione ad Apache Rivet</h2></div></div></div><p style="width:90%">
       Apache Rivet è un sistema per la creazione di contenuti web
       dinamici mediante un linguaggio di programmazione integrato con
       il Web Server Apache . È progettato per essere veloce, 
@@ -35,7 +35,7 @@
 	  distribuzione).
 	</p></li><li><p class="title"><b>Procurarsi Rivet</b></p><p style="width:90%">
 	  Si possono scaricare i sorgenti di Rivet da 
-	  <a href="http://tcl.apache.org/rivet/download" target="_top">http://tcl.apache.org/rivet/download</a>.  
+	  <a class="ulink" href="http://tcl.apache.org/rivet/download" target="_top">http://tcl.apache.org/rivet/download</a>.  
 	  Attualmente è il solo modo per ottenere Rivet. In futuro, 
 	  contiamo di distribuirlo anche direttamente nei formati 
 	  utilizzati da FreeBSD, Debian, Red Hat e windows.
@@ -51,7 +51,7 @@
 	  Raccomandiamo di costruire Rivet con una libreria caricabile 
 	  condivisa, per avere la massima flessibilità.</p><p style="width:90%">
           Il codice sorgente del server web Apache può essere reperito
-	  al seguente link: <a href="http://httpd.apache.org/" target="_top">http://httpd.apache.org/</a>.
+	  al seguente link: <a class="ulink" href="http://httpd.apache.org/" target="_top">http://httpd.apache.org/</a>.
 	</p></li><li><p class="title"><b>Decomprimere i sorgenti</b></p><p style="width:90%">
 	  Assumiamo, a questo punto, che abbiate installato Apache.
 	  Dovrete decomprimere i sorgenti di Rivet nella directory dove
@@ -66,31 +66,31 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</pre><p style="width:90%">
 	  informazioni incluse in Apache e Tcl, considerando le loro
 	  configurazioni, al fine di compilarlo tramite una serie di
 	  script Tcl, che sono ubicati nella directory 
-	  <tt class="filename">buildscripts/</tt>.
+	  <code class="filename">buildscripts/</code>.
 	</p><ol type="a"><li><p class="title"><b>Modificare src/make.tcl</b></p><p style="width:90%">
               Potrebbe essere necessario modificare a mano
-	      <tt class="filename">src/make.tcl</tt>, al fine di impostare
+	      <code class="filename">src/make.tcl</code>, al fine di impostare
 	      alcune opzioni. Per prima cosa provate la prossima 
 	      istruzione e vedete se ha successo.
 	    </p></li><li><p style="width:90%">A questo punto, siete pronti ad eseguire la compilazione
 	       del sistema:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">cd src/
-./make.tcl <i class="replaceable"><tt>option</tt></i></pre><p style="width:90%">dove <i class="replaceable"><tt>option</tt></i> può essere
+./make.tcl <em class="replaceable"><code>option</code></em></pre><p style="width:90%">dove <em class="replaceable"><code>option</code></em> può essere
 	    shared (condivisa) o 
 	    static (statica).
 	    </p></li><li><p class="title"><b>Installazione</b></p><p style="width:90%">
 	      Adesso siamo pronti ad eseguire il comando 
-	      <span style="font-family:monospace"><span><b class="command">./make.tcl install</b></span></span> per installare i 
+	      <span style="font-family:monospace"><span class="command"><strong>./make.tcl install</strong></span></span> per installare i 
 	      file risultanti. Questo
 	      dovrebbe copiare gli oggetti condivisi (come
-	      <tt class="filename">mod_rivet.so</tt>, se è stato creato con
+	      <code class="filename">mod_rivet.so</code>, se è stato creato con
 	      successo) nella directory di Apache
-	      <tt class="filename">libexec</tt>, come pure installare alcuni
+	      <code class="filename">libexec</code>, come pure installare alcuni
 	      script di supporto e codice vario.
 	    </p></li></ol></li><li><p class="title"><b>File di configurazione di Apache</b></p><p style="width:90%">
 	  Rivet è relativamente facile da configurare, cominceremo
 	  aggiungendogli il modulo:
-	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">LoadModule rivet_module	<i class="replaceable"><tt>/usr/lib/apache/1.3/
-mod_rivet.so</tt></i></pre><p style="width:90%">
+	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">LoadModule rivet_module	<em class="replaceable"><code>/usr/lib/apache/1.3/
+mod_rivet.so</code></em></pre><p style="width:90%">
           Questo informa Apache che deve caricare l'oggetto condiviso 
 	  Rivet, in qualsiasi parte esso risieda sul vostro file system.
 	  Ora abbiamo informato Apache su quali file sono del tipo 
@@ -98,46 +98,46 @@ mod_rivet.so</tt></i></pre><p style="width:90%">
 	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">AddType application/x-httpd-rivet .rvt
 	  AddType application/x-rivet-tcl .tcl</pre><p style="width:90%">
 	  Questo informa Apache di elaborare i file con le estensioni
-	  <tt class="filename">.rvt</tt> e <tt class="filename">.tcl</tt>
+	  <code class="filename">.rvt</code> e <code class="filename">.tcl</code>
 	  come file Rivet.
 	</p><p style="width:90%">
 	  Per altre direttive che Rivet fornisce per la configurazione di
-	  Apache, per cortesia, vedete <a href="#directives" title="Direttive di Apache">la sezione chiamata &#8220;Direttive di Apache&#8221;</a>.
+	  Apache, per cortesia, vedete <a class="xref" href="#directives" title="Direttive di Apache">la sezione chiamata «Direttive di Apache»</a>.
 	</p></li></ol></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="directives"></a>Direttive di Apache</h2></div></div></div><p style="width:90%">
       Queste direttive sono utilizzate con i file di configurazione del
       server httpd di Apache per modificare il comportamento di Apache
       Rivet. Vi sono delle precedenze, come segue: 
-      <span style="font-family:monospace"><span><b class="command">RivetDirConf</b></span></span>, <span style="font-family:monospace"><span><b class="command">RivetUserConf</b></span></span>,
-      <span style="font-family:monospace"><span><b class="command">RivetServerConf</b></span></span>, questo significa che DirConf 
+      <span style="font-family:monospace"><span class="command"><strong>RivetDirConf</strong></span></span>, <span style="font-family:monospace"><span class="command"><strong>RivetUserConf</strong></span></span>,
+      <span style="font-family:monospace"><span class="command"><strong>RivetServerConf</strong></span></span>, questo significa che DirConf 
       non terrà conto di  UserConf, il quale a sua volta non terrà 
       conto di ServerConf.
     </p><div class="variablelist"><dl><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">RivetServerConf</span>  (<span style="font-family:monospace; font-weight: bold;">CacheSize</span> | <span style="font-family:monospace; font-weight: bold;">GlobalInitScript</span> | <span style="font-family:monospace; font-weight: bold;">ChildInitScript</span> | <span style="font-family:monospace; font-weight: bold;">ChildExitScript</span> | <span style="font-family:monospace; font-weight: bold;">BeforeScript</span> | <span style="font-family:monospace; font-weight: bold;">AfterScript</span> | <span style="font-family:monospace; font-weight: bold;">ErrorScript</span> | <span style="font-family:monospace; font-weight: bold;">UploadDirectory</span> | <span style="font-family:monospace; font-weight: bold;">UploadMaxSize</span> | <span style="font-family:monospace; font-weight: bold;">UploadFilesToVar</span> | <span style="font-family:monospace; font-weight: bold;">SeperateVirtualInterps</span>)</div></div>
-	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex"><span style="font-family:monospace"><span><b class="command">RivetServerConf</b></span></span> specifica un opzione
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">RivetServerConf</span>  (<span style="font-family:monospace; font-weight: bold;">CacheSize</span> | <span style="font-family:monospace; font-weight: bold;">GlobalInitScript</span> | <span style="font-family:monospace; font-weight: bold;">ChildInitScript</span> | <span style="font-family:monospace; font-weight: bold;">ChildExitScript</span> | <span style="font-family:monospace; font-weight: bold;">BeforeScript</span> | <span style="font-family:monospace; font-weight: bold;">AfterScript</span> | <span style="font-family:monospace; font-weight: bold;">ErrorScript</span> | <span style="font-family:monospace; font-weight: bold;">UploadDirectory</span> | <span style="font-family:monospace; font-weight: bold;">UploadMaxSize</span> | <span style="font-family:monospace; font-weight: bold;">UploadFilesToVar</span> | <span style="font-family:monospace; font-weight: bold;">SeparateVirtualInterps</span>)</div></div>
+	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex"><span style="font-family:monospace"><span class="command"><strong>RivetServerConf</strong></span></span> specifica un opzione
 	    globale che è valida per l'intero server.
 	  </div><div class="variablelist"><dl><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">CacheSize</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>size</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">CacheSize</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>size</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Seleziona la dimensione della cache della pagina
 		  interna, dove
-		  <i class="replaceable"><tt>size</tt></i> è il
+		  <em class="replaceable"><code>size</code></em> è il
 		  numero di pagine byte-compilate da essere
 		  memorizzate per un uso futuro. Il valore predefinito è
-		  <span style="font-family:monospace"><span><b class="command">MaxRequestsPerChild</b></span></span> / 5, o 50,
-		  se <span style="font-family:monospace"><span><b class="command">MaxRequestsPerChild</b></span></span> è 0.
+		  <span style="font-family:monospace"><span class="command"><strong>MaxRequestsPerChild</strong></span></span> / 5, o 50,
+		  se <span style="font-family:monospace"><span class="command"><strong>MaxRequestsPerChild</strong></span></span> è 0.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">GlobalInitScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">GlobalInitScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>script</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Script Tcl che è eseguito quando ogni interprete viene
 		  inizializzato. 
-		  <i class="replaceable"><tt>script</tt></i>
+		  <em class="replaceable"><code>script</code></em>
 		  è uno script Tcl effettivo; così per eseguire un file, 
 		  voi eseguireste:
 
 		  <pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf GlobalInitScript "source /var/www/ 
 foobar.tcl"</pre>
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">ChildInitScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">ChildInitScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>script</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Lo script viene valutato quando ogni processo figlio
 		  di Apache è inizializzato. Questo è il posto
@@ -145,14 +145,14 @@ foobar.tcl"</pre>
 		  variabili globali, aprire le connessioni ad altre
 		  applicazioni (quali database) e così via.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">ChildExitScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">ChildExitScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>script</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Lo script viene valutato quando ogni processo figlio 
 		  di Apache termina. Questo è il posto più naturale dove
 		  ripulire le risorse create con 
 		  ChildInitScript.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">BeforeScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">BeforeScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>script</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Lo script viene valutato prima che ogni server abbia
 		  fatto l'analisi della pagina (.rvt). Questo può essere
@@ -163,18 +163,18 @@ foobar.tcl"</pre>
 		  metterlo in un GlobalInitScript
 		  ChildInitScript quando siete al 
 		  vostro primo sviluppo di un sito web.
-		  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Nota]" src="images/note.png"></td><th align="left">Nota</th></tr><tr><td colspan="2" align="left" valign="top">
+		  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Nota]" src="images/note.png"></td><th align="left">Nota</th></tr><tr><td align="left" valign="top">
 		    Questo codice è valutato globalmente e non 
 		    all'interno del namespace di dove le pagine sono
 		    elaborate.
 		  </td></tr></table></div>
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">AfterScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">AfterScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>script</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Lo script viene chiamato dopo che ogni server ha
 		  analizzato la pagina (.rvt).
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">ErrorScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>script</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">ErrorScript</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>script</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Quando Rivet incontra un errore in uno script, 
 		  costruisce una pagina HTML con alcune informazioni 
@@ -185,9 +185,9 @@ foobar.tcl"</pre>
 		  assicurarvi che nessun utente possa mai vedere il 
 		  vostro codice sorgente.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">UploadDirectory</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>directory</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">UploadDirectory</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>directory</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Directory ove posizionare i file caricati.</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">UploadMaxSize</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>size</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">UploadMaxSize</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>size</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Dimensione massima per i file caricati.</div></div></dd><dt><span class="term">
 		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">UploadFilesToVar</span>? (<span style="font-family:monospace; font-weight: bold;">yes</span> | <span style="font-family:monospace; font-weight: bold;">no</span>)</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
@@ -197,7 +197,7 @@ foobar.tcl"</pre>
 		  soluzione potrebbe essere più conveniente che inviare 
 		  dati ad un file su disco.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">SeperateVirtualInterps</span>? (<span style="font-family:monospace; font-weight: bold;">yes</span> | <span style="font-family:monospace; font-weight: bold;">no</span>)</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">SeparateVirtualInterps</span>? (<span style="font-family:monospace; font-weight: bold;">yes</span> | <span style="font-family:monospace; font-weight: bold;">no</span>)</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Se attivo, Rivet creerà un interprete Tcl separato per
 		  ogni host virtuale di Apache. Questo è utile in una
@@ -208,51 +208,51 @@ foobar.tcl"</pre>
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">RivetDirConf</span>  (<span style="font-family:monospace; font-weight: bold;">BeforeScript</span> | <span style="font-family:monospace; font-weight: bold;">AfterScript</span> | <span style="font-family:monospace; font-weight: bold;">ErrorScript</span> | <span style="font-family:monospace; font-weight: bold;">UploadDirectory</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Queste opzioni sono le stesse di
-	    <span style="font-family:monospace"><span><b class="command">RivetServerConf</b></span></span>, ad eccezione che sono
+	    <span style="font-family:monospace"><span class="command"><strong>RivetServerConf</strong></span></span>, ad eccezione che sono
 	    valide solo per la directory dove sono state specificate e
 	    relative sotto directory. Potranno essere dichiarate 
-	    nelle sezioni <span style="font-family:monospace"><span><b class="command">Directory</b></span></span>.
+	    nelle sezioni <span style="font-family:monospace"><span class="command"><strong>Directory</strong></span></span>.
 	  </div></div></dd><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">RivetUserConf</span>  (<span style="font-family:monospace; font-weight: bold;">BeforeScript</span> | <span style="font-family:monospace; font-weight: bold;">AfterScript</span> | <span style="font-family:monospace; font-weight: bold;">ErrorScript</span> | <span style="font-family:monospace; font-weight: bold;">UploadDirectory</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Queste opzioni sono le stesse di
-	    <span style="font-family:monospace"><span><b class="command">RivetServerConf</b></span></span>, ad eccezione che sono
+	    <span style="font-family:monospace"><span class="command"><strong>RivetServerConf</strong></span></span>, ad eccezione che sono
 	    valide solo per la directory dove sono state specificate e
 	    relative sotto directory.
 	  </div></div></dd></dl></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="commands"></a>Comandi e variabili Tcl di Rivet</h2></div></div></div><div class="variablelist"><dl><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
-	    Il comando <span style="font-family:monospace"><span><b class="command">var</b></span></span> recupera le informazioni
+	    Il comando <span style="font-family:monospace"><span class="command"><strong>var</strong></span></span> recupera le informazioni
 	    circa le variabili GET o POST, inviando lo script tramite una
 	    richiesta del client. Il trattamento di entrambe le 
 	    variabili GET e POST è identico, in considerazione delle 
 	    loro origini. Notate che vi sono due forme aggiuntive di 
-	    <span style="font-family:monospace"><span><b class="command">var</b></span></span>: <span style="font-family:monospace"><span><b class="command">var_qs</b></span></span> e 
-	    <span style="font-family:monospace"><span><b class="command">var_post</b></span></span>.
+	    <span style="font-family:monospace"><span class="command"><strong>var</strong></span></span>: <span style="font-family:monospace"><span class="command"><strong>var_qs</strong></span></span> e 
+	    <span style="font-family:monospace"><span class="command"><strong>var_post</strong></span></span>.
 	    Queste due forme restringono le informazioni sui parametri
 	    ottenendo rispettivamente la querystring 
 	    (?foo=bar&amp;bee=bop) o la POSTing.
 	  </div><div class="variablelist"><dl><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">get</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">get</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varname</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>?<span class="optional">default</span>?</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Ritorna il valore della variabile
-		  <i class="replaceable"><tt>varname</tt></i>
+		  <em class="replaceable"><code>varname</code></em>
 		  come una stringa (anche se vi sono valori multipli). Se
 		  non esiste come variabile GET o POST, viene restituito 
 		  il valore 
-	<i class="replaceable"><tt>?<span class="optional">default</span>?</tt></i>,
+	<em class="replaceable"><code>?<span class="optional">default</span>?</code></em>,
 		  altrimenti viene ritornato "" (una stringa vuota).
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">list</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">list</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varname</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce il valore della variabile
-		  <i class="replaceable"><tt>varname</tt></i> come
+		  <em class="replaceable"><code>varname</code></em> come
 		  una lista, se vi sono valori multipli.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">exists</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>varname</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">exists</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varname</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce 1 se
-		  <i class="replaceable"><tt>varname</tt></i>
+		  <em class="replaceable"><code>varname</code></em>
 		  esiste, 0 se non lo è.
 		</div></div></dd><dt><span class="term">
 		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">number</span>?</div></div>
@@ -263,44 +263,52 @@ foobar.tcl"</pre>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce una lista di nomi di variabili e valori.
 		</div></div></dd></dl></div><div style="margin-bottom:1.5ex ; padding .5ex">
-	    Vedete <a href="#variable_access" title="Esempio 3. Accesso alle variabili">Esempio 3, &#8220;Accesso alle variabili&#8221;</a>.
+	    Vedete <a class="xref" href="#variable_access" title="Esempio 3. Accesso alle variabili">Esempio 3, «Accesso alle variabili»</a>.
 	  </div></div></dd></dl></div><div class="variablelist"><dl><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">upload</span>  (<span style="font-family:monospace; font-weight: bold;">channel</span> | <span style="font-family:monospace; font-weight: bold;">save</span> | <span style="font-family:monospace; font-weight: bold;">data</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">size</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">filename</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Il comando upload è usato per la manipolazione del 
 	  caricamento dei file. Vedete le principali direttive di Apache 
 	  per altri tipi di configurazioni del funzionamento di questa 
 	  caratteristica di Rivet. </div><div class="variablelist"><dl><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">channel</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">channel</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>uploadname</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Quando date il nome ad un file caricato,
-		  <i class="replaceable"><tt>uploadname</tt></i>
+		  <em class="replaceable"><code>uploadname</code></em>
 		  restituisce un canale Tcl che può essere usato per
 		  accedere allo stesso file.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">save</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">save</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>uploadname</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>filename</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Salva 
-		  <i class="replaceable"><tt>uploadname</tt></i> nel
+		  <em class="replaceable"><code>uploadname</code></em> nel
 		  file
-		  <i class="replaceable"><tt>filename</tt></i>.
+		  <em class="replaceable"><code>filename</code></em>.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">data</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">data</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>uploadname</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce i dati caricati dal server. Questo è il
 		  binario pulito. In altre parole, potrà lavorare
 		  anche con file come immagini, eseguibili, compressi 
 		  e così via.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">size</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">exists</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>uploadname</code></em></span>?</div></div>
+	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		    Restituisce 1 se esiste un upload chiamato 
+		     ?<span style="font-family:monospace; font-weight: bold;">uploadname</span>?. Questo comando può essere utile
+		    negli script che si vuole usare nell'elaborazione di
+		    più pagine che inviano upload differenti che quindi
+		    necessitano di elaborazione specifica.
+		</div></div></dd><dt><span class="term">
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">size</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>uploadname</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Restituisce la dimensione del file caricato.
 		</div></div></dd><dt><span class="term">
 		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">type</span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
-		  Se il <tt class="varname">Content-type</tt> è impostato, viene
+		  Se il <code class="varname">Content-type</code> è impostato, viene
 		  restituito il valore, altrimenti una stringa vuota.
 		</div></div></dd><dt><span class="term">
-		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">filename</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uploadname</tt></i></span>?</div></div>
+		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">filename</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>uploadname</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Viene restituito il nome del file dell'host remoto 
 		  che ha caricato il file.
@@ -310,9 +318,9 @@ foobar.tcl"</pre>
 		  Restituisce i nomi delle variabili, in una lista, di
 		  tutti i file caricati.
 		</div></div></dd></dl></div><div style="margin-bottom:1.5ex ; padding .5ex">
-	    See <a href="#upload" title="Esempio 4. Caricare file">Esempio 4, &#8220;Caricare file&#8221;</a>.
+	    See <a class="xref" href="#upload" title="Esempio 4. Caricare file">Esempio 4, «Caricare file»</a>.
 	  </div></div></dd></dl></div><div class="variablelist"><dl><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_env</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_env</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>array_name</code></em></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Carica l'array delle variabili d'ambiente all'interno dello
 	    specificato nome di array. Utilizza l'array
@@ -323,70 +331,70 @@ foobar.tcl"</pre>
 	    precisare il nome dell'array per più utenti, va bene
 	    accedervi tramite env.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_headers</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_headers</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>array_name</code></em></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Carica gli header che provengono dalla richiesta di un
 	    client all'interno del nome dell'array indicato, o usa
 	    headers se non è stato indicato alcun 
 	    nome.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_cookies</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>array_name</tt></i></span>?</div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">load_cookies</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>array_name</code></em></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Carica l'array delle variabili cookie all'interno del nome
 	    dell'array indicato. Utilizza l'array
 	    cookies come valore predefinito.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">include</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename_name</tt></i></span>?</div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">include</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>filename_name</code></em></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Include un file senza analizzarlo per processare i tag &lt;?
 	    e ?&gt;.  Questo è il metodo migliore per includere un file 
 	    HTML o qualsiasi altro contenuto statico.
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parse</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">parse</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>filename</code></em></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
-	    Come il comando Tcl <span style="font-family:monospace"><span><b class="command">source</b></span></span>, ma analizza
+	    Come il comando Tcl <span style="font-family:monospace"><span class="command"><strong>source</strong></span></span>, ma analizza
 	    pure i tag di elaborazione per Rivet  &lt;? e ?&gt;.
 	    Utilizzando questo comando, potete utilizzare diversi file 
 	    .rvt.
 	  </div></div></dd><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">headers</span>  (<span style="font-family:monospace; font-weight: bold;">set</span> | <span style="font-family:monospace; font-weight: bold;">redirect</span> | <span style="font-family:monospace; font-weight: bold;">add</span> | <span style="font-family:monospace; font-weight: bold;">type</span> | <span style="font-family:monospace; font-weight: bold;">numeric</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
-	    Il comando <span style="font-family:monospace"><span><b class="command">headers</b></span></span> è per l'assegnazione e
+	    Il comando <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> è per l'assegnazione e
 	    l'elaborazione di header HTTP.
 	  </div><div style="margin-bottom:1.5ex ; padding .5ex">
-	    <div class="variablelist"><dl><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">set</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+	    <div class="variablelist"><dl><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">set</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>headername</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Assegna in modo discrezionale i valori ed i nomi
 		    agli header.
 		  </div></div></dd><dt><span class="term">
-		  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">redirect</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>uri</tt></i></span>?</div></div>
+		  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">redirect</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>uri</code></em></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Redirige dalla pagina corrente ad un nuovo URI.
 		    <span class="emphasis"><em>Questo</em></span> viene fatto nel primo
 		    blocco di codice Tcl.
 		  </div></div></dd><dt><span class="term">
-                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">add</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>headername</tt></i></span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>value</tt></i></span>?</div></div>
+                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">add</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>headername</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div>
                 </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Aggiunge testo all'header
-		  <tt class="varname">headername</tt>.</div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">type</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>content-type</tt></i></span>?</div></div>
+		  <code class="varname">headername</code>.</div></div></dd><dt><span class="term"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">type</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>content-type</code></em></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		    Questo comando assegna l'header
-		    <tt class="constant">Content-type</tt> ritornato dallo
+		    <code class="constant">Content-type</code> ritornato dallo
 		    script, è utile se desiderate inviare, con Rivet, 
 		    altri contenuti oltre all'HTML (PNG o immagini
 		    jpeg, per esempio).
 		  </div></div></dd><dt><span class="term">
-                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">numeric</span>? ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>response code</tt></i></span>?</div></div>
+                  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex ">?<span style="font-family:monospace; font-weight: bold;">numeric</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>response code</code></em></span>?</div></div>
 		</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">Assegna un codice di risposta numerico, come per
 		  esempio 200, 404 o 500.
 		  </div></div></dd></dl></div>
 	  </div></div></dd><dt><span class="term">
-	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  ?<span style="font-family:monospace; font-weight: bold;"><i class="replaceable"><tt>filename</tt></i></span>?</div></div>
+	  <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">makeurl</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>filename</code></em></span>?</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    Crea una URL di riferimento a se stesso dal nome di un file.
 	    Per esempio:
 	    <pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">makeurl /tclp.gif</pre>
 	    restituisce
-	    <tt class="constant">http://[hostname]:[port]/tclp.gif</tt>.
+	    <code class="constant">http://[hostname]:[port]/tclp.gif</code>.
 	    Dove hostname e port sono il nome dell'host e la porta del
 	    server in questione.
 	  </div></div></dd></dl></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Esempi ed uso</h2></div></div></div><p style="width:90%">
@@ -396,13 +404,13 @@ foobar.tcl"</pre>
       semplice e vi sono alcune buone risorse disponibili
       sul web che vi permetteranno di padroneggiarlo velocemente. 
       A questo proposito, vedete la sezione 
-      <a href="#websites" title="Siti Web">web sites</a>.
-    </p><div class="example"><a name="hello world"></a><p class="title"><b>Esempio 1. Hello World</b></p><p style="width:90%">
+      <a class="link" href="#websites" title="Siti Web">web sites</a>.
+    </p><div class="example"><a name="hello%20world"></a><p class="title"><b>Esempio 1. Hello World</b></p><div class="example-contents"><p style="width:90%">
 	Come qualsiasi altro tool, è piacevole vedere qualcosa al 
 	lavoro, così andremo a creare una piccola pagina 
 	"Hello World".</p><p style="width:90%">
 	Assumendo che sia stato configurato correttamente Apache, 
-	create un file chiamato <tt class="filename">hello.rvt</tt> in una 
+	create un file chiamato <code class="filename">hello.rvt</code> in una 
 	directory dove Apache lo possa trovare, con il seguente 
 	contenuto:
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
@@ -411,7 +419,7 @@ puts "Hello World"
 </pre><p style="width:90%">
 	Se poi vi accederete con vostro browser, sarà possibile vedere 
 	una pagina nera con il testo "Hello World" (senza apici).
-      </p></div><div class="example"><a name="table"></a><p class="title"><b>Esempio 2. Generare una tabella</b></p><p style="width:90%">
+      </p></div></div><br class="example-break"><div class="example"><a name="table"></a><p class="title"><b>Esempio 2. Generare una tabella</b></p><div class="example-contents"><p style="width:90%">
 	In un'altro semplice esempio, genereremo dinamicamente una
 	tabella:
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;? puts "&lt;table&gt;\n"
@@ -431,7 +439,7 @@ puts "&lt;/table&gt;\n" ?&gt;
 	e generare la stessa pagina HTML!
       </p><p style="width:90%">
 	Il risultato sarà qualcosa di simile a questo:
-      </p><div><img src="table.png"></div></div><div class="example"><a name="variable_access"></a><p class="title"><b>Esempio 3. Accesso alle variabili</b></p><p style="width:90%">
+      </p><div><img src="table.png"></div></div></div><br class="example-break"><div class="example"><a name="variable_access"></a><p class="title"><b>Esempio 3. Accesso alle variabili</b></p><div class="example-contents"><p style="width:90%">
 	In questa sezione mostreremo come accedere alle variabili 
 	utilizzando gli operatori GET o POST.
       </p><p style="width:90%">
@@ -531,65 +539,366 @@ if { [llength $errlist] != 0 } {
 ?&gt;
 </pre><p style="width:90%">
 	La prima istruzione si assicura che la variabile
-	<tt class="varname">boss</tt> sia passata allo script e poi fa
+	<code class="varname">boss</code> sia passata allo script e poi fa
 	qualcosa con quella informazione.
 	Se non è presente, un errore viene aggiunto alla lista degli 
 	errori.
       </p><p style="width:90%">
 	Nel secondo blocco del codice, la variabile
-	<tt class="varname">salary</tt> è riportata con un'altro errore di
+	<code class="varname">salary</code> è riportata con un'altro errore di
 	controllo, poiché è un numero, è necessario che sia composto
 	da cifre.
       </p><p style="width:90%">
-	Alla variabile <tt class="varname">boss</tt> non è richiesto di essere
+	Alla variabile <code class="varname">boss</code> non è richiesto di essere
 	inviata, la setteremo a "Mr. Burns" se non è tra le informazioni
 	ricevute.
       </p><p style="width:90%">
 	L'ultimo pezzo del codice di gestione delle variabili è un pezzo
-	ingannatore perché <tt class="varname">skills</tt> è una listbox e può
+	ingannatore perché <code class="varname">skills</code> è una listbox e può
 	avere, potenzialmente, valori multipli. Opteremo di riceverla
 	come una lista, in modo da poterla riutilizzare.
       </p><p style="width:90%">
 	Lo script si assicura che la variabile 
-	<tt class="varname">errlist</tt> sia vuota e restituisce un messaggio 
-	di ringraziamento. Se <tt class="varname">errlist</tt> non è vuota,
+	<code class="varname">errlist</code> sia vuota e restituisce un messaggio 
+	di ringraziamento. Se <code class="varname">errlist</code> non è vuota,
 	viene stampata la lista degli errori riscontrati.
-      </p></div><div class="example"><a name="upload"></a><p class="title"><b>Esempio 4. Caricare file</b></p><p style="width:90%">
-	Il seguente HTML in un file, detto,
-	<tt class="filename">upload.html</tt>
+      </p></div></div><br class="example-break"><div class="example"><a name="upload"></a><p class="title"><b>Esempio 4. Caricare file</b></p><div class="example-contents"><p style="width:90%">
+	Il comando <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span> fornisce a Rivet la
+	possibilità di accedere ai file trasferiti tramite http come
+	parti di una form "multipart". Per esempio il seguente 
+	frammento HTML (<code class="filename">upload.html</code>)
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action="foo.rvt" enctype="multipart/form-data" method="post"&gt;
 &lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
 &lt;input type="submit" value="Send File"&gt;&lt;/input&gt;
 &lt;/form&gt;
 </pre><p style="width:90%">
-	Può essere usato con il seguente codice Tcl in un secondo file
-	(<tt class="filename">upload.rvt</tt> per esempio) per creare una 
-	form che carica un file.
+	crea una form con una text input entry associata ad un bottone
+	per l'esplorazione del file system locale. 
+	Cliccando sul bottone appare un file browser con
+	il quale l'utente può scegliere il file da inviare (nella
+	text input entry apparirà il path al file scelto). 
+	Per essere certi di inviare
+	il contentuto del file è necessario combinare l'azione degli 
+	attributi enctype e method nel tag &lt;form...&gt; nel modo 
+	specificato nell'esempio. Se non viene fatto la form invierà la
+	definizione del path del file, non il suo contenuto.
+      </p><p style="width:90%">
+	Nello script invocato nell'azione della form (<code class="filename">upload.rvt</code>)
+	i comandi <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span>  ?<span style="font-family:monospace; font-weight: bold;">argument ...</span>? possono
+	essere usati per manipolare i file inviati al webserver
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 upload save MyUpload /tmp/uploadfiles/file1
 puts "Saved file [upload filename MyUpload] \
 	([upload size MyUpload] bytes) to server"
-?&gt;</pre></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="tcl_packages"></a>Pacchetti Tcl per Rivet</h2></div></div></div><p style="width:90%">
+?&gt;</pre><p style="width:90%">
+	Non dimenticate che il server Apache deve aver accesso 
+	in scrittura nella directory specificata per l'upload. Le 
+	direttive di configurazione di Rivet per 
+	per l'upload hanno un impatto considerevole sul funzionamento
+	del meccanismo di upload. Controllate la parte della documentazione
+	relativa a queste direttive in modo da scegliere i valori
+	che meglio soddisfano le vostre necessità.
+      </p><p style="width:90%">
+	E' anche importante capire che alcuni comandi <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span>
+	sono effettivi se usati in modo mutuamente esclusivo. Apache
+	memorizza i dati in file temporanei che vengono letti da comandi come
+	<span style="font-family:monospace"><span class="command"><strong>upload save  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? ?<span style="font-family:monospace; font-weight: bold;">filename</span>?</strong></span></span>
+	oppure <span style="font-family:monospace"><span class="command"><strong>upload data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span>. 
+	Due chiamate successive che si riferiscono allo stesso upload 
+	ritornerebbero un file vuoto alla seconda chiamata perchè la prima
+	consumerebbe i dati presenti.
+	In modo analogo la chiamata <span style="font-family:monospace"><span class="command"><strong>upload channel  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?
+	</strong></span></span> ritorna un canale Tcl al file (che può essere usato
+	in funzioni Tcl ordinarie di accesso ai file) solo se non avete già
+	letto o salvato i dati usando rispettivamente <span style="font-family:monospace"><span class="command"><strong>upload data 
+	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span> o <span style="font-family:monospace"><span class="command"><strong>upload save 
+	 ?<span style="font-family:monospace; font-weight: bold;">filename</span>?</strong></span></span>
+      </p></div></div><br class="example-break"><div class="example"><a name="file_download"></a><p class="title"><b>Esempio 5. File Download</b></p><div class="example-contents"><p style="width:90%">
+	    In generale mettere un file nelle condizioni di essere scaricato
+	    con http è facile quanto stabilire la URI del file stesso
+	    e lasciare che i meccanismi di download standard di Apache 
+	    facciano quello che è necessario. Se un simile approccio
+	    è adeguato al vostro progetto non c'è altro da
+	    fare che posizionare i vostri file destinati al download in una
+	    directory all'interno dell'albero definito dalla DocumentRoot (o
+	    in una qualsiasi delle directory che potete configurare con
+	    il parametro Alias di Apache o con un Virtual Host)
+	</p><p style="width:90%">
+	    Quando un client invia una uri per scaricare un certo file Apache
+	    determina il tipo di contenuto sulla base dell'estensione
+	    del file, invia gli header necessari ad informare il client 
+	    e quindi invia il contenuto stesso del file. Se il client è
+	    un browser in grado di rappresentare il
+	    contenuto del file questo apparirà all'utente nella finestra
+	    del browser stesso. Diversamente, se il browser non ha 
+	    metodi "builtin" o dei plugin registrati per quel tipo di file, 
+	    apparirà la tipica finestra di download che chiede istruzioni 
+	    all'utente.
+	</p><p style="width:90%">
+	    Rivet è però di aiuto nel caso abbiato esigenze più sofisticate.
+	    Immaginate per esempio di sviluppare un applicazione web based
+	    che raccogliere informazioni di input da passare a programmi
+	    esterni o altre procedure Tcl che generano il contenuto di
+	    un file a richiesta. In questi casi il file stesso non esiste
+	    e non è possibile definire per esso una URI. In altre 
+	    circostanze il vostro file esiste, ma potreste aver bisogno 
+	    di inibirne dinamicamente il download 
+	    e nasconderlo dal web, non solo per i nuovi visitatori del sito, 
+	    ma anche per quelli che potrebbero aver salvato nei loro bookmarks
+	    un riferimento a quel file. Naturalmente potreste eliminare dalle
+	    vostre pagine ogni riferimento a quella risorsa (le vostre pagine
+	    sono generate dinamicamente, non è vero?) e constestualmente
+	    spostare il file in una directory inaccessibile, ma sembra una
+	    soluzione tortuosa e poco elegante.
+	</p><p style="width:90%">
+	    Mettere Tcl e Rivet nella condizione di controllare completamente il 
+	    processo di download aiuta a costruire meccanismi di download 
+	    più eleganti e sicuri
+	</p><p style="width:90%"> 
+	    Ecco un esempio di una procedura Tcl che valuta una richiesta 
+	    di download di un file PDF sulla base del valore di un parametro
+	    passato dal client. Il parametro è il nome (senza estensione)
+	    del file pdf da scaricare. I file pdf sono tenuti in una
+	    directory definita dalla variabile <span style="font-family:monospace"><span class="command"><strong>pdf_repository</strong></span></span>
+	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># Code example for the transmission of a pdf file. 
+
+if {[var exists pdfname]} {
+    set pdfname [var get pdfname]
+
+# let's build the full path to the pdf file. The 'pdf_repository'
+# directory must be readable by the apache children
+
+    set pdf_full_path [file join $pdf_repository ${pdfname}.pdf]
+    if {[file exists $pdf_full_path]} {
+
+# Before the file is sent we inform the client about the file type and
+# file name. The client can be proposed a filename different from the
+# original one. In this case, this is the point where a new file name
+# must be generated.
+
+	headers type			"application/pdf"
+	headers add Content-Disposition "attachment; filename=${pdfname}.pdf"
+	headers add Content-Description "PDF Document"
+
+# The pdf is read and stored in a Tcl variable. The file handle is
+# configured for a binary read: we are just shipping raw data to a
+# client. The following 4 lines of code can be replaced by any code
+# that is able to retrieve the data to be sent from any data source
+# (e.g. database, external program, other Tcl code)
+
+	set paper	    [open $pdf_full_path r]
+	fconfigure	    $paper -translation binary
+	set pdf		    [read $paper]
+	close $paper
+
+# Now we got the data: let's tell the client how many bytes we are
+# about to send (useful for the download progress bar of a dialog box)
+
+	headers add Content-Length  [string length $pdf]
+
+# Let's send the actual file content
+
+	puts $pdf
+    } else {
+	source pdf_not_found_error.rvt
+    }
+} else {
+    source parameter_not_defined_error.rvt
+}
+</pre><p style="width:90%"> 
+	    Prima che il file PDF venga inviato la procedura usa gli header
+	    Content-Type, Content-Disposition, Content-Description e Content-Length 
+	    in modo da informare il client su tipo di file, il nome (proposto)
+	    e la sua dimensione. Notate che per impostare il Content-Type Rivet
+	    usa una forma specializzata del comando <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span>.
+	    Gli header devono essere inviati prima che i dati siano spediti verso
+	    il canale di output. Fare confusione in questo schema causa un errore
+	    poichè in quel caso il protocollo stesso viene violato.
+	</p><p style="width:90%">
+	    Altre informazioni sul significato dei "mime headers" nel contesto
+	    del protocoll http posso venir trovati alla pagina
+	    <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">http://www.w3.org/Protocols/rfc2616/rfc2616.html</a>
+	</p></div></div><br class="example-break"><div class="example"><a name="ajax_xml_messaging"></a><p class="title"><b>Esempio 6. Messagi XML e Ajax</b></p><div class="example-contents"><p style="width:90%">
+	Il comando <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> è fondamentale
+	per generare messaggi in formato XML che devono essere compresi
+	dal codice JavaScript usato in applicazioni Ajax.
+      </p><p style="width:90%">
+	Ajax è una tecnica di «<span class="quote">web programming</span>» che usa
+	intensamente la capacità di JavaScript (e di altri
+	linguaggi di scripting come VBScript) di manipolare dinamicamente
+	la struttura HTML di una pagina. Nei browser moderni il codice
+	JavaScript può inviare richieste http POST e GET verso
+	il webserver. Queste richieste posso chiedere al webserver di
+	lanciare script (per esempio script Tcl basati su Rivet) che,
+	a loro volta, costruiscono risposte che vengono inviate al
+	browser. JavaScript solitamente usa un handler che gestisce
+	in modo asincrono la comunicazione. Quando un messaggio di
+	risposta viene ricevuto l'handler elabora il contenuto della
+	risposta e modifica il contenuto della pagina corrente con
+	i nuovi dati. Ajax aiuta a sviluppare applicazioni web più
+	pronte e flessibili: invece di passare attraverso il ciclo
+	di richiesta-generazione-trasferimento di un pagina, Ajax
+	permette al programmatore di richiedere e trasmettere solo
+	i dati essenziali, contribuendo così a soddisfare il
+	generale requisito della separazione tra dati e interfaccia
+	utente (risparmiando altresì al server di inviare
+	lo stesso codice html and gli stessi elementi grafici ogni
+	volta che i dati di una pagina vengono aggiornati).
+      </p><p style="width:90%">
+	Nelle applicazioni Ajax la comunicazione tra client e server viene
+	controllata da una istanza di una classe specializzata che, nel 
+	mondo non-IE si chiama XMLHttpRequest, mentre per il mondo IE
+	si chiama ActiveXObject. Attraverso un istanza di questa classe
+	una richiesta tipo GET o POST viene inviata e il server risponde
+	con un messaggio che viene immagazzinato come stringa nella
+	proprietà <span style="font-family:monospace"><span class="command"><strong>returnedText</strong></span></span> dell'instanza
+	di XMLHttpRequest. Nonostante questo canale di comunicazione
+	non implichi affatto che la comunicazione su di esso si effettui
+	con un protocollo specifico, è diventato ampiamente
+	comune sfruttare XML come linguaggio per questi messaggi. Un
+	certo numero di specificazioni di protocollo basate su XML vengono
+	usate per queste applicazioni, tra queste SOAP e XML-RPC (l'ultima
+	è una raccomandazione del consorzio W3C. Comunque sia
+	voi potete inventare anche il vostro protocollo (basato su XML, ma
+	anche in altro formato). E' utile tuttavia sapere che se gli
+	headers http sono opportunamente specificati e se il messaggio
+	di ritorno è scritto in XML «<span class="quote">well formed</span>», allora
+	anche la proprietà 
+	<a class="ulink" href="http://www.w3schools.com/ajax/ajax_responsexml.asp" target="_top">
+	XMLResponse</a> di XMLHttpRequest viene definita con una 
+	con un oggetto che è un'istanza di una classe che 
+	possiede i metodi e le proprietà dell'
+	<a class="ulink" href="http://www.w3schools.com/dom/default.asp" target="_top">
+	XML W3C DOM</a>, permettendo al codice JavaScript di manipolare
+	i dati contenuti nel messaggio con questo modello di DOM.
+      </p><p style="width:90%">
+	In questo esempio uno script Rivet inizializza un array con 
+	i dati essenziali riguardanti alcuni dei maggiori compositori
+	della musica europea. Questo array ha il ruolo di un database
+	che, in una caso reale, può contenere grosse tabelle
+	con migliaia di righe, le quali possono avere dati più
+	completi ed estesi. Lo script è ideato per inviare al
+	client 2 tipi di risposte: un «<span class="quote">catalogo</span>» dei
+	compositori oppure un recordo singolo con le informazioni di
+	un compositore
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># The database array contains xml fragments representing the
+# results of queries to a database. Many databases are now able
+# to produce the results of a query in XML. 
+#
+#array unset composer
+#
+set	composer(1)	"&lt;composer&gt;\n"
+append  composer(1)     "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
+append  composer(1)	"    &lt;last_name&gt;Monteverdi&lt;/last_name&gt;\n"
+append	composer(1)	"    &lt;lifespan&gt;1567-1643&lt;/lifespan&gt;\n"
+append	composer(1)	"    &lt;era&gt;Renaissance/Baroque&lt;/era&gt;\n"
+append	composer(1)	"    &lt;key&gt;1&lt;/key&gt;\n"
+append	composer(1)	"&lt;/composer&gt;\n"
+
+set	composer(2)	"&lt;composer&gt;\n"
+append  composer(2)     "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
+append  composer(2)	"    &lt;last_name&gt;Bach&lt;/last_name&gt;\n"
+append	composer(2)	"    &lt;lifespan&gt;1685-1750&lt;/lifespan&gt;\n"
+append	composer(2)	"    &lt;era&gt;Baroque&lt;/era&gt;\n"
+append	composer(2)	"    &lt;key&gt;2&lt;/key&gt;\n"
+append	composer(2)	"&lt;/composer&gt;\n"
+
+set	composer(3)	"&lt;composer&gt;\n"
+append  composer(3)     "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
+append  composer(3)	"    &lt;last_name&gt;van Beethoven&lt;/last_name&gt;\n"
+append	composer(3)	"    &lt;lifespan&gt;1770-1827&lt;/lifespan&gt;\n"
+append	composer(3)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
+append	composer(3)	"    &lt;key&gt;3&lt;/key&gt;\n"
+append	composer(3)	"&lt;/composer&gt;\n"
+
+set	composer(4)	"&lt;composer&gt;\n"
+append  composer(4)     "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
+append  composer(4)	"    &lt;last_name&gt;Mozart&lt;/last_name&gt;\n"
+append	composer(4)	"    &lt;lifespan&gt;1756-1791&lt;/lifespan&gt;\n"
+append	composer(4)	"    &lt;era&gt;Classical&lt;/era&gt;\n"
+append	composer(4)	"    &lt;key&gt;4&lt;/key&gt;\n"
+append	composer(4)	"&lt;/composer&gt;\n"
+
+set	composer(5)	"&lt;composer&gt;\n"
+append  composer(5)     "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
+append  composer(5)	"    &lt;last_name&gt;Schumann&lt;/last_name&gt;\n"
+append	composer(5)	"    &lt;lifespan&gt;1810-1856&lt;/lifespan&gt;\n"
+append	composer(5)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
+append	composer(5)	"    &lt;key&gt;5&lt;/key&gt;\n"
+append	composer(5)	"&lt;/composer&gt;\n"
+
+# we use the 'load' argument in order to determine the type of query
+#
+# load=catalog:		    we have to return a list of the names in the database
+# load=composer&amp;res_id=&lt;id&gt;: the script is supposed to return the record
+#			    having &lt;id&gt; as record id
+
+if {[var exists load]} {
+
+# the xml declaration is common to every message (error messages included)
+
+    set xml "&lt;?xml version=\"1.0\" encoding=\"ISO-8859-1\"?&gt;\n"
+    switch [var get load] {
+	catalog {
+	    append xml "&lt;catalog&gt;\n"
+	    foreach nm [array names composer] {
+	    	if {[regexp {&lt;last_name&gt;(.+)&lt;/last_name&gt;}   $composer($nm) m last_name] &amp;&amp; \
+		    [regexp {&lt;first_name&gt;(.+)&lt;/first_name&gt;} $composer($nm) m first_name]} {
+	            append xml "    &lt;composer key='$nm'&gt;$first_name $last_name&lt;/composer&gt;\n"
+		}
+	    }
+	    append xml "&lt;/catalog&gt;"
+	}
+	composer {
+	    if {[var exists rec_id]} {
+		set rec_id [var get rec_id]
+		if {[info exists composer($rec_id)]} {
+		    append xml $composer($rec_id)
+		}
+	    }
+	}
+    }
+
+# we have to tell the client this is an XML message. Failing to do so
+# would result in an XMLResponse property set to null
+
+    headers type "text/xml"
+    headers add Content-Length [string length $xml]
+    puts $xml
+}
+
+</pre><p style="width:90%">
+	Per brevità il JavaScript e l'HTML non verranno riportati
+	qui. Possono essere scaricati (assieme allo script Tcl) nell'archivio
+	<a class="ulink" href="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz" target="_top">
+	rivet-ajax.tar.gz</a> archive. Semplicemente
+	aprendo questo archivio in una directory accessibile dal vostro
+	server Apache e puntando con un browser alla pagina rivetService.html
+	dovreste essere in grado di far girare l'esempio. Ogni volta
+	che scegliete il nome di un compositore una nuova query viene
+	inviata e registrata nel log di apache, anche se la pagina html 
+	non viene mai ricaricata, ma solo aggiornata con i nuovi dati.
+      </p></div></div><br class="example-break"></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="tcl_packages"></a>Pacchetti Tcl per Rivet</h2></div></div></div><p style="width:90%">
 	In aggiunta al nucleo del modulo Apache, Rivet fornisce un
 	numero di pacchetti Tcl che includono codice potenzialmente
 	utile.
     </p><div class="itemizedlist"><ul type="disc"><li><div style="margin-bottom:1.5ex ; padding .5ex">commserver è un package providing a .</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">dio è un database abstraction layer.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">dtcl è un pacchetto di compatibilità per applicazioni
 	   mod_dtcl.
-	</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">form - per creare form.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">rivet - alcune aggiunte, routine utili.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">tclrivet</div></li></ul></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="help"></a>Risorse - Come ottenere aiuto</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2513301">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2513344">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Siti Web</a></span></dt><dt><span class="section"><a href="#id2513441">Bug Tracking System</a></span></dt></dl></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513301"></a>Mailing Lists</h3></div></div></div><p style="width:90%">
+	</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">form - per creare form.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">rivet - alcune aggiunte, routine utili.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">tclrivet</div></li></ul></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="help"></a>Risorse - Come ottenere aiuto</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2556818">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2557531">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Siti Web</a></span></dt><dt><span class="section"><a href="#id2557628">Bug Tracking System</a></span></dt></dl></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2556818"></a>Mailing Lists</h3></div></div></div><p style="width:90%">
 	Se non avete trovato la soluzione al problema nella
 	documentazione, la mailing list di Rivet è il primo posto da
 	visitare per ottenere aiuto; spedite un'email a
-	<tt class="email">&lt;<a href="mailto:rivet-user@tcl.apache.org">rivet-user@tcl.apache.org</a>&gt;</tt>.  Se avete una domanda,
+	<code class="email">&lt;<a class="email" href="mailto:rivet-user@tcl.apache.org">rivet-user@tcl.apache.org</a>&gt;</code>.  Se avete una domanda,
 	un'idea, o un commento circa il codice di Rivet, per cortesia 
-	mandate un'email a <tt class="email">&lt;<a href="mailto:rivet-dev@tcl.apache.org">rivet-dev@tcl.apache.org</a>&gt;</tt>. Per
+	mandate un'email a <code class="email">&lt;<a class="email" href="mailto:rivet-dev@tcl.apache.org">rivet-dev@tcl.apache.org</a>&gt;</code>. Per
 	iscriversi ad entrambe le liste, mandate un'email a
-	<tt class="email">&lt;<a href="mailto:rivet-list-subscribe@tcl.apache.org">rivet-<i class="replaceable"><tt>list</tt></i>-subscribe@tcl.apache.org</a>&gt;</tt>.
+	<code class="email">&lt;<a class="email" href="mailto:rivet-list-subscribe@tcl.apache.org">rivet-<em class="replaceable"><code>list</code></em>-subscribe@tcl.apache.org</a>&gt;</code>.
       </p><p style="width:90%">
 	Gli archivi delle mailing list sono disponibili a questo 
 	indirizzo: 
-	<a href="http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118" target="_top">http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118</a>
-      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513344"></a>Newsgroup</h3></div></div></div><p style="width:90%">
-	Il newsgroup <a href="news:comp.lang.tcl" target="_top">news:comp.lang.tcl</a> è un buon posto
+	<a class="ulink" href="http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118" target="_top">http://nagoya.apache.org/eyebrowse/SummarizeList?listId=118</a>
+      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2557531"></a>Newsgroup</h3></div></div></div><p style="width:90%">
+	Il newsgroup <a class="ulink" href="news:comp.lang.tcl" target="_top">news:comp.lang.tcl</a> è un buon posto
 	per porre domande circa Tcl in generale. Gli sviluppatori di
 	Rivet seguono anche il newsgroup, ma è meglio porre domande
 	specifiche su Rivet presso la sua mailing list.
@@ -597,68 +906,68 @@ puts "Saved file [upload filename MyUpload] \
 	Ci sono diversi siti web che estensivamente trattano di Apache e
 	Tcl.
       </p><div class="itemizedlist"><ul type="disc"><li><div style="margin-bottom:1.5ex ; padding .5ex">
-	    <a href="http://tcl.apache.org" target="_top">http://tcl.apache.org</a> è la casa del progetto
+	    <a class="ulink" href="http://tcl.apache.org" target="_top">http://tcl.apache.org</a> è la casa del progetto
 	    Apache Tcl. Andateci per ottenere l'ultima versione del 
 	    nostro software (se non state leggendo queste pagine fuori 
 	    dal sito!).
 	  </div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">
-	    <a href="http://httpd.apache.org/docs/" target="_top">http://httpd.apache.org/docs/</a> è il primo
+	    <a class="ulink" href="http://httpd.apache.org/docs/" target="_top">http://httpd.apache.org/docs/</a> è il primo
 	    posto da visitare per domande inerenti il web server Apache.
 	  </div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">
-	    <a href="http://www.tcl.tk" target="_top">http://www.tcl.tk</a> è il sito canonico per
+	    <a class="ulink" href="http://www.tcl.tk" target="_top">http://www.tcl.tk</a> è il sito canonico per
 	    informazioni su Tcl.
 	  </div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">
-	    <a href="http://wiki.tcl.tk" target="_top">http://wiki.tcl.tk</a> è il Tcl'er Wiki, un
+	    <a class="ulink" href="http://wiki.tcl.tk" target="_top">http://wiki.tcl.tk</a> è il Tcl'er Wiki, un
 	    posto dove poter ricercare domande e risposte di aiuto.
-	  </div></li></ul></div></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513441"></a>Bug Tracking System</h3></div></div></div><p style="width:90%">
-	Apache Rivet usa il sistema Apache Bug Tracking presso <a href="http://nagoya.apache.org/bugzilla/" target="_top">http://nagoya.apache.org/bugzilla/</a>.  Qui
+	  </div></li></ul></div></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2557628"></a>Bug Tracking System</h3></div></div></div><p style="width:90%">
+	Apache Rivet usa il sistema Apache Bug Tracking presso <a class="ulink" href="http://nagoya.apache.org/bugzilla/" target="_top">http://nagoya.apache.org/bugzilla/</a>.  Qui
 	è possibile segnalare problemi o verificare se sono già 
 	conosciuti e quindi rintracciare pubblicazioni che lo 
 	descrivono.
-      </p></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2513487">Inizializzazione</a></span></dt><dt><span class="section"><a href="#id2513528">RivetChan</a></span></dt><dt><span class="section"><a href="#id2513561">Parsing delle pagine, Esecuzione e Cacheing</a></span></dt></dl></div><p style="width:90%">
+      </p></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2557675">Inizializzazione</a></span></dt><dt><span class="section"><a href="#id2557717">RivetChan</a></span></dt><dt><span class="section"><a href="#id2557749">Parsing delle pagine, Esecuzione e Cacheing</a></span></dt></dl></div><p style="width:90%">
       Questa sezione facilmente pare sorpassata, come nuovo codice 
       viene aggiunto, vecchio codice viene rimosso e di conseguenza
       vengono apportati i relativi cambiamenti. Il miglior posto 
       dove poter verificare se sono state inserite nuove funzionalità
       è il suo codice sorgente. Se siete interessati ai cambiamenti 
       osservate il FIXME.
-    </p><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513487"></a>Inizializzazione</h3></div></div></div><p style="width:90%">
+    </p><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2557675"></a>Inizializzazione</h3></div></div></div><p style="width:90%">
 	Quando Apache è attivo, (o quando i processi figli di Apache
 	sono attivi se un processo Tcl è in uso),
-	<tt class="function">Rivet_InitTclStuff</tt> viene chiamata, 
+	<code class="function">Rivet_InitTclStuff</code> viene chiamata, 
 	creando un nuovo interprete, o un interprete per host virtuale,
 	dipendentemente dalla configurazione. Inoltre inizializza varie
 	cose, come il canale di sistema 
 	<span class="structname">RivetChan</span>, crea i comandi Tcl specifici 
-	di Rivet ed esegue <tt class="filename">init.tcl</tt>. 
+	di Rivet ed esegue <code class="filename">init.tcl</code>. 
 	Il sistema di caching è anch'esso impostato e se c'è un 
-	<span style="font-family:monospace"><span><b class="command">GlobalInitScript</b></span></span>, viene eseguito.
-      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513528"></a>RivetChan</h3></div></div></div><p style="width:90%">
+	<span style="font-family:monospace"><span class="command"><strong>GlobalInitScript</strong></span></span>, viene eseguito.
+      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2557717"></a>RivetChan</h3></div></div></div><p style="width:90%">
 	Il sistema <span class="structname">RivetChan</span> fu creato al fine
 	di avere un canale Tcl reale che potesse redirigere lo standard
 	output. Questo permette di usare, per esempio, il comando
-	normale <span style="font-family:monospace"><span><b class="command">puts</b></span></span> nelle pagine .rvt. Lavora
+	normale <span style="font-family:monospace"><span class="command"><strong>puts</strong></span></span> nelle pagine .rvt. Lavora
 	creando un canale che bufferizza l'output e, a tempi
 	predeterminati, lo passa al sistema IO di Apache. Il normale
 	standard output di Tcl è rimpiazzato con un'istanza di questo
 	tipo di canale, in modo che, predefinitamente, l'output venga
 	inviato alla pagina web.
-      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513561"></a>Parsing delle pagine, Esecuzione e Cacheing</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2557749"></a>Parsing delle pagine, Esecuzione e Cacheing</h3></div></div></div><p style="width:90%">
 	Quando una pagina Rivet viene richiesta, è trasformata in un
 	normale script Tcl tramite l'analisi nel file delle etichette di
 	elaborazione delle istruzioni &lt;? ?&gt;. Ogni cosa fuori da
 	queste etichette diviene un'istruzione estesa
-	<span style="font-family:monospace"><span><b class="command">puts</b></span></span> ed ogni cosa dentro rimane codice Tcl.
+	<span style="font-family:monospace"><span class="command"><strong>puts</strong></span></span> ed ogni cosa dentro rimane codice Tcl.
       </p><p style="width:90%">
 	Ogni file .rvt è valutato nel proprio
-	<tt class="constant">::request</tt> namespace, in modo che non sia
+	<code class="constant">::request</code> namespace, in modo che non sia
 	necessario creare e distruggere gli interpreti dopo ogni
 	pagina. Tuttavia, operando nel proprio namespace, ogni pagina
 	non verrà eseguita sporcando le variabili locali create da altri
 	scripts, perché verranno cancellate automaticamente quando il
 	namespace termina, dopo che Apache ha finito di gestire le
 	richieste.
-      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Nota]" src="images/note.png"></td><th align="left">Nota</th></tr><tr><td colspan="2" align="left" valign="top">Un problema corrente con questo sistema è che, mentre le
+      </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Nota]" src="images/note.png"></td><th align="left">Nota</th></tr><tr><td align="left" valign="top">Un problema corrente con questo sistema è che, mentre le
       variabili usano la garbage collection, e quindi vengono distrutte
       automaticamente quando non sono più usate, i gestori dei file non
       lo sono: è molto importante quindi che gli autori di script Rivet
@@ -671,7 +980,7 @@ puts "Saved file [upload filename MyUpload] \
 	da disco. Il numero degli script immagazzinati in memoria è
 	configurabile. Questa caratteristica può significativamente
 	migliorare l'esecuzione.
-      </p></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="upgrading"></a>Aggiornamenti da mod_dtcl o NeoWebScript</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2513850">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2513866">NeoWebScript</a></span></dt></dl></div><p style="width:90%">
+      </p></div></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="upgrading"></a>Aggiornamenti da mod_dtcl o NeoWebScript</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2557849">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2557865">NeoWebScript</a></span></dt></dl></div><p style="width:90%">
       Rivet ha rotto con il passato, in quanto noi, gli autori, ci
       siamo dedicati ad acquisire ciò che preferivamo dalle nostre
       passate fatiche e tolto o cambiato ciò che non abbiamo più
@@ -679,8 +988,8 @@ puts "Saved file [upload filename MyUpload] \
       primario quando creammo Rivet, ma abbiamo fornito questa
       informazione che potrebbere essere utilizzata da chi desideri
       effettuare l'aggiornamento da installazioni mod_dtcl o NWS.
-    </p><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513850"></a>mod_dtcl</h3></div></div></div><p style="width:90%">
+    </p><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2557849"></a>mod_dtcl</h3></div></div></div><p style="width:90%">
 	Rivet era originalmente basato su codice dtcl, ma ne è stata
 	cambiata (migliorata !) una parte. I concetti rimangono gli 
 	stessi, ma alcuni dei comandi sono cambiati.
-      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2513866"></a>NeoWebScript</h3></div></div></div><p style="width:90%">TODO</p></div></div></div></body></html>
+      </p></div><div class="section" lang="it"><div class="titlepage"><div><div><h3 class="title"><a name="id2557865"></a>NeoWebScript</h3></div></div></div><p style="width:90%">TODO</p></div></div></div></body></html>

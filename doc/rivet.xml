@@ -8,6 +8,8 @@
       <!ENTITY vars.rvt SYSTEM "examples/vars.rvt" >
       <!ENTITY upload.html SYSTEM "examples/upload.html" >
       <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
+      <!ENTITY download.tcl SYSTEM "examples/download.tcl" >
+      <!ENTITY rivet_web_service.tcl SYSTEM "examples/rivet_web_service.tcl" >
 ]>
 
 <!--
@@ -585,7 +587,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
   <section id="commands">
     <title>Rivet Tcl Commands and Variables</title>
 
-
     <refentry>
       <refnamediv>
 	<refname>var</refname>
@@ -596,9 +597,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <refsynopsisdiv>
 	<cmdsynopsis>
-	  <command>
-	    var
-	  </command>
+	  <command>var</command>
 	  <group choice="req">
 	    <arg>get</arg>
 	    <arg>list</arg>
@@ -609,9 +608,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</cmdsynopsis>
 
 	<cmdsynopsis>
-	  <command>
-	    var_qs
-	  </command>
+	  <command>var_qs</command>
 	  <group choice="req">
 	    <arg>get</arg>
 	    <arg>list</arg>
@@ -622,9 +619,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</cmdsynopsis>
 
 	<cmdsynopsis>
-	  <command>
-	    var_post
-	  </command>
+	  <command>var_post</command>
 	  <group choice="req">
 	    <arg>get</arg>
 	    <arg>list</arg>
@@ -633,8 +628,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <arg>all</arg>
 	  </group>
 	</cmdsynopsis>
-
-
       </refsynopsisdiv>
 
       <refsect1>
@@ -769,8 +762,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	<title>Description</title>
 	<para>The upload command is for file upload manipulation.
 	  See the relevant Apache Directives to further configure the
-	  behavior of this Rivet feature.</para>
-
+	  behavior of this Rivet feature.
+	</para>
 
 	<variablelist>
 	  <varlistentry>
@@ -821,6 +814,23 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		Returns data uploaded to the server.  This is binary clean
 		- in other words, it will work even with files like
 		images, executables, compressed files, and so on.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">exists</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns true if an upload named <arg>uploadname</arg>
+		exists.  This can be used in scripts that are meant to
+		be run by different forms that send over uploads that
+		might need specific processing.
 	      </para>
 	    </listitem>
 	  </varlistentry>
@@ -885,8 +895,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	<para>
 	  See <xref linkend="upload"/>.
 	</para>
-
-
       </refsect1>
     </refentry>
 
@@ -1009,7 +1017,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</para>
       </refsect1>
     </refentry>
-
 
     <refentry>
       <refnamediv>
@@ -1490,7 +1497,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
   <section id="examples">
     <title>Examples and Usage</title>
-
     <para>
       Some examples of Rivet usage follow.  Some prior Tcl knowledge
       is assumed.  If you don't know much Tcl, don't worry, it's easy,
@@ -1583,18 +1589,191 @@ AddType application/x-rivet-tcl .tcl</programlisting>
     <example id="upload">
       <title>File Upload</title>
       <para>
-	The following HTML in one file, say,
-	<filename>upload.html</filename>
+	The <command>upload</command> command endows Rivet with an
+	interface to access files transferred over http as parts of a
+	multipart form.  The following HTML in one file, say,
+	<filename>upload.html</filename> creates a form with a text
+	input entry. By clicking the file chooser button the file
+	browser shows up and the user selects the file to be uploaded
+	(the file path will appear in the text input).  In order to make
+	sure you're uploading the whole file you must combine the
+	action of the enctype and method attributes of the
+	&lt;form...&gt; tag in the way shown in the example.  Failure
+	to do so would result in the client sending only the file's
+	path, rather than the actual contents.
       </para>
       <programlisting>&upload.html;</programlisting>
       <para>
-	Can be used with the following Tcl code, in a second file
-	(<filename>upload.rvt</filename> for instance)
-	in order to create a file upload form.
+	In the script invoked by the form
+	(<filename>upload.rvt</filename>) <command>upload</command>
+	<arg>argument ...</arg> commands can be used to manipulate the
+	various files uploaded.
       </para>
       <programlisting>&upload.rvt;</programlisting>
+      <para>
+	Don't forget that the apache server must have write access to
+	the directory where files are being created.  The Rivet Apache
+	directives have a substantial impact on the upload process,
+	you have to carefully read the docs in order to set the
+	appropriate directives values that would match your
+	requirements.
+      </para>
+      <para>
+	It is also important to understand that some
+	<command>upload</command> commands are effective only when
+	used in a mutually exclusive way.  Apache stores the data in
+	temporary files which are read by the <command>upload save
+	<arg>upload name</arg><arg>filename</arg> </command> or by the
+	<command>upload data <arg>upload name</arg> </command>
+	command. Subsequent calls to these 2 commands using the same
+	<arg>upload name</arg> argument will return no data on the
+	second call.  Likewise <command>upload channel <arg>upload
+	name</arg></command> will return a Tcl file channel that you
+	can use in regular Tcl scripts only if you haven't already
+	read the data, for example with a call to the <command>upload
+	data <arg>upload name</arg></command> command.
+      </para>
     </example>
-
+    <example id="file_download">
+      <title>File Download</title>
+      <para>
+	In general setting up a data file to be sent over http is as
+	easy as determining the file's URI and letting Apache's
+	standard download mechanism do all that is needed. If this
+	approach fits your design all you have to do is to keep the
+	downloadable files somewhere within Apache's DocumentRoot (or
+	in any of the directories that you can configure and register
+	using the Alias definitions or the Virtual Hosts mechanism).
+      </para>
+      <para>
+	When a client sends a request for a file Apache takes
+	care of determining the filetype, sends appropriate headers to
+	the client and then the file content.  If the client is a
+	browser capable of displaying the content of the file a
+	representation is shown in the browser's window. When the browser
+	hasn't a valid builtin method or plugin registered for the
+	file's content the typical download dialog pops up asking
+	for directions from the user.
+      </para>
+      <para>
+	Rivet can help if you have more sofisticated needs.  For
+	instance you may be developing an application that uses
+	webpages to collect input data that have to be
+	passed on to scripts or programs. In this case the content
+	is generated on demand  and a real file representing the
+	data doesn't exist on the server. In other circumstances you 
+	may need to dynamically inhibit the download of a specific 
+	file and hide it away, even to those clients that might have 
+	already saved the URI to the file in their bookmarks.
+	Your scripts may expunge from the pages
+	every link to the file (your pages are dynamic, aren't
+	they?) and move the file out of way, but it looks like a
+	cumbersome solution.
+      </para>
+      <para>
+	Putting Tcl and Rivet in charge of the whole download
+	mechanism helps in building cleaner and safer approaches to
+	the download problem.
+      </para>
+      <para>
+	In this example a procedure checks for the existence of a
+	parameter passed in by the browser. The parameter is the name
+	(without extension) of a pdf file.  
+	Pdf files are stored in a directory whose path is
+	in the <command>pdf_repository</command> variable.
+      </para> 
+      <programlisting>&download.tcl;</programlisting>
+      <para>
+	Before the pdf is sent the procedure sets the
+	<constant>Content-Type</constant>, 
+	<constant>Content-Disposition</constant>,
+	<constant>Content-Description</constant> and
+	<constant>Content-Length</constant> headers to inform
+	the client about the file type, name and size. Notice that in
+	order to set the <constant>Content-Type</constant> header Rivet 
+	uses a specialiezed form of the <command>headers</command> 
+	command. Headers must be sent before data gets sent down the 
+	output channel. Messing with this prescription causes an error 
+	to be raised (in fact the protocol itself is been violated)
+      </para>
+      <para>
+	More information about the meaning of the mime headers in the
+	http context can be found at 
+	<ulink url="http://www.w3.org/Protocols/rfc2616/rfc2616.html"/>
+      </para>
+    </example>
+    <example id="ajax_xml_messaging">
+      <title>XML Messages and Ajax</title>
+      <para>
+	The <command>headers</command> command is crucial for generating 
+	XML messages that have to be understood by JavaScript code used 
+	in Ajax applications. 
+      </para>
+      <para>
+	Ajax is a web programming technique that heavily relies on the 
+	abilty of JavaScript (and other scriping languages like VBScript) to 
+	manipulate dynamically the HTML structure of a page. In modern browsers 
+	JavaScript code is enabled to send GET or POST requests to the webserver.
+	These requests can ask the server to run scripts (for example Rivet
+	Tcl scripts) that build responses and send them back to the browser.
+	JavaScript code reads asynchronously these responses, elaborates
+	their content and accordingly modifies the page on display. 
+	Ajax helps to build web applications that are more responsive and 
+	flexible. Instead of going through the cycle of request-generation-transfer
+	of a page, Ajax allows the programmer to request and transmit only
+	the essential data thus matching the general requirement of separation
+	between data and user interface (and saving the server from sending over
+	the same html code and graphics every time a page is refreshed)
+      </para>
+      <para>
+	In Ajax	applications the communication between client and server 
+	is controlled by an instance of a specialized object: the non-IE world
+	uses the XMLHttpRequest class to create it, 
+	whereas IE uses the ActiveXObject class. Through an instance of
+	that class a POST or GET request is sent to the server, which in turn
+	responds with a message that is stored as a string in a property of the 
+	communication object called 'returnedText'. 
+	Although this sort of communication channel doesn't imply that the messages
+	being transmitted through it have a specific protocol, it's become widely
+	customary to use XML as the format for such messages. A number
+	of XML specification are being used for this, among which XML-RPC and
+	SOAP are worth to be quoted. Anyway, you can invent your own protocol
+	(either based on XML or anything else), but one has to be aware of the fact 
+	that if the http headers are properly set and the message returned 
+	to the client is a well formed XML fragment, also the property 
+	<ulink url="http://www.w3schools.com/ajax/ajax_responsexml.asp">
+	XMLResponse</ulink> is set with a reference to an object 
+	that stores the response as an XML document. This object is an 
+	instance of a class that implements the
+	<ulink url="http://www.w3schools.com/dom/default.asp">
+	XML W3C DOM</ulink> tree methods and properties, thus
+	enabling the scripts to read and manipulate the data embedded in 
+	the XML message with a structured and standard interface.
+      </para>
+      <para>
+        In this example a Rivet script initializes an array with the
+	essential data regarding a few of the major composers of the 
+	european music. This array plays the role of a database
+	which, in a real case, might store large tables with thousands 
+	records and more complete and extended information. 
+	The script is designed to send back to the client two 
+	types of responses: a catalog of the composers or a single 
+	record of a composer.
+      </para>
+      <programlisting>&rivet_web_service.tcl;</programlisting>
+      <para>
+	For sake of brevity the JavaScript and HTML will not listed here. 
+	They can be downloaded (along with the Tcl script) stored in the 
+	<ulink url="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz">
+	rivet-ajax.tar.gz</ulink> archive. By simply 
+	opening this tar archive in a directory accessible by your
+	apache server and pointing your browser to the rivetService.html
+	page you should see a page with a drop-down list. Every time
+	a different name is picked from the list a new query is sent and 
+	logged in the apache access.log file, even though the html 
+	is never reloaded.
+      </para>
+    </example>
   </section>
 
   <section id="tcl_packages">

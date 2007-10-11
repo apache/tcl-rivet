@@ -1,17 +1,17 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Esempi ed uso</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.66.1"><link rel="start" href="index.it.html" title="Apache Rivet"><link rel="up" href="index.it.html" title="Apache Rivet"><link rel="prev" href="commands.it.html" title="Comandi e variabili Tcl di Rivet"><link rel="next" href="tcl_packages.it.html" title="Pacchetti Tcl per Rivet"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Esempi ed uso</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="tcl_packages.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr></table></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Esempi ed uso</h2></div></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Esempi ed uso</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.it.html" title="Apache Rivet"><link rel="up" href="index.it.html" title="Apache Rivet"><link rel="prev" href="commands.it.html" title="Comandi e variabili Tcl di Rivet"><link rel="next" href="tcl_packages.it.html" title="Pacchetti Tcl per Rivet"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Esempi ed uso</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="tcl_packages.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr></table></div><div class="section" lang="it"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Esempi ed uso</h2></div></div></div><p style="width:90%">
       Seguono alcuni esempi sull'uso di Rivet.  Si presuppone che 
       conosciate, anche parzialmente, il linguaggio di programmazione 
       Tcl. Se non conoscete molto Tcl, non c'è da preoccuparsi: è 
       semplice e vi sono alcune buone risorse disponibili
       sul web che vi permetteranno di padroneggiarlo velocemente. 
       A questo proposito, vedete la sezione 
-      <a href="help.it.html#websites" title="Siti Web">web sites</a>.
-    </p><div class="example"><a name="hello world"></a><p class="title"><b>Esempio 1. Hello World</b></p><p style="width:90%">
+      <a class="link" href="help.it.html#websites" title="Siti Web">web sites</a>.
+    </p><div class="example"><a name="hello%20world"></a><p class="title"><b>Esempio 1. Hello World</b></p><div class="example-contents"><p style="width:90%">
 	Come qualsiasi altro tool, è piacevole vedere qualcosa al 
 	lavoro, così andremo a creare una piccola pagina 
 	"Hello World".</p><p style="width:90%">
 	Assumendo che sia stato configurato correttamente Apache, 
-	create un file chiamato <tt class="filename">hello.rvt</tt> in una 
+	create un file chiamato <code class="filename">hello.rvt</code> in una 
 	directory dove Apache lo possa trovare, con il seguente 
 	contenuto:
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
@@ -20,7 +20,7 @@ puts "Hello World"
 </pre><p style="width:90%">
 	Se poi vi accederete con vostro browser, sarà possibile vedere 
 	una pagina nera con il testo "Hello World" (senza apici).
-      </p></div><div class="example"><a name="table"></a><p class="title"><b>Esempio 2. Generare una tabella</b></p><p style="width:90%">
+      </p></div></div><br class="example-break"><div class="example"><a name="table"></a><p class="title"><b>Esempio 2. Generare una tabella</b></p><div class="example-contents"><p style="width:90%">
 	In un'altro semplice esempio, genereremo dinamicamente una
 	tabella:
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;? puts "&lt;table&gt;\n"
@@ -40,7 +40,7 @@ puts "&lt;/table&gt;\n" ?&gt;
 	e generare la stessa pagina HTML!
       </p><p style="width:90%">
 	Il risultato sarà qualcosa di simile a questo:
-      </p><div><img src="table.png"></div></div><div class="example"><a name="variable_access"></a><p class="title"><b>Esempio 3. Accesso alle variabili</b></p><p style="width:90%">
+      </p><div><img src="table.png"></div></div></div><br class="example-break"><div class="example"><a name="variable_access"></a><p class="title"><b>Esempio 3. Accesso alle variabili</b></p><div class="example-contents"><p style="width:90%">
 	In questa sezione mostreremo come accedere alle variabili 
 	utilizzando gli operatori GET o POST.
       </p><p style="width:90%">
@@ -140,42 +140,343 @@ if { [llength $errlist] != 0 } {
 ?&gt;
 </pre><p style="width:90%">
 	La prima istruzione si assicura che la variabile
-	<tt class="varname">boss</tt> sia passata allo script e poi fa
+	<code class="varname">boss</code> sia passata allo script e poi fa
 	qualcosa con quella informazione.
 	Se non è presente, un errore viene aggiunto alla lista degli 
 	errori.
       </p><p style="width:90%">
 	Nel secondo blocco del codice, la variabile
-	<tt class="varname">salary</tt> è riportata con un'altro errore di
+	<code class="varname">salary</code> è riportata con un'altro errore di
 	controllo, poiché è un numero, è necessario che sia composto
 	da cifre.
       </p><p style="width:90%">
-	Alla variabile <tt class="varname">boss</tt> non è richiesto di essere
+	Alla variabile <code class="varname">boss</code> non è richiesto di essere
 	inviata, la setteremo a "Mr. Burns" se non è tra le informazioni
 	ricevute.
       </p><p style="width:90%">
 	L'ultimo pezzo del codice di gestione delle variabili è un pezzo
-	ingannatore perché <tt class="varname">skills</tt> è una listbox e può
+	ingannatore perché <code class="varname">skills</code> è una listbox e può
 	avere, potenzialmente, valori multipli. Opteremo di riceverla
 	come una lista, in modo da poterla riutilizzare.
       </p><p style="width:90%">
 	Lo script si assicura che la variabile 
-	<tt class="varname">errlist</tt> sia vuota e restituisce un messaggio 
-	di ringraziamento. Se <tt class="varname">errlist</tt> non è vuota,
+	<code class="varname">errlist</code> sia vuota e restituisce un messaggio 
+	di ringraziamento. Se <code class="varname">errlist</code> non è vuota,
 	viene stampata la lista degli errori riscontrati.
-      </p></div><div class="example"><a name="upload"></a><p class="title"><b>Esempio 4. Caricare file</b></p><p style="width:90%">
-	Il seguente HTML in un file, detto,
-	<tt class="filename">upload.html</tt>
+      </p></div></div><br class="example-break"><div class="example"><a name="upload"></a><p class="title"><b>Esempio 4. Caricare file</b></p><div class="example-contents"><p style="width:90%">
+	Il comando <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span> fornisce a Rivet la
+	possibilità di accedere ai file trasferiti tramite http come
+	parti di una form "multipart". Per esempio il seguente 
+	frammento HTML (<code class="filename">upload.html</code>)
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action="foo.rvt" enctype="multipart/form-data" method="post"&gt;
 &lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
 &lt;input type="submit" value="Send File"&gt;&lt;/input&gt;
 &lt;/form&gt;
 </pre><p style="width:90%">
-	Può essere usato con il seguente codice Tcl in un secondo file
-	(<tt class="filename">upload.rvt</tt> per esempio) per creare una 
-	form che carica un file.
+	crea una form con una text input entry associata ad un bottone
+	per l'esplorazione del file system locale. 
+	Cliccando sul bottone appare un file browser con
+	il quale l'utente può scegliere il file da inviare (nella
+	text input entry apparirà il path al file scelto). 
+	Per essere certi di inviare
+	il contentuto del file è necessario combinare l'azione degli 
+	attributi enctype e method nel tag &lt;form...&gt; nel modo 
+	specificato nell'esempio. Se non viene fatto la form invierà la
+	definizione del path del file, non il suo contenuto.
+      </p><p style="width:90%">
+	Nello script invocato nell'azione della form (<code class="filename">upload.rvt</code>)
+	i comandi <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span>  ?<span style="font-family:monospace; font-weight: bold;">argument ...</span>? possono
+	essere usati per manipolare i file inviati al webserver
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
 upload save MyUpload /tmp/uploadfiles/file1
 puts "Saved file [upload filename MyUpload] \
 	([upload size MyUpload] bytes) to server"
-?&gt;</pre></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="commands.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><td width="20%" align="center"><a accesskey="u" href="index.it.html"><img src="images/up.png" alt="Risali"></a></td><td width="40%" align="right"> <a accesskey="n" href="tcl_packages.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr><tr><td width="40%" align="left" valign="top">Comandi e variabili Tcl di Rivet </td><td width="20%" align="center"><a accesskey="h" href="index.it.html"><img src="images/home.png" alt="Partenza"></a></td><td width="40%" align="right" valign="top"> Pacchetti Tcl per Rivet</td></tr></table></div></body></html>
+?&gt;</pre><p style="width:90%">
+	Non dimenticate che il server Apache deve aver accesso 
+	in scrittura nella directory specificata per l'upload. Le 
+	direttive di configurazione di Rivet per 
+	per l'upload hanno un impatto considerevole sul funzionamento
+	del meccanismo di upload. Controllate la parte della documentazione
+	relativa a queste direttive in modo da scegliere i valori
+	che meglio soddisfano le vostre necessità.
+      </p><p style="width:90%">
+	E' anche importante capire che alcuni comandi <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span>
+	sono effettivi se usati in modo mutuamente esclusivo. Apache
+	memorizza i dati in file temporanei che vengono letti da comandi come
+	<span style="font-family:monospace"><span class="command"><strong>upload save  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? ?<span style="font-family:monospace; font-weight: bold;">filename</span>?</strong></span></span>
+	oppure <span style="font-family:monospace"><span class="command"><strong>upload data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span>. 
+	Due chiamate successive che si riferiscono allo stesso upload 
+	ritornerebbero un file vuoto alla seconda chiamata perchè la prima
+	consumerebbe i dati presenti.
+	In modo analogo la chiamata <span style="font-family:monospace"><span class="command"><strong>upload channel  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?
+	</strong></span></span> ritorna un canale Tcl al file (che può essere usato
+	in funzioni Tcl ordinarie di accesso ai file) solo se non avete già
+	letto o salvato i dati usando rispettivamente <span style="font-family:monospace"><span class="command"><strong>upload data 
+	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span> o <span style="font-family:monospace"><span class="command"><strong>upload save 
+	 ?<span style="font-family:monospace; font-weight: bold;">filename</span>?</strong></span></span>
+      </p></div></div><br class="example-break"><div class="example"><a name="file_download"></a><p class="title"><b>Esempio 5. File Download</b></p><div class="example-contents"><p style="width:90%">
+	    In generale mettere un file nelle condizioni di essere scaricato
+	    con http è facile quanto stabilire la URI del file stesso
+	    e lasciare che i meccanismi di download standard di Apache 
+	    facciano quello che è necessario. Se un simile approccio
+	    è adeguato al vostro progetto non c'è altro da
+	    fare che posizionare i vostri file destinati al download in una
+	    directory all'interno dell'albero definito dalla DocumentRoot (o
+	    in una qualsiasi delle directory che potete configurare con
+	    il parametro Alias di Apache o con un Virtual Host)
+	</p><p style="width:90%">
+	    Quando un client invia una uri per scaricare un certo file Apache
+	    determina il tipo di contenuto sulla base dell'estensione
+	    del file, invia gli header necessari ad informare il client 
+	    e quindi invia il contenuto stesso del file. Se il client è
+	    un browser in grado di rappresentare il
+	    contenuto del file questo apparirà all'utente nella finestra
+	    del browser stesso. Diversamente, se il browser non ha 
+	    metodi "builtin" o dei plugin registrati per quel tipo di file, 
+	    apparirà la tipica finestra di download che chiede istruzioni 
+	    all'utente.
+	</p><p style="width:90%">
+	    Rivet è però di aiuto nel caso abbiato esigenze più sofisticate.
+	    Immaginate per esempio di sviluppare un applicazione web based
+	    che raccogliere informazioni di input da passare a programmi
+	    esterni o altre procedure Tcl che generano il contenuto di
+	    un file a richiesta. In questi casi il file stesso non esiste
+	    e non è possibile definire per esso una URI. In altre 
+	    circostanze il vostro file esiste, ma potreste aver bisogno 
+	    di inibirne dinamicamente il download 
+	    e nasconderlo dal web, non solo per i nuovi visitatori del sito, 
+	    ma anche per quelli che potrebbero aver salvato nei loro bookmarks
+	    un riferimento a quel file. Naturalmente potreste eliminare dalle
+	    vostre pagine ogni riferimento a quella risorsa (le vostre pagine
+	    sono generate dinamicamente, non è vero?) e constestualmente
+	    spostare il file in una directory inaccessibile, ma sembra una
+	    soluzione tortuosa e poco elegante.
+	</p><p style="width:90%">
+	    Mettere Tcl e Rivet nella condizione di controllare completamente il 
+	    processo di download aiuta a costruire meccanismi di download 
+	    più eleganti e sicuri
+	</p><p style="width:90%"> 
+	    Ecco un esempio di una procedura Tcl che valuta una richiesta 
+	    di download di un file PDF sulla base del valore di un parametro
+	    passato dal client. Il parametro è il nome (senza estensione)
+	    del file pdf da scaricare. I file pdf sono tenuti in una
+	    directory definita dalla variabile <span style="font-family:monospace"><span class="command"><strong>pdf_repository</strong></span></span>
+	</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># Code example for the transmission of a pdf file. 
+
+if {[var exists pdfname]} {
+    set pdfname [var get pdfname]
+
+# let's build the full path to the pdf file. The 'pdf_repository'
+# directory must be readable by the apache children
+
+    set pdf_full_path [file join $pdf_repository ${pdfname}.pdf]
+    if {[file exists $pdf_full_path]} {
+
+# Before the file is sent we inform the client about the file type and
+# file name. The client can be proposed a filename different from the
+# original one. In this case, this is the point where a new file name
+# must be generated.
+
+	headers type			"application/pdf"
+	headers add Content-Disposition "attachment; filename=${pdfname}.pdf"
+	headers add Content-Description "PDF Document"
+
+# The pdf is read and stored in a Tcl variable. The file handle is
+# configured for a binary read: we are just shipping raw data to a
+# client. The following 4 lines of code can be replaced by any code
+# that is able to retrieve the data to be sent from any data source
+# (e.g. database, external program, other Tcl code)
+
+	set paper	    [open $pdf_full_path r]
+	fconfigure	    $paper -translation binary
+	set pdf		    [read $paper]
+	close $paper
+
+# Now we got the data: let's tell the client how many bytes we are
+# about to send (useful for the download progress bar of a dialog box)
+
+	headers add Content-Length  [string length $pdf]
+
+# Let's send the actual file content
+
+	puts $pdf
+    } else {
+	source pdf_not_found_error.rvt
+    }
+} else {
+    source parameter_not_defined_error.rvt
+}
+</pre><p style="width:90%"> 
+	    Prima che il file PDF venga inviato la procedura usa gli header
+	    Content-Type, Content-Disposition, Content-Description e Content-Length 
+	    in modo da informare il client su tipo di file, il nome (proposto)
+	    e la sua dimensione. Notate che per impostare il Content-Type Rivet
+	    usa una forma specializzata del comando <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span>.
+	    Gli header devono essere inviati prima che i dati siano spediti verso
+	    il canale di output. Fare confusione in questo schema causa un errore
+	    poichè in quel caso il protocollo stesso viene violato.
+	</p><p style="width:90%">
+	    Altre informazioni sul significato dei "mime headers" nel contesto
+	    del protocoll http posso venir trovati alla pagina
+	    <a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">http://www.w3.org/Protocols/rfc2616/rfc2616.html</a>
+	</p></div></div><br class="example-break"><div class="example"><a name="ajax_xml_messaging"></a><p class="title"><b>Esempio 6. Messagi XML e Ajax</b></p><div class="example-contents"><p style="width:90%">
+	Il comando <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> è fondamentale
+	per generare messaggi in formato XML che devono essere compresi
+	dal codice JavaScript usato in applicazioni Ajax.
+      </p><p style="width:90%">
+	Ajax è una tecnica di «<span class="quote">web programming</span>» che usa
+	intensamente la capacità di JavaScript (e di altri
+	linguaggi di scripting come VBScript) di manipolare dinamicamente
+	la struttura HTML di una pagina. Nei browser moderni il codice
+	JavaScript può inviare richieste http POST e GET verso
+	il webserver. Queste richieste posso chiedere al webserver di
+	lanciare script (per esempio script Tcl basati su Rivet) che,
+	a loro volta, costruiscono risposte che vengono inviate al
+	browser. JavaScript solitamente usa un handler che gestisce
+	in modo asincrono la comunicazione. Quando un messaggio di
+	risposta viene ricevuto l'handler elabora il contenuto della
+	risposta e modifica il contenuto della pagina corrente con
+	i nuovi dati. Ajax aiuta a sviluppare applicazioni web più
+	pronte e flessibili: invece di passare attraverso il ciclo
+	di richiesta-generazione-trasferimento di un pagina, Ajax
+	permette al programmatore di richiedere e trasmettere solo
+	i dati essenziali, contribuendo così a soddisfare il
+	generale requisito della separazione tra dati e interfaccia
+	utente (risparmiando altresì al server di inviare
+	lo stesso codice html and gli stessi elementi grafici ogni
+	volta che i dati di una pagina vengono aggiornati).
+      </p><p style="width:90%">
+	Nelle applicazioni Ajax la comunicazione tra client e server viene
+	controllata da una istanza di una classe specializzata che, nel 
+	mondo non-IE si chiama XMLHttpRequest, mentre per il mondo IE
+	si chiama ActiveXObject. Attraverso un istanza di questa classe
+	una richiesta tipo GET o POST viene inviata e il server risponde
+	con un messaggio che viene immagazzinato come stringa nella
+	proprietà <span style="font-family:monospace"><span class="command"><strong>returnedText</strong></span></span> dell'instanza
+	di XMLHttpRequest. Nonostante questo canale di comunicazione
+	non implichi affatto che la comunicazione su di esso si effettui
+	con un protocollo specifico, è diventato ampiamente
+	comune sfruttare XML come linguaggio per questi messaggi. Un
+	certo numero di specificazioni di protocollo basate su XML vengono
+	usate per queste applicazioni, tra queste SOAP e XML-RPC (l'ultima
+	è una raccomandazione del consorzio W3C. Comunque sia
+	voi potete inventare anche il vostro protocollo (basato su XML, ma
+	anche in altro formato). E' utile tuttavia sapere che se gli
+	headers http sono opportunamente specificati e se il messaggio
+	di ritorno è scritto in XML «<span class="quote">well formed</span>», allora
+	anche la proprietà 
+	<a class="ulink" href="http://www.w3schools.com/ajax/ajax_responsexml.asp" target="_top">
+	XMLResponse</a> di XMLHttpRequest viene definita con una 
+	con un oggetto che è un'istanza di una classe che 
+	possiede i metodi e le proprietà dell'
+	<a class="ulink" href="http://www.w3schools.com/dom/default.asp" target="_top">
+	XML W3C DOM</a>, permettendo al codice JavaScript di manipolare
+	i dati contenuti nel messaggio con questo modello di DOM.
+      </p><p style="width:90%">
+	In questo esempio uno script Rivet inizializza un array con 
+	i dati essenziali riguardanti alcuni dei maggiori compositori
+	della musica europea. Questo array ha il ruolo di un database
+	che, in una caso reale, può contenere grosse tabelle
+	con migliaia di righe, le quali possono avere dati più
+	completi ed estesi. Lo script è ideato per inviare al
+	client 2 tipi di risposte: un «<span class="quote">catalogo</span>» dei
+	compositori oppure un recordo singolo con le informazioni di
+	un compositore
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># The database array contains xml fragments representing the
+# results of queries to a database. Many databases are now able
+# to produce the results of a query in XML. 
+#
+#array unset composer
+#
+set	composer(1)	"&lt;composer&gt;\n"
+append  composer(1)     "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
+append  composer(1)	"    &lt;last_name&gt;Monteverdi&lt;/last_name&gt;\n"
+append	composer(1)	"    &lt;lifespan&gt;1567-1643&lt;/lifespan&gt;\n"
+append	composer(1)	"    &lt;era&gt;Renaissance/Baroque&lt;/era&gt;\n"
+append	composer(1)	"    &lt;key&gt;1&lt;/key&gt;\n"
+append	composer(1)	"&lt;/composer&gt;\n"
+
+set	composer(2)	"&lt;composer&gt;\n"
+append  composer(2)     "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
+append  composer(2)	"    &lt;last_name&gt;Bach&lt;/last_name&gt;\n"
+append	composer(2)	"    &lt;lifespan&gt;1685-1750&lt;/lifespan&gt;\n"
+append	composer(2)	"    &lt;era&gt;Baroque&lt;/era&gt;\n"
+append	composer(2)	"    &lt;key&gt;2&lt;/key&gt;\n"
+append	composer(2)	"&lt;/composer&gt;\n"
+
+set	composer(3)	"&lt;composer&gt;\n"
+append  composer(3)     "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
+append  composer(3)	"    &lt;last_name&gt;van Beethoven&lt;/last_name&gt;\n"
+append	composer(3)	"    &lt;lifespan&gt;1770-1827&lt;/lifespan&gt;\n"
+append	composer(3)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
+append	composer(3)	"    &lt;key&gt;3&lt;/key&gt;\n"
+append	composer(3)	"&lt;/composer&gt;\n"
+
+set	composer(4)	"&lt;composer&gt;\n"
+append  composer(4)     "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
+append  composer(4)	"    &lt;last_name&gt;Mozart&lt;/last_name&gt;\n"
+append	composer(4)	"    &lt;lifespan&gt;1756-1791&lt;/lifespan&gt;\n"
+append	composer(4)	"    &lt;era&gt;Classical&lt;/era&gt;\n"
+append	composer(4)	"    &lt;key&gt;4&lt;/key&gt;\n"
+append	composer(4)	"&lt;/composer&gt;\n"
+
+set	composer(5)	"&lt;composer&gt;\n"
+append  composer(5)     "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
+append  composer(5)	"    &lt;last_name&gt;Schumann&lt;/last_name&gt;\n"
+append	composer(5)	"    &lt;lifespan&gt;1810-1856&lt;/lifespan&gt;\n"
+append	composer(5)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
+append	composer(5)	"    &lt;key&gt;5&lt;/key&gt;\n"
+append	composer(5)	"&lt;/composer&gt;\n"
+
+# we use the 'load' argument in order to determine the type of query
+#
+# load=catalog:		    we have to return a list of the names in the database
+# load=composer&amp;res_id=&lt;id&gt;: the script is supposed to return the record
+#			    having &lt;id&gt; as record id
+
+if {[var exists load]} {
+
+# the xml declaration is common to every message (error messages included)
+
+    set xml "&lt;?xml version=\"1.0\" encoding=\"ISO-8859-1\"?&gt;\n"
+    switch [var get load] {
+	catalog {
+	    append xml "&lt;catalog&gt;\n"
+	    foreach nm [array names composer] {
+	    	if {[regexp {&lt;last_name&gt;(.+)&lt;/last_name&gt;}   $composer($nm) m last_name] &amp;&amp; \
+		    [regexp {&lt;first_name&gt;(.+)&lt;/first_name&gt;} $composer($nm) m first_name]} {
+	            append xml "    &lt;composer key='$nm'&gt;$first_name $last_name&lt;/composer&gt;\n"
+		}
+	    }
+	    append xml "&lt;/catalog&gt;"
+	}
+	composer {
+	    if {[var exists rec_id]} {
+		set rec_id [var get rec_id]
+		if {[info exists composer($rec_id)]} {
+		    append xml $composer($rec_id)
+		}
+	    }
+	}
+    }
+
+# we have to tell the client this is an XML message. Failing to do so
+# would result in an XMLResponse property set to null
+
+    headers type "text/xml"
+    headers add Content-Length [string length $xml]
+    puts $xml
+}
+
+</pre><p style="width:90%">
+	Per brevità il JavaScript e l'HTML non verranno riportati
+	qui. Possono essere scaricati (assieme allo script Tcl) nell'archivio
+	<a class="ulink" href="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz" target="_top">
+	rivet-ajax.tar.gz</a> archive. Semplicemente
+	aprendo questo archivio in una directory accessibile dal vostro
+	server Apache e puntando con un browser alla pagina rivetService.html
+	dovreste essere in grado di far girare l'esempio. Ogni volta
+	che scegliete il nome di un compositore una nuova query viene
+	inviata e registrata nel log di apache, anche se la pagina html 
+	non viene mai ricaricata, ma solo aggiornata con i nuovi dati.
+      </p></div></div><br class="example-break"></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="commands.it.html"><img src="images/prev.png" alt="Indietro"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="tcl_packages.it.html"><img src="images/next.png" alt="Avanti"></a></td></tr><tr><td width="40%" align="left" valign="top">Comandi e variabili Tcl di Rivet </td><td width="20%" align="center"><a accesskey="h" href="index.it.html"><img src="images/home.png" alt="Partenza"></a></td><td width="40%" align="right" valign="top"> Pacchetti Tcl per Rivet</td></tr></table></div></body></html>

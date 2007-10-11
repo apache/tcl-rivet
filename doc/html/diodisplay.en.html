@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>DIODisplay - Database Interface Objects Display Class</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.68.1"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="dio.en.html#id2519782" title="DIO"><link rel="next" href="diodisplay.en.html#id2522975" title="DIODisplay"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">DIODisplay - Database Interface Objects Display Class</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="dio.en.html#id2519782"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="diodisplay.en.html#id2522975"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="diodisplay"></a>DIODisplay - Database Interface Objects Display Class</h2></div></div></div><div class="toc"><dl><dt><span class="refentrytitle"><a href="diodisplay.en.html#id2522975">DIODisplay</a></span><span class="refpurpose"> - Database Interface Objects Display Class</span></dt></dl></div><div class="refentry" lang="en"><a name="id2522975"></a><div class="titlepage"></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">DIODisplay &#8212; Database Interface Objects Display Class</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">DIODisplay</span>  (<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span> | <span style="font-family:monospace; font-weight: bold;">#auto</span>) (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>DIODisplay - Database Interface Objects Display Class</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="dio.en.html#id2576683" title="DIO"><link rel="next" href="diodisplay.en.html#id2579752" title="DIODisplay"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">DIODisplay - Database Interface Objects Display Class</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="dio.en.html#id2576683"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="diodisplay.en.html#id2579752"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="diodisplay"></a>DIODisplay - Database Interface Objects Display Class</h2></div></div></div><div class="toc"><dl><dt><span class="refentrytitle"><a href="diodisplay.en.html#id2579752">DIODisplay</a></span><span class="refpurpose"> &#8212; Database Interface Objects Display Class</span></dt></dl></div><div class="refentry" lang="en"><a name="id2579752"></a><div class="titlepage"></div><div class="refnamediv"><h3>Name</h3><p><h3 style="text-indent: 3em">DIODisplay &#8212; Database Interface Objects Display Class</h3></p></div><div class="refsynopsisdiv"><h3>Synopsis</h3><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">DIODisplay</span>  (<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span> | <span style="font-family:monospace; font-weight: bold;">#auto</span>) (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><h3>Description</h3><p style="width:90%">
 	  DIODisplay is an HTML display class that uses a DIO object
 	  to do the database work and a form object to do the
 	  displaying.
@@ -39,7 +39,7 @@
 	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		Specify a list of fields to be used in this object.
 		The fields list is actually created by using the
-		<span style="font-family:monospace"><span><strong class="command">field</strong></span></span> command to add fields to the
+		<span style="font-family:monospace"><span class="command"><strong>field</strong></span></span> command to add fields to the
 		display, but this option can be useful to sometimes
 		over-set the list of fields created.
 	      </div></div></dd><dt><span class="term">
@@ -151,7 +151,7 @@
 		  methods and procs which are defined as functions by
 		  the object.  This is to protect the program from
 		  executing a different procedure other than what is
-		  allowed.  The <span style="font-family:monospace"><span><strong class="command">function</strong></span></span> command
+		  allowed.  The <span style="font-family:monospace"><span class="command"><strong>function</strong></span></span> command
 		  adds a new function to the list of allowable
 		  functions.
 		</div></div></dd><dt><span class="term">
@@ -210,7 +210,7 @@
 		  looks for a variable called <code class="varname">mode</code>
 		  to be passed in through a form response and uses
 		  that mode to execute the appropriate function.  If
-		  mode is not given, the <span style="font-family:monospace"><span><strong class="command">Main</strong></span></span>
+		  mode is not given, the <span style="font-family:monospace"><span class="command"><strong>Main</strong></span></span>
 		  function is called.
 		</div><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This function should be called for every page.
@@ -220,8 +220,8 @@
 		  Display the form of the object.
 		</div><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This method displays the form for this display
-		  object.  It is used in the <span style="font-family:monospace"><span><strong class="command">Add</strong></span></span>
-		  and <span style="font-family:monospace"><span><strong class="command">Edit</strong></span></span> methods but can be
+		  object.  It is used in the <span style="font-family:monospace"><span class="command"><strong>Add</strong></span></span>
+		  and <span style="font-family:monospace"><span class="command"><strong>Edit</strong></span></span> methods but can be
 		  called separately if needed.
 		</div><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This method can be overridden if the default look of
@@ -248,7 +248,7 @@
 		</div><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This method displays the view for this display
 		  object.  It is used in the
-		  <span style="font-family:monospace"><span><strong class="command">Details</strong></span></span> methods but can be
+		  <span style="font-family:monospace"><span class="command"><strong>Details</strong></span></span> methods but can be
 		  called separately if needed.
 		</div><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This method can be overridden if the default look of
@@ -290,88 +290,88 @@
 		  specified, it sets a new value for value.
 		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><h3>DIO Display Functions</h3><p style="width:90%">
 	    These functions are called from the
-	    <span style="font-family:monospace"><span><strong class="command">show</strong></span></span> method when a form response
+	    <span style="font-family:monospace"><span class="command"><strong>show</strong></span></span> method when a form response
 	    variable called <code class="varname">mode</code> is set.  If no
 	    mode has been set, the default mode is
-	    <span style="font-family:monospace"><span><strong class="command">Main</strong></span></span>.  The show method will handle
+	    <span style="font-family:monospace"><span class="command"><strong>Main</strong></span></span>.  The show method will handle
 	    the necessary switching of functions.  The show method
 	    also handles checking to make sure the function given is a
 	    true function.  If not, an error message is displayed.
 	    New functions can be added as methods or by use of the
-	    <span style="font-family:monospace"><span><strong class="command">function</strong></span></span> command, and any of the
+	    <span style="font-family:monospace"><span class="command"><strong>function</strong></span></span> command, and any of the
 	    default functions can be overridden with new methods to
 	    create an entirely new class.  These are the default
 	    functions provided.
-	  </p><div class="variablelist"><dl><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Add</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+	  </p><div class="variablelist"><dl><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Add</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Show a form that allows the user to add a new entry
 		  to the database.  This function calls
-		  <span style="font-family:monospace"><span><strong class="command">showform</strong></span></span> to display the form
+		  <span style="font-family:monospace"><span class="command"><strong>showform</strong></span></span> to display the form
 		  for adding the entry.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Cancel</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
-		  The <span style="font-family:monospace"><span><strong class="command">Cancel</strong></span></span> function does nothing
-		  but redirect back to the <span style="font-family:monospace"><span><strong class="command">Main</strong></span></span>
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Cancel</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  The <span style="font-family:monospace"><span class="command"><strong>Cancel</strong></span></span> function does nothing
+		  but redirect back to the <span style="font-family:monospace"><span class="command"><strong>Main</strong></span></span>
 		  function.  This is handy for forms which have a
 		  cancel button to point to.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Delete</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Delete</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  If <code class="varname">confirmdelete</code> is true (the
-		  default), the <span style="font-family:monospace"><span><strong class="command">Delete</strong></span></span> function
+		  default), the <span style="font-family:monospace"><span class="command"><strong>Delete</strong></span></span> function
 		  will ask the user if they're sure they want to
 		  delete the record from the database.  If
 		  <code class="varname">confirmdelete</code> is false, or if the
 		  user confirms they wish to delete, this function
-		  calls the <span style="font-family:monospace"><span><strong class="command">DoDelete</strong></span></span> function to do
+		  calls the <span style="font-family:monospace"><span class="command"><strong>DoDelete</strong></span></span> function to do
 		  the actual deletion of a record.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Details</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Details</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Display the view of a single record from the database.  This function calls
-		  the <span style="font-family:monospace"><span><strong class="command">showview</strong></span></span> method to display a single record from the database.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">DoDelete</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  the <span style="font-family:monospace"><span class="command"><strong>showview</strong></span></span> method to display a single record from the database.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>DoDelete</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This function actually deletes a record from the
 		  database.  Once it has deleted the record, it
 		  redirects the user back to the
-		  <span style="font-family:monospace"><span><strong class="command">Main</strong></span></span> function.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Edit</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  <span style="font-family:monospace"><span class="command"><strong>Main</strong></span></span> function.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Edit</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Show a form that allows the user to edit an existing
 		  entry to the database.  This function calls
-		  <span style="font-family:monospace"><span><strong class="command">showform</strong></span></span> to display the form for
+		  <span style="font-family:monospace"><span class="command"><strong>showform</strong></span></span> to display the form for
 		  editing the entry and fills in the fields with the
 		  values retrieved from the database.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">List</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>List</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This function lists the entires contents of the
 		  database.  Each record is output in a row using the
-		  <span style="font-family:monospace"><span><strong class="command">showrow</strong></span></span> method.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Main</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		  <span style="font-family:monospace"><span class="command"><strong>showrow</strong></span></span> method.
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Main</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This function is the main function of the display
 		  object.  If there is no mode, or once most commands
 		  complete, the user will be redirected to this
-		  function.  The default <span style="font-family:monospace"><span><strong class="command">Main</strong></span></span>
+		  function.  The default <span style="font-family:monospace"><span class="command"><strong>Main</strong></span></span>
 		  function displays a list of functions the user can
 		  execute, a list of searchfields the user can search
 		  on, and a query field.  This query field is used by
 		  all of the other functions to determine what the
 		  user is trying to find.
 		</div><div style="margin-bottom:1.5ex ; padding .5ex">
-		  In the case of a <span style="font-family:monospace"><span><strong class="command">search</strong></span></span>, query
+		  In the case of a <span style="font-family:monospace"><span class="command"><strong>search</strong></span></span>, query
 		  specifies what string the user is looking for in the
 		  specified search field.  In the case of
-		  <span style="font-family:monospace"><span><strong class="command">delete</strong></span></span>,
-		  <span style="font-family:monospace"><span><strong class="command">details</strong></span></span> or
-		  <span style="font-family:monospace"><span><strong class="command">edit</strong></span></span>, the query specifies the
+		  <span style="font-family:monospace"><span class="command"><strong>delete</strong></span></span>,
+		  <span style="font-family:monospace"><span class="command"><strong>details</strong></span></span> or
+		  <span style="font-family:monospace"><span class="command"><strong>edit</strong></span></span>, the query specifies the
 		  database key to access.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Save</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Save</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This function saves any data passed to using the
-		  <span style="font-family:monospace"><span><strong class="command">store</strong></span></span> method.  This is primarily
-		  used by the <span style="font-family:monospace"><span><strong class="command">add</strong></span></span> and
-		  <span style="font-family:monospace"><span><strong class="command">edit</strong></span></span> commands to store the
+		  <span style="font-family:monospace"><span class="command"><strong>store</strong></span></span> method.  This is primarily
+		  used by the <span style="font-family:monospace"><span class="command"><strong>add</strong></span></span> and
+		  <span style="font-family:monospace"><span class="command"><strong>edit</strong></span></span> commands to store the
 		  results of the form the user has filled out.
-		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span><strong class="command">Search</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		</div></div></dd><dt><span class="term"><span style="font-family:monospace"><span class="command"><strong>Search</strong></span></span></span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  This function searches the database for any row
 		  whose <code class="varname">searchBy</code> field matches
 		  <code class="varname">query</code>. Once any number of records
-		  are found, <span style="font-family:monospace"><span><strong class="command">Search</strong></span></span> displays the
+		  are found, <span style="font-family:monospace"><span class="command"><strong>Search</strong></span></span> displays the
 		  results in rows.
 		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><h3>DIO Display Fields</h3><p style="width:90%">
 	    Display fields are created with the
-	    <span style="font-family:monospace"><span><strong class="command">field</strong></span></span> command of the DIODisplay object.
+	    <span style="font-family:monospace"><span class="command"><strong>field</strong></span></span> command of the DIODisplay object.
 	    Each field is created as a new DIODisplayField object or
 	    as a subclass of DIODisplayField.  The standard form
 	    fields use the standard field class, while specialized
@@ -427,4 +427,4 @@
 	    DIODisplay.  Some are standard HTML form fields, and
 	    others are DIODisplay fields which execute special actions
 	    and functions.
-	  </p></div></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="dio.en.html#id2519782"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="diodisplay.en.html#id2522975"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">DIO </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> DIODisplay</td></tr></table></div></body></html>
+	  </p></div></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="dio.en.html#id2576683"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="diodisplay.en.html#id2579752"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">DIO </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> DIODisplay</td></tr></table></div></body></html>
