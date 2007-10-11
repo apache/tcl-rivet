@@ -59,7 +59,7 @@
     Document revision: $Revision$, last modified $Date$ by $Author$.
   </para>
 
-  <section>
+  <section id="introduction">
     <title>Introduction to Apache Rivet</title>
     <para>
       Apache Rivet is a system for creating dynamic web content via a
@@ -587,7 +587,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
   <section id="commands">
     <title>Rivet Tcl Commands and Variables</title>
 
-    <refentry>
+    <refentry id="var">
       <refnamediv>
 	<refname>var</refname>
 	<refname>var_qs</refname>
@@ -737,7 +737,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="upload">
       <refnamediv>
 	<refname>upload</refname>
 	<refpurpose>handle a file uploaded by a client.</refpurpose>
@@ -898,7 +898,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="load_response">
       <refnamediv>
 	<refname>load_response</refname>
 	<refpurpose>load form variables into an array.</refpurpose>
@@ -918,7 +918,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="load_headers">
       <refnamediv>
 	<refname>load_headers</refname>
 	<refpurpose>get client request's headers.</refpurpose>
@@ -941,7 +941,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="load_cookies">
       <refnamediv>
 	<refname>load_cookies</refname>
 	<refpurpose>get any cookie variables sent by the client.</refpurpose>
@@ -964,7 +964,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </para>
     </refentry>
 
-    <refentry>
+    <refentry id="load_env">
       <refnamediv>
 	<refname>load_env</refname>
 	<refpurpose>get the request's environment variables.</refpurpose>
@@ -994,7 +994,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="env">
       <refnamediv>
 	<refname>env</refname> <refpurpose>Loads a single
 	"environmental variable" into a Tcl variable.</refpurpose>
@@ -1018,7 +1018,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="include">
       <refnamediv>
 	<refname>include</refname>
 	<refpurpose>includes a file into the output stream without modification.</refpurpose>
@@ -1041,7 +1041,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="parse">
       <refnamediv>
 	<refname>parse</refname>
 	<refpurpose>parses a Rivet template file.</refpurpose>
@@ -1064,7 +1064,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="headers">
       <refnamediv>
 	<refname>headers</refname>
 	<refpurpose>set and parse HTTP headers.</refpurpose>
@@ -1173,7 +1173,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="makeurl">
       <refnamediv>
 	<refname>makeurl</refname>
 	<refpurpose>construct url's based on hostname, port.</refpurpose>
@@ -1200,7 +1200,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
     </refentry>
 
 
-    <refentry>
+    <refentry id="cookie">
       <refnamediv>
 	<refname>cookie</refname>
 	<refpurpose>get and set cookies.</refpurpose>
@@ -1236,7 +1236,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="clock_to_rfc">
       <refnamediv>
 	<refname>clock_to_rfc850_gmt</refname>
 	<refpurpose>create a rfc850 time from [clock seconds].</refpurpose>
@@ -1259,7 +1259,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="html">
       <refnamediv>
 	<refname>html</refname>
 	<refpurpose>construct html tagged text.</refpurpose>
@@ -1284,7 +1284,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="incr0">
       <refnamediv>
 	<refname>incr0</refname>
 	<refpurpose>increment a variable or set it to 1 if nonexistant.</refpurpose>
@@ -1310,7 +1310,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="parray">
       <refnamediv>
 	<refname>parray</refname>
 	<refpurpose>Tcl's <command>parray</command> with html formatting.</refpurpose>
@@ -1336,7 +1336,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="abort_page">
       <refnamediv>
 	<refname>abort_page</refname>
 	<refpurpose>Stops outputing data to web page, similar in
@@ -1359,7 +1359,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="no_body">
       <refnamediv>
 	<refname>no_body</refname>
 	<refpurpose>Prevents Rivet from sending any content.</refpurpose>
@@ -1382,7 +1382,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="escape_string">
       <refnamediv>
 	<refname>escape_string</refname>
 	<refpurpose>convert a string into escaped characters.</refpurpose>
@@ -1410,7 +1410,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="escape_sgml_chars">
       <refnamediv>
 	<refname>escape_sgml_chars</refname>
 	<refpurpose>escape special SGML characters in a string.</refpurpose>
@@ -1435,7 +1435,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="escape_shell_command">
       <refnamediv>
 	<refname>escape_shell_command</refname>
 	<refpurpose>escape shell metacharacters in a string.</refpurpose>
@@ -1464,7 +1464,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </refsect1>
     </refentry>
 
-    <refentry>
+    <refentry id="unescape_string">
       <refnamediv>
 	<refname>unescape_string</refname>
 	<refpurpose>unescape escaped characters in a string.</refpurpose>
@@ -1586,7 +1586,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </para>
     </example>
 
-    <example id="upload">
+    <example id="file_upload">
       <title>File Upload</title>
       <para>
 	The <command>upload</command> command endows Rivet with an
@@ -1815,7 +1815,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
   <section id="dio">
     <title>DIO - Database Interface Objects</title>
-    <refentry>
+    <refentry id="dio">
       <refnamediv>
 	<refname>DIO</refname>
 	<refpurpose>Database Interface Objects</refpurpose>
@@ -2767,7 +2767,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
   <section id="diodisplay">
     <title>DIODisplay - Database Interface Objects Display Class</title>
-    <refentry>
+    <refentry id="diodisplay">
       <refnamediv>
 	<refname>DIODisplay</refname>
 	<refpurpose>Database Interface Objects Display Class</refpurpose>
@@ -3852,7 +3852,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       </para>
     </section>
 
-    <section>
+    <section id="requirements">
       <title>Requirements</title>
 
 

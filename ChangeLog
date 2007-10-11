@@ -1,3 +1,13 @@
+2007-10-11  David N. Welton  <davidw@dedasys.com>
+
+	* doc/rivet.xml: Added missing ID's.
+
+	* doc/Makefile.am (docs): Removed Russian and Italian
+	translations from the build.
+
+	* doc/norefchunk.xsl, doc/refentry.xsl: Ditch fancy-pants XSLT
+	stuff.
+
 2007-09-19  Massimo Manghi <massimo.manghi@unipr.it>
 
 	* configure.ac: TEA_INIT argument was changed to 3.6 to match 

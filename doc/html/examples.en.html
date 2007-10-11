@@ -1,8 +1,8 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="commands.en.html#id2575773" title="unescape_string"><link rel="next" href="tcl_packages.en.html" title="Rivet Tcl Packages"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.en.html#id2575773"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="tcl_packages.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.71.0"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="unescape_string.en.html" title="unescape_string"><link rel="next" href="tcl_packages.en.html" title="Rivet Tcl Packages"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="unescape_string.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="tcl_packages.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div></div><p style="width:90%">
       Some examples of Rivet usage follow.  Some prior Tcl knowledge
       is assumed.  If you don't know much Tcl, don't worry, it's easy,
       and there are some good resources available on the web that will
-      get you up to speed quickly.  Go to the <a class="link" href="help.en.html#websites" title="Web Sites">web sites</a> section and have a look.
+      get you up to speed quickly.  Go to the <a href="help.en.html#websites" title="Web Sites">web sites</a> section and have a look.
     </p><div class="example"><a name="hello%20world"></a><p class="title"><b>Example 1. Hello World</b></p><div class="example-contents"><p style="width:90%">
 	As with any tool, it's always nice to see something work, so
 	let's create a small "Hello World" page.</p><p style="width:90%">
@@ -156,8 +156,8 @@ if { [llength $errlist] != 0 } {
 	<code class="varname">errlist</code> is empty and outputting a thankyou
 	message.  If <code class="varname">errlist</code> is not empty, the list
 	of errors it contains is printed.
-      </p></div></div><br class="example-break"><div class="example"><a name="upload"></a><p class="title"><b>Example 4. File Upload</b></p><div class="example-contents"><p style="width:90%">
-	The <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span> command endows Rivet with an
+      </p></div></div><br class="example-break"><div class="example"><a name="file_upload"></a><p class="title"><b>Example 4. File Upload</b></p><div class="example-contents"><p style="width:90%">
+	The <span style="font-family:monospace"><span><strong class="command">upload</strong></span></span> command endows Rivet with an
 	interface to access files transferred over http as parts of a
 	multipart form.  The following HTML in one file, say,
 	<code class="filename">upload.html</code> creates a form with a text
@@ -175,7 +175,7 @@ if { [llength $errlist] != 0 } {
 &lt;/form&gt;
 </pre><p style="width:90%">
 	In the script invoked by the form
-	(<code class="filename">upload.rvt</code>) <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span>
+	(<code class="filename">upload.rvt</code>) <span style="font-family:monospace"><span><strong class="command">upload</strong></span></span>
 	 ?<span style="font-family:monospace; font-weight: bold;">argument ...</span>? commands can be used to manipulate the
 	various files uploaded.
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
@@ -191,17 +191,17 @@ puts "Saved file [upload filename MyUpload] \
 	requirements.
       </p><p style="width:90%">
 	It is also important to understand that some
-	<span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span> commands are effective only when
+	<span style="font-family:monospace"><span><strong class="command">upload</strong></span></span> commands are effective only when
 	used in a mutually exclusive way.  Apache stores the data in
-	temporary files which are read by the <span style="font-family:monospace"><span class="command"><strong>upload save
+	temporary files which are read by the <span style="font-family:monospace"><span><strong class="command">upload save
 	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? ?<span style="font-family:monospace; font-weight: bold;">filename</span>? </strong></span></span> or by the
-	<span style="font-family:monospace"><span class="command"><strong>upload data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? </strong></span></span>
+	<span style="font-family:monospace"><span><strong class="command">upload data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? </strong></span></span>
 	command. Subsequent calls to these 2 commands using the same
 	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? argument will return no data on the
-	second call.  Likewise <span style="font-family:monospace"><span class="command"><strong>upload channel  ?<span style="font-family:monospace; font-weight: bold;">upload
+	second call.  Likewise <span style="font-family:monospace"><span><strong class="command">upload channel  ?<span style="font-family:monospace; font-weight: bold;">upload
 	name</span>?</strong></span></span> will return a Tcl file channel that you
 	can use in regular Tcl scripts only if you haven't already
-	read the data, for example with a call to the <span style="font-family:monospace"><span class="command"><strong>upload
+	read the data, for example with a call to the <span style="font-family:monospace"><span><strong class="command">upload
 	data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span> command.
       </p></div></div><br class="example-break"><div class="example"><a name="file_download"></a><p class="title"><b>Example 5. File Download</b></p><div class="example-contents"><p style="width:90%">
 	In general setting up a data file to be sent over http is as
@@ -243,7 +243,7 @@ puts "Saved file [upload filename MyUpload] \
 	parameter passed in by the browser. The parameter is the name
 	(without extension) of a pdf file.  
 	Pdf files are stored in a directory whose path is
-	in the <span style="font-family:monospace"><span class="command"><strong>pdf_repository</strong></span></span> variable.
+	in the <span style="font-family:monospace"><span><strong class="command">pdf_repository</strong></span></span> variable.
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># Code example for the transmission of a pdf file. 
 
 if {[var exists pdfname]} {
@@ -297,16 +297,16 @@ if {[var exists pdfname]} {
 	<code class="constant">Content-Length</code> headers to inform
 	the client about the file type, name and size. Notice that in
 	order to set the <code class="constant">Content-Type</code> header Rivet 
-	uses a specialiezed form of the <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> 
+	uses a specialiezed form of the <span style="font-family:monospace"><span><strong class="command">headers</strong></span></span> 
 	command. Headers must be sent before data gets sent down the 
 	output channel. Messing with this prescription causes an error 
 	to be raised (in fact the protocol itself is been violated)
       </p><p style="width:90%">
 	More information about the meaning of the mime headers in the
 	http context can be found at 
-	<a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">http://www.w3.org/Protocols/rfc2616/rfc2616.html</a>
+	<a href="http://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">http://www.w3.org/Protocols/rfc2616/rfc2616.html</a>
       </p></div></div><br class="example-break"><div class="example"><a name="ajax_xml_messaging"></a><p class="title"><b>Example 6. XML Messages and Ajax</b></p><div class="example-contents"><p style="width:90%">
-	The <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> command is crucial for generating 
+	The <span style="font-family:monospace"><span><strong class="command">headers</strong></span></span> command is crucial for generating 
 	XML messages that have to be understood by JavaScript code used 
 	in Ajax applications. 
       </p><p style="width:90%">
@@ -340,11 +340,11 @@ if {[var exists pdfname]} {
 	(either based on XML or anything else), but one has to be aware of the fact 
 	that if the http headers are properly set and the message returned 
 	to the client is a well formed XML fragment, also the property 
-	<a class="ulink" href="http://www.w3schools.com/ajax/ajax_responsexml.asp" target="_top">
+	<a href="http://www.w3schools.com/ajax/ajax_responsexml.asp" target="_top">
 	XMLResponse</a> is set with a reference to an object 
 	that stores the response as an XML document. This object is an 
 	instance of a class that implements the
-	<a class="ulink" href="http://www.w3schools.com/dom/default.asp" target="_top">
+	<a href="http://www.w3schools.com/dom/default.asp" target="_top">
 	XML W3C DOM</a> tree methods and properties, thus
 	enabling the scripts to read and manipulate the data embedded in 
 	the XML message with a structured and standard interface.
@@ -446,7 +446,7 @@ if {[var exists load]} {
 </pre><p style="width:90%">
 	For sake of brevity the JavaScript and HTML will not listed here. 
 	They can be downloaded (along with the Tcl script) stored in the 
-	<a class="ulink" href="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz" target="_top">
+	<a href="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz" target="_top">
 	rivet-ajax.tar.gz</a> archive. By simply 
 	opening this tar archive in a directory accessible by your
 	apache server and pointing your browser to the rivetService.html
@@ -454,4 +454,4 @@ if {[var exists load]} {
 	a different name is picked from the list a new query is sent and 
 	logged in the apache access.log file, even though the html 
 	is never reloaded.
-      </p></div></div><br class="example-break"></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="commands.en.html#id2575773"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="tcl_packages.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">unescape_string </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Tcl Packages</td></tr></table></div></body></html>
+      </p></div></div><br class="example-break"></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="unescape_string.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="tcl_packages.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">unescape_string </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Tcl Packages</td></tr></table></div></body></html>

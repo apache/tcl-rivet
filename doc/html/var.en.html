@@ -1,0 +1,44 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>var</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.71.0"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="commands.en.html" title="Rivet Tcl Commands and Variables"><link rel="prev" href="commands.en.html" title="Rivet Tcl Commands and Variables"><link rel="next" href="upload.en.html" title="upload"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">var</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="commands.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center">Rivet Tcl Commands and Variables</th><td width="20%" align="right"> <a accesskey="n" href="upload.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="refentry" lang="en"><a name="var"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>var, var_qs, var_post &#8212; get the value of a form variable.</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var_qs</span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var_post</span>  (<span style="font-family:monospace; font-weight: bold;">get</span> | <span style="font-family:monospace; font-weight: bold;">list</span> | <span style="font-family:monospace; font-weight: bold;">exists</span> | <span style="font-family:monospace; font-weight: bold;">number</span> | <span style="font-family:monospace; font-weight: bold;">all</span>)</div></div></div><div class="refsect1" lang="en"><a name="id2544469"></a><h2>Description</h2><p style="width:90%">
+	  The <span style="font-family:monospace"><span><strong class="command">var</strong></span></span> command retrieves information
+	  about GET or POST variables sent to the script via client
+	  request.  It treats both GET and POST variables the same,
+	  regardless of their origin.  Note that there are two
+	  additional forms of <span style="font-family:monospace"><span><strong class="command">var</strong></span></span>:
+	  <span style="font-family:monospace"><span><strong class="command">var_qs</strong></span></span> and <span style="font-family:monospace"><span><strong class="command">var_post</strong></span></span>.
+	  These two restrict the retrieval of information to
+	  parameters arriving via the querystring
+	  (?foo=bar&amp;bee=bop) or POSTing, respectively.
+	</p><div class="variablelist"><dl><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>   <span style="font-family:monospace; font-weight: bold;">get</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varname</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>?<span class="optional">default</span>?</code></em></span>?</div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the value of variable
+		<em class="replaceable"><code>varname</code></em>
+		as a string (even if there are multiple values).  If
+		the variable doesn't exist as a GET or POST
+		variable, the
+		<em class="replaceable"><code>?<span class="optional">default</span>?</code></em>
+		value is returned, otherwise "" - an empty string -
+		is returned.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>   <span style="font-family:monospace; font-weight: bold;">list</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varname</code></em></span>?</div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the value of variable
+		<em class="replaceable"><code>varname</code></em> as a
+		list, if there are multiple values.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>   <span style="font-family:monospace; font-weight: bold;">exists</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varname</code></em></span>?</div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns 1 if
+		<em class="replaceable"><code>varname</code></em>
+		exists, 0 if it doesn't.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>   <span style="font-family:monospace; font-weight: bold;">number</span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Returns the number of variables.
+	      </div></div></dd><dt><span class="term">
+	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">var</span>   <span style="font-family:monospace; font-weight: bold;">all</span> </div></div>
+	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return a list of variable names and values.
+	      </div></div></dd></dl></div><p style="width:90%">
+	  See <a href="examples.en.html#variable_access" title="Example 3. Variable Access">Example 3, &#8220;Variable Access&#8221;</a>.
+	</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="commands.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="commands.en.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="upload.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Rivet Tcl Commands and Variables </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> upload</td></tr></table></div></body></html>
