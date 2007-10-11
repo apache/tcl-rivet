@@ -1304,7 +1304,7 @@ foobar.tcl"</programlisting>
       <para>
 	Per brevit&agrave; il JavaScript e l'HTML non verranno riportati
 	qui. Possono essere scaricati (assieme allo script Tcl) nell'archivio
-	<ulink url="http://www.biol.unipr.it/rivet/rivet-ajax.tar.gz">
+	<ulink url="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz">
 	rivet-ajax.tar.gz</ulink> archive. Semplicemente
 	aprendo questo archivio in una directory accessibile dal vostro
 	server Apache e puntando con un browser alla pagina rivetService.html

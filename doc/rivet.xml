@@ -587,7 +587,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
   <section id="commands">
     <title>Rivet Tcl Commands and Variables</title>
 
-
     <refentry>
       <refnamediv>
 	<refname>var</refname>
@@ -598,9 +597,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <refsynopsisdiv>
 	<cmdsynopsis>
-	  <command>
-	    var
-	  </command>
+	  <command>var</command>
 	  <group choice="req">
 	    <arg>get</arg>
 	    <arg>list</arg>
@@ -611,9 +608,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</cmdsynopsis>
 
 	<cmdsynopsis>
-	  <command>
-	    var_qs
-	  </command>
+	  <command>var_qs</command>
 	  <group choice="req">
 	    <arg>get</arg>
 	    <arg>list</arg>
@@ -624,9 +619,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</cmdsynopsis>
 
 	<cmdsynopsis>
-	  <command>
-	    var_post
-	  </command>
+	  <command>var_post</command>
 	  <group choice="req">
 	    <arg>get</arg>
 	    <arg>list</arg>
@@ -635,8 +628,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <arg>all</arg>
 	  </group>
 	</cmdsynopsis>
-
-
       </refsynopsisdiv>
 
       <refsect1>
@@ -771,8 +762,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	<title>Description</title>
 	<para>The upload command is for file upload manipulation.
 	  See the relevant Apache Directives to further configure the
-	  behavior of this Rivet feature.</para>
-
+	  behavior of this Rivet feature.
+	</para>
 
 	<variablelist>
 	  <varlistentry>
@@ -904,8 +895,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	<para>
 	  See <xref linkend="upload"/>.
 	</para>
-
-
       </refsect1>
     </refentry>
 
@@ -1028,7 +1017,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</para>
       </refsect1>
     </refentry>
-
 
     <refentry>
       <refnamediv>
@@ -1776,7 +1764,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       <para>
 	For sake of brevity the JavaScript and HTML will not listed here. 
 	They can be downloaded (along with the Tcl script) stored in the 
-	<ulink url="http://www.biol.unipr.it/rivet/rivet-ajax.tar.gz">
+	<ulink url="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz">
 	rivet-ajax.tar.gz</ulink> archive. By simply 
 	opening this tar archive in a directory accessible by your
 	apache server and pointing your browser to the rivetService.html
