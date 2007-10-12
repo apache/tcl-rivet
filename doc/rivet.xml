@@ -1815,7 +1815,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
   <section id="dio">
     <title>DIO - Database Interface Objects</title>
-    <refentry id="dio">
+    <refentry id="dio_package">
       <refnamediv>
 	<refname>DIO</refname>
 	<refpurpose>Database Interface Objects</refpurpose>
@@ -2767,7 +2767,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
   <section id="diodisplay">
     <title>DIODisplay - Database Interface Objects Display Class</title>
-    <refentry id="diodisplay">
+    <refentry id="diodisplay_package">
       <refnamediv>
 	<refname>DIODisplay</refname>
 	<refpurpose>Database Interface Objects Display Class</refpurpose>

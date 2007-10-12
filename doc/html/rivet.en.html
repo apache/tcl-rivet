@@ -1,9 +1,9 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Apache Rivet</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.71.0"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="id2481820"></a>Apache Rivet</h1></div><div><div class="author"><h3 class="author"><span class="firstname">The Rivet Team</span></h3><div class="affiliation"><span class="orgname">The Apache Software Foundation<br></span><div class="address"><p><br>
 	  <code class="email">&lt;<a href="mailto:rivet-dev@tcl.apache.org">rivet-dev@tcl.apache.org</a>&gt;</code><br>
-	</p></div></div></div></div><div><p class="copyright">Copyright © 2002, 2003, 2004 Apache Software Foundation</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#introduction">Introduction to Apache Rivet</a></span></dt><dt><span class="section"><a href="#installation">Apache Rivet Installation</a></span></dt><dt><span class="section"><a href="#directives">Rivet Apache Directives</a></span></dt><dt><span class="section"><a href="#commands">Rivet Tcl Commands and Variables</a></span></dt><dt><span class="section"><a href="#examples">Examples and Usage</a></span></dt><dt><span class="section"><a href="#tcl_packages">Rivet Tcl Packages</a></span></dt><dt><span class="section"><a href="#dio">DIO - Database Interface Objects</a></span></dt><dt><span class="section"><a href="#diodisplay">DIODisplay - Database Interface Objects Display Class</a></span></dt><dt><span class="section"><a href="#session_package">Session Package</a></span></dt><dd><dl><dt><span class="section"><a href="#id2536624">Introduction</a></span></dt><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#id2536689">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id2536738">Example Usage</a></span></dt><dt><span class="section"><a href="#id2536805">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id2537012">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id2537267">Session Methods</a></span></dt><dt><span class="section"><a href="#id2537506">Getting Additional Randomness From The Entropy File</a></span></dt></dl></dd><dt><span class="section"><a href="#help">Resources - How to Get Help</a></span></dt><dd><dl><dt><span class="section"><a href="#id2537541">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2537586">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id2537672">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id2537690">IRC</a></span></dt><dt><span class="section"><a href="#id2537702">Editing Rivet Template Files</a></span></dt></dl></dd><dt><span class="section"><a href="#internals">Rivet Internals</a></span></dt><dd><dl><dt><span class="section"><a href="#id2537773">Initialization</a></span></dt><dt><span class="section"><a href="#id2537811">RivetChan</a></span></dt><dt><span class="section"><a href="#id2537838">The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</a></span></dt><dt><span class="section"><a href="#id2537890">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id2537945">Debugging Rivet and Apache</a></span></dt></dl></dd><dt><span class="section"><a href="#upgrading">Upgrading from mod_dtcl or NeoWebScript</a></span></dt><dd><dl><dt><span class="section"><a href="#id2538118">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2538130">NeoWebScript</a></span></dt></dl></dd></dl></div><p style="width:90%">
+	</p></div></div></div></div><div><p class="copyright">Copyright © 2002, 2003, 2004 Apache Software Foundation</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#introduction">Introduction to Apache Rivet</a></span></dt><dt><span class="section"><a href="#installation">Apache Rivet Installation</a></span></dt><dt><span class="section"><a href="#directives">Rivet Apache Directives</a></span></dt><dt><span class="section"><a href="#commands">Rivet Tcl Commands and Variables</a></span></dt><dt><span class="section"><a href="#examples">Examples and Usage</a></span></dt><dt><span class="section"><a href="#tcl_packages">Rivet Tcl Packages</a></span></dt><dt><span class="section"><a href="#dio">DIO - Database Interface Objects</a></span></dt><dt><span class="section"><a href="#diodisplay">DIODisplay - Database Interface Objects Display Class</a></span></dt><dt><span class="section"><a href="#session_package">Session Package</a></span></dt><dd><dl><dt><span class="section"><a href="#id2536622">Introduction</a></span></dt><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#id2536686">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id2536736">Example Usage</a></span></dt><dt><span class="section"><a href="#id2536802">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id2537010">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id2537264">Session Methods</a></span></dt><dt><span class="section"><a href="#id2537503">Getting Additional Randomness From The Entropy File</a></span></dt></dl></dd><dt><span class="section"><a href="#help">Resources - How to Get Help</a></span></dt><dd><dl><dt><span class="section"><a href="#id2537538">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2537583">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id2537670">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id2537688">IRC</a></span></dt><dt><span class="section"><a href="#id2537699">Editing Rivet Template Files</a></span></dt></dl></dd><dt><span class="section"><a href="#internals">Rivet Internals</a></span></dt><dd><dl><dt><span class="section"><a href="#id2537770">Initialization</a></span></dt><dt><span class="section"><a href="#id2537809">RivetChan</a></span></dt><dt><span class="section"><a href="#id2537836">The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</a></span></dt><dt><span class="section"><a href="#id2537887">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id2537943">Debugging Rivet and Apache</a></span></dt></dl></dd><dt><span class="section"><a href="#upgrading">Upgrading from mod_dtcl or NeoWebScript</a></span></dt><dd><dl><dt><span class="section"><a href="#id2538109">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2538121">NeoWebScript</a></span></dt></dl></dd></dl></div><p style="width:90%">
     This document is also available in the following languages: <a href="index.it.html" target="_top">Italian</a>, <a href="index.ru.html" target="_top">Russian</a>
   </p><p style="width:90%">
-    Document revision: $Revision: 583833 $, last modified $Date: 2007-10-11 16:28:45 +0200 (Thu, 11 Oct 2007) $ by $Author: mxmanghi $.
+    Document revision: $Revision: 583898 $, last modified $Date: 2007-10-11 20:02:37 +0200 (Thu, 11 Oct 2007) $ by $Author: davidw $.
   </p><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="introduction"></a>Introduction to Apache Rivet</h2></div></div></div><p style="width:90%">
       Apache Rivet is a system for creating dynamic web content via a
       programming language integrated with Apache Web Server.  It is
@@ -936,7 +936,7 @@ if {[var exists load]} {
     </p><div class="itemizedlist"><ul type="disc"><li><div style="margin-bottom:1.5ex ; padding .5ex">commserver is a package providing a server that can be
 	used for IPC.  Still experimental.  Requires the comm package
 	from tcllib.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">dio is a database abstraction layer.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">dtcl is a compatibility package for mod_dtcl
-	applications.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">form - for creating forms.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">rivet - some additional, useful routines.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">tclrivet</div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="dio"></a>DIO - Database Interface Objects</h2></div></div></div><div class="toc"><dl><dt><span class="refentrytitle"><a href="#dio">DIO</a></span><span class="refpurpose"> &#8212; Database Interface Objects</span></dt></dl></div><div class="refentry" lang="en"><a name="dio"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>DIO &#8212; Database Interface Objects</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">::DIO::handle</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>interface</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><a name="id2530998"></a><h2>Description</h2><p style="width:90%">
+	applications.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">form - for creating forms.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">rivet - some additional, useful routines.</div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">tclrivet</div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="dio"></a>DIO - Database Interface Objects</h2></div></div></div><div class="toc"><dl><dt><span class="refentrytitle"><a href="#dio_package">DIO</a></span><span class="refpurpose"> &#8212; Database Interface Objects</span></dt></dl></div><div class="refentry" lang="en"><a name="dio_package"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>DIO &#8212; Database Interface Objects</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">::DIO::handle</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>interface</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><a name="id2531000"></a><h2>Description</h2><p style="width:90%">
 	  <span style="font-family:monospace"><span><strong class="command">DIO</strong></span></span> is designed to be a generic,
 	  object-oriented interface to SQL databases.  Its main goal
 	  is to be as generic as possible, but since not all SQL
@@ -953,7 +953,7 @@ if {[var exists load]} {
 	  specified, DIO creates an object of that name.  If there is
 	  no <em class="replaceable"><code>objectName</code></em>
 	  given, DIO will automatically generate a unique object ID
-	</p></div><div class="refsect1" lang="en"><a name="id2531050"></a><h2>Options</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-host</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>hostname</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+	</p></div><div class="refsect1" lang="en"><a name="id2531051"></a><h2>Options</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-host</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>hostname</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 		The hostname of the computer to connect to.  If none
 		is given, DIO assumes the local host.
 	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-port</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>portNumber</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">The port number to connect to on hostname.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-user</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>username</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">The username you wish to login to the server as.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-pass</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>password</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">The password to login to the server with.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-db</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>database</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
@@ -973,7 +973,7 @@ if {[var exists load]} {
 		field specified as AUTO.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-sequence</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>sequenceName</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 		If DIO is automatically generating keys, it will use
 		this sequence as a means to gain a unique number for
-		the stored key.</div></div></dd></dl></div></div><div class="refsect1" lang="en"><a name="id2531389"></a><h2>DIO Object Commands</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">array</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>request</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		the stored key.</div></div></dd></dl></div></div><div class="refsect1" lang="en"><a name="id2531391"></a><h2>DIO Object Commands</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">array</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>request</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 		Execute request as a SQL query and
 		create an array from the first record found.  The
 		array is set with the fields of the table and the
@@ -1209,11 +1209,11 @@ if {[var exists load]} {
 		current result record in the result object.  This
 		variable should not really be accessed outside of the
 		result object, but it's there if you want it.
-	      </div></div></dd></dl></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="diodisplay"></a>DIODisplay - Database Interface Objects Display Class</h2></div></div></div><div class="toc"><dl><dt><span class="refentrytitle"><a href="#diodisplay">DIODisplay</a></span><span class="refpurpose"> &#8212; Database Interface Objects Display Class</span></dt></dl></div><div class="refentry" lang="en"><a name="diodisplay"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>DIODisplay &#8212; Database Interface Objects Display Class</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">DIODisplay</span>  (<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span> | <span style="font-family:monospace; font-weight: bold;">#auto</span>) (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><a name="id2534086"></a><h2>Description</h2><p style="width:90%">
+	      </div></div></dd></dl></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="diodisplay"></a>DIODisplay - Database Interface Objects Display Class</h2></div></div></div><div class="toc"><dl><dt><span class="refentrytitle"><a href="#diodisplay_package">DIODisplay</a></span><span class="refpurpose"> &#8212; Database Interface Objects Display Class</span></dt></dl></div><div class="refentry" lang="en"><a name="diodisplay_package"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>DIODisplay &#8212; Database Interface Objects Display Class</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">DIODisplay</span>  (<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span> | <span style="font-family:monospace; font-weight: bold;">#auto</span>) (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><a name="id2534083"></a><h2>Description</h2><p style="width:90%">
 	  DIODisplay is an HTML display class that uses a DIO object
 	  to do the database work and a form object to do the
 	  displaying.
-	</p></div><div class="refsect1" lang="en"><a name="id2534099"></a><h2>Options</h2><div class="variablelist"><dl><dt><span class="term">
+	</p></div><div class="refsect1" lang="en"><a name="id2534095"></a><h2>Options</h2><div class="variablelist"><dl><dt><span class="term">
 	      <div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-DIO</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>dioObject</code></em></span> </div></div>
 	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		The DIO object to be used in conjunction with this
@@ -1293,7 +1293,7 @@ if {[var exists load]} {
 	    </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		The title of the display object.  This will be output
 		as the title of the HTML document.
-	      </div></div></dd></dl></div><div class="refsect2" lang="en"><a name="id2534609"></a><h3>DIO Display Object Commands</h3><div class="variablelist"><dl><dt><span class="term">
+	      </div></div></dd></dl></div><div class="refsect2" lang="en"><a name="id2534606"></a><h3>DIO Display Object Commands</h3><div class="variablelist"><dl><dt><span class="term">
 		<div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace"><em class="replaceable"><code>objectName</code></em></span>   <span style="font-family:monospace; font-weight: bold;">cleanup</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div>
 	      </span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 		  Return the current cleanup value.  If
@@ -1499,7 +1499,7 @@ if {[var exists load]} {
 		  Return the current value value.  If
 		  <em class="replaceable"><code>value</code></em> is
 		  specified, it sets a new value for value.
-		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><a name="id2535936"></a><h3>DIO Display Functions</h3><p style="width:90%">
+		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><a name="id2535933"></a><h3>DIO Display Functions</h3><p style="width:90%">
 	    These functions are called from the
 	    <span style="font-family:monospace"><span><strong class="command">show</strong></span></span> method when a form response
 	    variable called <code class="varname">mode</code> is set.  If no
@@ -1580,7 +1580,7 @@ if {[var exists load]} {
 		  <code class="varname">query</code>. Once any number of records
 		  are found, <span style="font-family:monospace"><span><strong class="command">Search</strong></span></span> displays the
 		  results in rows.
-		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><a name="id2536307"></a><h3>DIO Display Fields</h3><p style="width:90%">
+		</div></div></dd></dl></div></div><div class="refsect2" lang="en"><a name="id2536304"></a><h3>DIO Display Fields</h3><p style="width:90%">
 	    Display fields are created with the
 	    <span style="font-family:monospace"><span><strong class="command">field</strong></span></span> command of the DIODisplay object.
 	    Each field is created as a new DIODisplayField object or
@@ -1633,12 +1633,12 @@ if {[var exists load]} {
 	    Or, if type were textarea, you could define
 	    -rows and -cols to
 	    specify its row and column count.
-	  </p></div><div class="refsect2" lang="en"><a name="id2536598"></a><h3>DIO Display Field Types</h3><p style="width:90%">
+	  </p></div><div class="refsect2" lang="en"><a name="id2536595"></a><h3>DIO Display Field Types</h3><p style="width:90%">
 	    The following is a list of recognized field types by
 	    DIODisplay.  Some are standard HTML form fields, and
 	    others are DIODisplay fields which execute special actions
 	    and functions.
-	  </p></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="session_package"></a>Session Package</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2536624">Introduction</a></span></dt><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#id2536689">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id2536738">Example Usage</a></span></dt><dt><span class="section"><a href="#id2536805">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id2537012">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id2537267">Session Methods</a></span></dt><dt><span class="section"><a href="#id2537506">Getting Additional Randomness From The Entropy File</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536624"></a>Introduction</h3></div></div></div><p style="width:90%">
+	  </p></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="session_package"></a>Session Package</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2536622">Introduction</a></span></dt><dt><span class="section"><a href="#requirements">Requirements</a></span></dt><dt><span class="section"><a href="#id2536686">Preparing To Use It</a></span></dt><dt><span class="section"><a href="#id2536736">Example Usage</a></span></dt><dt><span class="section"><a href="#id2536802">Using Sessions From Your Code</a></span></dt><dt><span class="section"><a href="#id2537010">Session Configuration Options</a></span></dt><dt><span class="section"><a href="#id2537264">Session Methods</a></span></dt><dt><span class="section"><a href="#id2537503">Getting Additional Randomness From The Entropy File</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536622"></a>Introduction</h3></div></div></div><p style="width:90%">
 	This is session management code.  It provides an interface
 	to allow you to generate and track a browser's visit as a
 	"session", giving you a unique session ID and an interface
@@ -1665,7 +1665,7 @@ if {[var exists load]} {
 	  All DB interfacing is done through DIO, though, so it
 	  should be relatively easy to add support for other
 	  databases.
-	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536689"></a>Preparing To Use It</h3></div></div></div><p style="width:90%">Create the tables in your SQL server.  With Postgres,
+	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536686"></a>Preparing To Use It</h3></div></div></div><p style="width:90%">Create the tables in your SQL server.  With Postgres,
 	  do a <span style="font-family:monospace"><span><strong class="command">psql www</strong></span></span> or whatever DB you
 	  connect as, then a backslash-i on
 	  <code class="filename">session-create.sql</code></p><p style="width:90%">(If you need to delete the tables, use <code class="filename">session-drop.sql</code>)</p><p style="width:90%">The session code by default requires a DIO handle
@@ -1673,7 +1673,7 @@ if {[var exists load]} {
 	  overridden).  We get it by doing a</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">
   RivetServerConf ChildInitScript "package require DIO"
   RivetServerConf ChildInitScript "::DIO::handle Postgresql DIO -user www"
-</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536738"></a>Example Usage</h3></div></div></div><p style="width:90%">In your httpd.conf, add:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "package require Session; Session SESSION"</pre><p style="width:90%">
+</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536736"></a>Example Usage</h3></div></div></div><p style="width:90%">In your httpd.conf, add:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "package require Session; Session SESSION"</pre><p style="width:90%">
 	  This tells Rivet you want to create a session object named
 	  SESSION in every child process Apache creates.</p><p style="width:90%">
 	  You can configure the session at this point using numerous
@@ -1694,7 +1694,7 @@ if {[var exists load]} {
 	  additional requests are received during the session, all
 	  under the control of the key-value pairs controlling the
 	  session object.
-	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536805"></a>Using Sessions From Your Code</h3></div></div></div><p style="width:90%">The main methods your code will use are:</p><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">SESSION</span> <span style="font-weight:bold ; font-family:monospace">id</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+	</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2536802"></a>Using Sessions From Your Code</h3></div></div></div><p style="width:90%">The main methods your code will use are:</p><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">SESSION</span> <span style="font-weight:bold ; font-family:monospace">id</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 		After doing a <span style="font-family:monospace"><span><strong class="command">SESSION activate</strong></span></span>,
 		this will return a 32-byte ASCII-encoded random
 		hexadecimal string.  Every time this browser comes
@@ -1721,7 +1721,7 @@ if {[var exists load]} {
 		none was set.  (Status is set to the DIO error that
 		occurred, it can be fetched using the status
 		method.)
-	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537012"></a>Session Configuration Options</h3></div></div></div><p style="width:90%">The following key-value pairs can be specified when a
+	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537010"></a>Session Configuration Options</h3></div></div></div><p style="width:90%">The following key-value pairs can be specified when a
 	  session object (like SESSION above) is created:</p><div class="variablelist"><dl><dt><span class="term">sessionLifetime</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">how many seconds the session will live for.
 		7200 == 2 hours
 	      </div></div></dd><dt><span class="term">sessionRefreshInterval</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
@@ -1775,7 +1775,7 @@ if {[var exists load]} {
 		file handle that debugging messages will be written
 		to (default
 		<code class="varname">stdout</code>)
-	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537267"></a>Session Methods</h3></div></div></div><p style="width:90%">
+	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537264"></a>Session Methods</h3></div></div></div><p style="width:90%">
 	  The following methods can be invoked to find out
 	  information about the current session, store and fetch
 	  server data identified with this session, etc:
@@ -1814,7 +1814,7 @@ if {[var exists load]} {
 		If they don't have one or it isn't valid (timed out,
 		etc), create a session and drop a cookie on
 		them.
-	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537506"></a>Getting Additional Randomness From The Entropy File</h3></div></div></div><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "Session SESSION -entropyFile /dev/urandom \
+	      </div></div></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537503"></a>Getting Additional Randomness From The Entropy File</h3></div></div></div><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">RivetServerConf ChildInitScript "Session SESSION -entropyFile /dev/urandom \
   -entropyLength 10 -debugMode 1"</pre><p style="width:90%">
 	  This options say we want to get randomness from an entropy
 	  file (random data pseudo-device) of /dev/urandom, to get ten
@@ -1822,7 +1822,7 @@ if {[var exists load]} {
 	  on debug mode, which will cause the SESSION object to output
 	  all manner of debugging information as it does stuff.  This
 	  has been tested on FreeBSD and appears to work.
-      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="help"></a>Resources - How to Get Help</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2537541">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2537586">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id2537672">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id2537690">IRC</a></span></dt><dt><span class="section"><a href="#id2537702">Editing Rivet Template Files</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537541"></a>Mailing Lists</h3></div></div></div><p style="width:90%">
+      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="help"></a>Resources - How to Get Help</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2537538">Mailing Lists</a></span></dt><dt><span class="section"><a href="#id2537583">Newsgroup</a></span></dt><dt><span class="section"><a href="#websites">Web Sites</a></span></dt><dt><span class="section"><a href="#id2537670">Bug Tracking System</a></span></dt><dt><span class="section"><a href="#id2537688">IRC</a></span></dt><dt><span class="section"><a href="#id2537699">Editing Rivet Template Files</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537538"></a>Mailing Lists</h3></div></div></div><p style="width:90%">
 	The Rivet mailing list is the first place you should turn for
 	help, if you haven't found the solution to your problem in the
 	documentation.  Send email to
@@ -1835,7 +1835,7 @@ if {[var exists load]} {
 	Currently, dev is the preferred list to use.
       </p><p style="width:90%">
 	The mailing list archives are available at <a href="http://mail-archives.apache.org/eyebrowse/SummarizeList?listId=118" target="_top">http://mail-archives.apache.org/eyebrowse/SummarizeList?listId=118</a>
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537586"></a>Newsgroup</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537583"></a>Newsgroup</h3></div></div></div><p style="width:90%">
 	The <a href="news:comp.lang.tcl" target="_top">news:comp.lang.tcl</a> newsgroup is a good
 	place to ask about Tcl questions in general.  Rivet developers
 	also follow the newsgroup, but it's best to ask Rivet-specific
@@ -1857,14 +1857,14 @@ if {[var exists load]} {
 	  </div></li><li><div style="margin-bottom:1.5ex ; padding .5ex">
 	    <a href="http://wiki.tcl.tk" target="_top">http://wiki.tcl.tk</a> is the Tcl'ers Wiki, a
 	    free-form place to search for answers and ask for help.
-	  </div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537672"></a>Bug Tracking System</h3></div></div></div><p style="width:90%">
+	  </div></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537670"></a>Bug Tracking System</h3></div></div></div><p style="width:90%">
 	Apache Rivet uses the Apache Bug Tracking system at <a href="http://issues.apache.org/bugzilla/" target="_top">http://issues.apache.org/bugzilla/</a>.  Here,
 	you can report problems, or check and see if existing issues
 	are already known and being dealt with.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537690"></a>IRC</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537688"></a>IRC</h3></div></div></div><p style="width:90%">
         Occasionally, someone from the Rivet team is on IRC at
         irc.freenode.net, channel #tcl.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537702"></a>Editing Rivet Template Files</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537699"></a>Editing Rivet Template Files</h3></div></div></div><p style="width:90%">
 	Rivet makes available code for two popular editors,
 	<span class="application">emacs</span> and
 	<span class="application">vim</span> to facilitate the editing of
@@ -1874,14 +1874,14 @@ if {[var exists load]} {
 	<code class="filename">two-mode-mode.el</code> and
 	<code class="filename">rvt.vim</code> are available in the
 	<code class="filename">contrib/</code> directory.
-      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2537773">Initialization</a></span></dt><dt><span class="section"><a href="#id2537811">RivetChan</a></span></dt><dt><span class="section"><a href="#id2537838">The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</a></span></dt><dt><span class="section"><a href="#id2537890">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id2537945">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
+      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2537770">Initialization</a></span></dt><dt><span class="section"><a href="#id2537809">RivetChan</a></span></dt><dt><span class="section"><a href="#id2537836">The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</a></span></dt><dt><span class="section"><a href="#id2537887">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="#id2537943">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
       This section easily falls out of date, as new code is added, old
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
       themselves, the Subversion revision control system
       (<span style="font-family:monospace"><span><strong class="command">svn</strong></span></span>) can provide you with information about
       what has been happening with the code.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537773"></a>Initialization</h3></div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537770"></a>Initialization</h3></div></div></div><p style="width:90%">
 	When Apache is started, (or when child Apache processes are
 	started if a threaded Tcl is used),
 	<code class="function">Rivet_InitTclStuff</code> is called, which
@@ -1892,7 +1892,7 @@ if {[var exists load]} {
 	executes Rivet's <code class="filename">init.tcl</code>.  The caching
 	system is also set up, and if there is a
 	<span style="font-family:monospace"><span><strong class="command">GlobalInitScript</strong></span></span>, it is run.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537811"></a>RivetChan</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537809"></a>RivetChan</h3></div></div></div><p style="width:90%">
 	The <span class="structname">RivetChan</span> system was created in
 	order to have an actual Tcl channel that we could redirect
 	standard output to.  This lets us use, for instance, the
@@ -1902,7 +1902,7 @@ if {[var exists load]} {
 	Tcl's regular standard output is replaced with an instance of
 	this channel type, so that, by default, output will go to the
 	web page.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537838"></a>The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537836"></a>The <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> Command</h3></div></div></div><p style="width:90%">
 	Rivet aims to run standard Tcl code with as few surprises as
 	possible.  At times this involves some compromises - in this
 	case regarding the <span style="font-family:monospace"><span><strong class="command">global</strong></span></span> command.  The
@@ -1917,7 +1917,7 @@ if {[var exists load]} {
 	you really need a true global variable, use either
 	<span style="font-family:monospace"><span><strong class="command">::global</strong></span></span> or add the :: namespace qualifier
 	to variables you wish to make global.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537890"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537887"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
 	processing instruction tags.  Everything outside these tags
@@ -1943,7 +1943,7 @@ if {[var exists load]} {
 	without having to reload it (and re-parse it) from the disk.
 	The number of scripts stored in memory is configurable.  This
 	feature can significantly improve performance.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537945"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2537943"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
 	If you are interested in hacking on Rivet, you're welcome to
 	contribute!  Invariably, when working with code, things go
 	wrong, and it's necessary to do some debugging.  In a server
@@ -1999,15 +1999,15 @@ Starting program: /usr/sbin/apache.dbg -X
 	web page with the browser, and see where things go wrong (if
 	you are dealing with a crash, for instance).  A helpful
 	<span style="font-family:monospace"><span><strong class="command">gdb</strong></span></span> tutorial is available here: <a href="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html" target="_top">http://www.delorie.com/gnu/docs/gdb/gdb_toc.html</a>
-      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="upgrading"></a>Upgrading from mod_dtcl or NeoWebScript</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2538118">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2538130">NeoWebScript</a></span></dt></dl></div><p style="width:90%">
+      </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="upgrading"></a>Upgrading from mod_dtcl or NeoWebScript</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#id2538109">mod_dtcl</a></span></dt><dt><span class="section"><a href="#id2538121">NeoWebScript</a></span></dt></dl></div><p style="width:90%">
       Rivet is a break from the past, in that we, the authors, have
       attempted to take what we like best about our past efforts, and
       leave out or change things we no longer care for.  Backwards
       compatibility was not a primary goal when creating Rivet, but we
       do provide this information which may be of use to those wishing
       to upgrade from mod_dtcl or NWS installations.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2538118"></a>mod_dtcl</h3></div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2538109"></a>mod_dtcl</h3></div></div></div><p style="width:90%">
 	Rivet was originally based on the dtcl code, but it has
 	changed (improved!) quite a bit.  The concepts remain the
 	same, but many of the commands have changed.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2538130"></a>NeoWebScript</h3></div></div></div><p style="width:90%">TODO</p></div></div></div></body></html>
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2538121"></a>NeoWebScript</h3></div></div></div><p style="width:90%">TODO</p></div></div></div></body></html>
