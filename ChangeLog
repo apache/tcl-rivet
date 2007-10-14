@@ -1,3 +1,14 @@
+2007-10-14  Massimo Manghi <massimo.manghi@unipr.it>
+
+	* doc/rivet.xml: Front page updated, page for the
+	'load_response' command updated and extended, link to the 
+	Italian and Russian translations removed, html pages
+	in Italian and Russian removed from repository
+
+	* rivet/rivet-tcl: new 'load_response.tcl'. This
+	version deals in a more consistent way with the case
+	of parameters that receive multiple values (see docs)
+
 2007-10-12  David N. Welton  <davidw@dedasys.com>
 
 	* doc/rivet.xml: Fixed "dio" id's.
