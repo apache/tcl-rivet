@@ -37,6 +37,9 @@
       <year>2002</year>
       <year>2003</year>
       <year>2004</year>
+      <year>2005</year>
+      <year>2006</year>
+      <year>2007</year>
       <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
@@ -49,11 +52,11 @@
       </affiliation>
     </author>
   </articleinfo>
-  <para>
+  <!--para>
     This document is also available in the following languages: <ulink
     url="index.it.html">Italian</ulink>, <ulink
     url="index.ru.html">Russian</ulink>
-  </para>
+  </para-->
 
   <para>
     Document revision: $Revision$, last modified $Date$ by $Author$.
@@ -914,7 +917,21 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       <refsect1>
 	<title>Description</title>
 	Load any form variables passed to this page into an
-	array.
+	array. If <command>load_response</command> is called without 
+	arguments the array <option>response</option> is created in 
+	the scope of the caller. If the variables var1,var2,var3...
+	having values val1,val2,val3... are passed to the page, the
+	resulting array will be a collection mapping var1,var2,var3...
+	to their corresponding values. <command>load_response</command>
+	was inspired by the same NeoWebScript procedure in the way
+	it deals with multiple assignments: if a variable 
+	is assigned more than once the corresponding array element will be a 
+	list of the values for the variable. This can be useful in the case 
+	of forms with checkbox options that are given the same name.
+	Calling <command>load_response</command> several times for the same
+	array results in adding more values to the array at every call. 
+	When needed it is left to the caller to empty the array between 
+	two subsequent calls.  
       </refsect1>
     </refentry>
 

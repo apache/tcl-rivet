@@ -1,0 +1,274 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>DIO</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="dio.en.html" title="DIO - Database Interface Objects"><link rel="prev" href="dio.en.html" title="DIO - Database Interface Objects"><link rel="next" href="diodisplay.en.html" title="DIODisplay - Database Interface Objects Display Class"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">DIO</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="dio.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center">DIO - Database Interface Objects</th><td width="20%" align="right"> <a accesskey="n" href="diodisplay.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="refentry" lang="en"><a name="dio_package"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>DIO &#8212; Database Interface Objects</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">::DIO::handle</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>interface</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" lang="en"><a name="id2573624"></a><h2>Description</h2><p style="width:90%">
+	  <span style="font-family:monospace"><span class="command"><strong>DIO</strong></span></span> is designed to be a generic,
+	  object-oriented interface to SQL databases.  Its main goal
+	  is to be as generic as possible, but since not all SQL
+	  databases support the exact same syntaxes, keeping code
+	  generic between databases is left to the abilities of the
+	  programmer.  DIO simply provides a way to keep the Tcl
+	  interface generic.
+	</p><p style="width:90%">
+	  interface - The name of the database
+	  interface.  Currently supported interfaces are
+	  Postgresql and Mysql.
+	</p><p style="width:90%">
+	  If <em class="replaceable"><code>objectName</code></em> is
+	  specified, DIO creates an object of that name.  If there is
+	  no <em class="replaceable"><code>objectName</code></em>
+	  given, DIO will automatically generate a unique object ID
+	</p></div><div class="refsect1" lang="en"><a name="id2573676"></a><h2>Options</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-host</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>hostname</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		The hostname of the computer to connect to.  If none
+		is given, DIO assumes the local host.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-port</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>portNumber</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">The port number to connect to on hostname.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-user</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>username</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">The username you wish to login to the server as.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-pass</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>password</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">The password to login to the server with.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-db</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>database</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		The name of the database to connect to.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-table</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>tableName</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		The default table to use when using built-in commands
+		for storing and fetching.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-keyfield</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>keyFieldname</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		The default field to use as the primary key when using
+		built-in commands for storing and fetching.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-autokey</span>  (<span style="font-family:monospace; font-weight: bold;">1</span> | <span style="font-family:monospace; font-weight: bold;">0</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		If this option is set to 1, DIO will attempt to
+		determine an automatic key for
+		keyField when storing and fetching.
+		In most databases, this requires that the
+		sequence also be specified.  In the
+		case of MySQL, where sequences do not exist, autokey
+		must be used in conjunction with a table which has a
+		field specified as AUTO.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-sequence</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>sequenceName</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		If DIO is automatically generating keys, it will use
+		this sequence as a means to gain a unique number for
+		the stored key.</div></div></dd></dl></div></div><div class="refsect1" lang="en"><a name="id2574015"></a><h2>DIO Object Commands</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">array</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>request</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Execute request as a SQL query and
+		create an array from the first record found.  The
+		array is set with the fields of the table and the
+		values of the record found.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">autokey</span>? (<span style="font-family:monospace; font-weight: bold;">value</span> | <span style="font-family:monospace; font-weight: bold;">boolean</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current autokey value.  If
+		value is specified, it sets a new
+		value for the autokey option.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">close</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">	      Close the current database connection.  This command is
+		automatically called when the DIO object is destroyed.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">count</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">	      Return a count of the number of rows in the
+		specified (or current) table.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">db</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current database.  If
+		value is specified, it sets a new
+		value for the database.  In most cases, the DIO object
+		will automatically connect to the new database when
+		this option is changed.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">delete</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>key</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Delete a record from the database where the primary
+		key matches key.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">destroy</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Destroy the DIO object.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">errorinfo</span>? ?<span style="font-family:monospace; font-weight: bold;">value</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">errorinfo contains the value of
+		the last error, if any, to occur while executing a
+		request.  When a request fails for any reason, this
+		variable is filled with the error message from the SQL
+		interface package.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">exec</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>request</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Execute request as an SQL query.
+		When the exec command is called, the query is
+		executed, and a DIO result object is returned.  From
+		there, the result object can be used to obtain
+		information about the query status and records in a
+		generic way.  See <a class="link" href="dio_package.en.html#resultobj" title="Result Object Commands">Result
+		  Object Commands</a>
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">fetch</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>key</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>arrayName</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Fetch a record from the database where the primary key
+		matches key and store the result in
+		an array called arrayName.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">forall</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>request</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>arrayName</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>body</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+	       Execute an SQL select request and iteratively 
+	       fill the array named arrayName
+	       with elements named with the matching field names, and
+	       values containing the matching values, repeatedly executing 
+	       the specified code body
+	       for each row returned.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">host</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current host value.  If
+		value is specified, it sets a new
+		value for the host.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">insert</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>arrayName</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Insert fields from arrayName into the specified table in the database.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">interface</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the database interface type, such as 
+		<code class="literal">Postgresql</code> or <code class="literal">Mysql</code>.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">keyfield</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current keyfield.  If
+		value is specified, it sets a new
+		value for the keyfield.  Value can contain
+		multiple key fields as a Tcl list, if the table has multiple
+		key fields.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">keys</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>pattern</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return a list of keys in the database.  If
+		pattern is specified, only the keys
+		matching will be returned.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">lastkey</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the last key that was used from
+		sequence.  If sequence has not been
+		specified, this command returns an empty string.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">list</span>? ?<span style="font-family:monospace; font-weight: bold;">request</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Execute request as a SQL query and
+		return a list of the first column of each record
+		found.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">makekey</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>arrayName</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>keyfield</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Given an array containing key-value pairs and an optional
+		list of key fields (we use the object's keyfield if
+		none is specified), if we're doing auto keys, create
+		and return a new key, otherwise if it's a single key,
+		just return its value from the array, else if there are
+		multiple keys, return all the keys' values from the
+		array as a list.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">nextkey</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">Increment sequence and return the
+		next key to be used.  If sequence has not been
+		specified, this command returns an empty
+		string.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">open</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">Open the connection to the current database.  This
+		command is automatically called from any command which
+		accesses the database.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">pass</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current pass value.  If
+		value is specified, it sets a new
+		value for the password.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">port</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">Return the current port value.  If value is
+		specified, it sets a new value for the port.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">quote</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>string</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">Return the specified string quoted in
+	      a way that makes it acceptable as a value in a SQL statement.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">search</span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Search the current table, or the specified table if
+		-table tableName is specified, for rows matching
+		one or more fields as key-value pairs, and return
+		a query result handle.
+		See <a class="link" href="dio_package.en.html#resultobj" title="Result Object Commands">Result Object Commands</a>
+		</div><div style="margin-bottom:1.5ex ; padding .5ex">
+		For example,
+	<pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">set res [DIO search -table people -firstname Bob]</pre>
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">sequence</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current sequence value.  If value is
+		specified, it sets a new value for the sequence.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">store</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>arrayName</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Store the contents of arrayName in the 
+		database, where the keys are the field names and the
+		array's values are the corresponding values.  Do an SQL insert 
+		if the corresponding row doesn't exist, or an update 
+		if it does.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		The table name must have been previously set
+		or specified with  ?<span style="font-family:monospace; font-weight: bold;">-table</span>?, and the key field(s) must
+		have been previously set or specified with
+		 ?<span style="font-family:monospace; font-weight: bold;">-keyfield</span>?.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Please note that the store method has significantly higher 
+		overhead than
+		the update or insert methods, so if you know you are
+		inserting a row rather than updating one, it is advisable
+		to use the insert method and, likewise, if you know you
+		are updating rather than inserting, to use the
+		update method.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">string</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>request</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Execute request as a SQL query and
+		return a string containing the first record
+		found.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">table</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">Return the current table.  If
+		value is specified, it sets a new
+		value for the table.</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">update</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>arrayName</code></em></span>? (<span style="font-family:monospace; font-weight: bold;">-option</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Updates the row matching the contents of 
+		arrayName in the database.  The matching
+		row must already exist.  The table can have already been
+		set or can be specified with  ?<span style="font-family:monospace; font-weight: bold;">-table</span>?, and
+		the key field(s) must either have been set or
+		specified with  ?<span style="font-family:monospace; font-weight: bold;">-keyfield</span>?.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>objectName</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">user</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current user value.  If
+		value is specified, it sets a new
+		value for the user.
+	      </div></div></dd></dl></div></div><div class="refsect1" lang="en"><a name="resultobj"></a><h2>Result Object Commands</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">autocache</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current autocache value.  If
+		value is specified, it sets a new
+		value for autocache.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		If autocache is true, the result object will
+		automatically cache rows as you use them.  This means
+		that the first time you execute a forall command, each
+		row is being cached in the result object itself and
+		will no longer need to access the SQL result.
+		<span class="emphasis"><em>Default is true</em></span>.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">cache</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Cache the results of the current SQL result in the
+		result object itself.  This means that even if the
+		database connection is closed and all the results of
+		the DIO object are lost, this result object will still
+		maintain a cached copy of its records.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">errorcode</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current errorcode value.  If value
+		is specified, it sets a new value for errorcode.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		errorcode contains the current code from the
+		SQL database which specifies the result of the query
+		statement which created this object.  This variable
+		can be used to determine the success or failure of a
+		query.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">errorinfo</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current errorinfo value.  If value
+		is specified, it sets a new value for errorinfo.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		If an error occurred during the SQL query, DIO
+		attempts to set the value of errorinfo to the
+		resulting error message.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">fields</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current fields value.  If
+		value is specified, it sets a new
+		value for fields.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		fields contains the list of fields
+		used in this query.  The fields are in order of the
+		fields retrieved for each row.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">forall</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>-type</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varName</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>body</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Execute body over each record in the
+		result object.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">Types:</div><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-array</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      Create
+		      <em class="replaceable"><code>varName</code></em>
+		      as an array where the indexes are the names of
+		      the fields in the table and the values are the
+		      values of the current row.
+		    </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-keyvalue</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      Set
+		      <em class="replaceable"><code>varName</code></em>
+		      to a list containing key-value pairs of fields
+		      and values from the current row. (-field value
+		      -field value)
+		    </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-list</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      Set
+		      <em class="replaceable"><code>varName</code></em>
+		      to a list that contains the values of the
+		      current row.
+		    </div></div></dd></dl></div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">next</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>-type</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>varName</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Retrieve the next record in the result object.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">Types:</div><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-array</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      Create
+		      <em class="replaceable"><code>varName</code></em>
+		      as an array where the indexes are the names of
+		      the fields in the table and the values are the
+		      values of the current row.
+		    </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-keyvalue</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      Set
+		      <em class="replaceable"><code>varName</code></em>
+		      to a list containing key-value pairs of fields
+		      and values from the current row. (-field value
+		      -field value)
+		    </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-list</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      Set
+		      <em class="replaceable"><code>varName</code></em>
+		      to a list that contains the values of the
+		      current row.
+		    </div></div></dd></dl></div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">numrows</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current numrows value.  If value is
+		specified, it sets a new value for numrows.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		numrows is the number of rows in this result.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">resultid</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current resultid value.  If value is
+		specified, it sets a new value for resultid.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		resultid in most databases is the result
+		pointer which was given us by the database.  This
+		variable is not generic and should not really be used,
+		but it's there if you want it.
+	      </div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;  word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>resultObj</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">rowid</span>? ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>value</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		Return the current rowid value.  If value is
+		specified, it sets a new value for rowid.
+	      </div><div style="margin-bottom:1.5ex ; padding .5ex">
+		rowid contains the number of the
+		current result record in the result object.  This
+		variable should not really be accessed outside of the
+		result object, but it's there if you want it.
+	      </div></div></dd></dl></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="dio.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="dio.en.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="diodisplay.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">DIO - Database Interface Objects </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> DIODisplay - Database Interface Objects Display Class</td></tr></table></div></body></html>
