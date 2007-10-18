@@ -72,6 +72,23 @@ static request_rec *globalrr;
 
 TCL_DECLARE_MUTEX(sendMutex);
 
+/* come from mod_ruby licence is BSD-like */
+#ifdef APACHE2 /* Apache 2.x */
+static void ap_chdir_file(const char *file)
+{
+	const char *x;
+	char buf[HUGE_STRING_LEN];
+	x = strrchr(file, '/');
+	if (x == NULL) {
+		chdir(file);
+	}
+	else if (x - file < sizeof(buf) - 1) {
+		memcpy(buf, file, x - file);
+		buf[x - file] = '\0';
+		chdir(buf);
+	}
+}
+#endif
 /* Function to be used should we desire to upload files to a variable */
 
 #if 0
@@ -91,40 +108,20 @@ Rivet_UploadHook(void *ptr, char *buf, int len, ApacheUpload *upload)
 }
 #endif /* 0 */
 
-/*
- * Rivet_IsRivetFile(char*)
- *
- * small helper function to get the file type. Returns 1 if
- * the file ends with .rvt, 0 otherwise.
- */
 static int
-Rivet_IsRivetFile (char *filepath)
+Rivet_CheckType (request_rec *req)
 {
-    char *fileCopy = (char*) malloc((strlen(filepath)+1) * sizeof(char));
-    char *cPtr;
+	if ( req->content_type != NULL ) {
+		if( STREQU( req->content_type, "application/x-httpd-rivet")) {
+			return RIVET_FILE;
+		}
 
-    strcpy (fileCopy, filepath);
-    cPtr = fileCopy + (strlen(fileCopy) - 3);
-
-    if (*(cPtr-1) != '.') {
-        char *ePtr = fileCopy + (strlen(fileCopy) - 1);
-        while (*ePtr-- != '?')
-            ;
-        ePtr++;
-        *ePtr = '\0';
-        cPtr = ePtr - 3;
+		 if( STREQU( req->content_type, "application/x-rivet-tcl")) {
+			return TCL_FILE;
+		}
     }
-    
-    if (strcmp (cPtr, "rvt") == 0) {
-        return RIVET_FILE;
-    }
-    else if (strcmp (cPtr, "tcl") == 0) {
-        return TCL_FILE;
-    }
- 
-    return 0;
+	return 0; 
 }
-
 /*
  * Rivet_ParseFileArgString (char *szDocRoot, char *szArgs, char **file)
  *
@@ -133,6 +130,7 @@ Rivet_IsRivetFile (char *filepath)
  * arguments and returned. The file name is appended to the szDocRoot
  * argument and stored in the *file pointer.
  */
+#if 0
 static int
 Rivet_ParseFileArgString (const char *szDocRoot, const char *szArgs, char **file,apr_pool_t *p, 
         Tcl_HashTable *argTbl)
@@ -199,7 +197,7 @@ Rivet_ParseFileArgString (const char *szDocRoot, const char *szArgs, char **file
     
     return RIVET_OK;
 }
-
+#endif
 
 /*
  * Setup an array in each interpreter to tell us things about Apache.
@@ -471,9 +469,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
             }
         }
 
-        //if( 1//STREQU( req->req->content_type, "application/x-httpd-rivet")
-        //        || !toplevel )
-        if (Rivet_IsRivetFile(filename) == RIVET_FILE)
+        if (Rivet_CheckType(req->req) == RIVET_FILE)
         {
             /* toplevel == 0 means we are being called from the parse
              * command, which only works on Rivet .rvt files. */
@@ -1440,66 +1436,6 @@ Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
     //apr_pool_cleanup_register (pChild, s, Rivet_ChildExit, Rivet_ChildExit);
 }
 
-static int
-Rivet_TranslateUri (request_rec *r)
-{
-    char *filename;
-    /*
-    Tcl_HashTable argTbl;
-    Tcl_HashSearch searchPtr;
-    Tcl_HashEntry *entryPtr;
-    */
-    int res = RIVET_OK;
-  
-    fprintf(stderr, "file: %s\n", r->filename);
-    fflush(stderr);
-    if (r->main)
-        filename = r->main->filename;
-    else
-        filename = r->filename;
-    
-    if (r->main) {
-        res = Rivet_ParseFileArgString (ap_document_root(r), r->unparsed_uri, 
-                &r->main->filename, r->pool, NULL);
-        filename = r->main->filename;
-    }
-    else {
-        res = Rivet_ParseFileArgString (ap_document_root(r), r->unparsed_uri, 
-                &r->filename, r->pool, NULL);
-        filename = r->filename;
-    }
-
-    if (res != RIVET_OK)
-        return HTTP_BAD_REQUEST;
-
-    if (!Rivet_IsRivetFile (filename))
-        return DECLINED;
-
-    /*
-    for (entryPtr = Tcl_FirstHashEntry(&argTbl, &searchPtr);
-            entryPtr != NULL;
-            entryPtr = Tcl_NextHashEntry (&searchPtr)) {
-        char *arg, *val;
-        arg = Tcl_GetHashKey(&argTbl, entryPtr);
-        val = (char*) Tcl_GetHashValue(entryPtr);
-        fprintf (stderr, "arg=%s, val=%s\n", arg, val);
-        fflush (stderr);
-    }
-    */
-
-    /* 
-     * seems that a subrequest is created for / processing. If this is a /
-     * request, set the filename into r->main (which is the request that
-     * is propagated through)
-     */
-    if (r->main)
-        r->main->filename = filename;
-    else
-        r->filename = filename;
-    
-    return DECLINED;
-}
-
 /* Set things up to execute a file, then execute */
 static int
 Rivet_SendContent(request_rec *r)
@@ -1517,7 +1453,7 @@ Rivet_SendContent(request_rec *r)
     rivet_server_conf *rsc = NULL;
     rivet_server_conf *rdc;
 
-    if (!Rivet_IsRivetFile(r->filename))
+    if (!Rivet_CheckType(r))
         return DECLINED;
 
     Tcl_MutexLock(&sendMutex);
@@ -1544,8 +1480,7 @@ Rivet_SendContent(request_rec *r)
         goto sendcleanup;
     }
 
-    //if (r->finfo.st_mode == 0)
-    if (!r->finfo.valid)
+    if (r->finfo.protection == 0)
     {
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server,
                 "File does not exist: %s",
@@ -1566,7 +1501,7 @@ Rivet_SendContent(request_rec *r)
 
     /* This one is the big catch when it comes to moving towards
        Apache 2.0, or one of them, at least. */
-    //apr_chdir_file(r->filename);
+    ap_chdir_file(r->filename);
 
     //TODO: clarify whether rsc or rdc
     //Rivet_PropagatePerDirConfArrays( interp, rdc );
@@ -1619,6 +1554,7 @@ Rivet_SendContent(request_rec *r)
 #endif
 
     errstatus = ApacheRequest_parse(globals->req->apachereq);
+
     if (errstatus != OK) {
         retval = errstatus;
         goto sendcleanup;
@@ -1667,8 +1603,6 @@ rivet_register_hooks (apr_pool_t *p)
 
     ap_hook_post_config (Rivet_InitHandler, NULL, NULL, APR_HOOK_LAST);
     ap_hook_handler (Rivet_SendContent, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_translate_name (Rivet_TranslateUri, aszPreTranslate, NULL,
-            APR_HOOK_MIDDLE);
     ap_hook_child_init (Rivet_ChildInit, NULL, NULL, APR_HOOK_LAST);
 }
 
