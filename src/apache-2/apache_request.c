@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include <apr_lib.h>
+#include <apr_strings.h>
 
 #include "apache_request.h"
 #include "apache_multipart_buffer.h"
@@ -398,7 +399,7 @@ int ApacheRequest___parse(ApacheRequest *req)
             result = ApacheRequest_parse_multipart(req);
         } else {
             //TODO: fix logging apr_log_rerror
-            //apr_log_rerror(REQ_ERROR,"[libapreq] unknown content-type: `%s'", ct);
+            ap_log_rerror(REQ_ERROR,0, r->server, "unknown content-type: `%s'", ct);
             result = HTTP_INTERNAL_SERVER_ERROR;
         }
     }
@@ -454,34 +455,33 @@ static void remove_tmpfile(void *data)
     free(upload->tempname);
 }
 
-FILE *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
+apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
 {
     request_rec *r = req->r;
-    FILE *fp = 0;
-    char prefix[] = "apreq";
+    apr_file_t *fp = NULL;
     char *name = NULL;
-    int fd = 0; 
-    int tries = 100;
-
-    //TODO: port it
-    while (--tries > 0) {
-    	if ( (name = tempnam(req->temp_dir, prefix)) == NULL )
-    	    continue;
-    	//fd = apr_popenf(r->pool, name, O_CREAT|O_EXCL|O_RDWR|O_BINARY, 0600);
-        if ( fd >= 0 )
-    	    break; /* success */
-    	else
-    	    free(name);
-    }
-    
-    //if ( tries == 0  || (fp = ap_pfdopen(r->pool, fd, "w+" "b") ) == NULL ) {
-        //ap_log_rerror(REQ_ERROR, 
-        //                  "[libapreq] could not create/open temp file: %s",
-        //                  strerror(errno));
-    	//if ( fd >= 0 ) { remove(name); free(name); }
-    	//return NULL;
-    //}
-
+    char *file = NULL ; 
+	const char *tempdir;
+	apr_status_t rv;
+	
+	tempdir = req->temp_dir;
+/*	file = (char *)apr_palloc(r->pool,sizeof(apr_time_t)); */
+	file = apr_psprintf(r->pool,"%u", r->request_time);
+	rv = apr_temp_dir_get(&tempdir,r->pool); 
+	if (rv != APR_SUCCESS)  {
+		ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "No temp dir!");
+		return NULL;
+	}
+	rv = apr_filepath_merge(&name,tempdir,file,APR_FILEPATH_NATIVE,r->pool);
+	if (rv != APR_SUCCESS) {
+		ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "File path error!");
+		return NULL;
+	}
+	rv = apr_file_mktemp(&fp,name,0,r->pool);
+	if (rv != APR_SUCCESS) {
+		ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "Failed to open temp file!");
+		return NULL;
+	}
     upload->fp = fp;
     upload->tempname = name;
     apr_pool_cleanup_register (r->pool, (void *)upload,
@@ -500,7 +500,8 @@ ApacheRequest_parse_multipart(ApacheRequest *req)
     char *boundary;
     multipart_buffer *mbuff;
     ApacheUpload *upload = NULL;
-
+	apr_status_t  status;
+	char *error[1024];
     if (!ct) {
         //TODO: fix logging apr_log_rerror
         //apr_log_rerror(REQ_ERROR, "[libapreq] no Content-type header!");
@@ -620,22 +621,16 @@ ApacheRequest_parse_multipart(ApacheRequest *req)
             }
 
             while ((blen = multipart_buffer_read(mbuff, buff, sizeof(buff)))) {
-                if (req->upload_hook != NULL) {
-                    wlen = req->upload_hook(req->hook_data, buff, blen, upload);
-                } else {
-                    wlen = fwrite(buff, 1, blen, upload->fp);
-                }
-                if (wlen != blen) {
-                    return HTTP_INTERNAL_SERVER_ERROR;
-                }
-                upload->size += wlen;
-            }
+				status = apr_file_write(upload->fp,buff,&blen);
+				if (status != 0) {	
+					apr_strerror(status,error,1024); 
+                   	return HTTP_INTERNAL_SERVER_ERROR;
+				}
 
-            if (upload->size > 0 && (upload->fp != NULL)) {
-                fseek(upload->fp, 0, 0);
+                upload->size += blen;
             }
         }
-    }
+        }
 
     return OK;
 }

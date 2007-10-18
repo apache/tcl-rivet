@@ -56,7 +56,7 @@ struct ApacheUpload {
     char *tempname;
     //table *info;
     apr_table_t *info;
-    FILE *fp;
+    apr_file_t *fp;
     long size;
     ApacheRequest *req;
 };
@@ -110,7 +110,7 @@ apr_table_t *ApacheRequest_post_params(ApacheRequest *req, apr_pool_t *p);
 apr_table_t *ApacheRequest_query_params(ApacheRequest *req, apr_pool_t *p);
 apr_table_t *ApacheRequest_post_params(ApacheRequest *req, apr_pool_t *p);
 
-FILE *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload);
+apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload);
 ApacheUpload *ApacheUpload_new(ApacheRequest *req);
 ApacheUpload *ApacheUpload_find(ApacheUpload *upload, char *name);
 
