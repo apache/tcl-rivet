@@ -1,3 +1,29 @@
+2007-10-17  Massimo Manghi <massimo.manghi@unipr.it>
+
+	* configure.ac: added APACHE2 define to config.h,
+	added also a message when the apxs program is found
+
+	* doc/Makefile.am: 'clean' target fixed
+
+	* src/apache-2/Makefile.am: added -I"." to the INCLUDE symbol
+
+	* src/apache-2/mod_rivet.c: Changed function that determines
+	if this is a request rivet must serve. We now correctly 
+	rely on the module configuration and on the headers handed
+	on to us by apache. Added also a ap_chdir_file implementation.
+	This function was dropped by the apache developers: we are
+	reintroducing it using a code snippet inspired by mod_ruby.
+
+	* src/apache-2/apache_request.h: Changed prototype of
+	ApacheRequest_tmpfile function to return apr_file_t instead 
+	of FILE, also modified ApacheUpload structure 
+
+	* src/apache-2/apache_request.c: ApacheRequest_tmpfile
+	rewritten using calls to apr_* functions
+
+	* src/apache-2/TclWebapache_c: TclWeb_UploadSave in
+	a more robust way using apr_* calls 
+
 2007-10-14  Massimo Manghi <massimo.manghi@unipr.it>
 
 	* doc/rivet.xml: Front page updated, page for the
