@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[0.6.0])
+AC_INIT([Rivet],[0.8.0])
 AM_CONFIG_HEADER(config.h)
 
 #--------------------------------------------------------------------
@@ -247,6 +247,7 @@ AC_DEFUN([CHECK_APXS],[
         [  --with-apxs=FILE        location of Apache's apxs tool],  
     	[if test -x "${with_apxs}" ; then
 		apxs_found="${with_apxs}"
+        	AC_MSG_RESULT([$apxs_found])
 	fi]
         ,
         [ 
@@ -270,6 +271,8 @@ AC_DEFUN([CHECK_APXS],[
         fi
         if test x"${apxs_found}" = x; then
             AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
+	else
+            AC_MSG_RESULT([$apxs_found])
         fi
        ]
     )
@@ -369,6 +372,7 @@ AC_DEFUN([APACHE_VERSION],[
         AC_MSG_RESULT( building for apache 2.x )
 	AC_CONFIG_FILES([src/apache-2/Makefile])
 	apache_version_dir="apache-2"
+    AC_DEFINE(APACHE2,1,[Apache2 define to config.h])
     fi
 ])
 
