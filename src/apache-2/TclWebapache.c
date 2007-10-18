@@ -540,7 +540,7 @@ int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
 		fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
 #else
 	*chan = Tcl_MakeFileChannel(
-	    (ClientData)fileno(ApacheUpload_FILE(req->upload)), TCL_READABLE);
+	    (ClientData)fileno((FILE*)ApacheUpload_FILE(req->upload)), TCL_READABLE);
 #endif
 	Tcl_RegisterChannel(req->interp, *chan);
 	return TCL_OK;
@@ -551,45 +551,13 @@ int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
 
 int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 {
-    int sz;
-    char savebuffer[BUFSZ];
-    Tcl_Channel chan;
-    Tcl_Channel savechan;
-
-    savechan = Tcl_OpenFileChannel(req->interp, Tcl_GetString(filename),
-				   "w", 0600);
-    if (savechan == NULL) {
-	return TCL_ERROR;
-    } else {
-	Tcl_SetChannelOption(req->interp, savechan,
-			     "-translation", "binary");
-    }
-
-#ifdef __MINGW32__
-    chan = Tcl_MakeFileChannel(
-	(ClientData)_get_osfhandle(
-	    fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
-#else
-    chan = Tcl_MakeFileChannel(
-	(ClientData)fileno(ApacheUpload_FILE(req->upload)), TCL_READABLE);
-#endif
-    Tcl_SetChannelOption(req->interp, chan, "-translation", "binary");
-
-    while ((sz = Tcl_Read(chan, savebuffer, BUFSZ)))
-    {
-	if (sz == -1)
-	{
-	    Tcl_AddErrorInfo(req->interp, Tcl_PosixError(req->interp));
-	    return TCL_ERROR;
+	apr_status_t	status;
+	status = apr_file_copy(req->upload->tempname ,Tcl_GetString(filename),APR_FILE_SOURCE_PERMS,req->req->pool);
+	if ( status == 0 ) {
+	    return TCL_OK;
+	} else {
+		return TCL_ERROR;
 	}
-
-	Tcl_Write(savechan, savebuffer, sz);
-	if (sz < 4096) {
-	    break;
-	}
-    }
-    Tcl_Close(req->interp, savechan);
-    return TCL_OK;
 }
 
 int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
@@ -611,7 +579,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
 		fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
 #else
 	chan = Tcl_MakeFileChannel(
-	    (ClientData)fileno(ApacheUpload_FILE(req->upload)), TCL_READABLE);
+	    (ClientData)fileno((FILE *)ApacheUpload_FILE(req->upload)), TCL_READABLE);
 #endif
 	Tcl_SetChannelOption(req->interp, chan,
 			     "-translation", "binary");
