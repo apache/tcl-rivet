@@ -32,4 +32,4 @@ html/rivet.en.html: rivet.xml rivet-nochunk.xsl
 docs: html/index.en.html html/rivet.en.html
 
 clean:
-	rm html/*.html
+	-rm html/*.html
