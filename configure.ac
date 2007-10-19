@@ -232,7 +232,7 @@ AC_DEFUN([APACHE],[
         apache,
         [  --with-apache[=DIR]    Apache server base directory],
 	, [with_apache="/usr/local/apache"]
-    )
+	)
 	apache_base="${with_apache}"
         AC_MSG_RESULT([$apache_base])
 ])
