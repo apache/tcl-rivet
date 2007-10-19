@@ -1,7 +1,18 @@
+2007-10-19  Massimo Manghi <massimo.manghi@unipr.it>
+	
+	* src/apache-2/mod_rivet.c: Included a more correct
+	statement in aknowledgement of mod_ruby (BSD license)
+	for the code in ap_chdir_file.
+
+	* ChangeLog: the whole batch of patches described in 
+	the previous entry (2007-10-17), came from Valery 
+	Masiutsin <val.masutin@gmail.com>. I forgot to mention
+	it in this document. My fault.
+
 2007-10-17  Massimo Manghi <massimo.manghi@unipr.it>
 
 	* configure.ac: added APACHE2 define to config.h,
-	added also a message when the apxs program is found
+	added also a message when the apxs program is found.
 
 	* doc/Makefile.am: 'clean' target fixed
 
@@ -23,6 +34,7 @@
 
 	* src/apache-2/TclWebapache_c: TclWeb_UploadSave in
 	a more robust way using apr_* calls 
+
 
 2007-10-14  Massimo Manghi <massimo.manghi@unipr.it>
 

@@ -72,8 +72,9 @@ static request_rec *globalrr;
 
 TCL_DECLARE_MUTEX(sendMutex);
 
-/* come from mod_ruby licence is BSD-like */
+/* This snippet of code came from the mod_ruby project, which is under a BSD license. */
 #ifdef APACHE2 /* Apache 2.x */
+
 static void ap_chdir_file(const char *file)
 {
 	const char *x;
