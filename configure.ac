@@ -344,9 +344,9 @@ AC_DEFUN([APR_HANDLING],[
 	    AC_SUBST(APR_INCLUDES)
 	    APR_LDLFAGS=`${apr_found} --link-libtool --libs`
 	    AC_SUBST(APR_LDFLAGS)
-        else
-            AC_MSG_ERROR([Could not find apr-1-config.  apr-1-config must be in your PATH or you must specify the location of the apr script using --with-apr-config])
-        fi
+    else
+        AC_MSG_ERROR([Could not find apr-1-config.  apr-1-config must be in your PATH or you must specify the location of the apr script using --with-apr-config])
+    fi
 ])
 
 # apache version
@@ -360,7 +360,7 @@ AC_DEFUN([APACHE_VERSION],[
     AC_ARG_WITH(
         apache_version,
         [  --with-apache-version[=VER]  build for apache 1.x or 2.x],,
-        ,[with_apache_version="2"]
+        [with_apache_version="2"]
     )
 
     AC_MSG_CHECKING(for apache version)
@@ -372,7 +372,7 @@ AC_DEFUN([APACHE_VERSION],[
         AC_MSG_RESULT( building for apache 2.x )
 	AC_CONFIG_FILES([src/apache-2/Makefile])
 	apache_version_dir="apache-2"
-    AC_DEFINE(APACHE2,1,[Apache2 define to config.h])
+        AC_DEFINE(APACHE2,1,[Apache2 define to config.h])
     fi
 ])
 
@@ -393,15 +393,24 @@ AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
 	    TCL_PACKAGE_PATH=${res}
             AC_SUBST(TCL_PACKAGE_PATH)
         fi
-	     
 ])
-
 
 AC_DEFUN([GET_RIVET_BASE], [
-	RIVET_BASE_INCLUDE=`pwd`/src	
-	AC_SUBST(RIVET_BASE_INCLUDE)
+    RIVET_BASE_INCLUDE=`pwd`/src	
+    AC_SUBST(RIVET_BASE_INCLUDE)
 ])
 
+AC_DEFUN([RIVET_TCL_LIB],[
+    AC_ARG_WITH(
+        rivet_target_dir,
+        [ --with-rivet-target-dir=DIR  Rivet tcl library target dir ],,
+		with_rivet_target_dir="${apache_base}/lib/rivet${PACKAGE_VERSION}"
+    )
+    AC_MSG_CHECKING(for Rivet tcl library target)
+    RIVET_TCL_TARGET=${with_rivet_target_dir}
+    AC_SUBST(RIVET_TCL_TARGET)
+    AC_MSG_RESULT([$with_rivet_target_dir])
+])
 
 APACHE_VERSION
 GET_RIVET_BASE
@@ -409,9 +418,11 @@ APACHE
 CHECK_APXS
 APACHE_INCLUDES
 APR_HANDLING
+RIVET_TCL_LIB
 AC_SUBST(apache_include)
 AC_SUBST(apache_version_dir)
 
+AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
 
 # We need to use the package path for the installation procedure.  On
@@ -419,7 +430,6 @@ AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh
 #TCL_PACKAGE_PATH variable, so we have to handle this
 HANDLE_TCL_PACKAGE_PATH
 AC_SUBST(TCL_PACKAGE_PATH)
-
 
 # Finally, substitute all of the various values into the Makefile.
 # You may alternatively have a special pkgIndex.tcl.in or other files

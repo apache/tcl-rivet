@@ -24,6 +24,9 @@
 #include <sys/stat.h>
 #include <string.h>
 
+/* as long as we need to emulate ap_chdir_file we need to include unistd.h */
+#include <unistd.h>
+
 /* Apache includes */
 #include <httpd.h>
 #include <http_config.h>
@@ -412,8 +415,9 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
             delEntry = Tcl_FindHashEntry(
                     rsc->objCache,
                     rsc->objCacheList[ct]);
-            if (delEntry != NULL)
+            if (delEntry != NULL) {
                 Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+	    }
             Tcl_DeleteHashEntry(delEntry);
 
             free(rsc->objCacheList[ct]);
@@ -672,17 +676,14 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
     }
 }
 
-
-
-
 /* Function to get a config and merge the directory/server options  */
 rivet_server_conf *
 Rivet_GetConf( request_rec *r )
 {
-    rivet_server_conf *newconfig = NULL;
     rivet_server_conf *rsc = RIVET_SERVER_CONF( r->server->module_config );
-    rivet_server_conf *rdc;
     void *dconf = r->per_dir_config;
+    //rivet_server_conf *newconfig = NULL;
+    //rivet_server_conf *rdc;
     //int tst;
     
     FILEDEBUGINFO;
@@ -691,9 +692,8 @@ Rivet_GetConf( request_rec *r )
     if (dconf == NULL) {
         return rsc;
     }
-
     return rsc;
-
+/*
     rdc = RIVET_SERVER_CONF( dconf );
     
     newconfig = RIVET_NEW_CONF( r->pool );
@@ -703,6 +703,7 @@ Rivet_GetConf( request_rec *r )
     Rivet_MergeDirConfigVars( r->pool, newconfig, rsc, rdc );
 
     return newconfig;
+ */
 }
 
 static void *
@@ -805,8 +806,6 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     Tcl_DecrRefCount(arrayName);
 }
 
-
-
 /*
  *-----------------------------------------------------------------------------
  *
@@ -849,7 +848,12 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level
        commands. */
-    if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
+
+    /* We want to run the init.tcl specific to the installation
+     */
+
+    if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl")) {
+//  if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                 "init.tcl must be installed correctly for Apache Rivet to function: %s",
                 Tcl_GetStringResult(interp) );
@@ -1048,7 +1052,11 @@ static int
 Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp,
        server_rec *s)
 {
+#ifdef HIDE_RIVET_VERSION
     ap_add_version_component(pPool, "Rivet");
+#else
+    ap_add_version_component(pPool, "Rivet/"VERSION);
+#endif
     return OK;
 }
 
@@ -1248,13 +1256,22 @@ Rivet_ChildHandlers(server_rec *s, int init)
                 ( sr == s || rsc->separate_virtual_interps ||
                   function != parentfunction))
         {
-            if (Tcl_EvalObjEx(rsc->server_interp,
-                        function, 0) != TCL_OK) {
+            if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                         errmsg, Tcl_GetString(function));
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, "%s",
                         Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
             }
+
+	/*
+	 * Upon child exit we delete each interpreter before the caller 
+	 * uses Tcl_Finalize 
+	 */
+
+	    if (!init) {
+	    	Tcl_DeleteInterp(rsc->server_interp);
+	    }
+
         }
         sr = sr->next;
     }
@@ -1434,7 +1451,7 @@ Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
     Rivet_ChildHandlers(s, 1);
 
     //cleanup
-    //apr_pool_cleanup_register (pChild, s, Rivet_ChildExit, Rivet_ChildExit);
+    apr_pool_cleanup_register (pChild, s, Rivet_ChildExit, Rivet_ChildExit);
 }
 
 /* Set things up to execute a file, then execute */
@@ -1579,6 +1596,7 @@ Rivet_SendContent(request_rec *r)
         request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
         Tcl_IncrRefCount(request_cleanup);
     }
+
     if(Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, "%s",
                 Tcl_GetVar(interp, "errorInfo", 0));
@@ -1600,7 +1618,7 @@ rivet_register_hooks (apr_pool_t *p)
 {
     //static const char * const aszPre[] = {
     //    "http_core.c", "mod_mime.c", NULL };
-    static const char * const aszPreTranslate[] = {"mod_alias.c", NULL};
+    //static const char * const aszPreTranslate[] = {"mod_alias.c", NULL};
 
     ap_hook_post_config (Rivet_InitHandler, NULL, NULL, APR_HOOK_LAST);
     ap_hook_handler (Rivet_SendContent, NULL, NULL, APR_HOOK_LAST);

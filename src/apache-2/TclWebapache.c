@@ -423,8 +423,9 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     env     = (apr_table_entry_t *) env_arr->elts;
     for (i = 0; i < env_arr->nelts; ++i)
     {
-	if (!env[i].key)
+	if ((!env[i].key) || (!env[i].val)) {
 	    continue;
+	}
 
 	key = TclWeb_StringToUtfToObj(env[i].key, req);
 	val = TclWeb_StringToUtfToObj(env[i].val, req);

@@ -9,12 +9,17 @@
 
 EXTRA_DIST=LICENSE contrib debian doc rivet win/nmakehlp.c src/testing.c src/TclWebcgi.c
 SUBDIRS = src doc
+RIVETLIB_DESTDIR = @RIVET_TCL_TARGET@
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 install-data-local:
-	$(mkinstalldirs) $(DESTDIR)@libdir@/rivet@VERSION@
-	cp -r rivet/* $(DESTDIR)@libdir@/rivet@VERSION@
+	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
+	cp -r rivet/* $(RIVETLIB_DESTDIR)
+	-( cd  $(RIVETLIB_DESTDIR) ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+
+#	$(mkinstalldirs) $(DESTDIR)@libdir@/rivet@VERSION@
+#	cp -r rivet/* $(DESTDIR)@libdir@/rivet@VERSION@
 # This little bit of line noise generates the package index file (pkgIndex.tcl)
-	-( cd  $(DESTDIR)@libdir@/rivet@VERSION@ ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+#	-( cd  $(DESTDIR)@libdir@/rivet@VERSION@ ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )

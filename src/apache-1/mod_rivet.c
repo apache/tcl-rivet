@@ -704,7 +704,15 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level
     commands. */
-    if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
+
+    /* We want to run the init.tcl specific to the installation
+     * that is being carried out
+     */
+
+    Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl");
+
+    if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl")) {
+//  if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
 	ap_log_error( APLOG_MARK, APLOG_ERR, s,
 		      "init.tcl must be installed correctly for Apache Rivet to function: %s",
 		      Tcl_GetStringResult(interp) );
@@ -1381,6 +1389,15 @@ Rivet_ChildHandlers(server_rec *s, pool *p, int init)
 			     Tcl_GetString(function));
 		ap_log_error(APLOG_MARK, APLOG_ERR, s, "%s",
 			     Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
+	    }
+
+	/*
+	 * Upon child exit we delete each interpreter before the caller 
+	 * uses Tcl_Finalize 
+	 */
+
+	    if (!init) {
+	    	Tcl_DeleteInterp(rsc->server_interp);
 	    }
 	}
 	sr = sr->next;

@@ -25,7 +25,7 @@ INCLUDES = -I@apache_include@
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
-lib_libexecdir = @TCL_PACKAGE_PATH@/rivet
+lib_libexecdir = @RIVET_TCL_TARGET@
 lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
 
 #
