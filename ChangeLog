@@ -1,3 +1,42 @@
+2007-11-05  Massimo Manghi <massimo.manghi@unipr.it>
+
+	* configure.ac: the macro rivet_target_dir was added 
+	to 'configure'. This macro generates a name for the 
+	directory where Rivet libraries must be copied during 
+	the installation phase. User is enabled to change
+	the default value by feeding 'configure' with the switch
+	'--with-rivet-target-dir'. This macro defines also the
+	variable RIVET_TCL_TARGET and calls AC_SUBST on it.
+	The target directory gets inserted also in the 
+	auto_path list variable of every script run by 
+	the module. Defined configuration symbol 
+	RIVETLIB_DESTDIR in config.h.
+
+	* Makefile.am,src/Makefile.am: RIVET_TCL_TARGET variable
+	propagation.
+
+	* src/apache-1/Makefile.am: rivetWWW.c removed from 
+	linking into mod_rivet.so (this requires docs to 
+	be updated, as commands in this file have to be 
+	loaded explicitly using 'package require Rivet')
+
+	* src/apache-1/mod_rivet.c: Tcl_DeleteInterp called
+	upon child exit. ${RIVETLIB_DESTDIR)/init.tcl is 
+	run during the interpreter initialization.
+	
+	* src/apache-2/mod_rivet.c: Exit handler reenabled,
+	and Tcl_DeleteInterp called upon child exit. 
+	${RIVETLIB_DESTDIR)/init.tcl is run during the 
+	interpreter initialization. Code clean up in 
+	Rivet_GetConf. Minor changes in order to get rid
+	of some compilation warnings.
+
+	* src/apache-2/TclWebapache.c: Test checking for 
+	null values in the table of environment variables
+	has been extended to the value field. Failure to
+	do so caused a child to segfault when rivet was
+	used in conjuction with dir_module
+
 2007-10-19  Massimo Manghi <massimo.manghi@unipr.it>
 	
 	* src/apache-2/mod_rivet.c: Included a more correct
