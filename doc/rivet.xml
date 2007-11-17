@@ -1415,15 +1415,18 @@ AddType application/x-rivet-tcl .tcl</programlisting>
       <refsect1>
 	<title>Description</title>
 	<para>
-	  Scans through each character in the specified string looking
-	  for special characters, escaping them as needed, mapping
-	  special characters to a quoted hexadecimal equivalent,
-	  returning the result.
+	    Scans through each character in the specified string looking
+	    for special characters, escaping them as needed, mapping
+	    special characters to a quoted hexadecimal equivalent,
+	    returning the result.
 	</para>
 	<para>
-	This is useful for quoting strings that are going to be
-	part of a URL.
+	    This is useful for quoting strings that are going to be
+	    part of a URL.
 	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
       </refsect1>
     </refentry>
 
@@ -1449,6 +1452,9 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  For example, the right angle
 	  bracket is escaped to the corrected ampersand gt symbol.
 	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
       </refsect1>
     </refentry>
 
@@ -1472,12 +1478,16 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  for any shell metacharacters, such as asterisk, less than and
 	  greater than, parens, square brackets, curly brackets, angle 
 	  brackets, dollar signs, backslashes, semicolons, ampersands,
-	  vertical bars, etc.
+	  vertical bars, etc. 	
 	</para>
 	<para>
 	  For each metacharacter found, it is quoted in the result by
 	  prepending it with a backslash, returning the result.
 	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
+
       </refsect1>
     </refentry>
 
@@ -1504,9 +1514,12 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  plus signs to spaces, and returning the result.
 	</para>
 	<para>
-	This is useful for unquoting strings that have been quoted to
-	be part of a URL.
+	    This is useful for unquoting strings that have been quoted to
+	    be part of a URL.
 	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
       </refsect1>
     </refentry>
 
@@ -1636,12 +1649,12 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	requirements.
       </para>
       <para>
-	It is also important to understand that some
+	It is also important to understand that some 
 	<command>upload</command> commands are effective only when
 	used in a mutually exclusive way.  Apache stores the data in
 	temporary files which are read by the <command>upload save
-	<arg>upload name</arg><arg>filename</arg> </command> or by the
-	<command>upload data <arg>upload name</arg> </command>
+	<arg>upload name</arg><arg>filename</arg></command> or by the
+	<command>upload data <arg>upload name</arg></command>
 	command. Subsequent calls to these 2 commands using the same
 	<arg>upload name</arg> argument will return no data on the
 	second call.  Likewise <command>upload channel <arg>upload
@@ -1654,37 +1667,36 @@ AddType application/x-rivet-tcl .tcl</programlisting>
     <example id="file_download">
       <title>File Download</title>
       <para>
-	In general setting up a data file to be sent over http is as
-	easy as determining the file's URI and letting Apache's
-	standard download mechanism do all that is needed. If this
-	approach fits your design all you have to do is to keep the
-	downloadable files somewhere within Apache's DocumentRoot (or
-	in any of the directories that you can configure and register
-	using the Alias definitions or the Virtual Hosts mechanism).
+	In general setting up a data file for being sent over http is 
+	as easy as determining the file's URI and letting Apache's
+	do all that is needed. If this approach fits your design all 
+	you have to do is to keep the downloadable files somewhere 
+	within Apache's DocumentRoot (or in any of the directories 
+	Apache has right to access).
       </para>
       <para>
-	When a client sends a request for a file Apache takes
+	When a client sends a request for a file, Apache takes
 	care of determining the filetype, sends appropriate headers to
-	the client and then the file content.  If the client is a
-	browser capable of displaying the content of the file a
-	representation is shown in the browser's window. When the browser
-	hasn't a valid builtin method or plugin registered for the
-	file's content the typical download dialog pops up asking
-	for directions from the user.
+	the client and then the file content. The client is responsible
+	for deciding how to handle the data accordingly to the 
+	"content-type" headers and its internal design. For example
+	when browsers give up trying to display a certain "content-type"
+	they display a download dialog box asking for directions from
+	the user. 
       </para>
       <para>
 	Rivet can help if you have more sofisticated needs.  For
 	instance you may be developing an application that uses
-	webpages to collect input data that have to be
-	passed on to scripts or programs. In this case the content
-	is generated on demand  and a real file representing the
-	data doesn't exist on the server. In other circumstances you 
-	may need to dynamically inhibit the download of a specific 
-	file and hide it away, even to those clients that might have 
-	already saved the URI to the file in their bookmarks.
+	webpages to collect input data. This information might be
+	passed on to scripts or programs for processing. 
+	In this case a real file representing the
+	data doesn't exist and the content is generated on demand 
+	by the server. 
+	In other circumstances you may need to dynamically inhibit 
+	the download of specific files and hide them away, 
 	Your scripts may expunge from the pages
-	every link to the file (your pages are dynamic, aren't
-	they?) and move the file out of way, but it looks like a
+	every link to these files (your pages are dynamic, aren't
+	they?) and move them out of way, but it looks like a
 	cumbersome solution.
       </para>
       <para>
@@ -1699,6 +1711,10 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	Pdf files are stored in a directory whose path is
 	in the <command>pdf_repository</command> variable.
       </para> 
+      <para>
+	This code is reported as an example of how to control 
+	the protocol using the <command>headers</command> command.
+      </para>
       <programlisting>&download.tcl;</programlisting>
       <para>
 	Before the pdf is sent the procedure sets the

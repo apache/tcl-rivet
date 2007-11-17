@@ -1,3 +1,8 @@
+2007-11-18  Massimo Manghi <massimo.manghi@unipr.it>
+
+	* doc/rivet.xml: note added to description of
+	commands listed in the 'Rivet' package.
+
 2007-11-05  Massimo Manghi <massimo.manghi@unipr.it>
 
 	* configure.ac: the macro rivet_target_dir was added 
