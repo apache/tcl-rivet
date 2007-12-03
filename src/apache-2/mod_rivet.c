@@ -682,9 +682,8 @@ Rivet_GetConf( request_rec *r )
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( r->server->module_config );
     void *dconf = r->per_dir_config;
-    //rivet_server_conf *newconfig = NULL;
-    //rivet_server_conf *rdc;
-    //int tst;
+    rivet_server_conf *newconfig = NULL;
+    rivet_server_conf *rdc;
     
     FILEDEBUGINFO;
 
@@ -692,9 +691,7 @@ Rivet_GetConf( request_rec *r )
     if (dconf == NULL) {
         return rsc;
     }
-    return rsc;
-/*
-    rdc = RIVET_SERVER_CONF( dconf );
+    rdc = RIVET_SERVER_CONF( dconf ); 
     
     newconfig = RIVET_NEW_CONF( r->pool );
 
@@ -703,7 +700,6 @@ Rivet_GetConf( request_rec *r )
     Rivet_MergeDirConfigVars( r->pool, newconfig, rsc, rdc );
 
     return newconfig;
- */
 }
 
 static void *

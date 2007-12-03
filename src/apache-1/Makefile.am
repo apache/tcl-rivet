@@ -38,7 +38,8 @@ mod_rivet_la_SOURCES = \
 	TclWebapache.c \
 	../rivetCore.c \
 	../rivetChannel.c \
-	../rivetParser.c
+	../rivetParser.c \
+	../rivetWWW.c
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@

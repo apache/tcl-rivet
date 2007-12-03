@@ -40,9 +40,9 @@ void* my_memstr(char* haystack, int haystacklen, const char* needle,
     while( (ptr = memchr(ptr, needle[0], len)) ) {
 	/* calculate length after match */
 	len = haystacklen - (ptr - (char *)haystack);
-
+	 ;
 	/* done if matches up to capacity of buffer */
-	if(memcmp(needle, ptr, needlen < len ? needlen : len) == 0 &&
+	if(memcmp(needle, ptr, needlen) == 0 &&
 	   (partial || len >= needlen))
 	    break;
 
@@ -190,7 +190,7 @@ multipart_buffer *multipart_buffer_new(char *boundary, long length, request_rec 
     self->bufsize = minsize;
     self->request_length = length;
     self->boundary = (char*) apr_pstrcat(r->pool, "--", boundary, NULL);
-    self->boundary_next = (char*) apr_pstrcat(r->pool, "\n", self->boundary, NULL);
+    self->boundary_next = (char*) apr_pstrcat(r->pool, "\n", self->boundary+2, NULL);
     self->buf_begin = self->buffer;
     self->bytes_in_buffer = 0;
 
@@ -254,13 +254,15 @@ int multipart_buffer_read(multipart_buffer *self, char *buf, int bytes)
 
     /* look for a potential boundary match, only read data up to that point */
     if( (bound = my_memstr(self->buf_begin, self->bytes_in_buffer,
-			   self->boundary_next, 1)) )
-	max = bound - self->buf_begin;
-    else
+			   self->boundary_next, 1)) ) {
+	max = bound - self->buf_begin - 1 ;
+	self->bytes_in_buffer=max+1;
+     } else {
 	max = self->bytes_in_buffer;
-
+     }
     /* maximum number of bytes we are reading */
     len = max < bytes-1 ? max : bytes-1;
+
 
     /* if we read any data... */
     if(len > 0) {

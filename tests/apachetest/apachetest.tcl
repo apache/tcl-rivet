@@ -34,9 +34,14 @@ namespace eval apachetest {
 
     # name of the apache binary, such as /usr/sbin/httpd
     variable binname ""
+	if ![info exists ::httpd_version ] {
+    	puts stderr "Please create httpd_version variable in global namespace"
+	    exit 1
+	} 
+	variable httpd_version  $::httpd_version
     # this file should be in the same directory this script is.
     variable templatefile [file join [file dirname [info script]] \
-			       template.conf.tcl]
+			       template.conf.$httpd_version\.tcl]
 }
 
 # apachetest::need_modules --
@@ -105,6 +110,7 @@ proc apachetest::start { options conftext code } {
     variable serverpid 0
     variable binname
     variable debug
+    variable httpd_version
 
     set fn [file join [pwd] test.conf]
     catch {file delete -force $fn}
@@ -112,27 +118,34 @@ proc apachetest::start { options conftext code } {
     puts $fl [uplevel [list subst $conftext]]
     close $fl
 
+    #OpenBSD related workaround, their stock apache tries to chroot by default
+    #have to  add -u to the arguments to prevent this
+    catch {exec uname} uname_str
+    if {[string equal $uname_str OpenBSD] && $httpd_version == 1 } {
+        set server_args "-u -X -f"
+    } else {
+        set server_args "-X -f"
+    }
     # There has got to be a better way to do this, aside from waiting.
-    set serverpid [eval exec  $binname -X -f \
-		       [file join [pwd] server.conf] $options >& apachelog.txt &]
-
+    set serverpid [eval exec  $binname $server_args \
+	       [file join [pwd] server.conf] $options >& apachelog.txt &] 
     apachetest::connect
     if { $debug > 0 } {
-	puts "Apache started as PID $serverpid"
+	    puts "Apache started as PID $serverpid"
     }
     if { [catch {
 	uplevel $code
     } err] } {
-	puts $err
     }
     # Kill and wait are the only reasons we need TclX.
-    kill $serverpid
+    # apache2 binary started with -X reacts to SIGQUIT and ignores TERM
+    kill QUIT $serverpid 
     catch {
-	set waitres [wait $serverpid]
-	if { $debug > 0 } {
-	    puts $waitres
-	}
-    }
+        set waitres [wait $serverpid]
+        if { $debug > 0 } {
+            puts $waitres
+        }
+    } 
 }
 
 # startserver - start the server with 'options'.
@@ -225,28 +238,34 @@ proc apachetest::gethttpdconf { binname } {
 #	Text of configuration files.
 
 proc apachetest::getallincludes { conffile } {
-    set fl [open $conffile r]
-    set data [read $fl]
-    close $fl
+    if [file  exists $conffile] {
+	    set fl [open $conffile r]
+	    set data [read $fl]
+	    close $fl
 
-    set newdata {}
-    foreach line [split $data \n] {
-	# Look for Include lines.
-	if { [regexp -line {^[^\#]*Include +(.*)} $line match file] } {
-	    set file [string trim $file]
-	    # Since directories may be included, glob them for all
-	    # files contained therein.
-	    if { [file isdirectory $file] } {
-		foreach fl [glob -nocomplain [file join $file *]] {
-		    append newdata [getallincludes $fl]
+	    set newdata {}
+	    foreach line [split $data \n] {
+		# Look for Include lines.
+		if { [regexp -line {^[^\#]*Include +(.*)} $line match file] } {
+		    set file [string trim $file]
+		    # Since directories may be included, glob them for all
+		    # files contained therein.
+		    if { [file isdirectory $file] } {
+			foreach fl [glob -nocomplain [file join $file *]] {
+			    if [file  exists $fl] {
+				    append newdata [getallincludes $fl]
+			    }
+			}
+		    } else {
+			append newdata [getallincludes $file]
+		    }
 		}
-	    } else {
-		append newdata [getallincludes $file]
 	    }
-	}
-    }
-    append data $newdata
-    return $data
+	    append data $newdata
+	    return $data
+   } else {
+	return
+   }
 }
 
 # apachetest::getloadmodules --
@@ -267,14 +286,24 @@ proc apachetest::getallincludes { conffile } {
 proc apachetest::getloadmodules { conffile needtoget } {
     set confdata [getallincludes $conffile]
     set loadline [list]
+    regexp -line {^[^#]*(ServerRoot[\s]?[\"]?)([^\"]+)()([\"]?)} $confdata \
+    match sub1 server_root_path sub2 
     foreach mod $needtoget {
-	# Look for LoadModule lines.
-	if { ! [regexp -line "^\[^\#\]*(LoadModule\\s+$mod\\s+.+)\$"\
-		    $confdata match line] } {
-	    error "No LoadModule line for $mod!"
-	} else {
-	    lappend loadline $line
-	}
+    	# Look for LoadModule lines.
+        if { ! [regexp -line "^\[^\#\]*(LoadModule\\s+$mod\\s+.+)\$"\
+                $confdata match line] } {
+            error "No LoadModule line for $mod!"
+        } else {
+			set raw_path [join [lrange [split $line { }] 2 end]]
+			#trimming leading whitespaces
+			set path [string trimleft $raw_path]
+            if ![string equal [file pathtype $line] "absolute"] {
+                set absolute_path [file join $server_root_path $path]
+                lappend loadline "[join [lrange [split $line " "]  0 1]] $absolute_path"
+            } else {
+                lappend loadline $line
+            }
+        }
     }
     return [join $loadline "\n"]
 }
@@ -322,6 +351,11 @@ proc apachetest::makeconf { outfile {extra ""} } {
     variable binname
     variable templatefile
     set CWD [pwd]
+
+    #getting uid and gid of user
+    catch {exec id} raw_string		
+    set username  [lindex [regexp -inline {(uid=)([\d]+)(\()([^\)]+)(\))} $raw_string]  4]
+    set group  [lindex [regexp -inline {(groups=)([\d]+)(\()([^\)]+)(\))} $raw_string]  4]
 
     # replace with determinemodules
     set LOADMODULES [determinemodules $binname]

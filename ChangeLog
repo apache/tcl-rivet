@@ -1,3 +1,13 @@
+2007-12-03  Valery Masiutsin <val.masutin@gmail.com>
+
+	* tests/apachetest/: multiple changes has been made to tests
+	to get them working with apache2
+	* src/apache-2/mod_rivet.c, src/apache-2/apache_multipart_buffer.c:
+	fixes for  issues that has been discovered with tests, mostly
+	there were problems with multipart buffer parsing during POST
+	* configure.ac: minor issue with apache includes handling has been
+	fixed
+
 2007-11-18  Massimo Manghi <massimo.manghi@unipr.it>
 
 	* doc/rivet.xml: note added to description of

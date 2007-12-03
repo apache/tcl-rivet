@@ -23,13 +23,14 @@ dnl
 #-----------------------------------------------------------------------
 
 AC_INIT([Rivet],[0.8.0])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
 # This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
+
 
 TEA_INIT([3.6])
 
@@ -307,8 +308,10 @@ AC_DEFUN([APACHE_INCLUDES],[
   AC_ARG_WITH(
     apache_include,
     [  --with-apache-include[=DIR]     Apache server directory],
-    ,[apache_include="${APXS_INCLUDES}"]
+	 [apache_include="${with_apache_include}"] 
+	,[apache_include="${APXS_INCLUDES}"]
   )
+	AC_SUBST(apache_include)
 ])
 
 AC_DEFUN([APR_HANDLING],[
@@ -419,7 +422,6 @@ CHECK_APXS
 APACHE_INCLUDES
 APR_HANDLING
 RIVET_TCL_LIB
-AC_SUBST(apache_include)
 AC_SUBST(apache_version_dir)
 
 AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])

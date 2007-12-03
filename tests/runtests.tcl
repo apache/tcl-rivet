@@ -18,17 +18,32 @@
 
 # $Id$
 
+
 set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] apachetest]]
-package require apachetest
+
 
 proc runtests_usage {} {
     puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver?"
     exit 1
 }
 
+proc get_httpd_version {httpd} {
+	catch {exec $httpd -v} raw_string
+	set version  [lindex [regexp -inline {([0-9]{1,}\.[0-9]{1,}\.[0-9]{1,})} $raw_string]  1]
+	if [string match "1.3.*" $version] {
+		return 1
+	} else {
+		return 2
+	}
+}
+
 if { [llength $argv] < 1 } {
     runtests_usage
+} else {
+	set httpd_version [get_httpd_version  [lindex $argv 0]]
 }
+
+package require apachetest
 
 if { [encoding system] eq "utf-8" } {
     puts stderr {
@@ -46,17 +61,31 @@ if { [catch {
     runtests_usage
 }
 
-apachetest::need_modules {
-    {mod_log_config	  config_log_module}
-    {mod_mime		mime_module}
-    {mod_negotiation	 negotiation_module}
-    {mod_dir		         dir_module}
-    {mod_access	      access_module}
-    {mod_auth		auth_module}
+
+if {$httpd_version == 1} {
+	apachetest::need_modules {
+		{mod_log_config		config_log_module}
+		{mod_mime			mime_module}
+		{mod_negotiation	negotiation_module}
+		{mod_dir			dir_module}
+		{mod_auth			auth_module}
+		{mod_access			access_module}
+	}
+} else {
+	apachetest::need_modules {
+		{mod_mime           mime_module}
+		{mod_negotiation    negotiation_module}
+		{mod_dir            dir_module}
+		{mod_log_config     log_config_module}
+		{mod_authz_host     authz_host_module}
+	}
 }
 
 apachetest::makeconf server.conf {
-    LoadModule rivet_module [file join $CWD .. src .libs mod_rivet[info sharedlibextension]]
+    LoadModule rivet_module [file join $CWD .. src/apache-$apachetest::httpd_version .libs mod_rivet[info sharedlibextension]]
+
+    User $username
+    Group $group
 
     <IfModule mod_mime.c>
     TypesConfig $CWD/mime.types
@@ -67,7 +96,6 @@ apachetest::makeconf server.conf {
     AddType application/x-rivet-tcl .tcl
     </IfModule>
 
-    RivetServerConf UploadFilesToVar on
 
     <IfDefine SERVERCONFTEST>
     RivetServerConf BeforeScript 'puts "Page Header"'
@@ -87,7 +115,6 @@ apachetest::makeconf server.conf {
     # For testing, we want core dumps.
     CoreDumpDirectory $CWD
 }
-
 # Copy the rivet init files.
 file delete -force rivet
 file copy -force [file join .. rivet] .
