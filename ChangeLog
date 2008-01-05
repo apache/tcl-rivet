@@ -1,3 +1,8 @@
+2008-01-05 Massimo Manghi <massimo.manghi@unipr.it>
+	
+	* src/apache-[1|2]/mod_rivet.c: Added comments as per
+	David Welton's suggestion.
+
 2007-12-03  Valery Masiutsin <val.masutin@gmail.com>
 
 	* tests/apachetest/: multiple changes has been made to tests

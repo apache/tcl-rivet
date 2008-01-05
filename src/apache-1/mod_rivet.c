@@ -705,14 +705,18 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
     /* Eval Rivet's init.tcl file to load in the Tcl-level
     commands. */
 
-    /* We want to run the init.tcl specific to the installation
-     * that is being carried out
+    /* We call Tcl_EvalFile on init.tcl. This call sets up
+     * some variables and adds RIVETLIB_DESTDIR to auto_path.
+     * 
+     * This is the old call for setting up the tcl environment.
+     *
+     * if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
+     * 
+     * We may revert to it if we can devise a mechanism that
+     * links a specific installation to RivetTcl's version
      */
 
-    Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl");
-
     if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl")) {
-//  if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
 	ap_log_error( APLOG_MARK, APLOG_ERR, s,
 		      "init.tcl must be installed correctly for Apache Rivet to function: %s",
 		      Tcl_GetStringResult(interp) );
