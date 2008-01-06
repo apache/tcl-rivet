@@ -1,3 +1,30 @@
+2008-01-06 Massimo Manghi <massimo.manghi@unipr.it>
+
+	* Makefile.am: target 'uninstall-local' added. Stuff in
+	RIVETLIB_DESTDIR gets removed upon deinstallation
+
+	* rivet/packages/dio/dio_Mysql.tcl: small fixes for 
+	2 methods. In method 'open' the switch '-host' was
+	not handled. In method 'exec' the handling of 'select'
+	queries has been changed because the previous method
+	failed in certain circumstances (queries build with lists)
+
+	* src/apache-[1|2]/mod_rivet.c: Status returned by Tcl_EvalFile 
+	is now checked explicitly against TCL_ERROR
+
+	* doc/html/*.en.html: Html pages regenerated after changes in rivet.xml
+
+	* src/rivetCore.c: Moved into src/apache-1. This file was compiled by 
+	src/apache-1/Makefile.am, whereas src/apache-2 had its own 
+	rivetCore.c module. 
+
+	* src/apache-1/Makefile.am: Changed to reflect rivetCore's new location.
+	rivetWWW.c removed from module's compilation: stuff in it has to be loaded
+	into the interpreter with 'package require Rivet'
+
+	* src/apache-2/Makefile.am: Reordered list of files to allow better
+	comparison with apache-1 build.
+
 2008-01-05 Massimo Manghi <massimo.manghi@unipr.it>
 	
 	* src/apache-[1|2]/mod_rivet.c: Added comments as per
