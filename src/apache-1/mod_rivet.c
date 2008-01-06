@@ -200,8 +200,9 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	    delEntry = Tcl_FindHashEntry(
 		rsc->objCache,
 		rsc->objCacheList[ct]);
-	    if (delEntry != NULL)
+	    if (delEntry != NULL) {
 		Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+	    }
 	    Tcl_DeleteHashEntry(delEntry);
 
 	    free(rsc->objCacheList[ct]);
@@ -716,7 +717,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
      * links a specific installation to RivetTcl's version
      */
 
-    if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl")) {
+    if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl") == TCL_ERROR) {
 	ap_log_error( APLOG_MARK, APLOG_ERR, s,
 		      "init.tcl must be installed correctly for Apache Rivet to function: %s",
 		      Tcl_GetStringResult(interp) );
@@ -756,7 +757,7 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
     char *buf;
     char *format;
 
-    format = TCL_VARARGS_START(char *,arg1,argList);
+    format = (char *)TCL_VARARGS_START(char *,arg1,argList);
     buf = ap_pvsprintf(globalrr->pool, format, argList);
     ap_log_error(APLOG_MARK, APLOG_CRIT, globalrr->server,
 		 "Critical error in request: %s", globalrr->unparsed_uri);

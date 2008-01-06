@@ -190,12 +190,12 @@ puts "Saved file [upload filename MyUpload] \
 	appropriate directives values that would match your
 	requirements.
       </p><p style="width:90%">
-	It is also important to understand that some
+	It is also important to understand that some 
 	<span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span> commands are effective only when
 	used in a mutually exclusive way.  Apache stores the data in
 	temporary files which are read by the <span style="font-family:monospace"><span class="command"><strong>upload save
-	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? ?<span style="font-family:monospace; font-weight: bold;">filename</span>? </strong></span></span> or by the
-	<span style="font-family:monospace"><span class="command"><strong>upload data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? </strong></span></span>
+	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? ?<span style="font-family:monospace; font-weight: bold;">filename</span>?</strong></span></span> or by the
+	<span style="font-family:monospace"><span class="command"><strong>upload data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span>
 	command. Subsequent calls to these 2 commands using the same
 	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? argument will return no data on the
 	second call.  Likewise <span style="font-family:monospace"><span class="command"><strong>upload channel  ?<span style="font-family:monospace; font-weight: bold;">upload
@@ -204,35 +204,34 @@ puts "Saved file [upload filename MyUpload] \
 	read the data, for example with a call to the <span style="font-family:monospace"><span class="command"><strong>upload
 	data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span> command.
       </p></div></div><br class="example-break"><div class="example"><a name="file_download"></a><p class="title"><b>Example 5. File Download</b></p><div class="example-contents"><p style="width:90%">
-	In general setting up a data file to be sent over http is as
-	easy as determining the file's URI and letting Apache's
-	standard download mechanism do all that is needed. If this
-	approach fits your design all you have to do is to keep the
-	downloadable files somewhere within Apache's DocumentRoot (or
-	in any of the directories that you can configure and register
-	using the Alias definitions or the Virtual Hosts mechanism).
+	In general setting up a data file for being sent over http is 
+	as easy as determining the file's URI and letting Apache's
+	do all that is needed. If this approach fits your design all 
+	you have to do is to keep the downloadable files somewhere 
+	within Apache's DocumentRoot (or in any of the directories 
+	Apache has right to access).
       </p><p style="width:90%">
-	When a client sends a request for a file Apache takes
+	When a client sends a request for a file, Apache takes
 	care of determining the filetype, sends appropriate headers to
-	the client and then the file content.  If the client is a
-	browser capable of displaying the content of the file a
-	representation is shown in the browser's window. When the browser
-	hasn't a valid builtin method or plugin registered for the
-	file's content the typical download dialog pops up asking
-	for directions from the user.
+	the client and then the file content. The client is responsible
+	for deciding how to handle the data accordingly to the 
+	"content-type" headers and its internal design. For example
+	when browsers give up trying to display a certain "content-type"
+	they display a download dialog box asking for directions from
+	the user. 
       </p><p style="width:90%">
 	Rivet can help if you have more sofisticated needs.  For
 	instance you may be developing an application that uses
-	webpages to collect input data that have to be
-	passed on to scripts or programs. In this case the content
-	is generated on demand  and a real file representing the
-	data doesn't exist on the server. In other circumstances you 
-	may need to dynamically inhibit the download of a specific 
-	file and hide it away, even to those clients that might have 
-	already saved the URI to the file in their bookmarks.
+	webpages to collect input data. This information might be
+	passed on to scripts or programs for processing. 
+	In this case a real file representing the
+	data doesn't exist and the content is generated on demand 
+	by the server. 
+	In other circumstances you may need to dynamically inhibit 
+	the download of specific files and hide them away, 
 	Your scripts may expunge from the pages
-	every link to the file (your pages are dynamic, aren't
-	they?) and move the file out of way, but it looks like a
+	every link to these files (your pages are dynamic, aren't
+	they?) and move them out of way, but it looks like a
 	cumbersome solution.
       </p><p style="width:90%">
 	Putting Tcl and Rivet in charge of the whole download
@@ -244,13 +243,18 @@ puts "Saved file [upload filename MyUpload] \
 	(without extension) of a pdf file.  
 	Pdf files are stored in a directory whose path is
 	in the <span style="font-family:monospace"><span class="command"><strong>pdf_repository</strong></span></span> variable.
+      </p><p style="width:90%">
+	This code is reported as an example of how to control 
+	the protocol using the <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> command.
       </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># Code example for the transmission of a pdf file. 
+# An obvious limit of the approach followed by this 
+# example is the size of the files we can handle.
 
 if {[var exists pdfname]} {
     set pdfname [var get pdfname]
 
 # let's build the full path to the pdf file. The 'pdf_repository'
-# directory must be readable by the apache children
+# directory must be readable by the apache children.
 
     set pdf_full_path [file join $pdf_repository ${pdfname}.pdf]
     if {[file exists $pdf_full_path]} {
@@ -265,10 +269,11 @@ if {[var exists pdfname]} {
 	headers add Content-Description "PDF Document"
 
 # The pdf is read and stored in a Tcl variable. The file handle is
-# configured for a binary read: we are just shipping raw data to a
+# configured for a binary read: we are just shipping raw data to the
 # client. The following 4 lines of code can be replaced by any code
-# that is able to retrieve the data to be sent from any data source
-# (e.g. database, external program, other Tcl code)
+# able to generate the file content or query a data source (e.g. database, 
+# external program, other Tcl code) 
+# 
 
 	set paper	    [open $pdf_full_path r]
 	fconfigure	    $paper -translation binary
@@ -276,11 +281,11 @@ if {[var exists pdfname]} {
 	close $paper
 
 # Now we got the data: let's tell the client how many bytes we are
-# about to send (useful for the download progress bar of a dialog box)
+# about to send (useful for the download progress bar)
 
 	headers add Content-Length  [string length $pdf]
 
-# Let's send the actual file content
+# Let's send the actual file content. 
 
 	puts $pdf
     } else {
@@ -357,46 +362,49 @@ if {[var exists pdfname]} {
 	The script is designed to send back to the client two 
 	types of responses: a catalog of the composers or a single 
 	record of a composer.
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># The database array contains xml fragments representing the
+      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># 
+#
+# The database array contains xml fragments representing the
 # results of queries to a database. Many databases are now able
 # to produce the results of a query in XML. 
 #
-#array unset composer
+# $Id: $
 #
-set	composer(1)	"&lt;composer&gt;\n"
-append  composer(1)     "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
+
+set		composer(1)	"&lt;composer&gt;\n"
+append  composer(1) "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
 append  composer(1)	"    &lt;last_name&gt;Monteverdi&lt;/last_name&gt;\n"
 append	composer(1)	"    &lt;lifespan&gt;1567-1643&lt;/lifespan&gt;\n"
 append	composer(1)	"    &lt;era&gt;Renaissance/Baroque&lt;/era&gt;\n"
 append	composer(1)	"    &lt;key&gt;1&lt;/key&gt;\n"
 append	composer(1)	"&lt;/composer&gt;\n"
 
-set	composer(2)	"&lt;composer&gt;\n"
-append  composer(2)     "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
+set		composer(2)	"&lt;composer&gt;\n"
+append  composer(2) "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
 append  composer(2)	"    &lt;last_name&gt;Bach&lt;/last_name&gt;\n"
 append	composer(2)	"    &lt;lifespan&gt;1685-1750&lt;/lifespan&gt;\n"
 append	composer(2)	"    &lt;era&gt;Baroque&lt;/era&gt;\n"
 append	composer(2)	"    &lt;key&gt;2&lt;/key&gt;\n"
 append	composer(2)	"&lt;/composer&gt;\n"
 
-set	composer(3)	"&lt;composer&gt;\n"
-append  composer(3)     "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
+set		composer(3)	"&lt;composer&gt;\n"
+append  composer(3) "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
 append  composer(3)	"    &lt;last_name&gt;van Beethoven&lt;/last_name&gt;\n"
 append	composer(3)	"    &lt;lifespan&gt;1770-1827&lt;/lifespan&gt;\n"
 append	composer(3)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
 append	composer(3)	"    &lt;key&gt;3&lt;/key&gt;\n"
 append	composer(3)	"&lt;/composer&gt;\n"
 
-set	composer(4)	"&lt;composer&gt;\n"
-append  composer(4)     "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
+set		composer(4)	"&lt;composer&gt;\n"
+append  composer(4) "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
 append  composer(4)	"    &lt;last_name&gt;Mozart&lt;/last_name&gt;\n"
 append	composer(4)	"    &lt;lifespan&gt;1756-1791&lt;/lifespan&gt;\n"
 append	composer(4)	"    &lt;era&gt;Classical&lt;/era&gt;\n"
 append	composer(4)	"    &lt;key&gt;4&lt;/key&gt;\n"
 append	composer(4)	"&lt;/composer&gt;\n"
 
-set	composer(5)	"&lt;composer&gt;\n"
-append  composer(5)     "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
+set		composer(5)	"&lt;composer&gt;\n"
+append  composer(5) "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
 append  composer(5)	"    &lt;last_name&gt;Schumann&lt;/last_name&gt;\n"
 append	composer(5)	"    &lt;lifespan&gt;1810-1856&lt;/lifespan&gt;\n"
 append	composer(5)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"

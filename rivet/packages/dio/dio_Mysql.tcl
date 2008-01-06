@@ -16,7 +16,7 @@
 
 # $Id$
 
-package provide dio_Mysql 0.1
+package provide dio_Mysql 0.2
 
 namespace eval DIO {
     ::itcl::class Mysql {
@@ -49,7 +49,7 @@ namespace eval DIO {
 	    if {![lempty $user]} { lappend command -user $user }
 	    if {![lempty $pass]} { lappend command -password $pass }
 	    if {![lempty $port]} { lappend command -port $port }
-	    if {![lempty $host]} { lappend command $host }
+	    if {![lempty $host]} { lappend command -host $host }
 
 	    if {[catch $command error]} { return -code error $error }
 
@@ -68,7 +68,14 @@ namespace eval DIO {
 	    if {![info exists conn]} { open }
 
 	    set cmd mysqlexec
-	    if {[::string tolower [lindex $req 0]] == "select"} { set cmd mysqlsel }
+#
+#	    if {[::string tolower [lindex $req 0]] == "select"} { set cmd mysqlsel }
+#	    select is a 6 characters word, so let's see if the query is a select
+#
+	    set q [::string trim $req]
+	    set q [::string tolower $q]
+	    set q [::string range $q 0 5]
+	    if {[::string match select $q]} { set cmd mysqlsel }
 
 	    set errorinfo ""
 	    if {[catch {$cmd $conn $req} error]} {

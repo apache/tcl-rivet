@@ -31,13 +31,14 @@ INCLUDES = -I@apache_include@ -I@RIVET_BASE_INCLUDE@
 #
 # Apache Rivet Module, mod_rivet.so / mod_rivet.dll
 #
-mod_rivet_la_SOURCES = apache_multipart_buffer.c \
-	apache_request.c	\
-	../rivetChannel.c \
-	../rivetParser.c \
-	rivetCore.c	\
-	mod_rivet.c \
-	TclWebapache.c 
+mod_rivet_la_SOURCES = 			\
+	apache_multipart_buffer.c 	\
+	apache_request.c			\
+	mod_rivet.c 				\
+	TclWebapache.c 				\
+	rivetCore.c					\
+	../rivetChannel.c 			\
+	../rivetParser.c
 
 ##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 

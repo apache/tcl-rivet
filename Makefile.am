@@ -1,11 +1,11 @@
 #
-# top-level Makefile.am for Apache Rivet
-#
-# ...gets turned into a Makefile.in by automake
+# top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
 # $Id$
 #
-#foreign -- need to set this somehow
+# 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
+#
+#
 
 EXTRA_DIST=LICENSE contrib debian doc rivet win/nmakehlp.c src/testing.c src/TclWebcgi.c
 SUBDIRS = src doc
@@ -19,7 +19,7 @@ install-data-local:
 	cp -r rivet/* $(RIVETLIB_DESTDIR)
 	-( cd  $(RIVETLIB_DESTDIR) ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
-#	$(mkinstalldirs) $(DESTDIR)@libdir@/rivet@VERSION@
-#	cp -r rivet/* $(DESTDIR)@libdir@/rivet@VERSION@
-# This little bit of line noise generates the package index file (pkgIndex.tcl)
-#	-( cd  $(DESTDIR)@libdir@/rivet@VERSION@ ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+uninstall-local:
+	rm -fr $(RIVETLIB_DESTDIR)
+
+# 

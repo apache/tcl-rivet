@@ -77,19 +77,20 @@ TCL_DECLARE_MUTEX(sendMutex);
 
 /* This snippet of code came from the mod_ruby project, which is under a BSD license. */
 #ifdef APACHE2 /* Apache 2.x */
+	
 
 static void ap_chdir_file(const char *file)
 {
-	const char *x;
-	char buf[HUGE_STRING_LEN];
+	const  char *x;
+	char chdir_buf[HUGE_STRING_LEN];
 	x = strrchr(file, '/');
 	if (x == NULL) {
 		chdir(file);
 	}
-	else if (x - file < sizeof(buf) - 1) {
-		memcpy(buf, file, x - file);
-		buf[x - file] = '\0';
-		chdir(buf);
+	else if (x - file < sizeof(chdir_buf) - 1) {
+		memcpy(chdir_buf, file, x - file);
+		chdir_buf[x - file] = '\0';
+		chdir(chdir_buf);
 	}
 }
 #endif
@@ -855,8 +856,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
      * We may revert to it if we can devise a mechanism that
      * links a specific installation to RivetTcl's version
      */
-
-    if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl")==TCL_ERROR) {
+    if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl") == TCL_ERROR) {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                 "init.tcl must be installed correctly for Apache Rivet to function: %s",
                 Tcl_GetStringResult(interp) );
