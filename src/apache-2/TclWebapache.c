@@ -347,7 +347,7 @@ TclWeb_InitEnvVars( TclWebRequest *req )
     apr_table_t *table = req->req->subprocess_env;
     char *timefmt = DEFAULT_TIME_FORMAT;
     char *t;
-    time_t date = req->req->request_time;
+    apr_time_t date = req->req->request_time;
 #ifndef WIN32
     struct passwd *pw;
 #endif /* ndef WIN32 */

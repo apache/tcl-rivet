@@ -7,8 +7,9 @@
 #include "TclWeb.h"
 
 /* init.tcl file relative to the server root directory */
-#define RIVET_DIR "rivet"
-#define RIVET_INIT RIVET_DIR"/init.tcl"
+
+#define RIVET_DIR  RIVETLIB_DESTDIR
+#define RIVET_INIT RIVETLIB_DESTDIR"/init.tcl"
 
 #if 0
 #define FILEDEBUGINFO fprintf(stderr, "Function " __FUNCTION__ "\n")
