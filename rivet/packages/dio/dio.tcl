@@ -18,7 +18,7 @@
 
 catch {package require Tclx}
 package require Itcl
-set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+##set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
 namespace eval ::DIO {
 

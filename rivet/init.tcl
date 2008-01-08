@@ -75,9 +75,11 @@ namespace eval ::Rivet {
 	## Add the packages directory to the auto_path.
 	## If we have a packages$tcl_version directory
 	## (IE: packages8.3, packages8.4) append that as well.
+
+	## The packages directory come right after the rivet-tcl directory.
 	set pkgpath [file join [file dirname [info script]] packages]
-	lappend auto_path $pkgpath
-	lappend auto_path ${pkgpath}-local
+	set auto_path [linsert $auto_path 1 $pkgpath]
+	set auto_path [linsert $auto_path 2 ${pkgpath}-local]
 
 	if { [file exists ${pkgpath}$::tcl_version] } {
 	    lappend auto_path ${pkgpath}$::tcl_version
@@ -85,6 +87,8 @@ namespace eval ::Rivet {
 
 	## This will allow users to create proc libraries and tclIndex files
 	## in the local directory that can be autoloaded.
+	## Perhaps this must go to the front of the list to allow the user
+	## to override even Rivet's procs.
 	lappend auto_path .
     }
 

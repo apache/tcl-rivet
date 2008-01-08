@@ -50,7 +50,6 @@ namespace eval DIO {
 	    if {![lempty $pass]} { lappend command -password $pass }
 	    if {![lempty $port]} { lappend command -port $port }
 	    if {![lempty $host]} { lappend command -host $host }
-
 	    if {[catch $command error]} { return -code error $error }
 
 	    set conn $error

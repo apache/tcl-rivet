@@ -1,3 +1,22 @@
+2008-01-08 Massimo Manghi <massimo.manghi@unipr.it>
+
+	* rivet/packages/dio/dio.tcl: auto_path shouldn't be set 
+	or modified outsite init.tcl
+
+	* rivet/init.tcl: We want the Tcl code specific to an
+	installation to take precedence over other Tcl packages
+	or other versions of the same stuff. Therefore I put 
+	the references to the rivetlib directory in the first
+	positions in auto_path.
+
+2008-01-07 Massimo Manghi <massimo.manghi@unipr.it>
+
+	* src/apache-2/TclWebapache.c: Fixed timestamp printed in the
+	DATE_LOCAL and DATE_GMT fields of the environment table.
+
+	* src/apache-2/mod_rivet.h: Fixed definitions for RIVET_INIT and
+	RIVET_DIR. I couldn't fix SERVER_CONF though
+
 2008-01-06 Massimo Manghi <massimo.manghi@unipr.it>
 
 	* Makefile.am: target 'uninstall-local' added. Stuff in
