@@ -87,7 +87,8 @@ TclWeb_SetHeaderType(char *header, TclWebRequest *req)
     if(req->headers_set)
         return TCL_ERROR;
 
-    req->req->content_type = (char *) apr_pstrdup(req->req->pool, header);
+//    req->req->content_type = (char *) apr_pstrdup(req->req->pool, header);
+    ap_set_content_type(req->req,header);
     req->headers_set = 1;
     return TCL_OK;
 }

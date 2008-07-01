@@ -57,8 +57,7 @@
 
 //module AP_MODULE_DECLARE_DATA rivet_module;
 
-/* This is used *only* in the PanicProc.  Otherwise, don't touch
- * it! */
+/* This is used *only* in the PanicProc.  Otherwise, don't touch it! */
 static request_rec *globalrr;
 
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
@@ -66,8 +65,9 @@ static request_rec *globalrr;
 #define DEBUG(s) fprintf(stderr, s), fflush(stderr)
 
 /* rivet or tcl file */
-#define RIVET_FILE 1
-#define TCL_FILE 2
+#define CTYPE_NOT_HANDLED   0
+#define RIVET_FILE	    1
+#define TCL_FILE	    2
 
 /* rivet return codes */
 #define RIVET_OK 0
@@ -77,23 +77,25 @@ TCL_DECLARE_MUTEX(sendMutex);
 
 /* This snippet of code came from the mod_ruby project, which is under a BSD license. */
 #ifdef APACHE2 /* Apache 2.x */
-	
+
+#define RIVET_FILE_CTYPE	"application/x-httpd-rivet"
+#define TCL_FILE_CTYPE		"application/x-rivet-tcl"
 
 static void ap_chdir_file(const char *file)
 {
-	const  char *x;
-	char chdir_buf[HUGE_STRING_LEN];
-	x = strrchr(file, '/');
-	if (x == NULL) {
-		chdir(file);
-	}
-	else if (x - file < sizeof(chdir_buf) - 1) {
-		memcpy(chdir_buf, file, x - file);
-		chdir_buf[x - file] = '\0';
-		chdir(chdir_buf);
-	}
+    const  char *x;
+    char chdir_buf[HUGE_STRING_LEN];
+    x = strrchr(file, '/');
+    if (x == NULL) {
+	chdir(file);
+    } else if (x - file < sizeof(chdir_buf) - 1) {
+	memcpy(chdir_buf, file, x - file);
+	chdir_buf[x - file] = '\0';
+	chdir(chdir_buf);
+    }
 }
 #endif
+
 /* Function to be used should we desire to upload files to a variable */
 
 #if 0
@@ -116,16 +118,16 @@ Rivet_UploadHook(void *ptr, char *buf, int len, ApacheUpload *upload)
 static int
 Rivet_CheckType (request_rec *req)
 {
-	if ( req->content_type != NULL ) {
-		if( STREQU( req->content_type, "application/x-httpd-rivet")) {
-			return RIVET_FILE;
-		}
+    int	ctype = CTYPE_NOT_HANDLED;
 
-		 if( STREQU( req->content_type, "application/x-rivet-tcl")) {
-			return TCL_FILE;
-		}
+    if ( req->content_type != NULL ) {
+	if( STRNEQU( req->content_type, RIVET_FILE_CTYPE) ) {
+	    ctype  = RIVET_FILE;
+	} else if( STRNEQU( req->content_type, TCL_FILE_CTYPE) ) {
+	    ctype = TCL_FILE;
+	} 
     }
-	return 0; 
+    return ctype; 
 }
 /*
  * Rivet_ParseFileArgString (char *szDocRoot, char *szArgs, char **file)
@@ -370,14 +372,15 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
     /* Make sure to flush the output if buffer_add was the only output */
 good:
+
+    if (!globals->req->headers_set && (globals->req->charset != NULL)) {
+    	TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset),globals->req);
+    }
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(conf->outchannel));
 
     return TCL_OK;
 }
-
-
-
 
 /* This is a separate function so that it may be called from 'Parse' */
 int
@@ -427,7 +430,6 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         }
         *(rsc->cache_free) = *(rsc->cache_size);
     }
-
 
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
@@ -629,6 +631,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->upload_max = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
     newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
+    newrsc->honor_header_only_reqs = oldrsc->honor_header_only_reqs;
     newrsc->server_name = oldrsc->server_name;
     newrsc->upload_dir = oldrsc->upload_dir;
     newrsc->rivet_server_vars = oldrsc->rivet_server_vars;
@@ -731,6 +734,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->upload_max = 0;
     rsc->upload_files_to_var = 0;
     rsc->separate_virtual_interps = 0;
+    rsc->honor_header_only_reqs = 0;
     rsc->server_name = NULL;
     rsc->upload_dir = "/tmp";
     rsc->objCacheList = NULL;
@@ -827,8 +831,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     /* Create TCL commands to deal with Apache's BUFFs. */
     rsc->outchannel = apr_pcalloc(p, sizeof(Tcl_Channel));
-    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc,
-            TCL_WRITABLE);
+    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc, TCL_WRITABLE);
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
 
@@ -959,7 +962,8 @@ Rivet_SetScript(apr_pool_t *pool, rivet_server_conf *rsc, char *script, char *st
  * 	RivetServerConf UploadMaxSize <integer>
  * 	RivetServerConf UploadFilesToVar <yes|no>
  * 	RivetServerConf SeparateVirtualInterps <yes|no>
-*/
+ * 	RivetServerConf HonorHeaderOnlyRequests <yes|no> (2008-06-20: mm)
+ */
 
 static const char *
 Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
@@ -984,6 +988,8 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
         Tcl_GetBoolean (NULL, val, &rsc->upload_files_to_var);
     } else if( STREQU( var, "SeparateVirtualInterps" ) ) {
         Tcl_GetBoolean (NULL, val, &rsc->separate_virtual_interps);
+    } else if( STREQU( var, "HonorHeaderOnlyRequests" ) ) {
+        Tcl_GetBoolean (NULL, val, &rsc->honor_header_only_reqs);
     } else {
         string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }
@@ -1152,6 +1158,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
         overrides->upload_max : base->upload_max;
 
     rsc->separate_virtual_interps = base->separate_virtual_interps;
+    rsc->honor_header_only_reqs = base->honor_header_only_reqs;
 
     /* server_name is set up later. */
 
@@ -1461,21 +1468,24 @@ Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
 static int
 Rivet_SendContent(request_rec *r)
 {
-    char error[MAX_STRING_LEN];
-    char timefmt[MAX_STRING_LEN];
+//    char error[MAX_STRING_LEN];
+//    char timefmt[MAX_STRING_LEN];
     int errstatus;
     int retval;
+    int ctype;
 
-    Tcl_Interp	*interp;
-    static Tcl_Obj	*request_init = NULL;
-    static Tcl_Obj	*request_cleanup = NULL;
+    Tcl_Interp		*interp;
+    static Tcl_Obj 	*request_init = NULL;
+    static Tcl_Obj 	*request_cleanup = NULL;
 
     rivet_interp_globals *globals = NULL;
-    rivet_server_conf *rsc = NULL;
-    rivet_server_conf *rdc;
+    rivet_server_conf 	*rsc = NULL;
+    rivet_server_conf 	*rdc;
 
-    if (!Rivet_CheckType(r))
+    ctype = Rivet_CheckType(r);  
+    if (ctype == CTYPE_NOT_HANDLED) {
         return DECLINED;
+    }
 
     Tcl_MutexLock(&sendMutex);
 
@@ -1488,6 +1498,10 @@ Rivet_SendContent(request_rec *r)
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
     globals->r = r;
     globals->req = (TclWebRequest *)apr_pcalloc(r->pool, sizeof(TclWebRequest));
+
+/* we will test against NULL to check if a charset was specified in the conf */
+
+    globals->req->charset = NULL;
 
     if (r->per_dir_config != NULL)
         rdc = RIVET_SERVER_CONF( r->per_dir_config );
@@ -1517,8 +1531,8 @@ Rivet_SendContent(request_rec *r)
         goto sendcleanup;
     }
 
-    apr_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
-    apr_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
+//    apr_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
+//    apr_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
 
     /* This one is the big catch when it comes to moving towards
        Apache 2.0, or one of them, at least. */
@@ -1581,12 +1595,50 @@ Rivet_SendContent(request_rec *r)
         goto sendcleanup;
     }
 
-    if (r->header_only)
+    if (r->header_only && !rsc->honor_header_only_reqs)
     {
         TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
         TclWeb_PrintHeaders(globals->req);
         retval = OK;
         goto sendcleanup;
+    } 
+
+/* 
+ * if we are handling the request we also want to check if a charset 
+ * parameter was set with the content type, e.g. rivet's configuration 
+ * or .htaccess had lines like 
+ *
+ * AddType 'application/x-httpd-rivet; charset=utf-8;' rvt 
+ */
+ 
+/*
+ * if strlen(req->content_type) > strlen([RIVET|TCL]_FILE_CTYPE)
+ * a charset parameters might be there 
+ */
+
+    {
+	int content_type_len = strlen(r->content_type);
+
+	if (((ctype==RIVET_FILE) && (content_type_len > strlen(RIVET_FILE_CTYPE))) || \
+	     ((ctype==TCL_FILE)  && (content_type_len > strlen(TCL_FILE_CTYPE)))) {
+	    
+	    char* charset;
+
+	    /* we parse the content type: we are after a 'charset' parameter definition */
+		
+	    charset = strstr(r->content_type,"charset");
+	    if (charset != NULL) {
+		charset = apr_pstrdup(r->pool,charset);
+
+	    /* ther's some freedom about spaces in the AddType lines: let's strip them off */
+
+		apr_collapse_spaces(charset,charset);
+		globals->req->charset = charset;
+
+		fprintf(stderr,"%s\n",charset);
+		fflush(stderr);
+	    }
+	}
     }
 
     if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
@@ -1600,7 +1652,7 @@ Rivet_SendContent(request_rec *r)
         Tcl_IncrRefCount(request_cleanup);
     }
 
-    if(Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
+    if (Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, "%s",
                 Tcl_GetVar(interp, "errorInfo", 0));
     }
@@ -1614,7 +1666,6 @@ sendcleanup:
     Tcl_MutexUnlock(&sendMutex);
     return retval;
 }
-
 
 static void
 rivet_register_hooks (apr_pool_t *p)

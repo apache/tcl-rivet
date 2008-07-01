@@ -5,7 +5,8 @@
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_rivet */
 
-#define STREQU(s1, s2) (s1[0] == s2[0] && strcmp(s1, s2) == 0)
+#define STREQU(s1, s2)  (s1[0] == s2[0] && strcmp(s1, s2) == 0)
+#define STRNEQU(s1, s2) (s1[0] == s2[0] && strncmp(s1, s2, strlen(s2)) == 0)
 
 #define TCL_CMD_HEADER(cmd)	\
 static int cmd(\

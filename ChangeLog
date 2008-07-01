@@ -1,3 +1,31 @@
+2008-07-01 Massimo Manghi <mxmanghi@apache.org>
+	
+	* src/rivet.h: added macro STRNEQU(s1,s2) which efficiently
+	compares 2 strings. Unlike STREQU(s1,s2) this new macro compares
+	at most strlen(s2) characters.
+
+	* src/TclWeb.h: added charset field to TclWebRequest. This new
+	property gets initialized to NULL every time this structure
+	is instantiated. If used it stores a pointer to a string that 
+	specifies a header value fragment for the page being generated. 
+
+	* src/apache-2/TclWebapache.c: request_rec is treated as an
+	opaque structure and the field 'content_type' is set by calling
+	the ap_set_content_type apache core function
+
+	* src/apache-2/mod_rivet.h: a 'honor_header_only_reqs' is added
+	to the rivet_server_conf for handling of the 
+	HonorHeaderOnlyRequests configuration option
+
+	* src/apache-2/mod_rivet.c: Every content_type is checked 
+	for possible charset specifications. When found this is 
+	stored in the TclWebRequest structure to be processed later. 
+	If a script or template doesn't set a content type on its own (with 
+	the 'headers type <ctype>' command) the charset is written in 
+	the http headers. Added support for the 'HonorHeaderOnlyRequests' 
+	switch. Other minor changes include better code formatting 
+	in some functions and commenting out some cruft left around.
+
 2008-01-08 Massimo Manghi <massimo.manghi@unipr.it>
 
 	* rivet/packages/dio/dio.tcl: auto_path shouldn't be set 

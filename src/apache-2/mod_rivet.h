@@ -76,6 +76,7 @@ typedef struct _rivet_server_conf {
     int upload_max;
     int upload_files_to_var;
     int separate_virtual_interps;
+    int honor_header_only_reqs;			/* default: 0 */
     char *server_name;
     char *upload_dir;
     apr_table_t *rivet_server_vars;

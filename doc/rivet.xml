@@ -292,6 +292,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	      <arg>UploadMaxSize</arg>
 	      <arg>UploadFilesToVar</arg>
 	      <arg>SeparateVirtualInterps</arg>
+	      <arg>HonorHeaderOnlyRequests</arg>
 	    </group>
 	  </cmdsynopsis>
 	</term>
@@ -533,6 +534,29 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 		</para>
 		<para>This option is, by nature, only available at the
 		global level.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">HonorHeaderOnlyRequests</arg>
+		  <group choice="req">
+		    <arg>yes</arg>
+		    <arg>no</arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  If a HEAD requests is issued by the client Rivet detects
+		  this case and sends back to the client a standard header 
+		  response. If the real header has to be examined (e.g. 
+		  for debugging) you can turn on this options which 
+		  causes Rivet to parse and run the script the requests refers 
+		  to. In this case the real header is returned to the client.
+		</para>
+		<para>This option is, by nature, only available at the global level</para>
 	      </listitem>
 	    </varlistentry>
 	  </variablelist>
@@ -1390,7 +1414,6 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 
       <refsect1>
 	<title>Description</title>
-
 	<para>
 	  This command is useful for situations where it is necessary
 	  to only return HTTP headers and no actual content.  For
@@ -1747,48 +1770,56 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	abilty of JavaScript (and other scriping languages like VBScript) to 
 	manipulate dynamically the HTML structure of a page. In modern browsers 
 	JavaScript code is enabled to send GET or POST requests to the webserver.
-	These requests can ask the server to run scripts (for example Rivet
-	Tcl scripts) that build responses and send them back to the browser.
+	These requests can request the server to run scripts (for example Rivet
+	Tcl scripts) that build responses and to be sent back to the browser.
 	JavaScript code reads asynchronously these responses, elaborates
 	their content and accordingly modifies the page on display. 
 	Ajax helps to build web applications that are more responsive and 
-	flexible. Instead of going through the cycle of request-generation-transfer
+	flexible, if you can cope with the complexities, subtleties and 
+	incompatibilities even among the most common browsers available. 
+	Instead of going through the cycle of request-generation-transfer
 	of a page, Ajax allows the programmer to request and transmit only
 	the essential data thus matching the general requirement of separation
 	between data and user interface (and saving the server from sending over
-	the same html code and graphics every time a page is refreshed)
+	the same html code and graphics when only a fraction of a page has
+	to be refreshed)
       </para>
       <para>
 	In Ajax	applications the communication between client and server 
 	is controlled by an instance of a specialized object: the non-IE world
-	uses the XMLHttpRequest class to create it, 
-	whereas IE uses the ActiveXObject class. Through an instance of
-	that class a POST or GET request is sent to the server, which in turn
-	responds with a message that is stored as a string in a property of the 
-	communication object called 'returnedText'. 
-	Although this sort of communication channel doesn't imply that the messages
-	being transmitted through it have a specific protocol, it's become widely
-	customary to use XML as the format for such messages. A number
-	of XML specification are being used for this, among which XML-RPC and
-	SOAP are worth to be quoted. Anyway, you can invent your own protocol
-	(either based on XML or anything else), but one has to be aware of the fact 
-	that if the http headers are properly set and the message returned 
-	to the client is a well formed XML fragment, also the property 
+	(Firefox,Safari,Opera...) uses the XMLHttpRequest class to create it, 
+	whereas IE uses the ActiveXObject class.
+      	<note>
+	    With the release of IE7 Microsoft introduced 
+	    <ulink url="http://blogs.msdn.com/ie/archive/2006/01/23/516393.aspx">
+	    native support</ulink> for XMLHttpRequest class objects
+      	</note>	
+	By creating an instance of this class a POST or GET request can be sent 
+	to the server, whose response is stored in a 
+	property ('returnedText') of the communication object. 
+	It's become widely customary to encode in XML messages the response
+	from the server to the browser. A number of XML specification are 
+	being used for this, among which XML-RPC and SOAP are worth to be 
+	quoted. Anyway, you can invent your own message definitions
+	(either based on XML or anything else), but one has to be aware of 
+	the fact that if the http headers are properly set and the message 
+	returned to the client is a well formed XML fragment, also the property 
 	<ulink url="http://www.w3schools.com/ajax/ajax_responsexml.asp">
 	XMLResponse</ulink> is set with a reference to an object 
-	that stores the response as an XML document. This object is an 
-	instance of a class that implements the
+	that represent the
 	<ulink url="http://www.w3schools.com/dom/default.asp">
-	XML W3C DOM</ulink> tree methods and properties, thus
-	enabling the scripts to read and manipulate the data embedded in 
-	the XML message with a structured and standard interface.
+	DOM</ulink> of the XML response. 
+	By means of the XML W3C DOM tree methods and properties
+	you can write scripts that read and manipulate the data embedded in 
+	the XML message.
       </para>
       <para>
         In this example a Rivet script initializes an array with the
 	essential data regarding a few of the major composers of the 
 	european music. This array plays the role of a database
-	which, in a real case, might store large tables with thousands 
-	records and more complete and extended information. 
+	which, in a real case, has is a real DBM which stores large 
+	tables with thousands records and more complex and 
+	extended information. 
 	The script is designed to send back to the client two 
 	types of responses: a catalog of the composers or a single 
 	record of a composer.
