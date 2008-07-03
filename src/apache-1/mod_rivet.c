@@ -21,15 +21,15 @@
 #endif
 
 /* Apache includes */
-#include "httpd.h"
-#include "http_config.h"
-#include "http_request.h"
-#include "http_core.h"
-#include "http_protocol.h"
-#include "http_log.h"
-#include "http_main.h"
-#include "util_script.h"
-#include "http_conf_globals.h"
+#include <httpd.h>
+#include <http_config.h>
+#include <http_request.h>
+#include <http_core.h>
+#include <http_protocol.h>
+#include <http_log.h>
+#include <http_main.h>
+#include <util_script.h>
+#include <http_conf_globals.h>
 
 /* Tcl includes */
 #include <tcl.h>
@@ -43,6 +43,14 @@
 #include "rivet.h"
 #include "rivetParser.h"
 #include "rivetChannel.h"
+
+/* rivet or tcl file */
+#define CTYPE_NOT_HANDLED   0
+#define RIVET_FILE	    1
+#define TCL_FILE	    2
+
+#define RIVET_FILE_CTYPE	"application/x-httpd-rivet"
+#define TCL_FILE_CTYPE		"application/x-rivet-tcl"
 
 module MODULE_VAR_EXPORT rivet_module;
 
@@ -157,10 +165,34 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
     /* Make sure to flush the output if buffer_add was the only output */
     good:
+
+    if (!globals->req->headers_set && (globals->req->charset != NULL)) {
+	char* ct_header = ap_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL);
+
+//	fprintf(stderr,"New header: %s\n",ct_header);
+//	fflush(stderr);
+    	TclWeb_SetHeaderType (ct_header,globals->req);
+    }
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(conf->outchannel));
 
     return TCL_OK;
+}
+
+/* Rivet_CheckType returns true if the request is for mod_rivet */
+static int
+Rivet_CheckType (request_rec *req)
+{
+    int	ctype = CTYPE_NOT_HANDLED;
+
+    if ( req->content_type != NULL ) {
+	if( STRNEQU( req->content_type, RIVET_FILE_CTYPE) ) {
+	    ctype  = RIVET_FILE;
+	} else if( STRNEQU( req->content_type, TCL_FILE_CTYPE) ) {
+	    ctype = TCL_FILE;
+	} 
+    }
+    return ctype; 
 }
 
 /* This is a separate function so that it may be called from 'Parse' */
@@ -253,8 +285,8 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	    }
 	}
 
-	if( STREQU( req->req->content_type, "application/x-httpd-rivet")
-	    || !toplevel )
+//	if( STREQU( req->req->content_type, "application/x-httpd-rivet") || !toplevel )
+        if (Rivet_CheckType(req->req) == RIVET_FILE || !toplevel)
 	{
 	    /* toplevel == 0 means we are being called from the parse
 	     * command, which only works on Rivet .rvt files. */
@@ -430,6 +462,7 @@ Rivet_SendContent(request_rec *r)
     char timefmt[MAX_STRING_LEN];
     int errstatus;
     int retval;
+    int ctype;
 
     Tcl_Interp	*interp;
     static Tcl_Obj	*request_init = NULL;
@@ -438,6 +471,11 @@ Rivet_SendContent(request_rec *r)
     rivet_interp_globals *globals = NULL;
     rivet_server_conf *rsc = NULL;
     rivet_server_conf *rdc;
+
+    ctype = Rivet_CheckType(r);  
+    if (ctype == CTYPE_NOT_HANDLED) {
+        return DECLINED;
+    }
 
     Tcl_MutexLock(&sendMutex);
 
@@ -450,6 +488,7 @@ Rivet_SendContent(request_rec *r)
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
     globals->r = r;
     globals->req = (TclWebRequest *)ap_pcalloc(r->pool, sizeof(TclWebRequest));
+    globals->req->charset = NULL;
 
     rdc = RIVET_SERVER_CONF( r->per_dir_config );
 
@@ -537,12 +576,40 @@ Rivet_SendContent(request_rec *r)
 	goto sendcleanup;
     }
 
-    if (r->header_only)
+    if (r->header_only && !rsc->honor_header_only_reqs)
     {
 	TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
 	TclWeb_PrintHeaders(globals->req);
 	retval = OK;
 	goto sendcleanup;
+    }
+
+/* checking out content_type for possible type-charset association from the conf files */
+
+    {
+	int content_type_len = strlen(r->content_type);
+
+	if (((ctype==RIVET_FILE) && (content_type_len > strlen(RIVET_FILE_CTYPE))) || \
+	     ((ctype==TCL_FILE)  && (content_type_len > strlen(TCL_FILE_CTYPE)))) {
+	    
+	    char* charset;
+
+	    /* we parse content_type: we are after a 'charset' parameter definition */
+		
+	    charset = strstr(r->content_type,"charset");
+	    if (charset != NULL) {
+		char* conf_charset;
+
+		conf_charset = ap_pstrdup(r->pool,charset);
+
+	    /* ther's some freedom about spaces in the AddType lines: let's strip them off */
+
+		globals->req->charset = conf_charset;
+
+//		fprintf(stderr,"conf charset --> %s\n",conf_charset);
+//		fflush(stderr);
+	    }
+	}
     }
 
     if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
@@ -566,9 +633,7 @@ Rivet_SendContent(request_rec *r)
     retval = OK;
 sendcleanup:
     globals->req->content_sent = 0;
-
     Tcl_MutexUnlock(&sendMutex);
-
     return retval;
 }
 
@@ -976,6 +1041,7 @@ Rivet_SetScript( ap_pool *pool, rivet_server_conf *rsc, char *script, char *stri
  * 	RivetServerConf UploadMaxSize <integer>
  * 	RivetServerConf UploadFilesToVar <yes|no>
  * 	RivetServerConf SeparateVirtualInterps <yes|no>
+ * 	RivetServerConf HonorHeaderOnlyRequests <yes|no> (2008-06-20: mm)
 */
 
 static const char *
@@ -1001,6 +1067,8 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
 	Tcl_GetBoolean (NULL, val, &rsc->upload_files_to_var);
     } else if( STREQU( var, "SeparateVirtualInterps" ) ) {
 	Tcl_GetBoolean (NULL, val, &rsc->separate_virtual_interps);
+    } else if( STREQU( var, "HonorHeaderOnlyRequests" ) ) {
+        Tcl_GetBoolean (NULL, val, &rsc->honor_header_only_reqs);
     } else {
 	string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }
@@ -1173,6 +1241,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->upload_max = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
     newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
+    newrsc->honor_header_only_reqs = oldrsc->honor_header_only_reqs;
     newrsc->server_name = oldrsc->server_name;
     newrsc->upload_dir = oldrsc->upload_dir;
     newrsc->rivet_server_vars = oldrsc->rivet_server_vars;
@@ -1212,6 +1281,7 @@ Rivet_CreateConfig( pool *p, server_rec *s )
     rsc->upload_max = 0;
     rsc->upload_files_to_var = 0;
     rsc->separate_virtual_interps = 0;
+    rsc->honor_header_only_reqs = 0;
     rsc->server_name = NULL;
     rsc->upload_dir = "/tmp";
     rsc->objCacheList = NULL;
@@ -1315,6 +1385,7 @@ Rivet_MergeConfig(pool *p, void *basev, void *overridesv)
 	overrides->upload_max : base->upload_max;
 
     rsc->separate_virtual_interps = base->separate_virtual_interps;
+    rsc->honor_header_only_reqs = base->honor_header_only_reqs;
 
     /* server_name is set up later. */
 

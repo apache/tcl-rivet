@@ -1635,8 +1635,8 @@ Rivet_SendContent(request_rec *r)
 		apr_collapse_spaces(charset,charset);
 		globals->req->charset = charset;
 
-		fprintf(stderr,"%s\n",charset);
-		fflush(stderr);
+//		fprintf(stderr,"conf charset --> %s\n",conf_charset);
+//		fflush(stderr);
 	    }
 	}
     }

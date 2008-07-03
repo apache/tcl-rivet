@@ -1,3 +1,9 @@
+2008-07-03 Massimo Manghi <mxmanghi@apache.org>
+
+	* src/apache-1/mod_rivet.[c|h]: done modifications needed to replicate
+	for the apache 1 code the functionalities added to the apache 2
+	module
+
 2008-07-01 Massimo Manghi <mxmanghi@apache.org>
 	
 	* src/rivet.h: added macro STRNEQU(s1,s2) which efficiently
