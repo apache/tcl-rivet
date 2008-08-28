@@ -70,7 +70,7 @@ typedef struct _rivet_server_conf {
        have changed, it gets set. */
     int user_scripts_updated;
 
-    Tcl_Obj *rivet_default_error_script;         /*            for errors */
+    Tcl_Obj *rivet_default_error_script;        /* for errors */
     int *cache_size;
     int *cache_free;
     int upload_max;

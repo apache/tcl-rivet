@@ -302,9 +302,9 @@ Rivet_PropagateServerConfArray( Tcl_Interp *interp, rivet_server_conf *rsc )
  * Prints the error buffer if any.
  */
 static int
-Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
+Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
 {
-    rivet_server_conf *conf = Rivet_GetConf(r);
+    rivet_server_conf *conf = Rivet_GetConf(req);
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
@@ -477,7 +477,13 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
             }
         }
 
-        if (Rivet_CheckType(req->req) == RIVET_FILE)
+/*
+ * We check whether we are dealing with a pure Tcl script or a Rivet template.
+ * Actually this check is done only if we are processing a toplevel file, every nested 
+ * file (files included through the 'parse' command) is treated as a template.
+ */
+
+        if (!toplevel || (Rivet_CheckType(req->req) == RIVET_FILE))
         {
             /* toplevel == 0 means we are being called from the parse
              * command, which only works on Rivet .rvt files. */
@@ -494,8 +500,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         }
         if (toplevel) {
             if (rsc->rivet_after_script) {
-                Tcl_AppendObjToObj(outbuf,
-                        Tcl_NewStringObj(rsc->rivet_after_script, -1));
+                Tcl_AppendObjToObj(outbuf,Tcl_NewStringObj(rsc->rivet_after_script, -1));
             }
         }
 
@@ -525,7 +530,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
             Tcl_DeleteHashEntry(delEntry);
             free(rsc->objCacheList[*(rsc->cache_size) - 1]);
             memmove((rsc->objCacheList) + 1, rsc->objCacheList,
-                    sizeof(char *) * (*(rsc->cache_size) -1));
+                    sizeof(char *) * (*(rsc->cache_size) - 1));
 
             //hkCopy = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
             //strcpy (rsc->objCacheList[0], hashKey);
@@ -944,8 +949,6 @@ Rivet_SetScript(apr_pool_t *pool, rivet_server_conf *rsc, char *script, char *st
 
     return Tcl_GetStringFromObj( objarg, NULL );
 }
-
-
 
 /*
  * Implements the RivetServerConf Apache Directive
@@ -1371,7 +1374,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
         if (ap_max_requests_per_child != 0) {
             *(rsc->cache_size) = ap_max_requests_per_child / 5;
         } else {
-            *(rsc->cache_size) = 10; /* FIXME: Arbitrary number */
+            *(rsc->cache_size) = 50; /* FIXME: Arbitrary number */
         }
     }
 
@@ -1634,9 +1637,6 @@ Rivet_SendContent(request_rec *r)
 
 		apr_collapse_spaces(charset,charset);
 		globals->req->charset = charset;
-
-//		fprintf(stderr,"conf charset --> %s\n",conf_charset);
-//		fflush(stderr);
 	    }
 	}
     }

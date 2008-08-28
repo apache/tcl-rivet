@@ -1,3 +1,21 @@
+2008-08-28 Massimo Manghi <mxmanghi@apache.org>
+
+	* src/apache-2/mod_rivet.c: using the 'parse' command twice within
+	the innermost nested level would trick rivet into 
+	treating the second template as a Tcl script. 
+	Condition on the flag 'toplevel' has been reintroduced in the
+	on the file type (Rivet_ParseExecFile), but the whole mechanism 
+	has to be revised. 
+
+	Adopting a reverse logic in this test should achive the same
+	result in more linear way
+	
+	if (Rivet_CheckType(req->req) == TCL_FILE) {
+ 	    ---> Tcl script
+	} else {
+	    ---> Rivet template
+	}
+
 2008-07-03 Massimo Manghi <mxmanghi@apache.org>
 
 	* src/apache-1/mod_rivet.[c|h]: done modifications needed to replicate
