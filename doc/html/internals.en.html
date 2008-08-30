@@ -1,11 +1,11 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="help.en.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.en.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.en.html#id2580465">Initialization</a></span></dt><dt><span class="section"><a href="internals.en.html#id2580503">RivetChan</a></span></dt><dt><span class="section"><a href="internals.en.html#id2580530">The <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> Command</a></span></dt><dt><span class="section"><a href="internals.en.html#id2580582">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="internals.en.html#id2580632">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Internals</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.en.html" title="Apache Rivet"><link rel="up" href="index.en.html" title="Apache Rivet"><link rel="prev" href="help.en.html" title="Resources - How to Get Help"><link rel="next" href="upgrading.en.html" title="Upgrading from mod_dtcl or NeoWebScript"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Internals</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="internals"></a>Rivet Internals</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="internals.en.html#id2884624">Initialization</a></span></dt><dt><span class="section"><a href="internals.en.html#id2884660">RivetChan</a></span></dt><dt><span class="section"><a href="internals.en.html#id2884685">The <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> Command</a></span></dt><dt><span class="section"><a href="internals.en.html#id2884733">Page Parsing, Execution and Caching</a></span></dt><dt><span class="section"><a href="internals.en.html#id2884782">Debugging Rivet and Apache</a></span></dt></dl></div><p style="width:90%">
       This section easily falls out of date, as new code is added, old
       code is removed, and changes are made.  The best place to look
       is the source code itself.  If you are interested in the changes
       themselves, the Subversion revision control system
       (<span style="font-family:monospace"><span class="command"><strong>svn</strong></span></span>) can provide you with information about
       what has been happening with the code.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2580465"></a>Initialization</h3></div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2884624"></a>Initialization</h3></div></div></div><p style="width:90%">
 	When Apache is started, (or when child Apache processes are
 	started if a threaded Tcl is used),
 	<code class="function">Rivet_InitTclStuff</code> is called, which
@@ -16,7 +16,7 @@
 	executes Rivet's <code class="filename">init.tcl</code>.  The caching
 	system is also set up, and if there is a
 	<span style="font-family:monospace"><span class="command"><strong>GlobalInitScript</strong></span></span>, it is run.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2580503"></a>RivetChan</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2884660"></a>RivetChan</h3></div></div></div><p style="width:90%">
 	The <span class="structname">RivetChan</span> system was created in
 	order to have an actual Tcl channel that we could redirect
 	standard output to.  This lets us use, for instance, the
@@ -26,7 +26,7 @@
 	Tcl's regular standard output is replaced with an instance of
 	this channel type, so that, by default, output will go to the
 	web page.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2580530"></a>The <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> Command</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2884685"></a>The <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> Command</h3></div></div></div><p style="width:90%">
 	Rivet aims to run standard Tcl code with as few surprises as
 	possible.  At times this involves some compromises - in this
 	case regarding the <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> command.  The
@@ -41,7 +41,7 @@
 	you really need a true global variable, use either
 	<span style="font-family:monospace"><span class="command"><strong>::global</strong></span></span> or add the :: namespace qualifier
 	to variables you wish to make global.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2580582"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2884733"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
 	processing instruction tags.  Everything outside these tags
@@ -67,7 +67,7 @@
 	without having to reload it (and re-parse it) from the disk.
 	The number of scripts stored in memory is configurable.  This
 	feature can significantly improve performance.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2580632"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2884782"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
 	If you are interested in hacking on Rivet, you're welcome to
 	contribute!  Invariably, when working with code, things go
 	wrong, and it's necessary to do some debugging.  In a server
@@ -77,12 +77,12 @@
       </p><p style="width:90%">
 	The first thing you should know is that Apache can be launched
 	as a <span class="emphasis"><em>single process</em></span> with the
-	-X argument:</p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">httpd -X</pre>.
+	-X argument:</p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">httpd -X</pre>.
       <p style="width:90%">
 	On Linux, one of the first things to try is the system call
 	tracer, <span style="font-family:monospace"><span class="command"><strong>strace</strong></span></span>.  You don't even have to
 	recompile Rivet or Apache for this to work.
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">strace -o /tmp/outputfile -S 1000 httpd -X</pre><p style="width:90%">This command will run httpd in the system call tracer,
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">strace -o /tmp/outputfile -S 1000 httpd -X</pre><p style="width:90%">This command will run httpd in the system call tracer,
 	which leaves its output (there is potentially a lot of it) in
 	<code class="filename">/tmp/outputfile</code>.  The -S
 	option tells <span style="font-family:monospace"><span class="command"><strong></strong></span></span>strace to only record the
@@ -103,7 +103,7 @@
       </p><p style="width:90%">
 	Since it's easier to debug a single process, we'll still run
 	Apache in single process mode with -X:
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
 @ashland [~] $ gdb /usr/sbin/apache.dbg
 GNU gdb 5.3-debian
 Copyright 2002 Free Software Foundation, Inc.

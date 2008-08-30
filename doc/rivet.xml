@@ -40,6 +40,7 @@
       <year>2005</year>
       <year>2006</year>
       <year>2007</year>
+      <year>2008</year>
       <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
@@ -75,6 +76,7 @@
       meet these goals, we have chosen the Tcl programming language to
       combine with the Apache Web Server.
     </para>
+
     <para>
       In this manual, we aim to help get you started, and then
       writing productive code as quickly as possible, as well as
@@ -251,6 +253,16 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	  These tell Apache to process files with the
 	  <filename>.rvt</filename> and <filename>.tcl</filename>
 	  extensions as Rivet files.
+	</para>
+	<para>
+	  The characters encoding can be changed using the <command>header type</command> command,
+	  but if you want to change the default charset for the whole site or directory hierarchy  
+	  a new charset can be embedded in a AddType line in a way similar to the html pages encoding.
+	</para>
+	<programlisting>AddType 'application/x-httpd-rivet;charset=utf-8' rvt</programlisting>
+	<para>
+	   Pages which this configuration applies to send back to the client
+	   a <command>Content-Type:'text/html;charset=utf-8'</command> header.
 	</para>
 	<para>You may also wish to use Rivet files as index files for
 	directories.  In that case, you would do the following:</para>
@@ -1790,9 +1802,9 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	(Firefox,Safari,Opera...) uses the XMLHttpRequest class to create it, 
 	whereas IE uses the ActiveXObject class.
       	<note>
-	    With the release of IE7 Microsoft introduced 
+	    With the release of IE7 Microsoft introduced native support for 
 	    <ulink url="http://blogs.msdn.com/ie/archive/2006/01/23/516393.aspx">
-	    native support</ulink> for XMLHttpRequest class objects
+	    XMLHttpRequest</ulink> class objects
       	</note>	
 	By creating an instance of this class a POST or GET request can be sent 
 	to the server, whose response is stored in a 

@@ -120,7 +120,7 @@
 
   <xsl:template match="cmdsynopsis">
     <div class="{name(.)}" style="width:80%">
-      <div style="background:#bbbbff ; margin:1ex ; padding:.4ex ;
+      <div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex; 
 	word-spacing:1ex ">
 	<xsl:call-template name="anchor"/>
 	<xsl:apply-templates/>
@@ -302,9 +302,9 @@
 	  </pre>
 	</xsl:when>
 	<xsl:otherwise>
-	  <pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;
-	    padding: 1ex; border: solid black 1px ; white-space: pre;
-	    font-family:monospace ; " class="{name(.)}">
+	  <pre style="background:#ccc; margin: 2ex; margin-right: 10%; 
+	    padding: 1ex; border: dashed black 1px ; white-space: pre;
+	    font-family: monospace; font-size: 90%;" class="{name(.)}">
 	    <xsl:apply-templates/>
 	  </pre>
 	</xsl:otherwise>

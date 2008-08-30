@@ -9,7 +9,7 @@
 	Assuming you have Apache configured correctly, create a file
 	called <code class="filename">hello.rvt</code> where Apache can find
 	it, with the following content:
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;?
 puts "Hello World"
 ?&gt;
 </pre><p style="width:90%">
@@ -18,7 +18,7 @@ puts "Hello World"
 	it.
       </p></div></div><br class="example-break"><div class="example"><a name="table"></a><p class="title"><b>Example 2. Generate a Table</b></p><div class="example-contents"><p style="width:90%">
 	In another simple example, we dynamically generate a table:
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;? puts "&lt;table&gt;\n"
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;? puts "&lt;table&gt;\n"
 for {set i 1} { $i &lt;= 8 } {incr i} {
     puts "&lt;tr&gt;\n"
     for {set j 1} {$j &lt;= 8} {incr j} {
@@ -40,7 +40,7 @@ puts "&lt;/table&gt;\n" ?&gt;
 	POST operations.
       </p><p style="width:90%">
 	Given an HTML form like the following:
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">     &lt;form action="vars.rvt"&gt;
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">     &lt;form action="vars.rvt"&gt;
       &lt;table&gt;
 	&lt;tbody&gt;
 	  &lt;tr&gt;
@@ -73,7 +73,7 @@ puts "&lt;/table&gt;\n" ?&gt;
     &lt;/form&gt;
 </pre><p style="width:90%">
 	We can use this Rivet script to get the variable values:
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;?
 set errlist {}
 if { [var exists title] } {
     set title [var get title]
@@ -169,7 +169,7 @@ if { [llength $errlist] != 0 } {
 	&lt;form...&gt; tag in the way shown in the example.  Failure
 	to do so would result in the client sending only the file's
 	path, rather than the actual contents.
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;form action="foo.rvt" enctype="multipart/form-data" method="post"&gt;
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;form action="foo.rvt" enctype="multipart/form-data" method="post"&gt;
 &lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
 &lt;input type="submit" value="Send File"&gt;&lt;/input&gt;
 &lt;/form&gt;
@@ -178,7 +178,7 @@ if { [llength $errlist] != 0 } {
 	(<code class="filename">upload.rvt</code>) <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span>
 	 ?<span style="font-family:monospace; font-weight: bold;">argument ...</span>? commands can be used to manipulate the
 	various files uploaded.
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting">&lt;?
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;?
 upload save MyUpload /tmp/uploadfiles/file1
 puts "Saved file [upload filename MyUpload] \
 	([upload size MyUpload] bytes) to server"
@@ -246,15 +246,13 @@ puts "Saved file [upload filename MyUpload] \
       </p><p style="width:90%">
 	This code is reported as an example of how to control 
 	the protocol using the <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> command.
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># Code example for the transmission of a pdf file. 
-# An obvious limit of the approach followed by this 
-# example is the size of the files we can handle.
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting"># Code example for the transmission of a pdf file. 
 
 if {[var exists pdfname]} {
     set pdfname [var get pdfname]
 
 # let's build the full path to the pdf file. The 'pdf_repository'
-# directory must be readable by the apache children.
+# directory must be readable by the apache children
 
     set pdf_full_path [file join $pdf_repository ${pdfname}.pdf]
     if {[file exists $pdf_full_path]} {
@@ -269,11 +267,10 @@ if {[var exists pdfname]} {
 	headers add Content-Description "PDF Document"
 
 # The pdf is read and stored in a Tcl variable. The file handle is
-# configured for a binary read: we are just shipping raw data to the
+# configured for a binary read: we are just shipping raw data to a
 # client. The following 4 lines of code can be replaced by any code
-# able to generate the file content or query a data source (e.g. database, 
-# external program, other Tcl code) 
-# 
+# that is able to retrieve the data to be sent from any data source
+# (e.g. database, external program, other Tcl code)
 
 	set paper	    [open $pdf_full_path r]
 	fconfigure	    $paper -translation binary
@@ -281,11 +278,11 @@ if {[var exists pdfname]} {
 	close $paper
 
 # Now we got the data: let's tell the client how many bytes we are
-# about to send (useful for the download progress bar)
+# about to send (useful for the download progress bar of a dialog box)
 
 	headers add Content-Length  [string length $pdf]
 
-# Let's send the actual file content. 
+# Let's send the actual file content
 
 	puts $pdf
     } else {
@@ -319,92 +316,97 @@ if {[var exists pdfname]} {
 	abilty of JavaScript (and other scriping languages like VBScript) to 
 	manipulate dynamically the HTML structure of a page. In modern browsers 
 	JavaScript code is enabled to send GET or POST requests to the webserver.
-	These requests can ask the server to run scripts (for example Rivet
-	Tcl scripts) that build responses and send them back to the browser.
+	These requests can request the server to run scripts (for example Rivet
+	Tcl scripts) that build responses and to be sent back to the browser.
 	JavaScript code reads asynchronously these responses, elaborates
 	their content and accordingly modifies the page on display. 
 	Ajax helps to build web applications that are more responsive and 
-	flexible. Instead of going through the cycle of request-generation-transfer
+	flexible, if you can cope with the complexities, subtleties and 
+	incompatibilities even among the most common browsers available. 
+	Instead of going through the cycle of request-generation-transfer
 	of a page, Ajax allows the programmer to request and transmit only
 	the essential data thus matching the general requirement of separation
 	between data and user interface (and saving the server from sending over
-	the same html code and graphics every time a page is refreshed)
+	the same html code and graphics when only a fraction of a page has
+	to be refreshed)
       </p><p style="width:90%">
 	In Ajax	applications the communication between client and server 
 	is controlled by an instance of a specialized object: the non-IE world
-	uses the XMLHttpRequest class to create it, 
-	whereas IE uses the ActiveXObject class. Through an instance of
-	that class a POST or GET request is sent to the server, which in turn
-	responds with a message that is stored as a string in a property of the 
-	communication object called 'returnedText'. 
-	Although this sort of communication channel doesn't imply that the messages
-	being transmitted through it have a specific protocol, it's become widely
-	customary to use XML as the format for such messages. A number
-	of XML specification are being used for this, among which XML-RPC and
-	SOAP are worth to be quoted. Anyway, you can invent your own protocol
-	(either based on XML or anything else), but one has to be aware of the fact 
-	that if the http headers are properly set and the message returned 
-	to the client is a well formed XML fragment, also the property 
+	(Firefox,Safari,Opera...) uses the XMLHttpRequest class to create it, 
+	whereas IE uses the ActiveXObject class.
+      	</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+	    With the release of IE7 Microsoft introduced native support for 
+	    <a class="ulink" href="http://blogs.msdn.com/ie/archive/2006/01/23/516393.aspx" target="_top">
+	    XMLHttpRequest</a> class objects
+      	</td></tr></table></div><p style="width:90%">	
+	By creating an instance of this class a POST or GET request can be sent 
+	to the server, whose response is stored in a 
+	property ('returnedText') of the communication object. 
+	It's become widely customary to encode in XML messages the response
+	from the server to the browser. A number of XML specification are 
+	being used for this, among which XML-RPC and SOAP are worth to be 
+	quoted. Anyway, you can invent your own message definitions
+	(either based on XML or anything else), but one has to be aware of 
+	the fact that if the http headers are properly set and the message 
+	returned to the client is a well formed XML fragment, also the property 
 	<a class="ulink" href="http://www.w3schools.com/ajax/ajax_responsexml.asp" target="_top">
 	XMLResponse</a> is set with a reference to an object 
-	that stores the response as an XML document. This object is an 
-	instance of a class that implements the
+	that represent the
 	<a class="ulink" href="http://www.w3schools.com/dom/default.asp" target="_top">
-	XML W3C DOM</a> tree methods and properties, thus
-	enabling the scripts to read and manipulate the data embedded in 
-	the XML message with a structured and standard interface.
+	DOM</a> of the XML response. 
+	By means of the XML W3C DOM tree methods and properties
+	you can write scripts that read and manipulate the data embedded in 
+	the XML message.
       </p><p style="width:90%">
         In this example a Rivet script initializes an array with the
 	essential data regarding a few of the major composers of the 
 	european music. This array plays the role of a database
-	which, in a real case, might store large tables with thousands 
-	records and more complete and extended information. 
+	which, in a real case, has is a real DBM which stores large 
+	tables with thousands records and more complex and 
+	extended information. 
 	The script is designed to send back to the client two 
 	types of responses: a catalog of the composers or a single 
 	record of a composer.
-      </p><pre style="background:#bbffbb ; width:90ex ; margin: 2ex ;      padding: 1ex; border: solid black 1px ; white-space: pre;      font-family:monospace ; " class="programlisting"># 
-#
-# The database array contains xml fragments representing the
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting"># The database array contains xml fragments representing the
 # results of queries to a database. Many databases are now able
 # to produce the results of a query in XML. 
 #
-# $Id: $
+#array unset composer
 #
-
-set		composer(1)	"&lt;composer&gt;\n"
-append  composer(1) "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
+set	composer(1)	"&lt;composer&gt;\n"
+append  composer(1)     "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
 append  composer(1)	"    &lt;last_name&gt;Monteverdi&lt;/last_name&gt;\n"
 append	composer(1)	"    &lt;lifespan&gt;1567-1643&lt;/lifespan&gt;\n"
 append	composer(1)	"    &lt;era&gt;Renaissance/Baroque&lt;/era&gt;\n"
 append	composer(1)	"    &lt;key&gt;1&lt;/key&gt;\n"
 append	composer(1)	"&lt;/composer&gt;\n"
 
-set		composer(2)	"&lt;composer&gt;\n"
-append  composer(2) "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
+set	composer(2)	"&lt;composer&gt;\n"
+append  composer(2)     "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
 append  composer(2)	"    &lt;last_name&gt;Bach&lt;/last_name&gt;\n"
 append	composer(2)	"    &lt;lifespan&gt;1685-1750&lt;/lifespan&gt;\n"
 append	composer(2)	"    &lt;era&gt;Baroque&lt;/era&gt;\n"
 append	composer(2)	"    &lt;key&gt;2&lt;/key&gt;\n"
 append	composer(2)	"&lt;/composer&gt;\n"
 
-set		composer(3)	"&lt;composer&gt;\n"
-append  composer(3) "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
+set	composer(3)	"&lt;composer&gt;\n"
+append  composer(3)     "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
 append  composer(3)	"    &lt;last_name&gt;van Beethoven&lt;/last_name&gt;\n"
 append	composer(3)	"    &lt;lifespan&gt;1770-1827&lt;/lifespan&gt;\n"
 append	composer(3)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
 append	composer(3)	"    &lt;key&gt;3&lt;/key&gt;\n"
 append	composer(3)	"&lt;/composer&gt;\n"
 
-set		composer(4)	"&lt;composer&gt;\n"
-append  composer(4) "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
+set	composer(4)	"&lt;composer&gt;\n"
+append  composer(4)     "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
 append  composer(4)	"    &lt;last_name&gt;Mozart&lt;/last_name&gt;\n"
 append	composer(4)	"    &lt;lifespan&gt;1756-1791&lt;/lifespan&gt;\n"
 append	composer(4)	"    &lt;era&gt;Classical&lt;/era&gt;\n"
 append	composer(4)	"    &lt;key&gt;4&lt;/key&gt;\n"
 append	composer(4)	"&lt;/composer&gt;\n"
 
-set		composer(5)	"&lt;composer&gt;\n"
-append  composer(5) "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
+set	composer(5)	"&lt;composer&gt;\n"
+append  composer(5)     "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
 append  composer(5)	"    &lt;last_name&gt;Schumann&lt;/last_name&gt;\n"
 append	composer(5)	"    &lt;lifespan&gt;1810-1856&lt;/lifespan&gt;\n"
 append	composer(5)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
