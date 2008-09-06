@@ -40,7 +40,7 @@ void* my_memstr(char* haystack, int haystacklen, const char* needle,
     while( (ptr = memchr(ptr, needle[0], len)) ) {
 	/* calculate length after match */
 	len = haystacklen - (ptr - (char *)haystack);
-	 ;
+
 	/* done if matches up to capacity of buffer */
 	if(memcmp(needle, ptr, needlen) == 0 &&
 	   (partial || len >= needlen))
@@ -64,6 +64,7 @@ int fill_buffer(multipart_buffer *self)
     /* shift the existing data if necessary */
     if(self->bytes_in_buffer > 0 && self->buf_begin != self->buffer)
 	memmove(self->buffer, self->buf_begin, self->bytes_in_buffer);
+
     self->buf_begin = self->buffer;
 
     /* calculate the free space in the buffer */
@@ -79,11 +80,8 @@ int fill_buffer(multipart_buffer *self)
     /* read the required number of bytes */
     if(bytes_to_read > 0) {
 	char *buf = self->buffer + self->bytes_in_buffer;
-    //TODO: fix ap_hard_timeout
-    //ap_hard_timeout("[libapreq] multipart_buffer.c:fill_buffer", self->r);
+    
 	actual_read = ap_get_client_block(self->r, buf, bytes_to_read);
-	//TODO: fix ap_kill_timeout()
-    //ap_kill_timeout(self->r);
 
 	/* update the buffer length */
 	if(actual_read > 0)
@@ -190,7 +188,7 @@ multipart_buffer *multipart_buffer_new(char *boundary, long length, request_rec 
     self->bufsize = minsize;
     self->request_length = length;
     self->boundary = (char*) apr_pstrcat(r->pool, "--", boundary, NULL);
-    self->boundary_next = (char*) apr_pstrcat(r->pool, "\n", self->boundary+2, NULL);
+    self->boundary_next = (char*) apr_pstrcat(r->pool, "\n", self->boundary, NULL);
     self->buf_begin = self->buffer;
     self->bytes_in_buffer = 0;
 
@@ -201,15 +199,15 @@ multipart_buffer *multipart_buffer_new(char *boundary, long length, request_rec 
 //table *multipart_buffer_headers(multipart_buffer *self)
 apr_table_t *multipart_buffer_headers(multipart_buffer *self)
 {
-    //table *tab;
     apr_table_t *tab;
     char *line;
 
     /* didn't find boundary, abort */
+
     if(!find_boundary(self, self->boundary)) return NULL;
 
     /* get lines of text, or CRLF_CRLF */
-    //tab = ap_make_table(self->r->pool, 10);
+
     tab = apr_table_make(self->r->pool, 10);
     while( (line = get_line(self)) && strlen(line) > 0 ) {
 	/* add header to table */
@@ -218,9 +216,9 @@ apr_table_t *multipart_buffer_headers(multipart_buffer *self)
 
 	if(value) {
 	    *value = 0;
-	    do {
-            value++;
-        } while(apr_isspace(*value));
+	    do { 
+	    	value++; 
+	    } while (apr_isspace(*value));
 
 #ifdef DEBUG
 	    ap_log_rerror(MPB_ERROR,
@@ -229,8 +227,7 @@ apr_table_t *multipart_buffer_headers(multipart_buffer *self)
 #endif
 
 	    apr_table_add(tab, key, value);
-	}
-	else {
+	} else {
 #ifdef DEBUG
 	    ap_log_rerror(MPB_ERROR,
 			  "multipart_buffer_headers: '%s' = ''", key);
@@ -255,8 +252,7 @@ int multipart_buffer_read(multipart_buffer *self, char *buf, int bytes)
     /* look for a potential boundary match, only read data up to that point */
     if( (bound = my_memstr(self->buf_begin, self->bytes_in_buffer,
 			   self->boundary_next, 1)) ) {
-	max = bound - self->buf_begin - 1 ;
-	self->bytes_in_buffer=max+1;
+	max = bound - self->buf_begin;
      } else {
 	max = self->bytes_in_buffer;
      }

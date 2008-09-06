@@ -1,3 +1,24 @@
+2008-09-06 Massimo Manghi <mxmanghi@apache.org>
+
+	* INSTALL: instructions for builing Rivet expanded with
+	examples taken from real builds for Debian and Slackware.
+
+	* src/apache-2/apache_request.[c|h]: removed TODO comments
+	concerning ap_hard_timeout and ap_kill_timeout as these functions
+	doesn't not exist anymore in the apache 2.x api.
+	Added the Content-type as a new argumento to
+	ApacheRequest_parse_multipart for parts boundary determination.
+	The correctness of the content type has to be done before calling
+	in order to do the check only once. Commented declarations of variables
+	not used. The 'tempname' string is allocated now from the apache pool.
+	Changed template for temporary file name generation. If 
+	apr_file_mktemp fails a more descriptive error is logged.
+
+	* src/apache-2/apache_multipart_buffer.[c|h]: removed line in
+	multipart_buffer_read that lead the buffer pointer to fail following 
+	the parsing process. Input buffer size changed to a larger and more 
+	common size of 8192 bytes
+
 2008-08-28 Massimo Manghi <mxmanghi@apache.org>
 
 	* src/apache-2/mod_rivet.c: using the 'parse' command twice within

@@ -95,7 +95,7 @@ struct ApacheUpload {
 ApacheRequest *ApacheRequest_new(request_rec *r);
 /* int ApacheRequest_save_post_data(request_rec *r, int flag);
 char *ApacheRequest_fetch_post_data(request_rec *r);  */
-int ApacheRequest_parse_multipart(ApacheRequest *req);
+int ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct);
 int ApacheRequest_parse_urlencoded(ApacheRequest *req);
 char *ApacheRequest_script_name(ApacheRequest *req);
 char *ApacheRequest_script_path(ApacheRequest *req);
@@ -141,7 +141,8 @@ char *ApacheRequest_expires(ApacheRequest *req, char *time_str);
  }
 #endif
 
-#define REQ_ERROR APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, req->r
+#define REQ_ERROR  APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, req->r
+#define REQ_INFO   APLOG_MARK, APLOG_INFO, APR_EGENERAL, req->r
 
 #ifdef REQDEBUG
 #define REQ_DEBUG(a) (a)

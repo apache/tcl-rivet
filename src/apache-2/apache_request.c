@@ -56,9 +56,6 @@ util_read(ApacheRequest *req, const char **rbuf)
 
         *rbuf = apr_pcalloc(r->pool, length + 1);
 
-        //TODO: fix ap_hard_timeout
-        //ap_hard_timeout("[libapreq] util_read", r);
-
         while ((len_read =
                     ap_get_client_block(r, buff, sizeof(buff))) > 0) {
             if ((rpos + len_read) > length) {
@@ -70,9 +67,6 @@ util_read(ApacheRequest *req, const char **rbuf)
             memcpy((char*)*rbuf + rpos, buff, rsize);
             rpos += rsize;
         }
-
-        //TODO: fix ap_kill_timeout()
-        //ap_kill_timeout(r);
     }
 
     return rc;
@@ -226,8 +220,7 @@ static char x2c(const char *what)
     register char digit;
 
 #ifndef CHARSET_EBCDIC
-    digit = ((what[0] >= 'A') ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'))
-;
+    digit = ((what[0] >= 'A') ? ((what[0] & 0xdf) - 'A') + 10 : (what[0] - '0'));
     digit *= 16;
     digit += (what[1] >= 'A' ? ((what[1] & 0xdf) - 'A') + 10 : (what[1] - '0'));
 #else /*CHARSET_EBCDIC*/
@@ -337,7 +330,7 @@ static int ap_unescape_url_u(char *url)
 	   return OK;
 }
 
-static int urlword_dlm[] = {'&', ';', 0};
+//static int urlword_dlm[] = {'&', ';', 0};
 
 static char *my_urlword(apr_pool_t *p, const char **line)
 {
@@ -346,14 +339,14 @@ static char *my_urlword(apr_pool_t *p, const char **line)
     char ch;
 
     while ( (ch = *pos) != '\0' && ch != ';' && ch != '&') {
-	   ++pos;
+	++pos;
     }
 
     res = (char*) apr_pstrndup(p, *line, pos - *line);
 
     while (ch == ';' || ch == '&') {
-	   ++pos;
-	   ch = *pos;
+	++pos;
+	ch = *pos;
     }
 
     *line = pos;
@@ -376,7 +369,6 @@ static void split_to_parms(ApacheRequest *req, const char *data)
         ap_unescape_url_u((char*)val);
         apr_table_add(req->parms, key, val);
     }
-
 }
 
 int ApacheRequest___parse(ApacheRequest *req)
@@ -391,15 +383,16 @@ int ApacheRequest___parse(ApacheRequest *req)
 
     if (r->method_number == M_POST) {
         const char *ct = apr_table_get(r->headers_in, "Content-type");
+        if (ct) ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
         if (ct && strncaseEQ(ct, DEFAULT_ENCTYPE, DEFAULT_ENCTYPE_LENGTH)) {
             result = ApacheRequest_parse_urlencoded(req);
         } else if (ct && strncaseEQ(ct, TEXT_XML_ENCTYPE, TEXT_XML_ENCTYPE_LENGTH)) {
             result = ApacheRequest_parse_urlencoded(req);
         } else if (ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) {
-            result = ApacheRequest_parse_multipart(req);
+            result = ApacheRequest_parse_multipart(req,ct);
         } else {
             //TODO: fix logging apr_log_rerror
-            ap_log_rerror(REQ_ERROR,0, r->server, "unknown content-type: `%s'", ct);
+            ap_log_rerror(REQ_ERROR, "unknown content-type: `%s'", ct);
             result = HTTP_INTERNAL_SERVER_ERROR;
         }
     }
@@ -425,6 +418,7 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
     	    !strncaseEQ(type, TEXT_XML_ENCTYPE, TEXT_XML_ENCTYPE_LENGTH)) {
     	    return DECLINED;
     	}
+
     	if ((rc = util_read(req, &data)) != OK) {
     	    return rc;
     	}
@@ -437,10 +431,10 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
     return OK;
 }
 
-static void remove_tmpfile(void *data)
+static apr_status_t remove_tmpfile(void *data)
 {
     ApacheUpload *upload = (ApacheUpload *) data;
-    ApacheRequest *req = upload->req;
+//  ApacheRequest *req = upload->req;
 
     //TODO: fix ap_pfclose
     //if( ap_pfclose(req->r->pool, upload->fp) )
@@ -448,11 +442,14 @@ static void remove_tmpfile(void *data)
         //apr_log_rerror(REQ_ERROR,"[libapreq] close error on '%s'", upload->tempname);
 #ifndef DEBUG
     if( remove(upload->tempname) )
+    {
         //TODO: fix logging apr_log_rerror
         //apr_log_rerror(REQ_ERROR,"[libapreq] remove error on '%s'", upload->tempname);
+    }
 #endif
 
-    free(upload->tempname);
+//    free(upload->tempname);
+    return 0;
 }
 
 apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
@@ -461,52 +458,49 @@ apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
     apr_file_t *fp = NULL;
     char *name = NULL;
     char *file = NULL ; 
-	const char *tempdir;
-	apr_status_t rv;
+    const char *tempdir;
+    apr_status_t rv;
 	
-	tempdir = req->temp_dir;
+    tempdir = req->temp_dir;
 /*	file = (char *)apr_palloc(r->pool,sizeof(apr_time_t)); */
-	file = apr_psprintf(r->pool,"%u", r->request_time);
-	rv = apr_temp_dir_get(&tempdir,r->pool); 
-	if (rv != APR_SUCCESS)  {
-		ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "No temp dir!");
-		return NULL;
-	}
-	rv = apr_filepath_merge(&name,tempdir,file,APR_FILEPATH_NATIVE,r->pool);
-	if (rv != APR_SUCCESS) {
-		ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "File path error!");
-		return NULL;
-	}
-	rv = apr_file_mktemp(&fp,name,0,r->pool);
-	if (rv != APR_SUCCESS) {
-		ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "Failed to open temp file!");
-		return NULL;
-	}
+    file = apr_psprintf(r->pool,"%u.XXXXXX", (unsigned int)r->request_time);
+    rv = apr_temp_dir_get(&tempdir,r->pool); 
+    if (rv != APR_SUCCESS)  {
+	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "No temp dir!");
+	return NULL;
+    }
+	
+    rv = apr_filepath_merge(&name,tempdir,file,APR_FILEPATH_NATIVE,r->pool);
+    if (rv != APR_SUCCESS) {
+	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "File path error!");
+	return NULL;
+    }
+    
+    rv = apr_file_mktemp(&fp,name,0,r->pool);
+    if (rv != APR_SUCCESS) {
+	char* errorBuffer = (char*) apr_palloc(r->pool,256);
+	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "Failed to open temp file: %s",apr_strerror(rv,errorBuffer,256));
+	return NULL;
+    }
+
     upload->fp = fp;
     upload->tempname = name;
-    apr_pool_cleanup_register (r->pool, (void *)upload,
-			remove_tmpfile, apr_pool_cleanup_null);
+    apr_pool_cleanup_register (r->pool, (void *)upload, remove_tmpfile, apr_pool_cleanup_null);
     return fp;
 
 }
 
 int
-ApacheRequest_parse_multipart(ApacheRequest *req)
+ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
 {
     request_rec *r = req->r;
     int rc = OK;
-    const char *ct = apr_table_get(r->headers_in, "Content-Type");
     long length;
     char *boundary;
     multipart_buffer *mbuff;
     ApacheUpload *upload = NULL;
-	apr_status_t  status;
-	char *error[1024];
-    if (!ct) {
-        //TODO: fix logging apr_log_rerror
-        //apr_log_rerror(REQ_ERROR, "[libapreq] no Content-type header!");
-        return HTTP_INTERNAL_SERVER_ERROR;
-    }
+    apr_status_t  status;
+    char *error[1024];
 
     if ((rc = ap_setup_client_block(r, REQUEST_CHUNKED_ERROR))) {
         return rc;
@@ -518,7 +512,7 @@ ApacheRequest_parse_multipart(ApacheRequest *req)
 
     if ((length = r->remaining) > req->post_max && req->post_max > 0) {
         //TODO: fix logging apr_log_rerror
-        //apr_log_rerror(REQ_ERROR, "[libapreq] entity too large (%d, max=%d)",
+        //apr_log_rerror(REQ_ERROR, "entity too large (%d, max=%d)",
         //        (int)length, req->post_max);
         return HTTP_REQUEST_ENTITY_TOO_LARGE;
     }
@@ -544,21 +538,15 @@ ApacheRequest_parse_multipart(ApacheRequest *req)
         apr_table_t *header = (apr_table_t*) multipart_buffer_headers(mbuff);
         const char *cd, *param=NULL, *filename=NULL;
         char buff[FILLUNIT];
-        int blen, wlen;
+        int blen;
 
         if (!header) {
 #ifdef DEBUG
-            //TODO: fix logging apr_log_rerror
-            //apr_log_rerror(REQ_ERROR,
-            //   "[libapreq] silently drop remaining '%ld' bytes", r->remaining);
+            apr_log_rerror(REQ_ERROR,"Silently dropping remaining '%ld' bytes", r->remaining);
 #endif
-            //TODO: fix ap_hard_timeout
-            //ap_hard_timeout("[libapreq] parse_multipart", r);
-            while ( ap_get_client_block(r, buff, sizeof(buff)) > 0 )
-                /* wait for more input to ignore */ ;
-            //TODO: fix ap_kill_timeout()     
-            //ap_kill_timeout(r);
-            return OK;
+	    do { } while ( ap_get_client_block(r, buff, sizeof(buff)) > 0 );
+            	
+	    return OK;
         }
 
         if ((cd = apr_table_get(header, "Content-Disposition"))) {
@@ -621,16 +609,16 @@ ApacheRequest_parse_multipart(ApacheRequest *req)
             }
 
             while ((blen = multipart_buffer_read(mbuff, buff, sizeof(buff)))) {
-				status = apr_file_write(upload->fp,buff,&blen);
-				if (status != 0) {	
-					apr_strerror(status,error,1024); 
-                   	return HTTP_INTERNAL_SERVER_ERROR;
-				}
-
+		apr_size_t bytes_to_write = (apr_size_t) blen;
+		status = apr_file_write(upload->fp,buff,&bytes_to_write);
+		if (status != 0) {
+		    apr_strerror(status,error,1024); 
+                    return HTTP_INTERNAL_SERVER_ERROR;
+		}
                 upload->size += blen;
             }
         }
-        }
+    }
 
     return OK;
 }

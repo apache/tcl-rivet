@@ -3,19 +3,74 @@
 
 For more detailed instructions, see the docs/html/ directory.
 
-Rivet is now based on the auto tools - autoconf, automake and libtool,
+Rivet is now based on the autotools - autoconf, automake and libtool,
 and so compilation is simple.  For example:
 
-./configure --with-tcl=/usr/lib/tcl8.4/ --with-apxs=/usr/bin/apxs \
-	     --with-tclsh=/usr/bin/tclsh8.4
+if you have a clean source tree you have to prepare it for autotools
+
+  aclocal
+  autoreconf
+
+and then run 'configure' with the switches that suit your setup
+
+./configure --with-tcl=/usr/lib/tcl8.4/ 	\
+	    --with-apxs=/usr/bin/apxs 		\
+	    --with-tclsh=/usr/bin/tclsh8.4 	\
+	    --with-apache-version=1
 make
 make install
 
-Basic Apache configuration directives that are needed:
+Along with the usual 'configure' variables Rivet's configure script 
+handles other specific environmental variables. 
+
+--with-tclinclude=TCL_INCLUDES_DIR	Directory containing include
+					files for compiling code based 
+					on the Tcl C library.
+--with-apache-version=VER		Values are 1 or 2 depending
+					on the apache server you're 
+					builing the module for.
+--with-apache=DIR			Apache server's root directory.
+--with-apxs=FILE			Path to the apxs program to
+					be used in the compilation
+					process.
+--with-apache-include=DIR		Apache's include files path.
+--with-apr-config=FILE			Apache Portable Runtime 
+					metainformation program
+--with-rivet-target-dir=DIR		Rivet Tcl library installation
+					directory.
+
+These are the basic Apache configuration directives that are needed:
 
 # Loads the module.
 LoadModule rivet_module	/path/to/your/copy/of/mod_rivet.so
 
 # Let the module handle .rvt and .tcl files.
-AddType application/x-httpd-rivet .rvt
-AddType application/x-rivet-tcl .tcl
+AddType application/x-httpd-rivet  rvt
+AddType application/x-rivet-tcl    tcl
+
+# The default charset can be specified in the configuration
+
+AddType "application/x-httpd-rivet; charset=utf-8" rvt
+
+For Apache 2 a typical './configure' might look like this
+
+./configure --with-tcl=/usr/lib/tcl8.4 --with-apache-version=2 
+	    --with-tclsh=/usr/bin/tclsh8.4 --with-apache=/usr
+	    --with-rivet-target-dir=/usr/lib/myrivetlib
+
+If Apache1.x and Apache2.x coexist on the same system you must
+tell configure where the right apxs (apache extension tool) script is
+located. E.g.: on a Debian system apxs for Apache2.x is named apxs2
+
+./configure --with-apache-include=/usr/include/apr-1.0 		\
+	    --with-apache-version=2 --with-apxs=/usr/bin/apxs2 	\
+	    --with-tcl=/usr/lib/tcl8.4 --with-apache=/usr
+
+Here is another example reported by a user who successfully built 
+Rivet on Slackware 12.1
+
+aclocal
+autoreconf
+./configure --with-apache-version=2 --with-tcl=/usr/lib --with-apxs=/usr/bin/apxs 
+make
+
