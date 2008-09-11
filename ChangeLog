@@ -19,6 +19,15 @@
 	the parsing process. Input buffer size changed to a larger and more 
 	common size of 8192 bytes
 
+2008-08-30 Massimo Manghi <mxmanghi@apache.org>
+
+	* doc/rivet.[xml|xsl], doc/html/*.html: changed a couple of rule 
+	in rivet.xsl: they basically make example boxes a 
+	bit more flexible for html browsing and made their 
+	background color a bit more "neutral". I also made the character 
+	in them slighly smaller in order to have more 
+	space for code lines.
+
 2008-08-28 Massimo Manghi <mxmanghi@apache.org>
 
 	* src/apache-2/mod_rivet.c: using the 'parse' command twice within
