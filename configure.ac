@@ -23,18 +23,28 @@ dnl
 #-----------------------------------------------------------------------
 
 AC_INIT([Rivet],[0.8.0])
+TEA_INIT([3.6])
+
+AC_CONFIG_AUX_DIR(tclconfig)
+AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
+
+# AX_PREFIX_CONFIG_H is a macro taken from the autotools macro archive.
+# The typical configure generated 'config.h' can be renamed and 
+# preprocessor symbols in it can be prefixed in order to avoid clashes 
+# with Apache's config.h
+# 
+# As of today (27 Sept 2008) this macro is not part of autotools and
+# it's in the 'm4' directory
+#
+
+AX_PREFIX_CONFIG_H([rivet_config.h],[rivet])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
 # This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
-
-
-TEA_INIT([3.6])
-
-AC_CONFIG_AUX_DIR(tclconfig)
 
 #
 # Init automake stuff
@@ -231,7 +241,7 @@ AC_DEFUN([APACHE],[
     AC_MSG_CHECKING(for Apache base)
     AC_ARG_WITH(
         apache,
-        [  --with-apache[=DIR]    Apache server base directory],
+        [  --with-apache[=DIR] Apache server base directory],
 	, [with_apache="/usr/local/apache"]
 	)
 	apache_base="${with_apache}"
@@ -348,7 +358,7 @@ AC_DEFUN([APR_HANDLING],[
 	    APR_LDLFAGS=`${apr_found} --link-libtool --libs`
 	    AC_SUBST(APR_LDFLAGS)
     else
-        AC_MSG_ERROR([Could not find apr-1-config.  apr-1-config must be in your PATH or you must specify the location of the apr script using --with-apr-config])
+        AC_MSG_ERROR([Could not find apr-1-config. apr-1-config must be in your PATH or you must specify the location of the apr script using --with-apr-config])
     fi
 ])
 
@@ -415,6 +425,28 @@ AC_DEFUN([RIVET_TCL_LIB],[
     AC_MSG_RESULT([$with_rivet_target_dir])
 ])
 
+# --enable-version-display=[yes|no] (default: no)
+# switches on version number display in Apache's signature.
+#
+
+AC_DEFUN([DISPLAY_RIVET_VERSION],[
+    AC_ARG_ENABLE(
+        version_display,
+	[  --enable-version-display  Display Rivet version in Apache signature],
+	[ signature_version_display=$enable_version_display ],
+	[ signature_version_display="no" ]
+    )
+
+    AC_MSG_CHECKING(whether rivet version is printed in Apache signature)
+    if test "$signature_version_display" = "yes"; then
+    	AC_MSG_RESULT([yes])
+	AC_DEFINE(DISPLAY_VERSION,1,[Display Rivet version in Apache signature])
+    else
+    	AC_MSG_RESULT([no, Rivet version will be hidden])
+	AC_DEFINE(DISPLAY_VERSION,0,[Display Rivet version in Apache signature])
+    fi
+])
+
 APACHE_VERSION
 GET_RIVET_BASE
 APACHE
@@ -422,6 +454,7 @@ CHECK_APXS
 APACHE_INCLUDES
 APR_HANDLING
 RIVET_TCL_LIB
+DISPLAY_RIVET_VERSION
 AC_SUBST(apache_version_dir)
 
 AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])

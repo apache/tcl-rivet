@@ -8,8 +8,8 @@
 
 /* init.tcl file relative to the server root directory */
 
-#define RIVET_DIR  RIVETLIB_DESTDIR
-#define RIVET_INIT RIVETLIB_DESTDIR"/init.tcl"
+#define RIVET_DIR  RIVET_RIVETLIB_DESTDIR
+#define RIVET_INIT RIVET_RIVETLIB_DESTDIR"/init.tcl"
 
 #if 0
 #define FILEDEBUGINFO fprintf(stderr, "Function " __FUNCTION__ "\n")
@@ -27,13 +27,6 @@
 #else
 #define THREADED_TCL 0 /* Unless you have MINGW32, modify this one! */
 #endif
-
-/* If you want to show the mod_rivet version in the server
-   information, you can define this to 0.
-
-   Otherwise, set this to 1 to hide the version from potential
-   troublemakers.  */
-#define HIDE_RIVET_VERSION 1
 
 /* End Configuration options  */
 

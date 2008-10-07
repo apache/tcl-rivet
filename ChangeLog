@@ -1,3 +1,28 @@
+2008-10-07 Massimo Manghi <mxmanghi@apache.org>
+
+	* src/apache-2/apache_multipart_buffer.c, src/apache-2/rivetCore.c,
+	src/apache-2/TclWebapache.c,src/rivetChannel.c,src/rivetCrypt.c: 
+    	Inclusion of config.h changed to reflect renaming of config.h.
+
+	* configure.ac: new AX_PREFIX_CONFIG_H added to 'configure' 
+	generation. Added switch --enable-display-version for having 
+	Rivet's version printed in Apache signature
+
+	* m4/ax_prefix_config_h: added macro for renaming config.h into
+	rivet_config.h (or whatever we deem a good name for this file).
+	Preprocessor symbols in this file are also prefixed with RIVET_
+	
+	* Makefile.am: added handling of the macros in the 'm4' directory. 
+
+	* src/apache-2/mod_rivet.h: removed definition of preprocessor
+	symbol for hiding version number in apache logs (feature now
+	controlled in 'configure')
+
+	* src/apache-2/mod_rivet.c: Changed preprocessor symbols that
+	are now prefixed by 'RIVET_'. Moved misplaced #ifdef APACHE2 test.
+	Maybe this test is useless as we certainly are building against 
+	APACHE2 when compiling this file
+
 2008-09-06 Massimo Manghi <mxmanghi@apache.org>
 
 	* INSTALL: instructions for builing Rivet expanded with

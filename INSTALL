@@ -38,6 +38,8 @@ handles other specific environmental variables.
 					metainformation program
 --with-rivet-target-dir=DIR		Rivet Tcl library installation
 					directory.
+--enable-version-display		Apache signature shows Rivet 
+					version number. Default=no
 
 These are the basic Apache configuration directives that are needed:
 
@@ -74,3 +76,4 @@ autoreconf
 ./configure --with-apache-version=2 --with-tcl=/usr/lib --with-apxs=/usr/bin/apxs 
 make
 
+# RCS: @(#) $Id$

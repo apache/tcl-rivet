@@ -7,6 +7,7 @@
 #
 #
 
+ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST=LICENSE contrib debian doc rivet win/nmakehlp.c src/testing.c src/TclWebcgi.c
 SUBDIRS = src doc
 RIVETLIB_DESTDIR = @RIVET_TCL_TARGET@
