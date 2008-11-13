@@ -1,3 +1,14 @@
+2008-11-13 Massimo Manghi <mxmanghi@apache.org>
+
+	* src/apache-2/rivetCore.c: In function 'Rivet_Parse' the call
+	to Tcl_FSStat was turned into the corresponding apr function 
+	'apr_stat'. 
+	This change was motivated by a possibile mismatch between Rivet's
+	allocation of the structure 'Tcl_StatBuf' and the handling
+	of the structure done within the Tcl C library. 
+	This seems to have healed a pointer corruption that caused 
+	segfaults when the 'parse' command was executed.
+
 2008-10-07 Massimo Manghi <mxmanghi@apache.org>
 
 	* src/apache-2/apache_multipart_buffer.c, src/apache-2/rivetCore.c,
@@ -559,7 +570,7 @@
 	file uploads.
 
 2005-08-01  Karl Lehenbauer  <karl-rivet@sc.com>
-	* abort_page was, for all intents and purposes, completely and utterly 
+	* : abort_page was, for all intents and purposes, completely and utterly 
 	  broken -- it forced a return from whatever called it, as if it was 
 	  a "return" statement, but it didn't stop evaluating Tcl beyond that, 
 	  which was broken, and it discarded output by setting an "aborted"
@@ -698,7 +709,7 @@
 
 	* Collected some build notes in README.configure
 
-	* Clean up presentation of --with-apxs and --with-tclsh and
+	* : Clean up presentation of --with-apxs and --with-tclsh and
 	  have them show up when configure --help is run.
 
 	* tclconfig/tcl.m4, configure.ac, config.h, src/*.c:
@@ -709,9 +720,9 @@
 	  arguments, where the third argument is a description, so that 
 	  autoheader can generate the config.h.in, significantly 
 	  decluttering the compiler command lines.
-	  (tcl.m4 changes should be fed back to the TEA project,
+	  tcl.m4 changes should be fed back to the TEA project,
 	  as well as the technique for using automake to simplify
-	  the build)
+	  the build
 
 	* Move aclocal.m4 to acinclude.m4 -- we need the aclocal command
 	  to generate acinclude.m4 based on aclocal.m4 and stuff it gleans

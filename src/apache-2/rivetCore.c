@@ -41,6 +41,7 @@
 #include <tcl.h>
 #include <string.h>
 #include <stdio.h>
+#include <apr_errno.h>
 
 #include "apache_request.h"
 #include "mod_rivet.h"
@@ -52,6 +53,7 @@
 #define COOKIES_ARRAY_NAME "cookies"
 
 extern module rivet_module;
+extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 #define POOL (globals->r->pool)
 
@@ -105,10 +107,10 @@ TCL_CMD_HEADER( Rivet_MakeURL )
 
 TCL_CMD_HEADER( Rivet_Parse )
 {
-    char *filename;
-    Tcl_StatBuf buf;
-    Tcl_Obj *fnobj;
-    int retval = 0;
+    char	    *filename;
+    apr_status_t    stat_s;
+    apr_finfo_t	    finfo_b;
+
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( objc < 2 || objc > 3 )
@@ -124,8 +126,7 @@ TCL_CMD_HEADER( Rivet_Parse )
             Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
             return TCL_ERROR;
         }
-        filename = TclWeb_GetVirtualFile( globals->req,
-                Tcl_GetStringFromObj(objv[2], (int *)NULL) );
+        filename = TclWeb_GetVirtualFile(globals->req,Tcl_GetStringFromObj(objv[2],(int *)NULL));
     }
 
     if (!strcmp(filename, globals->r->filename))
@@ -134,13 +135,12 @@ TCL_CMD_HEADER( Rivet_Parse )
         return TCL_ERROR;
     }
 
-    fnobj = Tcl_NewStringObj(filename, -1);
-    Tcl_IncrRefCount(fnobj);
-    retval = Tcl_FSStat(fnobj, &buf);
-    Tcl_DecrRefCount(fnobj);
-    if (retval != 0)
+    stat_s = apr_stat(&finfo_b,filename,APR_FINFO_NORM,globals->r->pool);
+    if (stat_s != APR_SUCCESS)
     {
-        Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
+	char apr_error_message[256];
+
+        Tcl_AddErrorInfo(interp,apr_strerror(stat_s,apr_error_message,256));
         return TCL_ERROR;
     }
 
