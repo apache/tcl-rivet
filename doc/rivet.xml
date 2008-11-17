@@ -919,6 +919,20 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	    <term>
 	      <cmdsynopsis>
 		<command>upload</command>
+		<arg choice="plain">tempname</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the name of the temporary file on the local host that the file was uploaded info.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
 		<arg choice="plain">names</arg>
 	      </cmdsynopsis>
 	    </term>
