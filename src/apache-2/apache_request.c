@@ -500,7 +500,7 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
     multipart_buffer *mbuff;
     ApacheUpload *upload = NULL;
     apr_status_t  status;
-    char *error[1024];
+    char error[1024];
 
     if ((rc = ap_setup_client_block(r, REQUEST_CHUNKED_ERROR))) {
         return rc;

@@ -18,6 +18,7 @@
 #include <rivet_config.h>
 #endif
 
+#include <apr_strings.h>
 #include <apr_lib.h>
 
 #include "apache_multipart_buffer.h"

@@ -71,7 +71,7 @@ typedef struct _rivet_server_conf {
     int separate_virtual_interps;
     int honor_header_only_reqs;			/* default: 0 */
     char *server_name;
-    char *upload_dir;
+    const char *upload_dir;
     apr_table_t *rivet_server_vars;
     apr_table_t *rivet_dir_vars;
     apr_table_t *rivet_user_vars;

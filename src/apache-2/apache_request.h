@@ -43,7 +43,7 @@ typedef struct _ApacheRequest {
     int disable_uploads;
     int (*upload_hook)(void *ptr, char *buf, int len, ApacheUpload *upload);
     void *hook_data;
-    char* temp_dir;
+    const char* temp_dir;
     char* raw_post; /* Raw post data. */
     request_rec *r;
     int nargs;

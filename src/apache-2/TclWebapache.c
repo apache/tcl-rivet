@@ -34,6 +34,7 @@
 #include <httpd.h>
 #include <http_request.h>
 #include <ap_compat.h>
+#include <apr_strings.h>
 #include "apache_request.h"
 #include "mod_rivet.h"
 #include "TclWeb.h"
@@ -532,24 +533,31 @@ int TclWeb_PrepareUpload(char *varname, TclWebRequest *req)
 
 int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
 {
-    if (ApacheUpload_FILE(req->upload) != NULL)
-    {
-	/* create and return a file channel */
-
-#ifdef __MINGW32__
-	*chan = Tcl_MakeFileChannel(
-	    (ClientData)_get_osfhandle(
-		fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
-#else
-	*chan = Tcl_MakeFileChannel(
-	    (ClientData)fileno((FILE*)ApacheUpload_FILE(req->upload)), TCL_READABLE);
-#endif
-	Tcl_RegisterChannel(req->interp, *chan);
-	return TCL_OK;
-    } else {
+    *chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
+    if (chan == NULL) {
 	return TCL_ERROR;
+    } else {
+	if (Tcl_SetChannelOption(req->interp, *chan,
+			         "-translation", "binary") == TCL_ERROR) {
+	    return TCL_ERROR;
+	}
+	if (Tcl_SetChannelOption(req->interp, *chan,
+				 "-encoding", "binary") == TCL_ERROR) {
+	    return TCL_ERROR;
+	}
+	Tcl_RegisterChannel (req->interp, *chan);
+	return TCL_OK;
     }
 }
+
+int TclWeb_UploadTempname(Tcl_Obj *tempname, TclWebRequest *req)
+{
+    Tcl_SetStringObj(tempname,
+		     TclWeb_StringToUtf(req->upload->tempname,
+					req), -1);
+    return TCL_OK;
+}
+
 
 int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 {
@@ -569,25 +577,27 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
     rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
     /* This sucks - we should use the hook, but I want to
        get everything fixed and working first */
-    if (rsc->upload_files_to_var)
+    if (1 || rsc->upload_files_to_var)
     {
-	/* char *bytes = NULL; */
-	Tcl_Channel chan = NULL;
+	Tcl_Channel chan;
+	chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
+	if (chan == NULL) {
+	    return TCL_ERROR;
+	}
+	if (Tcl_SetChannelOption(req->interp, chan,
+				 "-translation", "binary") == TCL_ERROR) {
+	    return TCL_ERROR;
+	}
+	if (Tcl_SetChannelOption(req->interp, chan,
+				 "-encoding", "binary") == TCL_ERROR) {
+	    return TCL_ERROR;
+	}
 
-	/* bytes = Tcl_Alloc((unsigned)ApacheUpload_size(req->upload)); */
-#ifdef __MINGW32__
-	chan = Tcl_MakeFileChannel(
-	    (ClientData)_get_osfhandle(
-		fileno(ApacheUpload_FILE(req->upload))), TCL_READABLE);
-#else
-	chan = Tcl_MakeFileChannel(
-	    (ClientData)fileno((FILE *)ApacheUpload_FILE(req->upload)), TCL_READABLE);
-#endif
-	Tcl_SetChannelOption(req->interp, chan,
-			     "-translation", "binary");
-	Tcl_SetChannelOption(req->interp, chan, "-encoding", "binary");
 	/* Put data in a variable  */
 	Tcl_ReadChars(chan, data, ApacheUpload_size(req->upload), 0);
+	if (Tcl_Close(req->interp, chan) == TCL_ERROR) {
+	    return TCL_ERROR;
+	}
     } else {
 	Tcl_AppendResult(req->interp,
 			 "RivetServerConf UploadFilesToVar is not set", NULL);

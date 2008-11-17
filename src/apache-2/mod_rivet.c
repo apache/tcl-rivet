@@ -737,7 +737,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     *(rsc->cache_size) = -1;
     *(rsc->cache_free) = 0;
     rsc->upload_max = 0;
-    rsc->upload_files_to_var = 0;
+    rsc->upload_files_to_var = 1;
     rsc->separate_virtual_interps = 0;
     rsc->honor_header_only_reqs = 0;
     rsc->server_name = NULL;
@@ -899,8 +899,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
  *----------------------------------------------------------------------
  */
 
-static char *
-Rivet_SetScript(apr_pool_t *pool, rivet_server_conf *rsc, char *script, char *string)
+static const char *
+Rivet_SetScript(apr_pool_t *pool, rivet_server_conf *rsc, 
+                const char *script, const char *string)
 {
     Tcl_Obj *objarg = NULL;
 
@@ -969,11 +970,12 @@ Rivet_SetScript(apr_pool_t *pool, rivet_server_conf *rsc, char *script, char *st
  */
 
 static const char *
-Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
+Rivet_ServerConf( cmd_parms *cmd, void *dummy, 
+                  const char *var, const char *val )
 {
     server_rec *s = cmd->server;
     rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
-    char *string = val;
+    const char *string = val;
 
     FILEDEBUGINFO;
 
@@ -1011,9 +1013,11 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy, char *var, char *val )
  * 	RivetDirConf UploadDirectory <directory>
 */
 static const char *
-Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
+Rivet_DirConf( cmd_parms *cmd, void *vrdc, 
+               const char *var, const char *val )
 {
-    char *string = val;
+    const char *string = val;
+    rivet_server_conf *rdc = (rivet_server_conf *)vrdc;
 
     FILEDEBUGINFO;
 
@@ -1040,9 +1044,12 @@ Rivet_DirConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
  * 	RivetUserConf ErrorScript <script>
 */
 static const char *
-Rivet_UserConf( cmd_parms *cmd, rivet_server_conf *rdc, char *var, char *val )
+Rivet_UserConf( cmd_parms *cmd, void *vrdc, 
+                const char *var, 
+		const char *val )
 {
-    char *string = val;
+    const char *string = val;
+    rivet_server_conf *rdc = (rivet_server_conf *)vrdc;
 
     FILEDEBUGINFO;
 
