@@ -1,3 +1,59 @@
+2008-11-17 Karl Lehenbauer <karl@apache.org>
+    * src/apache-2/TclWebapache.c: Make TclWeb_UploadChannel open the 
+    uploaded file and make the file handle available through standard Tcl 
+    mechanisms, removing OS depdendencies.
+
+    Make TclWeb_UploadData access the uploaded file through standard
+    Tcl mechanisms, making the uploaded data available and also removing
+    OS dependencies.
+
+    Add TclWeb_UploadTempname to get the name of the temp file the
+    uploaded file was saved to.
+
+    Include apr_strings.h to remove compiler warning of implicit
+    definitions of apr_pstrdup and apr_psprintf as well as multiple
+    warnings about casts to pointer from integer of different size.
+
+    Force rsc->upload_files_to_var to be set, temporarily, pending figuring 
+    out why the configuration directive to set that is not working.
+
+    * src/apache-2/rivetCore.c: Check return from Tcl_GetIndexFromObj call 
+    in "upload" command processing (Rivet_Upload command).  Return an error 
+    when the subcommand (channel, save, data, exists, size, type, filename, 
+    tempname, or names) is invalid.
+
+    Add "tempname" option to "upload" command.  "upload tempname" will
+    return the name of the temporary file a file uploaded via a
+    POST command was saved to.
+
+    * src/apache-2/mod_rivet.c: Change "char *" arguments to 
+    Rivet_ServerConf, Rivet_DirConf and Rivet_UserConf to be
+    "const char *" to bring them in line with what Apache expects,
+    fixing compiler warnings warnings about "assignment discards qualifiers 
+    from pointer target type".
+
+    Use a "void *" argument where expected in calls to AP_INIT_TAKE2
+    for Rivet_DirConf and Rivet_UserConf and do an assigment to the
+    Rivet-desired types of rivet_server_conf to eliminate
+    "initialization from incompatible pointer type" compiler warnings.
+
+    Make Rivet_SetScript's script and string arguments be const char *
+    instead of char *.
+
+    * src/apache-2/apache_request.c: Change "char *error[1024]"
+    to "char error[1024]" to fix "incompatible pointer type" error
+    in the call to apr_strerror.
+
+    * src/apache-2/apache_request.h - make temp_dir be a const char *
+    instead of a char *.
+
+    * src/apache-2/apache_multipart_buffer.c: Add include of apr_strings.h
+    to remove compiler warning of implicit definitions of apr_pstrcat and 
+    warnings about casts to pointer from integer of different size (which
+    occurred on 64-bit machines, anyway.)
+
+    * doc/rivet.xml: added the "tempname" option to "upload".
+
 2008-11-13 Massimo Manghi <mxmanghi@apache.org>
 
 	* src/apache-2/rivetCore.c: In function 'Rivet_Parse' the call
