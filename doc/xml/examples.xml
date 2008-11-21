@@ -8,9 +8,8 @@
 	linkend="websites">web sites</link> section and have a look.
     </para>
 
-    <section id="hw">
-      <title>Hello World</title>
     <example id="hello world">
+      <title>Hello World</title>
       <para>
 	As with any tool, it's always nice to see something work, so
 	let's create a small "Hello World" page.</para>
@@ -26,11 +25,9 @@
 	it.
       </para>
     </example>
-    </section>
 
-    <section id="table">
+    <example>
 	<title>Generate a Table</title>
-	<example>
 	  <para>
 	    In another simple example, we dynamically generate a table:
 	  </para>
@@ -45,8 +42,7 @@
 	  </para>
 	  <graphic fileref="table.png"/>
 
-	</example>
-    </section>
+    </example>
 
     <example id="variable_access">
       <title>Variable Access</title>
