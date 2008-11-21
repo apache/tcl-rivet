@@ -1,0 +1,36 @@
+  <section id="tcl_packages">
+    <title>Rivet Tcl Packages</title>
+    <para>
+      In addition to the core Apache module, Rivet provides a number
+      of Tcl packages that include potentially useful code.
+    </para>
+    <itemizedlist>
+
+      <listitem>
+	<para>commserver is a package providing a server that can be
+	used for IPC.  Still experimental.  Requires the comm package
+	from tcllib.</para>
+      </listitem>
+
+      <listitem>
+	<para>dio is a database abstraction layer.</para>
+      </listitem>
+
+      <listitem>
+	<para>dtcl is a compatibility package for mod_dtcl
+	applications.</para>
+      </listitem>
+
+      <listitem>
+	<para>form - for creating forms.</para>
+      </listitem>
+
+      <listitem>
+	<para>rivet - some additional, useful routines.</para>
+      </listitem>
+
+      <listitem>
+	<para>tclrivet</para>
+      </listitem>
+    </itemizedlist>
+  </section>

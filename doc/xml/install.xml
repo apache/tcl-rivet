@@ -1,0 +1,180 @@
+<section id="installation">
+    <title>Apache Rivet Installation</title>
+    <procedure>
+      <step>
+	<title>Check Dependencies</title>
+	<para>
+	  To install Rivet, you will need Tcl 8.4 or greater and
+	  Apache 1.3.xx.  It is known to run on Linux, FreeBSD,
+	  OpenBSD, and Solaris and HPUX.  Windows NT is also possible
+	  - please see the directions in the distribution.  Note that
+	  Rivet does not currently work with Apache 2.
+	</para>
+      </step>
+      <step>
+	<title>Get Rivet</title>
+	<para>
+	  Download the sources at <ulink
+	    url="http://tcl.apache.org/rivet/download"/>.  Currently
+	  the only way to obtain Rivet.  In the future, we hope to
+	  have a FreeBSD port, Debian package, RPM's, and windows
+	  binaries.
+	</para>
+      </step>
+      <step performance="required">
+	<title>Install Tcl</title>
+	<para>
+	  If you don't have Tcl already, you need it!  If you already
+	  have it, you should just be able to use your system Tcl as
+	  long as it is recent.  You can tell Rivet where Tcl is via
+	  the <option>-with-tclconfig</option> option to
+	  <command>configure.tcl</command> (see below).</para>
+      </step>
+      <step performance="optional">
+	<title>Get and Install Apache Sources</title>
+	<para>
+          Rivet needs some Apache include (.h) files in order to
+	  build.  The easiest way to get them is to download the
+	  source code of the Apache web server, although some systems
+	  (Debian GNU/Linux for example) make it possible to install
+	  only the headers and other development files.  If you intend
+	  to build Rivet statically (compiled into the Apache web
+	  server instead of loaded dynamically), you definitely need
+	  the sources.  We recommend that you build Rivet as a
+	  loadable shared library, for maximum flexibility, meaning
+	  that you also build Apache to be able to load modules.
+	  Other than that, the default Apache install is fine.  We
+	  will tell Rivet where it is located via the
+	  <option>-with-apxs</option> option to
+	  <command>configure.tcl</command> (see below).
+	</para>
+	<para>
+          The source code for the Apache web server may be found by
+          following the links here: <ulink
+          url="http://httpd.apache.org/"/>.
+	</para>
+      </step>
+      <step>
+	<title>Uncompress Sources</title>
+	<para>
+	  We will assume that you have Apache installed at this point.
+	  You must uncompress the Rivet sources in the directory where you
+	  wish to compile them.
+
+	  <programlisting>gunzip tcl-rivet-X.X.X.tar.gz
+tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
+
+	</para>
+      </step>
+      <step>
+	<title>Building Rivet</title>
+	<substeps>
+	  <step>
+	    <para>
+	      On Linux or Unix systems, Rivet uses the standard
+	      ./configure ; make ; make install technique.
+	    </para>
+	    <para>
+	      There are several options to configure that might be useful
+	      or necessary:
+	      <variablelist>
+		<varlistentry>
+		  <term>--with-tcl</term>
+		  <listitem>
+		    <para>
+		      This points to the directory where the
+		      <filename>tclConfig.sh</filename> file is located.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-tclsh</term>
+		  <listitem>
+		    <para>This points to the location of the
+		      <filename>tclsh</filename> executable.</para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-apxs</term>
+		  <listitem>
+		    <para>The location of the <filename>apxs</filename>
+		      program that provides information about the
+		      configuration and compilation of Apache modules.</para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </para>
+
+	<programlisting>cd src/
+./configure --with-tcl=/usr/lib/tcl8.4/ --with-tclsh=/usr/bin/tclsh8.4 \
+	    --with-apxs=/usr/bin/apxs
+</programlisting>
+
+	  </step>
+	  <step>
+	    <title>Run make</title>
+	    <para>
+	      At this point, you are ready to run make, which should
+	      run to completion without any errors (a warning or two
+	      is ok, generally).
+	    </para>
+	  </step>
+	  <step>
+	    <title>Install</title>
+	    <para>
+	      Now, you are ready to run the <command>make
+		install</command> to install the resulting files.
+		This should copy the shared object (like
+		<filename>mod_rivet.so</filename>, if one was
+		successfully created, into Apache's
+		<filename>libexec</filename> directory, as well as
+		install some support scripts and various code.
+	    </para>
+	  </step>
+	</substeps>
+      </step>
+      <step>
+	<title>Apache Configuration Files</title>
+	<para>
+	  Rivet is relatively easy to configure - we start off by
+	  adding the module itself:
+	</para>
+
+	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable></programlisting>
+
+	<para>
+	  This tells Apache to load the Rivet shared object, wherever
+	  it happens to reside on your file system.  Now we have to
+	  tell Apache what kind of files are "Rivet" files and how to
+	  process them:
+	</para>
+
+	<programlisting>AddType application/x-httpd-rivet .rvt
+AddType application/x-rivet-tcl .tcl</programlisting>
+
+	<para>
+	  These tell Apache to process files with the
+	  <filename>.rvt</filename> and <filename>.tcl</filename>
+	  extensions as Rivet files.
+	</para>
+	<para>
+	  The characters encoding can be changed using the <command>header type</command> command,
+	  but if you want to change the default charset for the whole site or directory hierarchy  
+	  a new charset can be embedded in a AddType line in a way similar to the html pages encoding.
+	</para>
+	<programlisting>AddType 'application/x-httpd-rivet;charset=utf-8' rvt</programlisting>
+	<para>
+	   Pages which this configuration applies to send back to the client
+	   a <command>Content-Type:'text/html;charset=utf-8'</command> header.
+	</para>
+	<para>You may also wish to use Rivet files as index files for
+	directories.  In that case, you would do the following:</para>
+	<programlisting>DirectoryIndex index.html index.htm index.shtml index.cgi index.tcl index.rvt</programlisting>
+	<para>
+	  For other directives that Rivet provides for Apache
+	  configuration, please see <xref linkend="directives"/>.
+	</para>
+      </step>
+    </procedure>
+</section>
+

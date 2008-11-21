@@ -1,0 +1,24 @@
+  <section id="upgrading">
+    <title>Upgrading from mod_dtcl or NeoWebScript</title>
+    <para>
+      Rivet is a break from the past, in that we, the authors, have
+      attempted to take what we like best about our past efforts, and
+      leave out or change things we no longer care for.  Backwards
+      compatibility was not a primary goal when creating Rivet, but we
+      do provide this information which may be of use to those wishing
+      to upgrade from mod_dtcl or NWS installations.
+    </para>
+    <section>
+      <title>mod_dtcl</title>
+      <para>
+	Rivet was originally based on the dtcl code, but it has
+	changed (improved!) quite a bit.  The concepts remain the
+	same, but many of the commands have changed.
+      </para>
+    </section>
+    <section>
+      <title>NeoWebScript</title>
+      <para>TODO</para>
+    </section>
+  </section>
+

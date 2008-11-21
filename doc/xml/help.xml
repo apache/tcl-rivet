@@ -1,0 +1,109 @@
+  <section id="help">
+    <title>Resources - How to Get Help</title>
+
+    <section>
+      <title>Mailing Lists</title>
+      <para>
+	The Rivet mailing list is the first place you should turn for
+	help, if you haven't found the solution to your problem in the
+	documentation.  Send email to
+	<email>rivet-dev@tcl.apache.org</email>.  If you have a
+	question, idea, or comment about the Rivet code itself, please
+	send us email at <email>rivet-dev@tcl.apache.org</email>.  To
+	subscribe to either list, post email to
+	<email>rivet-<replaceable>list</replaceable>-subscribe@tcl.apache.org</email>,
+	where <replaceable>list</replaceable> is either dev or user.
+	Currently, dev is the preferred list to use.
+      </para>
+      <para>
+	The mailing list archives are available at <ulink
+	  url="http://mail-archives.apache.org/eyebrowse/SummarizeList?listId=118"/>
+      </para>
+    </section>
+
+    <section>
+      <title>Newsgroup</title>
+      <para>
+	The <ulink url="news:comp.lang.tcl"/> newsgroup is a good
+	place to ask about Tcl questions in general.  Rivet developers
+	also follow the newsgroup, but it's best to ask Rivet-specific
+	questions on the Rivet list.
+      </para>
+    </section>
+
+    <section id="websites">
+      <title>Web Sites</title>
+
+      <para>
+	There are several web sites that cover Apache and Tcl
+	extensively.
+      </para>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <ulink url="http://tcl.apache.org"/> is the home for the
+	    Apache Tcl project.  Go there for the latest versions of
+	    our software (if you aren't reading these pages off of the
+	    site!).
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://httpd.apache.org/docs/"/> is the first
+	    place to go for questions about the Apache web server.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://www.tcl.tk"/> is the canonical site
+	    for Tcl information.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://wiki.tcl.tk"/> is the Tcl'ers Wiki, a
+	    free-form place to search for answers and ask for help.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Bug Tracking System</title>
+
+      <para>
+	Apache Rivet uses the Apache Bug Tracking system at <ulink
+	  url="http://issues.apache.org/bugzilla/"></ulink>.  Here,
+	you can report problems, or check and see if existing issues
+	are already known and being dealt with.
+      </para>
+    </section>
+
+    <section>
+      <title>IRC</title>
+
+      <para>
+        Occasionally, someone from the Rivet team is on IRC at
+        irc.freenode.net, channel #tcl.
+      </para>
+    </section>
+
+    <section>
+      <title>Editing Rivet Template Files</title>
+      <para>
+	Rivet makes available code for two popular editors,
+	<application>emacs</application> and
+	<application>vim</application> to facilitate the editing of
+	Rivet template files.  The key concept is that the editor is
+	aware of the &lt;? and ?&gt; tags and switches back and forth
+	between Tcl and HTML modes as the cursor moves.  These files,
+	<filename>two-mode-mode.el</filename> and
+	<filename>rvt.vim</filename> are available in the
+	<filename>contrib/</filename> directory.
+      </para>
+    </section>
+
+
+  </section>
+
+

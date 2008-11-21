@@ -16,12 +16,12 @@
 
 
 # English, multiple files.
-html/index.en.html: rivet.xml rivet-chunk.xsl
+html/index.en.html: rivet.xml rivet-chunk.xsl xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css --stringparam \
 	html.ext ".en.html" --nonet -o html/ rivet-chunk.xsl rivet.xml
 
 # English, one big file.
-html/rivet.en.html: rivet.xml rivet-nochunk.xsl
+html/rivet.en.html: rivet.xml rivet-nochunk.xsl xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css --stringparam \
 	html.ext ".en.html" --nonet -o html/rivet.en.html rivet-nochunk.xsl \
 	rivet.xml

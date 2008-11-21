@@ -1,0 +1,1050 @@
+  <section id="diodisplay">
+    <title>DIODisplay - Database Interface Objects Display Class</title>
+    <refentry id="diodisplay_package">
+      <refnamediv>
+	<refname>DIODisplay</refname>
+	<refpurpose>Database Interface Objects Display Class</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>DIODisplay</command>
+	  <group>
+	    <arg><replaceable>objectName</replaceable></arg>
+	    <arg>#auto</arg>
+	  </group>
+	  <group choice="opt">
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>...</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  DIODisplay is an HTML display class that uses a DIO object
+	  to do the database work and a form object to do the
+	  displaying.
+	</para>
+      </refsect1>
+      <refsect1>
+	<title>Options</title>
+	<variablelist>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-DIO</arg>
+		<arg choice="plain"><replaceable>dioObject</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		The DIO object to be used in conjunction with this
+		display object.  This is a required field.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-cleanup</arg>
+		<group>
+		  <arg>1</arg>
+		  <arg>0</arg>
+		</group>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		If cleanup is true, when the display object is shown,
+		it will automatically destroy the DIO object, the form
+		object and itself. Default is true.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+
+	  <!-- begin transform.html -->
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-confirmdelete</arg>
+		<group>
+		  <arg>1</arg>
+		  <arg>0</arg>
+		</group>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		If confirmdelete is true, attempting to delete a
+		record from the database first requires that the user
+		confirm that they wish to delete it.  If it is false,
+		deletion occurs without prompting the user. Defaults
+		to true.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-errorhandler</arg>
+		<arg choice="plain"><replaceable>procName</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		The name of a procedure to handle errors when they
+		occur.  During the processing of requests and pages,
+		sometimes unexpected errors can occur.  This procedure
+		will handle any errors.  It is called with a single
+		argument, the error string.  Use of the Tcl errorInfo
+		and errorCode variables is also recommended though.
+	      </para>
+	      <para>
+		If no errorhandler is specified, the handle_error
+		method within the Display object will handle the
+		error.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-fields</arg>
+		<arg choice="plain"><replaceable>fieldList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Specify a list of fields to be used in this object.
+		The fields list is actually created by using the
+		<command>field</command> command to add fields to the
+		display, but this option can be useful to sometimes
+		over-set the list of fields created.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-form</arg>
+		<arg choice="plain"><replaceable>formObject</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A Rivet form object to use when displaying a form.  If
+		one is not specified, the display object will
+		automatically create one when it is necessary.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-functions</arg>
+		<arg choice="plain"><replaceable>functionList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of functions to be displayed in the main menu.
+		This is a list of functions the user is allowed to
+		execute.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-pagesize</arg>
+		<arg choice="plain"><replaceable>pageSize</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		How many records to show per page on a search or
+		list. Default is 25.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-rowfields</arg>
+		<arg choice="plain"><replaceable>fieldList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of fields to display in each row of a search or
+		list.  When a search or list is conducted and the
+		resulting rows are displayed, this list will limit
+		which fields are displayed.  Default is all fields.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-rowfunctions</arg>
+		<arg choice="plain"><replaceable>functionList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of functions to display in each row of a search
+		or list.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-searchfields</arg>
+		<arg choice="plain"><replaceable>fieldList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of fields to allow a user to search by.  This
+		list will appear in the main screen as a drop-down box
+		of fields the user can search on.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-title</arg>
+		<arg choice="plain"><replaceable>title</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		The title of the display object.  This will be output
+		as the title of the HTML document.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+
+	<refsect2>
+	  <title>DIO Display Object Commands</title>
+
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">cleanup</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current cleanup value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for the cleanup
+		  option.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">delete</arg>
+		  <arg choice="plain"><replaceable>key</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+		<listitem>
+		  <para>
+		  Delete the specified <option>key</option> from the
+		  database.
+		</para>
+		<para>
+		  The default action of this method is to call the DIO
+		  object's delete command.  This method can be
+		  overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">destroy</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Destroy the diodisplay object.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">DIO</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current DIO value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for DIO.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">errorhandler</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current errorhandler value.  If
+		  <option><replaceable>value</replaceable></option> is specified, it
+		  sets a new value for errorhandler.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">fetch</arg>
+		  <arg choice="plain"><replaceable>key</replaceable></arg>
+		  <arg choice="plain"><replaceable>arrayName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Fetch the specified <replaceable><option>key</option></replaceable>
+		  from the database and store it as an array in
+		  <replaceable><replaceable>arrayName</replaceable></replaceable>.
+		</para>
+		<para>
+		  The default of this method is to call the DIO object's fetch command.
+		  This method can be overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">field</arg>
+		  <arg choice="plain"><replaceable>fieldName</replaceable></arg>
+		  <group rep="repeat">
+		    <arg choice="plain">-arg</arg>
+		    <arg choice="plain"><replaceable>arg</replaceable></arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Create a new field object and add it to the display.
+		  When a field is added to the display, a new object
+		  of the DIODisplayField class is created with its
+		  values.  See [FIXME - LINK] DIO Display Fields for
+		  options and values.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">fields</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current fields value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for fields.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">form</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current form value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for form.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">function</arg>
+		  <arg choice="plain"><replaceable>functionName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Add a new function to the list of possible
+		  functions.  The display object will only execute
+		  methods and procs which are defined as functions by
+		  the object.  This is to protect the program from
+		  executing a different procedure other than what is
+		  allowed.  The <command>function</command> command
+		  adds a new function to the list of allowable
+		  functions.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain"><replaceable>objectName</replaceable></arg>
+		  <arg choice="plain">functions</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current functions value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for functions.  See
+		  [FIXME - LINK DIO Display Functions] for a list of
+		  default functions.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">pagesize</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current form pagesize.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for pagesize.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowfields</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current form rowfields.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for rowfields.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowfooter</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Output the footer of a list of rows to the web page.
+		</para>
+		<para>
+		  This method can be overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowfunctions</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current rowfunctions value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for rowfunctions.
+		  
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowheader</arg>
+		</cmdsynopsis>
+	      </term>
+	    <listitem>
+	      <para>
+		Output the header of a list of rows to the web page.
+		By default, this is an HTML table with a top row
+		listing the fields in the table.
+		</para>
+		<para>
+		  This method can be overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">searchfields</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current searchfields value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for searchfields.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">show</arg>
+		</cmdsynopsis>
+	      </term>
+	    <listitem>
+	      <para>
+		Show the display object.
+		</para>
+		<para>
+		  This is the main method of the display class.  It
+		  looks for a variable called <varname>mode</varname>
+		  to be passed in through a form response and uses
+		  that mode to execute the appropriate function.  If
+		  mode is not given, the <command>Main</command>
+		  function is called.
+		</para>
+		<para>
+		  This function should be called for every page.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">showform</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Display the form of the object.
+		</para>
+		<para>
+		  This method displays the form for this display
+		  object.  It is used in the <command>Add</command>
+		  and <command>Edit</command> methods but can be
+		  called separately if needed.
+		</para>
+		<para>
+		  This method can be overridden if the default look of
+		  a form needs to be changed.  By default, the form
+		  displayed is simply the fields in a table, in order.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">showrow</arg>
+		  <arg choice="plain"><replaceable>arrayName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Display a single row of a resulting list or search.
+		</para>
+		<para>
+		  This method is used to display a single row while
+		  displaying the result of a list or search.
+		  <option><replaceable>arrayName</replaceable></option>
+		  is a fetched array of the record.
+		</para>
+		<para>
+		  This method can be overriden if the default look of
+		  a row needs to be changed.  By default, each row is
+		  output as a table row with each field as a table
+		  data cell.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">showview</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Display the view of the object.
+		</para>
+		<para>
+		  This method displays the view for this display
+		  object.  It is used in the
+		  <command>Details</command> methods but can be
+		  called separately if needed.
+		</para>
+		<para>
+		  This method can be overridden if the default look of
+		  a view needs to be changed.  By default, the view
+		  displayed is simply the fields in a table, in order.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">store</arg>
+		  <arg choice="plain"><replaceable>arrayName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Store the specified
+		  <option><replaceable>arrayName</replaceable></option>
+		  in the database.
+		</para>
+		<para>
+		  The default of this method is to call the DIO
+		  object's store command.  This method can be
+		  overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">text</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current text value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for text.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">title</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current title value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for title.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">type</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current type value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for type.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">value</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current value value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsect2>
+
+	<refsect2>
+	  <title>DIO Display Functions</title>
+	  <para>
+	    These functions are called from the
+	    <command>show</command> method when a form response
+	    variable called <varname>mode</varname> is set.  If no
+	    mode has been set, the default mode is
+	    <command>Main</command>.  The show method will handle
+	    the necessary switching of functions.  The show method
+	    also handles checking to make sure the function given is a
+	    true function.  If not, an error message is displayed.
+	    New functions can be added as methods or by use of the
+	    <command>function</command> command, and any of the
+	    default functions can be overridden with new methods to
+	    create an entirely new class.  These are the default
+	    functions provided.
+	  </para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term><command>Add</command></term>
+	      <listitem>
+		<para>
+		  Show a form that allows the user to add a new entry
+		  to the database.  This function calls
+		  <command>showform</command> to display the form
+		  for adding the entry.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Cancel</command></term>
+	      <listitem>
+		<para>
+		  The <command>Cancel</command> function does nothing
+		  but redirect back to the <command>Main</command>
+		  function.  This is handy for forms which have a
+		  cancel button to point to.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	    <varlistentry>
+	      <term><command>Delete</command></term>
+	      <listitem>
+		<para>
+		  If <varname>confirmdelete</varname> is true (the
+		  default), the <command>Delete</command> function
+		  will ask the user if they're sure they want to
+		  delete the record from the database.  If
+		  <varname>confirmdelete</varname> is false, or if the
+		  user confirms they wish to delete, this function
+		  calls the <command>DoDelete</command> function to do
+		  the actual deletion of a record.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Details</command></term>
+	      <listitem>
+		<para>
+		  Display the view of a single record from the database.  This function calls
+		  the <command>showview</command> method to display a single record from the database.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>DoDelete</command></term>
+	      <listitem>
+		<para>
+		  This function actually deletes a record from the
+		  database.  Once it has deleted the record, it
+		  redirects the user back to the
+		  <command>Main</command> function.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Edit</command></term>
+	      <listitem>
+		<para>
+		  Show a form that allows the user to edit an existing
+		  entry to the database.  This function calls
+		  <command>showform</command> to display the form for
+		  editing the entry and fills in the fields with the
+		  values retrieved from the database.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>List</command></term>
+	      <listitem>
+		<para>
+		  This function lists the entires contents of the
+		  database.  Each record is output in a row using the
+		  <command>showrow</command> method.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Main</command></term>
+	      <listitem>
+		<para>
+		  This function is the main function of the display
+		  object.  If there is no mode, or once most commands
+		  complete, the user will be redirected to this
+		  function.  The default <command>Main</command>
+		  function displays a list of functions the user can
+		  execute, a list of searchfields the user can search
+		  on, and a query field.  This query field is used by
+		  all of the other functions to determine what the
+		  user is trying to find.
+		</para>
+		<para>
+		  In the case of a <command>search</command>, query
+		  specifies what string the user is looking for in the
+		  specified search field.  In the case of
+		  <command>delete</command>,
+		  <command>details</command> or
+		  <command>edit</command>, the query specifies the
+		  database key to access.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Save</command></term>
+	      <listitem>
+		<para>
+		  This function saves any data passed to using the
+		  <command>store</command> method.  This is primarily
+		  used by the <command>add</command> and
+		  <command>edit</command> commands to store the
+		  results of the form the user has filled out.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Search</command></term>
+	      <listitem>
+		<para>
+		  This function searches the database for any row
+		  whose <varname>searchBy</varname> field matches
+		  <varname>query</varname>. Once any number of records
+		  are found, <command>Search</command> displays the
+		  results in rows.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsect2>
+
+	<refsect2>
+	  <title>DIO Display Fields</title>
+	  <para>
+	    Display fields are created with the
+	    <command>field</command> command of the DIODisplay object.
+	    Each field is created as a new DIODisplayField object or
+	    as a subclass of DIODisplayField.  The standard form
+	    fields use the standard field class, while specialized
+	    field types use a class with different options but still
+	    supports all of the same commands and values a generic
+	    field does.
+	  </para>
+
+	  <cmdsynopsis>
+	    <command><replaceable>displayObject</replaceable></command>
+	    <arg choice="plain">field</arg>
+	    <arg
+	    choice="plain"><replaceable>fieldname</replaceable></arg>
+	    <group choice="opt" rep="repeat">
+	      <arg choice="plain">-option</arg>
+	      <arg choice="plain"><replaceable>option</replaceable></arg>
+	    </group>
+	  </cmdsynopsis>
+
+	  <para>
+	    These are the standard options supported by field types:
+	  </para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-formargs</arg>
+		  <arg choice="plain"><replaceable>arguments</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  When a field is created, any argument which is not a
+		  standard option is assumed to be an argument passed
+		  to the form object when the field is shown in a
+		  form.  These arguments are all appended to the
+		  <varname>formargs</varname> variable.  You can use
+		  this option to override or add options after the
+		  initial creation of an object
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-readonly</arg>
+		  <group>
+		    <arg>1</arg>
+		    <arg>0</arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  If <varname>readonly</varname> is set to true, the
+		  field will not display a form entry when displaying
+		  in a form.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-text</arg>
+		  <arg choice="plain"><replaceable>text</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  The text displayed next to the form or view field.
+		  By default, DIODisplay tries to figure out a pretty
+		  way to display the field name.  This text will
+		  override that default and display whatever is
+		  specified.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-type</arg>
+		  <arg choice="plain"><replaceable>fieldType</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  The type of field this is.  This type is used when
+		  creating the field in the form object.
+		  <option><replaceable>fieldType</replaceable></option>
+		  can be any of the accepted form field types.  See
+		  [FIXME - LINK DIO Field Types] for a list of types
+		  available.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+
+	  <para>
+	    All other arguments, unless specified in an individual
+	    field type, are passed directly to the form object when
+	    the field is created.  So, you can pass
+	    <option>-size</option> or <option>-maxsize</option> to
+	    specify the length and maximum length of the field entry.
+	    Or, if type were textarea, you could define
+	    <option>-rows</option> and <option>-cols</option> to
+	    specify its row and column count.
+	  </para>
+	</refsect2>
+	<refsect2>
+	  <title>DIO Display Field Types</title>
+	  <para>
+	    The following is a list of recognized field types by
+	    DIODisplay.  Some are standard HTML form fields, and
+	    others are DIODisplay fields which execute special actions
+	    and functions.
+	  </para>
+	</refsect2>
+      </refsect1>
+    </refentry>
+  </section>
+

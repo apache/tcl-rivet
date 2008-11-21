@@ -1,3 +1,14 @@
+2008-11-21 Massimo Manghi <mxmanghi@apache.org>
+
+    * doc/rivet.xml: file broken up into chunks containing the toplevel
+    sections of the manual. For every file an xml entity was created.
+
+    * doc/xml/*.xml: added xml files containing every toplevel section of
+    the manual.
+
+    * doc/Makefile.am: added dependency from xml/*.xml for html pages
+    generation
+
 2008-11-17 Karl Lehenbauer <karl@apache.org>
     * src/apache-2/TclWebapache.c: Make TclWeb_UploadChannel open the 
     uploaded file and make the file handle available through standard Tcl 

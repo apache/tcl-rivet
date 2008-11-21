@@ -1,0 +1,4675 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd" [
+      <!ENTITY hello.rvt SYSTEM "examples/hello.rvt" >
+      <!ENTITY table.rvt SYSTEM "examples/table.rvt" >
+      <!ENTITY vars.html SYSTEM "examples/vars.html" >
+      <!ENTITY vars.rvt SYSTEM "examples/vars.rvt" >
+      <!ENTITY upload.html SYSTEM "examples/upload.html" >
+      <!ENTITY upload.rvt SYSTEM "examples/upload.rvt" >
+      <!ENTITY download.tcl SYSTEM "examples/download.tcl" >
+      <!ENTITY rivet_web_service.tcl SYSTEM "examples/rivet_web_service.tcl" >
+]>
+
+<!--
+   Copyright 2002-2005 The Apache Software Foundation
+
+   Licensed under the Apache License, Version 2.0 (the "License"); you
+   may not use this file except in compliance with the License.  You
+   may obtain a copy of the License at
+
+   	http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied.  See the License for the specific language governing
+   permissions and limitations under the License.
+-->
+
+<!-- $Id: rivet.xml 718432 2008-11-17 23:14:18Z karl $ -->
+
+<article>
+  <articleinfo>
+    <title>Apache Rivet</title>
+    <copyright>
+      <year>2002</year>
+      <year>2003</year>
+      <year>2004</year>
+      <year>2005</year>
+      <year>2006</year>
+      <year>2007</year>
+      <year>2008</year>
+      <holder>Apache Software Foundation</holder>
+    </copyright>
+    <author>
+      <firstname>The Rivet Team</firstname>
+      <affiliation>
+	<orgname>The Apache Software Foundation</orgname>
+	<address>
+	  <email>rivet-dev@tcl.apache.org</email>
+	</address>
+      </affiliation>
+    </author>
+  </articleinfo>
+  <!--para>
+    This document is also available in the following languages: <ulink
+    url="index.it.html">Italian</ulink>, <ulink
+    url="index.ru.html">Russian</ulink>
+  </para-->
+
+  <para>
+    Document revision: $Revision: 718432 $, last modified $Date: 2008-11-18 00:14:18 +0100 (Tue, 18 Nov 2008) $ by $Author: karl $.
+  </para>
+
+  <section id="introduction">
+    <title>Introduction to Apache Rivet</title>
+    <para>
+      Apache Rivet is a system for creating dynamic web content via a
+      programming language integrated with Apache Web Server.  It is
+      designed to be fast, powerful and extensible, consume few system
+      resources, be easy to learn, and to provide the user with a
+      platform that can also be used for other programming tasks
+      outside the web (GUI's, system administration tasks, text
+      processing, database manipulation, XML, and so on).  In order to
+      meet these goals, we have chosen the Tcl programming language to
+      combine with the Apache Web Server.
+    </para>
+
+    <para>
+      In this manual, we aim to help get you started, and then
+      writing productive code as quickly as possible, as well as
+      giving you ideas on how to best take advantage of Rivet's
+      architecture to create different styles of web site.
+    </para>
+
+    <para>
+      This documentation is a work in progress, and, like everything
+      else about Apache Rivet, it is Free Software.  If you see
+      something that needs improving, and have ideas or suggestions,
+      don't hesitate to let us know.  If you want to contribute
+      directly, better yet!
+    </para>
+  </section>
+
+
+  <section id="installation">
+    <title>Apache Rivet Installation</title>
+
+    <procedure>
+      <step>
+	<title>Check Dependencies</title>
+	<para>
+	  To install Rivet, you will need Tcl 8.4 or greater and
+	  Apache 1.3.xx.  It is known to run on Linux, FreeBSD,
+	  OpenBSD, and Solaris and HPUX.  Windows NT is also possible
+	  - please see the directions in the distribution.  Note that
+	  Rivet does not currently work with Apache 2.
+	</para>
+      </step>
+      <step>
+	<title>Get Rivet</title>
+	<para>
+	  Download the sources at <ulink
+	    url="http://tcl.apache.org/rivet/download"/>.  Currently
+	  the only way to obtain Rivet.  In the future, we hope to
+	  have a FreeBSD port, Debian package, RPM's, and windows
+	  binaries.
+	</para>
+      </step>
+      <step performance="required">
+	<title>Install Tcl</title>
+	<para>
+	  If you don't have Tcl already, you need it!  If you already
+	  have it, you should just be able to use your system Tcl as
+	  long as it is recent.  You can tell Rivet where Tcl is via
+	  the <option>-with-tclconfig</option> option to
+	  <command>configure.tcl</command> (see below).</para>
+      </step>
+      <step performance="optional">
+	<title>Get and Install Apache Sources</title>
+	<para>
+          Rivet needs some Apache include (.h) files in order to
+	  build.  The easiest way to get them is to download the
+	  source code of the Apache web server, although some systems
+	  (Debian GNU/Linux for example) make it possible to install
+	  only the headers and other development files.  If you intend
+	  to build Rivet statically (compiled into the Apache web
+	  server instead of loaded dynamically), you definitely need
+	  the sources.  We recommend that you build Rivet as a
+	  loadable shared library, for maximum flexibility, meaning
+	  that you also build Apache to be able to load modules.
+	  Other than that, the default Apache install is fine.  We
+	  will tell Rivet where it is located via the
+	  <option>-with-apxs</option> option to
+	  <command>configure.tcl</command> (see below).
+	</para>
+	<para>
+          The source code for the Apache web server may be found by
+          following the links here: <ulink
+          url="http://httpd.apache.org/"/>.
+	</para>
+      </step>
+      <step>
+	<title>Uncompress Sources</title>
+	<para>
+	  We will assume that you have Apache installed at this point.
+	  You must uncompress the Rivet sources in the directory where you
+	  wish to compile them.
+
+	  <programlisting>gunzip tcl-rivet-X.X.X.tar.gz
+tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
+
+	</para>
+      </step>
+      <step>
+	<title>Building Rivet</title>
+	<substeps>
+	  <step>
+	    <para>
+	      On Linux or Unix systems, Rivet uses the standard
+	      ./configure ; make ; make install technique.
+	    </para>
+	    <para>
+	      There are several options to configure that might be useful
+	      or necessary:
+	      <variablelist>
+		<varlistentry>
+		  <term>--with-tcl</term>
+		  <listitem>
+		    <para>
+		      This points to the directory where the
+		      <filename>tclConfig.sh</filename> file is located.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-tclsh</term>
+		  <listitem>
+		    <para>This points to the location of the
+		      <filename>tclsh</filename> executable.</para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-apxs</term>
+		  <listitem>
+		    <para>The location of the <filename>apxs</filename>
+		      program that provides information about the
+		      configuration and compilation of Apache modules.</para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </para>
+
+	<programlisting>cd src/
+./configure --with-tcl=/usr/lib/tcl8.4/ --with-tclsh=/usr/bin/tclsh8.4 \
+	    --with-apxs=/usr/bin/apxs
+</programlisting>
+
+	  </step>
+	  <step>
+	    <title>Run make</title>
+	    <para>
+	      At this point, you are ready to run make, which should
+	      run to completion without any errors (a warning or two
+	      is ok, generally).
+	    </para>
+	  </step>
+	  <step>
+	    <title>Install</title>
+	    <para>
+	      Now, you are ready to run the <command>make
+		install</command> to install the resulting files.
+		This should copy the shared object (like
+		<filename>mod_rivet.so</filename>, if one was
+		successfully created, into Apache's
+		<filename>libexec</filename> directory, as well as
+		install some support scripts and various code.
+	    </para>
+	  </step>
+	</substeps>
+      </step>
+      <step>
+	<title>Apache Configuration Files</title>
+	<para>
+	  Rivet is relatively easy to configure - we start off by
+	  adding the module itself:
+	</para>
+
+	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable></programlisting>
+
+	<para>
+	  This tells Apache to load the Rivet shared object, wherever
+	  it happens to reside on your file system.  Now we have to
+	  tell Apache what kind of files are "Rivet" files and how to
+	  process them:
+	</para>
+
+	<programlisting>AddType application/x-httpd-rivet .rvt
+AddType application/x-rivet-tcl .tcl</programlisting>
+
+	<para>
+	  These tell Apache to process files with the
+	  <filename>.rvt</filename> and <filename>.tcl</filename>
+	  extensions as Rivet files.
+	</para>
+	<para>
+	  The characters encoding can be changed using the <command>header type</command> command,
+	  but if you want to change the default charset for the whole site or directory hierarchy  
+	  a new charset can be embedded in a AddType line in a way similar to the html pages encoding.
+	</para>
+	<programlisting>AddType 'application/x-httpd-rivet;charset=utf-8' rvt</programlisting>
+	<para>
+	   Pages which this configuration applies to send back to the client
+	   a <command>Content-Type:'text/html;charset=utf-8'</command> header.
+	</para>
+	<para>You may also wish to use Rivet files as index files for
+	directories.  In that case, you would do the following:</para>
+	<programlisting>DirectoryIndex index.html index.htm index.shtml index.cgi index.tcl index.rvt</programlisting>
+	<para>
+	  For other directives that Rivet provides for Apache
+	  configuration, please see <xref linkend="directives"/>.
+	</para>
+      </step>
+    </procedure>
+  </section>
+
+  <section id="directives">
+    <title>Rivet Apache Directives</title>
+
+    <para>
+      These directives are used within the Apache httpd server
+      configuration files to modify Apache Rivet's behavior.  Their
+      precedence is as follows: <command>RivetDirConf</command>,
+      <command>RivetUserConf</command>,
+      <command>RivetServerConf</command>, meaning that DirConf will
+      override UserConf, which will in turn override ServerConf.
+    </para>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>RivetServerConf</command>
+	    <group choice="req">
+	      <arg>CacheSize</arg>
+	      <arg>GlobalInitScript</arg>
+	      <arg>ChildInitScript</arg>
+	      <arg>ChildExitScript</arg>
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	      <arg>UploadMaxSize</arg>
+	      <arg>UploadFilesToVar</arg>
+	      <arg>SeparateVirtualInterps</arg>
+	      <arg>HonorHeaderOnlyRequests</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para><command>RivetServerConf</command> specifies a global
+	    option that is valid for the whole server.  If you have a
+	    virtual host, in some cases, the option specified in the
+	    virtualhost takes precedence over the 'global' version.
+	  </para>
+	</listitem>
+	<listitem>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">CacheSize</arg>
+		  <arg><replaceable>size</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Sets the size of the internal page cache, where
+		  <option><replaceable>size</replaceable></option> is
+		  the number of byte-compiled pages to be cached for
+		  future use.  Default is
+		  <command>MaxRequestsPerChild</command> / 5, or 50,
+		  if <command>MaxRequestsPerChild</command> is 0.
+		</para>
+		<para>
+		  This option is completely global, even when using
+		  separate, per-virtual host interpreters.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">GlobalInitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Tcl script that is run when each interpreter is
+		  initialized. <replaceable><option>script</option></replaceable>
+		  is an actual Tcl script, so to run a file, you would
+		  do:
+
+		  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
+		</para>
+		<para>
+		  This option is ignored in virtual hosts.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">ChildInitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be evaluated when each Apache child
+		  process is initialized.  This is the recommended
+		  place to load modules, create global variables, open
+		  connections to other facilities (such as databases)
+		  and so on.
+		</para>
+		<para>
+		  In virtual hosts, this script is run in addition to
+		  any global childinitscript.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">ChildExitScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be evaluated when each Apache child
+		  process exits.  This is the logical place to clean
+		  up resources created in
+		  <option>ChildInitScript</option>, if necessary.
+		</para>
+		<para>
+		  In virtual hosts, this script is run in addition to
+		  any global childexitscript.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">BeforeScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be evaluated before each server parsed
+		  (.rvt) page.  This can be used to create a standard
+		  header, for instance.  It could also be used to load
+		  code that you need for every page, if you don't want
+		  to put it in a <option>GlobalInitScript</option>
+		  <option>ChildInitScript</option> when you are first
+		  developing a web site.
+		  <note>
+		    This code is evaluated at the global level, not
+		    inside the request namespace where pages are
+		    evaluated.
+		  </note>
+		</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">AfterScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Script to be called after each server parsed (.rvt) page.
+		</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">ErrorScript</arg>
+		  <arg><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  When Rivet encounters an error in a script, it
+		  constructs an HTML page with some information about
+		  the error, and the script that was being
+		  evaluated. If an <option>ErrorScript</option> is
+		  specified, it is possible to create custom error
+		  pages.  This may be useful if you want to make sure
+		  that users never view your source code.
+		</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">UploadDirectory</arg>
+		  <arg><replaceable>directory</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>Directory to place uploaded files.</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">UploadMaxSize</arg>
+		  <arg><replaceable>size</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>Maximum size for uploaded files.</para>
+		<para>
+		  In virtual hosts, this option takes precedence over
+		  the global setting.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">UploadFilesToVar</arg>
+		  <group choice="req"><arg>yes</arg><arg>no</arg></group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  This option controls whether it is possible to
+		  upload files to a Tcl variable.  If you have a size
+		  limit, and don't have to deal with large files, this
+		  might be more convenient than sending the data to a
+		  file on disk.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">SeparateVirtualInterps</arg>
+		  <group choice="req">
+		    <arg>yes</arg>
+		    <arg>no</arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  If on, Rivet will create a separate Tcl interpreter
+		  for each Apache virtual host.  This is useful in an
+		  ISP type situation where it is desirable to separate
+		  clients into separate interpreters, so that they
+		  don't accidentally interfere with one another.
+		</para>
+		<para>This option is, by nature, only available at the
+		global level.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">HonorHeaderOnlyRequests</arg>
+		  <group choice="req">
+		    <arg>yes</arg>
+		    <arg>no</arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  If a HEAD requests is issued by the client Rivet detects
+		  this case and sends back to the client a standard header 
+		  response. If the real header has to be examined (e.g. 
+		  for debugging) you can turn on this options which 
+		  causes Rivet to parse and run the script the requests refers 
+		  to. In this case the real header is returned to the client.
+		</para>
+		<para>This option is, by nature, only available at the global level</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>RivetDirConf</command>
+	    <group choice="req">
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    These options are the same as for
+	    <command>RivetServerConf</command>, except that they are
+	    only valid for the directory where they are specified, and
+	    its subdirectories.  It may be specified in
+	    <command>Directory</command> sections.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+	    <command>RivetUserConf</command>
+	    <group choice="req">
+	      <arg>BeforeScript</arg>
+	      <arg>AfterScript</arg>
+	      <arg>ErrorScript</arg>
+	      <arg>UploadDirectory</arg>
+	    </group>
+	  </cmdsynopsis>
+	</term>
+	<listitem>
+	  <para>
+	    These options are the same as for
+	    <command>RivetServerConf</command>, except that they are
+	    only valid for the directory where they are specified, and
+	    its subdirectories.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </section>
+
+  <section id="commands">
+    <title>Rivet Tcl Commands and Variables</title>
+
+    <refentry id="var">
+      <refnamediv>
+	<refname>var</refname>
+	<refname>var_qs</refname>
+	<refname>var_post</refname>
+	<refpurpose>get the value of a form variable.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>var</command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+
+	<cmdsynopsis>
+	  <command>var_qs</command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+
+	<cmdsynopsis>
+	  <command>var_post</command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>list</arg>
+	    <arg>exists</arg>
+	    <arg>number</arg>
+	    <arg>all</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  The <command>var</command> command retrieves information
+	  about GET or POST variables sent to the script via client
+	  request.  It treats both GET and POST variables the same,
+	  regardless of their origin.  Note that there are two
+	  additional forms of <command>var</command>:
+	  <command>var_qs</command> and <command>var_post</command>.
+	  These two restrict the retrieval of information to
+	  parameters arriving via the querystring
+	  (?foo=bar&amp;bee=bop) or POSTing, respectively.
+	</para>
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>var</command>
+		<arg choice="plain">get</arg>
+		<arg><replaceable>varname</replaceable></arg>
+		<arg><replaceable><optional>default</optional></replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the value of variable
+		<option><replaceable>varname</replaceable></option>
+		as a string (even if there are multiple values).  If
+		the variable doesn't exist as a GET or POST
+		variable, the
+		<option><replaceable><optional>default</optional></replaceable></option>
+		value is returned, otherwise "" - an empty string -
+		is returned.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>var</command>
+		<arg choice="plain">list</arg>
+		<arg><replaceable>varname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the value of variable
+		<option><replaceable>varname</replaceable></option> as a
+		list, if there are multiple values.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>var</command>
+		<arg choice="plain">exists</arg>
+		<arg><replaceable>varname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns 1 if
+		<option><replaceable>varname</replaceable></option>
+		exists, 0 if it doesn't.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>var</command>
+		<arg choice="plain">number</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the number of variables.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>var</command>
+		<arg choice="plain">all</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Return a list of variable names and values.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>
+	  See <xref linkend="variable_access"/>.
+	</para>
+
+      </refsect1>
+    </refentry>
+
+    <refentry id="upload">
+      <refnamediv>
+	<refname>upload</refname>
+	<refpurpose>handle a file uploaded by a client.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>upload</command>
+	  <group choice="req">
+	    <arg>channel</arg>
+	    <arg>save</arg>
+	    <arg>data</arg>
+	    <arg>exists</arg>
+	    <arg>size</arg>
+	    <arg>type</arg>
+	    <arg>filename</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>The upload command is for file upload manipulation.
+	  See the relevant Apache Directives to further configure the
+	  behavior of this Rivet feature.
+	</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">channel</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		When given the name of a file upload
+		<option><replaceable>uploadname</replaceable></option>,
+		returns a Tcl channel that can be used to access the
+		uploaded file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">save</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+		<arg><replaceable>filename</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Saves the
+		<option><replaceable>uploadname</replaceable></option> in
+		the file
+		<option><replaceable>filename</replaceable></option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">data</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns data uploaded to the server.  This is binary clean
+		- in other words, it will work even with files like
+		images, executables, compressed files, and so on.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">exists</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns true if an upload named <arg>uploadname</arg>
+		exists.  This can be used in scripts that are meant to
+		be run by different forms that send over uploads that
+		might need specific processing.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">size</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the size of the file uploaded.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">type</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		If the <varname>Content-type</varname> is set, it is
+		returned, otherwise, an empty string.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">filename</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the filename on the remote host that uploaded the file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">tempname</arg>
+		<arg><replaceable>uploadname</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the name of the temporary file on the local host that the file was uploaded info.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>upload</command>
+		<arg choice="plain">names</arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns the variable names, as a list, of all the files
+		uploaded.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>
+	  See <xref linkend="upload"/>.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="load_response">
+      <refnamediv>
+	<refname>load_response</refname>
+	<refpurpose>load form variables into an array.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_response</command>
+	  <arg><replaceable>arrayName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	Load any form variables passed to this page into an
+	array. If <command>load_response</command> is called without 
+	arguments the array <option>response</option> is created in 
+	the scope of the caller. If the variables var1,var2,var3...
+	having values val1,val2,val3... are passed to the page, the
+	resulting array will be a collection mapping var1,var2,var3...
+	to their corresponding values. <command>load_response</command>
+	was inspired by the same NeoWebScript procedure in the way
+	it deals with multiple assignments: if a variable 
+	is assigned more than once the corresponding array element will be a 
+	list of the values for the variable. This can be useful in the case 
+	of forms with checkbox options that are given the same name.
+	Calling <command>load_response</command> several times for the same
+	array results in adding more values to the array at every call. 
+	When needed it is left to the caller to empty the array between 
+	two subsequent calls.  
+      </refsect1>
+    </refentry>
+
+    <refentry id="load_headers">
+      <refnamediv>
+	<refname>load_headers</refname>
+	<refpurpose>get client request's headers.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_headers</command>
+	  <arg><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Load the headers that come from a client request into the
+	  provided array name, or use <option>headers</option> if no
+	  name is provided.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="load_cookies">
+      <refnamediv>
+	<refname>load_cookies</refname>
+	<refpurpose>get any cookie variables sent by the client.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_cookies</command>
+	  <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+      </refsect1>
+      <para>
+	Load the array of cookie variables into the specified
+	array name.  Uses array <option>cookies</option> by
+	default.
+      </para>
+    </refentry>
+
+    <refentry id="load_env">
+      <refnamediv>
+	<refname>load_env</refname>
+	<refpurpose>get the request's environment variables.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>load_env</command>
+	  <arg choice="opt"><replaceable>array_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>
+	  Load the array of environment variables into the specified
+	  array name.  Uses array <option>::request::env</option> by
+	  default.
+	</para>
+	<para>
+	  As Rivet pages are run in the <option>::request</option>
+	  namespace, it isn't necessary to qualify the array name
+	  for most uses - it's ok to access it as
+	  <option>env</option>.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="env">
+      <refnamediv>
+	<refname>env</refname> <refpurpose>Loads a single
+	"environmental variable" into a Tcl variable.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>env</command>
+	  <arg><replaceable>varName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>
+	  If it is only necessary to load one environmental variable,
+	  this command may be used to avoid the overhead of loading
+	  and storing the entire array.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="include">
+      <refnamediv>
+	<refname>include</refname>
+	<refpurpose>includes a file into the output stream without modification.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>include</command>
+	  <arg><replaceable>filename_name</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Include a file without parsing it for processing tags &lt;?
+	  and ?&gt;.  This is the best way to include an HTML file or
+	  any other static content.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="parse">
+      <refnamediv>
+	<refname>parse</refname>
+	<refpurpose>parses a Rivet template file.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>parse</command>
+	  <arg><replaceable>filename</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Like the Tcl <command>source</command> command, but also
+	  parses for Rivet &lt;?  and ?&gt; processing tags.  Using
+	  this command, you can use one .rvt file from another.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="headers">
+      <refnamediv>
+	<refname>headers</refname>
+	<refpurpose>set and parse HTTP headers.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>headers</command>
+	  <group choice="req">
+	    <arg>set</arg>
+	    <arg>redirect</arg>
+	    <arg>add</arg>
+	    <arg>type</arg>
+	    <arg>numeric</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  The <command>headers</command> command is for setting and
+	  parsing HTTP headers.
+	</para>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term><cmdsynopsis>
+		<command>headers</command>
+		<arg choice="plain">set</arg>
+		<arg><replaceable>headername</replaceable></arg>
+		<arg><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Set arbitrary header names and values.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>headers</command>
+		<arg choice="plain">redirect</arg>
+		<arg><replaceable>uri</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Redirect from the current page to a new
+		URI. <emphasis>Must</emphasis> be done in the first block
+		of TCL code.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>headers</command>
+		<arg choice="plain">add</arg>
+		<arg><replaceable>headername</replaceable></arg>
+		<arg><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>Add text to header
+		<varname>headername</varname>.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><cmdsynopsis>
+		<command>headers</command>
+		<arg choice="plain">type</arg>
+		<arg><replaceable>content-type</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		This command sets the <constant>Content-type</constant>
+		header returned by the script, which is useful if you wish
+		to send content other than HTML with Rivet - PNG or jpeg
+		images, for example.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>headers</command>
+		<arg choice="plain">numeric</arg>
+		<arg><replaceable>response code</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>Set a numeric response code, such as 200, 404 or 500.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+    <refentry id="makeurl">
+      <refnamediv>
+	<refname>makeurl</refname>
+	<refpurpose>construct url's based on hostname, port.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>makeurl</command>
+	  <arg><replaceable>filename</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Create a self referencing URL from a filename.  For example:
+	  <programlisting>makeurl /tclp.gif</programlisting>
+	  returns
+	  <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
+	  where hostname and port are the hostname and port of the
+	  server in question.
+	</para>
+      </refsect1>
+    </refentry>
+
+
+    <refentry id="cookie">
+      <refnamediv>
+	<refname>cookie</refname>
+	<refpurpose>get and set cookies.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>set</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	  <arg><replaceable><optional>cookiValue</optional></replaceable></arg>
+	  <arg>-days <replaceable>expireInDays</replaceable></arg>
+	  <arg>-hours <replaceable>expireInHours</replaceable></arg>
+	  <arg>-minutes <replaceable>expireInMinutes</replaceable></arg>
+	  <arg>-expires <replaceable>Wdy, DD-Mon-YYYY HH:MM:SS GMT</replaceable></arg>
+	  <arg>-path <replaceable>uriPathCookieAppliesTo</replaceable></arg>
+	  <arg>-secure <replaceable>1/0</replaceable></arg>
+	</cmdsynopsis>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>get</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  <command>cookie</command> gets or sets a cookie.  When you
+	  get a cookie, the command returns the value of the cookie,
+	  or an empty string if no cookie exists.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="clock_to_rfc">
+      <refnamediv>
+	<refname>clock_to_rfc850_gmt</refname>
+	<refpurpose>create a rfc850 time from [clock seconds].</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>clock_to_rfc850_gmt</command>
+	  <arg><replaceable>seconds</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Convert an integer-seconds-since-1970 click value to
+	  RFC850 format, with the additional requirement that it be
+	  GMT only.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="html">
+      <refnamediv>
+	<refname>html</refname>
+	<refpurpose>construct html tagged text.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>html</command>
+	  <arg><replaceable>string</replaceable></arg>
+	  <arg rep="repeat"><replaceable>arg</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Print text with the added ability to pass HTML tags
+	  following the string.  Example:
+	  <programlisting>html "Test" b i</programlisting>
+	  produces: <computeroutput>&lt;b&gt;&lt;i&gt;Test&lt;/i&gt;&lt;/b&gt;</computeroutput>
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="incr0">
+      <refnamediv>
+	<refname>incr0</refname>
+	<refpurpose>increment a variable or set it to 1 if nonexistant.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>incr0</command>
+	  <arg><replaceable>varname</replaceable></arg>
+	  <arg><replaceable>num</replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Increment a variable
+	  <option><replaceable>varname</replaceable></option> by
+	  <option><replaceable>num</replaceable></option>.  If the
+	  variable doesn't exist, create it instead of returning an
+	  error.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="parray">
+      <refnamediv>
+	<refname>parray</refname>
+	<refpurpose>Tcl's <command>parray</command> with html formatting.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>parray</command>
+	  <arg><replaceable>arrayName</replaceable></arg>
+	  <arg><replaceable><optional>pattern</optional></replaceable></arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  An html version of the standard Tcl
+	  <command>parray</command> command.  Displays the entire
+	  contents of an array in a sorted, nicely-formatted way.
+	  Mostly used for debugging purposes.
+	</para>
+
+      </refsect1>
+    </refentry>
+
+    <refentry id="abort_page">
+      <refnamediv>
+	<refname>abort_page</refname>
+	<refpurpose>Stops outputing data to web page, similar in
+	  purpose to PHP's <command>die</command> command.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>abort_page</command>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title> <para>This command flushes the
+	output buffer and stops the Tcl script from sending any more
+	data to the client.  A normal Tcl script might use the
+	<command>exit</command> command, but that cannot be used in
+	Rivet without actually exiting the apache child
+	process!</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="no_body">
+      <refnamediv>
+	<refname>no_body</refname>
+	<refpurpose>Prevents Rivet from sending any content.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>no_body</command>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  This command is useful for situations where it is necessary
+	  to only return HTTP headers and no actual content.  For
+	  instance, when returning a 304 redirect.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="escape_string">
+      <refnamediv>
+	<refname>escape_string</refname>
+	<refpurpose>convert a string into escaped characters.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>escape_string</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	    Scans through each character in the specified string looking
+	    for special characters, escaping them as needed, mapping
+	    special characters to a quoted hexadecimal equivalent,
+	    returning the result.
+	</para>
+	<para>
+	    This is useful for quoting strings that are going to be
+	    part of a URL.
+	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
+      </refsect1>
+    </refentry>
+
+    <refentry id="escape_sgml_chars">
+      <refnamediv>
+	<refname>escape_sgml_chars</refname>
+	<refpurpose>escape special SGML characters in a string.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>escape_sgml_chars</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Scans through each character in the specified string looking
+	  for any special (with respect to SGML, and hence HTML) characters
+	  from the specified string, and returns the result.  
+	  For example, the right angle
+	  bracket is escaped to the corrected ampersand gt symbol.
+	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
+      </refsect1>
+    </refentry>
+
+    <refentry id="escape_shell_command">
+      <refnamediv>
+	<refname>escape_shell_command</refname>
+	<refpurpose>escape shell metacharacters in a string.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>escape_shell_command</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Scans through each character in the specified string looking
+	  for any shell metacharacters, such as asterisk, less than and
+	  greater than, parens, square brackets, curly brackets, angle 
+	  brackets, dollar signs, backslashes, semicolons, ampersands,
+	  vertical bars, etc. 	
+	</para>
+	<para>
+	  For each metacharacter found, it is quoted in the result by
+	  prepending it with a backslash, returning the result.
+	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
+
+      </refsect1>
+    </refentry>
+
+    <refentry id="unescape_string">
+      <refnamediv>
+	<refname>unescape_string</refname>
+	<refpurpose>unescape escaped characters in a string.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>unescape_string</command>
+	  <arg>string</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  Scans through each character in the specified string looking
+	  for escaped character sequences (characters containing a
+	  percent sign and two hexadecimal characters, unescaping them 
+	  back to their original character values, as needed, also mapping
+	  plus signs to spaces, and returning the result.
+	</para>
+	<para>
+	    This is useful for unquoting strings that have been quoted to
+	    be part of a URL.
+	</para>
+	<note> 
+	    You must require the Rivet package in order to gain access to this command
+	</note>
+      </refsect1>
+    </refentry>
+
+  </section>
+
+  <section id="examples">
+    <title>Examples and Usage</title>
+    <para>
+      Some examples of Rivet usage follow.  Some prior Tcl knowledge
+      is assumed.  If you don't know much Tcl, don't worry, it's easy,
+      and there are some good resources available on the web that will
+      get you up to speed quickly.  Go to the <link
+	linkend="websites">web sites</link> section and have a look.
+    </para>
+
+    <example id="hello world">
+      <title>Hello World</title>
+      <para>
+	As with any tool, it's always nice to see something work, so
+	let's create a small "Hello World" page.</para>
+      <para>
+	Assuming you have Apache configured correctly, create a file
+	called <filename>hello.rvt</filename> where Apache can find
+	it, with the following content:
+      </para>
+      <programlisting>&hello.rvt;</programlisting>
+      <para>
+	If you then access it with your browser, you should see a
+	blank page with the text "Hello World" (without the quotes) on
+	it.
+      </para>
+    </example>
+
+    <example id="table">
+      <title>Generate a Table</title>
+      <para>
+	In another simple example, we dynamically generate a table:
+      </para>
+      <programlisting>&table.rvt;</programlisting>
+      <para>
+	If you read the code, you can see that this is pure Tcl.  We
+	could take the same code, run it outside of Rivet, and it
+	would generate the same HTML!
+      </para>
+      <para>
+	The result should look something like this:
+      </para>
+      <graphic fileref="table.png"/>
+
+    </example>
+
+    <example id="variable_access">
+      <title>Variable Access</title>
+      <para>
+	Here, we demonstrate how to access variables set by GET or
+	POST operations.
+      </para>
+      <para>
+	Given an HTML form like the following:
+      </para>
+      <programlisting>&vars.html;</programlisting>
+      <para>
+	We can use this Rivet script to get the variable values:
+      </para>
+      <programlisting>&vars.rvt;</programlisting>
+      <para>
+	The first statement checks to make sure that the
+	<varname>boss</varname> variable has been passed to the
+	script, and then does something with that information.  If
+	it's not present, an error is added to the list of errors.
+      </para>
+      <para>
+	In the second block of code, the variable
+	<varname>salary</varname> is fetched, with one more error
+	check - because it's a number, it needs to be composed of
+	digits.
+      </para>
+      <para>
+	The <varname>boss</varname> variable isn't required to have
+	been sent - we set it to "Mr. Burns" if it isn't among the
+	information we received.
+      </para>
+      <para>
+	The last bit of variable handing code is a bit trickier.
+	Because <varname>skills</varname> is a listbox, and can
+	potentially have multiple values, we opt to receive them as a
+	list, so that at some point, we could iterate over them.
+      </para>
+      <para>
+	The script then checks to make sure that
+	<varname>errlist</varname> is empty and outputting a thankyou
+	message.  If <varname>errlist</varname> is not empty, the list
+	of errors it contains is printed.
+      </para>
+    </example>
+
+    <example id="file_upload">
+      <title>File Upload</title>
+      <para>
+	The <command>upload</command> command endows Rivet with an
+	interface to access files transferred over http as parts of a
+	multipart form.  The following HTML in one file, say,
+	<filename>upload.html</filename> creates a form with a text
+	input entry. By clicking the file chooser button the file
+	browser shows up and the user selects the file to be uploaded
+	(the file path will appear in the text input).  In order to make
+	sure you're uploading the whole file you must combine the
+	action of the enctype and method attributes of the
+	&lt;form...&gt; tag in the way shown in the example.  Failure
+	to do so would result in the client sending only the file's
+	path, rather than the actual contents.
+      </para>
+      <programlisting>&upload.html;</programlisting>
+      <para>
+	In the script invoked by the form
+	(<filename>upload.rvt</filename>) <command>upload</command>
+	<arg>argument ...</arg> commands can be used to manipulate the
+	various files uploaded.
+      </para>
+      <programlisting>&upload.rvt;</programlisting>
+      <para>
+	Don't forget that the apache server must have write access to
+	the directory where files are being created.  The Rivet Apache
+	directives have a substantial impact on the upload process,
+	you have to carefully read the docs in order to set the
+	appropriate directives values that would match your
+	requirements.
+      </para>
+      <para>
+	It is also important to understand that some 
+	<command>upload</command> commands are effective only when
+	used in a mutually exclusive way.  Apache stores the data in
+	temporary files which are read by the <command>upload save
+	<arg>upload name</arg><arg>filename</arg></command> or by the
+	<command>upload data <arg>upload name</arg></command>
+	command. Subsequent calls to these 2 commands using the same
+	<arg>upload name</arg> argument will return no data on the
+	second call.  Likewise <command>upload channel <arg>upload
+	name</arg></command> will return a Tcl file channel that you
+	can use in regular Tcl scripts only if you haven't already
+	read the data, for example with a call to the <command>upload
+	data <arg>upload name</arg></command> command.
+      </para>
+    </example>
+    <example id="file_download">
+      <title>File Download</title>
+      <para>
+	In general setting up a data file for being sent over http is 
+	as easy as determining the file's URI and letting Apache's
+	do all that is needed. If this approach fits your design all 
+	you have to do is to keep the downloadable files somewhere 
+	within Apache's DocumentRoot (or in any of the directories 
+	Apache has right to access).
+      </para>
+      <para>
+	When a client sends a request for a file, Apache takes
+	care of determining the filetype, sends appropriate headers to
+	the client and then the file content. The client is responsible
+	for deciding how to handle the data accordingly to the 
+	"content-type" headers and its internal design. For example
+	when browsers give up trying to display a certain "content-type"
+	they display a download dialog box asking for directions from
+	the user. 
+      </para>
+      <para>
+	Rivet can help if you have more sofisticated needs.  For
+	instance you may be developing an application that uses
+	webpages to collect input data. This information might be
+	passed on to scripts or programs for processing. 
+	In this case a real file representing the
+	data doesn't exist and the content is generated on demand 
+	by the server. 
+	In other circumstances you may need to dynamically inhibit 
+	the download of specific files and hide them away, 
+	Your scripts may expunge from the pages
+	every link to these files (your pages are dynamic, aren't
+	they?) and move them out of way, but it looks like a
+	cumbersome solution.
+      </para>
+      <para>
+	Putting Tcl and Rivet in charge of the whole download
+	mechanism helps in building cleaner and safer approaches to
+	the download problem.
+      </para>
+      <para>
+	In this example a procedure checks for the existence of a
+	parameter passed in by the browser. The parameter is the name
+	(without extension) of a pdf file.  
+	Pdf files are stored in a directory whose path is
+	in the <command>pdf_repository</command> variable.
+      </para> 
+      <para>
+	This code is reported as an example of how to control 
+	the protocol using the <command>headers</command> command.
+      </para>
+      <programlisting>&download.tcl;</programlisting>
+      <para>
+	Before the pdf is sent the procedure sets the
+	<constant>Content-Type</constant>, 
+	<constant>Content-Disposition</constant>,
+	<constant>Content-Description</constant> and
+	<constant>Content-Length</constant> headers to inform
+	the client about the file type, name and size. Notice that in
+	order to set the <constant>Content-Type</constant> header Rivet 
+	uses a specialiezed form of the <command>headers</command> 
+	command. Headers must be sent before data gets sent down the 
+	output channel. Messing with this prescription causes an error 
+	to be raised (in fact the protocol itself is been violated)
+      </para>
+      <para>
+	More information about the meaning of the mime headers in the
+	http context can be found at 
+	<ulink url="http://www.w3.org/Protocols/rfc2616/rfc2616.html"/>
+      </para>
+    </example>
+    <example id="ajax_xml_messaging">
+      <title>XML Messages and Ajax</title>
+      <para>
+	The <command>headers</command> command is crucial for generating 
+	XML messages that have to be understood by JavaScript code used 
+	in Ajax applications. 
+      </para>
+      <para>
+	Ajax is a web programming technique that heavily relies on the 
+	abilty of JavaScript (and other scriping languages like VBScript) to 
+	manipulate dynamically the HTML structure of a page. In modern browsers 
+	JavaScript code is enabled to send GET or POST requests to the webserver.
+	These requests can request the server to run scripts (for example Rivet
+	Tcl scripts) that build responses and to be sent back to the browser.
+	JavaScript code reads asynchronously these responses, elaborates
+	their content and accordingly modifies the page on display. 
+	Ajax helps to build web applications that are more responsive and 
+	flexible, if you can cope with the complexities, subtleties and 
+	incompatibilities even among the most common browsers available. 
+	Instead of going through the cycle of request-generation-transfer
+	of a page, Ajax allows the programmer to request and transmit only
+	the essential data thus matching the general requirement of separation
+	between data and user interface (and saving the server from sending over
+	the same html code and graphics when only a fraction of a page has
+	to be refreshed)
+      </para>
+      <para>
+	In Ajax	applications the communication between client and server 
+	is controlled by an instance of a specialized object: the non-IE world
+	(Firefox,Safari,Opera...) uses the XMLHttpRequest class to create it, 
+	whereas IE uses the ActiveXObject class.
+      	<note>
+	    With the release of IE7 Microsoft introduced native support for 
+	    <ulink url="http://blogs.msdn.com/ie/archive/2006/01/23/516393.aspx">
+	    XMLHttpRequest</ulink> class objects
+      	</note>	
+	By creating an instance of this class a POST or GET request can be sent 
+	to the server, whose response is stored in a 
+	property ('returnedText') of the communication object. 
+	It's become widely customary to encode in XML messages the response
+	from the server to the browser. A number of XML specification are 
+	being used for this, among which XML-RPC and SOAP are worth to be 
+	quoted. Anyway, you can invent your own message definitions
+	(either based on XML or anything else), but one has to be aware of 
+	the fact that if the http headers are properly set and the message 
+	returned to the client is a well formed XML fragment, also the property 
+	<ulink url="http://www.w3schools.com/ajax/ajax_responsexml.asp">
+	XMLResponse</ulink> is set with a reference to an object 
+	that represent the
+	<ulink url="http://www.w3schools.com/dom/default.asp">
+	DOM</ulink> of the XML response. 
+	By means of the XML W3C DOM tree methods and properties
+	you can write scripts that read and manipulate the data embedded in 
+	the XML message.
+      </para>
+      <para>
+        In this example a Rivet script initializes an array with the
+	essential data regarding a few of the major composers of the 
+	european music. This array plays the role of a database
+	which, in a real case, has is a real DBM which stores large 
+	tables with thousands records and more complex and 
+	extended information. 
+	The script is designed to send back to the client two 
+	types of responses: a catalog of the composers or a single 
+	record of a composer.
+      </para>
+      <programlisting>&rivet_web_service.tcl;</programlisting>
+      <para>
+	For sake of brevity the JavaScript and HTML will not listed here. 
+	They can be downloaded (along with the Tcl script) stored in the 
+	<ulink url="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz">
+	rivet-ajax.tar.gz</ulink> archive. By simply 
+	opening this tar archive in a directory accessible by your
+	apache server and pointing your browser to the rivetService.html
+	page you should see a page with a drop-down list. Every time
+	a different name is picked from the list a new query is sent and 
+	logged in the apache access.log file, even though the html 
+	is never reloaded.
+      </para>
+    </example>
+  </section>
+
+  <section id="tcl_packages">
+    <title>Rivet Tcl Packages</title>
+    <para>
+      In addition to the core Apache module, Rivet provides a number
+      of Tcl packages that include potentially useful code.
+    </para>
+    <itemizedlist>
+
+      <listitem>
+	<para>commserver is a package providing a server that can be
+	used for IPC.  Still experimental.  Requires the comm package
+	from tcllib.</para>
+      </listitem>
+
+      <listitem>
+	<para>dio is a database abstraction layer.</para>
+      </listitem>
+
+      <listitem>
+	<para>dtcl is a compatibility package for mod_dtcl
+	applications.</para>
+      </listitem>
+
+      <listitem>
+	<para>form - for creating forms.</para>
+      </listitem>
+
+      <listitem>
+	<para>rivet - some additional, useful routines.</para>
+      </listitem>
+
+      <listitem>
+	<para>tclrivet</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section id="dio">
+    <title>DIO - Database Interface Objects</title>
+    <refentry id="dio_package">
+      <refnamediv>
+	<refname>DIO</refname>
+	<refpurpose>Database Interface Objects</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>::DIO::handle</command>
+	  <arg choice="plain"><replaceable>interface</replaceable></arg>
+	  <arg choice="opt"><replaceable>objectName</replaceable></arg>
+	  <group choice="opt">
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>...</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  <command>DIO</command> is designed to be a generic,
+	  object-oriented interface to SQL databases.  Its main goal
+	  is to be as generic as possible, but since not all SQL
+	  databases support the exact same syntaxes, keeping code
+	  generic between databases is left to the abilities of the
+	  programmer.  DIO simply provides a way to keep the Tcl
+	  interface generic.
+	</para>
+	<para>
+	  <option>interface</option> - The name of the database
+	  interface.  Currently supported interfaces are
+	  <option>Postgresql</option> and <option>Mysql</option>.
+	</para>
+	<para>
+	  If <option><replaceable>objectName</replaceable></option> is
+	  specified, DIO creates an object of that name.  If there is
+	  no <option><replaceable>objectName</replaceable></option>
+	  given, DIO will automatically generate a unique object ID
+	</para>
+      </refsect1>
+      <refsect1>
+	<title>Options</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-host</arg>
+		<arg choice="opt"><replaceable>hostname</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The hostname of the computer to connect to.  If none
+		is given, DIO assumes the local host.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-port</arg>
+		<arg><replaceable>portNumber</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The port number to connect to on <option>hostname</option>.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-user</arg>
+		<arg><replaceable>username</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The username you wish to login to the server as.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-pass</arg>
+		<arg><replaceable>password</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>The password to login to the server with.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-db</arg>
+		<arg><replaceable>database</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The name of the database to connect to.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-table</arg>
+		<arg><replaceable>tableName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The default table to use when using built-in commands
+		for storing and fetching.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-keyfield</arg>
+		<arg><replaceable>keyFieldname</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		The default field to use as the primary key when using
+		built-in commands for storing and fetching.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-autokey</arg>
+		<group>
+		  <arg>1</arg>
+		  <arg>0</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		If this option is set to 1, DIO will attempt to
+		determine an automatic key for
+		<option>keyField</option> when storing and fetching.
+		In most databases, this requires that the
+		<option>sequence</option> also be specified.  In the
+		case of MySQL, where sequences do not exist, autokey
+		must be used in conjunction with a table which has a
+		field specified as AUTO.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain">-sequence</arg>
+		<arg><replaceable>sequenceName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		If DIO is automatically generating keys, it will use
+		this sequence as a means to gain a unique number for
+		the stored key.</para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+      </refsect1>
+      <refsect1>
+	<title>DIO Object Commands</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>array</arg>
+		<arg><replaceable>request</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		create an array from the first record found.  The
+		array is set with the fields of the table and the
+		values of the record found.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>autokey</arg>
+		<group choice="opt">
+		  <arg>value</arg>
+		  <arg>boolean</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Return the current autokey value.  If
+		<option>value</option> is specified, it sets a new
+		value for the autokey option.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>close</arg>
+	      </cmdsynopsis>
+	      <para>	      Close the current database connection.  This command is
+		automatically called when the DIO object is destroyed.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>count</arg>
+	      </cmdsynopsis>
+	      <para>	      Return a count of the number of rows in the
+		specified (or current) table.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>db</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current database.  If
+		<option>value</option> is specified, it sets a new
+		value for the database.  In most cases, the DIO object
+		will automatically connect to the new database when
+		this option is changed.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>delete</arg>
+		<arg><replaceable>key</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Delete a record from the database where the primary
+		key matches <option>key</option>.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>destroy</arg>
+	      </cmdsynopsis>
+	      <para>
+		Destroy the DIO object.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>errorinfo</arg>
+		<arg choice="opt">value</arg>
+	      </cmdsynopsis>
+	      <para><option>errorinfo</option> contains the value of
+		the last error, if any, to occur while executing a
+		request.  When a request fails for any reason, this
+		variable is filled with the error message from the SQL
+		interface package.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>exec</arg>
+		<arg><replaceable>request</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as an SQL query.
+		When the exec command is called, the query is
+		executed, and a DIO result object is returned.  From
+		there, the result object can be used to obtain
+		information about the query status and records in a
+		generic way.  See <link linkend="resultobj">Result
+		  Object Commands</link>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>fetch</arg>
+		<arg><replaceable>key</replaceable></arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Fetch a record from the database where the primary key
+		matches <option>key</option> and store the result in
+		an array called <option>arrayName</option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>forall</arg>
+		<arg><replaceable>request</replaceable></arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		  <arg><replaceable>body</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+	       Execute an SQL select <option>request</option> and iteratively 
+	       fill the array named <option>arrayName</option>
+	       with elements named with the matching field names, and
+	       values containing the matching values, repeatedly executing 
+	       the specified code <option>body</option>
+	       for each row returned.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>host</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current host value.  If
+		<option>value</option> is specified, it sets a new
+		value for the host.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>insert</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Insert fields from <option>arrayName</option> into the specified table in the database.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>interface</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the database interface type, such as 
+		<literal>Postgresql</literal> or <literal>Mysql</literal>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>keyfield</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current keyfield.  If
+		<option>value</option> is specified, it sets a new
+		value for the keyfield.  <option>Value</option> can contain
+		multiple key fields as a Tcl list, if the table has multiple
+		key fields.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>keys</arg>
+		<arg choice="opt"><replaceable>pattern</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Return a list of keys in the database.  If
+		<option>pattern</option> is specified, only the keys
+		matching will be returned.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>lastkey</arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the last key that was used from
+		<option>sequence</option>.  If sequence has not been
+		specified, this command returns an empty string.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>list</arg>
+		<arg>request</arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		return a list of the first column of each record
+		found.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>makekey</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<arg choice="opt"><replaceable>keyfield</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Given an array containing key-value pairs and an optional
+		list of key fields (we use the object's keyfield if
+		none is specified), if we're doing auto keys, create
+		and return a new key, otherwise if it's a single key,
+		just return its value from the array, else if there are
+		multiple keys, return all the keys' values from the
+		array as a list.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>nextkey</arg>
+	      </cmdsynopsis>
+	      <para>Increment <option>sequence</option> and return the
+		next key to be used.  If sequence has not been
+		specified, this command returns an empty
+		string.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>open</arg>
+	      </cmdsynopsis>
+	      <para>Open the connection to the current database.  This
+		command is automatically called from any command which
+		accesses the database.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>pass</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current pass value.  If
+		<option>value</option> is specified, it sets a new
+		value for the password.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>port</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>Return the current port value.  If <option>value</option> is
+		specified, it sets a new value for the port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>quote</arg>
+		<arg><replaceable>string</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>Return the specified <option>string</option> quoted in
+	      a way that makes it acceptable as a value in a SQL statement.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>search</arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Search the current table, or the specified table if
+		-table tableName is specified, for rows matching
+		one or more fields as key-value pairs, and return
+		a query result handle.
+		See <link linkend="resultobj">Result Object Commands</link>
+		</para>
+		<para>
+		For example,
+	<programlisting>set res [DIO search -table people -firstname Bob]</programlisting>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>sequence</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current sequence value.  If <option>value</option> is
+		specified, it sets a new value for the sequence.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>store</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Store the contents of <option>arrayName</option> in the 
+		database, where the keys are the field names and the
+		array's values are the corresponding values.  Do an SQL insert 
+		if the corresponding row doesn't exist, or an update 
+		if it does.
+	      </para>
+	      <para>
+		The table name must have been previously set
+		or specified with <arg>-table</arg>, and the key field(s) must
+		have been previously set or specified with
+		<arg>-keyfield</arg>.
+	      </para>
+	      <para>
+		Please note that the store method has significantly higher 
+		overhead than
+		the update or insert methods, so if you know you are
+		inserting a row rather than updating one, it is advisable
+		to use the insert method and, likewise, if you know you
+		are updating rather than inserting, to use the
+		update method.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>string</arg>
+		<arg><replaceable>request</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>request</option> as a SQL query and
+		return a string containing the first record
+		found.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>table</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>Return the current table.  If
+		<option>value</option> is specified, it sets a new
+		value for the table.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>update</arg>
+		<arg><replaceable>arrayName</replaceable></arg>
+		<group choice="opt">
+		  <arg>-option</arg>
+		  <arg><replaceable>option</replaceable></arg>
+		  <arg>...</arg>
+		</group>
+	      </cmdsynopsis>
+	      <para>
+		Updates the row matching the contents of 
+		<option>arrayName</option> in the database.  The matching
+		row must already exist.  The table can have already been
+		set or can be specified with <arg>-table</arg>, and
+		the key field(s) must either have been set or
+		specified with <arg>-keyfield</arg>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>objectName</replaceable></arg>
+		<arg>user</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current user value.  If
+		<option>value</option> is specified, it sets a new
+		value for the user.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+      <refsect1 id="resultobj">
+	<title>Result Object Commands</title>
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>autocache</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current autocache value.  If
+		<option>value</option> is specified, it sets a new
+		value for autocache.
+	      </para>
+	      <para>
+		If autocache is true, the result object will
+		automatically cache rows as you use them.  This means
+		that the first time you execute a forall command, each
+		row is being cached in the result object itself and
+		will no longer need to access the SQL result.
+		<emphasis>Default is true</emphasis>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>cache</arg>
+	      </cmdsynopsis>
+	      <para>
+		Cache the results of the current SQL result in the
+		result object itself.  This means that even if the
+		database connection is closed and all the results of
+		the DIO object are lost, this result object will still
+		maintain a cached copy of its records.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>errorcode</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current errorcode value.  If <option>value</option>
+		is specified, it sets a new value for errorcode.
+	      </para>
+	      <para>
+		<option>errorcode</option> contains the current code from the
+		SQL database which specifies the result of the query
+		statement which created this object.  This variable
+		can be used to determine the success or failure of a
+		query.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>errorinfo</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current errorinfo value.  If <option>value</option>
+		is specified, it sets a new value for errorinfo.
+	      </para>
+	      <para>
+		If an error occurred during the SQL query, DIO
+		attempts to set the value of <option>errorinfo</option> to the
+		resulting error message.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>fields</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current fields value.  If
+		<option>value</option> is specified, it sets a new
+		value for fields.
+	      </para>
+	      <para>
+		<option>fields</option> contains the list of fields
+		used in this query.  The fields are in order of the
+		fields retrieved for each row.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>forall</arg>
+		<arg><replaceable>-type</replaceable></arg>
+		<arg><replaceable>varName</replaceable></arg>
+		<arg><replaceable>body</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Execute <option>body</option> over each record in the
+		result object.
+	      </para>
+	      <para>Types:</para>
+	      <variablelist>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-array</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Create
+		      <option><replaceable>varName</replaceable></option>
+		      as an array where the indexes are the names of
+		      the fields in the table and the values are the
+		      values of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-keyvalue</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list containing key-value pairs of fields
+		      and values from the current row. (-field value
+		      -field value)
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-list</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list that contains the values of the
+		      current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>next</arg>
+		<arg><replaceable>-type</replaceable></arg>
+		<arg choice="opt"><replaceable>varName</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Retrieve the next record in the result object.
+	      </para>
+	      <para>Types:</para>
+	      <variablelist>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-array</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Create
+		      <option><replaceable>varName</replaceable></option>
+		      as an array where the indexes are the names of
+		      the fields in the table and the values are the
+		      values of the current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-keyvalue</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list containing key-value pairs of fields
+		      and values from the current row. (-field value
+		      -field value)
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
+		      <arg choice="plain">-list</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set
+		      <option><replaceable>varName</replaceable></option>
+		      to a list that contains the values of the
+		      current row.
+		    </para>
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>numrows</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current numrows value.  If <option>value</option> is
+		specified, it sets a new value for numrows.
+	      </para>
+	      <para>
+		<option>numrows</option> is the number of rows in this result.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>resultid</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current resultid value.  If <option>value</option> is
+		specified, it sets a new value for resultid.
+	      </para>
+	      <para>
+		<option>resultid</option> in most databases is the result
+		pointer which was given us by the database.  This
+		variable is not generic and should not really be used,
+		but it's there if you want it.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<arg choice="plain"><replaceable>resultObj</replaceable></arg>
+		<arg>rowid</arg>
+		<arg choice="opt"><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Return the current rowid value.  If <option>value</option> is
+		specified, it sets a new value for rowid.
+	      </para>
+	      <para>
+		<option>rowid</option> contains the number of the
+		current result record in the result object.  This
+		variable should not really be accessed outside of the
+		result object, but it's there if you want it.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+  </section>
+
+
+  <section id="diodisplay">
+    <title>DIODisplay - Database Interface Objects Display Class</title>
+    <refentry id="diodisplay_package">
+      <refnamediv>
+	<refname>DIODisplay</refname>
+	<refpurpose>Database Interface Objects Display Class</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>DIODisplay</command>
+	  <group>
+	    <arg><replaceable>objectName</replaceable></arg>
+	    <arg>#auto</arg>
+	  </group>
+	  <group choice="opt">
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>-option</arg>
+	    <arg><replaceable>option</replaceable></arg>
+	    <arg>...</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+	<title>Description</title>
+	<para>
+	  DIODisplay is an HTML display class that uses a DIO object
+	  to do the database work and a form object to do the
+	  displaying.
+	</para>
+      </refsect1>
+      <refsect1>
+	<title>Options</title>
+	<variablelist>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-DIO</arg>
+		<arg choice="plain"><replaceable>dioObject</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		The DIO object to be used in conjunction with this
+		display object.  This is a required field.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-cleanup</arg>
+		<group>
+		  <arg>1</arg>
+		  <arg>0</arg>
+		</group>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		If cleanup is true, when the display object is shown,
+		it will automatically destroy the DIO object, the form
+		object and itself. Default is true.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+
+	  <!-- begin transform.html -->
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-confirmdelete</arg>
+		<group>
+		  <arg>1</arg>
+		  <arg>0</arg>
+		</group>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		If confirmdelete is true, attempting to delete a
+		record from the database first requires that the user
+		confirm that they wish to delete it.  If it is false,
+		deletion occurs without prompting the user. Defaults
+		to true.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-errorhandler</arg>
+		<arg choice="plain"><replaceable>procName</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		The name of a procedure to handle errors when they
+		occur.  During the processing of requests and pages,
+		sometimes unexpected errors can occur.  This procedure
+		will handle any errors.  It is called with a single
+		argument, the error string.  Use of the Tcl errorInfo
+		and errorCode variables is also recommended though.
+	      </para>
+	      <para>
+		If no errorhandler is specified, the handle_error
+		method within the Display object will handle the
+		error.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-fields</arg>
+		<arg choice="plain"><replaceable>fieldList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Specify a list of fields to be used in this object.
+		The fields list is actually created by using the
+		<command>field</command> command to add fields to the
+		display, but this option can be useful to sometimes
+		over-set the list of fields created.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-form</arg>
+		<arg choice="plain"><replaceable>formObject</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A Rivet form object to use when displaying a form.  If
+		one is not specified, the display object will
+		automatically create one when it is necessary.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-functions</arg>
+		<arg choice="plain"><replaceable>functionList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of functions to be displayed in the main menu.
+		This is a list of functions the user is allowed to
+		execute.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-pagesize</arg>
+		<arg choice="plain"><replaceable>pageSize</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		How many records to show per page on a search or
+		list. Default is 25.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-rowfields</arg>
+		<arg choice="plain"><replaceable>fieldList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of fields to display in each row of a search or
+		list.  When a search or list is conducted and the
+		resulting rows are displayed, this list will limit
+		which fields are displayed.  Default is all fields.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-rowfunctions</arg>
+		<arg choice="plain"><replaceable>functionList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of functions to display in each row of a search
+		or list.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-searchfields</arg>
+		<arg choice="plain"><replaceable>fieldList</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		A list of fields to allow a user to search by.  This
+		list will appear in the main screen as a drop-down box
+		of fields the user can search on.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<arg choice="plain">-title</arg>
+		<arg choice="plain"><replaceable>title</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		The title of the display object.  This will be output
+		as the title of the HTML document.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+
+	<refsect2>
+	  <title>DIO Display Object Commands</title>
+
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">cleanup</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current cleanup value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for the cleanup
+		  option.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">delete</arg>
+		  <arg choice="plain"><replaceable>key</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+		<listitem>
+		  <para>
+		  Delete the specified <option>key</option> from the
+		  database.
+		</para>
+		<para>
+		  The default action of this method is to call the DIO
+		  object's delete command.  This method can be
+		  overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">destroy</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Destroy the diodisplay object.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">DIO</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current DIO value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for DIO.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">errorhandler</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current errorhandler value.  If
+		  <option><replaceable>value</replaceable></option> is specified, it
+		  sets a new value for errorhandler.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">fetch</arg>
+		  <arg choice="plain"><replaceable>key</replaceable></arg>
+		  <arg choice="plain"><replaceable>arrayName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Fetch the specified <replaceable><option>key</option></replaceable>
+		  from the database and store it as an array in
+		  <replaceable><replaceable>arrayName</replaceable></replaceable>.
+		</para>
+		<para>
+		  The default of this method is to call the DIO object's fetch command.
+		  This method can be overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">field</arg>
+		  <arg choice="plain"><replaceable>fieldName</replaceable></arg>
+		  <group rep="repeat">
+		    <arg choice="plain">-arg</arg>
+		    <arg choice="plain"><replaceable>arg</replaceable></arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Create a new field object and add it to the display.
+		  When a field is added to the display, a new object
+		  of the DIODisplayField class is created with its
+		  values.  See [FIXME - LINK] DIO Display Fields for
+		  options and values.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">fields</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current fields value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for fields.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">form</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current form value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for form.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">function</arg>
+		  <arg choice="plain"><replaceable>functionName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Add a new function to the list of possible
+		  functions.  The display object will only execute
+		  methods and procs which are defined as functions by
+		  the object.  This is to protect the program from
+		  executing a different procedure other than what is
+		  allowed.  The <command>function</command> command
+		  adds a new function to the list of allowable
+		  functions.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain"><replaceable>objectName</replaceable></arg>
+		  <arg choice="plain">functions</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current functions value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for functions.  See
+		  [FIXME - LINK DIO Display Functions] for a list of
+		  default functions.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">pagesize</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current form pagesize.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for pagesize.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowfields</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current form rowfields.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for rowfields.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowfooter</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Output the footer of a list of rows to the web page.
+		</para>
+		<para>
+		  This method can be overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowfunctions</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current rowfunctions value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for rowfunctions.
+		  
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">rowheader</arg>
+		</cmdsynopsis>
+	      </term>
+	    <listitem>
+	      <para>
+		Output the header of a list of rows to the web page.
+		By default, this is an HTML table with a top row
+		listing the fields in the table.
+		</para>
+		<para>
+		  This method can be overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">searchfields</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current searchfields value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for searchfields.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">show</arg>
+		</cmdsynopsis>
+	      </term>
+	    <listitem>
+	      <para>
+		Show the display object.
+		</para>
+		<para>
+		  This is the main method of the display class.  It
+		  looks for a variable called <varname>mode</varname>
+		  to be passed in through a form response and uses
+		  that mode to execute the appropriate function.  If
+		  mode is not given, the <command>Main</command>
+		  function is called.
+		</para>
+		<para>
+		  This function should be called for every page.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">showform</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Display the form of the object.
+		</para>
+		<para>
+		  This method displays the form for this display
+		  object.  It is used in the <command>Add</command>
+		  and <command>Edit</command> methods but can be
+		  called separately if needed.
+		</para>
+		<para>
+		  This method can be overridden if the default look of
+		  a form needs to be changed.  By default, the form
+		  displayed is simply the fields in a table, in order.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">showrow</arg>
+		  <arg choice="plain"><replaceable>arrayName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Display a single row of a resulting list or search.
+		</para>
+		<para>
+		  This method is used to display a single row while
+		  displaying the result of a list or search.
+		  <option><replaceable>arrayName</replaceable></option>
+		  is a fetched array of the record.
+		</para>
+		<para>
+		  This method can be overriden if the default look of
+		  a row needs to be changed.  By default, each row is
+		  output as a table row with each field as a table
+		  data cell.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">showview</arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Display the view of the object.
+		</para>
+		<para>
+		  This method displays the view for this display
+		  object.  It is used in the
+		  <command>Details</command> methods but can be
+		  called separately if needed.
+		</para>
+		<para>
+		  This method can be overridden if the default look of
+		  a view needs to be changed.  By default, the view
+		  displayed is simply the fields in a table, in order.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">store</arg>
+		  <arg choice="plain"><replaceable>arrayName</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Store the specified
+		  <option><replaceable>arrayName</replaceable></option>
+		  in the database.
+		</para>
+		<para>
+		  The default of this method is to call the DIO
+		  object's store command.  This method can be
+		  overridden.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">text</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current text value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for text.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">title</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current title value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for title.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">type</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current type value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for type.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <command><replaceable>objectName</replaceable></command>
+		  <arg choice="plain">value</arg>
+		  <arg><replaceable>value</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  Return the current value value.  If
+		  <option><replaceable>value</replaceable></option> is
+		  specified, it sets a new value for value.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsect2>
+
+	<refsect2>
+	  <title>DIO Display Functions</title>
+	  <para>
+	    These functions are called from the
+	    <command>show</command> method when a form response
+	    variable called <varname>mode</varname> is set.  If no
+	    mode has been set, the default mode is
+	    <command>Main</command>.  The show method will handle
+	    the necessary switching of functions.  The show method
+	    also handles checking to make sure the function given is a
+	    true function.  If not, an error message is displayed.
+	    New functions can be added as methods or by use of the
+	    <command>function</command> command, and any of the
+	    default functions can be overridden with new methods to
+	    create an entirely new class.  These are the default
+	    functions provided.
+	  </para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term><command>Add</command></term>
+	      <listitem>
+		<para>
+		  Show a form that allows the user to add a new entry
+		  to the database.  This function calls
+		  <command>showform</command> to display the form
+		  for adding the entry.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Cancel</command></term>
+	      <listitem>
+		<para>
+		  The <command>Cancel</command> function does nothing
+		  but redirect back to the <command>Main</command>
+		  function.  This is handy for forms which have a
+		  cancel button to point to.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+
+	    <varlistentry>
+	      <term><command>Delete</command></term>
+	      <listitem>
+		<para>
+		  If <varname>confirmdelete</varname> is true (the
+		  default), the <command>Delete</command> function
+		  will ask the user if they're sure they want to
+		  delete the record from the database.  If
+		  <varname>confirmdelete</varname> is false, or if the
+		  user confirms they wish to delete, this function
+		  calls the <command>DoDelete</command> function to do
+		  the actual deletion of a record.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Details</command></term>
+	      <listitem>
+		<para>
+		  Display the view of a single record from the database.  This function calls
+		  the <command>showview</command> method to display a single record from the database.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>DoDelete</command></term>
+	      <listitem>
+		<para>
+		  This function actually deletes a record from the
+		  database.  Once it has deleted the record, it
+		  redirects the user back to the
+		  <command>Main</command> function.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Edit</command></term>
+	      <listitem>
+		<para>
+		  Show a form that allows the user to edit an existing
+		  entry to the database.  This function calls
+		  <command>showform</command> to display the form for
+		  editing the entry and fills in the fields with the
+		  values retrieved from the database.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>List</command></term>
+	      <listitem>
+		<para>
+		  This function lists the entires contents of the
+		  database.  Each record is output in a row using the
+		  <command>showrow</command> method.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Main</command></term>
+	      <listitem>
+		<para>
+		  This function is the main function of the display
+		  object.  If there is no mode, or once most commands
+		  complete, the user will be redirected to this
+		  function.  The default <command>Main</command>
+		  function displays a list of functions the user can
+		  execute, a list of searchfields the user can search
+		  on, and a query field.  This query field is used by
+		  all of the other functions to determine what the
+		  user is trying to find.
+		</para>
+		<para>
+		  In the case of a <command>search</command>, query
+		  specifies what string the user is looking for in the
+		  specified search field.  In the case of
+		  <command>delete</command>,
+		  <command>details</command> or
+		  <command>edit</command>, the query specifies the
+		  database key to access.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Save</command></term>
+	      <listitem>
+		<para>
+		  This function saves any data passed to using the
+		  <command>store</command> method.  This is primarily
+		  used by the <command>add</command> and
+		  <command>edit</command> commands to store the
+		  results of the form the user has filled out.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term><command>Search</command></term>
+	      <listitem>
+		<para>
+		  This function searches the database for any row
+		  whose <varname>searchBy</varname> field matches
+		  <varname>query</varname>. Once any number of records
+		  are found, <command>Search</command> displays the
+		  results in rows.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</refsect2>
+
+	<refsect2>
+	  <title>DIO Display Fields</title>
+	  <para>
+	    Display fields are created with the
+	    <command>field</command> command of the DIODisplay object.
+	    Each field is created as a new DIODisplayField object or
+	    as a subclass of DIODisplayField.  The standard form
+	    fields use the standard field class, while specialized
+	    field types use a class with different options but still
+	    supports all of the same commands and values a generic
+	    field does.
+	  </para>
+
+	  <cmdsynopsis>
+	    <command><replaceable>displayObject</replaceable></command>
+	    <arg choice="plain">field</arg>
+	    <arg
+	    choice="plain"><replaceable>fieldname</replaceable></arg>
+	    <group choice="opt" rep="repeat">
+	      <arg choice="plain">-option</arg>
+	      <arg choice="plain"><replaceable>option</replaceable></arg>
+	    </group>
+	  </cmdsynopsis>
+
+	  <para>
+	    These are the standard options supported by field types:
+	  </para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-formargs</arg>
+		  <arg choice="plain"><replaceable>arguments</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  When a field is created, any argument which is not a
+		  standard option is assumed to be an argument passed
+		  to the form object when the field is shown in a
+		  form.  These arguments are all appended to the
+		  <varname>formargs</varname> variable.  You can use
+		  this option to override or add options after the
+		  initial creation of an object
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-readonly</arg>
+		  <group>
+		    <arg>1</arg>
+		    <arg>0</arg>
+		  </group>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  If <varname>readonly</varname> is set to true, the
+		  field will not display a form entry when displaying
+		  in a form.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-text</arg>
+		  <arg choice="plain"><replaceable>text</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  The text displayed next to the form or view field.
+		  By default, DIODisplay tries to figure out a pretty
+		  way to display the field name.  This text will
+		  override that default and display whatever is
+		  specified.
+		</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+		<cmdsynopsis>
+		  <arg choice="plain">-type</arg>
+		  <arg choice="plain"><replaceable>fieldType</replaceable></arg>
+		</cmdsynopsis>
+	      </term>
+	      <listitem>
+		<para>
+		  The type of field this is.  This type is used when
+		  creating the field in the form object.
+		  <option><replaceable>fieldType</replaceable></option>
+		  can be any of the accepted form field types.  See
+		  [FIXME - LINK DIO Field Types] for a list of types
+		  available.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+
+	  <para>
+	    All other arguments, unless specified in an individual
+	    field type, are passed directly to the form object when
+	    the field is created.  So, you can pass
+	    <option>-size</option> or <option>-maxsize</option> to
+	    specify the length and maximum length of the field entry.
+	    Or, if type were textarea, you could define
+	    <option>-rows</option> and <option>-cols</option> to
+	    specify its row and column count.
+	  </para>
+	</refsect2>
+	<refsect2>
+	  <title>DIO Display Field Types</title>
+	  <para>
+	    The following is a list of recognized field types by
+	    DIODisplay.  Some are standard HTML form fields, and
+	    others are DIODisplay fields which execute special actions
+	    and functions.
+	  </para>
+	</refsect2>
+      </refsect1>
+    </refentry>
+  </section>
+
+
+
+  <section id="session_package">
+    <title>Session Package</title>
+    <section>
+      <title>Introduction</title>
+      <para>
+	This is session management code.  It provides an interface
+	to allow you to generate and track a browser's visit as a
+	"session", giving you a unique session ID and an interface
+	for storing and retrieving data for that session on the
+	server.
+      </para>
+
+      <para>
+	This is an alpha/beta release -- documentation is not in
+	final form, but everything you need should be in this file.
+      </para>
+
+      <para>
+	Using sessions and their included ability to store and
+	retrieve session-related data on the server, programmers can
+	generate more secure and higher-performance websites.  For
+	example, hidden fields do not have to be included in forms
+	(and the risk of them being manipulated by the user
+	mitigated) since data that would be stored in hidden fields
+	can now be stored in the session cache on the server.  Forms
+	are then faster since no hidden data is transmitted --
+	hidden fields must be sent twice, once in the form to the
+	broswer and once in the response from it.
+      </para>
+
+      <para>
+	Robust login systems, etc, can be built on top of this code.
+      </para>
+    </section>
+
+    <section id="requirements">
+      <title>Requirements</title>
+
+
+	<para>
+	  Rivet.  Currently has only been tested with Postgresql.
+	  All DB interfacing is done through DIO, though, so it
+	  should be relatively easy to add support for other
+	  databases.
+	</para>
+      </section>
+
+      <section>
+	<title>Preparing To Use It</title>
+
+	<para>Create the tables in your SQL server.  With Postgres,
+	  do a <command>psql www</command> or whatever DB you
+	  connect as, then a backslash-i on
+	  <filename>session-create.sql</filename></para>
+
+	<para>(If you need to delete the tables, use <filename>session-drop.sql</filename>)</para>
+
+	<para>The session code by default requires a DIO handle
+	  called <varname>DIO</varname> (the name of which can be
+	  overridden).  We get it by doing a</para>
+
+<programlisting>
+  RivetServerConf ChildInitScript "package require DIO"
+  RivetServerConf ChildInitScript "::DIO::handle Postgresql DIO -user www"
+</programlisting>
+
+      </section>
+
+      <section>
+	<title>Example Usage</title>
+
+	<para>In your httpd.conf, add:</para>
+
+	<programlisting>RivetServerConf ChildInitScript "package require Session; Session SESSION"</programlisting>
+
+	<para>
+	  This tells Rivet you want to create a session object named
+	  SESSION in every child process Apache creates.</para>
+
+	<para>
+	  You can configure the session at this point using numerous
+	  key-value pairs (which are defined later in this doc).
+	  Here's a quick example:</para>
+
+	<programlisting>RivetServerConf ChildInitScript "package require Session; Session SESSION \
+  -cookieLifetime 120 -debugMode 1"</programlisting>
+
+	<para>
+	  Turn debugging on <option>-debugMode 1</option> to figure
+	  out what's going on -- it's really useful, if
+	  verbose.</para>
+
+	<para>
+	  In your .rvt file, when you're generating the &lt;HEAD&gt;
+	  section:
+	</para>
+
+	<programlisting>SESSION activate</programlisting>
+
+	<para>
+	  Activate handles everything for you with respect to
+	  creating new sessions, and for locating, validating, and
+	  updating existing sessions.  Activate will either locate
+	  an existing session, or create a new one.  Sessions will
+	  automatically be refreshed (their lifetimes extended) as
+	  additional requests are received during the session, all
+	  under the control of the key-value pairs controlling the
+	  session object.
+	</para>
+      </section>
+
+      <section>
+	<title>Using Sessions From Your Code</title>
+
+	<para>The main methods your code will use are:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION</command> <command>id</command>
+	      </cmdsynopsis>
+	      <para>
+		After doing a <command>SESSION activate</command>,
+		this will return a 32-byte ASCII-encoded random
+		hexadecimal string.  Every time this browser comes
+		to us with a request within the timeout period, this
+		same string will be returned (assuming they have
+		cookies enabled).
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION</command>
+		<command>is_new_session</command>
+	      </cmdsynopsis>
+	      <para>returns 1 if it's a new session or 0 if it has
+		previously existed (i.e. it's a zero if this request
+		represents a "return" or subsequent visit to a
+		current session.)</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION new_session_reason</command></cmdsynopsis>
+	      <para>
+		This will return why this request is the first
+		request of a new session, either "no_cookie" saying
+		the browser didn't give us a session cookie,
+		"no_session" indicating we got a cookie but couldn't
+		find it in our session table, or "timeout" where
+		they had a cookie and we found the matching session
+		but the session has timed out.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION store</command>
+		<arg><replaceable>packageName</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+		<arg><replaceable>data</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Given the name of a package, a key, and some data.
+		Stores the data in the rivet session cache table.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION fetch</command>
+		<arg><replaceable>packageName</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Given a package name and a key, return the data
+		stored by the store method, or an empty string if
+		none was set.  (Status is set to the DIO error that
+		occurred, it can be fetched using the status
+		method.)
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </section>
+
+      <section>
+	<title>Session Configuration Options</title>
+
+	<para>The following key-value pairs can be specified when a
+	  session object (like SESSION above) is created:</para>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term><option>sessionLifetime</option></term>
+
+	    <listitem>
+	      <para>how many seconds the session will live for.
+		7200 == 2 hours
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>sessionRefreshInterval</term>
+	    <listitem>
+	      <para>
+		If a request is processed for a browser that
+		currently has a session and this long has elapsed
+		since the session update time was last updated,
+		update it.  900 == 15 minutes.  so if at least 15
+		minutes has elapsed and we've gotten a new request
+		for a page, update the session update time,
+		extending the session lifetime (sessions that are in
+		use keep getting extended).
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>cookieName</term>
+	    <listitem>
+	      <para></para>
+	      name of the cookie stored on the user's web browser
+	      default rivetSession
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry><term>dioObject</term> 
+	    <listitem>
+	      <para>
+		The name of the DIO object we'll use to access the
+		database (default DIO)
+	      </para>
+	    </listitem></varlistentry>
+
+	  <varlistentry><term>gcProbability</term>
+	    <listitem>
+	      <para>
+		The probability that garbage collection will occur
+		in percent.  (default 1%, i.e. 1)</para></listitem></varlistentry>
+
+	  <varlistentry><term>gcMaxLifetime</term>
+		<listitem><para>the number of seconds after which
+		data will be seen as "garbage" and cleaned up --
+		defaults to 1 day (86400)</para></listitem></varlistentry>
+
+	  <varlistentry><term>refererCheck</term>
+		<listitem><para>The substring you want to check each
+		HTTP referer for.  If the referer was sent by the
+		browser and the substring is not found, the session
+		will be deleted. (not coded yet)</para></listitem></varlistentry>
+
+	  <varlistentry><term>entropyFile</term> <listitem><para>The
+		name of a file that random binary data can be read
+		from.  (<filename>/dev/urandom</filename>) Data will
+		be used from this file to help generate a
+		super-hard-to-guess session ID.</para></listitem></varlistentry>
+
+	  <varlistentry><term>entropyLength</term>
+		<listitem><para>The number of bytes which will be
+		read from the entropy file.  If 0, the entropy file
+		will not be read (default 0)</para></listitem></varlistentry>
+
+	  <varlistentry><term>scrambleCode</term> <listitem><para>
+		Set the scramble code to something unique for the
+		site or your app or whatever, to slightly increase
+		the unguessability of session ids (default "some
+		random string")</para></listitem></varlistentry>
+
+	  <varlistentry><term>cookieLifetime</term>
+		<listitem><para>The lifetime of the cookie in
+		minutes.  0 means until the browser is closed (I
+		think). (default 0)</para></listitem></varlistentry>
+
+	  <varlistentry><term>cookiePath</term> <listitem><para>The
+		webserver subpath that the session cookie applies to
+		(defaults to
+		<filename>/</filename>)</para></listitem></varlistentry>
+
+	  <varlistentry><term>cookieDomain</term>
+	  <listitem><para>The domain to set in the session cookie
+	  (FIXME - not coded yet)</para></listitem></varlistentry>
+
+	  <varlistentry><term>cookieSecure</term>
+		<listitem><para>Specifies whether the cookie should
+		only be sent over secure connections, 0 = any, 1 =
+		secure connections only (default
+		0)</para></listitem></varlistentry>
+
+	  <varlistentry><term>sessionTable</term>
+		<listitem><para>The name of the table that session
+		info will be stored in (default
+		<varname>rivet_session</varname>)</para></listitem></varlistentry>
+
+	  <varlistentry><term>sessionCacheTable</term>
+		<listitem><para>The name of the table that contains
+		cached session data (default
+		<varname>rivet_session_cache</varname>)</para></listitem></varlistentry>
+
+	  <varlistentry><term>debugMode</term> <listitem><para>Set
+		debug mode to 1 to trace through and see the session
+		object do its thing (default 0)</para></listitem></varlistentry>
+
+	  <varlistentry><term>debugFile</term> <listitem><para>The
+		file handle that debugging messages will be written
+		to (default
+		<varname>stdout</varname>)
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+      </section>
+
+      <section>
+	<title>Session Methods</title>
+
+	<para>
+	  The following methods can be invoked to find out
+	  information about the current session, store and fetch
+	  server data identified with this session, etc:
+	</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION status</command></cmdsynopsis>
+	      <para>
+		Return the status of the last operation
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION id</command></cmdsynopsis>
+	      <para>
+		Get the session ID of the current browser.  Returns
+		an empty string if there's no session (will not
+		happen is SESSION activate has been issued.)
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION new_session_reason</command>
+	      </cmdsynopsis>
+	      <para>
+		Returns the reason why there wasn't a previous
+		session, either "no_cookie" saying the browser
+		didn't give us a session cookie, "no_session"
+		indicating we got a cookie but couldn't find it in
+		the session table, or "timeout" when we had a cookie
+		and a session but the session had timed out.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION store</command>
+		<arg><replaceable>packageName</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+		<arg><replaceable>data</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Given a package name, a key string, and a data
+		string, store the data in the rivet session
+		cache.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION fetch</command>
+		<arg><replaceable>packageName</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+	      </cmdsynopsis>
+	      <para>
+		Given a package name and a key, return the data
+		stored by the store method, or an empty string if
+		none was set.  Status is set to the DIO error that
+		occurred, it can be fetched using the status
+		method.
+	      </para>
+	    </listitem></varlistentry>
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION delete</command></cmdsynopsis>
+
+	      <para>
+		Given a user ID and looking at their IP address we
+		inherited from the environment (thanks, Apache),
+		remove them from the session table.  (the session
+		table is how the server remembers stuff about
+		sessions). If the session ID was not specified the
+		current session is deleted.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term></term>
+	    <listitem>
+	      <cmdsynopsis>
+		<command>SESSION activate</command></cmdsynopsis>
+
+	      <para>
+		Find and validate the session ID if they have one.
+		If they don't have one or it isn't valid (timed out,
+		etc), create a session and drop a cookie on
+		them.
+	      </para>
+	    </listitem>
+	  </varlistentry></variablelist>
+      </section>
+
+      <section>
+	<title>Getting Additional Randomness From The Entropy File</title>
+
+	<programlisting>RivetServerConf ChildInitScript "Session SESSION -entropyFile /dev/urandom \
+  -entropyLength 10 -debugMode 1"</programlisting>
+
+	<para>
+	  This options say we want to get randomness from an entropy
+	  file (random data pseudo-device) of /dev/urandom, to get ten
+	  bytes of random data from that entropy device, and to turn
+	  on debug mode, which will cause the SESSION object to output
+	  all manner of debugging information as it does stuff.  This
+	  has been tested on FreeBSD and appears to work.
+      </para>
+    </section>
+  </section>
+
+  <section id="help">
+    <title>Resources - How to Get Help</title>
+
+    <section>
+      <title>Mailing Lists</title>
+      <para>
+	The Rivet mailing list is the first place you should turn for
+	help, if you haven't found the solution to your problem in the
+	documentation.  Send email to
+	<email>rivet-dev@tcl.apache.org</email>.  If you have a
+	question, idea, or comment about the Rivet code itself, please
+	send us email at <email>rivet-dev@tcl.apache.org</email>.  To
+	subscribe to either list, post email to
+	<email>rivet-<replaceable>list</replaceable>-subscribe@tcl.apache.org</email>,
+	where <replaceable>list</replaceable> is either dev or user.
+	Currently, dev is the preferred list to use.
+      </para>
+      <para>
+	The mailing list archives are available at <ulink
+	  url="http://mail-archives.apache.org/eyebrowse/SummarizeList?listId=118"/>
+      </para>
+    </section>
+
+    <section>
+      <title>Newsgroup</title>
+      <para>
+	The <ulink url="news:comp.lang.tcl"/> newsgroup is a good
+	place to ask about Tcl questions in general.  Rivet developers
+	also follow the newsgroup, but it's best to ask Rivet-specific
+	questions on the Rivet list.
+      </para>
+    </section>
+
+    <section id="websites">
+      <title>Web Sites</title>
+
+      <para>
+	There are several web sites that cover Apache and Tcl
+	extensively.
+      </para>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <ulink url="http://tcl.apache.org"/> is the home for the
+	    Apache Tcl project.  Go there for the latest versions of
+	    our software (if you aren't reading these pages off of the
+	    site!).
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://httpd.apache.org/docs/"/> is the first
+	    place to go for questions about the Apache web server.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://www.tcl.tk"/> is the canonical site
+	    for Tcl information.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    <ulink url="http://wiki.tcl.tk"/> is the Tcl'ers Wiki, a
+	    free-form place to search for answers and ask for help.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>Bug Tracking System</title>
+
+      <para>
+	Apache Rivet uses the Apache Bug Tracking system at <ulink
+	  url="http://issues.apache.org/bugzilla/"></ulink>.  Here,
+	you can report problems, or check and see if existing issues
+	are already known and being dealt with.
+      </para>
+    </section>
+
+    <section>
+      <title>IRC</title>
+
+      <para>
+        Occasionally, someone from the Rivet team is on IRC at
+        irc.freenode.net, channel #tcl.
+      </para>
+    </section>
+
+    <section>
+      <title>Editing Rivet Template Files</title>
+      <para>
+	Rivet makes available code for two popular editors,
+	<application>emacs</application> and
+	<application>vim</application> to facilitate the editing of
+	Rivet template files.  The key concept is that the editor is
+	aware of the &lt;? and ?&gt; tags and switches back and forth
+	between Tcl and HTML modes as the cursor moves.  These files,
+	<filename>two-mode-mode.el</filename> and
+	<filename>rvt.vim</filename> are available in the
+	<filename>contrib/</filename> directory.
+      </para>
+    </section>
+
+
+  </section>
+
+  <section id="internals">
+    <title>Rivet Internals</title>
+    <para>
+      This section easily falls out of date, as new code is added, old
+      code is removed, and changes are made.  The best place to look
+      is the source code itself.  If you are interested in the changes
+      themselves, the Subversion revision control system
+      (<command>svn</command>) can provide you with information about
+      what has been happening with the code.
+    </para>
+    <section>
+      <title>Initialization</title>
+      <para>
+	When Apache is started, (or when child Apache processes are
+	started if a threaded Tcl is used),
+	<function>Rivet_InitTclStuff</function> is called, which
+	creates a new interpreter, or one interpreter per virtual
+	host, depending on the configuration. It also initializes
+	various things, like the <structname>RivetChan</structname>
+	channel system, creates the Rivet-specific Tcl commands, and
+	executes Rivet's <filename>init.tcl</filename>.  The caching
+	system is also set up, and if there is a
+	<command>GlobalInitScript</command>, it is run.
+      </para>
+    </section>
+    <section>
+      <title>RivetChan</title>
+      <para>
+	The <structname>RivetChan</structname> system was created in
+	order to have an actual Tcl channel that we could redirect
+	standard output to.  This lets us use, for instance, the
+	regular <command>puts</command> command in .rvt pages.  It
+	works by creating a channel that buffers output, and, at
+	predetermined times, passes it on to Apache's IO system.
+	Tcl's regular standard output is replaced with an instance of
+	this channel type, so that, by default, output will go to the
+	web page.
+      </para>
+    </section>
+    <section>
+      <title>The <command>global</command> Command</title>
+      <para>
+	Rivet aims to run standard Tcl code with as few surprises as
+	possible.  At times this involves some compromises - in this
+	case regarding the <command>global</command> command.  The
+	problem is that the command will create truly global
+	variables.  If the user is just cut'n'pasting some Tcl code
+	into Rivet, they most likely just want to be able to share the
+	variable in question with other procs, and don't really care
+	if the variable is actually persistant between pages.  The
+	solution we have created is to create a proc
+	<command>::request::global</command> that takes the place of
+	the <command>global</command> command in Rivet templates.  If
+	you really need a true global variable, use either
+	<command>::global</command> or add the :: namespace qualifier
+	to variables you wish to make global.
+      </para>
+    </section>
+    <section>
+      <title>Page Parsing, Execution and Caching</title>
+      <para>
+	When a Rivet page is requested, it is transformed into an
+	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
+	processing instruction tags.  Everything outside these tags
+	becomes a large <command>puts</command> statement, and
+	everything inside them remains Tcl code.
+      </para>
+      <para>
+	Each .rvt file is evaluated in its own
+	<constant>::request</constant> namespace, so that it is not
+	necessary to create and tear down interpreters after each
+	page.  By running in its own namespace, though, each page will
+	not run afoul of local variables created by other scripts,
+	because they will be deleted automatically when the namespace
+	goes away after Apache finishes handling the request.
+      <note>
+	    One current problem with this system is that while
+	    variables are garbage collected, file handles are not, so
+	    that it is very important that Rivet script authors make
+	    sure to close all the files they open.
+      </note>
+      </para>
+      <para>
+	After a script has been loaded and parsed into it's "pure Tcl"
+	form, it is also cached, so that it may be used in the future
+	without having to reload it (and re-parse it) from the disk.
+	The number of scripts stored in memory is configurable.  This
+	feature can significantly improve performance.
+      </para>
+    </section>
+
+    <section>
+      <title>Debugging Rivet and Apache</title>
+      <para>
+	If you are interested in hacking on Rivet, you're welcome to
+	contribute!  Invariably, when working with code, things go
+	wrong, and it's necessary to do some debugging.  In a server
+	environment like Apache, it can be a bit more difficult to
+	find the right way to do this.  Here are some techniques to
+	try.
+      </para>
+      <para>
+	The first thing you should know is that Apache can be launched
+	as a <emphasis>single process</emphasis> with the
+	<option>-X</option> argument:</para>
+      <programlisting>httpd -X</programlisting>.
+      <para>
+	On Linux, one of the first things to try is the system call
+	tracer, <command>strace</command>.  You don't even have to
+	recompile Rivet or Apache for this to work.
+      </para>
+
+      <programlisting>strace -o /tmp/outputfile -S 1000 httpd -X</programlisting>
+
+      <para>This command will run httpd in the system call tracer,
+	which leaves its output (there is potentially a lot of it) in
+	<filename>/tmp/outputfile</filename>.  The <option>-S</option>
+	option tells <command></command>strace to only record the
+	first 1000 bytes of a syscall.  Some calls such as
+	<function>write</function> can potentially be much longer than
+	this, so you may want to increase this number.  The results
+	are a list of all the system calls made by the program.  You
+	want to look at the end, where the failure presumably occured,
+	to see if you can find anything that looks like an error.  If
+	you're not sure what to make of the results, you can always
+	ask on the Rivet development mailing list.
+      </para>
+
+      <para>
+	If <command>strace</command> (or its equivalent on your
+	operating system) doesn't answer your question, it may be time
+	to debug Apache and Rivet.  To do this, you will need to run
+	the <command>./configure.tcl</command> script with the
+	<option>-enable-symbols</option> option, and recompile.
+      </para>
+      <para>
+	Since it's easier to debug a single process, we'll still run
+	Apache in single process mode with -X:
+      </para>
+
+      <programlisting>
+@ashland [~] $ gdb /usr/sbin/apache.dbg
+GNU gdb 5.3-debian
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "powerpc-linux"...
+(gdb) run -X
+Starting program: /usr/sbin/apache.dbg -X
+[New Thread 16384 (LWP 13598)]
+.
+.
+.
+      </programlisting>
+
+      <para>
+	When your apache session is up and running, you can request a
+	web page with the browser, and see where things go wrong (if
+	you are dealing with a crash, for instance).  A helpful
+	<command>gdb</command> tutorial is available here: <ulink
+	  url="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html"></ulink>
+      </para>
+
+    </section>
+
+  </section>
+  <section id="upgrading">
+    <title>Upgrading from mod_dtcl or NeoWebScript</title>
+    <para>
+      Rivet is a break from the past, in that we, the authors, have
+      attempted to take what we like best about our past efforts, and
+      leave out or change things we no longer care for.  Backwards
+      compatibility was not a primary goal when creating Rivet, but we
+      do provide this information which may be of use to those wishing
+      to upgrade from mod_dtcl or NWS installations.
+    </para>
+    <section>
+      <title>mod_dtcl</title>
+      <para>
+	Rivet was originally based on the dtcl code, but it has
+	changed (improved!) quite a bit.  The concepts remain the
+	same, but many of the commands have changed.
+      </para>
+    </section>
+    <section>
+      <title>NeoWebScript</title>
+      <para>TODO</para>
+    </section>
+  </section>
+</article>
