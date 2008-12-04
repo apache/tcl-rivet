@@ -29,6 +29,7 @@
   <xsl:param name="admon.graphics" select="1"/>
   <xsl:param name="generate.section.toc.level" select="1"/>
   <xsl:param name="refentry.separator" select="1"/>
+  <xsl:param name="generate.toc">article toc,title,example</xsl:param>
 
 <!--
   <xsl:param name="refentry.generate.title" select="1"/>
@@ -51,6 +52,7 @@
   <xsl:variable name="group.choice.req.close.str">)</xsl:variable>
 
   <xsl:variable name="group.rep.repeat.str">...</xsl:variable>
+
 
   <xsl:template name="inline.underlineseq">
     <xsl:param name="content">

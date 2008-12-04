@@ -73,7 +73,7 @@
   </para-->
 
   <para>
-    Document revision: $Revision$, last modified $Date$ by $Author$.
+    Document revision: $Revision$, last modified <?dbtimestamp format="Y-m-d X" ?>$ by $Author$.
   </para>
 
     <!-- Introduction -->

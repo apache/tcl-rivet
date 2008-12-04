@@ -1,3 +1,15 @@
+2008-12-03 Massimo Manghi <mxmanghi@apache.org>
+
+    * doc/rivet.xml: document timestamp is generated with the 
+    EXSLT datetime() function controlled through the <?dbtimestamp ...?>
+    element. The timestamp now reflects the actual time when the xsl
+    processor is run, instead of time when the svn commit is carried out.
+
+    * doc/rivet.xsl: customization added to make a list of examples
+    appear at the end of the table of contents.
+
+    * doc/html/*.html: manual pages rebuilt and committed to repository
+
 2008-11-21 Massimo Manghi <mxmanghi@apache.org>
 
     * doc/rivet.xml: file broken up into chunks containing the toplevel

@@ -16,9 +16,9 @@ puts "Hello World"
 	If you then access it with your browser, you should see a
 	blank page with the text "Hello World" (without the quotes) on
 	it.
-      </p></div></div><br class="example-break"><div class="example"><a name="table"></a><p class="title"><b>Example 2. Generate a Table</b></p><div class="example-contents"><p style="width:90%">
-	In another simple example, we dynamically generate a table:
-      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;? puts "&lt;table&gt;\n"
+      </p></div></div><br class="example-break"><div class="example"><a name="id2613925"></a><p class="title"><b>Example 2. Generate a Table</b></p><div class="example-contents"><p style="width:90%">
+	    In another simple example, we dynamically generate a table:
+	  </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;? puts "&lt;table&gt;\n"
 for {set i 1} { $i &lt;= 8 } {incr i} {
     puts "&lt;tr&gt;\n"
     for {set j 1} {$j &lt;= 8} {incr j} {
@@ -30,12 +30,12 @@ for {set i 1} { $i &lt;= 8 } {incr i} {
 }
 puts "&lt;/table&gt;\n" ?&gt;
 </pre><p style="width:90%">
-	If you read the code, you can see that this is pure Tcl.  We
-	could take the same code, run it outside of Rivet, and it
-	would generate the same HTML!
-      </p><p style="width:90%">
-	The result should look something like this:
-      </p><div><img src="table.png"></div></div></div><br class="example-break"><div class="example"><a name="variable_access"></a><p class="title"><b>Example 3. Variable Access</b></p><div class="example-contents"><p style="width:90%">
+	    If you read the code, you can see that this is pure Tcl.  We
+	    could take the same code, run it outside of Rivet, and it
+	    would generate the same HTML!
+	  </p><p style="width:90%">
+	    The result should look something like this:
+	  </p><div><img src="table.png"></div></div></div><br class="example-break"><div class="example"><a name="variable_access"></a><p class="title"><b>Example 3. Variable Access</b></p><div class="example-contents"><p style="width:90%">
 	Here, we demonstrate how to access variables set by GET or
 	POST operations.
       </p><p style="width:90%">
