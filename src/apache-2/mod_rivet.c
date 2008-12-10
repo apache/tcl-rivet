@@ -307,7 +307,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
     rivet_server_conf *conf = Rivet_GetConf(req);
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    if( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
+    if ( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
         Tcl_Obj *errscript;
         Tcl_Obj *errorCodeListObj;
         Tcl_Obj *errorCodeElementObj;
@@ -374,7 +374,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
 good:
 
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
-    	TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset),globals->req);
+    	TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
     }
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(conf->outchannel));

@@ -1,3 +1,5 @@
+<!-- $ Id: $ -->
+
   <section id="internals">
     <title>Rivet Internals</title>
     <para>
@@ -158,9 +160,7 @@ Starting program: /usr/sbin/apache.dbg -X
       <para>
 	When your apache session is up and running, you can request a
 	web page with the browser, and see where things go wrong (if
-	you are dealing with a crash, for instance).  A helpful
-	<command>gdb</command> tutorial is available here: <ulink
-	  url="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html"></ulink>
+	you are dealing with a crash, for instance).
       </para>
 
     </section>

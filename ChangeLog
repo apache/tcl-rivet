@@ -1,3 +1,12 @@
+2008-12-11 Massimo Manghi <mxmanghi@apache.org>
+    
+    * src/apache-2/mod_rivet.c: fixed call to apr_strcat in function
+    Rivet_ExecuteAndCheck (the corresponding call in the apache-1 code
+    has been checked and appears to be correct).
+    
+    * doc/xml/internals.xml: Removed broken external link pointing
+    to a no more existing gdb tutorial.
+
 2008-12-03 Massimo Manghi <mxmanghi@apache.org>
 
     * doc/rivet.xml: document timestamp is generated with the 
