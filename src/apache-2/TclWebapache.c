@@ -577,7 +577,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
     rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
     /* This sucks - we should use the hook, but I want to
        get everything fixed and working first */
-    if (1 || rsc->upload_files_to_var)
+    if (rsc->upload_files_to_var)
     {
 	Tcl_Channel chan;
 	chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
