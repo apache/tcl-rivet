@@ -584,6 +584,7 @@ TCL_CMD_HEADER( Rivet_Upload )
 	"type",
 	"filename",
 	"names",
+	"tempname",
 	NULL
     };
 
@@ -595,25 +596,27 @@ TCL_CMD_HEADER( Rivet_Upload )
 	SIZE,
 	TYPE,
 	FILENAME,
-	NAMES
+	NAMES,
+	TEMPNAME
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     command = Tcl_GetString(objv[1]);
     Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
-			"channel|save|data|exists|size|type|filename|names",
+			"channel|save|data|exists|size|type|filename|names|tempname",
 			0, &subcommandindex);
 
     /* If it's any of these, we need to find a specific name. */
 
     /* Excluded cases are EXISTS and NAMES. */
-    if ((enum subcommand)subcommandindex == CHANNEL ||
-	(enum subcommand)subcommandindex == SAVE ||
-	(enum subcommand)subcommandindex == DATA ||
-	(enum subcommand)subcommandindex == EXISTS ||
-	(enum subcommand)subcommandindex == SIZE ||
-	(enum subcommand)subcommandindex == TYPE ||
-	(enum subcommand)subcommandindex == FILENAME)
+    if ((enum subcommand)subcommandindex == CHANNEL 	||
+	(enum subcommand)subcommandindex == SAVE 	||
+	(enum subcommand)subcommandindex == DATA 	||
+	(enum subcommand)subcommandindex == EXISTS 	||
+	(enum subcommand)subcommandindex == SIZE 	||
+	(enum subcommand)subcommandindex == TYPE 	||
+	(enum subcommand)subcommandindex == FILENAME 	||
+	(enum subcommand)subcommandindex == TEMPNAME)
     {
 	varname = Tcl_GetString(objv[2]);
 	if ((enum subcommand)subcommandindex != EXISTS)
@@ -683,6 +686,9 @@ TCL_CMD_HEADER( Rivet_Upload )
     case FILENAME:
 	TclWeb_UploadFilename(result, globals->req);
 	break;
+    case TEMPNAME:
+	TclWeb_UploadTempname(result,globals->req);
+	break;
     case NAMES:
 	if (objc != 2)
 	{
@@ -693,7 +699,7 @@ TCL_CMD_HEADER( Rivet_Upload )
 	break;
     default:
 	Tcl_WrongNumArgs(interp, 1, objv,
-			 "channel|save ?name?|data|exists|size|type|filename|names");
+			 "channel|save ?name?|data|exists|size|type|filename|names|tempname");
     }
     Tcl_SetObjResult(interp, result);
     return TCL_OK;

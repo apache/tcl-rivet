@@ -1,3 +1,8 @@
+2008-12-21 Massimo Manghi <mxmanghi@apache.ora>
+
+    * src/apache-2/rivetCode.c: add handling for subcommand
+    'tempname'
+
 2008-12-15 Massimo Manghi <mxmanghi@apache.org>
 
     * src/apache-2/TclWebapache.c: fixed test on configuaration
