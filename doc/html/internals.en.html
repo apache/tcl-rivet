@@ -5,7 +5,7 @@
       themselves, the Subversion revision control system
       (<span style="font-family:monospace"><span class="command"><strong>svn</strong></span></span>) can provide you with information about
       what has been happening with the code.
-    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2627919"></a>Initialization</h3></div></div></div><p style="width:90%">
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2859140"></a>Initialization</h3></div></div></div><p style="width:90%">
 	When Apache is started, (or when child Apache processes are
 	started if a threaded Tcl is used),
 	<code class="function">Rivet_InitTclStuff</code> is called, which
@@ -16,7 +16,7 @@
 	executes Rivet's <code class="filename">init.tcl</code>.  The caching
 	system is also set up, and if there is a
 	<span style="font-family:monospace"><span class="command"><strong>GlobalInitScript</strong></span></span>, it is run.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2628569"></a>RivetChan</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2859790"></a>RivetChan</h3></div></div></div><p style="width:90%">
 	The <span class="structname">RivetChan</span> system was created in
 	order to have an actual Tcl channel that we could redirect
 	standard output to.  This lets us use, for instance, the
@@ -26,7 +26,7 @@
 	Tcl's regular standard output is replaced with an instance of
 	this channel type, so that, by default, output will go to the
 	web page.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2628596"></a>The <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> Command</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2859816"></a>The <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> Command</h3></div></div></div><p style="width:90%">
 	Rivet aims to run standard Tcl code with as few surprises as
 	possible.  At times this involves some compromises - in this
 	case regarding the <span style="font-family:monospace"><span class="command"><strong>global</strong></span></span> command.  The
@@ -41,7 +41,7 @@
 	you really need a true global variable, use either
 	<span style="font-family:monospace"><span class="command"><strong>::global</strong></span></span> or add the :: namespace qualifier
 	to variables you wish to make global.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2628647"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2859868"></a>Page Parsing, Execution and Caching</h3></div></div></div><p style="width:90%">
 	When a Rivet page is requested, it is transformed into an
 	ordinary Tcl script by parsing the file for the &lt;? ?&gt;
 	processing instruction tags.  Everything outside these tags
@@ -67,7 +67,7 @@
 	without having to reload it (and re-parse it) from the disk.
 	The number of scripts stored in memory is configurable.  This
 	feature can significantly improve performance.
-      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2628697"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2859923"></a>Debugging Rivet and Apache</h3></div></div></div><p style="width:90%">
 	If you are interested in hacking on Rivet, you're welcome to
 	contribute!  Invariably, when working with code, things go
 	wrong, and it's necessary to do some debugging.  In a server
@@ -121,6 +121,5 @@ Starting program: /usr/sbin/apache.dbg -X
       </pre><p style="width:90%">
 	When your apache session is up and running, you can request a
 	web page with the browser, and see where things go wrong (if
-	you are dealing with a crash, for instance).  A helpful
-	<span style="font-family:monospace"><span class="command"><strong>gdb</strong></span></span> tutorial is available here: <a class="ulink" href="http://www.delorie.com/gnu/docs/gdb/gdb_toc.html" target="_top">http://www.delorie.com/gnu/docs/gdb/gdb_toc.html</a>
+	you are dealing with a crash, for instance).
       </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="help.en.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="upgrading.en.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Resources - How to Get Help </td><td width="20%" align="center"><a accesskey="h" href="index.en.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Upgrading from mod_dtcl or NeoWebScript</td></tr></table></div></body></html>
