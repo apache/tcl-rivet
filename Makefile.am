@@ -16,11 +16,11 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 install-data-local:
-	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
-	cp -r rivet/* $(RIVETLIB_DESTDIR)
-	-( cd  $(RIVETLIB_DESTDIR) ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	$(mkinstalldirs) $(DESTDIR)$(RIVETLIB_DESTDIR)
+	cp -r rivet/* $(DESTDIR)$(RIVETLIB_DESTDIR)
+	-( cd  $(DESTDIR)$(RIVETLIB_DESTDIR) ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-local:
-	rm -fr $(RIVETLIB_DESTDIR)
+	rm -fr $(DESTDIR)$(RIVETLIB_DESTDIR)
 
 # 

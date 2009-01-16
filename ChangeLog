@@ -1,3 +1,9 @@
+2009-01-16 Massimo Manghi <mxmanghi@apache.org>
+
+    * Makefile.am: Add DESTLIB variable handling as suggested
+    by kikusz@gmail.com and accordingly with Automake directives
+    for local install rules.
+
 2008-12-21 Massimo Manghi <mxmanghi@apache.ora>
 
     * src/apache-2/rivetCode.c: add handling for subcommand
