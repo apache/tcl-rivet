@@ -1525,7 +1525,7 @@ Rivet_SendContent(request_rec *r)
         goto sendcleanup;
     }
 
-    if (r->finfo.protection == 0)
+    if (r->finfo.filetype == 0)
     {
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server,
                 "File does not exist: %s",

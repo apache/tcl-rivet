@@ -1,3 +1,11 @@
+2009-04-27 Karl Lehenbauer <karl@apache.org>
+
+    * src/apache-2/mod_rivet.c: In Rivet_SendContent, when checking to see
+      if the file doesn't exist, check r->finfo.filetype rather than
+      r->finfo.protection.  (The prior check failed to detect that the
+      Rivet source file did not exist, causing zero length webpages to
+      be sent rather than 404's.)
+
 2009-01-16 Massimo Manghi <mxmanghi@apache.org>
 
     * Makefile.am: Add DESTLIB variable handling as suggested
