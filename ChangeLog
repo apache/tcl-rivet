@@ -1,3 +1,15 @@
+2009-05-01 Karl Lehenbauer <karl@apache.org>
+    * Rename global request rec pointer from globalrr to 
+      rivet_panic_request_rec, add rivet_panic_pool and
+      rivet_panic_server_rec, grabbing those values from Rivet initialization
+      rather than request handling so that they are initialized enough that
+      Rivet_Panic can use them.  (Previously Rivet_Panic or Tcl_Panic at 
+      initialization time caused a null-pointer-dereference segmentation 
+      violation because no request was being served.
+
+      In Rivet_Panic, avoid emitting the unparsed URI unless a request is
+      being processed.
+
 2009-04-27 Karl Lehenbauer <karl@apache.org>
 
     * src/apache-2/mod_rivet.c: In Rivet_SendContent, when checking to see

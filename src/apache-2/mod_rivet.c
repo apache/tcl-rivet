@@ -58,7 +58,9 @@
 //module AP_MODULE_DECLARE_DATA rivet_module;
 
 /* This is used *only* in the PanicProc.  Otherwise, don't touch it! */
-static request_rec *globalrr;
+static request_rec *rivet_panic_request_rec = NULL;
+static apr_pool_t *rivet_panic_pool = NULL;
+static server_rec *rivet_panic_server_rec = NULL;
 
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
 #define NESTED_INCLUDE_MAGIC	(&rivet_module)
@@ -1071,6 +1073,9 @@ static int
 Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp,
        server_rec *s)
 {
+    rivet_panic_pool = pPool;
+    rivet_panic_server_rec = s;
+
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_PACKAGE_VERSION);
 #else
@@ -1216,10 +1221,17 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
     char *format;
 
     format = (char *) TCL_VARARGS_START(char *,arg1,argList);
-    buf = (char *) apr_pvsprintf(globalrr->pool, format, argList);
-    ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, globalrr->server,
-		 "Critical error in request: %s", globalrr->unparsed_uri);
-    ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, globalrr->server, buf);
+    buf = (char *) apr_pvsprintf(rivet_panic_pool, format, argList);
+
+    if (rivet_panic_request_rec != NULL) {
+	ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
+		 rivet_panic_server_rec,
+		 "Critical error in request: %s", 
+		 rivet_panic_request_rec->unparsed_uri);
+    }
+
+    ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
+		 rivet_panic_server_rec, buf);
 
     abort();
 }
@@ -1467,6 +1479,8 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
 static void
 Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
 {
+    ap_assert (s != (server_rec *)NULL);
+
     Rivet_InitTclStuff(s, pChild);
     Rivet_ChildHandlers(s, 1);
 
@@ -1501,7 +1515,7 @@ Rivet_SendContent(request_rec *r)
 
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
-    globalrr = r;
+    rivet_panic_request_rec = r;
 
     rsc = Rivet_GetConf(r);
     interp = rsc->server_interp;
