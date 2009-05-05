@@ -6,6 +6,18 @@
     * Add new "upload" option "tempname" that'll return the name of the
       temporary file containing the upload.
 
+    * When instantiating separate virtual interpreters, postpend an interpreter
+      count to the self-created slave interpreter name, to keep 
+      Tcl_CreateSlave from failing if two or more virtual hosts have the same 
+      ServerName and don't have a port defined in the ServerName directive.
+
+    * Detect and report failure of Tcl_CreateSlave rather than assuming it
+      succeeded and dereferencing a null pointer when it didn't.  Also added
+      asserts to detect null interpreter pointer.
+
+    * Slightly improved error messages when a child init or exit function
+      fails.
+
 2009-05-01 Karl Lehenbauer <karl@apache.org>
     * Rename global request rec pointer from globalrr to 
       rivet_panic_request_rec, add rivet_panic_pool and

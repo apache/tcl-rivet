@@ -836,6 +836,8 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     Tcl_Interp *interp = rsc->server_interp;
     rivet_interp_globals *globals = NULL;
 
+    ap_assert (interp != (Tcl_Interp *)NULL);
+
     /* Create TCL commands to deal with Apache's BUFFs. */
     rsc->outchannel = apr_pcalloc(p, sizeof(Tcl_Channel));
     *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc, TCL_WRITABLE);
@@ -1291,7 +1293,11 @@ Rivet_ChildHandlers(server_rec *s, int init)
             if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                         errmsg, Tcl_GetString(function));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, "%s",
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+			"errorCode: %s",
+                        Tcl_GetVar(rsc->server_interp, "errorCode", 0));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+		        "errorInfo: %s",
                         Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
             }
 
@@ -1359,6 +1365,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
     rivet_server_conf *myrsc;
     server_rec *sr;
     extern int ap_max_requests_per_child;
+    int interpCount = 0;
 
     /* Initialize TCL stuff  */
     Tcl_FindExecutable(RIVET_NAMEOFEXECUTABLE);
@@ -1417,8 +1424,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
         }
     }
 
-    sr = s;
-    while (sr)
+    for (sr = s; sr; sr = sr->next)
     {
         myrsc = RIVET_SERVER_CONF(sr->module_config);
         /* We only have a different rivet_server_conf if MergeConfig
@@ -1435,12 +1441,20 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
         if (sr != s) /* not the first one  */
         {
             if (rsc->separate_virtual_interps != 0) {
-                char *slavename = (char*) apr_psprintf(p, "%s_%d", 
+                char *slavename = (char*) apr_psprintf(p, "%s_%d_%d", 
                         sr->server_hostname, 
-                        sr->port);
+                        sr->port,
+			interpCount++);
+
                 /* Separate virtual interps. */
                 myrsc->server_interp = Tcl_CreateSlave(interp,
                         slavename, 0);
+		if (myrsc->server_interp == NULL) {
+		    ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+			          "slave interp create failed: %s",
+		                  Tcl_GetStringResult(interp) );
+		    exit(1);
+		}
                 Rivet_PerInterpInit(s, myrsc, p);
             } else {
                 myrsc->server_interp = rsc->server_interp;
@@ -1454,8 +1468,6 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
             myrsc->objCacheList = rsc->objCacheList;
         }
         myrsc->server_name = (char*)apr_pstrdup(p, sr->server_hostname);
-
-        sr = sr->next;
     }
 }
 
