@@ -223,6 +223,22 @@ int TclWeb_UploadFilename(Tcl_Obj *filename, TclWebRequest *req);
 /*
  *-----------------------------------------------------------------------------
  *
+ * TclWeb_UploadTempname --
+ *
+ * Get the name of the temp file the uploaded data was stored in.
+ *
+ * Results:
+ *
+ * Stores the temp name in 'tempname'.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int TclWeb_UploadTempname(Tcl_Obj *tempname, TclWebRequest *req);
+
+/*
+ *-----------------------------------------------------------------------------
+ *
  * TclWeb_UploadNames --
  *
  * Fetch names of all the uploaded variables.

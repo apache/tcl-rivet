@@ -1,3 +1,11 @@
+2009-05-05 Karl Lehenbauer <karl@apache.org>
+    * Add new Rivet Tcl command,apache_table, which can query, get and set
+      values in the Apache "notes", "headers_in", "headers_out",
+      "err_headers_out" and "subprocess_env" tables.
+
+    * Add new "upload" option "tempname" that'll return the name of the
+      temporary file containing the upload.
+
 2009-05-01 Karl Lehenbauer <karl@apache.org>
     * Rename global request rec pointer from globalrr to 
       rivet_panic_request_rec, add rivet_panic_pool and

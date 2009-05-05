@@ -540,6 +540,251 @@ TCL_CMD_HEADER ( Rivet_Var )
 /*
 */
 
+static int append_key_callback (void *data, const char *key, const char *val)
+{
+    Tcl_Obj *list = data;
+
+    Tcl_ListObjAppendElement (NULL, list, Tcl_NewStringObj (key, -1));
+    return 1;
+}
+
+static int
+append_key_value_callback (void *data, const char *key, const char *val)
+{
+    Tcl_Obj *list = data;
+
+    Tcl_ListObjAppendElement (NULL, list, Tcl_NewStringObj (key, -1));
+    Tcl_ListObjAppendElement (NULL, list, Tcl_NewStringObj (val, -1));
+    return 1;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_ApacheTable --
+ *
+ * 	Deals with Rivet key-value tables in the request structure
+ *
+ *	apache_table get tablename key
+ *      apache_table set tablename key value
+ *      apache_table exists tablename key
+ *      apache_table unset tablename key
+ *      apache_table list tablename
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_ApacheTable )
+{
+    apr_table_t *table;
+    int subcommandindex;
+
+    static CONST84 char *SubCommand[] = {
+	"get",
+	"set",
+	"exists",
+	"unset",
+	"names",
+	"array_get",
+	"clear",
+	NULL
+    };
+
+    enum subcommand {
+	SUB_GET,
+	SUB_SET,
+	SUB_EXISTS,
+	SUB_UNSET,
+	SUB_NAMES,
+	SUB_ARRAY_GET,
+	SUB_CLEAR
+    };
+
+    static CONST84 char *tableNames[] = {
+	"notes",
+	"headers_in",
+	"headers_out",
+	"err_headers_out",
+	"subprocess_env",
+	NULL
+    };
+
+    int tableindex;
+
+    enum tablename {
+	TABLE_NOTES,
+	TABLE_HEADERS_IN,
+	TABLE_HEADERS_OUT,
+	TABLE_ERR_HEADERS_OUT,
+	TABLE_SUBPROCESS_ENV
+    };
+
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    if ((objc < 3) || (objc > 5)) {
+	Tcl_WrongNumArgs(interp, 1, objv, "option tablename ?args?");
+	return TCL_ERROR;
+    }
+
+    if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
+			"get|set|unset|list",
+			0, &subcommandindex) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    if (Tcl_GetIndexFromObj (interp, objv[2], tableNames,
+			"notes|headers_in|headers_out|err_header_out|subprocess_env",
+			0, &tableindex) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    switch ((enum tablename)tableindex)
+    {
+	case TABLE_NOTES: {
+	    table = globals->r->notes;
+	    break;
+	}
+
+	case TABLE_HEADERS_IN: {
+	    table = globals->r->headers_in;
+	    break;
+	}
+
+	case TABLE_HEADERS_OUT: {
+	    table = globals->r->headers_out;
+	    break;
+	}
+
+	case TABLE_ERR_HEADERS_OUT: {
+	    table = globals->r->err_headers_out;
+	    break;
+	}
+
+	case TABLE_SUBPROCESS_ENV: {
+	    table = globals->r->subprocess_env;
+	    break;
+	}
+    }
+
+    switch ((enum subcommand)subcommandindex)
+    {
+	case SUB_GET: {
+	    const char *key;
+	    const char *value;
+
+	    if (objc != 4) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    value = apr_table_get (table, key);
+
+	    if (value != NULL) {
+		Tcl_SetObjResult (interp, Tcl_NewStringObj (value, -1));
+	    }
+	    break;
+	}
+
+	case SUB_EXISTS: {
+	    const char *key;
+	    const char *value;
+
+	    if (objc != 4) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    value = apr_table_get (table, key);
+
+	    Tcl_SetObjResult (interp, Tcl_NewBooleanObj (value != NULL));
+	    break;
+	}
+
+
+	case SUB_SET: {
+	    int i;
+	    char *key;
+	    char *value;
+
+	    if (objc == 4) {
+		int listObjc;
+		Tcl_Obj **listObjv;
+
+		if (Tcl_ListObjGetElements (interp, objv[3], &listObjc, &listObjv) == TCL_ERROR) {
+		    return TCL_ERROR;
+		}
+
+		if (listObjc % 2 == 1) {
+		    Tcl_SetObjResult (interp, Tcl_NewStringObj ("list must have even number of elements", -1));
+		    return TCL_ERROR;
+		}
+
+		for (i = 0; i < listObjc; i += 2) {
+		    apr_table_set (table, Tcl_GetString (listObjv[i]), Tcl_GetString (listObjv[i+1]));
+		}
+
+		break;
+	    }
+
+	    if (objc != 5) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key value");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    value = Tcl_GetString (objv[4]);
+
+	    apr_table_set (table, key, value);
+	    break;
+	}
+
+	case SUB_UNSET: {
+	    char *key;
+
+	    if (objc != 4) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    apr_table_unset (table, key);
+	    break;
+	}
+
+	case SUB_NAMES: {
+            Tcl_Obj *list = Tcl_NewObj ();
+
+	    apr_table_do(append_key_callback, (void*)list, table, NULL);
+
+	    Tcl_SetObjResult (interp, list);
+	    break;
+	}
+
+	case SUB_ARRAY_GET: {
+            Tcl_Obj *list = Tcl_NewObj ();
+
+	    apr_table_do(append_key_value_callback, (void*)list, table, NULL);
+
+	    Tcl_SetObjResult (interp, list);
+	    break;
+	}
+
+	case SUB_CLEAR: {
+	    apr_table_clear (table);
+	}
+    }
+
+    return TCL_OK;
+}
+
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -583,6 +828,7 @@ TCL_CMD_HEADER( Rivet_Upload )
 	"size",
 	"type",
 	"filename",
+	"tempname",
 	"names",
 	"tempname",
 	NULL
@@ -602,9 +848,12 @@ TCL_CMD_HEADER( Rivet_Upload )
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     command = Tcl_GetString(objv[1]);
-    Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
-			"channel|save|data|exists|size|type|filename|names|tempname",
-			0, &subcommandindex);
+    if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
+			"channel|save|data|exists|size|type|filename|names|tempname"
+			"|tempname|names",
+			0, &subcommandindex) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
 
     /* If it's any of these, we need to find a specific name. */
 
@@ -955,6 +1204,11 @@ Rivet_InitCore( Tcl_Interp *interp )
     Tcl_CreateObjCommand(interp,
 			 "var",
 			 Rivet_Var,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			 "apache_table",
+			 Rivet_ApacheTable,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
     Tcl_CreateObjCommand(interp,
