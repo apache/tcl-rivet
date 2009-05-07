@@ -309,6 +309,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
     rivet_server_conf *conf = Rivet_GetConf(req);
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    Tcl_Preserve (interp);
     if ( Tcl_EvalObjEx(interp, outbuf, 0) == TCL_ERROR ) {
         Tcl_Obj *errscript;
         Tcl_Obj *errorCodeListObj;
@@ -380,6 +381,7 @@ good:
     }
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(conf->outchannel));
+    Tcl_Release(interp);
 
     return TCL_OK;
 }
@@ -837,6 +839,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     rivet_interp_globals *globals = NULL;
 
     ap_assert (interp != (Tcl_Interp *)NULL);
+    Tcl_Preserve (interp);
 
     /* Create TCL commands to deal with Apache's BUFFs. */
     rsc->outchannel = apr_pcalloc(p, sizeof(Tcl_Channel));
@@ -863,7 +866,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
      * 
      * This is the old call for setting up the tcl environment.
      *
-     * if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL) {
+     * if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL)
      * 
      * We may revert to it if we can devise a mechanism that
      * links a specific installation to RivetTcl's version
@@ -879,8 +882,10 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
      * won't send any result packets to the browser unless the Rivet
      * programmer does a "flush stdout" or the page is completed.
      */
-    Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
+    // Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
+    Tcl_SetChannelBufferSize (*(rsc->outchannel), 1000000);
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
+    Tcl_Release(interp);
 }
 
 
@@ -1290,6 +1295,7 @@ Rivet_ChildHandlers(server_rec *s, int init)
                 ( sr == s || rsc->separate_virtual_interps ||
                   function != parentfunction))
         {
+	    Tcl_Preserve (rsc->server_interp);
             if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                         errmsg, Tcl_GetString(function));
@@ -1300,18 +1306,23 @@ Rivet_ChildHandlers(server_rec *s, int init)
 		        "errorInfo: %s",
                         Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
             }
-
-	/*
-	 * Upon child exit we delete each interpreter before the caller 
-	 * uses Tcl_Finalize 
-	 */
-
-	    if (!init) {
-	    	Tcl_DeleteInterp(rsc->server_interp);
-	    }
+	    Tcl_Release (rsc->server_interp);
 
         }
         sr = sr->next;
+
+	if (!init) {
+	    /*
+	     * Upon child exit we delete the master interpreter before the 
+	     * caller invokes Tcl_Finalize.  Even if we're running separate
+	     * virtual interpreters, we don't delete the slaves
+	     * as deleting the master implicitly deltes its slave interpreters.
+	     */
+	    rsc = RIVET_SERVER_CONF(s->module_config);
+	    if (!Tcl_InterpDeleted (rsc->server_interp)) {
+		Tcl_DeleteInterp(rsc->server_interp);
+	    }
+	}
     }
 }
 /*
@@ -1447,8 +1458,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
 			interpCount++);
 
                 /* Separate virtual interps. */
-                myrsc->server_interp = Tcl_CreateSlave(interp,
-                        slavename, 0);
+                myrsc->server_interp = Tcl_CreateSlave(interp, slavename, 0);
 		if (myrsc->server_interp == NULL) {
 		    ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
 			          "slave interp create failed: %s",

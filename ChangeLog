@@ -1,4 +1,16 @@
 2009-05-05 Karl Lehenbauer <karl@apache.org>
+    * src/apache-2/mod_rivet.c: When Rivet is shutting down and per-vhost
+      separate virtual interpreters were in use, the shutdown code deleted
+      the master interpreter and all of the slave interpreters using
+      Tcl_DepeteInterp().  This was an error as it should only delete the
+      mater interpreter, as deleting the master interpreter causes its
+      slaves to be deleted. It now does this.  (Had it checked using
+      Tcl_InterpDeleted to see if the interpreter was already marked as
+      deleted, it probably would have been OK.)
+
+    * src/rivetChannel.c - update Tcl channel handler to channel version 4.
+
+2009-05-05 Karl Lehenbauer <karl@apache.org>
     * Add new Rivet Tcl command,apache_table, which can query, get and set
       values in the Apache "notes", "headers_in", "headers_out",
       "err_headers_out" and "subprocess_env" tables.

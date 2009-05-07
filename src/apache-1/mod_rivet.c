@@ -1466,17 +1466,21 @@ Rivet_ChildHandlers(server_rec *s, pool *p, int init)
 		ap_log_error(APLOG_MARK, APLOG_ERR, s, "%s",
 			     Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
 	    }
-
-	/*
-	 * Upon child exit we delete each interpreter before the caller 
-	 * uses Tcl_Finalize 
-	 */
-
-	    if (!init) {
-	    	Tcl_DeleteInterp(rsc->server_interp);
-	    }
 	}
 	sr = sr->next;
+
+	if (!init) {
+	    /*
+	     * Upon child exit we delete the master interpreter before the 
+	     * caller invokes Tcl_Finalize.  Even if we're running separate
+	     * virtual interpreters, we don't delete the slaves
+	     * as deleting the master implicitly deltes its slave interpreters.
+	     */
+	    rsc = RIVET_SERVER_CONF(s->module_config);
+	    if (!Tcl_InterpDeleted (rsc->server_interp)) {
+		Tcl_DeleteInterp(rsc->server_interp);
+	    }
+	}
     }
 }
 
