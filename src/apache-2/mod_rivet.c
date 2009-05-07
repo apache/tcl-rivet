@@ -1281,12 +1281,15 @@ Rivet_ChildHandlers(server_rec *s, int init)
         //errmsg = (char *) apr_pstrdup(p, "Error in child exit script: %s");
     }
 
-    sr = s;
-    while (sr)
+    for (sr = s; sr; sr = sr->next)
     {
         rsc = RIVET_SERVER_CONF(sr->module_config);
         function = init ? rsc->rivet_child_init_script :
             rsc->rivet_child_exit_script;
+
+	if (!init && sr == s) {
+	    Tcl_Preserve(rsc->server_interp);
+	}
 
         /* Execute it if it exists and it's the top level, separate
          * virtual interps are turned on, or it's different than the
@@ -1309,20 +1312,20 @@ Rivet_ChildHandlers(server_rec *s, int init)
 	    Tcl_Release (rsc->server_interp);
 
         }
-        sr = sr->next;
+    }
 
-	if (!init) {
-	    /*
-	     * Upon child exit we delete the master interpreter before the 
-	     * caller invokes Tcl_Finalize.  Even if we're running separate
-	     * virtual interpreters, we don't delete the slaves
-	     * as deleting the master implicitly deltes its slave interpreters.
-	     */
-	    rsc = RIVET_SERVER_CONF(s->module_config);
-	    if (!Tcl_InterpDeleted (rsc->server_interp)) {
-		Tcl_DeleteInterp(rsc->server_interp);
-	    }
+    if (!init) {
+	/*
+	 * Upon child exit we delete the master interpreter before the 
+	 * caller invokes Tcl_Finalize.  Even if we're running separate
+	 * virtual interpreters, we don't delete the slaves
+	 * as deleting the master implicitly deltes its slave interpreters.
+	 */
+	rsc = RIVET_SERVER_CONF(s->module_config);
+	if (!Tcl_InterpDeleted (rsc->server_interp)) {
+	    Tcl_DeleteInterp(rsc->server_interp);
 	}
+	Tcl_Release (rsc->server_interp);
     }
 }
 /*
