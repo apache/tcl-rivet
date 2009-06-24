@@ -1,3 +1,16 @@
+
+2009-06-24 Karl Lehenbauer <karl@apache.org>
+    * acinclude.m4: Include m4/ax_prefix_config_h.m4 to define the
+      AX_PREFIX_CONFIG_H macro.
+
+    * tclconfig/libtool.m4, tclconfig/config.guess, tclconfig/config.sub,
+      tclconfig/ltmain.sh: Freshened these files with the latest versions
+      from libtool.
+
+    * configure.ac, tclconfig/tcl.m4, tclconfig/ChangeLog,
+      tclconfig/README.txt, tclconfig/install-sh: Updated to Tcl Extension
+      Architecture (TEA) 3.7.
+
 2009-05-05 Karl Lehenbauer <karl@apache.org>
     * src/apache-2/mod_rivet.c: When Rivet is shutting down and per-vhost
       separate virtual interpreters were in use, the shutdown code deleted

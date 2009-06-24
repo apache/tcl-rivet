@@ -23,7 +23,7 @@ dnl
 #-----------------------------------------------------------------------
 
 AC_INIT([Rivet],[0.8.0])
-TEA_INIT([3.6])
+TEA_INIT([3.7])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 AM_INIT_AUTOMAKE

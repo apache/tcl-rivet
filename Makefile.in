@@ -17,7 +17,7 @@
 #
 # top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
-# $Id: Makefile.am 609240 2008-01-06 00:15:55Z mxmanghi $
+# $Id: Makefile.am 734980 2009-01-16 11:42:19Z mxmanghi $
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
 #
@@ -43,14 +43,16 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure ChangeLog INSTALL TODO install-sh \
-	missing tclconfig/ChangeLog tclconfig/compile \
-	tclconfig/config.guess tclconfig/config.sub tclconfig/depcomp \
-	tclconfig/install-sh tclconfig/ltmain.sh tclconfig/missing
+	$(top_srcdir)/configure ChangeLog INSTALL TODO \
+	tclconfig/ChangeLog tclconfig/compile tclconfig/config.guess \
+	tclconfig/config.sub tclconfig/depcomp tclconfig/install-sh \
+	tclconfig/ltmain.sh tclconfig/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_prefix_config_h.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/tclconfig/tcl.m4 \
-	$(top_srcdir)/tclconfig/libtool.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/tclconfig/tcl.m4 \
+	$(top_srcdir)/tclconfig/libtool.m4 \
+	$(top_srcdir)/m4/ax_prefix_config_h.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -122,6 +124,7 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DL_LIBS = @DL_LIBS@
+DSYMUTIL = @DSYMUTIL@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -152,6 +155,7 @@ MAKE_STATIC_LIB = @MAKE_STATIC_LIB@
 MAKE_STUB_LIB = @MAKE_STUB_LIB@
 MATH_LIBS = @MATH_LIBS@
 MKDIR_P = @MKDIR_P@
+NMEDIT = @NMEDIT@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -173,6 +177,7 @@ RANLIB = @RANLIB@
 RANLIB_STUB = @RANLIB_STUB@
 RIVET_BASE_INCLUDE = @RIVET_BASE_INCLUDE@
 RIVET_TCL_TARGET = @RIVET_TCL_TARGET@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHARED_BUILD = @SHARED_BUILD@
 SHELL = @SHELL@
@@ -252,6 +257,7 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 with_apr_config = @with_apr_config@
@@ -715,12 +721,12 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 install-data-local:
-	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
-	cp -r rivet/* $(RIVETLIB_DESTDIR)
-	-( cd  $(RIVETLIB_DESTDIR) ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	$(mkinstalldirs) $(DESTDIR)$(RIVETLIB_DESTDIR)
+	cp -r rivet/* $(DESTDIR)$(RIVETLIB_DESTDIR)
+	-( cd  $(DESTDIR)$(RIVETLIB_DESTDIR) ; echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-local:
-	rm -fr $(RIVETLIB_DESTDIR)
+	rm -fr $(DESTDIR)$(RIVETLIB_DESTDIR)
 
 # 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
