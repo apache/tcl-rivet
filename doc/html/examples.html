@@ -1,0 +1,467 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="unescape_string.html" title="unescape_string"><link rel="next" href="tcl_packages.html" title="Rivet Tcl Packages"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="unescape_string.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="tcl_packages.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" title="Examples and Usage"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div></div><p style="width:90%">
+      Some examples of Rivet usage follow.  Some prior Tcl knowledge
+      is assumed.  If you don't know much Tcl, don't worry, it's easy,
+      and there are some good resources available on the web that will
+      get you up to speed quickly.  Go to the <a class="link" href="help.html#websites" title="Web Sites">web sites</a> section and have a look.
+    </p><div class="example"><a name="hello%20world"></a><p class="title"><b>Example 1. Hello World</b></p><div class="example-contents"><p style="width:90%">
+	As with any tool, it's always nice to see something work, so
+	let's create a small "Hello World" page.</p><p style="width:90%">
+	Assuming you have Apache configured correctly, create a file
+	called <code class="filename">hello.rvt</code> where Apache can find
+	it, with the following content:
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;?
+puts "Hello World"
+?&gt;
+</pre><p style="width:90%">
+	If you then access it with your browser, you should see a
+	blank page with the text "Hello World" (without the quotes) on
+	it.
+      </p></div></div><br class="example-break"><div class="example"><a name="id500984"></a><p class="title"><b>Example 2. Generate a Table</b></p><div class="example-contents"><p style="width:90%">
+	    In another simple example, we dynamically generate a table:
+	  </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;? puts "&lt;table&gt;\n"
+for {set i 1} { $i &lt;= 8 } {incr i} {
+    puts "&lt;tr&gt;\n"
+    for {set j 1} {$j &lt;= 8} {incr j} {
+        set num [ expr $i * $j * 4 - 1]
+        puts [ format "&lt;td bgcolor=\"%02x%02x%02x\" &gt; $num $num $num &lt;/td&gt;\n" \
+		   $num $num $num ]
+    }
+    puts "&lt;/tr&gt;\n"
+}
+puts "&lt;/table&gt;\n" ?&gt;
+</pre><p style="width:90%">
+	    If you read the code, you can see that this is pure Tcl.  We
+	    could take the same code, run it outside of Rivet, and it
+	    would generate the same HTML!
+	  </p><p style="width:90%">
+	    The result should look something like this:
+	  </p><div><img src="table.png"></div></div></div><br class="example-break"><div class="example"><a name="variable_access"></a><p class="title"><b>Example 3. Variable Access</b></p><div class="example-contents"><p style="width:90%">
+	Here, we demonstrate how to access variables set by GET or
+	POST operations.
+      </p><p style="width:90%">
+	Given an HTML form like the following:
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">     &lt;form action="vars.rvt"&gt;
+      &lt;table&gt;
+	&lt;tbody&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Title:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;&lt;input name="title"&gt;&lt;/td&gt;
+	  &lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Salary:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;&lt;input name="salary"&gt;&lt;/td&gt;
+	  &lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Boss:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;&lt;input name="boss"&gt;&lt;/td&gt;&lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;b&gt;Skills:&lt;/b&gt;&lt;/td&gt;
+	    &lt;td&gt;
+	      &lt;select name="skills" multiple="multiple"&gt;
+		&lt;option&gt;c&lt;/option&gt;
+		&lt;option&gt;java&lt;/option&gt;
+		&lt;option&gt;Tcl&lt;/option&gt;
+		&lt;option&gt;Perl&lt;/option&gt;
+	      &lt;/select&gt;
+	    &lt;/td&gt;
+	  &lt;/tr&gt;
+	  &lt;tr&gt;
+	    &lt;td&gt;&lt;input type="submit"&gt;&lt;/td&gt;
+	  &lt;/tr&gt;
+	&lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/form&gt;
+</pre><p style="width:90%">
+	We can use this Rivet script to get the variable values:
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;?
+set errlist {}
+if { [var exists title] } {
+    set title [var get title]
+} else {
+    set errlist "You need to enter a title"
+}
+
+if { [var exists salary] } {
+    set salary [var get salary]
+    if { ! [string is digit $salary] } {
+	lappend errlist "Salary must be a number"
+    }
+} else {
+    lappend errlist "You need to enter a salary"
+}
+
+if { [var exists boss] } {
+    set boss [var get boss]
+} else {
+    set boss "Mr. Burns"
+}
+
+if { [var exists skills] } {
+    set skills [var list skills]
+} else {
+    lappend errlist "You need to enter some skills"
+}
+
+if { [llength $errlist] != 0 } {
+    foreach err $errlist {
+	puts "&lt;b&gt; $err &lt;/b&gt;"
+    }
+} else {
+    puts "Thanks for the information!"
+    ?&gt;
+    &lt;table&gt;
+      &lt;tbody&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Title:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $title ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Boss:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $boss ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Salary:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $salary ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+	  &lt;td&gt;&lt;b&gt;Skills:&lt;/b&gt;&lt;/td&gt;
+	  &lt;td&gt;&lt;? puts $skills ?&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+    &lt;?
+}
+?&gt;
+</pre><p style="width:90%">
+	The first statement checks to make sure that the
+	<code class="varname">boss</code> variable has been passed to the
+	script, and then does something with that information.  If
+	it's not present, an error is added to the list of errors.
+      </p><p style="width:90%">
+	In the second block of code, the variable
+	<code class="varname">salary</code> is fetched, with one more error
+	check - because it's a number, it needs to be composed of
+	digits.
+      </p><p style="width:90%">
+	The <code class="varname">boss</code> variable isn't required to have
+	been sent - we set it to "Mr. Burns" if it isn't among the
+	information we received.
+      </p><p style="width:90%">
+	The last bit of variable handing code is a bit trickier.
+	Because <code class="varname">skills</code> is a listbox, and can
+	potentially have multiple values, we opt to receive them as a
+	list, so that at some point, we could iterate over them.
+      </p><p style="width:90%">
+	The script then checks to make sure that
+	<code class="varname">errlist</code> is empty and outputting a thankyou
+	message.  If <code class="varname">errlist</code> is not empty, the list
+	of errors it contains is printed.
+      </p></div></div><br class="example-break"><div class="example"><a name="file_upload"></a><p class="title"><b>Example 4. File Upload</b></p><div class="example-contents"><p style="width:90%">
+	The <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span> command endows Rivet with an
+	interface to access files transferred over http as parts of a
+	multipart form.  The following HTML in one file, say,
+	<code class="filename">upload.html</code> creates a form with a text
+	input entry. By clicking the file chooser button the file
+	browser shows up and the user selects the file to be uploaded
+	(the file path will appear in the text input).  In order to make
+	sure you're uploading the whole file you must combine the
+	action of the enctype and method attributes of the
+	&lt;form...&gt; tag in the way shown in the example.  Failure
+	to do so would result in the client sending only the file's
+	path, rather than the actual contents.
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;form action="foo.rvt" enctype="multipart/form-data" method="post"&gt;
+&lt;input type="file" name="MyUpload"&gt;&lt;/input&gt;
+&lt;input type="submit" value="Send File"&gt;&lt;/input&gt;
+&lt;/form&gt;
+</pre><p style="width:90%">
+	In the script invoked by the form
+	(<code class="filename">upload.rvt</code>) <span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span>
+	 ?<span style="font-family:monospace; font-weight: bold;">argument ...</span>? commands can be used to manipulate the
+	various files uploaded.
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;?
+upload save MyUpload /tmp/uploadfiles/file1
+puts "Saved file [upload filename MyUpload] \
+	([upload size MyUpload] bytes) to server"
+?&gt;</pre><p style="width:90%">
+	Don't forget that the apache server must have write access to
+	the directory where files are being created.  The Rivet Apache
+	directives have a substantial impact on the upload process,
+	you have to carefully read the docs in order to set the
+	appropriate directives values that would match your
+	requirements.
+      </p><p style="width:90%">
+	It is also important to understand that some 
+	<span style="font-family:monospace"><span class="command"><strong>upload</strong></span></span> commands are effective only when
+	used in a mutually exclusive way.  Apache stores the data in
+	temporary files which are read by the <span style="font-family:monospace"><span class="command"><strong>upload save
+	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? ?<span style="font-family:monospace; font-weight: bold;">filename</span>?</strong></span></span> or by the
+	<span style="font-family:monospace"><span class="command"><strong>upload data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span>
+	command. Subsequent calls to these 2 commands using the same
+	 ?<span style="font-family:monospace; font-weight: bold;">upload name</span>? argument will return no data on the
+	second call.  Likewise <span style="font-family:monospace"><span class="command"><strong>upload channel  ?<span style="font-family:monospace; font-weight: bold;">upload
+	name</span>?</strong></span></span> will return a Tcl file channel that you
+	can use in regular Tcl scripts only if you haven't already
+	read the data, for example with a call to the <span style="font-family:monospace"><span class="command"><strong>upload
+	data  ?<span style="font-family:monospace; font-weight: bold;">upload name</span>?</strong></span></span> command.
+      </p></div></div><br class="example-break"><div class="example"><a name="file_download"></a><p class="title"><b>Example 5. File Download</b></p><div class="example-contents"><p style="width:90%">
+	In general setting up a data file for being sent over http is 
+	as easy as determining the file's URI and letting Apache's
+	do all that is needed. If this approach fits your design all 
+	you have to do is to keep the downloadable files somewhere 
+	within Apache's DocumentRoot (or in any of the directories 
+	Apache has right to access).
+      </p><p style="width:90%">
+	When a client sends a request for a file, Apache takes
+	care of determining the filetype, sends appropriate headers to
+	the client and then the file content. The client is responsible
+	for deciding how to handle the data accordingly to the 
+	"content-type" headers and its internal design. For example
+	when browsers give up trying to display a certain "content-type"
+	they display a download dialog box asking for directions from
+	the user. 
+      </p><p style="width:90%">
+	Rivet can help if you have more sofisticated needs.  For
+	instance you may be developing an application that uses
+	webpages to collect input data. This information might be
+	passed on to scripts or programs for processing. 
+	In this case a real file representing the
+	data doesn't exist and the content is generated on demand 
+	by the server. 
+	In other circumstances you may need to dynamically inhibit 
+	the download of specific files and hide them away, 
+	Your scripts may expunge from the pages
+	every link to these files (your pages are dynamic, aren't
+	they?) and move them out of way, but it looks like a
+	cumbersome solution.
+      </p><p style="width:90%">
+	Putting Tcl and Rivet in charge of the whole download
+	mechanism helps in building cleaner and safer approaches to
+	the download problem.
+      </p><p style="width:90%">
+	In this example a procedure checks for the existence of a
+	parameter passed in by the browser. The parameter is the name
+	(without extension) of a pdf file.  
+	Pdf files are stored in a directory whose path is
+	in the <span style="font-family:monospace"><span class="command"><strong>pdf_repository</strong></span></span> variable.
+      </p><p style="width:90%">
+	This code is reported as an example of how to control 
+	the protocol using the <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> command.
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting"># Code example for the transmission of a pdf file. 
+
+if {[var exists pdfname]} {
+    set pdfname [var get pdfname]
+
+# let's build the full path to the pdf file. The 'pdf_repository'
+# directory must be readable by the apache children
+
+    set pdf_full_path [file join $pdf_repository ${pdfname}.pdf]
+    if {[file exists $pdf_full_path]} {
+
+# Before the file is sent we inform the client about the file type and
+# file name. The client can be proposed a filename different from the
+# original one. In this case, this is the point where a new file name
+# must be generated.
+
+	headers type			"application/pdf"
+	headers add Content-Disposition "attachment; filename=${pdfname}.pdf"
+	headers add Content-Description "PDF Document"
+
+# The pdf is read and stored in a Tcl variable. The file handle is
+# configured for a binary read: we are just shipping raw data to a
+# client. The following 4 lines of code can be replaced by any code
+# that is able to retrieve the data to be sent from any data source
+# (e.g. database, external program, other Tcl code)
+
+	set paper	    [open $pdf_full_path r]
+	fconfigure	    $paper -translation binary
+	set pdf		    [read $paper]
+	close $paper
+
+# Now we got the data: let's tell the client how many bytes we are
+# about to send (useful for the download progress bar of a dialog box)
+
+	headers add Content-Length  [string length $pdf]
+
+# Let's send the actual file content
+
+	puts $pdf
+    } else {
+	source pdf_not_found_error.rvt
+    }
+} else {
+    source parameter_not_defined_error.rvt
+}
+</pre><p style="width:90%">
+	Before the pdf is sent the procedure sets the
+	<code class="constant">Content-Type</code>, 
+	<code class="constant">Content-Disposition</code>,
+	<code class="constant">Content-Description</code> and
+	<code class="constant">Content-Length</code> headers to inform
+	the client about the file type, name and size. Notice that in
+	order to set the <code class="constant">Content-Type</code> header Rivet 
+	uses a specialiezed form of the <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> 
+	command. Headers must be sent before data gets sent down the 
+	output channel. Messing with this prescription causes an error 
+	to be raised (in fact the protocol itself is been violated)
+      </p><p style="width:90%">
+	More information about the meaning of the mime headers in the
+	http context can be found at 
+	<a class="ulink" href="http://www.w3.org/Protocols/rfc2616/rfc2616.html" target="_top">http://www.w3.org/Protocols/rfc2616/rfc2616.html</a>
+      </p></div></div><br class="example-break"><div class="example"><a name="ajax_xml_messaging"></a><p class="title"><b>Example 6. XML Messages and Ajax</b></p><div class="example-contents"><p style="width:90%">
+	The <span style="font-family:monospace"><span class="command"><strong>headers</strong></span></span> command is crucial for generating 
+	XML messages that have to be understood by JavaScript code used 
+	in Ajax applications. 
+      </p><p style="width:90%">
+	Ajax is a web programming technique that heavily relies on the 
+	abilty of JavaScript (and other scriping languages like VBScript) to 
+	manipulate dynamically the HTML structure of a page. In modern browsers 
+	JavaScript code is enabled to send GET or POST requests to the webserver.
+	These requests can request the server to run scripts (for example Rivet
+	Tcl scripts) that build responses and to be sent back to the browser.
+	JavaScript code reads asynchronously these responses, elaborates
+	their content and accordingly modifies the page on display. 
+	Ajax helps to build web applications that are more responsive and 
+	flexible, if you can cope with the complexities, subtleties and 
+	incompatibilities even among the most common browsers available. 
+	Instead of going through the cycle of request-generation-transfer
+	of a page, Ajax allows the programmer to request and transmit only
+	the essential data thus matching the general requirement of separation
+	between data and user interface (and saving the server from sending over
+	the same html code and graphics when only a fraction of a page has
+	to be refreshed)
+      </p><p style="width:90%">
+	In Ajax	applications the communication between client and server 
+	is controlled by an instance of a specialized object: the non-IE world
+	(Firefox,Safari,Opera...) uses the XMLHttpRequest class to create it, 
+	whereas IE uses the ActiveXObject class.
+      	</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+	    With the release of IE7 Microsoft introduced native support for 
+	    <a class="ulink" href="http://blogs.msdn.com/ie/archive/2006/01/23/516393.aspx" target="_top">
+	    XMLHttpRequest</a> class objects
+      	</td></tr></table></div><p style="width:90%">	
+	By creating an instance of this class a POST or GET request can be sent 
+	to the server, whose response is stored in a 
+	property ('returnedText') of the communication object. 
+	It's become widely customary to encode in XML messages the response
+	from the server to the browser. A number of XML specification are 
+	being used for this, among which XML-RPC and SOAP are worth to be 
+	quoted. Anyway, you can invent your own message definitions
+	(either based on XML or anything else), but one has to be aware of 
+	the fact that if the http headers are properly set and the message 
+	returned to the client is a well formed XML fragment, also the property 
+	<a class="ulink" href="http://www.w3schools.com/ajax/ajax_responsexml.asp" target="_top">
+	XMLResponse</a> is set with a reference to an object 
+	that represent the
+	<a class="ulink" href="http://www.w3schools.com/dom/default.asp" target="_top">
+	DOM</a> of the XML response. 
+	By means of the XML W3C DOM tree methods and properties
+	you can write scripts that read and manipulate the data embedded in 
+	the XML message.
+      </p><p style="width:90%">
+        In this example a Rivet script initializes an array with the
+	essential data regarding a few of the major composers of the 
+	european music. This array plays the role of a database
+	which, in a real case, has is a real DBM which stores large 
+	tables with thousands records and more complex and 
+	extended information. 
+	The script is designed to send back to the client two 
+	types of responses: a catalog of the composers or a single 
+	record of a composer.
+      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting"># The database array contains xml fragments representing the
+# results of queries to a database. Many databases are now able
+# to produce the results of a query in XML. 
+#
+#array unset composer
+#
+set	composer(1)	"&lt;composer&gt;\n"
+append  composer(1)     "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
+append  composer(1)	"    &lt;last_name&gt;Monteverdi&lt;/last_name&gt;\n"
+append	composer(1)	"    &lt;lifespan&gt;1567-1643&lt;/lifespan&gt;\n"
+append	composer(1)	"    &lt;era&gt;Renaissance/Baroque&lt;/era&gt;\n"
+append	composer(1)	"    &lt;key&gt;1&lt;/key&gt;\n"
+append	composer(1)	"&lt;/composer&gt;\n"
+
+set	composer(2)	"&lt;composer&gt;\n"
+append  composer(2)     "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
+append  composer(2)	"    &lt;last_name&gt;Bach&lt;/last_name&gt;\n"
+append	composer(2)	"    &lt;lifespan&gt;1685-1750&lt;/lifespan&gt;\n"
+append	composer(2)	"    &lt;era&gt;Baroque&lt;/era&gt;\n"
+append	composer(2)	"    &lt;key&gt;2&lt;/key&gt;\n"
+append	composer(2)	"&lt;/composer&gt;\n"
+
+set	composer(3)	"&lt;composer&gt;\n"
+append  composer(3)     "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
+append  composer(3)	"    &lt;last_name&gt;van Beethoven&lt;/last_name&gt;\n"
+append	composer(3)	"    &lt;lifespan&gt;1770-1827&lt;/lifespan&gt;\n"
+append	composer(3)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
+append	composer(3)	"    &lt;key&gt;3&lt;/key&gt;\n"
+append	composer(3)	"&lt;/composer&gt;\n"
+
+set	composer(4)	"&lt;composer&gt;\n"
+append  composer(4)     "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
+append  composer(4)	"    &lt;last_name&gt;Mozart&lt;/last_name&gt;\n"
+append	composer(4)	"    &lt;lifespan&gt;1756-1791&lt;/lifespan&gt;\n"
+append	composer(4)	"    &lt;era&gt;Classical&lt;/era&gt;\n"
+append	composer(4)	"    &lt;key&gt;4&lt;/key&gt;\n"
+append	composer(4)	"&lt;/composer&gt;\n"
+
+set	composer(5)	"&lt;composer&gt;\n"
+append  composer(5)     "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
+append  composer(5)	"    &lt;last_name&gt;Schumann&lt;/last_name&gt;\n"
+append	composer(5)	"    &lt;lifespan&gt;1810-1856&lt;/lifespan&gt;\n"
+append	composer(5)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
+append	composer(5)	"    &lt;key&gt;5&lt;/key&gt;\n"
+append	composer(5)	"&lt;/composer&gt;\n"
+
+# we use the 'load' argument in order to determine the type of query
+#
+# load=catalog:		    we have to return a list of the names in the database
+# load=composer&amp;res_id=&lt;id&gt;: the script is supposed to return the record
+#			    having &lt;id&gt; as record id
+
+if {[var exists load]} {
+
+# the xml declaration is common to every message (error messages included)
+
+    set xml "&lt;?xml version=\"1.0\" encoding=\"ISO-8859-1\"?&gt;\n"
+    switch [var get load] {
+	catalog {
+	    append xml "&lt;catalog&gt;\n"
+	    foreach nm [array names composer] {
+	    	if {[regexp {&lt;last_name&gt;(.+)&lt;/last_name&gt;}   $composer($nm) m last_name] &amp;&amp; \
+		    [regexp {&lt;first_name&gt;(.+)&lt;/first_name&gt;} $composer($nm) m first_name]} {
+	            append xml "    &lt;composer key='$nm'&gt;$first_name $last_name&lt;/composer&gt;\n"
+		}
+	    }
+	    append xml "&lt;/catalog&gt;"
+	}
+	composer {
+	    if {[var exists rec_id]} {
+		set rec_id [var get rec_id]
+		if {[info exists composer($rec_id)]} {
+		    append xml $composer($rec_id)
+		}
+	    }
+	}
+    }
+
+# we have to tell the client this is an XML message. Failing to do so
+# would result in an XMLResponse property set to null
+
+    headers type "text/xml"
+    headers add Content-Length [string length $xml]
+    puts $xml
+}
+
+</pre><p style="width:90%">
+	For sake of brevity the JavaScript and HTML will not listed here. 
+	They can be downloaded (along with the Tcl script) stored in the 
+	<a class="ulink" href="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz" target="_top">
+	rivet-ajax.tar.gz</a> archive. By simply 
+	opening this tar archive in a directory accessible by your
+	apache server and pointing your browser to the rivetService.html
+	page you should see a page with a drop-down list. Every time
+	a different name is picked from the list a new query is sent and 
+	logged in the apache access.log file, even though the html 
+	is never reloaded.
+      </p></div></div><br class="example-break"></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="unescape_string.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="tcl_packages.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">unescape_string </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Tcl Packages</td></tr></table></div></body></html>

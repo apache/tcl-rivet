@@ -14,8 +14,7 @@
       <step>
 	<title>Get Rivet</title>
 	<para>
-	  Download the sources at <ulink
-	    url="http://tcl.apache.org/rivet/download"/>.  Currently
+	  Download the sources at <ulink url="http://tcl.apache.org/rivet/download.html"/>.  Currently
 	  the only way to obtain Rivet.  In the future, we hope to
 	  have a FreeBSD port, Debian package, RPM's, and windows
 	  binaries.
@@ -140,7 +139,9 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	  adding the module itself:
 	</para>
 
-	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable></programlisting>
+	<programlisting>LoadModule rivet_module	
+	    <replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable>
+	</programlisting>
 
 	<para>
 	  This tells Apache to load the Rivet shared object, wherever
