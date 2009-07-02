@@ -287,9 +287,7 @@
 		  If a HEAD requests is issued by the client Rivet detects
 		  this case and sends back to the client a standard header 
 		  response. If the real header has to be examined (e.g. 
-		  for debugging) you can turn on this options which 
-		  causes Rivet to parse and run the script the requests refers 
-		  to. In this case the real header is returned to the client.
+		  for debugging) you can turn this options on. 
 		</para>
 		<para>This option is, by nature, only available at the global level</para>
 	      </listitem>
@@ -315,8 +313,8 @@
 	    These options are the same as for
 	    <command>RivetServerConf</command>, except that they are
 	    only valid for the directory where they are specified, and
-	    its subdirectories.  It may be specified in
-	    <command>Directory</command> sections.
+	    its subdirectories.  It may be specified in <command>Directory</command> 
+	    sections.
 	  </para>
 	</listitem>
       </varlistentry>

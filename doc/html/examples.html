@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="unescape_string.html" title="unescape_string"><link rel="next" href="tcl_packages.html" title="Rivet Tcl Packages"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="unescape_string.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="tcl_packages.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" title="Examples and Usage"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Examples and Usage</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="unescape_string.html" title="unescape_string"><link rel="next" href="tcl_packages.html" title="Rivet Tcl Packages"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Examples and Usage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="unescape_string.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="tcl_packages.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="examples"></a>Examples and Usage</h2></div></div></div><p style="width:90%">
       Some examples of Rivet usage follow.  Some prior Tcl knowledge
       is assumed.  If you don't know much Tcl, don't worry, it's easy,
       and there are some good resources available on the web that will
@@ -16,7 +16,7 @@ puts "Hello World"
 	If you then access it with your browser, you should see a
 	blank page with the text "Hello World" (without the quotes) on
 	it.
-      </p></div></div><br class="example-break"><div class="example"><a name="id500984"></a><p class="title"><b>Example 2. Generate a Table</b></p><div class="example-contents"><p style="width:90%">
+      </p></div></div><br class="example-break"><div class="example"><a name="id2732097"></a><p class="title"><b>Example 2. Generate a Table</b></p><div class="example-contents"><p style="width:90%">
 	    In another simple example, we dynamically generate a table:
 	  </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">&lt;? puts "&lt;table&gt;\n"
 for {set i 1} { $i &lt;= 8 } {incr i} {
@@ -312,62 +312,42 @@ if {[var exists pdfname]} {
 	XML messages that have to be understood by JavaScript code used 
 	in Ajax applications. 
       </p><p style="width:90%">
-	Ajax is a web programming technique that heavily relies on the 
-	abilty of JavaScript (and other scriping languages like VBScript) to 
-	manipulate dynamically the HTML structure of a page. In modern browsers 
-	JavaScript code is enabled to send GET or POST requests to the webserver.
-	These requests can request the server to run scripts (for example Rivet
-	Tcl scripts) that build responses and to be sent back to the browser.
-	JavaScript code reads asynchronously these responses, elaborates
-	their content and accordingly modifies the page on display. 
-	Ajax helps to build web applications that are more responsive and 
-	flexible, if you can cope with the complexities, subtleties and 
-	incompatibilities even among the most common browsers available. 
-	Instead of going through the cycle of request-generation-transfer
-	of a page, Ajax allows the programmer to request and transmit only
-	the essential data thus matching the general requirement of separation
-	between data and user interface (and saving the server from sending over
-	the same html code and graphics when only a fraction of a page has
-	to be refreshed)
-      </p><p style="width:90%">
-	In Ajax	applications the communication between client and server 
-	is controlled by an instance of a specialized object: the non-IE world
-	(Firefox,Safari,Opera...) uses the XMLHttpRequest class to create it, 
-	whereas IE uses the ActiveXObject class.
-      	</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
-	    With the release of IE7 Microsoft introduced native support for 
-	    <a class="ulink" href="http://blogs.msdn.com/ie/archive/2006/01/23/516393.aspx" target="_top">
-	    XMLHttpRequest</a> class objects
-      	</td></tr></table></div><p style="width:90%">	
-	By creating an instance of this class a POST or GET request can be sent 
-	to the server, whose response is stored in a 
-	property ('returnedText') of the communication object. 
-	It's become widely customary to encode in XML messages the response
-	from the server to the browser. A number of XML specification are 
-	being used for this, among which XML-RPC and SOAP are worth to be 
-	quoted. Anyway, you can invent your own message definitions
-	(either based on XML or anything else), but one has to be aware of 
-	the fact that if the http headers are properly set and the message 
-	returned to the client is a well formed XML fragment, also the property 
-	<a class="ulink" href="http://www.w3schools.com/ajax/ajax_responsexml.asp" target="_top">
-	XMLResponse</a> is set with a reference to an object 
-	that represent the
-	<a class="ulink" href="http://www.w3schools.com/dom/default.asp" target="_top">
-	DOM</a> of the XML response. 
-	By means of the XML W3C DOM tree methods and properties
-	you can write scripts that read and manipulate the data embedded in 
-	the XML message.
-      </p><p style="width:90%">
-        In this example a Rivet script initializes an array with the
-	essential data regarding a few of the major composers of the 
-	european music. This array plays the role of a database
-	which, in a real case, has is a real DBM which stores large 
-	tables with thousands records and more complex and 
-	extended information. 
-	The script is designed to send back to the client two 
-	types of responses: a catalog of the composers or a single 
-	record of a composer.
-      </p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting"># The database array contains xml fragments representing the
+	    Ajax is a web programming technique that heavily relies on the abilty of a web browser to run in backround
+	    JavaScript functions. JavaScript functions can be run as callbacks of events generated by a user interaction 
+	    but they can also react to other I/O events, for example network events. 
+	    Modern browsers endow JavaScript with the ability to build http GET/POST requests to be sent to a remote
+	    webserver. Generally these requests refer to scripts (e.g. Tcl scripts run by Rivet) which inherit as 
+	    variables the arguments encoded in the request. 
+	    The output produced by these scripts is sent back to the browser where callbacks functions extract 
+	    information and hand it down to functions that directly manipulate a page's DOM.
+	    Therefore through Ajax becomes possible to build web applications that are more responsive and flexible: 
+	    instead of going through the cycle of request-generation-transfer-display 
+	    of a whole page, Ajax scripts request from a webserver only the essential data to be displayed.
+	    Ajax emphasizes the requirement of separation between data and user interface, saves 
+	    the server from sending over the same html code and graphics if only a fraction of a page has to be 
+	    updated, allows the programmer to design flexible solutions for complex forms and makes possible
+	    to find new innovative approaches to simple problems (e.g. Google tips that show up as you type in
+	    a query). A downside of this approach is the large number of complexities, subtleties and incompatibilities 
+	    that still exist in the way different versions of popular browsers handle the DOM elements of a page.
+	</p><p style="width:90%">
+	    JavaScript can handle the communication between client and server through an instance of a 
+	    specialized object. For quite a long time 2 approaches existed, the non-IE world (Firefox,Safari,Opera...) 
+	    used the XMLHttpRequest class to create this object, whereas IE (before IE7) used the ActiveXObject class.
+	    With the release of IE7 Microsoft introduced native support for XMLHttpRequest class objects thus enabling
+	    programmers with a unique method for the development of dynamic pages. 
+	</p><p style="width:90%">
+	    By creating an instance of this class a POST or GET request can be sent to the server and the response is 
+	    stored in a property ('returnedText') of the communication object. It's become widely customary to encode 
+	    these responses in XML messages. You can invent your own message structure (either based on XML or anything 
+	    else), but one has to be aware that if the http headers are properly set and the message returned to the 
+	    client is a well formed XML fragment, also the property XMLResponse is assigned with a reference to an object 
+	    that represents the DOM of the XML response. By means of the XML W3C DOM interface the programmer can easily
+	    manipulate the data embedded in the XML message.
+	</p><p style="width:90%">
+	    In this example a Rivet script initializes an array with the essential data regarding a few of the major 
+	    composers of the european music. This array plays the role of a database. The script sends back to the 
+	    client two types of responses: a catalog of the composers or a single record of a composer.
+	</p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting"># The database array contains xml fragments representing the
 # results of queries to a database. Many databases are now able
 # to produce the results of a query in XML. 
 #
@@ -454,14 +434,10 @@ if {[var exists load]} {
 }
 
 </pre><p style="width:90%">
-	For sake of brevity the JavaScript and HTML will not listed here. 
-	They can be downloaded (along with the Tcl script) stored in the 
-	<a class="ulink" href="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz" target="_top">
-	rivet-ajax.tar.gz</a> archive. By simply 
-	opening this tar archive in a directory accessible by your
-	apache server and pointing your browser to the rivetService.html
-	page you should see a page with a drop-down list. Every time
-	a different name is picked from the list a new query is sent and 
-	logged in the apache access.log file, even though the html 
-	is never reloaded.
-      </p></div></div><br class="example-break"></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="unescape_string.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="tcl_packages.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">unescape_string </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Tcl Packages</td></tr></table></div></body></html>
+	    For sake of brevity the JavaScript and HTML will not listed here. They can be downloaded (along with the Tcl 
+	    script) stored in the <a class="ulink" href="http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz" target="_top">rivet-ajax.tar.gz</a> archive. 
+	    By simply opening this tar archive in a directory accessible 
+	    by your apache server and pointing your browser to the rivetService.html page you should see a page with a 
+	    drop-down list. Every time a different name is picked from the list a new query is sent and logged in the 
+	    apache access.log file, even though the html is never reloaded.
+	</p></div></div><br class="example-break"></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="unescape_string.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="tcl_packages.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">unescape_string </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Rivet Tcl Packages</td></tr></table></div></body></html>

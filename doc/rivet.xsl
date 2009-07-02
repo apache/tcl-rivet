@@ -27,7 +27,7 @@
   <xsl:param name="navig.graphics" select="1"/>
   <xsl:param name="navig.graphics.extension" select="'.png'"/>
   <xsl:param name="admon.graphics" select="1"/>
-  <xsl:param name="generate.section.toc.level" select="1"/>
+  <xsl:param name="generate.section.toc.level" select="2"/>
   <xsl:param name="refentry.separator" select="1"/>
   <xsl:param name="generate.toc">article toc,title,example</xsl:param>
 

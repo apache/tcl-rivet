@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Apache Directives</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.1"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="installation.html" title="Apache Rivet Installation"><link rel="next" href="commands.html" title="Rivet Tcl Commands and Variables"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Apache Directives</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="installation.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="commands.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" title="Rivet Apache Directives"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="directives"></a>Rivet Apache Directives</h2></div></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Rivet Apache Directives</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><link rel="start" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="installation.html" title="Apache Rivet Installation"><link rel="next" href="commands.html" title="Rivet Tcl Commands and Variables"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Rivet Apache Directives</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="installation.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="commands.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" lang="en"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="directives"></a>Rivet Apache Directives</h2></div></div></div><p style="width:90%">
       These directives are used within the Apache httpd server
       configuration files to modify Apache Rivet's behavior.  Their
       precedence is as follows: <span style="font-family:monospace"><span class="command"><strong>RivetDirConf</strong></span></span>,
@@ -65,7 +65,7 @@
 		  to put it in a GlobalInitScript
 		  ChildInitScript when you are first
 		  developing a web site.
-		  <div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+		  <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
 		    This code is evaluated at the global level, not
 		    inside the request namespace where pages are
 		    evaluated.
@@ -126,17 +126,15 @@
 		  If a HEAD requests is issued by the client Rivet detects
 		  this case and sends back to the client a standard header 
 		  response. If the real header has to be examined (e.g. 
-		  for debugging) you can turn on this options which 
-		  causes Rivet to parse and run the script the requests refers 
-		  to. In this case the real header is returned to the client.
+		  for debugging) you can turn this options on. 
 		</div><div style="margin-bottom:1.5ex ; padding .5ex">This option is, by nature, only available at the global level</div></div></dd></dl></div></div></dd><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">RivetDirConf</span>  (<span style="font-family:monospace; font-weight: bold;">BeforeScript</span> | <span style="font-family:monospace; font-weight: bold;">AfterScript</span> | <span style="font-family:monospace; font-weight: bold;">ErrorScript</span> | <span style="font-family:monospace; font-weight: bold;">UploadDirectory</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
 	    These options are the same as for
 	    <span style="font-family:monospace"><span class="command"><strong>RivetServerConf</strong></span></span>, except that they are
 	    only valid for the directory where they are specified, and
-	    its subdirectories.  It may be specified in
-	    <span style="font-family:monospace"><span class="command"><strong>Directory</strong></span></span> sections.
+	    its subdirectories.  It may be specified in <span style="font-family:monospace"><span class="command"><strong>Directory</strong></span></span> 
+	    sections.
 	  </div></div></dd><dt><span class="term">
 	  <div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">RivetUserConf</span>  (<span style="font-family:monospace; font-weight: bold;">BeforeScript</span> | <span style="font-family:monospace; font-weight: bold;">AfterScript</span> | <span style="font-family:monospace; font-weight: bold;">ErrorScript</span> | <span style="font-family:monospace; font-weight: bold;">UploadDirectory</span>)</div></div>
 	</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
