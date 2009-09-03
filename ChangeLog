@@ -1,3 +1,6 @@
+2009-09-03 Karl Lehenbauer <karl@apache.org>
+    * src/apache-2/rivetCore.c: Add new command, apache_log_error, which
+      allows consistent logging to the Apache error log file.
 
 2009-06-24 Karl Lehenbauer <karl@apache.org>
     * acinclude.m4: Include m4/ax_prefix_config_h.m4 to define the

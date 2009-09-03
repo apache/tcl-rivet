@@ -947,5 +947,213 @@
       </refsect1>
     </refentry>
 
-</section>
+    <refentry id="apache_log_error">
+      <refnamediv>
+	<refname>apache_log_error</refname>
+	<refpurpose>log messages to the Apache error log</refpurpose>
+      </refnamediv>
 
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>apache_log_error</command>
+	    <arg>priority</arg>
+	    <arg>message</arg>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>The apache_log_error command logs a message to the 
+	  Apache error log, whose name and location have been
+	  set by the <option>ErrorLog</option> directive.
+	</para>
+	<para>
+	Priority must be one of
+	    <option>debug</option>,
+	    <option>info</option>,
+	    <option>notice</option>,
+	    <option>warning</option>,
+	    <option>err</option>,
+	    <option>crit</option>,
+	    <option>alert</option>, or
+	    <option>emerg</option>.
+	</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="apache_table">
+      <refnamediv>
+	<refname>apache_table</refname>
+	<refpurpose>access and manipulate Apache tables in the request structure.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<cmdsynopsis>
+	  <command>apache_table</command>
+	  <group choice="req">
+	    <arg>get</arg>
+	    <arg>set</arg>
+	    <arg>exists</arg>
+	    <arg>unset</arg>
+	    <arg>names</arg>
+	    <arg>array_get</arg>
+	    <arg>clear</arg>
+	  </group>
+	</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+	<para>The apache_table command is for accessing and manipulating
+	  Apache tables in the request structure.
+	</para>
+	<para>
+	The table name must be one of
+	    <option>notes</option>,
+	    <option>headers_in</option>,
+	    <option>headers_out</option>,
+	    <option>err_headers_out</option>, or
+	    <option>subprocess_env</option>.
+	</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">get</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		When given the name of an Apache table
+		<option><replaceable>tablename</replaceable></option>
+		and the name of a key
+		<option><replaceable>tablename</replaceable></option>,
+		returns the value of the key in the table, or an empty
+		string.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">set</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+		<arg><replaceable>value</replaceable></arg>
+	      </cmdsynopsis>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">set</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+		<arg><replaceable>list</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Stores the
+		<option><replaceable>value</replaceable></option> in
+		the table
+		<option><replaceable>tablename</replaceable></option>
+		under the key
+		<option><replaceable>key</replaceable></option>.
+	      </para>
+	      <para>
+	        For the list form,
+		<option><replaceable>list</replaceable></option> contains
+		a list of zero or more pairs of key-value pairs to be
+		set into the table
+		<option><replaceable>tablename</replaceable></option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">exists</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns 1 if the specified key,
+		<option><replaceable>key</replaceable></option>,
+		exists in table
+		<option><replaceable>tablename</replaceable></option>,
+		else 0.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">unset</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+		<arg><replaceable>key</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+	        Removes the key-value pair referenced by
+		<option><replaceable>key</replaceable></option>
+		from the table
+		<option><replaceable>tablename</replaceable></option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">names</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Returns a list of all of the keys present in the table
+		<option><replaceable>tablename</replaceable></option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">array_get</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+	        Returns a list of key-value pairs from the table
+		<option><replaceable>tablename</replaceable></option>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      <cmdsynopsis>
+		<command>apache_table</command>
+		<arg choice="plain">clear</arg>
+		<arg><replaceable>tablename</replaceable></arg>
+	      </cmdsynopsis>
+	    </term>
+	    <listitem>
+	      <para>
+		Clears the contents of the specified table.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+</section>

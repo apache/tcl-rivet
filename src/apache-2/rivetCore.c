@@ -567,9 +567,15 @@ append_key_value_callback (void *data, const char *key, const char *val)
  *
  *	apache_table get tablename key
  *      apache_table set tablename key value
+ *      apache_table set tablename list
  *      apache_table exists tablename key
  *      apache_table unset tablename key
- *      apache_table list tablename
+ *      apache_table names tablename
+ *      apache_table array_get tablename
+ *      apache_table clear tablename
+ *
+ *      Table names can be "notes", "headers_in", "headers_out",
+ *      "err_headers_out", and "subprocess_env".
  *
  * Results:
  *	A standard Tcl result.
@@ -1121,6 +1127,116 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
     return TCL_OK;
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_LogError --
+ *
+ * 	Log an error from Rivet
+ *
+ *	log_error priority message
+ *
+ *        priority can be one of "emerg", "alert", "crit", "err",
+ *            "warning", "notice", "info", "debug"
+ *
+ * Results:
+ *      A message is logged to the Apache error log.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_LogErrorCmd )
+{
+    char *loglevel = NULL;
+    char *message = NULL;
+
+    server_rec *serverRec;
+
+    int loglevelindex;
+    int  apLogLevel = 0;
+
+    static CONST84 char *logLevel[] = {
+	"emerg",
+	"alert",
+	"crit",
+	"err",
+	"warning",
+	"notice",
+	"info",
+	"debug",
+	NULL
+    };
+
+    enum loglevel {
+	EMERG,
+	ALERT,
+	CRIT,
+	ERR,
+	WARNING,
+	NOTICE,
+	INFO,
+	DEBUG
+    };
+
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    if( objc != 3 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "loglevel message" );
+	return TCL_ERROR;
+    }
+
+    loglevel = Tcl_GetString(objv[1]);
+    message = Tcl_GetString (objv[2]);
+    if (Tcl_GetIndexFromObj(interp, objv[1], logLevel,
+			"emerg|alert|crit|err|warning|notice|info|debug",
+			0, &loglevelindex) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    switch ((enum loglevel)loglevelindex)
+    {
+      case EMERG:
+        apLogLevel = APLOG_EMERG;
+	break;
+
+      case ALERT:
+        apLogLevel = APLOG_ALERT;
+        break;
+
+      case CRIT:
+        apLogLevel = APLOG_CRIT;
+        break;
+
+      case ERR:
+        apLogLevel = APLOG_ERR;
+        break;
+
+      case WARNING:
+        apLogLevel = APLOG_WARNING;
+        break;
+
+      case NOTICE:
+        apLogLevel = APLOG_NOTICE;
+        break;
+
+      case INFO:
+        apLogLevel = APLOG_INFO;
+        break;
+
+      case DEBUG:
+        apLogLevel = APLOG_DEBUG;
+        break;
+    }
+
+    /* if we are serving a page, we know our server, 
+     * else send null for server
+     */
+    serverRec = (globals->r == NULL) ? NULL : globals->r->server;
+
+    ap_log_error (APLOG_MARK, apLogLevel, 0, serverRec, "%s", message);
+    return TCL_OK;
+}
+
 #define TESTPANIC 0
 
 #ifdef TESTPANIC
@@ -1186,69 +1302,88 @@ Rivet_InitCore( Tcl_Interp *interp )
 			 Rivet_MakeURL,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "headers",
 			 Rivet_Headers,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "load_env",
 			 Rivet_LoadEnv,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "load_headers",
 			 Rivet_LoadHeaders,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "var",
 			 Rivet_Var,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "apache_table",
 			 Rivet_ApacheTable,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "var_qs",
 			 Rivet_Var,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "var_post",
 			 Rivet_Var,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "raw_post",
 			 Rivet_RawPost,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "upload",
 			 Rivet_Upload,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "include",
 			 Rivet_Include,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "parse",
 			 Rivet_Parse,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "no_body",
 			 Rivet_NoBody,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
+
     Tcl_CreateObjCommand(interp,
 			 "env",
 			 Rivet_EnvCmd,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+
+    Tcl_CreateObjCommand(interp,
+			 "apache_log_error",
+			 Rivet_LogErrorCmd,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
 
