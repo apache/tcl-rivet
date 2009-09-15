@@ -1,3 +1,10 @@
+2009-09-15 Karl Lehenbauer <karl@apache.org>
+    * rivet/packages/form/form.tcl: If the array containing default values
+      for the form is passed in when the form is created
+      (for instance: form myform -defaults response -method post),
+      make sure form classes public variable "defaults" is set to
+      that array name.
+
 2009-09-03 Karl Lehenbauer <karl@apache.org>
     * src/apache-2/rivetCore.c: Add new command, apache_log_error, which
       allows consistent logging to the Apache error log file.

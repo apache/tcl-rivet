@@ -34,6 +34,10 @@ package provide form 1.0
 	import_data form $this arguments $args
 
 	if {[info exists arguments(defaults)]} {
+	    # make the public variable contain the name of the array
+	    # we are sucking default values out of
+	    set defaults $arguments(defaults)
+
 	    upvar 1 $arguments(defaults) defaults
 	    array set DefaultValues [array get defaults]
 	    unset arguments(defaults)
