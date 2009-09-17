@@ -1,3 +1,10 @@
+2009-09-17 Karl Lehenbauer <karl@apache.org>
+    * rivet/packages/form/form.tcl, form.txt: Add a new form method, "button",
+      that's just like "submit" except pressing enter doesn't cause it to be 
+      invoked.  Add quick doc, form.txt, on the forms package.
+
+      Terminate <option> with </option> in form selectors.
+
 2009-09-15 Karl Lehenbauer <karl@apache.org>
     * rivet/packages/form/form.tcl: If the array containing default values
       for the form is passed in when the form is created

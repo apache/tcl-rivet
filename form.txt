@@ -1,0 +1,163 @@
+Super quick doc on the Rivet form package.
+
+Forms directly emit HTML so if you want to format them in a table or
+something, you've got to be emitting your table around your form calls.
+See the example.
+
+The supported field types are:
+
+	checkbox
+
+	text
+
+	password
+
+	hidden
+
+	submit
+
+	button
+
+	reset
+
+	image
+
+	radiobuttons
+
+	select
+
+	textarea
+
+
+
+
+form myform -defaults tag -method post -action view_photo.rvt
+
+    This defines a form called "myform", says that default values can be
+    taken from an array named "tag", specifies that the submit method
+    will be "post" and that the view_photo.rvt URL will be invoked
+    upon submission.
+
+myform start
+
+    This starts emitting the form.  It will generate the "<form>" HTML.
+
+myform text tail -size 8 -maxlength 20
+
+    This defines a single line text entry box.
+
+myform textarea description -cols 60 -rows 8
+
+    This defines a multiline text box.
+
+
+myform select part_of_day -labels [list "" Day Dawn Dusk Night] -values [list "" day dawn dusk night]  -style "width: 160px;"
+
+    This defines a dropbox.  The labels of each entry will be blank,
+    Day, Dawn, Dusk, Night, and the values sent in the field named
+    "part_of_day" will correspondingly be blank, day, dawn, dusk and
+    night.
+
+    If values is not set, the labels will be used.
+
+
+myform radiobuttons station -labels [list "" KUHF KLOL KRBE KLBJ] -values [list "" kuhg klol krbe klbj]
+
+    If values is not set, the labels will be used.
+
+myform hidden upload_id -value $uploadID
+
+    This specifies a hidden field named upload_id and assigns a value to
+    it as the contents of the variable uploadID.
+
+
+myform submit Tag
+
+    This creates the submit button for the form and calls it Tag.
+
+myform button Tag
+
+    This creates a clickable button for the form and calls it Tag.  Unlike
+    a submit element, button elements are not invoked if the user presses
+    "Enter".
+
+myform cancel
+
+    This create the cancel button for the form.
+
+myform end
+
+    This ends the form and is mandatory.  It generates the HTML to
+    complete the form.
+
+
+myform destroy
+
+    This gets rid of the form object.
+
+FILE UPLOADING
+
+There isn't a form type in forms at this time for uploading a file, however
+you can do it by emitting something like:
+
+    <input type="file" name="media" size="40">
+
+
+
+EXAMPLE
+
+package require form
+
+form myform -defaults response -method get -name feedsearch
+
+    myform start
+
+puts "<table>"
+puts "<tr>"
+
+puts "<td>"
+    myform select codebase -values [list stable beta] -labels [list Stable Beta]
+puts "</td>"
+
+puts "<td>"
+    myform select type -values [list xmlparsed parsed] -labels [list XML T1]
+puts "</td>"
+
+puts "<td>ident</td><td>"
+myform text ident -size 8
+puts "</td>"
+
+puts "<td>"
+myform select startMonth -values "1 2 3 4 5 6 7 8 9 10 11 12"
+puts "</td>"
+
+puts "<td>"
+myform select startDay -values "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+20 21 22 23 24 25 26 27 28 29 30 31"
+puts "</td>"
+
+puts "<td>"
+myform select startYear -values "2005 2006 2007 2008"
+puts "</td>"
+
+puts "<td>days</td>"
+
+puts "<td>"
+myform select days -values "1 2 3"
+puts "</td>"
+
+puts "<td>"
+myform submit submit -value Search
+puts "</td>"
+
+puts "</tr>"
+puts "</table>"
+
+emit_toggle_all_function
+emit_toggle_buttons
+
+
+    myform end
+
+    myform destroy
+

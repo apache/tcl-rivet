@@ -259,6 +259,13 @@ package provide form 1.0
     }
 
     #
+    # button -- emit an HTML "button" field
+    #
+    method button {name args} {
+	eval field button $name $args
+    }
+
+    #
     # reset -- emit an HTML "reset" button
     #
     method reset {name args} {
@@ -358,7 +365,7 @@ package provide form 1.0
 	    } else {
 		set string "<option value=\"$value\">"
 	    }
-	    html $string$label
+	    html "$string$label</option>"
 	}
 	html "</select>"
     }
