@@ -247,17 +247,38 @@ proc apachetest::getallincludes { conffile } {
 	    foreach line [split $data \n] {
 		# Look for Include lines.
 		if { [regexp -line {^[^\#]*Include +(.*)} $line match file] } {
+		    puts "including files from $file"
 		    set file [string trim $file]
-		    # Since directories may be included, glob them for all
-		    # files contained therein.
-		    if { [file isdirectory $file] } {
-			foreach fl [glob -nocomplain [file join $file *]] {
+
+		    # Include directives accept as argument a file, a directory
+		    # or a glob-style file matching pattern. Patterns usually match
+		    # many files, but are not directories, so we have to handle 
+		    # all these 3 cases
+
+		    # we use the glob command to tell whether we are dealing with
+		    # a pure file expression or a matching pattern
+
+		    set matched_files [glob -nocomplain $file]
+		    set matched_files_n [llength $matched_files]
+		    if {$matched_files_n > 1} {
+			foreach fl $matched_files {
+			    puts "including $fl"
 			    if [file  exists $fl] {
 				    append newdata [getallincludes $fl]
 			    }
 			}
-		    } else {
-			append newdata [getallincludes $file]
+		    } elseif {$matched_files_n == 1} {
+			set file $matched_files
+			if { [file isdirectory $file] } {
+			    foreach fl [glob -nocomplain [file join $file *]] {
+				puts "including $fl"
+				if [file  exists $fl] {
+					append newdata [getallincludes $fl]
+				}
+			    }
+			} else {
+			    append newdata [getallincludes $file]
+			}
 		    }
 		}
 	    }
@@ -284,19 +305,24 @@ proc apachetest::getallincludes { conffile } {
 
 
 proc apachetest::getloadmodules { conffile needtoget } {
+    puts "checking $conffile "
     set confdata [getallincludes $conffile]
     set loadline [list]
     regexp -line {^[^#]*(ServerRoot[\s]?[\"]?)([^\"]+)()([\"]?)} $confdata \
     match sub1 server_root_path sub2 
     foreach mod $needtoget {
     	# Look for LoadModule lines.
+	puts -nonewline "check conf line for $mod module..."
+	flush stdout
         if { ! [regexp -line "^\[^\#\]*(LoadModule\\s+$mod\\s+.+)\$"\
                 $confdata match line] } {
-            error "No LoadModule line for $mod!"
+            error "No LoadModule line for $mod\!"
         } else {
-			set raw_path [join [lrange [split $line { }] 2 end]]
-			#trimming leading whitespaces
-			set path [string trimleft $raw_path]
+	    puts ok
+
+	    set raw_path [join [lrange [split $line { }] 2 end]]
+	    #trimming leading whitespaces
+	    set path [string trimleft $raw_path]
             if ![string equal [file pathtype $line] "absolute"] {
                 set absolute_path [file join $server_root_path $path]
                 lappend loadline "[join [lrange [split $line " "]  0 1]] $absolute_path"

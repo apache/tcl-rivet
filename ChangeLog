@@ -1,3 +1,7 @@
+2009-09-02 Massimo Manghi <mxmanghi@apache.org>
+    * tests/apachetest/apachetest.tcl: apachetest::getallincludes failed to
+    properly handle glob style file patterns. 
+
 2009-09-17 Karl Lehenbauer <karl@apache.org>
     * rivet/packages/form/form.tcl, form.txt: Add a new form method, "button",
       that's just like "submit" except pressing enter doesn't cause it to be 

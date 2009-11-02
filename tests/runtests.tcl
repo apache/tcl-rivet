@@ -21,6 +21,7 @@
 
 set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] apachetest]]
 
+puts stderr "runtests.tcl is running with auto_path: $auto_path"
 
 proc runtests_usage {} {
     puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver?"
@@ -40,8 +41,10 @@ proc get_httpd_version {httpd} {
 if { [llength $argv] < 1 } {
     runtests_usage
 } else {
-	set httpd_version [get_httpd_version  [lindex $argv 0]]
+    set httpd_version [get_httpd_version  [lindex $argv 0]]
 }
+
+puts stderr "Tests will be run against apache${httpd_version}"
 
 package require apachetest
 
@@ -65,11 +68,11 @@ if { [catch {
 if {$httpd_version == 1} {
 	apachetest::need_modules {
 		{mod_log_config		config_log_module}
-		{mod_mime			mime_module}
+		{mod_mime		mime_module}
 		{mod_negotiation	negotiation_module}
-		{mod_dir			dir_module}
-		{mod_auth			auth_module}
-		{mod_access			access_module}
+		{mod_dir		dir_module}
+		{mod_auth		auth_module}
+		{mod_access		access_module}
 	}
 } else {
 	apachetest::need_modules {
