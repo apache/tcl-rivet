@@ -836,7 +836,6 @@ TCL_CMD_HEADER( Rivet_Upload )
 	"filename",
 	"tempname",
 	"names",
-	"tempname",
 	NULL
     };
 
@@ -848,8 +847,8 @@ TCL_CMD_HEADER( Rivet_Upload )
 	SIZE,
 	TYPE,
 	FILENAME,
-	NAMES,
-	TEMPNAME
+	TEMPNAME,
+	NAMES
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -863,7 +862,8 @@ TCL_CMD_HEADER( Rivet_Upload )
 
     /* If it's any of these, we need to find a specific name. */
 
-    /* Excluded cases are EXISTS and NAMES. */
+    /* Excluded case is NAMES. */
+
     if ((enum subcommand)subcommandindex == CHANNEL 	||
 	(enum subcommand)subcommandindex == SAVE 	||
 	(enum subcommand)subcommandindex == DATA 	||
