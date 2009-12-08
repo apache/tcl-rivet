@@ -360,35 +360,35 @@ package provide form 1.0
     # search -- emit an HTML 5 "search" form field
     #
     method search {name args} {
-        eval search range $name $args
+        eval field search $name $args
     }
 
     #
     # tel -- emit an HTML 5 "tel" form field
     #
     method tel {name args} {
-        eval tel range $name $args
+        eval field tel $name $args
     }
 
     #
     # time -- emit an HTML 5 "time" form field
     #
     method time {name args} {
-        eval time range $name $args
+        eval field time $name $args
     }
 
     #
     # url -- emit an HTML 5 "url" form field
     #
     method url {name args} {
-        eval url range $name $args
+        eval field url $name $args
     }
 
     #
     # week -- emit an HTML 5 "week" form field
     #
     method week {name args} {
-        eval week range $name $args
+        eval field week $name $args
     }
 
     #
