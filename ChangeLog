@@ -1,3 +1,9 @@
+2009-12-08 Karl Lehenbauer <karl@apache.org>
+    * rivet/packages/form/form.tcl, form.txt: Add new form methods for HTML 5
+      form elements "color", "date", "datetime", "datetime_local", "email",
+      "file", "image", "month", "number", "range", "search", "tel", "time",
+      "url", "week"
+
 2009-11-03 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: in function Rivet_Upload the list of subcommands
     had 2 entries for 'tempname" leading Tcl_GetIndexfromObject to mismatch the entry for

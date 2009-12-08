@@ -294,6 +294,111 @@ package provide form 1.0
     }
 
     #
+    # color -- emit an HTML 5 "color" form field
+    #
+    method color {name args} {
+        eval field color $name $args
+    }
+
+    #
+    # date -- emit an HTML 5 "date" form field
+    #
+    method date {name args} {
+        eval field date $name $args
+    }
+
+    #
+    # datetime -- emit an HTML 5 "datetime" form field
+    #
+    method datetime {name args} {
+        eval field datetime $name $args
+    }
+
+    #
+    # datetime_local -- emit an HTML 5 "datetime-local" form field
+    #
+    method datetime_local {name args} {
+        eval field datetime-local $name $args
+    }
+
+    #
+    # email -- emit an HTML 5 "email" form field
+    #
+    method email {name args} {
+        eval field email $name $args
+    }
+
+    #
+    # file -- emit an HTML 5 "file" form field
+    #
+    method file {name args} {
+        eval field email $name $args
+    }
+
+    #
+    # image -- emit an HTML 5 "image" form field
+    #
+    method image {name args} {
+        eval field image $name $args
+    }
+
+    #
+    # month -- emit an HTML 5 "month" form field
+    #
+    method month {name args} {
+        eval field month $name $args
+    }
+
+    #
+    # number -- emit an HTML 5 "number" form field
+    #
+    method number {name args} {
+        eval field number $name $args
+    }
+
+    #
+    # range -- emit an HTML 5 "range" form field
+    #
+    method range {name args} {
+        eval field range $name $args
+    }
+
+    #
+    # search -- emit an HTML 5 "search" form field
+    #
+    method search {name args} {
+        eval search range $name $args
+    }
+
+    #
+    # tel -- emit an HTML 5 "tel" form field
+    #
+    method tel {name args} {
+        eval tel range $name $args
+    }
+
+    #
+    # time -- emit an HTML 5 "time" form field
+    #
+    method time {name args} {
+        eval time range $name $args
+    }
+
+    #
+    # url -- emit an HTML 5 "url" form field
+    #
+    method url {name args} {
+        eval url range $name $args
+    }
+
+    #
+    # week -- emit an HTML 5 "week" form field
+    #
+    method week {name args} {
+        eval week range $name $args
+    }
+
+    #
     # radiobuttons -- 
     #
     method radiobuttons {name args} {

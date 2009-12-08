@@ -28,6 +28,38 @@ The supported field types are:
 
 	textarea
 
+And the new HTML 5 types that may not be in every browser (but are in the
+iPhone):
+
+	color
+
+	date
+
+	datetime
+
+	datetime_local
+
+	email
+
+	file
+
+	image
+
+	month
+
+	number
+
+	range
+
+	search
+
+	tel
+
+	time
+
+	url
+
+	week
 
 
 
