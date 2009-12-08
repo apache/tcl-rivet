@@ -336,13 +336,6 @@ package provide form 1.0
     }
 
     #
-    # image -- emit an HTML 5 "image" form field
-    #
-    method image {name args} {
-        eval field image $name $args
-    }
-
-    #
     # month -- emit an HTML 5 "month" form field
     #
     method month {name args} {
