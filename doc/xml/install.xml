@@ -94,11 +94,11 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 		  </listitem>
 		</varlistentry>
 		<varlistentry>
-		  <term>--with-apache-version</term>
+		  <term>--with-apache-version=[1|2]</term>
 		  <listitem>
 		    <para>
-			This option's value must be either 1 or 2, meaning you want to build Rivet for
-			Apache 1.x or Apache 2.x servers.
+			This option tells the build scripts whether you want to build Rivet for the
+			Apache 1.x or Apache 2.x server.
 		    </para>
 		  </listitem>
 		</varlistentry>
@@ -129,10 +129,13 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 		</varlistentry>
 	      </variablelist>
 	    </para>
-
-	<programlisting>cd src/
-./configure --with-tcl=/usr/lib/tcl8.4/ --with-tclsh=/usr/bin/tclsh8.4 \
-	    --with-apxs=/usr/bin/apxs
+	    <para>
+		Example: configuring the build system to compile Rivet for an apache 2.x server, using tcl8.5 and
+		specifying a custom name for the apxs program. 
+	    </para>
+	<programlisting>
+./configure --with-tcl=/usr/lib/tcl8.5/ --with-tclsh=/usr/bin/tclsh8.5 \
+	    --with-apxs=/usr/bin/apxs2 --with-apache=/usr --with-apache-version=2
 	</programlisting>
 	  </step>
 	  <step>
@@ -164,8 +167,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	  adding the module itself:
 	</para>
 
-	<programlisting>LoadModule rivet_module	
-	    <replaceable>/usr/lib/apache/1.3/mod_rivet.so</replaceable>
+	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache2/modules/mod_rivet.so</replaceable>
 	</programlisting>
 
 	<para>
@@ -185,8 +187,7 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</para>
 	<para>
 	  The characters encoding can be changed using the <command>header type</command> command,
-	  but if you want to change the default charset for the whole site or directory hierarchy  
-	  a new charset can be embedded in a AddType line in a way similar to the html pages encoding.
+	  but you can also change the default charset for the whole site:
 	</para>
 	<programlisting>AddType 'application/x-httpd-rivet;charset=utf-8' rvt</programlisting>
 	<para>
