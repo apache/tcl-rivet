@@ -9,7 +9,7 @@ set testfilename1 upload.rvt
     set data [read $fl]
     close $fl
 
-    set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n${bound}--"
+    set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n--${bound}--"
 
     set page [::http::geturl "${urlbase}$testfilename1" \
 		  -type "multipart/form-data; boundary=$bound" -query $outputData]
@@ -17,7 +17,7 @@ set testfilename1 upload.rvt
     set ret [string trim [::http::data $page]]
     ::http::cleanup $page
     set ret
-} {uploadtest 1 42747  AngeloFish.jpg}
+} {uploadtest 1 42747 -- AngeloFish.jpg}
 
 set testfilename1 uploadsave.rvt
 
@@ -29,7 +29,7 @@ set testfilename1 uploadsave.rvt
     set data [read $fl]
     close $fl
 
-    set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n${bound}--"
+    set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n--${bound}--"
 
     set page [::http::geturl "${urlbase}$testfilename1" \
 		  -type "multipart/form-data; boundary=$bound" -query $outputData]

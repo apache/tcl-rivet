@@ -1,3 +1,9 @@
+2010-04-19 Massimo Manghi <mxmanghi@apache.org>
+    * tests/upload.[rvt|test]: fix upload message sent to server. The end boundary
+	went undetected and Rivet added it to the uploaded file. Thus the problem
+	affected only the test, not the module. Added delimiter to the returned 
+	message to allow easy spotting of an empty string.
+
 2009-12-08 Karl Lehenbauer <karl@apache.org>
     * rivet/packages/form/form.tcl, form.txt: Add new form methods for HTML 5
       form elements "color", "date", "datetime", "datetime_local", "email",

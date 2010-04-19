@@ -1,5 +1,2 @@
-<?
+<? puts "[upload names] [upload exists uploadtest] [upload size uploadtest] -[upload type uploadtest]- [upload filename uploadtest]" ?>
 
-puts "[upload names] [upload exists uploadtest] [upload size uploadtest] [upload type uploadtest] [upload filename uploadtest]"
-
-?>
