@@ -4,19 +4,17 @@
       <step>
 	<title>Check Dependencies</title>
 	<para>
-	  To install Rivet, you will need Tcl 8.4 or greater and
-	  Apache 1.3.xx.  It is known to run on Linux, FreeBSD,
-	  OpenBSD, and Solaris and HPUX.  Windows NT is also possible
-	  - please see the directions in the distribution.  Note that
-	  Rivet does not currently work with Apache 2.
+	  To install Rivet, you will need Tcl 8.4 or greater. Rivet can be compiled to work 
+	  with either Apache 1.3.xx or Apache 2.2.xx server.
+	  It is known to run on Linux, FreeBSD, OpenBSD, Solaris and HPUX. Windows NT is also possible
+	  - please see the directions in the distribution.  
 	</para>
       </step>
       <step>
 	<title>Get Rivet</title>
 	<para>
 	  Download the sources at <ulink url="http://tcl.apache.org/rivet/download.html"/>.  Currently
-	  the only way to obtain Rivet.  In the future, we hope to
-	  have a FreeBSD port, Debian package, RPM's, and windows
+	  the only way to obtain Rivet.  In the future, we hope to have a FreeBSD port, Debian package, RPM's, and windows
 	  binaries.
 	</para>
       </step>
@@ -25,27 +23,22 @@
 	<para>
 	  If you don't have Tcl already, you need it!  If you already
 	  have it, you should just be able to use your system Tcl as
-	  long as it is recent.  You can tell Rivet where Tcl is via
-	  the <option>-with-tclconfig</option> option to
-	  <command>configure.tcl</command> (see below).</para>
+	  long as it is recent.  You can tell Rivet build scripts where Tcl is via
+	  the <option>--with-tcl</option> option to <command>configure</command> (see below).
+	</para>
       </step>
       <step performance="optional">
 	<title>Get and Install Apache Sources</title>
 	<para>
-          Rivet needs some Apache include (.h) files in order to
-	  build.  The easiest way to get them is to download the
-	  source code of the Apache web server, although some systems
-	  (Debian GNU/Linux for example) make it possible to install
-	  only the headers and other development files.  If you intend
-	  to build Rivet statically (compiled into the Apache web
-	  server instead of loaded dynamically), you definitely need
-	  the sources.  We recommend that you build Rivet as a
-	  loadable shared library, for maximum flexibility, meaning
-	  that you also build Apache to be able to load modules.
-	  Other than that, the default Apache install is fine.  We
-	  will tell Rivet where it is located via the
-	  <option>-with-apxs</option> option to
-	  <command>configure.tcl</command> (see below).
+          Rivet needs some Apache include (.h) files in order to build.  The easiest way 
+	  to get them is to download the source code of the Apache web server, although some systems
+	  (Debian GNU/Linux for example) make it possible to install only the headers and other 
+	  development files.  If you intend to build Rivet statically (compiled into the Apache web
+	  server instead of loaded dynamically), you definitely need the sources.  
+	    We recommend that you build Rivet as a loadable shared library, for maximum flexibility,
+	    meaning that you also build Apache to be able to load modules. Other than that, 
+	    the default Apache install is fine.  We will tell Rivet where it is located via the 
+	    <option>--with-apxs</option> option to <command>configure</command> (see below).
 	</para>
 	<para>
           The source code for the Apache web server may be found by
@@ -74,8 +67,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	      ./configure ; make ; make install technique.
 	    </para>
 	    <para>
-	      There are several options to configure that might be useful
-	      or necessary:
+	      There are several rivet specific options to configure that might be useful (or needed):
 	      <variablelist>
 		<varlistentry>
 		  <term>--with-tcl</term>
@@ -98,8 +90,42 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 		  <listitem>
 		    <para>The location of the <filename>apxs</filename>
 		      program that provides information about the
-		      configuration and compilation of Apache modules.</para>
+		      configuration and compilation options of Apache modules.</para>
 		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-apache-version</term>
+		  <listitem>
+		    <para>
+			This option's value must be either 1 or 2, meaning you want to build Rivet for
+			Apache 1.x or Apache 2.x servers.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--with-apache-include[=DIR]</term>
+		  <listitem>
+		    <para>
+			    Locates the Apache include files on your computer, if they're not in standard directory. 
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>--enable-version-display=[yes|no]</term>
+		  <listitem>
+		    <para>
+			This option enables Rivet to display its version in the logfiles when Apache is started. 
+			The default is to keep Rivet version hidden.
+		    </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		    <term>--with-rivet-target-dir=DIR</term>
+		    <listitem>
+			<para>
+			    This option tells the install script where Rivet's Tcl packages have to be copied. 
+			</para>
+		    </listitem>
 		</varlistentry>
 	      </variablelist>
 	    </para>
@@ -107,8 +133,7 @@ tar -xvf tcl-rivet-X.X.X.tar.gz</programlisting>
 	<programlisting>cd src/
 ./configure --with-tcl=/usr/lib/tcl8.4/ --with-tclsh=/usr/bin/tclsh8.4 \
 	    --with-apxs=/usr/bin/apxs
-</programlisting>
-
+	</programlisting>
 	  </step>
 	  <step>
 	    <title>Run make</title>
@@ -165,8 +190,8 @@ AddType application/x-rivet-tcl .tcl</programlisting>
 	</para>
 	<programlisting>AddType 'application/x-httpd-rivet;charset=utf-8' rvt</programlisting>
 	<para>
-	   Pages which this configuration applies to send back to the client
-	   a <command>Content-Type:'text/html;charset=utf-8'</command> header.
+	   All the pages generated by Rivet on this site will be sent with a 
+	    <command>Content-Type:'text/html;charset=utf-8'</command> header.
 	</para>
 	<para>You may also wish to use Rivet files as index files for
 	directories.  In that case, you would do the following:</para>
