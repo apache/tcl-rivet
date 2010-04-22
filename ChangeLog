@@ -1,3 +1,7 @@
+2010-04-22 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl: add to auto_path the directory where init.tcl is located, as this
+    is also the directory for package Rivet
+
 2010-04-19 Massimo Manghi <mxmanghi@apache.org>
     * tests/upload.[rvt|test]: fix upload message sent to server. The end boundary
 	went undetected and Rivet added it to the uploaded file. Thus the problem
