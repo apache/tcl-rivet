@@ -21,7 +21,7 @@
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <rivet_config.h>
 #endif
 
 #include "httpd.h"
@@ -47,6 +47,7 @@
 #define COOKIES_ARRAY_NAME "cookies"
 
 extern module rivet_module;
+extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 #define POOL (globals->r->pool)
 
@@ -578,6 +579,7 @@ TCL_CMD_HEADER( Rivet_Upload )
 	"size",
 	"type",
 	"filename",
+	"tempname",
 	"names",
 	NULL
     };
@@ -590,24 +592,26 @@ TCL_CMD_HEADER( Rivet_Upload )
 	SIZE,
 	TYPE,
 	FILENAME,
+	TEMPNAME,
 	NAMES
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
     command = Tcl_GetString(objv[1]);
     Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
-			"channel|save|data|exists|size|type|filename|names",
+			"channel|save|data|exists|size|type|filename|tempname|names",
 			0, &subcommandindex);
 
     /* If it's any of these, we need to find a specific name. */
 
-    /* Excluded cases are EXISTS and NAMES. */
-    if ((enum subcommand)subcommandindex == CHANNEL ||
-	(enum subcommand)subcommandindex == SAVE ||
-	(enum subcommand)subcommandindex == DATA ||
-	(enum subcommand)subcommandindex == EXISTS ||
-	(enum subcommand)subcommandindex == SIZE ||
-	(enum subcommand)subcommandindex == TYPE ||
+    /* Excluded case is NAMES. */
+    if ((enum subcommand)subcommandindex == CHANNEL	||
+	(enum subcommand)subcommandindex == SAVE	||
+	(enum subcommand)subcommandindex == DATA	||
+	(enum subcommand)subcommandindex == EXISTS	||
+	(enum subcommand)subcommandindex == SIZE	||
+	(enum subcommand)subcommandindex == TYPE	||
+	(enum subcommand)subcommandindex == TEMPNAME	||
 	(enum subcommand)subcommandindex == FILENAME)
     {
 	varname = Tcl_GetString(objv[2]);
@@ -685,6 +689,9 @@ TCL_CMD_HEADER( Rivet_Upload )
 	    return TCL_ERROR;
 	}
 	TclWeb_UploadNames(result, globals->req);
+	break;
+    case TEMPNAME:
+	TclWeb_UploadTempname(result,globals->req);
 	break;
     default:
 	Tcl_WrongNumArgs(interp, 1, objv,

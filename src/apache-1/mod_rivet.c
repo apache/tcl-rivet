@@ -17,7 +17,7 @@
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <rivet_config.h>
 #endif
 
 /* Apache includes */
@@ -752,8 +752,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
 
     /* Create TCL commands to deal with Apache's BUFFs. */
     rsc->outchannel = ap_pcalloc(p, sizeof(Tcl_Channel));
-    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc,
-					   TCL_WRITABLE);
+    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc, TCL_WRITABLE);
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
 
@@ -782,7 +781,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
      * links a specific installation to RivetTcl's version
      */
 
-    if (Tcl_EvalFile(interp,RIVETLIB_DESTDIR"/init.tcl") == TCL_ERROR) {
+    if (Tcl_EvalFile(interp,RIVET_RIVETLIB_DESTDIR"/init.tcl") == TCL_ERROR) {
 	ap_log_error( APLOG_MARK, APLOG_ERR, s,
 		      "init.tcl must be installed correctly for Apache Rivet to function: %s",
 		      Tcl_GetStringResult(interp) );
@@ -858,7 +857,7 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     server_rec *sr;
 
     /* Initialize TCL stuff  */
-    Tcl_FindExecutable(NAMEOFEXECUTABLE);
+    Tcl_FindExecutable(RIVET_NAMEOFEXECUTABLE);
     interp = Tcl_CreateInterp();
 
     if (interp == NULL)
@@ -1534,13 +1533,13 @@ Rivet_ChildExit(server_rec *s, pool *p)
 
 
 MODULE_VAR_EXPORT void
-Rivet_InitHandler(server_rec *s, pool *p)
+Rivet_InitHandler(server_rec *s, pool *pPool)
 {
-#ifndef HIDE_RIVET_VERSION
-    ap_add_version_component("Rivet/"VERSION);
+#if RIVET_DISPLAY_VERSION
+    ap_add_version_component(RIVET_PACKAGE_NAME"/"RIVET_PACKAGE_VERSION);
 #else
-    ap_add_version_component("Rivet");
-#endif /* !HIDE_RIVET_VERSION */
+    ap_add_version_component(RIVET_PACKAGE_NAME);
+#endif /* RIVET_DISPLAY_VERSION */
 }
 
 const handler_rec rivet_handlers[] =

@@ -316,7 +316,7 @@ static int ap_unescape_url_u(char *url)
 	return OK;
 }
 
-static int urlword_dlm[] = {'&', ';', 0};
+// static int urlword_dlm[] = {'&', ';', 0};
 
 static char *my_urlword(pool *p, const char **line)
 {
@@ -409,7 +409,7 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
 	    return rc;
 	}
 	if (data) {
-	    req->raw_post = data; /* Give people a way of getting at the raw data. */
+	    req->raw_post = (char *) data; /* Give people a way of getting at the raw data. */
 	    split_to_parms(req, data);
 	}
     }

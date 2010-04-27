@@ -26,7 +26,7 @@
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <rivet_config.h>
 #endif
 
 #include <tcl.h>
@@ -535,6 +535,14 @@ int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
     } else {
 	return TCL_ERROR;
     }
+}
+
+int TclWeb_UploadTempname(Tcl_Obj *tempname, TclWebRequest *req)
+{
+    Tcl_SetStringObj(tempname,
+		     TclWeb_StringToUtf(req->upload->tempname,
+					req), -1);
+    return TCL_OK;
 }
 
 int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
