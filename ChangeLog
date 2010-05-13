@@ -1,3 +1,9 @@
+2010-05-13 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-1/TclWebapache.c: call to ap_send_http_headers centralized in TclWeb_SendHeaders
+    * src/apache-2/TclWebapache.c: bugfix for string assigned to the content_type field that has to
+	be duplicated to preserve from memory deallocation by Tcl, includes to modules from apache APR
+	library added, call to ap_send_http_headers centralized in TclWeb_SendHeaders
+ 
 2010-04-29 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_multipart_buffer.c: Add include <apr_string.h> to silence a compilation
     warning.

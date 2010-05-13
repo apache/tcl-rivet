@@ -100,7 +100,10 @@ TclWeb_PrintHeaders(TclWebRequest *req)
     if (req->headers_set == 0)
 	TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
 
-    ap_send_http_header(req->req);
+//  Call to 'ap_send_http_header(req->req)' centralized in TclWeb_SendHeaders
+
+    TclWeb_SendHeaders (req);
+
     req->headers_printed = 1;
     return TCL_OK;
 }
