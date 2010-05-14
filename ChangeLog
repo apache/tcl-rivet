@@ -1,3 +1,6 @@
+2010-05-14 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/install-sh: the install-sh script is replaced with the same script shipped with automake-1.11
+
 2010-05-13 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-1/TclWebapache.c: call to ap_send_http_headers centralized in TclWeb_SendHeaders
     * src/apache-2/TclWebapache.c: bugfix for string assigned to the content_type field that has to
