@@ -9,3 +9,15 @@ docs in HTML are more thorough and extensive.
 See LICENSE for licensing terms.
 
 $Id$
+
+
+			    KNOWN PROBLEMS
+			    ==============
+
+
+ - Rivet is reported to conflict with cgi scripts on some Linux machines.
+Symptom of the problem is when cgi scripts hang forever and don't send contents
+to the client
+
+ 
+

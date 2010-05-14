@@ -1,17 +1,19 @@
-			  Rivet Installation
-			  ==================
+			  Rivet 2.0 Installation
+			  ======================
 
 For more detailed instructions, see the docs/html/ directory.
 
 Rivet is now based on the autotools - autoconf, automake and libtool,
 and so compilation is simple.  For example:
 
-if you have a clean source tree you have to prepare it for autotools
+1) If you're building from the rivet-$(VERSION).tar.gz archive
+you can skip the next step, if you have a clean source tree obtained 
+from svn you have to prepare it for autotools. 
 
   aclocal
   autoreconf
 
-and then run 'configure' with the switches that suit your setup
+2) run 'configure' with the switches that suit your setup
 
 ./configure --with-tcl=/usr/lib/tcl8.4/ 	\
 	    --with-apxs=/usr/bin/apxs 		\
@@ -20,12 +22,16 @@ and then run 'configure' with the switches that suit your setup
 make
 make install
 
+Below it's also reported an example to build rivet for Apache 2.2 on
+a Debian machine.
+
 Along with the usual 'configure' variables Rivet's configure script 
 handles other specific environmental variables. 
 
---with-tclinclude=TCL_INCLUDES_DIR	Directory containing include
-					files for compiling code based 
-					on the Tcl C library.
+--with-tcl=DIR				Directory where tclConfig.sh is
+					stored. This is a shell script that
+					defines all the relevant symbols needed
+					to build Tcl related applications.
 --with-apache-version=VER		Values are 1 or 2 depending
 					on the apache server you're 
 					builing the module for.
@@ -54,10 +60,11 @@ AddType application/x-rivet-tcl    tcl
 
 AddType "application/x-httpd-rivet; charset=utf-8" rvt
 
-For Apache 2 a typical './configure' might look like this
+Configuring the compilation phase for Rivet with Apache 2 (using Tcl8.5) on a 
+system where multiple version of Tcl coexist might look like the following
 
-./configure --with-tcl=/usr/lib/tcl8.4 --with-apache-version=2 
-	    --with-tclsh=/usr/bin/tclsh8.4 --with-apache=/usr
+./configure --with-tcl=/usr/lib/tcl8.5 --with-apache-version=2	\
+	    --with-tclsh=/usr/bin/tclsh8.5 --with-apache=/usr	\
 	    --with-rivet-target-dir=/usr/lib/myrivetlib
 
 If Apache1.x and Apache2.x coexist on the same system you must

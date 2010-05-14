@@ -1,7 +1,31 @@
+2010-05-14 Massimo Manghi <mxmanghi@apache.org>
+    * BUGS,INSTALL,Changelog: small improvements in the documentation
+
+2010-05-14 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/install-sh: the install-sh script is replaced with the same script shipped with automake-1.11
+
+2010-05-13 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-1/TclWebapache.c: call to ap_send_http_headers centralized in TclWeb_SendHeaders
+    * src/apache-2/TclWebapache.c: bugfix for string assigned to the content_type field that has to
+	be duplicated to preserve from memory deallocation by Tcl, includes to modules from apache APR
+	library added, call to ap_send_http_headers centralized in TclWeb_SendHeaders
+ 
+2010-04-29 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_multipart_buffer.c: Add include <apr_string.h> to silence a compilation
+    warning.
+    * src/apache-2/apache_multipart_buffer.h: set svn property to enable $Id: keyword expansion
+    * doc/xml/session.xml: Commented line about a 'CookieDomain' command of Session that appears to
+    be non coded yet. To be added to the TODO file.
+
 2010-04-29 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac,VERSION: Pre-branching operations: AC_INIT now uses 2.0.0 as version number
     to be used across the build system. Also the file VERSION has been updated to reflect the
     release number.
+
+2010-04-27 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-1/TclWebapache.c,src/apache-1/rivetCore.c,src/apache-1/mod_rivet.c,
+      src/apache-1/apache_request.c,src/apache-1/apache_multipart_buffer.c: changes and 
+      additions made for apache 2 added to the code for apache 1.x   
 
 2010-04-22 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl: add to auto_path the directory where init.tcl is located, as this

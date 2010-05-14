@@ -290,9 +290,9 @@
 		(defaults to
 		<filename>/</filename>)</para></listitem></varlistentry>
 
-	  <varlistentry><term>cookieDomain</term>
+	  <!--varlistentry><term>cookieDomain</term>
 	  <listitem><para>The domain to set in the session cookie
-	  (FIXME - not coded yet)</para></listitem></varlistentry>
+	  (FIXME - not coded yet)</para></listitem></varlistentry-->
 
 	  <varlistentry><term>cookieSecure</term>
 		<listitem><para>Specifies whether the cookie should

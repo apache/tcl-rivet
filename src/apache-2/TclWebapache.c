@@ -30,6 +30,8 @@
 #endif
 
 #include <tcl.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 #include <httpd.h>
 #include <http_request.h>
@@ -69,7 +71,9 @@ INLINE int
 TclWeb_SendHeaders(TclWebRequest *req)
 {
     //TODO: fix ap_send_http_header
+    
     ap_send_http_header(req->req);
+
     return TCL_OK;
 }
 
@@ -85,11 +89,13 @@ TclWeb_StopSending(TclWebRequest *req)
 int
 TclWeb_SetHeaderType(char *header, TclWebRequest *req)
 {
+    
     if(req->headers_set)
         return TCL_ERROR;
 
 //    req->req->content_type = (char *) apr_pstrdup(req->req->pool, header);
-    ap_set_content_type(req->req,header);
+
+    ap_set_content_type(req->req,apr_pstrdup(req->req->pool, header));
     req->headers_set = 1;
     return TCL_OK;
 }
@@ -102,13 +108,18 @@ TclWeb_PrintHeaders(TclWebRequest *req)
         return TCL_ERROR;
 
     if (req->headers_set == 0)
+    {
         TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
-
+    }
+    
     /*
      * seems that ap_send_http_header is redefined to ; in Apache2.2
      * ap_send_http_header(req->req);
      */
-    ap_send_http_header(req->req);
+    
+    TclWeb_SendHeaders(req);
+    /* ap_send_http_header(req->req); */
+
     req->headers_printed = 1;
     return TCL_OK;
 }
