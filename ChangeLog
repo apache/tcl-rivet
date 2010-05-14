@@ -1,4 +1,7 @@
 2010-05-14 Massimo Manghi <mxmanghi@apache.org>
+    * BUGS,INSTALL,Changelog: small improvements in the documentation
+
+2010-05-14 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/install-sh: the install-sh script is replaced with the same script shipped with automake-1.11
 
 2010-05-13 Massimo Manghi <mxmanghi@apache.org>
