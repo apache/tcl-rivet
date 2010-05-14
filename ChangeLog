@@ -14,6 +14,11 @@
     * doc/xml/session.xml: Commented line about a 'CookieDomain' command of Session that appears to
     be non coded yet. To be added to the TODO file.
 
+2010-04-29 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac,VERSION: Pre-branching operations: AC_INIT now uses 2.0.0 as version number
+    to be used across the build system. Also the file VERSION has been updated to reflect the
+    release number.
+
 2010-04-27 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-1/TclWebapache.c,src/apache-1/rivetCore.c,src/apache-1/mod_rivet.c,
       src/apache-1/apache_request.c,src/apache-1/apache_multipart_buffer.c: changes and 
