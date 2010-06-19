@@ -1,3 +1,10 @@
+2010-06-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: filled SERVER_CONF variable in the 'server' array with value generated
+    by the build system of the directory holding the conf files. 
+    This fulfills a TODO comment in the code. The array server is undocumented and is not clear if it was
+    added for the benefit of the programmer or for debugging of the module.
+    * src/apache-2/mod_rivet.h: structure definitions beautified and aligned.
+  
 2010-05-14 Massimo Manghi <mxmanghi@apache.org>
     * BUGS,INSTALL,Changelog: small improvements in the documentation
 

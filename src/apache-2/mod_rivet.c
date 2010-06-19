@@ -58,9 +58,9 @@
 //module AP_MODULE_DECLARE_DATA rivet_module;
 
 /* This is used *only* in the PanicProc.  Otherwise, don't touch it! */
-static request_rec *rivet_panic_request_rec = NULL;
-static apr_pool_t *rivet_panic_pool = NULL;
-static server_rec *rivet_panic_server_rec = NULL;
+static request_rec  *rivet_panic_request_rec = NULL;
+static apr_pool_t   *rivet_panic_pool	     = NULL;
+static server_rec   *rivet_panic_server_rec  = NULL;
 
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
 #define NESTED_INCLUDE_MAGIC	(&rivet_module)
@@ -233,9 +233,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
-    //obj = Tcl_NewStringObj(ap_server_root_relative(p, ap_server_confname), -1);
-    //TODO: fix server conf name
-    obj = Tcl_NewStringObj ("serverconfname", -1);
+    obj = Tcl_NewStringObj(ap_server_root_relative(p,SERVER_CONFIG_FILE), -1);
     Tcl_IncrRefCount(obj);
     Tcl_SetVar2Ex(interp,
             "server",
