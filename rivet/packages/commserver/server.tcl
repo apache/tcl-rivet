@@ -27,6 +27,8 @@
 
 package require comm
 
+if {![info exists argv]} { return }
+
 set Port [lindex $argv 0]
 if { [catch {
     comm::comm config -port $Port

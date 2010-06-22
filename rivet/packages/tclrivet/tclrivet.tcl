@@ -18,7 +18,7 @@
 
 package provide tclrivet 0.1
 
-load [file join [file dirname [info script]] .. .. .. src \
+load [file join [file dirname [info script]] .. .. \
 	  librivetparser[info sharedlibextension]]
 
 proc include { filename } {

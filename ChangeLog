@@ -1,3 +1,12 @@
+2010-06-22 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: Rivet install target deletes every pkgIndex.tcl file that might have been 
+    left around in the Rivet directory tree, before calling pkg_mkIndex.tcl to regenerate 
+    the library index file in the root directory.
+    * rivet/packages/tclrivet/parse.tcl,rivet/packages/commserver/server.tcl: add existence test on 
+    argv variable that wept during the installation process. If not set exits silently (variable is 
+    required for a sensible use of the procedures)
+    * rivet/packages/tclrivet/tclrivet.tcl: wrong path to librivetparser.[so|dll] corrected
+    
 2010-06-19 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: filled SERVER_CONF variable in the 'server' array with value generated
     by the build system of the directory holding the conf files. 
