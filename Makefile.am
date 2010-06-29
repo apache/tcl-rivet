@@ -4,7 +4,8 @@
 # $Id$
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
-#
+# 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
+#             before invoking pkg_mkIndex.
 #
 
 ACLOCAL_AMFLAGS = -I m4

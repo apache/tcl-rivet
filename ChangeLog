@@ -1,3 +1,13 @@
+2010-06-30 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form.tcl: fixed various methods in package form: 'field' method must
+    treat checkboxes and radiobuttons alike, so that labels are printed next to the button.
+    'radiobuttons' specialized method should not propagate the '-labels' switch to the attributes
+    of the tag. 
+    * doc/rivet.xml: add new documentation in file doc/xml/form.xml
+    * doc/xml/form.xml: add to repository
+    * doc/html/form.html,doc/html/form_package.html: add to repository
+    * doc/html/*.html: new manual pages including the form package
+
 2010-06-22 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: Rivet install target deletes every pkgIndex.tcl file that might have been 
     left around in the Rivet directory tree, before calling pkg_mkIndex.tcl to regenerate 

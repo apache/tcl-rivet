@@ -1,0 +1,150 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>form</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="form.html" title="Form: An HTML Form Fields Generation Utility"><link rel="prev" href="form.html" title="Form: An HTML Form Fields Generation Utility"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">form</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="form.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center">Form: An HTML Form Fields Generation Utility</th><td width="20%" align="right"> <a accesskey="n" href="help.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="refentry" title="form"><a name="form_package"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>form &#8212; 
+				The <span style="font-family:monospace"><span class="command"><strong>form</strong></span></span> packages creates a form object that can be manipulated
+				to generate HTML forms
+			</p></div><div class="refsynopsisdiv" title="Synopsis"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">form</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>form_name</code></em></span>  (<span style="font-family:monospace; font-weight: bold;">-option1</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option value 1</code></em></span> | <span style="font-family:monospace; font-weight: bold;">-option2</span> | <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>option value 2</code></em></span> | <span style="font-family:monospace; font-weight: bold;">...</span>)</div></div></div><div class="refsect1" title="Description"><a name="id371527"></a><h2>Description</h2><p style="width:90%">
+				The <span style="font-family:monospace"><span class="command"><strong>form</strong></span></span> package is a utility to generating html forms. A <span style="font-family:monospace"><span class="command"><strong>form</strong></span></span>
+				object command saves the programmer from typing the cumbersome html code of input elements, 
+				working out a solution for better standardization and readability of the code. 
+				<span style="font-family:monospace"><span class="command"><strong>form</strong></span></span> requires that just the basic information of interest to the code are 
+				typed, greatly simplyfing the development of forms.
+				A <span style="font-family:monospace"><span class="command"><strong>form</strong></span></span> object has specialized menthods to generate all the standard 
+				input fields, i.e. text, password, hidden, generic button, submit or reset buttons and
+				image. <span style="font-family:monospace"><span class="command"><strong>form</strong></span></span> creates select input fields, radiobutton and checkbox
+				boolean options groups. Also new inputs introduced with HTML5 are supported: color, date, 
+				datetime, datetime-local, email, file, month, number, range, search, tel, time, url, week.
+			</p><p style="width:90%">
+				Other input elements can be generated using the general purpose 'field' method.			
+			</p></div><div class="refsect1" title="Form Object subcommands"><a name="id371577"></a><h2>Form Object subcommands</h2><p style="width:90%">
+				Form Objects are Tcl commands that need subcommands to invoke specific actions on an object. 
+				They have a general syntax that follow this scheme:				
+			</p><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex ">
+							form_object   <span style="font-family:monospace; font-weight: bold;">subcommand</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>name</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">-option1</span>? ?<span style="font-family:monospace; font-weight: bold;">value1</span>? ?<span style="font-family:monospace; font-weight: bold;">-option2</span>? ?<span style="font-family:monospace; font-weight: bold;">value2</span>?</div></div></div></dd></dl></div><p style="width:90%">
+				Where  ?<span style="font-family:monospace; font-weight: bold;">name</span>? is to become the value of a 'name' attribute in input field tag. The list
+				of switches that follows  ?<span style="font-family:monospace; font-weight: bold;">name</span>? is copied into the a tag as attribute="value" pairs. 
+				Some subcommand (e.g. radiobuttons and checkboxes) treat specific options in a way that fits
+				the specific organization of these fields.
+			</p></div><div class="refsect1" title="Options"><a name="id371676"></a><h2>Options</h2><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-method</span>  ?<span style="font-family:monospace; font-weight: bold;">post|get</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      		The method to be used to encode the form data. Possible values are get or post
+		      	</div><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+					At the time of writing only the 'get' method is implemented		      	
+		      	</td></tr></table></div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-name</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>form_name</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+		      		a name for the form being generated: this value becomes the value of the 
+		      		attribute 'name' in the &lt;form&gt; tag.
+		      	</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-defaults</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>default_values</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+						an array of default values	to be assigned to the fields of the form. 
+						Every name in the array is matched with an input field, when
+						a given field gets added to the form it is initialized with the 
+						value of the corresponding variable in the array. 
+						This option works well in conjuction with the 
+						<span style="font-family:monospace"><span class="command"><strong>load_response</strong></span></span> command of Rivet when default values
+						come from another form.
+					</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">-action</span>  ?<span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>URL to form data processing procedure</code></em></span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							The URL to the procedure data are being sent to. If no  ?<span style="font-family:monospace; font-weight: bold;">-action</span>? switch is specified
+							the data are sent to the form's URL.
+					</div></div></dd></div><div class="refsect1"><a name="id371837"></a><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">start</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							generate the &lt;form&gt; tag with all of its arguments. 
+							This command must be called as first in the form generation
+							process. The following is a sample of code creating a form named 'formname' whose data will
+							be sent with menthod GET and initialized with data stored in array 'response' 
+						</div><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
+form myform -defaults response -method get -name formname
+myform start
+myform text	  text_entry -size 20
+myform select option_selected -values {opt1 opt2 opt3 opt4}
+myform submit submit -value Search
+myform end</pre><div style="margin-bottom:1.5ex ; padding .5ex">
+							The code collects the input field values and send them through GET 
+							method to the same form URL for further processing. Use the  ?<span style="font-family:monospace; font-weight: bold;">-action</span>? 
+							switch to specify a different URL to process the data
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">end</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							generate the &lt;/form&gt; closing tag. This command must
+							be called as last in the form generation process
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">field</span>  ?<span style="font-family:monospace; font-weight: bold;">type</span>? ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							emit a field of the given  ?<span style="font-family:monospace; font-weight: bold;">type</span>? and  ?<span style="font-family:monospace; font-weight: bold;">name</span>?,
+							including any default key-value pairs defined for this field 
+							type and optional key-value pairs included with the statement
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">text</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits a text input field of the form
+							&lt;input type="text" name=" ?<span style="font-family:monospace; font-weight: bold;">name</span>?" .../&gt;
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">password</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Same as text, but the input is kept hidden as usual for
+							passwords
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">hidden</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							hidden input element: the classical field to be embedded in form to 
+							pass status variables.
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">submit</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							emits the code for a classical HTML submit button. Example: the following
+							code
+						</div><div style="margin-bottom:1.5ex ; padding .5ex">
+							<pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
+form myform -defaults response -method get -name feedsearch
+myform start
+myform submit submit -value Search</pre>						
+						</div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Would emit a form  like this
+						</div><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
+&lt;form...&gt;
+&lt;input type="submit" name="submit" value="Search" /&gt; 
+&lt;/form&gt;</pre></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">button</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							emits the code for a button field having  ?<span style="font-family:monospace; font-weight: bold;">name</span>? as name
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">reset</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Classical HTML reset button that brings the input fields
+							back to their initial values
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">image</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an image input field
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">checkbox</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits a checkbox input field
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">radio</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits a radiobutton input field
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">color</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "color" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">date</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "date" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">datetime</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "datetime" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">datetime_local</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "datetime_local" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">email</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "email" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">file</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "file" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">month</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "month" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">number</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "number" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">range</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "range" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">search</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "search" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">tel</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "tel" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">time</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "time" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">url</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "url" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">week</span>  ?<span style="font-family:monospace; font-weight: bold;">name</span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							Emits an HTML 5 "week" form field						
+						</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "> <span style="font-family:monospace; font-weight: bold;">name</span>  ?<span style="font-family:monospace; font-weight: bold;">-values <em class="replaceable"><code>values list</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">-labels <em class="replaceable"><code>labels list</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">args</span>?</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							the <span style="font-family:monospace"><span class="command"><strong>radiobutton</strong></span></span> creates a whole radiobutton group
+							with the values and labels specified in the argument list. If no  ?<span style="font-family:monospace; font-weight: bold;">-labels</span>? switch is
+							passed to the subcommand the values are printed as labels of the radiobutton.  Example:
+						</div><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
+form myform -defaults response -method get -name formname
+myform start
+myform text	  text_entry -size 20
+myform radiobuttons fruit -values {big medium small} \
+								  -labels {Watermelon Orange Strawberry} \
+								  -class myradiobuttonclass
+myform submit submit -value Search
+myform end</pre><div style="margin-bottom:1.5ex ; padding .5ex">
+							will generate the following HTML code.
+						</div><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
+&lt;input type="radio" name="fruit" class="myradiobuttonclass" value="big" /&gt;Watermelon
+&lt;input type="radio" name="fruit" class="myradiobuttonclass" value="medium" /&gt;Orange
+&lt;input type="radio" name="fruit" class="myradiobuttonclass" value="small" /&gt;Strawberry
+</pre><div style="margin-bottom:1.5ex ; padding .5ex">
+							if the 'response' array has a variable for the name 'fruit' the corresponding 
+							radiobutton field is automatically checked. The options  ?<span style="font-family:monospace; font-weight: bold;">values</span>? and  ?<span style="font-family:monospace; font-weight: bold;">labels</span>?
+							are used internally and don't get into the tag attributes. If a  ?<span style="font-family:monospace; font-weight: bold;">labels</span>? 
+							switch is not given labels are generated using the  ?<span style="font-family:monospace; font-weight: bold;">values</span>? argument.
+						</div></div></dd></dl></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="form.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="form.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="help.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Form: An HTML Form Fields Generation Utility </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Resources - How to Get Help</td></tr></table></div></body></html>

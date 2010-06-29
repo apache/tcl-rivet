@@ -102,7 +102,7 @@ package provide form 1.0
 	foreach {var val} $list {
 	    set var [string range [string tolower $var] 1 end]
 	    set data($var) $val
-	    if {$var == "values"} { continue }
+	    if {($var == "values") || ($var == "labels")} { continue }
 	    lappend return -$var $val
 	}
 	return $return
@@ -214,7 +214,7 @@ package provide form 1.0
 		# and it matches the value we have for it, make
 		# the field show up as selected (checked)
 		if {[info exists DefaultValues($name)]} {
-		    if {$data(value) == $DefaultValues($name)} {
+		    if {[lsearch $DefaultValues($name) $data(value)] >= 0} {			
 			append string { checked="checked"}
 		    }
 		}
@@ -223,7 +223,7 @@ package provide form 1.0
 	append string " />"
 
 	# ...and emit it
-	if {$type == "radio"} {
+	if {($type == "radio") || ($type == "checkbox")} {
 	    html $string$data(label)
 	} else {
 	    html $string
@@ -273,14 +273,14 @@ package provide form 1.0
     }
 
     #
-    # reset -- emit an HTML image field
+    #  image -- emit an HTML image field
     #
     method image {name args} {
 	eval field image $name $args
     }
 
     #
-    # reset -- emit an HTML "checkbox" form field
+    # checkbox -- emit an HTML "checkbox" form field
     #
     method checkbox {name args} {
 	eval field checkbox $name $args
