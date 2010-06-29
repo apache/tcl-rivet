@@ -1,4 +1,8 @@
 2010-06-30 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/form.xml: Add 'checkbox' subcommand documentation
+    * doc/html/*.html: Updated manual pages
+
+2010-06-30 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form.tcl: fixed various methods in package form: 'field' method must
     treat checkboxes and radiobuttons alike, so that labels are printed next to the button.
     'radiobuttons' specialized method should not propagate the '-labels' switch to the attributes

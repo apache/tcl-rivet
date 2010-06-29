@@ -18,10 +18,11 @@
 #
 # top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
-# $Id: Makefile.am 956947 2010-06-22 16:45:49Z mxmanghi $
+# $Id: Makefile.am 959005 2010-06-29 15:07:45Z mxmanghi $
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
-#
+# 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
+#             before invoking pkg_mkIndex.
 #
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@

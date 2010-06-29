@@ -14,13 +14,9 @@
 			<cmdsynopsis>
 			  	<command>form</command>
 			  	<arg choice="plain"><replaceable>form_name</replaceable></arg>
-			  	<group choice="opt">
-			   	<arg>-option1</arg>
-			    	<arg><replaceable>option value 1</replaceable></arg>
-			    	<arg>-option2</arg>
-			    	<arg><replaceable>option value 2</replaceable></arg>
-			    	<arg>...</arg>
-			  	</group>
+			   <arg>-option1 <replaceable>value_1</replaceable></arg>
+			   <arg>-option2 <replaceable>value_2</replaceable></arg>
+			   <arg>...</arg>
 			</cmdsynopsis>
 		</refsynopsisdiv>
 		<refsect1>
@@ -31,6 +27,10 @@
 				working out a solution for better standardization and readability of the code. 
 				<command>form</command> requires that just the basic information of interest to the code are 
 				typed, greatly simplyfing the development of forms.
+				Option to the command are treated as a list of parameter-value pairs that become the defaults
+				for the corresponding attributes of the form.
+			</para>
+			<para>
 				A <command>form</command> object has specialized menthods to generate all the standard 
 				input fields, i.e. text, password, hidden, generic button, submit or reset buttons and
 				image. <command>form</command> creates select input fields, radiobutton and checkbox
@@ -42,7 +42,7 @@
 			</para>
 		</refsect1>
 		<refsect1>
-			<title>Form Object subcommands</title>
+			<title>Form Object Commands</title>
 			<para>
 				Form Objects are Tcl commands that need subcommands to invoke specific actions on an object. 
 				They have a general syntax that follow this scheme:				
@@ -51,8 +51,8 @@
 				<varlistentry>
 					<listitem>
 						<cmdsynopsis>
-							form_object <arg choice="plain">subcommand</arg> <arg><replaceable>name</replaceable></arg>
-							<arg>-option1</arg> <arg>value1</arg> <arg>-option2</arg> <arg>value2</arg>
+							form_object <arg choice="plain">subcommand</arg> <arg>name</arg>
+							<arg>-option1 <replaceable>value1</replaceable></arg> <arg>-option2 <replaceable>value2</replaceable></arg>
 						</cmdsynopsis>
 					</listitem>	
 				</varlistentry>			
@@ -60,73 +60,15 @@
 			<para>
 				Where <arg>name</arg> is to become the value of a 'name' attribute in input field tag. The list
 				of switches that follows <arg>name</arg> is copied into the a tag as attribute="value" pairs. 
-				Some subcommand (e.g. radiobuttons and checkboxes) treat specific options in a way that fits
-				the specific organization of these fields.
+				Some subcommand (e.g. form, radiobuttons and checkboxes) treat specific options in a way that fits
+				the specific organization and function of these fields.
 			</para>
 		</refsect1>
 		<refsect1>
-			<title>Options</title>
-			<varlistentry>
-		    	<listitem>
-		      	<cmdsynopsis>
-					<arg choice="plain">-method</arg>
-					<arg choice="opt">post|get</arg>
-		      	</cmdsynopsis>
-		      	<para>
-		      		The method to be used to encode the form data. Possible values are get or post
-		      	</para>
-		      	<note>
-					At the time of writing only the 'get' method is implemented		      	
-		      	</note>
-		    	</listitem>
-	  		</varlistentry>
-			<varlistentry>
-		    	<listitem>
-		      	<cmdsynopsis>
-					<arg choice="plain">-name</arg>
-					<arg choice="opt"><replaceable>form_name</replaceable></arg>
-		      	</cmdsynopsis>
-		      	<para>
-		      		a name for the form being generated: this value becomes the value of the 
-		      		attribute 'name' in the &lt;form&gt; tag.
-		      	</para>
-		    	</listitem>
-	  		</varlistentry>
-	  		<varlistentry>
-				<listitem>
-					<cmdsynopsis>
-						<arg choice="plain">-defaults</arg>
-						<arg choice="opt"><replaceable>default_values</replaceable></arg>
-					</cmdsynopsis>
-					<para>
-						an array of default values	to be assigned to the fields of the form. 
-						Every name in the array is matched with an input field, when
-						a given field gets added to the form it is initialized with the 
-						value of the corresponding variable in the array. 
-						This option works well in conjuction with the 
-						<command>load_response</command> command of Rivet when default values
-						come from another form.
-					</para>
-				</listitem>	  		
-	  		</varlistentry>
-	  		<varlistentry>
-				<listitem>
-					<cmdsynopsis>
-						<arg choice="plain">-action</arg>
-						<arg choice="opt"><replaceable>URL to form data processing procedure</replaceable></arg>
-					</cmdsynopsis>
-					<para>
-							The URL to the procedure data are being sent to. If no <arg>-action</arg> switch is specified
-							the data are sent to the form's URL.
-					</para>
-				</listitem>	  		
-	  		</varlistentry>
-
-		</refsect1>
-		<refsect1>
 			<variablelist>
+				<title>Subcommands</title>
 				<varlistentry>
-	    			<listitem>
+					<listitem>
 	      			<cmdsynopsis>
 							<arg choice="plain">start</arg>
 	      			</cmdsynopsis>
@@ -149,8 +91,73 @@ myform end</programlisting>
 							switch to specify a different URL to process the data
 						</para>
 	    			</listitem>
+				</varlistentry>
+			</variablelist>
+			<refsect2>
+
+			<variablelist>
+				<title>Options</title>
+				<varlistentry>
+			    	<listitem>
+			      	<cmdsynopsis>
+						<arg choice="plain">-method</arg>
+						<arg choice="opt">post|get</arg>
+			      	</cmdsynopsis>
+			      	<para>
+			      		The method to be used to encode the form data. Possible values are get or post
+			      	</para>
+			      	<note>
+						At the time of writing only the 'get' method is implemented		      	
+			      	</note>
+			    	</listitem>
 	  			</varlistentry>
-	  			
+				<varlistentry>
+		    		<listitem>
+		      		<cmdsynopsis>
+							<arg choice="plain">-name</arg>
+							<arg choice="opt"><replaceable>form_name</replaceable></arg>
+		      		</cmdsynopsis>
+		      		<para>
+		      			a name for the form being generated: this value becomes the value of the 
+		      			attribute 'name' in the &lt;form&gt; tag.
+		      		</para>
+		    		</listitem>
+	  			</varlistentry>
+	  			<varlistentry>
+					<listitem>
+						<cmdsynopsis>
+							<arg choice="plain">-defaults</arg>
+							<arg choice="opt"><replaceable>default_values</replaceable></arg>
+						</cmdsynopsis>
+						<para>
+							an array of default values	to be assigned to the fields of the form. 
+							Every name in the array is matched with an input field, when
+							a given field gets added to the form it is initialized with the 
+							value of the corresponding variable in the array. 
+							This option works well in conjuction with the 
+							<command>load_response</command> command of Rivet when default values
+							come from another form.
+						</para>
+					</listitem>	  		
+	  			</varlistentry>
+	  			<varlistentry>
+					<listitem>
+						<cmdsynopsis>
+							<arg choice="plain">-action</arg>
+							<arg choice="opt"><replaceable>URL</replaceable></arg>
+						</cmdsynopsis>
+						<para>
+								The URL to the procedure data are being sent to. If no <arg>-action</arg> switch is specified
+								the data are sent to the form's URL.
+						</para>
+					</listitem>	  		
+	  			</varlistentry>
+	  		</variablelist>
+	  		</refsect2>
+		</refsect1>
+		<refsect1>
+			<title>Subcommands</title>
+			<variablelist>
 	  			<varlistentry>
 	    			<listitem>
 	      			<cmdsynopsis>
@@ -177,6 +184,76 @@ myform end</programlisting>
 							type and optional key-value pairs included with the statement
 						</para>
 					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<listitem>
+						<cmdsynopsis>
+							<arg choice="plain">radiobuttons</arg>
+							<arg>name</arg>
+							<arg>-values <replaceable>values</replaceable></arg>
+							<arg>-labels <replaceable>labels</replaceable></arg>
+							<arg>args</arg> 					
+						</cmdsynopsis>
+						<para>
+							the <command>radiobutton</command> creates a whole radiobutton group
+							with the values and labels specified in the argument list. If no <arg>-labels</arg> switch is
+							passed to the subcommand the values are printed as labels of the radiobutton.  Example:
+						</para>
+						<programlisting>
+form myform -defaults response -method get -name formname
+myform start
+myform text text_entry -size 20
+myform radiobuttons fruit -values {big medium small} \
+              -labels {Watermelon Orange Strawberry} \
+              -class myradiobclass
+myform submit submit -value Search
+myform end</programlisting>
+						<para>
+							will generate the following HTML code.
+						</para>
+						<programlisting>
+&lt;input type="radio" name="fruit" class="myradiobclass" value="big" /&gt;Watermelon
+&lt;input type="radio" name="fruit" class="myradiobclass" value="medium" /&gt;Orange
+&lt;input type="radio" name="fruit" class="myradiobclass" value="small" /&gt;Strawberry
+</programlisting>
+						<para>
+							if the 'response' array has a variable for the name 'fruit' the corresponding 
+							radiobutton field is automatically checked. The options <arg>values</arg> and <arg>labels</arg>
+							are used internally and don't get into the tag attributes. If a <arg>labels</arg> 
+							switch is not given labels are generated using the <arg>values</arg> list.
+						</para>
+					</listitem>				
+				</varlistentry>
+				<varlistentry>
+					<listitem>
+						<cmdsynopsis>
+							<arg choice="plain">checkbox</arg>
+							<arg>name</arg>
+							<arg>-label <replaceable>label</replaceable></arg>
+							<arg>-value <replaceable>value</replaceable></arg>
+							<arg>args</arg>
+						</cmdsynopsis>
+						<para>
+							The <arg choice="plain">checkbox</arg> subcommand emits a checkbox type input field with
+							the name, label and value attributes set accordingly to the parameters passed to the subcommand.
+							Example, the following code:
+						</para>
+						<programlisting>myform checkbox options -value opt1   -label "Option 1"
+myform checkbox options -value opt2   -label "Option 2"
+myform checkbox options -value opt3   -label "Option 3"
+myform checkbox options -value opt4   -label "Option 4"
+						</programlisting>
+						<para>
+							Provided opt2 was in the list valued response array (in the 'options' variable) that 
+							initialized the form, the output would look like this
+						</para>
+						<programlisting>&lt;input type="checkbox" name="options" label="Option 1" value="opt1" /&gt;Option 1
+&lt;input type="checkbox" name="options" label="Option 2" value="opt2" 
+       checked="checked" /&gt;Option 2
+&lt;input type="checkbox" name="options" label="Option 3" value="opt3" /&gt;Option 3
+&lt;input type="checkbox" name="options" label="Option 4" value="opt4" /&gt;Option 4						
+						</programlisting>
+					</listitem>				
 				</varlistentry>
 				<varlistentry>
 					<listitem>
@@ -491,44 +568,6 @@ myform submit submit -value Search</programlisting>
 						<para>
 							Emits an HTML 5 "week" form field						
 						</para>			
-					</listitem>				
-				</varlistentry>
-				<varlistentry>
-					<listitem>
-						<cmdsynopsis>
-							<arg choice="plain">name</arg>
-							<arg>-values <replaceable>values list</replaceable></arg>
-							<arg>-labels <replaceable>labels list</replaceable></arg>
-							<arg>args</arg> 					
-						</cmdsynopsis>
-						<para>
-							the <command>radiobutton</command> creates a whole radiobutton group
-							with the values and labels specified in the argument list. If no <arg>-labels</arg> switch is
-							passed to the subcommand the values are printed as labels of the radiobutton.  Example:
-						</para>
-						<programlisting>
-form myform -defaults response -method get -name formname
-myform start
-myform text	  text_entry -size 20
-myform radiobuttons fruit -values {big medium small} \
-								  -labels {Watermelon Orange Strawberry} \
-								  -class myradiobuttonclass
-myform submit submit -value Search
-myform end</programlisting>
-						<para>
-							will generate the following HTML code.
-						</para>
-						<programlisting>
-&lt;input type="radio" name="fruit" class="myradiobuttonclass" value="big" /&gt;Watermelon
-&lt;input type="radio" name="fruit" class="myradiobuttonclass" value="medium" /&gt;Orange
-&lt;input type="radio" name="fruit" class="myradiobuttonclass" value="small" /&gt;Strawberry
-</programlisting>
-						<para>
-							if the 'response' array has a variable for the name 'fruit' the corresponding 
-							radiobutton field is automatically checked. The options <arg>values</arg> and <arg>labels</arg>
-							are used internally and don't get into the tag attributes. If a <arg>labels</arg> 
-							switch is not given labels are generated using the <arg>values</arg> argument.
-						</para>
 					</listitem>				
 				</varlistentry>
 	  		</variablelist>
