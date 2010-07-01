@@ -1,3 +1,7 @@
+2010-07-01 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/Makefile.am: removed target 'html/rivet.html" from 'docs' depends. The no-chunks version
+    of the manual can be build running 'make docs-nochunk'
+
 2010-06-30 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/form.xml: Add 'checkbox' subcommand documentation
     * doc/html/*.html: Updated manual pages
