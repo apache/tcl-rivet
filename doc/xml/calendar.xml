@@ -1,0 +1,59 @@
+<section id="calendar_package">
+	<title>Calendar Package</title>
+   <section>
+   	<title>Introduction</title>
+      <para>
+      	Calendar is a set of three classes that produce Calendar tables
+      	in different forms: Calendar, XmlCalendar and HtmlCalendar. 
+      	The base class Calendar outputs a calendar
+      	table (or a whole year calendar) in a similar form the typical
+      	Unix command does, but its internal code is based on Tcl only
+      	so that it doesn't rely on the existance of this utility on
+      	the system. This is also a base class from which the XmlCalendar
+      	class inherits the basics methods that generate the table.
+      	XmlCalendar prints an XML calendar table. Header, weekdays banner
+      	and week rows tags are configurable and also specific days or
+      	specific weeks can be given arbitrary attributes.
+      </para>
+		<para>
+			HtmlCalendar is a concrete class derived from XmlCalendar where
+			tags are HTML tags and the output is ready for display.			
+		</para>
+   </section>
+   <section>
+		<title>Creating a Calendar instance</title>
+    	<variablelist>
+	  		<varlistentry>
+	    		<listitem>
+	      		<cmdsynopsis>
+						<command>Calendar <arg>cal</arg></command> 
+	      		</cmdsynopsis>
+	      		<para>
+	      			The command creates an command object called <arg>cal</arg> ready
+	      			to output a calendar table
+	      		</para>
+					<programlisting>set cal [Calendar #auto]</programlisting>
+					<para>
+						The method 'emit' if invoked without arguments returns an 
+						ASCII formatted calendar of the current month
+	      		</para>
+	      		<programlisting>
+set current_month [$cal emit]
+puts $current_month
+      Jun 2010
+  Su Mo Tu We Th Fr Sa
+        1  2  3  4  5
+  6  7  8  9 10 11 12
+ 13 14 15 16 17 18 19
+ 20 21 22 23 24 25 26
+ 27 28 29 30
+</programlisting>
+
+	      	</listitem>
+	  		</varlistentry>
+    		<para>
+    		
+    		</para>
+		</variablelist>
+	</section>
+</section>

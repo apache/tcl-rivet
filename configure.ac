@@ -256,7 +256,7 @@ AC_DEFUN([CHECK_APXS],[
     AC_ARG_WITH(
         apxs,
         [  --with-apxs=FILE        location of Apache's apxs tool],  
-    	[if test -x "${with_apxs}" ; then
+	[if test -x "${with_apxs}" ; then
 		apxs_found="${with_apxs}"
         	AC_MSG_RESULT([$apxs_found])
 	fi]
@@ -381,11 +381,12 @@ AC_DEFUN([APACHE_VERSION],[
         AC_MSG_RESULT( building for apache 1.x )
 	AC_CONFIG_FILES([src/apache-1/Makefile])   
 	apache_version_dir="apache-1"
+        AC_DEFINE(APACHE1,1,[APACHE1 definition in config.h])
     else
         AC_MSG_RESULT( building for apache 2.x )
 	AC_CONFIG_FILES([src/apache-2/Makefile])
 	apache_version_dir="apache-2"
-        AC_DEFINE(APACHE2,1,[Apache2 define to config.h])
+        AC_DEFINE(APACHE2,1,[APACHE2 definition in config.h])
     fi
 ])
 

@@ -1,3 +1,12 @@
+2010-07-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/calendar.xml: Add manual page for package Calendar (package still to be
+      added to repository)
+    * doc/xml/form.xml: Page for package 'form' written with a more structured
+      docbook organization that allows finer styling of a manual page.
+    * doc/rivet.xsl: Add xsl configurations for elements refsect1,refsect2 and
+      refsect3
+    * configure.ac: Add message when building for Apache 1.x
+ 
 2010-07-01 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/Makefile.am: removed target 'html/rivet.html" from 'docs' depends. The no-chunks version
     of the manual can be build running 'make docs-nochunk'
