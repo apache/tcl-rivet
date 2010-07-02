@@ -1,4 +1,7 @@
 2010-07-02 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: Add experimental package Calendar
+
+2010-07-02 Massimo Manghi <mxmanghi@apache.org>
     * doc/html/calendar.html, doc/html/xml_calendar.html: Add html manual pages for Calendar
     * doc/xml/calendar.xml: more changes to calendar.xml
 
