@@ -26,14 +26,10 @@
 		</para>
 	</section>
 	<refentry id="form_package">
+
 		<refnamediv>
 			<refname>form</refname>
-			<refpurpose>
-				<para>
-					The <command>form</command> command creates a form object that can be manipulated
-					to generate HTML forms. 				
-				</para>
-			</refpurpose>
+			<refpurpose> a Tcl command object for creating HTML forms</refpurpose>
 		</refnamediv>
 		<refsynopsisdiv>
 			<cmdsynopsis>
@@ -47,7 +43,6 @@
 		<refsect1>
 			<para>
 				creates and returns a new Tcl command named <replaceable>form_name</replaceable>. 
-				This command can be used to build the crate a form
 			</para>
 			<refsect2>
 				<title>Options</title>
@@ -60,7 +55,7 @@
 								<arg choice="opt">post|get</arg>
 			      		</cmdsynopsis>
 			      		<para>
-			      			The method to be used to encode the form data. 
+			      			The http method for sending the form data back to the server.
 			      			Possible values are get or post
 			      		</para>
 			      		<note>
@@ -92,8 +87,8 @@
 								a given field gets added to the form it is initialized with the 
 								value of the corresponding variable in the array. 
 								This option works well in conjuction with the 
-								<command>load_response</command> command of Rivet when default values
-								come from another form.
+								<command>load_response</command> command of Rivet when default 
+								values come from another form.
 							</para>
 						</listitem>	  		
 	  				</varlistentry>
@@ -115,7 +110,10 @@
 		<refsect1>
 			<title>Form Object Commands</title>
 			<para>
-				Form object commands follow the usual general syntax of Tcl commands: 				
+				Form object commands follow the usual syntax of Tcl commands with a <arg>subcommand</arg> argument playing the
+				role of a switch among various functionalities of the command. Form objects need also the parameter <arg>name</arg>
+				which is to become the value of the 'name' attribute in an input field. This argument is the key that has to be 
+				used by the server-side script to retrieve the input field value. 
 			</para>
 			<variablelist>
 				<varlistentry>
@@ -129,11 +127,16 @@
 					</listitem>	
 				</varlistentry>			
 			</variablelist>
-			<para>
-				Where <arg>name</arg> is to become the value of a 'name' attribute in the opening tag of a field 
-				or form. Options passed to a subcommand are copied into the tag as attribute="value" pairs. 
+			<para>			
+				Options passed to a subcommand are copied into the tag as attribute="value" pairs. 
 				Some subcommand (e.g. form, radiobuttons and checkboxes) treat specific options in a way 
 				that fits the specific organization and function of these fields. 
+			</para>
+			<para>
+				Exception to this general syntax are the subcommand <command>field</command> and <command>end</command>. 
+				<command>field</command> is an abstract input field creation method and requires an additional
+				parameter specifiyng the type of field being created. Every concrete input field generation command
+				uses this subcommand internally to get the html code printed.
 			</para>
 		</refsect1>
 		
@@ -153,22 +156,23 @@
 								<arg>args</arg>
 					      </cmdsynopsis>
 			      		<para>
-								Print the &lt;form&gt; tag with all of its arguments. 
+								Print the &lt;form&gt; tag with all its attributes. 
 								This command must be called as first in the form generation
 								process. The following is a sample of code creating a form named 'formname' whose data will
-								be sent with menthod GET and initialized with data stored in array 'response' 
+								be sent with method GET. Initial form fields values will be obtained from array 
+								'response'
 							</para>
 							<programlisting>
-	form myform -defaults response -method get -name formname
-	myform start
-	myform text	  text_entry -size 20
-	myform select option_selected -values {opt1 opt2 opt3 opt4}
-	myform submit submit -value Search
-	myform end</programlisting>						
+form myform -defaults response -method get -name formname
+myform start
+myform text	  text_entry -size 20
+myform select option_selected -values {opt1 opt2 opt3 opt4}
+myform submit submit -value Search
+myform end</programlisting>						
 							<para>
-								The code collects the input field values and send them through GET 
-								method to the same form URL for further processing. Use the <arg>-action</arg> 
-								switch to specify a different URL to process the data
+								The code prints a form that sends a text entry content and the option value 
+								associated to a radiobutton. The URL of the server script is the same that
+								created the form. Use the <arg>-url</arg> option to specify a different url
 							</para>
 		    			</listitem>
 			   	</varlistentry>

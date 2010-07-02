@@ -3,41 +3,57 @@
    <section>
    	<title>Introduction</title>
       <para>
-      	Calendar is a set of three classes that produce Calendar tables
-      	in different forms: Calendar, XmlCalendar and HtmlCalendar. 
-      	The base class Calendar outputs a calendar
-      	table (or a whole year calendar) in a similar form the typical
-      	Unix command does, but its internal code is based on Tcl only
-      	so that it doesn't rely on the existance of this utility on
-      	the system. This is also a base class from which the XmlCalendar
-      	class inherits the basics methods that generate the table.
-      	XmlCalendar prints an XML calendar table. Header, weekdays banner
-      	and week rows tags are configurable and also specific days or
+      	The Calendar package is a set of three classes that produce 
+      	calendar tables in 2 different forms: Ascii calendar and XML
+      	Calendar. The third class HtmlCalendar is a concrete descendant
+      	of XmlCalendar that prints a calendar in xhtml form. 
+      	The ascii output from Calendar is formatted in the same form
+      	the typical Unix <command>cal</command> command does. The internal
+      	code is based on Tcl only therefore doesn't rely on the existance 
+      	of the 'cal' command on the system. 
+      	This is also a base class from which the XmlCalendar
+      	class inherits the basic methods that generate the table.
+      	XmlCalendar prints an XML calendar table whose header, weekdays banner
+      	and week rows tags are configurable. Also specific days or
       	specific weeks can be given arbitrary attributes.
       </para>
-		<para>
-			HtmlCalendar is a concrete class derived from XmlCalendar where
-			tags are HTML tags and the output is ready for display.			
-		</para>
    </section>
-   <section>
-		<title>Creating a Calendar instance</title>
-    	<variablelist>
-	  		<varlistentry>
-	    		<listitem>
-	      		<cmdsynopsis>
-						<command>Calendar <arg>cal</arg></command> 
-	      		</cmdsynopsis>
-	      		<para>
-	      			The command creates an command object called <arg>cal</arg> ready
-	      			to output a calendar table
-	      		</para>
-					<programlisting>set cal [Calendar #auto]</programlisting>
-					<para>
-						The method 'emit' if invoked without arguments returns an 
-						ASCII formatted calendar of the current month
-	      		</para>
-	      		<programlisting>
+   <refentry id="calendar">
+   	<refnamediv>
+			<refname>Calendar</refname>
+			<refpurpose>Utility class the builds and prints a calendar table</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+			  	<command>Calendar</command>
+			  	<arg choice="plain"><replaceable>calendar_name</replaceable></arg>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<title>Calendar object subcommands</title>
+			<para>
+				The main public command for a calendar object is <command>emit</command> that returns a calendar table
+			</para>
+		</refsect1>
+		<refsect1>
+	    	<variablelist>
+		  		<varlistentry>
+		    		<listitem>
+		      		<cmdsynopsis>
+		      			<command>calendar_obj</command>
+		      		</cmdsynopsis>
+						<cmdsynopsis>
+		      			<command>calendar_obj</command> <arg>month</arg> <arg>year</arg>
+		      		</cmdsynopsis>
+		      		<cmdsynopsis>
+							<command>calendar_obj</command> <arg><replaceable>month | year</replaceable></arg>
+		      		</cmdsynopsis>
+						<para>
+							The method 'emit' if invoked without arguments returns an 
+							ASCII formatted calendar of the current month
+		      		</para>
+		      		<programlisting>
+set cal [Calendar #auto]
 set current_month [$cal emit]
 puts $current_month
       Jun 2010
@@ -46,14 +62,124 @@ puts $current_month
   6  7  8  9 10 11 12
  13 14 15 16 17 18 19
  20 21 22 23 24 25 26
- 27 28 29 30
-</programlisting>
+ 27 28 29 30</programlisting>
+		      	</listitem>
+		  		</varlistentry>
+	    		<para>
+	    			The method <command>emit</command> when invoked with a single argument
+	    			interprets this vale as a year number and prints the whole calendar of
+	    			that year. When invoked with 2 arguments takes the first as month, either
+	    			expressed in its shortened form ('Jan','Feb',...) or as number in the 
+	    			range 1-12. The second argument is a year number.
+	    		</para>
+			</variablelist>
+		</refsect1>
+	</refentry>
+	<refentry id="xml_calendar">
+	   <refnamediv>
+			<refname>XmlCalendar</refname>
+			<refpurpose>XmlCalendar returns XML formatted calendar tables</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+			  	<command>XmlCalendar</command>
+			  	<arg choice="plain"><replaceable>calendar_name</replaceable></arg>
+			   <arg>-option1 <replaceable>value_1</replaceable></arg>
+			   <arg>-option2 <replaceable>value_2</replaceable></arg>
+			   <arg>...</arg>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<para>
+				An XmlCalendar object is created and returned. This command object accepts many 
+				customization options to specify the XML tags to be used in the structure of
+				the cal table. 
+			</para>
+			<refsect2>
+				<title>Options</title>			
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<command>-container options_list</command>
+							</cmdsynopsis>
+							<para>
+								Assigns the <command>options_list</command> to the XML root element that 
+								will encompass the whole table.   
+							</para>
+							<para>
+								An option list is organized as an odd-sized list of option:
+<programlisting>tag_name <option>attr11 val1 attr2 val2 ...</option></programlisting>
+							</para>
+							<para>
+								The first element of the list is the tag name that will assigned to the container
+								(default: calendar, no attributes). The remaining terms must be an even number and are
+								interpreted as attribute-value pairs	
+							</para>
+						</listitem>					
+					</varlistentry>
 
-	      	</listitem>
-	  		</varlistentry>
-    		<para>
-    		
-    		</para>
-		</variablelist>
-	</section>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<command>-header <group>tag_name <option>attr11 val1 
+								attr2 val2 ...</option></group></command>
+							</cmdsynopsis>
+							<para>
+								Assigns tag name and attributes to the XML header element (default: calheader) 						
+							</para>
+						</listitem>					
+					</varlistentry>
+
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<command>-body <group>tag_name <option>attr11 val1 
+								attr2 val2 ...</option></group></command>
+							</cmdsynopsis>
+							<para>
+								Assigns tag name and attributes to the XML body element of the table (default: calbody) 						
+							</para>
+						</listitem>					
+					</varlistentry>
+
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<command>-banner <group>tag_name <option>attr11 val1 
+								attr2 val2 ...</option></group></command>
+							</cmdsynopsis>
+							<para>
+								Assigns tag name and attributes to the XML banner element of the table (default: monthyear) 						
+							</para>
+							<para>
+								The header of a calendar table is made of a banner, showing the Month and Year number, and
+								of a weekdays bar. 							
+							</para>
+						</listitem>					
+					</varlistentry>
+
+
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<command>-foot <group>tag_name <option>attr11 val1 
+								attr2 val2 ...</option></group></command>
+							</cmdsynopsis>
+							<para>
+								Assigns tag name and attributes to the XML foot element of the table (default: calfoot). 						
+							</para>
+							<note>
+								This option was added for completeness, but it's not implemented yet							
+							</note>
+						</listitem>					
+					</varlistentry>
+
+
+					
+				</variablelist>
+			</refsect2>
+			
+		</refsect1>	
+	</refentry>
 </section>

@@ -1,4 +1,8 @@
 2010-07-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/html/calendar.html, doc/html/xml_calendar.html: Add html manual pages for Calendar
+    * doc/xml/calendar.xml: more changes to calendar.xml
+
+2010-07-02 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/calendar.xml: Add manual page for package Calendar (package still to be
       added to repository)
     * doc/xml/form.xml: Page for package 'form' written with a more structured
