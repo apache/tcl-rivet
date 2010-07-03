@@ -1,15 +1,16 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Calendar Package</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="form_package.html" title="form"><link rel="next" href="calendar.html" title="Calendar"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Calendar Package</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="form_package.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="calendar.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" title="Calendar Package"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="calendar_package"></a>Calendar Package</h2></div></div></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h3 class="title"><a name="id621306"></a>Introduction</h3></div></div></div><p style="width:90%">
-      	The Calendar package is a set of three classes that produce 
-      	calendar tables in 2 different forms: Ascii calendar and XML
-      	Calendar. The third class HtmlCalendar is a concrete descendant
-      	of XmlCalendar that prints a calendar in xhtml form. 
-      	The ascii output from Calendar is formatted in the same form
-      	the typical Unix <span style="font-family:monospace"><span class="command"><strong>cal</strong></span></span> command does. The internal
-      	code is based on Tcl only therefore doesn't rely on the existance 
-      	of the 'cal' command on the system. 
-      	This is also a base class from which the XmlCalendar
-      	class inherits the basic methods that generate the table.
-      	XmlCalendar prints an XML calendar table whose header, weekdays banner
-      	and week rows tags are configurable. Also specific days or
-      	specific weeks can be given arbitrary attributes.
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Calendar Package</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="form_package.html" title="form"><link rel="next" href="calendar.html" title="Calendar"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Calendar Package</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="form_package.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="calendar.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" title="Calendar Package"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="calendar_package"></a>Calendar Package</h2></div></div></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h3 class="title"><a name="id362642"></a>Introduction</h3></div></div></div><p style="width:90%">
+      	The package is based on the Calendar class, a class capable
+      	of printing an ascii calendar table that closely resembles the output 
+      	of the typical Unix <span style="font-family:monospace"><span class="command"><strong>cal</strong></span></span> command. The internal
+      	code is written entirely in Tcl, therefore doesn't rely on the 
+      	existance of <span style="font-family:monospace"><span class="command"><strong>cal</strong></span></span> on the system. 
+      	XmlCalendar inherits the basic methods and adds XML tagging to the
+      	table. XmlCalendar prints an XML calendar table whose header, 
+      	weekdays banner and days rows tags are configurable. 
+      	Also specific days or specific weeks can be given arbitrary attributes.
+      </p><p style="width:90%">
+      	Calendar core methods are based on the 
+      	<a class="ulink" href="http://wiki.tcl.tk/17964" target="_top">cal</a> procedure
+      	written by Richard Suchenwirth and published on the 
+      	<a class="ulink" href="http://wiki.tcl.tk" target="_top">Tcl Wiki</a>
       </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="form_package.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="calendar.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">form </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Calendar</td></tr></table></div></body></html>

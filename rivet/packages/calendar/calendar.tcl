@@ -15,7 +15,7 @@
 #
 #
 #
-# $Id: calendar.tcl 915 2010-07-02 14:15:00Z massimo.manghi $
+# $Id: calendar.tcl 916 2010-07-03 00:37:44Z massimo.manghi $
 #
 
 package provide Calendar 1.0
@@ -101,7 +101,7 @@ catch {::itcl::delete class Calendar}
 }
 
 ::itcl::body Calendar::weekdays {} {
-    return "  $day_names($language)\n"
+    return "$day_names($language)\n"
 }
 
 # header <month_idx> <year>
@@ -364,8 +364,8 @@ catch {::itcl::delete class Calendar}
 				    body	{tag "calbody"	    attr "" } \
 				    foot	{tag "calfoot"	    attr "" } \
 				    banner	{tag "monthyear"    attr "" } \
-				    banner_month {tag "span"	    attr "" } \
-				    banner_year  {tag "span"	    attr "" } \
+				    banner_month {tag "month"	    attr "" } \
+				    banner_year  {tag "year"	    attr "" } \
 				    wkdays_bar	{tag "weekdays"	    attr "" } \
 				    wkday_cell	{tag "wkday"	    attr "" } \
 				    days_row	{tag "week"	    attr "" } \
@@ -430,22 +430,20 @@ catch {::itcl::delete class Calendar}
 
 ::itcl::body XmlCalendar::weekdays { } {
     set rowtag	[getParameters wkdays_bar tag]
-    set html	[mkOpenTag $rowtag]    
+    set xml	[mkOpenTag $rowtag]    
 
     set tagname [getParameters wkday_cell tag]
     set wdn	0
     foreach dn $day_names($language) {
 	if {$wdn == $current_weekday} {
-	    append html "[mkOpenTag $tagname {class current_wkday}]$dn[mkCloseTag $tagname]"
+	    append xml "[mkOpenTag $tagname {class current_wkday}]$dn[mkCloseTag $tagname]"
 	} else {
-	    append html "[mkOpenTag $tagname]$dn[mkCloseTag $tagname]"
+	    append xml "[mkOpenTag $tagname]$dn[mkCloseTag $tagname]"
 	}
 	incr wdn
     }
-    append html [mkCloseTag $rowtag]
-    append html "\n"
-    return $html
-
+    append xml [mkCloseTag $rowtag]
+    return $xml
 }
 
 ::itcl::body XmlCalendar::banner {month_idx yr} {

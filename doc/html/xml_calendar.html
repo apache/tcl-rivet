@@ -1,17 +1,28 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>XmlCalendar</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="calendar_package.html" title="Calendar Package"><link rel="prev" href="calendar.html" title="Calendar"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">XmlCalendar</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="calendar.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center">Calendar Package</th><td width="20%" align="right"> <a accesskey="n" href="help.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="refentry" title="XmlCalendar"><div class="refentry.separator"><hr></div><a name="xml_calendar"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>XmlCalendar &#8212; XmlCalendar returns XML formatted calendar tables</p></div><div class="refsynopsisdiv" title="Synopsis"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">XmlCalendar</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>calendar_name</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">-option1 <em class="replaceable"><code>value_1</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">-option2 <em class="replaceable"><code>value_2</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">...</span>?</div></div></div><div class="refsect1"><a name="id621844"></a><p style="width:90%">
-				An XmlCalendar object is created and returned. This command object accepts many 
-				customization options to specify the XML tags to be used in the structure of
-				the cal table. 
-			</p><div class="refsect2" title="Options"><a name="id621851"></a><h3>Options</h3><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-container options_list</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
-								Assigns the <span style="font-family:monospace"><span class="command"><strong>options_list</strong></span></span> to the XML root element that 
-								will encompass the whole table.   
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>XmlCalendar</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="calendar_package.html" title="Calendar Package"><link rel="prev" href="calendar.html" title="Calendar"><link rel="next" href="html_calendar.html" title="HtmlCalendar"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">XmlCalendar</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="calendar.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center">Calendar Package</th><td width="20%" align="right"> <a accesskey="n" href="html_calendar.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="refentry" title="XmlCalendar"><div class="refentry.separator"><hr></div><a name="xml_calendar"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>XmlCalendar &#8212; Prints XML formatted calendar tables</p></div><div class="refsynopsisdiv" title="Synopsis"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">XmlCalendar</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>calendar_name</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">-option1 <em class="replaceable"><code>option_list</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">-option2 <em class="replaceable"><code>option_list</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">...</span>?</div></div></div><div class="refsect1"><a name="id363200"></a><p style="width:90%">
+				An XmlCalendar object is created and returned. XmlCalendar objects
+				print XML formatted calendar tables. The markup can be customized
+				using the configuration options. 
+			</p><p style="width:90%">
+				Configuration option are odd-length list of options. 
+			</p><p style="width:90%">
+				</p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">tag_name attr11 val1 attr2 val2 ...</pre><p style="width:90%">			
+			</p><p style="width:90%">
+				The first element of an option list is a tag name, the remaining terms (if specified) are
+				a even-length sublist which is interpreted as attribute-value pairs that
+				will be copied into the opening tag of an element			
+			</p></div><div class="refsect1" title="Methods"><a name="id363226"></a><h2>Methods</h2><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex ">
+		      			cal_obj <span style="font-weight:bold ; font-family:monospace">emit</span> -opt1 val1 -opt2 val2</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex ">
+		      			cal_obj <span style="font-weight:bold ; font-family:monospace">emit</span>  ?<span style="font-family:monospace; font-weight: bold;">month</span>? ?<span style="font-family:monospace; font-weight: bold;">year</span>?-opt1 val1 -opt2 val2</div></div><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex ">
+							cal_obj <span style="font-weight:bold ; font-family:monospace">emit</span>  ?<span style="font-family:monospace; font-weight: bold;">
+							<em class="replaceable"><code>month | year</code></em></span>?-opt1 val1 -opt2 val2</div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+							The method 'emit' if invoked without arguments returns an 
+							ASCII formatted calendar of the current month
+		      		</div></div></dd></dl></div></div><div class="refsect1"><a name="id363318"></a><div class="refsect2" title="Options"><a name="id363320"></a><h3>Options</h3><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-container  (tag_name 
+								attr11 val1 attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								Assigns an options list to the XML element that 
+								will hold the whole table.   
 							</div><div style="margin-bottom:1.5ex ; padding .5ex">
-								An option list is organized as an odd-sized list of option:
-<pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">tag_name attr11 val1 attr2 val2 ...</pre>
-							</div><div style="margin-bottom:1.5ex ; padding .5ex">
-								The first element of the list is the tag name that will assigned to the container
-								(default: calendar, no attributes). The remaining terms must be an even number and are
-								interpreted as attribute-value pairs	
+								The default tag for the container is 'calendar', with no attributes.
 							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-header  (tag_name attr11 val1 
 								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 								Assigns tag name and attributes to the XML header element (default: calheader) 						
@@ -26,7 +37,49 @@
 								of a weekdays bar. 							
 							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-foot  (tag_name attr11 val1 
 								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
-								Assigns tag name and attributes to the XML foot element of the table (default: calfoot). 						
+								Assigns tag name and attributes to the XML foot element 
+								of the table (default: calfoot). 						
 							</div><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
 								This option was added for completeness, but it's not implemented yet							
-							</td></tr></table></div></div></dd></dl></div></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="calendar.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="calendar_package.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="help.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Calendar </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Resources - How to Get Help</td></tr></table></div></body></html>
+							</td></tr></table></div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-banner_month  (tag_name attr11 val1 
+								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								Tag name and attributes for the XML element holding the 
+								month name (default:month)					
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-banner_year  (tag_name attr11 val1 
+								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								Tag name and attributes for the XML element holding the 
+								month name (default: year)					
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-weekdays  (tag_name attr11 val1 
+								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								Tag name and attributes for the XML element holding the 
+								weekday header (default: weekdays)					
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-weekdays_cell  (tag_name attr11 val1 
+								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								Tag name and attributes for the XML element holding the 
+								each single weekday (default: wkdays)					
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-days_row  (tag_name attr11 val1 
+								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								Tag name and attributes for the XML element holding the 
+								each row of the calendar table (default: week)					
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-days_cell  (tag_name attr11 val1 
+								attr2 val2 ...)</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								Tag name and attributes for the XML element representing
+								a cell in the calendar table (default: day)					
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-cell_function proc</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								If set this option is the name of a procedure that gets
+								called for every day of the month. The procedure must
+								accept 4 argument representing day, month, year and weekday
+								and must return an odd-length list interpreted in the same
+								way as options lists. 
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-current_day day</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								This option works as a simple method for pointing out
+								a specific day of the month. If set with a day number
+								that day will get the class attribute automatically
+								set as "current"
+							</div></div></dd><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">-current_weekday 0-6 | today</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+								This option works as a simple method for pointing out
+								a specific weekday of the month. If set with a weekday 
+								index (0: Sunday, 6: Saturday) the corresponding cell in
+								the weekdays header will get the class attribute automatically
+								set as "current_wkday"
+							</div></div></dd></dl></div></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="calendar.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="calendar_package.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="html_calendar.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">Calendar </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> HtmlCalendar</td></tr></table></div></body></html>

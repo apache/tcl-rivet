@@ -1,0 +1,25 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>HtmlCalendar</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="calendar_package.html" title="Calendar Package"><link rel="prev" href="xml_calendar.html" title="XmlCalendar"><link rel="next" href="help.html" title="Resources - How to Get Help"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">HtmlCalendar</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="xml_calendar.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center">Calendar Package</th><td width="20%" align="right"> <a accesskey="n" href="help.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="refentry" title="HtmlCalendar"><div class="refentry.separator"><hr></div><a name="html_calendar"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>HtmlCalendar &#8212; Concrete class derived from XmlCalendar</p></div><div class="refsynopsisdiv" title="Synopsis"><h2>Synopsis</h2><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">XmlCalendar</span>   <span style="font-family:monospace; font-weight: bold;"><em class="replaceable"><code>calendar_name</code></em></span>  ?<span style="font-family:monospace; font-weight: bold;">-option1 <em class="replaceable"><code>option_list</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">-option2 <em class="replaceable"><code>option_list</code></em></span>? ?<span style="font-family:monospace; font-weight: bold;">...</span>?</div></div></div><div class="refsect1"><a name="id363838"></a><p style="width:90%">
+				Concrete XmlCalendar class for printing html calendar tables. The markup of the class
+				is xhtml compliant and prints a code fragment for inclusion in a webpage.
+				The following is the class definition.
+			</p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
+::itcl::class HtmlCalendar {
+    inherit XmlCalendar
+    
+    constructor {args} {XmlCalendar::constructor $args} {
+    $this configure -container	 table   	\
+                    -header	    thead   	\
+                    -body         tbody   	\
+                    -banner	    tr	    	\
+                    -banner_month {th colspan 3 style "text-align: right;"} \
+                    -banner_year  {th colspan 4 style "text-align: left;"}  \
+                    -weekdays	    tr	   \
+                    -weekday_cell th	   \
+                    -days_row	    tr	   \
+                    -days_cell	 td 
+    }
+}</pre></div><div class="refsect1"><a name="id363857"></a><p style="width:90%">
+				A sample output from HtmlCalendar			
+			</p><p style="width:90%">
+				</p><div><img src="calendar.png"></div><p style="width:90%">			
+			</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="xml_calendar.html"><img src="images/prev.png" alt="Prev"></a> </td><td width="20%" align="center"><a accesskey="u" href="calendar_package.html"><img src="images/up.png" alt="Up"></a></td><td width="40%" align="right"> <a accesskey="n" href="help.html"><img src="images/next.png" alt="Next"></a></td></tr><tr><td width="40%" align="left" valign="top">XmlCalendar </td><td width="20%" align="center"><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a></td><td width="40%" align="right" valign="top"> Resources - How to Get Help</td></tr></table></div></body></html>
