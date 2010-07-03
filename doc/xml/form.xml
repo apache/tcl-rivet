@@ -6,16 +6,16 @@
 	<section>
 		<title>Introduction</title>
 	  	<para>
-			The <command>form</command> package is a utility to generating html forms. A <command>form</command>
+			The <command>form</command> package is a utility for generating html forms. A <command>form</command>
 			object command saves the programmer from typing the cumbersome html code of input elements, 
 			working out a solution for better standardization and readability of the code. 
-			<command>form</command> requires that just the basic information of interest to the code are 
+			<command>form</command> requires that only the minimum necessary to distinguish the element is
 			typed, greatly simplyfing the development of forms.
-			Option to the command are treated as a list of parameter-value pairs that become the defaults
+			Options to the command are treated as a list of parameter-value pairs that become the defaults
 			for the corresponding attributes of the form.
 		</para>
 		<para>
-			A <command>form</command> object has specialized menthods to generate all the standard 
+			A <command>form</command> object has specialized menthods to generate all of the standard 
 			input fields, i.e. text, password, hidden, generic button, submit or reset buttons and
 			image. <command>form</command> creates select input fields, radiobutton and checkbox
 			boolean options groups. Also new inputs introduced with HTML5 are supported: color, date, 
@@ -42,7 +42,7 @@
 		</refsynopsisdiv>
 		<refsect1>
 			<para>
-				creates and returns a new Tcl command named <replaceable>form_name</replaceable>. 
+	                        creates and returns a new Tcl command named <option><replaceable>form_name</replaceable></option>.
 			</para>
 			<refsect2>
 				<title>Options</title>
@@ -99,7 +99,7 @@
 								<arg choice="opt"><replaceable>URL</replaceable></arg>
 							</cmdsynopsis>
 							<para>
-								The URL to the procedure data are being sent to. If no <arg>-action</arg> switch is specified
+								The URL the data are being sent to. If no <arg>-action</arg> switch is specified
 								the data are sent to the form's URL.
 							</para>
 						</listitem>	  		
@@ -110,8 +110,8 @@
 		<refsect1>
 			<title>Form Object Commands</title>
 			<para>
-				Form object commands follow the usual syntax of Tcl commands with a <arg>subcommand</arg> argument playing the
-				role of a switch among various functionalities of the command. Form objects need also the parameter <arg>name</arg>
+	Form object commands follow the usual syntax of Tcl commands with a <arg><replaceable>subcommand</replaceable></arg> argument playing the
+	role of a switch among various functionalities of the command. Form objects also need the <arg><replaceable>name</replaceable></arg> parameter 
 				which is to become the value of the 'name' attribute in an input field. This argument is the key that has to be 
 				used by the server-side script to retrieve the input field value. 
 			</para>
@@ -129,14 +129,14 @@
 			</variablelist>
 			<para>			
 				Options passed to a subcommand are copied into the tag as attribute="value" pairs. 
-				Some subcommand (e.g. form, radiobuttons and checkboxes) treat specific options in a way 
+				Some subcommands (e.g. form, radiobuttons and checkboxes) treat specific options in a way 
 				that fits the specific organization and function of these fields. 
 			</para>
 			<para>
-				Exception to this general syntax are the subcommand <command>field</command> and <command>end</command>. 
+				Exceptions to this general syntax are the <command>field</command> and <command>end</command> subcommands.
 				<command>field</command> is an abstract input field creation method and requires an additional
-				parameter specifiyng the type of field being created. Every concrete input field generation command
-				uses this subcommand internally to get the html code printed.
+				parameter specifiyng the type of field to create. Every concrete input field generation command
+				uses this subcommand internally to print the final html.
 			</para>
 		</refsect1>
 		
@@ -159,8 +159,8 @@
 								Print the &lt;form&gt; tag with all its attributes. 
 								This command must be called as first in the form generation
 								process. The following is a sample of code creating a form named 'formname' whose data will
-								be sent with method GET. Initial form fields values will be obtained from array 
-								'response'
+								be sent via the GET method. Initial form fields values will be obtained from array 
+		<varname>response</varname>
 							</para>
 							<programlisting>
 form myform -defaults response -method get -name formname
@@ -171,8 +171,8 @@ myform submit submit -value Search
 myform end</programlisting>						
 							<para>
 								The code prints a form that sends a text entry content and the option value 
-								associated to a radiobutton. The URL of the server script is the same that
-								created the form. Use the <arg>-url</arg> option to specify a different url
+								associated with a radiobutton. The URL of the server script is the same that
+								created the form. Use the <arg>-url</arg> option to specify a different url.
 							</para>
 		    			</listitem>
 			   	</varlistentry>
@@ -192,7 +192,7 @@ myform end</programlisting>
 				      			Possible values are get or post
 				      		</para>
 				      		<note>
-									At the time of writing only the 'get' method is implemented		      	
+									Currently, only the 'get' method is implemented		      	
 				      		</note>
 				    		</listitem>
 		  				</varlistentry>
@@ -232,7 +232,7 @@ myform end</programlisting>
 									<arg choice="opt"><replaceable>URL</replaceable></arg>
 								</cmdsynopsis>
 								<para>
-									The URL to the procedure data are being sent to. If no <arg>-action</arg> switch is specified
+									The URL the data will be sent to. If no <arg>-action</arg> switch is specified
 									the data are sent to the form's URL.
 								</para>
 							</listitem>	  		
@@ -250,7 +250,7 @@ myform end</programlisting>
 					      </cmdsynopsis>
 			      		<para>	
 			      			Print the &lt;/form&gt; closing tag. This command must
-								be called as last in the form generation process
+								be called last in the form generation process
 							</para>
 						</listitem>
 					</varlistentry>
@@ -267,7 +267,7 @@ myform end</programlisting>
 								<arg>args</arg>
 					      </cmdsynopsis>
 			      		<para>	
-			      			Print a field of the given <arg>type</arg> and <arg>name</arg>,
+		Print a field of the given <arg><replaceable>type</replaceable></arg> and <arg><replaceable>name</replaceable></arg>,
 								including any default key-value pairs defined for this field 
 								type and optional key-value pairs included with the statement
 							</para>
@@ -320,7 +320,7 @@ myform end</programlisting>
 												<arg choice="opt"><replaceable>values_list</replaceable></arg>
 											</cmdsynopsis>
 											<para>
-												List of values associated to the radiobuttons to be displayed
+												List of values associated with the radiobuttons to be displayed
 											</para>								
 										</listitem>								
 									</varlistentry>
@@ -359,7 +359,7 @@ myform end</programlisting>
 &lt;input type="radio" name="fruit" class="myradiobclass" value="small" /&gt;Strawberry
 </programlisting>
 							<para>
-								if the 'response' array has a variable for the name 'fruit' the corresponding 
+		if the <varname>response</varname> array has a variable for the name 'fruit' the corresponding 
 								radiobutton field is automatically checked. The options <arg>values</arg> and <arg>labels</arg>
 								are used internally and don't get into the tag attributes. If a <arg>labels</arg> 
 								option is not given, labels are assigned using the <arg>values</arg> list.
@@ -383,7 +383,7 @@ myform end</programlisting>
 							<para>
 								The <arg choice="plain">checkbox</arg> subcommand emits a checkbox 
 								type input field with the name, label and value attributes set 
-								accordingly to the parameters passed to the subcommand.
+								according to the parameters passed to the subcommand.
 							</para>
 								<refsect3>
 								<title>Options</title>
@@ -395,7 +395,7 @@ myform end</programlisting>
 												<arg choice="opt"><replaceable>values_list</replaceable></arg>
 											</cmdsynopsis>
 											<para>
-												List of values associated to the checkboxes to be displayed
+												List of values associated with the checkboxes to be displayed
 											</para>								
 										</listitem>								
 									</varlistentry>
@@ -414,7 +414,7 @@ myform end</programlisting>
 								</variablelist>				
 							</refsect3>
 							<para>
-								Example, the following code:
+								Example:
 							</para>
 							<programlisting>myform checkbox options -value opt1   -label "Option 1"
 myform checkbox options -value opt2   -label "Option 2"
@@ -444,8 +444,7 @@ myform checkbox options -value opt4   -label "Option 4"</programlisting>
 								<arg>args</arg>
 							</cmdsynopsis>
 							<para>
-								Same as text, but the input is kept hidden as usual for
-								passwords
+								Same as text, but the input is obfuscated so as not to reveal the text being typed
 							</para>					
 						</listitem>				
 					</varlistentry>
@@ -461,7 +460,7 @@ myform checkbox options -value opt4   -label "Option 4"</programlisting>
 								<arg>args</arg>
 							</cmdsynopsis>
 							<para>
-								hidden input element: the classical field to be embedded in form to 
+								hidden input element: typicall embedded in a form in order to
 								pass status variables.
 							</para>					
 						</listitem>				
@@ -509,7 +508,7 @@ myform checkbox options -value opt4   -label "Option 4"</programlisting>
 								<arg>args</arg>
 							</cmdsynopsis>
 							<para>
-								emits the code for a button field having <arg>name</arg> as name
+		emits the code for a button field having <arg><replaceable>name</replaceable></arg> as name
 							</para>			
 						</listitem>
 					</varlistentry>
@@ -525,7 +524,7 @@ myform checkbox options -value opt4   -label "Option 4"</programlisting>
 								<arg>args</arg>
 							</cmdsynopsis>
 							<para>
-								Classical HTML reset button that brings the input fields
+								Classical HTML reset button that resets the input fields
 								back to their initial values
 							</para>
 						</listitem>								
