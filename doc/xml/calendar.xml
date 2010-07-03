@@ -19,6 +19,11 @@
       	written by Richard Suchenwirth and published on the 
       	<ulink url="http://wiki.tcl.tk">Tcl Wiki</ulink>
       </para>
+      <note>
+	The Calendar package uses Tcl <command>dict</command> command to manage markup 
+	information. Hence either Tcl8.5 or Tcl8.4 with 
+	<ulink url="http://wiki.tcl.tk/5042">package dict</ulink> are required.   
+      </note>
    </section>
    <refentry id="calendar">
    	<refnamediv>
@@ -340,7 +345,7 @@ puts $current_month
 		</refnamediv>
 		<refsynopsisdiv>
 			<cmdsynopsis>
-			  	<command>XmlCalendar</command>
+			  	<command>HtmlCalendar</command>
 			  	<arg choice="plain"><replaceable>calendar_name</replaceable></arg>
 			   <arg>-option1 <replaceable>option_list</replaceable></arg>
 			   <arg>-option2 <replaceable>option_list</replaceable></arg>
@@ -358,16 +363,16 @@ puts $current_month
     inherit XmlCalendar
     
     constructor {args} {XmlCalendar::constructor $args} {
-    $this configure -container	 table   	\
-                    -header	    thead   	\
-                    -body         tbody   	\
-                    -banner	    tr	    	\
+    $this configure -container    table \
+                    -header       thead \
+                    -body         tbody \
+                    -banner       tr    \
                     -banner_month {th colspan 3 style "text-align: right;"} \
                     -banner_year  {th colspan 4 style "text-align: left;"}  \
-                    -weekdays	    tr	   \
-                    -weekday_cell th	   \
-                    -days_row	    tr	   \
-                    -days_cell	 td 
+                    -weekdays     tr    \
+                    -weekday_cell th    \
+                    -days_row     tr    \
+                    -days_cell    td 
     }
 }</programlisting>
 		</refsect1>

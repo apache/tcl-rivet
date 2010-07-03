@@ -18,10 +18,13 @@
 # $Id: calendar.tcl 916 2010-07-03 00:37:44Z massimo.manghi $
 #
 
+
+if {[catch {package require Tcl 8.5} e] && [catch {package require dict} e]} {
+    return -code error -errorInfo "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)"
+}
+
 package provide Calendar 1.0
 package require Itcl
-
-catch {::itcl::delete class Calendar}
 
 # Calendar: base class to create a calendar table. 
 #
