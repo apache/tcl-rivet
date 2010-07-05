@@ -421,7 +421,7 @@ myform checkbox options -value opt2   -label "Option 2"
 myform checkbox options -value opt3   -label "Option 3"
 myform checkbox options -value opt4   -label "Option 4"</programlisting>
 							<para>
-								Provided opt2 was in the list valued response array (in the 'options' variable) that 
+								Provided opt2 was in response array (in the list valued 'options' variable) that 
 								initialized the form, the output would look like this
 							</para>
 							<programlisting>&lt;input type="checkbox" name="options" label="Option 1" value="opt1" /&gt;Option 1
