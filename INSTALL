@@ -4,43 +4,56 @@
 For more detailed instructions, see the docs/html/ directory.
 
 Rivet is now based on the autotools - autoconf, automake and libtool,
-and so compilation is simple.  For example:
+and so compilation is simple.  
 
-if you have a clean source tree you have to prepare it for autotools
+1) run 'configure' with the appropiate options for your installation. (if you
+are building Rivet from a working copy created by svn you have also to prepare
+the source tree running 'aclocal; autoreconf' beforehand)
 
-  aclocal
-  autoreconf
+Example:
 
-and then run 'configure' with the switches that suit your setup
-
-./configure --with-tcl=/usr/lib/tcl8.4/ 	\
+./configure --with-tcl=/usr/lib/tcl8.5/ 	\
 	    --with-apxs=/usr/bin/apxs 		\
-	    --with-tclsh=/usr/bin/tclsh8.4 	\
-	    --with-apache-version=1
+	    --with-tclsh=/usr/bin/tclsh8.5 	\
+	    --with-apache-version=2		\
+	    --with-rivet-target-dir=/usr/lib/rivet2.0 \
+	    --enable-version-display
+
+2) if 'configure' was successful Rivet is ready for compilation
+
 make
+
+3) Install Rivet with the usual 
+
+sudo make install
+
+or simply
+
 make install
 
-Along with the usual 'configure' variables Rivet's configure script 
-handles other specific environmental variables. 
+if your configuration doesn't require you to have administrative privileges.
 
---with-tcl=DIR				Directory where tclConfig.sh is
-					stored. This is a shell script that
-					defines all the relevant symbols needed
-					to build Tcl related applications.
---with-apache-version=VER		Values are 1 or 2 depending
-					on the apache server you're 
-					builing the module for.
---with-apache=DIR			Apache server's root directory.
---with-apxs=FILE			Path to the apxs program to
-					be used in the compilation
-					process.
---with-apache-include=DIR		Apache's include files path.
---with-apr-config=FILE			Apache Portable Runtime 
-					metainformation program
---with-rivet-target-dir=DIR		Rivet Tcl library installation
-					directory.
---enable-version-display		Apache signature shows Rivet 
-					version number. Default=no
+Along with the usual 'configure' variables Rivet's configure script 
+handles other specific options. 
+
+--with-tcl=DIR			Directory where tclConfig.sh is
+				stored. This is a shell script that
+				defines all the relevant symbols needed
+				to build Tcl related applications.
+--with-apache-version=VER	Values are 1 or 2 depending
+				on the apache server you're 
+				builing the module for.
+--with-apache=DIR		Apache server's root directory.
+--with-apxs=FILE		Path to the apxs program to
+				be used in the compilation
+				process.
+--with-apache-include=DIR	Apache's include files path.
+--with-apr-config=FILE		Apache Portable Runtime 
+				metainformation program
+--with-rivet-target-dir=DIR	Rivet library installation directory.
+--enable-version-display	Apache signature shows Rivet 
+				version number in the form Rivet/2.0.x. 
+				Default=no
 
 These are the basic Apache configuration directives that are needed:
 
@@ -54,13 +67,6 @@ AddType application/x-rivet-tcl    tcl
 # The default charset can be specified in the configuration
 
 AddType "application/x-httpd-rivet; charset=utf-8" rvt
-
-Configuring the compilation phase for Rivet with Apache 2 (using Tcl8.5) on a 
-system where multiple version of Tcl coexist might look like the following
-
-./configure --with-tcl=/usr/lib/tcl8.5 --with-apache-version=2	\
-	    --with-tclsh=/usr/bin/tclsh8.5 --with-apache=/usr	\
-	    --with-rivet-target-dir=/usr/lib/myrivetlib
 
 If Apache1.x and Apache2.x coexist on the same system you must
 tell configure where the right apxs (apache extension tool) script is
@@ -77,5 +83,7 @@ aclocal
 autoreconf
 ./configure --with-apache-version=2 --with-tcl=/usr/lib --with-apxs=/usr/bin/apxs 
 make
+
+Rivet was packaged for SuSE. See http://tcl.apache.org/download.html
 
 # RCS: @(#) $Id$

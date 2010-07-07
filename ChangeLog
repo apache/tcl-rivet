@@ -1,9 +1,16 @@
+2010-07-07 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: improved installation instructions before merging trunk into branches/2_0
+
 2010-07-03 Massimo Manghi <mxmanghi@apache.org>
     * rivet/package/calendar/calendar.tcl: Add check on tcl version. If Tcl8.4 is being used
     we also need 'dict' backport as Calendar uses a dictionary to store some internal
     data.
     * doc/xml/calendar.xml: Wrong header corrected. Added explicit note about the requirements
     of the package
+
+2010-07-03 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: Fixed indentation in weekdays row
+    * doc/html/: Manual pages regenerated to include latest changes in section about package Calendar
 
 2010-07-02 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/calendar/calendar.tcl: Add experimental package Calendar
