@@ -20,7 +20,8 @@
 
 
 if {[catch {package require Tcl 8.5} e] && [catch {package require dict} e]} {
-    return -code error -errorInfo "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)"
+    return -code error -errorinfo "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)" \
+	    "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)"
 }
 
 package provide Calendar 1.0
