@@ -175,7 +175,7 @@ package require Itcl
 #   command output this corresponds to the 2 lines showing the year, the month and
 #   the weekdays
 #   - the output buffer is appended filled with the actual table of days of the month
-#   - the output is closed. The abstract method does basically nothing
+#   - the output is closed. This class does basically nothing
 
 ::itcl::body Calendar::cal {month_idx year} {
 
@@ -190,13 +190,13 @@ package require Itcl
 
 }
 
-# emit args: emit return the text of the calendar. If one argument is passed
+# emit args: emit returns the text of the calendar. If one argument is passed
 # to this method its value is taken as a year number and the whole calendar for
 # that year is printed, thus cycling this same method for each month of the year and
 # concatenating the output in a single buffer.
-# If 2 arguments are passed in emit interprets them as month and year. <month> can be
-# specified both in number (1-12) or abbrebiated (Jan,Feb,....,Dec). A minimal support
-# for other languages exists. If no argumets are passed to 'emit' the current month
+# If 2 arguments are passed emit interprets them as month and year. <month> can be
+# specified both in number (1-12) or abbreviated name (Jan,Feb,....,Dec). A minimal support
+# for other languages exists. If no arguments are passed to 'emit' the current month
 # calendar is displayed.
 #
 
@@ -298,6 +298,12 @@ package require Itcl
 
 }
 
+# XmlCalendar: XmlCalendar inherits the table structure of Calendar and 
+# adds XML markup to a calendar table. The design is driven by the layout
+# of a calendar table. This is probably a rather naive approach.  
+# A better implementation would require separate data and layout classes,
+# but it's only a calendar table anyway 
+
 ::itcl::class XmlCalendar {
     inherit Calendar
 
@@ -311,6 +317,8 @@ package require Itcl
 #  - days_row
 #  - days_cell
 #
+# for every key a 'tag' and 'attr' key is defined. attr is a even-length list storing 
+# attribute-value pairs
 
     protected variable	parameters
 
