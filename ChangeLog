@@ -4,6 +4,8 @@
     * rivet/packages/session/session-create.sql: columns 'key' and 'package' are renamed as 'key_" and
     'package_'.
     * rivet/packages/dio/dio_Postgresql.tcl: fixed typo in variable name 
+    * doc/xml/calendar.xml: More correction made on calendar.xml
+    * doc/html/*.html: The whole manual has been rebuilt with the latest changes
 
 2010-07-07 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: improved installation instructions before merging trunk into branches/2_0

@@ -104,13 +104,14 @@ puts $current_month
 				using the configuration options. 
 			</para>
 			<para>
-				Configuration option are odd-length list of options. 
+				Configuration options accept odd-length lists as values. An option_list has the following
+				structure
 			<para>
 				<programlisting>tag_name <option>attr11 val1 attr2 val2 ...</option></programlisting>			
 			</para>
-				The first element of an option list is a tag name, the remaining terms (if specified) are
-				a even-length sublist which is interpreted as attribute-value pairs that
-				will be copied into the opening tag of an element			
+				The first element of an option list is a tag name, the remaining terms are therefore
+				an even-length sublist which is interpreted as a sequence of attribute-value pairs that
+				will in turn become attributes of the tag.
 			</para>
 		</refsect1>
 		<refsect1>
@@ -123,15 +124,16 @@ puts $current_month
 		      		</cmdsynopsis>
 						<cmdsynopsis>
 		      			cal_obj <command>emit</command> <arg>month</arg> <arg>year</arg> 
-		      			 <option>-opt1 val1 -opt2 val2</option>
+		      			 <option> -opt1 val1 -opt2 val2</option>
 		      		</cmdsynopsis>
 		      		<cmdsynopsis>
 							cal_obj <command>emit</command> <arg>
-							<replaceable>month | year</replaceable></arg> <option>-opt1 val1 -opt2 val2</option>
+							<replaceable>month | year</replaceable></arg> <option> -opt1 val1 
+							-opt2 val2</option>
 		      		</cmdsynopsis>
 						<para>
 							The method 'emit' if invoked without arguments returns an 
-							ASCII formatted calendar of the current month
+							XML calendar table of the current month
 		      		</para>
 					</listitem>
 				</varlistentry>
@@ -378,7 +380,7 @@ puts $current_month
 		</refsect1>
 		<refsect1>
 			<para>
-				A sample output from HtmlCalendar			
+				A sample output from HtmlCalendar (with some styling)			
 			</para>
 			<para>
 				<graphic fileref="calendar.png"/>			
