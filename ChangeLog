@@ -1,3 +1,6 @@
+2010-07-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: no code change, only new comments added
+
 2010-07-07 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: improved installation instructions before merging trunk into branches/2_0
 
