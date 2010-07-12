@@ -1,3 +1,79 @@
+2010-07-12 Massimo Manghi <mxmanghi@apache.org>
+    * branches/2_0: Merge of trunk changes into the 2_0 branch. 
+
+2010-07-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: new comments added. Fixed misspelled -errorinfo option
+    in a return statement.
+    * rivet/packages/session/session-create.sql: columns 'key' and 'package' are renamed as 'key_" and
+    'package_'.
+    * rivet/packages/dio/dio_Postgresql.tcl: fixed typo in variable name 
+    * doc/xml/calendar.xml: More correction made on calendar.xml
+    * doc/html/*.html: The whole manual has been rebuilt with the latest changes
+
+2010-07-07 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: improved installation instructions before merging trunk into branches/2_0
+
+2010-07-03 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/package/calendar/calendar.tcl: Add check on tcl version. If Tcl8.4 is being used
+    we also need 'dict' backport as Calendar uses a dictionary to store some internal
+    data.
+    * doc/xml/calendar.xml: Wrong header corrected. Added explicit note about the requirements
+    of the package
+
+2010-07-03 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: Fixed indentation in weekdays row
+    * doc/html/: Manual pages regenerated to include latest changes in section about package Calendar
+
+2010-07-02 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: Add experimental package Calendar
+
+2010-07-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/html/calendar.html, doc/html/xml_calendar.html: Add html manual pages for Calendar
+    * doc/xml/calendar.xml: more changes to calendar.xml
+
+2010-07-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/calendar.xml: Add manual page for package Calendar (package still to be
+      added to repository)
+    * doc/xml/form.xml: Page for package 'form' written with a more structured
+      docbook organization that allows finer styling of a manual page.
+    * doc/rivet.xsl: Add xsl configurations for elements refsect1,refsect2 and
+      refsect3
+    * configure.ac: Add message when building for Apache 1.x
+ 
+2010-07-01 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/Makefile.am: removed target 'html/rivet.html" from 'docs' depends. The no-chunks version
+    of the manual can be build running 'make docs-nochunk'
+
+2010-06-30 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/form.xml: Add 'checkbox' subcommand documentation
+    * doc/html/*.html: Updated manual pages
+
+2010-06-30 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form.tcl: fixed various methods in package form: 'field' method must
+    treat checkboxes and radiobuttons alike, so that labels are printed next to the button.
+    'radiobuttons' specialized method should not propagate the '-labels' switch to the attributes
+    of the tag. 
+    * doc/rivet.xml: add new documentation in file doc/xml/form.xml
+    * doc/xml/form.xml: add to repository
+    * doc/html/form.html,doc/html/form_package.html: add to repository
+    * doc/html/*.html: new manual pages including the form package
+
+2010-06-22 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: Rivet install target deletes every pkgIndex.tcl file that might have been 
+    left around in the Rivet directory tree, before calling pkg_mkIndex.tcl to regenerate 
+    the library index file in the root directory.
+    * rivet/packages/tclrivet/parse.tcl,rivet/packages/commserver/server.tcl: add existence test on 
+    argv variable that wept during the installation process. If not set exits silently (variable is 
+    required for a sensible use of the procedures)
+    * rivet/packages/tclrivet/tclrivet.tcl: wrong path to librivetparser.[so|dll] corrected
+    
+2010-06-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: filled SERVER_CONF variable in the 'server' array with value generated
+    by the build system of the directory holding the conf files. 
+    This fulfills a TODO comment in the code. The array server is undocumented and is not clear if it was
+    added for the benefit of the programmer or for debugging of the module.
+    * src/apache-2/mod_rivet.h: structure definitions beautified and aligned.
+  
 2010-05-14 Massimo Manghi <mxmanghi@apache.org>
     * BUGS,INSTALL,Changelog: small improvements in the documentation
 

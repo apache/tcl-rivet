@@ -340,40 +340,42 @@
       </refsynopsisdiv>
 
       <refsect1>
-	<title>Description</title>
-	Load any form variables passed to this page into an
-	array. If <command>load_response</command> is called without 
-	arguments the array <option>response</option> is created in 
-	the scope of the caller. If the variables var1,var2,var3...
-	having values val1,val2,val3... are passed to the page, the
-	resulting array will be a collection mapping var1,var2,var3...
-	to their corresponding values. <command>load_response</command>
-	was inspired by the same NeoWebScript procedure in the way
-	it deals with multiple assignments: if a variable 
-	is assigned more than once the corresponding array element will be a 
-	list of the values for the variable. This can be useful in the case 
-	of forms with checkbox options that are given the same name.
-	Calling <command>load_response</command> several times for the same
-	array results in adding more values to the array at every call. 
-	When needed it is left to the caller to empty the array between 
-	two subsequent calls.  
+			<title>Description</title>
+			<para>
+				Load any form variables passed to this page into an
+				array. If <command>load_response</command> is called without 
+				arguments the array <option>response</option> is created in 
+				the scope of the caller. If the variables var1,var2,var3...
+				having values val1,val2,val3... are passed to the page, the
+				resulting array will be a collection mapping var1,var2,var3...
+				to their corresponding values. <command>load_response</command>
+				was inspired by the same NeoWebScript procedure in the way
+				it deals with multiple assignments: if a variable 
+				is assigned more than once the corresponding array element will be a 
+				list of the values for the variable. This can be useful in the case 
+				of forms with checkbox options that are given the same name.
+				Calling <command>load_response</command> several times for the same
+				array results in adding more values to the array at every call. 
+				When needed it is left to the caller to empty the array between 
+				two subsequent calls.  
+			</para>
       </refsect1>
     </refentry>
 
     <refentry id="load_headers">
       <refnamediv>
-	<refname>load_headers</refname>
-	<refpurpose>get client request's headers.</refpurpose>
+			<refname>load_headers</refname>
+			<refpurpose>get client request's headers.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>load_headers</command>
-	  <arg><replaceable>array_name</replaceable></arg>
-	</cmdsynopsis>
+			<cmdsynopsis>
+			  <command>load_headers</command>
+			  <arg><replaceable>array_name</replaceable></arg>
+			</cmdsynopsis>
       </refsynopsisdiv>
 
-      <refsect1>
+	<refsect1>
 	<title>Description</title>
 	<para>
 	  Load the headers that come from a client request into the
@@ -825,8 +827,8 @@
 
     <refentry id="escape_string">
       <refnamediv>
-	<refname>escape_string</refname>
-	<refpurpose>convert a string into escaped characters.</refpurpose>
+			<refname>escape_string</refname>
+			<refpurpose>convert a string into escaped characters.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>

@@ -51,43 +51,42 @@
 module AP_MODULE_DECLARE_DATA rivet_module;
 
 typedef struct _rivet_server_conf {
-    Tcl_Interp *server_interp;           /* per server Tcl interpreter */
-    Tcl_Obj *rivet_global_init_script;   /* run once when apache is started */
+    Tcl_Interp *server_interp;          /* per server Tcl interpreter */
+    Tcl_Obj *rivet_global_init_script;	/* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
-    char *rivet_before_script;        /* script run before each page */
-    char *rivet_after_script;         /*            after            */
-    char *rivet_error_script;         /*            for errors */
+    char *rivet_before_script;		/* script run before each page	*/
+    char *rivet_after_script;		/*            after		*/
+    char *rivet_error_script;		/*            for errors	*/
 
     /* This flag is used with the above directives.  If any of them
        have changed, it gets set. */
     int user_scripts_updated;
 
-    Tcl_Obj *rivet_default_error_script;        /* for errors */
+    Tcl_Obj *rivet_default_error_script;    /* for errors */
     int *cache_size;
     int *cache_free;
     int upload_max;
     int upload_files_to_var;
     int separate_virtual_interps;
-    int honor_header_only_reqs;			/* default: 0 */
+    int honor_header_only_reqs;		    /* default: 0 */
     char *server_name;
     const char *upload_dir;
     apr_table_t *rivet_server_vars;
     apr_table_t *rivet_dir_vars;
     apr_table_t *rivet_user_vars;
-    char **objCacheList;   /* Array of cached objects (for priority handling) */
-    Tcl_HashTable *objCache; /* Objects cache - the key is the script name */
+    char **objCacheList;		    /* Array of cached objects (for priority handling) */
+    Tcl_HashTable *objCache;		    /* Objects cache - the key is the script name */
 
-    /* stuff for buffering output */
-    Tcl_Channel *outchannel;
+    Tcl_Channel *outchannel;		    /* stuff for buffering output */
 } rivet_server_conf;
 
 /* eventually we will transfer 'global' variables in here and
    'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
-    request_rec *r;             /* request rec */
-    TclWebRequest *req;         /* TclWeb API request */
+    request_rec *r;			    /* request rec */
+    TclWebRequest *req;			    /* TclWeb API request */
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);

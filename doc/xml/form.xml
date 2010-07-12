@@ -1,0 +1,808 @@
+<!-- $Id: -->
+
+<section id="form">
+	<title>Form: An HTML Form Fields Generation Utility</title>
+
+	<section>
+		<title>Introduction</title>
+	  	<para>
+			The <command>form</command> package is a utility for generating html forms. A <command>form</command>
+			object command saves the programmer from typing the cumbersome html code of input elements, 
+			working out a solution for better standardization and readability of the code. 
+			<command>form</command> requires that only the minimum necessary to distinguish the element is
+			typed, greatly simplyfing the development of forms.
+			Options to the command are treated as a list of parameter-value pairs that become the defaults
+			for the corresponding attributes of the form.
+		</para>
+		<para>
+			A <command>form</command> object has specialized menthods to generate all of the standard 
+			input fields, i.e. text, password, hidden, generic button, submit or reset buttons and
+			image. <command>form</command> creates select input fields, radiobutton and checkbox
+			boolean options groups. Also new inputs introduced with HTML5 are supported: color, date, 
+			datetime, datetime-local, email, file, month, number, range, search, tel, time, url, week.
+		</para>
+		<para>
+			Other input elements can be generated using the general purpose 'field' method.			
+		</para>
+	</section>
+	<refentry id="form_package">
+
+		<refnamediv>
+			<refname>form</refname>
+			<refpurpose> a Tcl command object for creating HTML forms</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+			  	<command>form</command>
+			  	<arg choice="plain"><replaceable>form_name</replaceable></arg>
+			   <arg>-option1 <replaceable>value_1</replaceable></arg>
+			   <arg>-option2 <replaceable>value_2</replaceable></arg>
+			   <arg>...</arg>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<para>
+	                        creates and returns a new Tcl command named <option><replaceable>form_name</replaceable></option>.
+			</para>
+			<refsect2>
+				<title>Options</title>
+
+	    		<variablelist>
+					<varlistentry>
+			    		<listitem>
+			      		<cmdsynopsis>
+								<arg choice="plain">-method</arg>
+								<arg choice="opt">post|get</arg>
+			      		</cmdsynopsis>
+			      		<para>
+			      			The http method for sending the form data back to the server.
+			      			Possible values are get or post
+			      		</para>
+			      		<note>
+								At the time of writing only the 'get' method is implemented		      	
+			      		</note>
+			    		</listitem>
+	  				</varlistentry>
+					<varlistentry>
+		    			<listitem>
+		      			<cmdsynopsis>
+								<arg choice="plain">-name</arg>
+								<arg choice="opt"><replaceable>form_name</replaceable></arg>
+		      			</cmdsynopsis>
+		      			<para>
+		      				a name for the form being created: this value becomes the value of the 
+		      				attribute 'name' in the &lt;form&gt; tag.
+		      			</para>
+		    			</listitem>
+	  				</varlistentry>
+	  				<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">-defaults</arg>
+								<arg choice="opt"><replaceable>default_values</replaceable></arg>
+							</cmdsynopsis>
+							<para>
+								an array of default values	to be assigned to the fields of the form. 
+								Every name in the array is matched with an input field, when
+								a given field gets added to the form it is initialized with the 
+								value of the corresponding variable in the array. 
+								This option works well in conjuction with the 
+								<command>load_response</command> command of Rivet when default 
+								values come from another form.
+							</para>
+						</listitem>	  		
+	  				</varlistentry>
+	  				<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">-action</arg>
+								<arg choice="opt"><replaceable>URL</replaceable></arg>
+							</cmdsynopsis>
+							<para>
+								The URL the data are being sent to. If no <arg>-action</arg> switch is specified
+								the data are sent to the form's URL.
+							</para>
+						</listitem>	  		
+	  				</varlistentry>
+  				</variablelist>
+			</refsect2>
+		</refsect1>
+		<refsect1>
+			<title>Form Object Commands</title>
+			<para>
+	Form object commands follow the usual syntax of Tcl commands with a <arg><replaceable>subcommand</replaceable></arg> argument playing the
+	role of a switch among various functionalities of the command. Form objects also need the <arg><replaceable>name</replaceable></arg> parameter 
+				which is to become the value of the 'name' attribute in an input field. This argument is the key that has to be 
+				used by the server-side script to retrieve the input field value. 
+			</para>
+			<variablelist>
+				<varlistentry>
+					<listitem>
+						<cmdsynopsis>
+								form_object <arg choice="plain">subcommand</arg> <arg>name</arg>
+								<arg>-option1 <replaceable>value1</replaceable></arg> 
+								<arg>-option2 <replaceable>value2</replaceable></arg>
+								<arg>...</arg>
+						</cmdsynopsis>
+					</listitem>	
+				</varlistentry>			
+			</variablelist>
+			<para>			
+				Options passed to a subcommand are copied into the tag as attribute="value" pairs. 
+				Some subcommands (e.g. form, radiobuttons and checkboxes) treat specific options in a way 
+				that fits the specific organization and function of these fields. 
+			</para>
+			<para>
+				Exceptions to this general syntax are the <command>field</command> and <command>end</command> subcommands.
+				<command>field</command> is an abstract input field creation method and requires an additional
+				parameter specifiyng the type of field to create. Every concrete input field generation command
+				uses this subcommand internally to print the final html.
+			</para>
+		</refsect1>
+		
+		<refsect1>
+			<title>Subcommands</title>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+					      <cmdsynopsis>
+								<command>start</command>
+								<arg>name</arg>
+								<arg>-method <replaceable>get | post</replaceable></arg> 
+								<arg>-name <replaceable>form_name</replaceable></arg>
+								<arg>-defaults <replaceable>default_values</replaceable></arg>
+								<arg>-action <replaceable>URL</replaceable></arg>
+								<arg>args</arg>
+					      </cmdsynopsis>
+			      		<para>
+								Print the &lt;form&gt; tag with all its attributes. 
+								This command must be called as first in the form generation
+								process. The following is a sample of code creating a form named 'formname' whose data will
+								be sent via the GET method. Initial form fields values will be obtained from array 
+		<varname>response</varname>
+							</para>
+							<programlisting>
+form myform -defaults response -method get -name formname
+myform start
+myform text	  text_entry -size 20
+myform select option_selected -values {opt1 opt2 opt3 opt4}
+myform submit submit -value Search
+myform end</programlisting>						
+							<para>
+								The code prints a form that sends a text entry content and the option value 
+								associated with a radiobutton. The URL of the server script is the same that
+								created the form. Use the <arg>-url</arg> option to specify a different url.
+							</para>
+		    			</listitem>
+			   	</varlistentry>
+				</variablelist>
+		    	<refsect3>
+		    		<title>Options</title>
+	
+		    		<variablelist>
+						<varlistentry>
+				    		<listitem>
+				      		<cmdsynopsis>
+									<arg choice="plain">-method</arg>
+									<arg choice="opt">post|get</arg>
+				      		</cmdsynopsis>
+				      		<para>
+				      			The method to be used to encode the form data. 
+				      			Possible values are get or post
+				      		</para>
+				      		<note>
+									Currently, only the 'get' method is implemented		      	
+				      		</note>
+				    		</listitem>
+		  				</varlistentry>
+						<varlistentry>
+			    			<listitem>
+			      			<cmdsynopsis>
+									<arg choice="plain">-name</arg>
+									<arg choice="opt"><replaceable>form_name</replaceable></arg>
+			      			</cmdsynopsis>
+			      			<para>
+			      				a name for the form being generated: this value becomes the value of the 
+			      				attribute 'name' in the &lt;form&gt; tag.
+			      			</para>
+			    			</listitem>
+		  				</varlistentry>
+		  				<varlistentry>
+							<listitem>
+								<cmdsynopsis>
+									<arg choice="plain">-defaults</arg>
+									<arg choice="opt"><replaceable>default_values</replaceable></arg>
+								</cmdsynopsis>
+								<para>
+									an array of default values	to be assigned to the fields of the form. 
+									Every name in the array is matched with an input field, when
+									a given field gets added to the form it is initialized with the 
+									value of the corresponding variable in the array. 
+									This option works well in conjuction with the 
+									<command>load_response</command> command of Rivet when default values
+									come from another form.
+								</para>
+							</listitem>	  		
+		  				</varlistentry>
+		  				<varlistentry>
+							<listitem>
+								<cmdsynopsis>
+									<arg choice="plain">-action</arg>
+									<arg choice="opt"><replaceable>URL</replaceable></arg>
+								</cmdsynopsis>
+								<para>
+									The URL the data will be sent to. If no <arg>-action</arg> switch is specified
+									the data are sent to the form's URL.
+								</para>
+							</listitem>	  		
+		  				</varlistentry>
+	  				</variablelist>
+				</refsect3>
+			</refsect2>
+
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+					      <cmdsynopsis>
+								<command>end</command>
+					      </cmdsynopsis>
+			      		<para>	
+			      			Print the &lt;/form&gt; closing tag. This command must
+								be called last in the form generation process
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+					      <cmdsynopsis>
+								<command>field</command>
+								<arg>name</arg>
+								<arg>type</arg>
+								<arg>args</arg>
+					      </cmdsynopsis>
+			      		<para>	
+		Print a field of the given <arg><replaceable>type</replaceable></arg> and <arg><replaceable>name</replaceable></arg>,
+								including any default key-value pairs defined for this field 
+								type and optional key-value pairs included with the statement
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+				<refsect3>
+		    		<title>Options</title>
+	
+		    		<variablelist>
+						<varlistentry>
+				    		<listitem>
+				      		<cmdsynopsis>
+									<arg choice="plain">-opt1</arg>
+									<arg choice="opt">val1</arg>
+				      		</cmdsynopsis>
+				      		<para>
+				      			Option description
+				      		</para>
+				    		</listitem>
+		  				</varlistentry>
+					</variablelist>
+				</refsect3>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">radiobuttons</arg>
+								<arg>name</arg>
+								<arg>-values <replaceable>values</replaceable></arg>
+								<arg>-labels <replaceable>labels</replaceable></arg>
+								<arg>args</arg> 					
+							</cmdsynopsis>
+							<para>
+								the <command>radiobutton</command> creates a whole radiobutton group
+								with the values and labels specified in the argument list. 
+								If no <arg>-labels</arg> switch is
+								passed to the subcommand the values are printed as labels of 
+								the radiobutton.
+							</para>
+							<refsect3>
+								<title>Options</title>
+								<variablelist>
+									<varlistentry>
+										<listitem>
+											<cmdsynopsis>
+												<arg choice="plain">-values</arg>
+												<arg choice="opt"><replaceable>values_list</replaceable></arg>
+											</cmdsynopsis>
+											<para>
+												List of values associated with the radiobuttons to be displayed
+											</para>								
+										</listitem>								
+									</varlistentry>
+									<varlistentry>
+										<listitem>
+											<cmdsynopsis>
+												<arg choice="plain">-labels</arg>
+												<arg choice="opt"><replaceable>labels_list</replaceable></arg>
+											</cmdsynopsis>
+											<para>
+												List of labels to be printed with every radiobutton. There must
+												be a label for every radiobutton
+	 										</para>
+										</listitem>								
+									</varlistentry>
+								</variablelist>				
+							</refsect3>
+							<para>
+								Example:
+							</para>
+							<programlisting>
+form myform -defaults response -method get -name formname
+myform start
+myform text text_entry -size 20
+myform radiobuttons fruit -values {big medium small} \
+              -labels {Watermelon Orange Strawberry} \
+              -class myradiobclass
+myform submit submit -value Search
+myform end</programlisting>
+							<para>
+								will print the following HTML code.
+							</para>
+							<programlisting>
+&lt;input type="radio" name="fruit" class="myradiobclass" value="big" /&gt;Watermelon
+&lt;input type="radio" name="fruit" class="myradiobclass" value="medium" /&gt;Orange
+&lt;input type="radio" name="fruit" class="myradiobclass" value="small" /&gt;Strawberry
+</programlisting>
+							<para>
+		if the <varname>response</varname> array has a variable for the name 'fruit' the corresponding 
+								radiobutton field is automatically checked. The options <arg>values</arg> and <arg>labels</arg>
+								are used internally and don't get into the tag attributes. If a <arg>labels</arg> 
+								option is not given, labels are assigned using the <arg>values</arg> list.
+							</para>
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">checkbox</arg>
+								<arg>name</arg>
+								<arg>-label <replaceable>label</replaceable></arg>
+								<arg>-value <replaceable>value</replaceable></arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								The <arg choice="plain">checkbox</arg> subcommand emits a checkbox 
+								type input field with the name, label and value attributes set 
+								according to the parameters passed to the subcommand.
+							</para>
+								<refsect3>
+								<title>Options</title>
+								<variablelist>
+									<varlistentry>
+										<listitem>
+											<cmdsynopsis>
+												<arg choice="plain">-values</arg>
+												<arg choice="opt"><replaceable>values_list</replaceable></arg>
+											</cmdsynopsis>
+											<para>
+												List of values associated with the checkboxes to be displayed
+											</para>								
+										</listitem>								
+									</varlistentry>
+									<varlistentry>
+										<listitem>
+											<cmdsynopsis>
+												<arg choice="plain">-labels</arg>
+												<arg choice="opt"><replaceable>labels_list</replaceable></arg>
+											</cmdsynopsis>
+											<para>
+												List of labels to be printed with every checkbox. There must
+												be a label for every checkbox
+	 										</para>
+										</listitem>								
+									</varlistentry>
+								</variablelist>				
+							</refsect3>
+							<para>
+								Example:
+							</para>
+							<programlisting>myform checkbox options -value opt1   -label "Option 1"
+myform checkbox options -value opt2   -label "Option 2"
+myform checkbox options -value opt3   -label "Option 3"
+myform checkbox options -value opt4   -label "Option 4"</programlisting>
+							<para>
+								Provided opt2 was in response array (in the list valued 'options' variable) that 
+								initialized the form, the output would look like this
+							</para>
+							<programlisting>&lt;input type="checkbox" name="options" label="Option 1" value="opt1" /&gt;Option 1
+&lt;input type="checkbox" name="options" label="Option 2" value="opt2" 
+       	 checked="checked" /&gt;Option 2
+&lt;input type="checkbox" name="options" label="Option 3" value="opt3" /&gt;Option 3
+&lt;input type="checkbox" name="options" label="Option 4" value="opt4" /&gt;Option 4</programlisting>
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">password</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								Same as text, but the input is obfuscated so as not to reveal the text being typed
+							</para>					
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">hidden</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								hidden input element: typicall embedded in a form in order to
+								pass status variables.
+							</para>					
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">submit</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								emits the code for a classical HTML submit button. Example: the following
+								code
+							</para>
+							<para>
+								<programlisting>
+	form myform -defaults response -method get -name feedsearch
+	myform start
+	myform submit submit -value Search</programlisting>						
+							</para>
+							<para>
+								Would emit a form  like this
+							</para>
+							<programlisting>
+	&lt;form...&gt;
+	&lt;input type="submit" name="submit" value="Search" /&gt; 
+	&lt;/form&gt;</programlisting>
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">button</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+		emits the code for a button field having <arg><replaceable>name</replaceable></arg> as name
+							</para>			
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">reset</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								Classical HTML reset button that resets the input fields
+								back to their initial values
+							</para>
+						</listitem>								
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>	
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">image</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								Emits an image input field
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">checkbox</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								Emits a checkbox input field
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">radio</arg>
+								<arg>name</arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								Emits a radiobutton input field
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">color</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "color" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">date</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "date" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">datetime</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "datetime" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">datetime_local</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "datetime_local" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">email</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "email" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">file</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "file" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">month</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "month" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">number</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "number" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">range</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "range" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">search</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "search" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">tel</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "tel" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">time</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "time" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">url</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "url" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">week</arg>
+								<arg>name</arg>
+								<arg>args</arg>							
+							</cmdsynopsis>
+							<para>
+								Emits an HTML 5 "week" form field						
+							</para>			
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+	  		</refsect2>
+		</refsect1>
+	</refentry>
+</section>	

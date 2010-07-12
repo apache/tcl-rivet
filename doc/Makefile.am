@@ -16,12 +16,12 @@
 
 
 # English, multiple files.
-html/index.html: rivet.xml rivet-chunk.xsl xml/*.xml
+html/index.html: rivet.xml rivet-chunk.xsl rivet.xsl xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css --stringparam \
 	html.ext ".html" --nonet -o html/ rivet-chunk.xsl rivet.xml
 
 # English, one big file.
-html/rivet.html: rivet.xml rivet-nochunk.xsl xml/*.xml
+html/rivet.html: rivet.xml rivet-nochunk.xsl rivet.xsl xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css --stringparam \
 	html.ext ".html" --nonet -o html/rivet.html rivet-nochunk.xsl \
 	rivet.xml
@@ -29,7 +29,9 @@ html/rivet.html: rivet.xml rivet-nochunk.xsl xml/*.xml
 # FIXME - this means these are not build automatically, but at least
 # people aren't forced to build them either.
 
-docs: html/index.html html/rivet.html
+docs: html/index.html
+
+docs-nochunk:	html/rivet.html
 
 clean:
 	-rm html/*.html

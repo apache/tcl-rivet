@@ -4,6 +4,8 @@
 
 # Parse a rivet file and execute it.
 
+if {![info exists argv]} { return }
+
 set auto_path "[file dirname [info script]] $auto_path"
 package require tclrivet
 

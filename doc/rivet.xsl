@@ -156,6 +156,34 @@
     </div>
   </xsl:template>
 
+<!-- refsect3 -->
+  <xsl:template match="refsect3/title">
+      <div style="padding:4 ; margin-top:3 ; margin-left: 5%;">
+			<xsl:apply-templates />
+		</div>
+  </xsl:template>
+
+  <xsl:template match="refsect3/variablelist/varlistentry">
+    <dt>
+      <xsl:call-template name="anchor"/>
+      <xsl:apply-templates select="term"/>
+    </dt>
+    <dd>
+      <div style="padding:4 ; margin-top:3 ; margin-left: 5%;
+	margin-bottom:3 ; width:70%;" >
+	<xsl:apply-templates select="listitem"/>
+      </div>
+    </dd>
+  </xsl:template>
+
+<!--  -->
+
+  <xsl:template match="listitem/para">
+    <div style="margin-bottom:1.5ex ; padding .5ex">
+      <xsl:apply-templates/>
+    </div>
+  </xsl:template>
+
   <xsl:template match="arg">
     <xsl:variable name="choice" select="@choice"/>
     <xsl:variable name="rep" select="@rep"/>
