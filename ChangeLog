@@ -1,6 +1,9 @@
 2010-07-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/calendar/calendar.tcl: new comments added. Fixed misspelled -errorinfo option
     in a return statement.
+    * rivet/packages/session/session-create.sql: columns 'key' and 'package' are renamed as 'key_" and
+    'package_'.
+    * rivet/packages/dio/dio_Postgresql.tcl: fixed typo in variable name 
 
 2010-07-07 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: improved installation instructions before merging trunk into branches/2_0

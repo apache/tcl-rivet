@@ -138,7 +138,7 @@ namespace eval DIO {
 	    # did, put that in in place of numrows, hiding a postgresql
 	    # idiosyncracy from DIO
 	    if {$numrows == 0} {
-	        set cmdrows [pg_result $resultId -cmdTuples]
+	        set cmdrows [pg_result $resultid -cmdTuples]
 		if {$cmdrows != ""} {
 		    set numrows $cmdrows
 		}

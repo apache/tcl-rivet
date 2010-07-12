@@ -16,8 +16,8 @@ create table rivet_session(
 
 create table rivet_session_cache(
     session_id		varchar REFERENCES rivet_session(session_id) ON DELETE CASCADE,
-    package		varchar,
-    key                 varchar,
+    package_		varchar,
+    key_                varchar,
     data                varchar,
 
     UNIQUE( session_id, package, key )
