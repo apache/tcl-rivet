@@ -1,3 +1,6 @@
+2010-07-13 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml,doc/html/*.html: Latest minor changes before releasing
+
 2010-07-12 Massimo Manghi <mxmanghi@apache.org>
     * branches/2_0: Merge of trunk changes into the 2_0 branch. 
 
