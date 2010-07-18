@@ -68,35 +68,37 @@ static server_rec   *rivet_panic_server_rec  = NULL;
 
 /* rivet or tcl file */
 #define CTYPE_NOT_HANDLED   0
-#define RIVET_FILE	    1
-#define TCL_FILE	    2
+#define RIVET_FILE          1
+#define TCL_FILE            2
 
 /* rivet return codes */
 #define RIVET_OK 0
 #define RIVET_ERROR 1
-
+ 
 TCL_DECLARE_MUTEX(sendMutex);
 
 #define RIVET_FILE_CTYPE	"application/x-httpd-rivet"
 #define TCL_FILE_CTYPE		"application/x-rivet-tcl"
 
 /* This snippet of code came from the mod_ruby project, which is under a BSD license. */
-#ifdef RIVET_APACHE2 /* Apache 2.x */
 
-static void ap_chdir_file(const char *file)
+static int Rivet_chdir_file (const char *file)
 {
     const  char *x;
+    int    chdir_retval = 0;
+
     char chdir_buf[HUGE_STRING_LEN];
     x = strrchr(file, '/');
     if (x == NULL) {
-	chdir(file);
+        chdir_retval = chdir(file);
     } else if (x - file < sizeof(chdir_buf) - 1) {
-	memcpy(chdir_buf, file, x - file);
-	chdir_buf[x - file] = '\0';
-	chdir(chdir_buf);
+        memcpy(chdir_buf, file, x - file);
+        chdir_buf[x - file] = '\0';
+        chdir_retval = chdir(chdir_buf);
     }
+        
+    return chdir_retval;
 }
-#endif
 
 /* Function to be used should we desire to upload files to a variable */
 
@@ -1583,7 +1585,17 @@ Rivet_SendContent(request_rec *r)
 
     /* This one is the big catch when it comes to moving towards
        Apache 2.0, or one of them, at least. */
-    ap_chdir_file(r->filename);
+    if (Rivet_chdir_file(r->filename) < 0)
+    {
+        /* something went wrong doing chdir into r->filename, we are not specific
+        at this. We simply emit an internal server error and print a log message
+        */
+        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
+                    "Error accessing %s, could not chdir into directory", r->filename);
+
+        retval = HTTP_INTERNAL_SERVER_ERROR;
+        goto sendcleanup;
+    }
 
     //TODO: clarify whether rsc or rdc
     //Rivet_PropagatePerDirConfArrays( interp, rdc );

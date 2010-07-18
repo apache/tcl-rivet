@@ -1,3 +1,9 @@
+2010-07-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: static void ap_chdir_file renamed as static int Rivet_chdir_file. Rivet_chdir_file
+    returns the value returned by chdir. This value is checked and in case of error the request
+    aborts with an HTTP_INTERNAL_ERROR and a message is printed in the log file.
+    * VERSION,configure.ac: version number changes as 2.0.1 (temporarily) 
+    
 2010-07-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/calendar/calendar.tcl: new comments added. Fixed misspelled -errorinfo option
     in a return statement.
