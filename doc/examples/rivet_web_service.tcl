@@ -1,12 +1,16 @@
 #
-# Query servelet: a database is built into the dictionary 'composers'. It emulates
-# the role of a data source. The script send 2 types of responses: a catalog of the records
-# id the database and a database entry. The script obviously misses error handling and the
-# likes. It must be seen working with its html and JavaScript counterparts.
+# Ajax query servelet: a pseudo database is built into the dictionary 'composers' with the
+# purpose of emulating the role of a real data source. 
+# The script answers with  2 types of responses: a catalog of the record ids and a database 
+# entry matching a given rec_id. The script obviously misses the error handling and the
+# likes. Just an example to see rivet sending xml data to a browser. The full Tcl, JavaScript
+# and HTML code are available from http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz
 
-# Requires Tcl8.5 or Tcl8.4 with package 'dict' (http://pascal.scheffers.net/software/tclDict-8.5.2.tar.gz)
+# This example requires Tcl8.5 or Tcl8.4 with package 'dict' 
+# (http://pascal.scheffers.net/software/tclDict-8.5.2.tar.gz)
 # 
 
+# A pseudo database. rec_id matches a record in the db
 
 set composers [dict create  1 {first_name Claudio middle_name "" last_name Monteverdi	\
 			       lifespan 1567-1643 era Renaissance/Baroque}		\
