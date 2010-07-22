@@ -267,32 +267,12 @@
     <example id="calendar">
 	<title>A Calendar Utility</title>
 	<para>
-	    Rivet comes with a <emphasis>Calendar</emphasis> package that provides 3 classes for printing 
+	    Rivet comes with a <emphasis>Calendar</emphasis> package that provides classes for printing 
 	    calendar tables in various forms.	
 	</para>
-	<orderedlist>
-	    <listitem>
-		The <emphasis>Calendar</emphasis> class prints ascii calendar tables
-		<programlisting>package require Calendar
-set c [Calendar #auto]
-set c_txt [$c emit]
-puts $c_txt
-      Jul 2010
- Su Mo Tu We Th Fr Sa 
-              1  2  3
-  4  5  6  7  8  9 10
- 11 12 13 14 15 16 17
- 18 19 20 21 22 23 24
- 25 26 27 28 29 30 31</programlisting>
-	    </listitem>
-	    <listitem>
-		The <emphasis>XmlCalendar</emphasis> class prints a calendar table with XML markup to
-		identify different parts of the table
-	    </listitem>
-	    <listitem>
-		The <emphasis>HtmlCalendar</emphasis> class prints an XmlCalendar whose markup has been
-		specialized to be a valid XHTML fragment. The implementation of HtmlCalendar 
-		uses the HTML 'table' tag to format the calendar. Example: the following code
+	<para>
+		The <emphasis>HtmlCalendar</emphasis> class prints a calendar table in a similar form the Unix 
+		program 'cal' does. Example: the following code
 		<programlisting>package require Calendar
 
 proc ::cal_cell_attributes { day month year weekday } {
@@ -308,10 +288,9 @@ puts $html_txt
 </programlisting>
 
 	    with some CSS styling would print
-	    <para>
+	 </para>
+	 <para>
 		<graphic fileref="calendar.png" />
-	    </para>
-	    </listitem>
-	</orderedlist>
-    </example>
+	 </para>
+  </example>
 </section>
