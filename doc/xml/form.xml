@@ -58,9 +58,6 @@
 			      			The http method for sending the form data back to the server.
 			      			Possible values are get or post
 			      		</para>
-			      		<note>
-								At the time of writing only the 'get' method is implemented		      	
-			      		</note>
 			    		</listitem>
 	  				</varlistentry>
 					<varlistentry>

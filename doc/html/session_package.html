@@ -1,4 +1,4 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Session Package</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="diodisplay_package.html" title="DIODisplay"><link rel="next" href="form.html" title="Form: An HTML Form Fields Generation Utility"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Session Package</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="diodisplay_package.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="form.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" title="Session Package"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="session_package"></a>Session Package</h2></div></div></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h3 class="title"><a name="id619472"></a>Introduction</h3></div></div></div><p style="width:90%">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Session Package</title><link rel="stylesheet" href="rivet.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="Apache Rivet"><link rel="up" href="index.html" title="Apache Rivet"><link rel="prev" href="diodisplay_package.html" title="DIODisplay"><link rel="next" href="form.html" title="Form: An HTML Form Fields Generation Utility"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Session Package</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="diodisplay_package.html"><img src="images/prev.png" alt="Prev"></a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="form.html"><img src="images/next.png" alt="Next"></a></td></tr></table></div><div class="section" title="Session Package"><div class="titlepage"><div><div><hr><h2 class="title" style="clear: both"><a name="session_package"></a>Session Package</h2></div></div></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h3 class="title"><a name="id568598"></a>Introduction</h3></div></div></div><p style="width:90%">
 	This is session management code.  It provides an interface
 	to allow you to generate and track a browser's visit as a
 	"session", giving you a unique session ID and an interface
@@ -25,7 +25,7 @@
 	  All DB interfacing is done through DIO, though, so it
 	  should be relatively easy to add support for other
 	  databases.
-	</p></div><div class="section" title="Preparing To Use It"><div class="titlepage"><div><div><h3 class="title"><a name="id619808"></a>Preparing To Use It</h3></div></div></div><p style="width:90%">Create the tables in your SQL server.  With Postgres,
+	</p></div><div class="section" title="Preparing To Use It"><div class="titlepage"><div><div><h3 class="title"><a name="id568934"></a>Preparing To Use It</h3></div></div></div><p style="width:90%">Create the tables in your SQL server.  With Postgres,
 	  do a <span style="font-family:monospace"><span class="command"><strong>psql www</strong></span></span> or whatever DB you
 	  connect as, then a backslash-i on
 	  <code class="filename">session-create.sql</code></p><p style="width:90%">(If you need to delete the tables, use <code class="filename">session-drop.sql</code>)</p><p style="width:90%">The session code by default requires a DIO handle
@@ -33,7 +33,7 @@
 	  overridden).  We get it by doing a</p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">
 	      RivetServerConf ChildInitScript "package require DIO"
 	      RivetServerConf ChildInitScript "::DIO::handle Postgresql DIO -user www"
-	    </pre></div><div class="section" title="Example Usage"><div class="titlepage"><div><div><h3 class="title"><a name="id619853"></a>Example Usage</h3></div></div></div><p style="width:90%">In your httpd.conf, add:</p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">RivetServerConf ChildInitScript "package require Session; Session SESSION"</pre><p style="width:90%">
+	    </pre></div><div class="section" title="Example Usage"><div class="titlepage"><div><div><h3 class="title"><a name="id568979"></a>Example Usage</h3></div></div></div><p style="width:90%">In your httpd.conf, add:</p><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">RivetServerConf ChildInitScript "package require Session; Session SESSION"</pre><p style="width:90%">
 	  This tells Rivet you want to create a session object named
 	  SESSION in every child process Apache creates.</p><p style="width:90%">
 	  You can configure the session at this point using numerous
@@ -54,7 +54,7 @@
 	  additional requests are received during the session, all
 	  under the control of the key-value pairs controlling the
 	  session object.
-	</p></div><div class="section" title="Using Sessions From Your Code"><div class="titlepage"><div><div><h3 class="title"><a name="id619910"></a>Using Sessions From Your Code</h3></div></div></div><p style="width:90%">The main methods your code will use are:</p><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">SESSION</span> <span style="font-weight:bold ; font-family:monospace">id</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
+	</p></div><div class="section" title="Using Sessions From Your Code"><div class="titlepage"><div><div><h3 class="title"><a name="id569035"></a>Using Sessions From Your Code</h3></div></div></div><p style="width:90%">The main methods your code will use are:</p><div class="variablelist"><dl><dt></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div class="cmdsynopsis" style="width:80%"><div style="background:#ccccff ; margin:1ex ; padding:.4ex; padding-left: 0.8ex;   word-spacing:1ex "><span style="font-weight:bold ; font-family:monospace">SESSION</span> <span style="font-weight:bold ; font-family:monospace">id</span> </div></div><div style="margin-bottom:1.5ex ; padding .5ex">
 		After doing a <span style="font-family:monospace"><span class="command"><strong>SESSION activate</strong></span></span>,
 		this will return a 32-byte ASCII-encoded random
 		hexadecimal string.  Every time this browser comes
@@ -81,7 +81,7 @@
 		none was set.  (Status is set to the DIO error that
 		occurred, it can be fetched using the status
 		method.)
-	      </div></div></dd></dl></div></div><div class="section" title="Session Configuration Options"><div class="titlepage"><div><div><h3 class="title"><a name="id620107"></a>Session Configuration Options</h3></div></div></div><p style="width:90%">The following key-value pairs can be specified when a
+	      </div></div></dd></dl></div></div><div class="section" title="Session Configuration Options"><div class="titlepage"><div><div><h3 class="title"><a name="id569233"></a>Session Configuration Options</h3></div></div></div><p style="width:90%">The following key-value pairs can be specified when a
 	  session object (like SESSION above) is created:</p><div class="variablelist"><dl><dt><span class="term">sessionLifetime</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">how many seconds the session will live for.
 		7200 == 2 hours
 	      </div></div></dd><dt><span class="term">sessionRefreshInterval</span></dt><dd><div style="padding:4 ; margin-top:3 ;  margin-bottom:3 ; width:75%"><div style="margin-bottom:1.5ex ; padding .5ex">
@@ -134,7 +134,7 @@
 		file handle that debugging messages will be written
 		to (default
 		<code class="varname">stdout</code>)
-	      </div></div></dd></dl></div></div><div class="section" title="Session Methods"><div class="titlepage"><div><div><h3 class="title"><a name="id620335"></a>Session Methods</h3></div></div></div><p style="width:90%">
+	      </div></div></dd></dl></div></div><div class="section" title="Session Methods"><div class="titlepage"><div><div><h3 class="title"><a name="id569460"></a>Session Methods</h3></div></div></div><p style="width:90%">
 	  The following methods can be invoked to find out
 	  information about the current session, store and fetch
 	  server data identified with this session, etc:
@@ -173,7 +173,7 @@
 		If they don't have one or it isn't valid (timed out,
 		etc), create a session and drop a cookie on
 		them.
-	      </div></div></dd></dl></div></div><div class="section" title="Getting Additional Randomness From The Entropy File"><div class="titlepage"><div><div><h3 class="title"><a name="id620561"></a>Getting Additional Randomness From The Entropy File</h3></div></div></div><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">RivetServerConf ChildInitScript "Session SESSION -entropyFile /dev/urandom \
+	      </div></div></dd></dl></div></div><div class="section" title="Getting Additional Randomness From The Entropy File"><div class="titlepage"><div><div><h3 class="title"><a name="id569686"></a>Getting Additional Randomness From The Entropy File</h3></div></div></div><pre style="background:#ccc; margin: 2ex; margin-right: 10%;       padding: 1ex; border: dashed black 1px ; white-space: pre;      font-family: monospace; font-size: 90%;" class="programlisting">RivetServerConf ChildInitScript "Session SESSION -entropyFile /dev/urandom \
   -entropyLength 10 -debugMode 1"</pre><p style="width:90%">
 	  This options say we want to get randomness from an entropy
 	  file (random data pseudo-device) of /dev/urandom, to get ten

@@ -26,7 +26,7 @@ html/rivet.html: rivet.xml rivet-nochunk.xsl rivet.xsl xml/*.xml
 	html.ext ".html" --nonet -o html/rivet.html rivet-nochunk.xsl \
 	rivet.xml
 
-# FIXME - this means these are not build automatically, but at least
+# This means these are not build automatically, but at least
 # people aren't forced to build them either.
 
 docs: html/index.html
