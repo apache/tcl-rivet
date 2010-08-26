@@ -1,3 +1,9 @@
+2010-08-26 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: removed AC_DEFINE(BUILD_rivet....) as the tcl.m4 providing TEA 3.9
+    makes redundant this definition. Argument to TEA_INIT changed accordingly
+    * tclconfig/tcl.m4: overwritten by the new tcl.m4 and made a couple of adjustments that make it autoreconf/autoheader
+    friendly.
+
 2010-07-20 Massimo Manghi <mxmanghi@apache.org>
     * doc/examples/rivet_web_service.tcl,doc/html/*.html: Improved example of Ajax servlet. 
     Manual changed accordingly.

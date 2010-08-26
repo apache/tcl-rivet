@@ -23,7 +23,7 @@ dnl
 #-----------------------------------------------------------------------
 
 AC_INIT([Rivet],[2.0.1])
-TEA_INIT([3.7])
+TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 AM_INIT_AUTOMAKE
@@ -125,15 +125,17 @@ TEA_ADD_TCL_SOURCES([])
 # TEA_ADD_* any platform specific compiler/build info here.
 #--------------------------------------------------------------------
 
+# removed AC_DEFINE(BUILD_rivet....) as per TEA 3.9 (Massimo Manghi 20100825)
+
 if test "${TEA_PLATFORM}" = "windows" ; then
-    AC_DEFINE(BUILD_rivet,1,[Define to define the BUILD_rivet define (?)])
+#   AC_DEFINE(BUILD_rivet,1,[Define to define the BUILD_rivet define (?)])
     CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
-    #TEA_ADD_SOURCES([win/winFile.c])
-    #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
+#   #TEA_ADD_SOURCES([win/winFile.c])
+#   #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
 else
     CLEANFILES="pkgIndex.tcl"
-    #TEA_ADD_SOURCES([unix/unixFile.c])
-    #TEA_ADD_LIBS([-lsuperfly])
+#   #TEA_ADD_SOURCES([unix/unixFile.c])
+#   #TEA_ADD_LIBS([-lsuperfly])
 fi
 AC_SUBST(CLEANFILES)
 
