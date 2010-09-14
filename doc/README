@@ -1,0 +1,8 @@
+$Id: $
+
+Graphic files that are to be displayed in the manual must be in the doc/images/ directory. 
+Files in this directory are copied into the doc/html/images directory where they are referenced 
+by the html pages. Files are to be added to svn manually. References to this files must be relative
+to the manual root and therefore look like
+
+<graphic fileref="images/calendar.png" />

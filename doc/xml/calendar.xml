@@ -383,7 +383,7 @@ puts $current_month
 				A sample output from HtmlCalendar (with some styling)			
 			</para>
 			<para>
-				<graphic fileref="calendar.png"/>			
+				<graphic fileref="images/calendar.png"/>			
 			</para>
 		</refsect1>
 	</refentry>
