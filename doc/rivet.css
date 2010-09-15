@@ -1,0 +1,31 @@
+body {
+    font-family: Arial, sans-serif;
+    font-style: normal;
+}
+
+div.navheader  {
+    background-color: #405871;
+    color: #ffffff;
+    font-size: 150%;
+}
+
+div.navfooter {
+    font-weight: bold;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:link {
+    font-weight: bold;
+}
+a:visited {
+    font-weight: normal;
+}
+a:active {
+    text-decoration: underline;
+}
+a:hover {
+    text-decoration: underline;
+}

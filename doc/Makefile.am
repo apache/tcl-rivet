@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# $Id$
+
 .PHONY:	clean 
 
 MANDIRS = html/ html/images
@@ -33,9 +35,12 @@ html/rivet.html: rivet.xml rivet-nochunk.xsl rivet.xsl xml/*.xml
 # This means these are not build automatically, but at least
 # people aren't forced to build them either.
 
-docs: mandirs graphics html/index.html
+docs: mandirs graphics html/rivet.css html/index.html
 
 docs-nochunk: html/rivet.html
+
+html/rivet.css: mandirs rivet.css
+	cp -v rivet.css html/
 
 graphics: mandirs $(PICTURES)
 	for gfile in $?; do \
@@ -50,6 +55,7 @@ $(MANDIRS):
 
 clean:
 	-rm html/*.html 
+	-rm html/*.css
 	-rm html/images/*.*
 	if [ -e graphics ]; then \
 	    rm graphics ; \
