@@ -1,3 +1,9 @@
+libapache2-mod-rivet (2.0.1-1) unstable; urgency=low
+    
+  * repackaging rivet
+
+ -- Massimo Manghi <mxmanghi@apache.org>  Wed, 15 Sep 2010 17:52:00 +0200
+
 rivet (0.5.0-2) unstable; urgency=low
 
   * Added a dependency on Apache.  Added .info file.  Added some automatic

@@ -2,14 +2,22 @@
 
 # $Id$
 
-TCL_VERSION=8.4
+export	DH_VERBOSE=1
 
-package=rivet
+TCL_VERSION=8.5
+
+package=libapache2-mod-rivet
 
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	./configure --with-tcl=/usr/lib/tcl$(TCL_VERSION)/ --with-apxs=/usr/bin/apxs --enable-threads  --with-tclsh=/usr/bin/tclsh$(TCL_VERSION)
+	./configure --with-tcl=/usr/lib/tcl$(TCL_VERSION)/	\
+		    --with-apache=/usr				\
+		    --with-apxs=/usr/bin/apxs2			\
+		    --with-tclsh=/usr/bin/tclsh$(TCL_VERSION)	\
+		    --with-apache-version=2			\
+		    --with-rivet-target-dir=/usr/lib/rivet2.0	\
+		    --enable-version-display 
 	touch configure-stamp
 
 build: build-stamp
@@ -17,7 +25,7 @@ build: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
 	$(MAKE)
-	( cd doc/ $(MAKE) docs )
+	( cd doc/; $(MAKE) docs )
 	touch build-stamp
 
 clean:
@@ -33,11 +41,13 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
-	cp debian/500mod_rivet.info \
-                debian/tmp/`apxs -q LIBEXECDIR`/500mod_rivet.info
-	cp debian/rivet.conf \
-                debian/tmp/etc/apache/conf.d/rivet.conf
+#	cp debian/rivet.load debian/tmp/etc/apache2/mods-available/
+#	(cd debian/tmp/etc/apache2/mods-enabled/ ; ln -s ../mods-available/rivet.load)
+#	cp debian/rivet.conf debian/tmp/etc/apache2/mods-available/
+#	(cd debian/tmp/etc/apache2/mods-enabled/ ; ln -s ../mods-available/rivet.conf)
 
+#	cp debian/500mod_rivet.info debian/tmp/`apxs -q LIBEXECDIR`/500mod_rivet.info
+#	cp debian/rivet.conf debian/tmp/etc/apache/conf.d/rivet.conf
 
 binary-indep: build install
 
