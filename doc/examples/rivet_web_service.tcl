@@ -1,48 +1,27 @@
-# The database array contains xml fragments representing the
-# results of queries to a database. Many databases are now able
-# to produce the results of a query in XML. 
 #
-#array unset composer
-#
-set	composer(1)	"&lt;composer&gt;\n"
-append  composer(1)     "    &lt;first_name&gt;Claudio&lt;/first_name&gt;\n"
-append  composer(1)	"    &lt;last_name&gt;Monteverdi&lt;/last_name&gt;\n"
-append	composer(1)	"    &lt;lifespan&gt;1567-1643&lt;/lifespan&gt;\n"
-append	composer(1)	"    &lt;era&gt;Renaissance/Baroque&lt;/era&gt;\n"
-append	composer(1)	"    &lt;key&gt;1&lt;/key&gt;\n"
-append	composer(1)	"&lt;/composer&gt;\n"
+# Ajax query servelet: a pseudo database is built into the dictionary 'composers' with the
+# purpose of emulating the role of a real data source. 
+# The script answers with  2 types of responses: a catalog of the record ids and a database 
+# entry matching a given rec_id. The script obviously misses the error handling and the
+# likes. Just an example to see rivet sending xml data to a browser. The full Tcl, JavaScript
+# and HTML code are available from http://people.apache.org/~mxmanghi/rivet-ajax.tar.gz
 
-set	composer(2)	"&lt;composer&gt;\n"
-append  composer(2)     "    &lt;first_name&gt;Johann Sebastian&lt;/first_name&gt;\n"
-append  composer(2)	"    &lt;last_name&gt;Bach&lt;/last_name&gt;\n"
-append	composer(2)	"    &lt;lifespan&gt;1685-1750&lt;/lifespan&gt;\n"
-append	composer(2)	"    &lt;era&gt;Baroque&lt;/era&gt;\n"
-append	composer(2)	"    &lt;key&gt;2&lt;/key&gt;\n"
-append	composer(2)	"&lt;/composer&gt;\n"
+# This example requires Tcl8.5 or Tcl8.4 with package 'dict' 
+# (http://pascal.scheffers.net/software/tclDict-8.5.2.tar.gz)
+# 
 
-set	composer(3)	"&lt;composer&gt;\n"
-append  composer(3)     "    &lt;first_name&gt;Ludwig&lt;/first_name&gt;\n"
-append  composer(3)	"    &lt;last_name&gt;van Beethoven&lt;/last_name&gt;\n"
-append	composer(3)	"    &lt;lifespan&gt;1770-1827&lt;/lifespan&gt;\n"
-append	composer(3)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
-append	composer(3)	"    &lt;key&gt;3&lt;/key&gt;\n"
-append	composer(3)	"&lt;/composer&gt;\n"
+# A pseudo database. rec_id matches a record in the db
 
-set	composer(4)	"&lt;composer&gt;\n"
-append  composer(4)     "    &lt;first_name&gt;Wolfgang Amadaeus&lt;/first_name&gt;\n"
-append  composer(4)	"    &lt;last_name&gt;Mozart&lt;/last_name&gt;\n"
-append	composer(4)	"    &lt;lifespan&gt;1756-1791&lt;/lifespan&gt;\n"
-append	composer(4)	"    &lt;era&gt;Classical&lt;/era&gt;\n"
-append	composer(4)	"    &lt;key&gt;4&lt;/key&gt;\n"
-append	composer(4)	"&lt;/composer&gt;\n"
-
-set	composer(5)	"&lt;composer&gt;\n"
-append  composer(5)     "    &lt;first_name&gt;Robert&lt;/first_name&gt;\n"
-append  composer(5)	"    &lt;last_name&gt;Schumann&lt;/last_name&gt;\n"
-append	composer(5)	"    &lt;lifespan&gt;1810-1856&lt;/lifespan&gt;\n"
-append	composer(5)	"    &lt;era&gt;Romantic&lt;/era&gt;\n"
-append	composer(5)	"    &lt;key&gt;5&lt;/key&gt;\n"
-append	composer(5)	"&lt;/composer&gt;\n"
+set composers [dict create  1 {first_name Claudio middle_name "" last_name Monteverdi	\
+			       lifespan 1567-1643 era Renaissance/Baroque}		\
+			    2 {first_name Johann middle_name Sebastian last_name Bach	\
+			       lifespan 1685-1750 era Baroque }				\
+			    3 {first_name Ludwig middle_name "" last_name "van Beethoven" \
+			       lifespan 1770-1827 era Classical/Romantic}		\
+			    4 {first_name Wolfgang middle_name Amadeus last_name Mozart	\
+				lifespan 1756-1791 era Classical }			\
+			    5 {first_name Robert middle_name "" last_name Schumann	\
+				lifespan 1810-1856 era Romantic} ]
 
 # we use the 'load' argument in order to determine the type of query
 #
@@ -58,21 +37,31 @@ if {[var exists load]} {
     switch [var get load] {
 	catalog {
 	    append xml "&lt;catalog&gt;\n"
-	    foreach nm [array names composer] {
-	    	if {[regexp {&lt;last_name&gt;(.+)&lt;/last_name&gt;}   $composer($nm) m last_name] &amp;&amp; \
-		    [regexp {&lt;first_name&gt;(.+)&lt;/first_name&gt;} $composer($nm) m first_name]} {
-	            append xml "    &lt;composer key='$nm'&gt;$first_name $last_name&lt;/composer&gt;\n"
+	    foreach nm [dict keys $composers] {
+		set first_name [dict get $composers $nm first_name]
+		set middle_name [dict get $composers $nm middle_name]
+		set last_name  [dict get $composers $nm last_name]
+	        append xml "    &lt;composer key=\"$nm\"&gt;$first_name "
+		if {[string length [string trim $middle_name]] &gt; 0} {
+		    append xml "$middle_name "
 		}
+		append xml "$last_name&lt;/composer&gt;\n"
 	    }
-	    append xml "&lt;/catalog&gt;"
+	    append xml "&lt;/catalog&gt;\n"
 	}
 	composer {
+	    append xml "&lt;composer&gt;\n"
 	    if {[var exists rec_id]} {
 		set rec_id [var get rec_id]
-		if {[info exists composer($rec_id)]} {
-		    append xml $composer($rec_id)
+		if {[dict exists $composers $rec_id]} {
+
+		    foreach {k v} [dict get $composers $rec_id] {
+			append xml "&lt;$k&gt;$v&lt;/$k&gt;\n"
+		    }
+
 		}
 	    }
+	    append xml "&lt;/composer&gt;\n"
 	}
     }
 

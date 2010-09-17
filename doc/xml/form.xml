@@ -58,9 +58,6 @@
 			      			The http method for sending the form data back to the server.
 			      			Possible values are get or post
 			      		</para>
-			      		<note>
-								At the time of writing only the 'get' method is implemented		      	
-			      		</note>
 			    		</listitem>
 	  				</varlistentry>
 					<varlistentry>
@@ -183,29 +180,26 @@ myform end</programlisting>
 		    		<variablelist>
 						<varlistentry>
 				    		<listitem>
-				      		<cmdsynopsis>
-									<arg choice="plain">-method</arg>
-									<arg choice="opt">post|get</arg>
-				      		</cmdsynopsis>
-				      		<para>
-				      			The method to be used to encode the form data. 
-				      			Possible values are get or post
-				      		</para>
-				      		<note>
-									Currently, only the 'get' method is implemented		      	
-				      		</note>
+    				      		<cmdsynopsis>
+    								<arg choice="plain">-method</arg>
+    								<arg choice="opt">post|get</arg>
+    				      		</cmdsynopsis>
+    				      		<para>
+    				      			The method to be used to encode the form data. 
+    				      			Possible values are get or post
+    				      		</para>
 				    		</listitem>
 		  				</varlistentry>
 						<varlistentry>
 			    			<listitem>
-			      			<cmdsynopsis>
-									<arg choice="plain">-name</arg>
-									<arg choice="opt"><replaceable>form_name</replaceable></arg>
-			      			</cmdsynopsis>
-			      			<para>
-			      				a name for the form being generated: this value becomes the value of the 
-			      				attribute 'name' in the &lt;form&gt; tag.
-			      			</para>
+    			      			<cmdsynopsis>
+    								<arg choice="plain">-name</arg>
+    								<arg choice="opt"><replaceable>form_name</replaceable></arg>
+    			      			</cmdsynopsis>
+    			      			<para>
+    			      				a name for the form being generated: this value becomes the value of the 
+    			      				attribute 'name' in the &lt;form&gt; tag.
+    			      			</para>
 			    			</listitem>
 		  				</varlistentry>
 		  				<varlistentry>

@@ -109,7 +109,7 @@ package provide form 1.0
     }
 
     #
-    # argstring - given an array name, construct areturn string of the
+    # argstring - given an array name, construct a string of the
     # style key1="data1" key2="data2" etc for each key value pair in the
     # array
     #

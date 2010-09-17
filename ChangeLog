@@ -1,3 +1,33 @@
+
+2010-09-15 Massimo Manghi <mxmanghi@apache.org>
+    * debian/README.Debian, debian/rivet.load: add files needed to build a Debian package
+    * debian/rules, debian/changelog, debian/control: experimental versions of files needed by .deb packages
+
+2010-09-14 Massimo Manghi <mxmanghi@apache.org>
+    * doc/html/*: directory removed from repository 
+    * doc/Makefile.am: New targets for creating the doc/html/ directory and copying new or modified graphic files from
+    doc/images to doc/html/images
+
+2010-08-30 Massimo Manghi <mxmanghi@apache.org>
+    * doc/images: Graphics displayed in the manual is copied in this directory. This is a first step in the transition 
+    to a manual generation procedure that should achieve a cleaner repository structure
+
+2010-08-26 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: removed AC_DEFINE(BUILD_rivet....) as the tcl.m4 providing TEA 3.9
+    makes redundant this definition. Argument to TEA_INIT changed accordingly
+    * tclconfig/tcl.m4: overwritten by the new tcl.m4 and made a couple of adjustments that make it autoreconf/autoheader
+    friendly.
+
+2010-07-20 Massimo Manghi <mxmanghi@apache.org>
+    * doc/examples/rivet_web_service.tcl,doc/html/*.html: Improved example of Ajax servlet. 
+    Manual changed accordingly.
+
+2010-07-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: static void ap_chdir_file renamed as static int Rivet_chdir_file. Rivet_chdir_file
+    returns the value returned by chdir. This value is checked and in case of error the request
+    aborts with an HTTP_INTERNAL_ERROR and a message is printed in the log file.
+    * VERSION,configure.ac: version number changes as 2.0.1 (temporarily) 
+    
 2010-07-13 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xml,doc/html/*.html: Latest minor changes before releasing
     * VERSION,configure.ac: Release number changed as 2.0.1

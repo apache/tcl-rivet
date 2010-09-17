@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# $Id$
+
+.PHONY:	clean 
+
+MANDIRS = html/ html/images
+PICTURES:=$(wildcard images/*.png)
 
 # English, multiple files.
 html/index.html: rivet.xml rivet-chunk.xsl rivet.xsl xml/*.xml
@@ -26,12 +32,32 @@ html/rivet.html: rivet.xml rivet-nochunk.xsl rivet.xsl xml/*.xml
 	html.ext ".html" --nonet -o html/rivet.html rivet-nochunk.xsl \
 	rivet.xml
 
-# FIXME - this means these are not build automatically, but at least
+# This means these are not build automatically, but at least
 # people aren't forced to build them either.
 
-docs: html/index.html
+docs: mandirs graphics html/rivet.css html/index.html
 
-docs-nochunk:	html/rivet.html
+docs-nochunk: html/rivet.html
+
+html/rivet.css: mandirs rivet.css
+	cp -v rivet.css html/
+
+graphics: mandirs $(PICTURES)
+	for gfile in $?; do \
+	    cp -v $$gfile html/images/ ; \
+	done ; \
+	touch graphics
+
+mandirs: $(MANDIRS)
+
+$(MANDIRS):
+	mkdir $@
 
 clean:
-	-rm html/*.html
+	-rm html/*.html 
+	-rm html/*.css
+	-rm html/images/*.*
+	if [ -e graphics ]; then \
+	    rm graphics ; \
+	fi 
+
