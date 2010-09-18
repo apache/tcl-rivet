@@ -35,29 +35,41 @@ html/rivet.html: rivet.xml rivet-nochunk.xsl rivet.xsl xml/*.xml
 # This means these are not build automatically, but at least
 # people aren't forced to build them either.
 
-docs: mandirs graphics html/rivet.css html/index.html
+docs: picts html/rivet.css html/index.html
 
 docs-nochunk: html/rivet.html
 
 html/rivet.css: mandirs rivet.css
 	cp -v rivet.css html/
 
-graphics: mandirs $(PICTURES)
+
+# target picts checks the directory tree exists, then lets target 'graphics' copy new
+# or updated files to the target tree.
+
+picts:	mandirs graphics
+
+graphics: $(PICTURES)
 	for gfile in $?; do \
 	    cp -v $$gfile html/images/ ; \
 	done ; \
 	touch graphics
 
+#  target that builds the essential directory tree that will get the html and 
+#  graphic files of the manual
+
 mandirs: $(MANDIRS)
 
 $(MANDIRS):
-	mkdir $@
+	mkdir $@  
+
+# this target cleans everything up in the html directory
 
 clean:
 	-rm html/*.html 
 	-rm html/*.css
 	-rm html/images/*.*
+	-rmdir html/images
+	-rmdir html
 	if [ -e graphics ]; then \
 	    rm graphics ; \
 	fi 
-
