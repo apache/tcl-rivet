@@ -41,13 +41,7 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
-#	cp debian/rivet.load debian/tmp/etc/apache2/mods-available/
-#	(cd debian/tmp/etc/apache2/mods-enabled/ ; ln -s ../mods-available/rivet.load)
-#	cp debian/rivet.conf debian/tmp/etc/apache2/mods-available/
-#	(cd debian/tmp/etc/apache2/mods-enabled/ ; ln -s ../mods-available/rivet.conf)
 
-#	cp debian/500mod_rivet.info debian/tmp/`apxs -q LIBEXECDIR`/500mod_rivet.info
-#	cp debian/rivet.conf debian/tmp/etc/apache/conf.d/rivet.conf
 
 binary-indep: build install
 
@@ -58,7 +52,7 @@ binary-arch: build install
 	dh_installchangelogs ChangeLog
 	dh_installdocs doc/*
 	dh_installexamples
-#	dh_install
+	dh_install
 #	dh_installmenu
 #	dh_installdebconf
 #	dh_installlogrotate

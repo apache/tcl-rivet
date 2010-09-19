@@ -1,0 +1,2 @@
+debian/rivet.load   etc/apache2/mods-available
+debian/rivet.conf   etc/apache2/mods-available

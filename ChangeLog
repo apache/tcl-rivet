@@ -1,3 +1,6 @@
+2010-09-18 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: files modified and added in the process to build a debian package
+    * doc/Makefile.am: comments added. Better target handling
 
 2010-09-15 Massimo Manghi <mxmanghi@apache.org>
     * debian/README.Debian, debian/rivet.load: add files needed to build a Debian package
