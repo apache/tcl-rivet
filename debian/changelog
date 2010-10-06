@@ -1,10 +1,4 @@
-libapache2-mod-rivet (2.0.2-2) unstable; urgency=low
-
-  * Cruft removed from debian/
-
- -- Massimo Manghi <mxmanghi@apache.org>  Mon, 21 Sep 2010 16:37:14 +0200
-
-libapache2-mod-rivet (2.0.2-1) unstable; urgency=low
+libapache2-mod-rivet (2.0.1-1) unstable; urgency=low
 
   * Initial release 
 

@@ -59,9 +59,9 @@ libapache2-mod-rivet: build
 	dh_installdirs -p$@
 	dh_installchangelogs ChangeLog
 	dh_install -a
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/$@
+#	$(MAKE) install DESTDIR=$(CURDIR)/debian/$@
 	dh_installexamples -a -p$@
-	dh_auto_install -a -p$@ 
+	dh_auto_install -a -p$@ --destdir=$(CURDIR)/debian/$@
 #	dh_install -a $(CURDIR)/debian/tmp $(CURDIR/debian/$(package)
 	dh_install -a -p$@
 #	dh_installmenu
