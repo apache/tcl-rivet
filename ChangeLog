@@ -1,3 +1,8 @@
+2010-10-06 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: most files in this directory have been modified to comply with the latest version of debian packaging 
+    system. Some files were deleted because superseded by others which have been added to produce 2 separate
+    packages: one for the module and the Tcl library, the other for the html manual.
+
 2010-09-20 Massimo Manghi <mxmanghi@apache.org>
     * debian/*: changing some info in files needed by the debian
 

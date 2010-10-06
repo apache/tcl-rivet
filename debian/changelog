@@ -1,51 +1,11 @@
-libapache2-mod-rivet (2.0.1-1) unstable; urgency=low
-    
-  * repackaging rivet
+libapache2-mod-rivet (2.0.2-2) unstable; urgency=low
 
- -- Massimo Manghi <mxmanghi@apache.org>  Wed, 15 Sep 2010 17:52:00 +0200
+  * Cruft removed from debian/
 
-rivet (0.5.0-2) unstable; urgency=low
+ -- Massimo Manghi <mxmanghi@apache.org>  Mon, 21 Sep 2010 16:37:14 +0200
 
-  * Added a dependency on Apache.  Added .info file.  Added some automatic
-    configuration files.
+libapache2-mod-rivet (2.0.2-1) unstable; urgency=low
 
- -- David N. Welton <davidw@debian.org>  Sat, 30 Apr 2005 10:37:09 +0200
+  * Initial release 
 
-rivet (0.5.0-1) unstable; urgency=low
-
-  * New upstream version.
-
- -- David N. Welton <davidw@debian.org>  Thu, 24 Mar 2005 10:45:27 +0100
-
-rivet (0.4.0-1) unstable; urgency=low
-
-  * New upstream version.
-
- -- David N. Welton <davidw@debian.org>  Fri, 28 May 2004 22:44:16 +0200
-
-rivet (0.3.0-1) unstable; urgency=low
-
-  * New upstream version.
-  * Bug fix: "apache complains about mod_rivet not compiled with -DEAPI",
-    thanks to Massimo Manghi (Closes: #215111).
-
- -- David N. Welton <davidw@debian.org>  Fri,  6 Feb 2004 22:49:10 +0100
-
-rivet (0.2.0-1) unstable; urgency=low
-
-  * New upstream version.
-
- -- David N. Welton <davidw@debian.org>  Wed,  1 Oct 2003 11:27:44 +0200
-
-rivet (0.1.2-1) unstable; urgency=low
-
-  * New upstream version.
-
- -- David N. Welton <davidw@debian.org>  Mon,  7 Apr 2003 19:45:59 -0700
-
-rivet (0.1.1-1) unstable; urgency=low
-
-  * Initial Release.
-
- -- David N. Welton <davidw@debian.org>  Thu, 13 Feb 2003 00:26:50 -0800
-
+ -- Massimo Manghi <mxmanghi@apache.org>  Mon, 20 Sep 2010 16:37:14 +0200
