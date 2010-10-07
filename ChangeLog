@@ -1,3 +1,6 @@
+2010-10-07 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: various changes that fix some consistency faults in the debian packages 
+
 2010-10-06 Massimo Manghi <mxmanghi@apache.org>
     * debian/*: most files in this directory have been modified to comply with the latest version of debian packaging 
     system. Some files were deleted because superseded by others which have been added to produce 2 separate

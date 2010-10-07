@@ -23,6 +23,7 @@ Description: Server-side Tcl programming system combining ease of use and power
  Server.
 
 Package: libapache2-mod-rivet-doc
+Section: doc
 Architecture: all
 Description: Server-side Tcl programming system combining ease of use and power
  Apache Rivet is a system for creating dynamic web content via a
