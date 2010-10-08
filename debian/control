@@ -2,15 +2,13 @@ Source: libapache2-mod-rivet
 Section: web
 Priority: extra
 Maintainer: Massimo Manghi <mxmanghi@apache.org>
-Build-Depends: debhelper (>= 7.0.50~)
+Build-Depends: tcl8.5-dev, libapr1-dev, apache2-prefork-dev, debhelper (>= 7.0.50~)
 Standards-Version: 3.8.4
 Homepage: http://tcl.apache.org/rivet/
-#Vcs-Git: git://git.debian.org/collab-maint/libapache2-mod-rivet.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/libapache2-mod-rivet.git;a=summary
 
 Package: libapache2-mod-rivet
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, tcl8.5-dev, libapr1-dev, apache2-prefork-dev, debhelper (>= 7.0.50~)
+Depends: ${shlibs:Depends}, ${misc:Depends}, tcl8.5, libapr1, debhelper (>= 7.0.50~)
 Suggests: libapache2-mod-rivet-doc
 Description: Server-side Tcl programming system combining ease of use and power
  Apache Rivet is a system for creating dynamic web content via the Tcl
