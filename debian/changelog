@@ -1,5 +1,13 @@
+libapache2-mod-rivet (2.0.1-2) unstable; urgency=low
+
+  * Initial package of Rivet for Debian
+  * closes: bug#599446
+
+ -- Massimo Manghi <mxmanghi@apache.org>  Thu, 07 Oct 2010 18:23:45 +0200
+
 libapache2-mod-rivet (2.0.1-1) unstable; urgency=low
 
-  * Initial release 
+  * Initial release
+  * closes: bug#599447
 
- -- Massimo Manghi <mxmanghi@apache.org>  Mon, 20 Sep 2010 16:37:14 +0200
+ -- Massimo Manghi <mxmanghi@apache.org>  Thu, 06 Oct 2010 22:15:40 +0200
