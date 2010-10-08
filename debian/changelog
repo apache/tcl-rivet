@@ -1,3 +1,10 @@
+libapache2-mod-rivet (2.0.1-3) unstable; urgency=low
+  
+  * Description of the package amended as per suggestions received on the list 
+    debian-mentors
+
+ -- Massimo Manghi <mxmanghi@apache.org>  Thu, 08 Oct 2010 12:32:23 +0200
+
 libapache2-mod-rivet (2.0.1-2) unstable; urgency=low
 
   * Initial package of Rivet for Debian
