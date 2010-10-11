@@ -42,7 +42,6 @@ docs-nochunk: html/rivet.html
 html/rivet.css: mandirs rivet.css
 	cp -v rivet.css html/
 
-
 # target picts checks the directory tree exists, then lets target 'graphics' copy new
 # or updated files to the target tree.
 
@@ -64,7 +63,7 @@ $(MANDIRS):
 
 # this target cleans everything up in the html directory
 
-clean:
+distclean:
 	-rm html/*.html 
 	-rm html/*.css
 	-rm html/images/*.*
@@ -73,3 +72,4 @@ clean:
 	if [ -e graphics ]; then \
 	    rm graphics ; \
 	fi 
+

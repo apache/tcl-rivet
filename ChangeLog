@@ -1,3 +1,10 @@
+2010-10-11 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/config.sub,tclconfig/config.guess: Debian package build system signalled that these 2 files were too old
+    and suggested to update them with newer versions shipped by automake-1.11
+    * debian/*: various stuff was changed trying to shape scripts to make debian packages as uneventful as possible
+    * doc/Makefile.am: The 'clean' target in doc/Makefile was renamed as 'distclean'. HTML files are deleted only when
+    a deep cleaning is required.
+
 2010-10-07 Massimo Manghi <mxmanghi@apache.org>
     * debian/*: various changes that fix some consistency faults in the debian packages 
 

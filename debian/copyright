@@ -1,24 +1,72 @@
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+Name: libapache2-mod-rivet
+Maintainer: Massimo Manghi <mxmanghi@apache.org>
+Source: http://www.apache.org/dyn/closer.cgi/tcl/rivet
+Copyright: 2002-2010 The Rivet Team <rivet-dev@tcl.apache.org>
+License: Apache-2.0
+
+Files: m4/ax_prefix_config_h.m4
+Copyright: 	Copyright (c) 2008 Guido U. Draheim <guidod@gmx.de>
+   		Copyright (c) 2008 Marten Svantesson
+   		Copyright (c) 2008 Gerald Point <Gerald.Point@labri.fr>
+License: GPL-2+
+
+
+License: Apache-2.0
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+    Copyright (C) 2002-2010 The Apache Software Foundation
+
+On Debian systems, the complete text of the Apache version 2.0 license
+can be found in "/usr/share/common-licenses/Apache-2.0".
+
 This work was packaged for Debian by:
 
     Massimo Manghi <mxmanghi@apache.org> on Mon, 20 Sep 2010 16:37:14 +0200
 
-It was downloaded from:
+License: GPL-2+
 
-    http://tcl.apache.org/rivet
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2 of the License, or (at your
+   option) any later version.
 
-Upstream Author(s):
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+   Public License for more details.
 
-    The Rivet Team
+   You should have received a copy of the GNU General Public License along
+   with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Copyright:
+   As a special exception, the respective Autoconf Macro's copyright owner
+   gives unlimited permission to copy, distribute and modify the configure
+   scripts that are the output of Autoconf when processing the Macro. You
+   need not follow the terms of the GNU General Public License when using
+   or distributing such scripts, even though portions of the text of the
+   Macro appear in them. The GNU General Public License (GPL) does govern
+   all other use of the material that constitutes the Autoconf Macro.
 
-    Copyright (C) 2002-2010 The Apache Software Foundation
+   This special exception to the GPL applies to versions of the Autoconf
+   Macro released by the Autoconf Macro Archive. When you make and
+   distribute a modified version of the Autoconf Macro, you may extend this
+   special exception to the GPL to apply to your modified version as well.
 
 License:
+   
+   The GPL license is available at "/usr/share/common-licenses/GPL-2+".
 
-    Apache licence
-
-The Debian packaging is:
+The Debian packager was:
 
     Copyright (C) 2010 Massimo Manghi <mxmanghi@apache.org>
 

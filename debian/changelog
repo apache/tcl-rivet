@@ -1,11 +1,15 @@
 libapache2-mod-rivet (2.0.1-1) unstable; urgency=low
-  
+
+  * Non-maintainer upload.
+  * Switch to dpkg-source 3.0 (quilt) format
+  * added debian/watch file
+  * copyright file amended and extended
+  * removed old build system unused files and win/* 
   * Initial package of Rivet for Debian
   * closes: bug#599446
   * closes: bug#599447
   * Description of the package amended as per suggestions received on the list 
     debian-mentors
 
- -- Massimo Manghi <mxmanghi@apache.org>  Thu, 08 Oct 2010 12:17:55 +0200
-
+ -- Massimo Manghi <mxmanghi@apache.org>  Mon, 11 Oct 2010 15:22:19 +0200
 
