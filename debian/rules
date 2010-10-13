@@ -17,7 +17,7 @@ export DH_OPTIONS
 
 #%:
 #	dh $@ 
-clean:
+clean: configure
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
