@@ -1,3 +1,7 @@
+2010-10-13 Massimo Manghi <mxmanghi@apache.org>
+    * src/buildscripts: trying to keep the source tree as tidy as possible. src/buildscripts/* are removed because they were\
+    then initial and later abandoned Rivet build scripts
+
 2010-10-11 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/config.sub,tclconfig/config.guess: Debian package build system signalled that these 2 files were too old
     and suggested to update them with newer versions shipped by automake-1.11
