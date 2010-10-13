@@ -1,3 +1,28 @@
+2010-10-13 Massimo Manghi <mxmanghi@apache.org>
+    * src/buildscripts: trying to keep the source tree as tidy as possible. src/buildscripts/* are removed because they were\
+    then initial and later abandoned Rivet build scripts
+    * branches/2_0/src/buildscripts: removed also from the branch development
+    * branches/2_0/debian/*: merging the debian scripts largely rewritten in trunk. Added control files to 
+    build 2 packages for debian (binary module and docs)
+
+2010-10-11 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/config.sub,tclconfig/config.guess: Debian package build system signalled that these 2 files were too old
+    and suggested to update them with newer versions shipped by automake-1.11
+    * debian/*: various stuff was changed trying to shape scripts to make debian packages as uneventful as possible
+    * doc/Makefile.am: The 'clean' target in doc/Makefile was renamed as 'distclean'. HTML files are deleted only when
+    a deep cleaning is required.
+
+2010-10-07 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: various changes that fix some consistency faults in the debian packages 
+
+2010-10-06 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: most files in this directory have been modified to comply with the latest version of debian packaging 
+    system. Some files were deleted because superseded by others which have been added to produce 2 separate
+    packages: one for the module and the Tcl library, the other for the html manual.
+
+2010-09-20 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: changing some info in files needed by the debian
+
 2010-09-18 Massimo Manghi <mxmanghi@apache.org>
     * debian/*: files modified and added in the process to build a debian package
     * doc/Makefile.am: comments added. Better target handling

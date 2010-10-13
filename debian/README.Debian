@@ -1,1 +1,12 @@
+libapache2-mod-rivet
+-----
 
+This package provides mod_rivet, an apache module that endows the Apache server 
+with the ability generate content by scripting pages using the Tcl command 
+language (http://www.tcl.tk).
+
+Though mod_rivet can run on its own the package ships also a Tcl library with
+Tcl packages for various purposes (e.g. transparent dbms access and 
+session management).
+
+  -- Massimo Manghi <mxmanghi@apache.org>, Mon, 20 Sep 2010 13:30:00 +02:00
