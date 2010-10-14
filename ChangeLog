@@ -1,3 +1,7 @@
+2010-10-14 Massimo Manghi <mxmanghi@apache.org>
+    * debian/: more adjustments in the way of getting a working setup for Debian. Some information was moved to make
+    it 'package specific'. More tweaking on debian/control and /debian/changelog
+
 2010-10-13 Massimo Manghi <mxmanghi@apache.org>
     * src/buildscripts: trying to keep the source tree as tidy as possible. src/buildscripts/* are removed because they were\
     then initial and later abandoned Rivet build scripts
