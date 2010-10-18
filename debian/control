@@ -3,6 +3,7 @@ Section: web
 Priority: extra
 Maintainer: Massimo Manghi <mxmanghi@apache.org>
 Build-Depends: tcl8.5-dev, apache2-prefork-dev, debhelper (>= 7.0.50~)
+Build-Depends-Indep: xsltproc, docbook, docbook-utils, docbook-xsl, docbook-xml
 Standards-Version: 3.9.1
 Homepage: http://tcl.apache.org/rivet/
 

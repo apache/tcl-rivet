@@ -1,3 +1,7 @@
+2010-10-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/tclrivet/parse.tcl: add svn:executable property as per suggested by the debian consistency script
+    * debian/*: more changes to remove unnecessary files from the binary packages of Debian
+
 2010-10-14 Massimo Manghi <mxmanghi@apache.org>
     * debian/: more adjustments in the way of getting a working setup for Debian. Some information was moved to make
     it 'package specific'. More tweaking on debian/control and /debian/changelog
