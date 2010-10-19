@@ -587,7 +587,7 @@ append_key_value_callback (void *data, const char *key, const char *val)
 
 TCL_CMD_HEADER( Rivet_ApacheTable )
 {
-    apr_table_t *table;
+    apr_table_t *table = NULL;
     int subcommandindex;
 
     static CONST84 char *SubCommand[] = {

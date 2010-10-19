@@ -72,4 +72,5 @@ distclean:
 	if [ -e graphics ]; then \
 	    rm graphics ; \
 	fi 
+	-rm Makefile
 
