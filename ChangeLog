@@ -1,5 +1,13 @@
+2010-10-19 Massimo Manghi <mxmanghi@apache.org>
+    * debian/control,debian/Makefile.am: Minor adjustments to debian/control to fulfill Debian policy
+    * debian/libapache2-mod-rivet-doc.docs: the 'contrib' directory is installed now in this package.
+    * src/apache-2/rivetCore.c: In Rivet_ApacheTable the variable table is initialized to NULL to silence a 
+    compilation warning
+    * doc/Makefile.am: the 'distclean' target must remove the Makefile
+    * Makefile.am: rivet_config.h removal added to 'distclean-local'
+
 2010-10-18 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/tclrivet/parse.tcl: add svn:executable property as per suggested by the debian consistency script
+    * rivet/packages/tclrivet/parse.tcl: add svn:executable property as suggested by the debian consistency scripts
     * debian/*: more changes to remove unnecessary files from the binary packages of Debian
 
 2010-10-14 Massimo Manghi <mxmanghi@apache.org>

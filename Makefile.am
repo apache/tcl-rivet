@@ -27,3 +27,5 @@ uninstall-local:
 	rm -fr $(DESTDIR)$(RIVETLIB_DESTDIR)
 
 # 
+distclean-local:
+	rm -fr rivet_config.h
