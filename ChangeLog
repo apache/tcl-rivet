@@ -1,3 +1,7 @@
+2010-10-20 Massimo Manghi <mxmanghi@apache.org>
+    * debian/[clean,install,docs,dirs]: removed because not needed or redundant
+    * debian/copyright: completed to include also the Tcl license. Added copyright notes for stuff in win/
+
 2010-10-19 Massimo Manghi <mxmanghi@apache.org>
     * debian/control,debian/Makefile.am: Minor adjustments to debian/control to fulfill Debian policy
     * debian/libapache2-mod-rivet-doc.docs: the 'contrib' directory is installed now in this package.

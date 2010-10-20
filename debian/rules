@@ -71,7 +71,9 @@ libapache2-mod-rivet-doc: build
 	dh_testdir
 	dh_testroot
 	dh_installdirs -p$@
-	dh_installdocs -p$@ 
+	dh_installdocs -p$@
+	dh_compress -p$@
+	dh_fixperms -p$@
 	dh_installdeb -p$@
 	dh_gencontrol -p$@
 	dh_md5sums -p$@
