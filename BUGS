@@ -2,9 +2,10 @@ KNOWN BUGS
 
 $Id$
 
-"DIO store" will malfunction if the case of the variable names in the array
+1) "DIO store" will malfunction if the case of the variable names in the array
 does not match the case of the field names in the table.  What happens is that 
 any fields with case inconsistencies will neither be inserted or updated.
 
-Rivet apparently conflicts with mod_cgi in some apache installations. When
-mod_rivet is loaded cgi script stop sending content to any client.
+2010-04-29: Rivet apparently conflicts with mod_cgi in some apache installations. When
+mod_rivet is loaded cgi script stop sending content to any client. 
+

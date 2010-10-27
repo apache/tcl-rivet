@@ -1,3 +1,14 @@
+2010-10-27 Massimo Manghi <mxmanghi@apache.org>
+    * branches/2_0: changes done in branches 2_0 reintegrated into trunk. This implied the following changes in trunk 
+    * debian/[clean,docs,*.substvars,dirs,files,install]: not needed, hence removed from repository
+    * debian/[changelog,copyright,rules]: files changed to produce a clean package out of the source tree
+    * VERSION,configure.ac: version number bumped up to 2.0.2
+    * doc/rivet-chunk.xsl: obsolete and misplaced copyright statement removed
+
+2010-10-20 Massimo Manghi <mxmanghi@apache.org>
+    * debian/[clean,install,docs,dirs]: removed because not needed or redundant
+    * debian/copyright: completed to include also the Tcl license. Added copyright notes for stuff in win/
+
 2010-10-19 Massimo Manghi <mxmanghi@apache.org>
     * debian/control,debian/Makefile.am: Minor adjustments to debian/control to fulfill Debian policy
     * debian/libapache2-mod-rivet-doc.docs: the 'contrib' directory is installed now in this package.
@@ -17,6 +28,9 @@
 2010-10-13 Massimo Manghi <mxmanghi@apache.org>
     * src/buildscripts: trying to keep the source tree as tidy as possible. src/buildscripts/* are removed because they were\
     then initial and later abandoned Rivet build scripts
+    * branches/2_0/src/buildscripts: removed also from the branch development
+    * branches/2_0/debian/*: merging the debian scripts largely rewritten in trunk. Added control files to 
+    build 2 packages for debian (binary module and docs)
 
 2010-10-11 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/config.sub,tclconfig/config.guess: Debian package build system signalled that these 2 files were too old
@@ -69,6 +83,13 @@
     aborts with an HTTP_INTERNAL_ERROR and a message is printed in the log file.
     * VERSION,configure.ac: version number changes as 2.0.1 (temporarily) 
     
+2010-07-13 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml,doc/html/*.html: Latest minor changes before releasing
+    * VERSION,configure.ac: Release number changed as 2.0.1
+
+2010-07-12 Massimo Manghi <mxmanghi@apache.org>
+    * branches/2_0: Merge of trunk changes into the 2_0 branch. 
+
 2010-07-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/calendar/calendar.tcl: new comments added. Fixed misspelled -errorinfo option
     in a return statement.

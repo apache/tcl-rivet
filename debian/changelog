@@ -1,4 +1,4 @@
-libapache2-mod-rivet (2.0.1-1) unstable; urgency=low
+libapache2-mod-rivet (2.0.2-1) unstable; urgency=low
 
   * Initial package of Rivet for Debian
   * Closes: #599446, #599447

@@ -107,19 +107,19 @@
     <!-- Sessions -->
    &session.xml;
 
-	<!-- Form -->
-	&form.xml;
+    <!-- Form -->
+    &form.xml;
 
-	<!-- Calendar -->
-	 &calendar.xml;
+    <!-- Calendar -->
+    &calendar.xml;
 
     <!-- Help -->
     &help.xml;
 
-   <!-- Internals -->
-   &internals.xml;
+    <!-- Internals -->
+    &internals.xml;
 
-   <!-- Upgrade -->
-   &upgrade.xml;
+    <!-- Upgrade -->
+    &upgrade.xml;
 
 </article>
