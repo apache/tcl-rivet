@@ -1,3 +1,10 @@
+libapache2-mod-rivet (2.0.2-2) unstable; urgency=low
+
+  * removed redundant code in libapache2-mod-rivet.postinst
+  * files in contrib/ are now installed with the docs 
+
+ -- Massimo Manghi <mxmanghi@apache.org>  Tue, 30 Nov 2010 12:31:27 +0100
+
 libapache2-mod-rivet (2.0.2-1) unstable; urgency=low
 
   * Initial package of Rivet for Debian

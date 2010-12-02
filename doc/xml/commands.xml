@@ -643,11 +643,11 @@
       </refsect1>
     </refentry>
 
-
+    <!-- Reference page for command 'cookie' -->
     <refentry id="cookie">
       <refnamediv>
 	<refname>cookie</refname>
-	<refpurpose>get and set cookies.</refpurpose>
+	<refpurpose>get, set and delete cookies.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
@@ -668,18 +668,37 @@
 	  <arg>get</arg>
 	  <arg><replaceable>cookieName</replaceable></arg>
 	</cmdsynopsis>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>delete</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	</cmdsynopsis>
+	<cmdsynopsis>
+	  <command>cookie</command>
+	  <arg>unset</arg>
+	  <arg><replaceable>cookieName</replaceable></arg>
+	</cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
 	<title>Description</title>
 	<para>
-	  <command>cookie</command> gets or sets a cookie.  When you
+	  <command>cookie</command> gets, sets, unsets or deletes a cookie.  When you
 	  get a cookie, the command returns the value of the cookie,
 	  or an empty string if no cookie exists.
+	</para>
+	<para>
+	  <command>cookie delete</command> will set the timeout value to -1 minutes - 
+	  deleting the cookie in the browser.
+	</para>
+	<para>
+	  <command>cookie unset</command> will remove the defined cookie in the server 
+	  (perhaps preparatory to checking/resetting the cookie).
 	</para>
       </refsect1>
     </refentry>
 
+    <!-- Reference page for command 'clock_to_rfc' -->
     <refentry id="clock_to_rfc">
       <refnamediv>
 	<refname>clock_to_rfc850_gmt</refname>

@@ -1,3 +1,9 @@
+2010-12-02 Massimo Manghi <mxmanghi@apache.org>
+    * debian/libapache2-mod-rivet.*,debian/changelog: removed redundant lines from postist script (Debian package)
+    * rivet/rivet-tcl/cookie.tcl: add command "cookie unset"
+    * contrib/form.tcl,contrib/README: add a form.tcl based on TclOO. New README explanatory file
+    * doc/xml/commands.xml: new command "cookie unset" explained
+    
 2010-10-27 Massimo Manghi <mxmanghi@apache.org>
     * branches/2_0: changes done in branches 2_0 reintegrated into trunk. This implied the following changes in trunk 
     * debian/[clean,docs,*.substvars,dirs,files,install]: not needed, hence removed from repository

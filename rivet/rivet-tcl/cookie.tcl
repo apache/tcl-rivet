@@ -104,5 +104,11 @@ proc cookie {cmd name args} {
 	    ## with a time that has already expired.
 	    cookie set $name "" -minutes -1
 	}
+	"unset" {
+	    ::request::global RivetCookies
+	    if {![array exists RivetCookies]} { load_cookies RivetCookies }
+	    if {![info exists RivetCookies($name)]} { return }
+	    unset RivetCookies($name)
+	}
     }
 }
