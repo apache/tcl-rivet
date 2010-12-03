@@ -51,13 +51,13 @@
 module AP_MODULE_DECLARE_DATA rivet_module;
 
 typedef struct _rivet_server_conf {
-    Tcl_Interp *server_interp;          /* per server Tcl interpreter */
+    Tcl_Interp *server_interp;          /* per server Tcl interpreter 	   */
     Tcl_Obj *rivet_global_init_script;	/* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
-    char *rivet_before_script;		/* script run before each page	*/
-    char *rivet_after_script;		/*            after		*/
-    char *rivet_error_script;		/*            for errors	*/
+    Tcl_Obj *rivet_before_script;	/* script run before each page	*/
+    Tcl_Obj *rivet_after_script;	/*            after		*/
+    Tcl_Obj *rivet_error_script;	/*            for errors	*/
 
     /* This flag is used with the above directives.  If any of them
        have changed, it gets set. */

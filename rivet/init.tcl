@@ -88,7 +88,7 @@ namespace eval ::Rivet {
 	## Likewise we have also to add to auto_path the directory containing 
 	## this script since it holds the pkgIndex.tcl file for package Rivet. 
 
-	set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+#	set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
 	## This will allow users to create proc libraries and tclIndex files
 	## in the local directory that can be autoloaded.

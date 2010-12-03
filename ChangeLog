@@ -1,3 +1,11 @@
+2010-12-03 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: new macros to set default values of configuration parameters.
+    * src/apache-2/mod_rivet.c,mod_rivet.h: Default values are set in rivet_config.h through autotools. The Tcl
+    Rivet environment is now loaded from mod_rivet by calling Tcl_PackageRequire("RivetTcl","1.1"); after auto_path
+    is properly set. Configuration scripts are now stored in Tcl_Obj objects
+    * doc/xml/install.xml: Add documentation for new 'configure' switch.
+    * rivet/init.tcl: the path to RIVETLIB_DESTDIR is added to auto_path in mod_rivet.
+
 2010-12-02 Massimo Manghi <mxmanghi@apache.org>
     * debian/libapache2-mod-rivet.*,debian/changelog: removed redundant lines from postist script (Debian package)
     * rivet/rivet-tcl/cookie.tcl: add command "cookie unset"

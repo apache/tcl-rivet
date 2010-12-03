@@ -72,8 +72,8 @@ static server_rec   *rivet_panic_server_rec  = NULL;
 #define TCL_FILE            2
 
 /* rivet return codes */
-#define RIVET_OK 0
-#define RIVET_ERROR 1
+#define RIVET_OK            0
+#define RIVET_ERROR         1
  
 TCL_DECLARE_MUTEX(sendMutex);
 
@@ -81,13 +81,13 @@ TCL_DECLARE_MUTEX(sendMutex);
 #define TCL_FILE_CTYPE		"application/x-rivet-tcl"
 
 /* This snippet of code came from the mod_ruby project, which is under a BSD license. */
-
+ 
 static int Rivet_chdir_file (const char *file)
 {
     const  char *x;
     int    chdir_retval = 0;
-
     char chdir_buf[HUGE_STRING_LEN];
+
     x = strrchr(file, '/');
     if (x == NULL) {
         chdir_retval = chdir(file);
@@ -125,14 +125,15 @@ Rivet_CheckType (request_rec *req)
     int	ctype = CTYPE_NOT_HANDLED;
 
     if ( req->content_type != NULL ) {
-	if( STRNEQU( req->content_type, RIVET_FILE_CTYPE) ) {
-	    ctype  = RIVET_FILE;
-	} else if( STRNEQU( req->content_type, TCL_FILE_CTYPE) ) {
-	    ctype = TCL_FILE;
-	} 
+        if( STRNEQU( req->content_type, RIVET_FILE_CTYPE) ) {
+            ctype  = RIVET_FILE;
+        } else if( STRNEQU( req->content_type, TCL_FILE_CTYPE) ) {
+            ctype = TCL_FILE;
+        } 
     }
     return ctype; 
 }
+
 /*
  * Rivet_ParseFileArgString (char *szDocRoot, char *szArgs, char **file)
  *
@@ -221,6 +222,7 @@ Rivet_ParseFileArgString (const char *szDocRoot, const char *szArgs, char **file
  * RIVET_DIR   - Rivet's Tcl source directory
  * RIVET_INIT  - Rivet's init.tcl file
  */
+
 static void
 Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
 {
@@ -355,7 +357,8 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
 
         /* If we don't have an error script, use the default error handler. */
         if (conf->rivet_error_script ) {
-            errscript = Tcl_NewStringObj(conf->rivet_error_script, -1);
+//          errscript = Tcl_NewStringObj(conf->rivet_error_script, -1);
+            errscript = conf->rivet_error_script;
         } else {
             errscript = conf->rivet_default_error_script;
         }
@@ -363,8 +366,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
         Tcl_IncrRefCount(errscript);
         if (Tcl_EvalObjEx(interp, errscript, 0) == TCL_ERROR) {
             CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
-            TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>", 1,
-                    globals->req);
+            TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
             TclWeb_PrintError( errorinfo, 0, globals->req );
         }
 
@@ -377,7 +379,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
 good:
 
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
-    	TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
+        TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
     }
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(conf->outchannel));
@@ -469,15 +471,13 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     /* We don't have a compiled version.  Let's create one. */
     if (isNew || *(rsc->cache_size) == 0)
     {
-        //char *hkCopy;
-
         outbuf = Tcl_NewObj();
         Tcl_IncrRefCount(outbuf);
 
         if (toplevel) {
             if (rsc->rivet_before_script) {
-                Tcl_AppendObjToObj(outbuf,
-                        Tcl_NewStringObj(rsc->rivet_before_script, -1));
+                Tcl_AppendObjToObj(outbuf,rsc->rivet_before_script);
+//              Tcl_NewStringObj(rsc->rivet_before_script, -1));
             }
         }
 
@@ -504,7 +504,8 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         }
         if (toplevel) {
             if (rsc->rivet_after_script) {
-                Tcl_AppendObjToObj(outbuf,Tcl_NewStringObj(rsc->rivet_after_script, -1));
+//              Tcl_AppendObjToObj(outbuf,Tcl_NewStringObj(rsc->rivet_after_script, -1));
+                Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
             }
         }
 
@@ -655,6 +656,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 /*
  * Merge the per-directory configuration options into a new configuration.
  */
+
 static void
 Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
 			  rivet_server_conf *base, rivet_server_conf *add )
@@ -709,7 +711,6 @@ Rivet_GetConf( request_rec *r )
     newconfig = RIVET_NEW_CONF( r->pool );
 
     Rivet_CopyConfig( rsc, newconfig );
-
     Rivet_MergeDirConfigVars( r->pool, newconfig, rsc, rdc );
 
     return newconfig;
@@ -722,13 +723,16 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
 
     FILEDEBUGINFO;
 
-    rsc->server_interp = NULL;
-    rsc->rivet_global_init_script = NULL;
-    rsc->rivet_child_init_script = NULL;
-    rsc->rivet_child_exit_script = NULL;
-    rsc->rivet_before_script = NULL;
-    rsc->rivet_after_script = NULL;
-    rsc->rivet_error_script = NULL;
+    rsc->server_interp		    = NULL;
+
+/* scripts obj pointers *must* be initialized to NULL */
+
+    rsc->rivet_global_init_script   = NULL;
+    rsc->rivet_child_init_script    = NULL;
+    rsc->rivet_child_exit_script    = NULL;
+    rsc->rivet_before_script	    = NULL;
+    rsc->rivet_after_script	    = NULL;
+    rsc->rivet_error_script	    = NULL;
 
     rsc->user_scripts_updated = 0;
 
@@ -738,18 +742,18 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     /* these are pointers so that they can be passed around...  */
     rsc->cache_size = apr_pcalloc(p, sizeof(int));
     rsc->cache_free = apr_pcalloc(p, sizeof(int));
-    *(rsc->cache_size) = -1;
-    *(rsc->cache_free) = 0;
-    rsc->upload_max = 0;
-    rsc->upload_files_to_var = 1;
-    rsc->separate_virtual_interps = 0;
-    rsc->honor_header_only_reqs = 0;
-    rsc->server_name = NULL;
-    rsc->upload_dir = "/tmp";
-    rsc->objCacheList = NULL;
-    rsc->objCache = NULL;
+    *(rsc->cache_size) 		  = -1;
+    *(rsc->cache_free) 		  = 0;
+    rsc->upload_max 		  = RIVET_MAX_POST;
+    rsc->upload_files_to_var 	  = RIVET_UPLOAD_FILES_TO_VAR;
+    rsc->separate_virtual_interps = RIVET_SEPARATE_VIRTUAL_INTERPS;
+    rsc->honor_header_only_reqs   = RIVET_HEAD_REQUESTS;
+    rsc->upload_dir 		  = RIVET_UPLOAD_DIR;
+    rsc->server_name              = NULL;
+    rsc->objCacheList             = NULL;
+    rsc->objCache                 = NULL;
 
-    rsc->outchannel = NULL;
+    rsc->outchannel               = NULL;
 
     rsc->rivet_server_vars = (apr_table_t *) apr_table_make ( p, 4 );
     rsc->rivet_dir_vars = (apr_table_t *) apr_table_make ( p, 4 );
@@ -775,7 +779,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     /* Propagate all of the DirConf variables into an array. */
     t = rsc->rivet_dir_vars;
     arr   = (apr_array_header_t*) apr_table_elts( t );
-    elts  = (apr_table_entry_t *)arr->elts;
+    elts  = (apr_table_entry_t *) arr->elts;
     nelts = arr->nelts;
     arrayName = Tcl_NewStringObj( "RivetDirConf", -1 );
     Tcl_IncrRefCount(arrayName);
@@ -837,6 +841,8 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 {
     Tcl_Interp *interp = rsc->server_interp;
     rivet_interp_globals *globals = NULL;
+    Tcl_Obj* auto_path = NULL;
+    Tcl_Obj* rivet_tcl = NULL;
 
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
@@ -858,25 +864,30 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     globals = apr_pcalloc(p, sizeof(rivet_interp_globals));
     Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
-    /* Eval Rivet's init.tcl file to load in the Tcl-level
-       commands. */
+    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
-    /* We call Tcl_EvalFile on init.tcl. This call sets up
-     * some variables and adds RIVETLIB_DESTDIR to auto_path.
-     * 
-     * This is the old call for setting up the tcl environment.
-     *
-     * if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL)
-     * 
-     * We may revert to it if we can devise a mechanism that
-     * links a specific installation to RivetTcl's version
+    /* We put in front the auto_path list the path to the directory where
+     * init.tcl is located (provides package RivetTcl)
      */
-    if (Tcl_EvalFile(interp,RIVET_RIVETLIB_DESTDIR"/init.tcl") == TCL_ERROR) {
+
+    auto_path = Tcl_GetVar2Ex(interp,"auto_path",NULL,TCL_GLOBAL_ONLY);
+
+    rivet_tcl = Tcl_NewStringObj(RIVET_DIR,-1);
+    Tcl_IncrRefCount(rivet_tcl);
+    if (Tcl_ListObjReplace(interp,auto_path,0,0,1,&rivet_tcl) == TCL_ERROR)
+    {
+        ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+			        "error setting auto_path: %s",Tcl_GetStringFromObj(auto_path,NULL));
+    } 
+    Tcl_DecrRefCount(rivet_tcl);
+    
+    if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL)
+    {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                 "init.tcl must be installed correctly for Apache Rivet to function: %s",
                 Tcl_GetStringResult(interp) );
         exit(1);
-    }
+    } 
 
     /* Set the output buffer size to the largest allowed value, so that we 
      * won't send any result packets to the browser unless the Rivet
@@ -888,6 +899,44 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     Tcl_Release(interp);
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * Rivet_AssignStringtoConf --
+ *
+ *	Assign a string to a Tcl_Obj valued configuration parameter
+ *
+ * Arguments:
+ *
+ *	- objPnt: Pointer to a pointer to a Tcl_Obj. If the pointer *objPnt
+ *	is NULL (configuration script obj pointers are initialized to NULL)
+ *      a new Tcl_Obj is created
+ * 	- string_value: a string to be assigned to the Tcl_Obj
+ *
+ * Results:
+ * 	
+ *	- Pointer to a Tcl_Obj containing the parameter value.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static Tcl_Obj* 
+Rivet_AssignStringToConf (Tcl_Obj** objPnt, const char* string_value)
+{
+    Tcl_Obj *objarg = NULL;
+    
+    if (*objPnt == NULL)
+    {
+        objarg = Tcl_NewStringObj(string_value,-1);
+        Tcl_IncrRefCount(objarg);
+        *objPnt = objarg;
+    } else {
+        objarg = *objPnt;
+        Tcl_AppendToObj(objarg, string_value, -1);
+    }
+    Tcl_AppendToObj( objarg, "\n", 1 );
+    return objarg;
+}
 
 /*
  *----------------------------------------------------------------------
@@ -902,57 +951,31 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
  *
  * Results:
  *
- *	Returns the string representation of the current value for the
- *	directive.
+ *	Returns a Tcl_Obj* pointing to the string representation of 
+ *	the current value for the directive.
  *
  *----------------------------------------------------------------------
  */
 
+
 static const char *
-Rivet_SetScript(apr_pool_t *pool, rivet_server_conf *rsc, 
-                const char *script, const char *string)
+Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, 
+                 const char *script, const char *string)
 {
     Tcl_Obj *objarg = NULL;
 
     if( STREQU( script, "GlobalInitScript" ) ) {
-        if( rsc->rivet_global_init_script == NULL ) {
-            objarg = Tcl_NewStringObj( string, -1 );
-            Tcl_IncrRefCount( objarg );
-            Tcl_AppendToObj( objarg, "\n", 1 );
-            rsc->rivet_global_init_script = objarg;
-        } else {
-            objarg = rsc->rivet_global_init_script;
-            Tcl_AppendToObj( objarg, string, -1 );
-            Tcl_AppendToObj( objarg, "\n", 1 );
-        }
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_global_init_script),string);
     } else if( STREQU( script, "ChildInitScript" ) ) {
-        if( rsc->rivet_child_init_script == NULL ) {
-            objarg = Tcl_NewStringObj( string, -1 );
-            Tcl_IncrRefCount( objarg );
-            Tcl_AppendToObj( objarg, "\n", 1 );
-            rsc->rivet_child_init_script = objarg;
-        } else {
-            objarg = rsc->rivet_child_init_script;
-            Tcl_AppendToObj( objarg, string, -1 );
-            Tcl_AppendToObj( objarg, "\n", 1 );
-        }
+	objarg = Rivet_AssignStringToConf(&(rsc->rivet_child_init_script),string);
     } else if( STREQU( script, "ChildExitScript" ) ) {
-        if( rsc->rivet_child_exit_script == NULL ) {
-            objarg = Tcl_NewStringObj( string, -1 );
-            Tcl_IncrRefCount( objarg );
-            Tcl_AppendToObj( objarg, "\n", 1 );
-            rsc->rivet_child_exit_script = objarg;
-        } else {
-            objarg = rsc->rivet_child_exit_script;
-            Tcl_AppendToObj( objarg, string, -1 );
-            Tcl_AppendToObj( objarg, "\n", 1 );
-        }
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_child_exit_script),string);
     } else if( STREQU( script, "BeforeScript" ) ) {
-        rsc->rivet_before_script = apr_pstrcat(pool, string, "\n", NULL);
+	objarg = Rivet_AssignStringToConf(&(rsc->rivet_before_script),string);
     } else if( STREQU( script, "AfterScript" ) ) {
-        rsc->rivet_after_script = apr_pstrcat(pool, string, "\n", NULL);
+	objarg = Rivet_AssignStringToConf(&(rsc->rivet_after_script),string);
     } else if( STREQU( script, "ErrorScript" ) ) {
-        rsc->rivet_error_script = apr_pstrcat(pool, string, "\n", NULL);
+	objarg = Rivet_AssignStringToConf(&(rsc->rivet_error_script),string);
     }
 
     if( !objarg ) return string;
@@ -1008,7 +1031,7 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy,
         string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }
 
-    apr_table_set( rsc->rivet_server_vars, var, string );
+    if (string != NULL) apr_table_set( rsc->rivet_server_vars, var, string );
     return( NULL );
 }
 
@@ -1020,7 +1043,8 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy,
  * 	RivetDirConf AfterScript <script>
  * 	RivetDirConf ErrorScript <script>
  * 	RivetDirConf UploadDirectory <directory>
-*/
+ */
+
 static const char *
 Rivet_DirConf( cmd_parms *cmd, void *vrdc, 
                const char *var, const char *val )
@@ -1040,7 +1064,7 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
         string = Rivet_SetScript( cmd->pool, rdc, var, val );
     }
 
-    apr_table_set( rdc->rivet_dir_vars, var, string );
+    if (string != NULL) apr_table_set( rdc->rivet_dir_vars, var, string );
     return NULL;
 }
 
@@ -1051,7 +1075,8 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
  * 	RivetUserConf BeforeScript <script>
  * 	RivetUserConf AfterScript <script>
  * 	RivetUserConf ErrorScript <script>
-*/
+ */
+
 static const char *
 Rivet_UserConf( cmd_parms *cmd, void *vrdc, 
                 const char *var, 
@@ -1065,6 +1090,7 @@ Rivet_UserConf( cmd_parms *cmd, void *vrdc,
     if ( var == NULL || val == NULL ) {
         return "Rivet Error: RivetUserConf requires two arguments";
     }
+
     /* We have modified these scripts. */
     /* This is less than ideal though, because it will get set to 1
      * every time - FIXME. */
@@ -1072,7 +1098,7 @@ Rivet_UserConf( cmd_parms *cmd, void *vrdc,
 
     string = Rivet_SetScript( cmd->pool, rdc, var, val );
     /* XXX Need to figure out what to do about setting the table.  */
-    apr_table_set( rdc->rivet_user_vars, var, string );
+    if (string != NULL) apr_table_set( rdc->rivet_user_vars, var, string );
     return NULL;
 }
 
@@ -1310,17 +1336,18 @@ Rivet_ChildHandlers(server_rec *s, int init)
                         Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
             }
 	    Tcl_Release (rsc->server_interp);
-
         }
     }
 
     if (!init) {
+
 	/*
 	 * Upon child exit we delete the master interpreter before the 
 	 * caller invokes Tcl_Finalize.  Even if we're running separate
 	 * virtual interpreters, we don't delete the slaves
-	 * as deleting the master implicitly deltes its slave interpreters.
+	 * as deleting the master implicitly deletes its slave interpreters.
 	 */
+
 	rsc = RIVET_SERVER_CONF(s->module_config);
 	if (!Tcl_InterpDeleted (rsc->server_interp)) {
 	    Tcl_DeleteInterp(rsc->server_interp);
@@ -1352,7 +1379,6 @@ Rivet_ChildExit(void *data)
     Tcl_Finalize();
     return OK;
 }
-
 
 /*
  *-----------------------------------------------------------------------------
@@ -1410,6 +1436,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
      * If the cache size is 0, the user has requested not to cache
      * documents.
      */
+
     if(*(rsc->cache_size) < 0) {
         if (ap_max_requests_per_child != 0) {
             *(rsc->cache_size) = ap_max_requests_per_child / 5;
@@ -1441,9 +1468,11 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
     for (sr = s; sr; sr = sr->next)
     {
         myrsc = RIVET_SERVER_CONF(sr->module_config);
+
         /* We only have a different rivet_server_conf if MergeConfig
          * was called. We really need a separate one for each server,
          * so we go ahead and create one here, if necessary. */
+
         if (sr != s && myrsc == rsc) {
             myrsc = RIVET_NEW_CONF(p);
             ap_set_module_config(sr->module_config, &rivet_module, myrsc);
@@ -1660,7 +1689,7 @@ Rivet_SendContent(request_rec *r)
         TclWeb_PrintHeaders(globals->req);
         retval = OK;
         goto sendcleanup;
-    } 
+    }
 
 /* 
  * if we are handling the request we also want to check if a charset 

@@ -110,7 +110,7 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
 		  </listitem>
 		</varlistentry>
 		<varlistentry>
-		  <term>--enable-version-display=[yes|no]</term>
+		  <term>--enable-version-display=[yes|no] (default: no)</term>
 		  <listitem>
 		    <para>
 			This option enables Rivet to display its version in the logfiles when Apache is started. 
@@ -119,14 +119,61 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
 		  </listitem>
 		</varlistentry>
 		<varlistentry>
-		    <term>--with-rivet-target-dir=DIR</term>
+			<term>--with-rivet-target-dir=DIR</term>
+		   <listitem>
+				<para>
+			   	This option tells the install script where Rivet's Tcl packages have to be copied. 
+				</para>
+		   </listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>--with-rivet-target-dir=DIR</term>
+		   <listitem>
+				<para>
+			   	This option tells the install script where Rivet's Tcl packages have to be copied. 
+				</para>
+		   </listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>--with-upload-dir=DIR (default: '/tmp')</term>
+			<listitem>
+				<para>
+					Sets the default directory where Rivet stores files in an upload 
+					operation. (Can be changed in the conf with the parameter 'UploadDirectory',
+					see )
+				</para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>--enable-head-request (default: 'no') </term>
+			<listitem>
+				If enabled returns the real headers in response to a HEAD http request. (Can
+				be changed in the configuration with the 'HonorHeaderOnlyRequests' parameter)
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>--enable-virtual-interps-separation (default: 'no')</term>
+			<listitem>
+				When enabled each virtual host will have its own interpreter. (Can be changed in the
+				configuration with the 'SeparateVirtualInterps' parameter)
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+		    <term>--with-post-max=BYTES Maximum size of data in a POST (default: 0=unlimited)</term>
 		    <listitem>
-			<para>
-			    This option tells the install script where Rivet's Tcl packages have to be copied. 
-			</para>
+		       Form data are sent to the server in either a GET or a POST operation. Data in POST
+		       can be large and you can set the default maximumx size of data that can be accepted
+		       in a POST. (Can be changed in configuration with the 'UploadMaxSize' parameter)
 		    </listitem>
 		</varlistentry>
-	      </variablelist>
+		<varlistentry>
+		    <term>--enable-upload-var=[yes|no]</term>
+		    <listitem>
+            This sets the default for the configuration parameter 'UploadFilesToVar'. If set this 
+            option allow the upload of files into Tcl variables		    
+		    </listitem>
+		</varlistentry>
+	</variablelist>
 	    </para>
 	    <para>
 		Example: configuring the build system to compile Rivet for an apache 2.x server, using tcl8.5 and

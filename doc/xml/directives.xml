@@ -251,24 +251,26 @@
 
 	    <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">SeparateVirtualInterps</arg>
-		  <group choice="req">
-		    <arg>yes</arg>
-		    <arg>no</arg>
-		  </group>
-		</cmdsynopsis>
-	      </term>
+		    <cmdsynopsis>
+		       <arg choice="plain">SeparateVirtualInterps</arg>
+		       <group choice="req">
+		          <arg>yes</arg>
+		          <arg>no</arg>
+		       </group>
+		       </cmdsynopsis>
+		   </term>
 	      <listitem>
-		<para>
-		  If on, Rivet will create a separate Tcl interpreter
-		  for each Apache virtual host.  This is useful in an
-		  ISP type situation where it is desirable to separate
-		  clients into separate interpreters, so that they
-		  don't accidentally interfere with one another.
-		</para>
-		<para>This option is, by nature, only available at the
-		global level.</para>
+      		<para>
+      		  If on, Rivet will create a separate Tcl interpreter
+      		  for each Apache virtual host.  This is useful in an
+      		  ISP type situation where it is desirable to separate
+      		  clients into separate interpreters, so that they
+      		  don't accidentally interfere with one another.
+      		</para>
+   		   <para>
+   		     This option is, by nature, only available at the
+   		     global level.
+   		   </para>
 	      </listitem>
 	    </varlistentry>
 

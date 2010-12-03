@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.0.2])
+AC_INIT([Rivet],[2.0.3])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
@@ -428,6 +428,9 @@ AC_DEFUN([RIVET_TCL_LIB],[
     AC_MSG_RESULT([$with_rivet_target_dir])
 ])
 
+
+# DISPLAY_RIVET_VERSION
+#
 # --enable-version-display=[yes|no] (default: no)
 # switches on version number display in Apache's signature.
 #
@@ -450,6 +453,122 @@ AC_DEFUN([DISPLAY_RIVET_VERSION],[
     fi
 ])
 
+# UPLOAD_DIRECTORY
+# 
+# Adds '--with-upload-dir=DIR' to configure's arguments
+#
+# let's make configuration of the upload directory more flexible for windows builds
+# (in case someone steps forward and takes up the Windows port)
+# The upload directory can be changed in the configuration, but we give the 
+# user/packager the chance to set a default at compile time.
+# Default: /tmp
+
+AC_DEFUN([UPLOAD_DIRECTORY],[
+    AC_ARG_WITH(
+	upload_dir,
+	[ --with-upload-dir=DIR Default directory for uploads],,
+	    with_upload_dir="/tmp"
+    )
+    AC_MSG_CHECKING(where Rivet will save uploads)
+    RIVET_UPLOAD_DIR=${with_upload_dir}
+    AC_SUBST(RIVET_UPLOAD_DIR)
+    AC_MSG_RESULT([$with_upload_dir])
+])
+
+# HONOR_HEAD_REQUESTS (--enable-head-requests)
+# Rivet answers to HEAD requests with a standard response to avoid the whole workload
+# of generating the content of a page with to the sole purpose of returning the HTTP 
+# headers.To test the configuration or scripts that manipulate the headers it 
+# can be useful to let Rivet honor a HEAD request as if the whole content was 
+# generated so that the real headers are returned (this can be set in configuration 
+# by adding "RivetServerConf HonorHeaderOnlyRequests yes" to the server configuration)
+# Default: no
+
+AC_DEFUN([HONOR_HEAD_REQUESTS],[
+    AC_ARG_ENABLE(
+	head_requests,
+	[  --enable-head-requests Returns real headers in response to a HEAD request],
+	[ honor_head_requests=$enable_head_requests ],
+	[ honor_head_requests="no"]
+    )
+
+    AC_MSG_CHECKING(whether Rivet has to honor HEAD requests)
+    if test "$honor_head_requests" = "yes"; then
+	AC_MSG_RESULT([yes])
+	AC_DEFINE(HEAD_REQUESTS,1,[Honor HEAD requests])
+    else
+	AC_MSG_RESULT([no, Rivet will shunt HEAD requests])
+	AC_DEFINE(HEAD_REQUESTS,0,[Honor HEAD requests])
+    fi
+])
+
+# SEPARATE_VIRTUAL_INTERPS (--enable-virtual-interps-separation)
+# Virtual hosts get their own interpreter and configuration. Different
+# applications running on different virtual hosts don't mix up variables
+# and namespaces, avoiding conflicts.
+# Default: no
+
+AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
+    AC_ARG_ENABLE(
+	virtual-interps-separation,
+	[  --enable-virtual-interps-separation to turn on virtual host separation],
+	[ separate_virtual_interps=$enable_virtual_interps_separation ],
+	[ separate_virtual_interps="no"]
+    )
+
+    AC_MSG_CHECKING(whether Rivet will crate an interpreter for each virtual host)
+    if test "$separate_virtual_interps" = "yes"; then
+	AC_MSG_RESULT([yes])
+	AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,1,[virtual hosts will have their own interp])
+    else
+	AC_MSG_RESULT([no])
+	AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,0,[one interpreter per child])
+    fi
+])
+
+# POST_MAX_SIZE (--with-post-max)
+# Maximum size of data posted by a form
+# Default: 0=unlimited
+
+AC_DEFUN([POST_MAX_SIZE],[
+    AC_ARG_WITH(
+	post_max,
+	[  --with-post-max=BYTES Maximum size of data to be sent with a POST],,
+	    with_post_max=0
+    )
+    
+    AC_MSG_CHECKING(maximum size of a POST)
+    MAX_POST=${with_post_max}
+    AC_SUBST(MAX_POST)
+    if test $with_post_max = 0; then
+	AC_MSG_RESULT([unlimited size])
+    else
+        AC_MSG_RESULT([$with_post_max])
+    fi
+])
+
+# UPLOAD_TO_VAR (--enable-upload-var)
+# Enables upload of files into Tcl variables
+# Default: 1=enabled
+
+AC_DEFUN([UPLOAD_TO_VAR],[
+    AC_ARG_ENABLE(
+	upload-var,
+	[  --enable-upload-var to enable automatic upload to variables ],
+	[ upload_var=$enable_upload_var ],
+	[ upload_var="yes"]
+    )
+
+    AC_MSG_CHECKING(if files are uploaded to Tcl variables)
+    if test "$upload_var" = "yes"; then
+	AC_MSG_RESULT([yes])
+	AC_DEFINE(UPLOAD_FILES_TO_VAR,1,[Files are uploaded to Tcl variables])
+    else
+	AC_MSG_RESULT([no])
+	AC_DEFINE(UPLOAD_FILES_TO_VAR,0,[uploads go to files])
+    fi
+
+])
 APACHE_VERSION
 GET_RIVET_BASE
 APACHE
@@ -458,10 +577,17 @@ APACHE_INCLUDES
 APR_HANDLING
 RIVET_TCL_LIB
 DISPLAY_RIVET_VERSION
+UPLOAD_DIRECTORY
+HONOR_HEAD_REQUESTS
+VIRTUAL_INTERPS_SEPARATION
+POST_MAX_SIZE
+UPLOAD_TO_VAR
 AC_SUBST(apache_version_dir)
 
 AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
+AC_DEFINE_UNQUOTED(UPLOAD_DIR,"${RIVET_UPLOAD_DIR}",[Path to the disk directory where uploads are saved])
+AC_DEFINE_UNQUOTED(MAX_POST,"${MAX_POST}",[Max size of data in POST operations])
 
 # We need to use the package path for the installation procedure.  On
 #Debian linux TCL_PACKAGE_PATH may have more than one path in the
