@@ -1,3 +1,7 @@
+2011-01-09 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: fixed AC_DEFINE_UNQUOTED macro call for definition of proprocessor symbol RIVET_MAX_POST, 
+    an integer valued symbol which was put in quotation marks. File indentation was fixed and tabs replaced with spaces
+
 2010-12-03 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: new macros to set default values of configuration parameters.
     * src/apache-2/mod_rivet.c,mod_rivet.h: Default values are set in rivet_config.h through autotools. The Tcl

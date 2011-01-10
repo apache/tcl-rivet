@@ -1,7 +1,7 @@
 #!/bin/sh 
-dnl	This file is an input file used by the GNU "autoconf" program to
-dnl	generate the file "configure", which is run when building Rivet
-dnl	to configure the system for the local environment.
+dnl This file is an input file used by the GNU "autoconf" program to
+dnl generate the file "configure", which is run when building Rivet
+dnl to configure the system for the local environment.
 dnl
 dnl You need at least autoconf 2.59
 dnl
@@ -232,7 +232,7 @@ if test x"${with_tclsh}" != x ; then
     fi
     AC_SUBST(TCLSH_PROG)
 else
-TEA_PROG_TCLSH
+    TEA_PROG_TCLSH
 fi
 
 #TEA_PROG_WISH
@@ -244,10 +244,10 @@ AC_DEFUN([APACHE],[
     AC_ARG_WITH(
         apache,
         [  --with-apache[=DIR] Apache server base directory],
-	, [with_apache="/usr/local/apache"]
-	)
-	apache_base="${with_apache}"
-        AC_MSG_RESULT([$apache_base])
+    , [with_apache="/usr/local/apache"]
+    )
+    apache_base="${with_apache}"
+    AC_MSG_RESULT([$apache_base])
 ])
 
 #
@@ -258,10 +258,10 @@ AC_DEFUN([CHECK_APXS],[
     AC_ARG_WITH(
         apxs,
         [  --with-apxs=FILE        location of Apache's apxs tool],  
-	[if test -x "${with_apxs}" ; then
-		apxs_found="${with_apxs}"
-        	AC_MSG_RESULT([$apxs_found])
-	fi]
+    [if test -x "${with_apxs}" ; then
+        apxs_found="${with_apxs}"
+            AC_MSG_RESULT([$apxs_found])
+    fi]
         ,
         [ 
         APXS_NAMES=apxs
@@ -284,35 +284,35 @@ AC_DEFUN([CHECK_APXS],[
         fi
         if test x"${apxs_found}" = x; then
             AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
-	else
+        else
             AC_MSG_RESULT([$apxs_found])
         fi
        ]
     )
-	if test "${apxs_found+set}" = set ; then
-		dnl At this point we already have apr sorted out
-		export PATH=$PATH:`dirname $apxs_found`
-		APXS_CPPFLAGS=`${apxs_found} -q CFLAGS`
-		AC_SUBST(APXS_CPPFLAGS)
-		APXS_LDFLAGS=`${apxs_found} -q LDFLAGS_SHLIB`
-		AC_SUBST(APXS_LDFLAGS)
-		APXS_LIBS=`${apxs_found} -q LIBS_SHLIB`
-		AC_SUBST(APXS_LIBS)
-		APXS_INCLUDES=-I`${apxs_found} -q INCLUDEDIR`
-		AC_SUBST(APXS_INCLUDES)
-		APXS_CPPFLAGS_SHLIB=`${apxs_found} -q CFLAGS_SHLIB`
-		AC_SUBST(APXS_CPPFLAGS_SHLIB)
-		APXS_LD_SHLIB=`${apxs_found} -q LD_SHLIB`
-		AC_SUBST(APXS_LD_SHLIB)
-		APXS_LIBEXECDIR=`${apxs_found} -q LIBEXECDIR`
-		AC_SUBST(APXS_LIBEXECDIR)
-		APXS_SYSCONFDIR=`${apxs_found} -q SYSCONFDIR`
-		AC_SUBST(APXS_SYSCONFDIR)
-		APXS_PREFIX=`${apxs_found} -q PREFIX`
-		AC_SUBST(APXS_PREFIX)
-        else 
-            AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
-        fi
+    if test "${apxs_found+set}" = set ; then
+        dnl At this point we already have apr sorted out
+        export PATH=$PATH:`dirname $apxs_found`
+        APXS_CPPFLAGS=`${apxs_found} -q CFLAGS`
+        AC_SUBST(APXS_CPPFLAGS)
+        APXS_LDFLAGS=`${apxs_found} -q LDFLAGS_SHLIB`
+        AC_SUBST(APXS_LDFLAGS)
+        APXS_LIBS=`${apxs_found} -q LIBS_SHLIB`
+        AC_SUBST(APXS_LIBS)
+        APXS_INCLUDES=-I`${apxs_found} -q INCLUDEDIR`
+        AC_SUBST(APXS_INCLUDES)
+        APXS_CPPFLAGS_SHLIB=`${apxs_found} -q CFLAGS_SHLIB`
+        AC_SUBST(APXS_CPPFLAGS_SHLIB)
+        APXS_LD_SHLIB=`${apxs_found} -q LD_SHLIB`
+        AC_SUBST(APXS_LD_SHLIB)
+        APXS_LIBEXECDIR=`${apxs_found} -q LIBEXECDIR`
+        AC_SUBST(APXS_LIBEXECDIR)
+        APXS_SYSCONFDIR=`${apxs_found} -q SYSCONFDIR`
+        AC_SUBST(APXS_SYSCONFDIR)
+        APXS_PREFIX=`${apxs_found} -q PREFIX`
+        AC_SUBST(APXS_PREFIX)
+    else 
+        AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
+    fi
 ])
 
 
@@ -320,45 +320,45 @@ AC_DEFUN([APACHE_INCLUDES],[
   AC_ARG_WITH(
     apache_include,
     [  --with-apache-include[=DIR]     Apache server directory],
-	 [apache_include="${with_apache_include}"] 
-	,[apache_include="${APXS_INCLUDES}"]
+     [apache_include="${with_apache_include}"] 
+    ,[apache_include="${APXS_INCLUDES}"]
   )
-	AC_SUBST(apache_include)
+    AC_SUBST(apache_include)
 ])
 
 AC_DEFUN([APR_HANDLING],[
   AC_MSG_CHECKING(for Apache apr)
   AC_ARG_WITH(
    apr_config,
-   	[  --with-apr-config=FILE     apr portable apr-1-config path],
-	 [if test -x "${with_apr_config}"; then
-	     apr_found="${with_apr_config}"
-	 fi]
+    [  --with-apr-config=FILE     apr portable apr-1-config path],
+     [if test -x "${with_apr_config}"; then
+         apr_found="${with_apr_config}"
+     fi]
          ,
-	 [if test -x "${apache_base}/bin/apr-1-config" ; then
-	     apr_found="${apache_base}/bin/apr-1-config" 
-	 elif test -x "${apache_base}/sbin/apr-1-config" ; then
-	     apr_found="${apache_base}/sbin/apr-1-config" 
-         elif test "${apache_base+set}" = set; then 
-             AC_PATH_PROGS(with_apr_config, apr-1-config)
-             if test "${with_apr_config+set}" = set ; then
-                 apr_found="${with_apr_config}"
-             fi
-         else 
-    	      AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config, 1)
-	 fi]
+    [if test -x "${apache_base}/bin/apr-1-config" ; then
+         apr_found="${apache_base}/bin/apr-1-config" 
+    elif test -x "${apache_base}/sbin/apr-1-config" ; then
+         apr_found="${apache_base}/sbin/apr-1-config" 
+    elif test "${apache_base+set}" = set; then 
+        AC_PATH_PROGS(with_apr_config, apr-1-config)
+        if test "${with_apr_config+set}" = set ; then
+            apr_found="${with_apr_config}"
+        fi
+    else 
+        AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config, 1)
+    fi]
 )
-	if test "${apr_found+set}" = set ; then
+    if test "${apr_found+set}" = set ; then
             AC_MSG_RESULT([$apr_found])
-	    dnl At this point we already have apr sorted out
-	    dnl It actually calls another script, so the PATH needs to be set.
-	    export PATH=$PATH:`dirname ${apr_found}`
-	    APR_CPPFLAGS=`${apr_found} --cppflags`
-	    AC_SUBST(APR_CPPFLAGS)
-	    APR_INCLUDES=`${apr_found} --includes`
-	    AC_SUBST(APR_INCLUDES)
-	    APR_LDLFAGS=`${apr_found} --link-libtool --libs`
-	    AC_SUBST(APR_LDFLAGS)
+        dnl At this point we already have apr sorted out
+        dnl It actually calls another script, so the PATH needs to be set.
+        export PATH=$PATH:`dirname ${apr_found}`
+        APR_CPPFLAGS=`${apr_found} --cppflags`
+        AC_SUBST(APR_CPPFLAGS)
+        APR_INCLUDES=`${apr_found} --includes`
+        AC_SUBST(APR_INCLUDES)
+        APR_LDLFAGS=`${apr_found} --link-libtool --libs`
+        AC_SUBST(APR_LDFLAGS)
     else
         AC_MSG_ERROR([Could not find apr-1-config. apr-1-config must be in your PATH or you must specify the location of the apr script using --with-apr-config])
     fi
@@ -381,13 +381,13 @@ AC_DEFUN([APACHE_VERSION],[
     AC_MSG_CHECKING(for apache version)
     if test "$with_apache_version" = "1"; then
         AC_MSG_RESULT( building for apache 1.x )
-	AC_CONFIG_FILES([src/apache-1/Makefile])   
-	apache_version_dir="apache-1"
+        AC_CONFIG_FILES([src/apache-1/Makefile])   
+        apache_version_dir="apache-1"
         AC_DEFINE(APACHE1,1,[APACHE1 definition in config.h])
     else
         AC_MSG_RESULT( building for apache 2.x )
-	AC_CONFIG_FILES([src/apache-2/Makefile])
-	apache_version_dir="apache-2"
+        AC_CONFIG_FILES([src/apache-2/Makefile])
+        apache_version_dir="apache-2"
         AC_DEFINE(APACHE2,1,[APACHE2 definition in config.h])
     fi
 ])
@@ -402,17 +402,17 @@ AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
            AC_MSG_RESULT([could not find ${TCL_BIN_DIR}/tclConfig.sh])
         fi
     # If we have multiple paths, pull the first one, add end slash if needed
-	res=`echo ${TCL_PACKAGE_PATH} | \
+    res=`echo ${TCL_PACKAGE_PATH} | \
              grep '[[^\]] ' | \
              sed -e 's/\([[^\]]\)\( \)\(.*\)$/\1/'  -e 's/\([[^\/]]\)$/\1\//' `
-	if test x"${res}" != x; then
-	    TCL_PACKAGE_PATH=${res}
-            AC_SUBST(TCL_PACKAGE_PATH)
-        fi
+    if test x"${res}" != x; then
+        TCL_PACKAGE_PATH=${res}
+        AC_SUBST(TCL_PACKAGE_PATH)
+    fi
 ])
 
 AC_DEFUN([GET_RIVET_BASE], [
-    RIVET_BASE_INCLUDE=`pwd`/src	
+    RIVET_BASE_INCLUDE=`pwd`/src    
     AC_SUBST(RIVET_BASE_INCLUDE)
 ])
 
@@ -420,7 +420,7 @@ AC_DEFUN([RIVET_TCL_LIB],[
     AC_ARG_WITH(
         rivet_target_dir,
         [ --with-rivet-target-dir=DIR  Rivet tcl library target dir ],,
-		with_rivet_target_dir="${apache_base}/lib/rivet${PACKAGE_VERSION}"
+        with_rivet_target_dir="${apache_base}/lib/rivet${PACKAGE_VERSION}"
     )
     AC_MSG_CHECKING(for Rivet tcl library target)
     RIVET_TCL_TARGET=${with_rivet_target_dir}
@@ -438,18 +438,18 @@ AC_DEFUN([RIVET_TCL_LIB],[
 AC_DEFUN([DISPLAY_RIVET_VERSION],[
     AC_ARG_ENABLE(
         version_display,
-	[  --enable-version-display  Display Rivet version in Apache signature],
-	[ signature_version_display=$enable_version_display ],
-	[ signature_version_display="no" ]
+    [  --enable-version-display  Display Rivet version in Apache signature],
+    [ signature_version_display=$enable_version_display ],
+    [ signature_version_display="no" ]
     )
 
     AC_MSG_CHECKING(whether rivet version is printed in Apache signature)
     if test "$signature_version_display" = "yes"; then
-    	AC_MSG_RESULT([yes])
-	AC_DEFINE(DISPLAY_VERSION,1,[Display Rivet version in Apache signature])
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(DISPLAY_VERSION,1,[Display Rivet version in Apache signature])
     else
-    	AC_MSG_RESULT([no, Rivet version will be hidden])
-	AC_DEFINE(DISPLAY_VERSION,0,[Display Rivet version in Apache signature])
+        AC_MSG_RESULT([no, Rivet version will be hidden])
+        AC_DEFINE(DISPLAY_VERSION,0,[Display Rivet version in Apache signature])
     fi
 ])
 
@@ -465,9 +465,9 @@ AC_DEFUN([DISPLAY_RIVET_VERSION],[
 
 AC_DEFUN([UPLOAD_DIRECTORY],[
     AC_ARG_WITH(
-	upload_dir,
-	[ --with-upload-dir=DIR Default directory for uploads],,
-	    with_upload_dir="/tmp"
+    upload_dir,
+    [ --with-upload-dir=DIR Default directory for uploads],,
+        with_upload_dir="/tmp"
     )
     AC_MSG_CHECKING(where Rivet will save uploads)
     RIVET_UPLOAD_DIR=${with_upload_dir}
@@ -486,19 +486,19 @@ AC_DEFUN([UPLOAD_DIRECTORY],[
 
 AC_DEFUN([HONOR_HEAD_REQUESTS],[
     AC_ARG_ENABLE(
-	head_requests,
-	[  --enable-head-requests Returns real headers in response to a HEAD request],
-	[ honor_head_requests=$enable_head_requests ],
-	[ honor_head_requests="no"]
+    head_requests,
+    [  --enable-head-requests Returns real headers in response to a HEAD request],
+    [ honor_head_requests=$enable_head_requests ],
+    [ honor_head_requests="no"]
     )
 
     AC_MSG_CHECKING(whether Rivet has to honor HEAD requests)
     if test "$honor_head_requests" = "yes"; then
-	AC_MSG_RESULT([yes])
-	AC_DEFINE(HEAD_REQUESTS,1,[Honor HEAD requests])
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(HEAD_REQUESTS,1,[Honor HEAD requests])
     else
-	AC_MSG_RESULT([no, Rivet will shunt HEAD requests])
-	AC_DEFINE(HEAD_REQUESTS,0,[Honor HEAD requests])
+        AC_MSG_RESULT([no, Rivet will shunt HEAD requests])
+        AC_DEFINE(HEAD_REQUESTS,0,[Honor HEAD requests])
     fi
 ])
 
@@ -510,19 +510,19 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
 
 AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
     AC_ARG_ENABLE(
-	virtual-interps-separation,
-	[  --enable-virtual-interps-separation to turn on virtual host separation],
-	[ separate_virtual_interps=$enable_virtual_interps_separation ],
-	[ separate_virtual_interps="no"]
+    virtual-interps-separation,
+    [  --enable-virtual-interps-separation to turn on virtual host separation],
+    [ separate_virtual_interps=$enable_virtual_interps_separation ],
+    [ separate_virtual_interps="no"]
     )
 
     AC_MSG_CHECKING(whether Rivet will crate an interpreter for each virtual host)
     if test "$separate_virtual_interps" = "yes"; then
-	AC_MSG_RESULT([yes])
-	AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,1,[virtual hosts will have their own interp])
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,1,[virtual hosts will have their own interp])
     else
-	AC_MSG_RESULT([no])
-	AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,0,[one interpreter per child])
+        AC_MSG_RESULT([no])
+        AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,0,[one interpreter per child])
     fi
 ])
 
@@ -532,16 +532,16 @@ AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
 
 AC_DEFUN([POST_MAX_SIZE],[
     AC_ARG_WITH(
-	post_max,
-	[  --with-post-max=BYTES Maximum size of data to be sent with a POST],,
-	    with_post_max=0
+    post_max,
+    [  --with-post-max=BYTES Maximum size of data to be sent with a POST],,
+        with_post_max=0
     )
     
     AC_MSG_CHECKING(maximum size of a POST)
     MAX_POST=${with_post_max}
     AC_SUBST(MAX_POST)
     if test $with_post_max = 0; then
-	AC_MSG_RESULT([unlimited size])
+        AC_MSG_RESULT([unlimited size])
     else
         AC_MSG_RESULT([$with_post_max])
     fi
@@ -553,19 +553,19 @@ AC_DEFUN([POST_MAX_SIZE],[
 
 AC_DEFUN([UPLOAD_TO_VAR],[
     AC_ARG_ENABLE(
-	upload-var,
-	[  --enable-upload-var to enable automatic upload to variables ],
-	[ upload_var=$enable_upload_var ],
-	[ upload_var="yes"]
+    upload-var,
+    [  --enable-upload-var to enable automatic upload to variables ],
+    [ upload_var=$enable_upload_var ],
+    [ upload_var="yes"]
     )
 
     AC_MSG_CHECKING(if files are uploaded to Tcl variables)
     if test "$upload_var" = "yes"; then
-	AC_MSG_RESULT([yes])
-	AC_DEFINE(UPLOAD_FILES_TO_VAR,1,[Files are uploaded to Tcl variables])
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(UPLOAD_FILES_TO_VAR,1,[Files are uploaded to Tcl variables])
     else
-	AC_MSG_RESULT([no])
-	AC_DEFINE(UPLOAD_FILES_TO_VAR,0,[uploads go to files])
+        AC_MSG_RESULT([no])
+        AC_DEFINE(UPLOAD_FILES_TO_VAR,0,[uploads go to files])
     fi
 
 ])
@@ -587,7 +587,7 @@ AC_SUBST(apache_version_dir)
 AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
 AC_DEFINE_UNQUOTED(UPLOAD_DIR,"${RIVET_UPLOAD_DIR}",[Path to the disk directory where uploads are saved])
-AC_DEFINE_UNQUOTED(MAX_POST,"${MAX_POST}",[Max size of data in POST operations])
+AC_DEFINE_UNQUOTED(MAX_POST,[$MAX_POST],[Max size of data in POST operations])
 
 # We need to use the package path for the installation procedure.  On
 #Debian linux TCL_PACKAGE_PATH may have more than one path in the
