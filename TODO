@@ -1,3 +1,17 @@
+2011-01-22 Ranting: 
+
+We could consider to put GlobalInitScript in charge for the 
+initialization of the master interp by moving its execution 
+from Rivet_InitTclStuff into Rivet_InitHandler (it would 
+supersede ServerInitScript). The script referenced in 
+rivet_global_init_script is relevant only if SVI are turned 
+off because meaningful only for the 'default' server, in case 
+multiple virtual host are managed. An emphasis could be put 
+on this script and upgraded to the rank of master interpreter 
+initialization script. This should include the role it has had 
+so far without breaking existing code.
+
+
 BUGS
 ====
 

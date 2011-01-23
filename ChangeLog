@@ -1,3 +1,9 @@
+2011-01-23 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[c|h]: Created new ServerUnitScript configuration directive: it assigns 
+    rivet_server_init_script with a script run in Rivet_InitHandler after configuration has been built and
+    before server children are forked. A master interpreter is created in Rivet_InitHandler. Children
+    interpreters should hopefully be pure clones of this interpreter created by 'fork'
+
 2011-01-09 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: fixed AC_DEFINE_UNQUOTED macro call for definition of proprocessor symbol RIVET_MAX_POST, 
     an integer valued symbol which was put in quotation marks. File indentation was fixed and tabs replaced with spaces
