@@ -30,7 +30,7 @@
 
 /* End Configuration options  */
 
-/* For Tcl 8.3/8.4 compatibility - see http://mini.net/tcl/3669 */
+/* For Tcl 8.3/8.4 compatibility - see http://wiki.tcl.tk/3669 */
 #ifndef CONST84
 #   define CONST84
 #endif
@@ -52,6 +52,7 @@ module AP_MODULE_DECLARE_DATA rivet_module;
 
 typedef struct _rivet_server_conf {
     Tcl_Interp *server_interp;          /* per server Tcl interpreter 	   */
+    Tcl_Obj *rivet_server_init_script;  /* run before children are forked  */
     Tcl_Obj *rivet_global_init_script;	/* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;

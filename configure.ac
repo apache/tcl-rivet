@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.0.3])
+AC_INIT([Rivet],[2.1.0r1])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
@@ -513,7 +513,7 @@ AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
     virtual-interps-separation,
     [  --enable-virtual-interps-separation to turn on virtual host separation],
     [ separate_virtual_interps=$enable_virtual_interps_separation ],
-    [ separate_virtual_interps="no"]
+    [ separate_virtual_interps="yes"]
     )
 
     AC_MSG_CHECKING(whether Rivet will crate an interpreter for each virtual host)

@@ -9,6 +9,19 @@
       <command>RivetServerConf</command>, meaning that DirConf will
       override UserConf, which will in turn override ServerConf.
     </para>
+    <para>
+    	The directive <command>ServerInitScript</command> plays a special
+    	role since the script runs within the master interpreter,
+    	an interpreter created before the Apache parent process spawns
+    	the children that actually will serve the requests coming from
+    	the network. During this
+    	stage Apache is still running as a single process, so this
+    	is the right place for doing initialization of anything that 
+    	might work as an IPC infrastructure. Moreover everything
+    	created and initialized in this stage will be handed on to the
+    	interpreters run by the child processes, as they are
+    	created by copying the memory of the parent process.
+    </para>
 
     <variablelist>
       <varlistentry>
@@ -17,6 +30,7 @@
 	    <command>RivetServerConf</command>
 	    <group choice="req">
 	      <arg>CacheSize</arg>
+	      <arg>ServerInitScript</arg>
 	      <arg>GlobalInitScript</arg>
 	      <arg>ChildInitScript</arg>
 	      <arg>ChildExitScript</arg>
@@ -42,122 +56,145 @@
 	  <variablelist>
 	    <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">CacheSize</arg>
-		  <arg><replaceable>size</replaceable></arg>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">CacheSize</arg>
+				  <arg><replaceable>size</replaceable></arg>
+				</cmdsynopsis>
 	      </term>
-	      <listitem>
-		<para>
-		  Sets the size of the internal page cache, where
-		  <option><replaceable>size</replaceable></option> is
-		  the number of byte-compiled pages to be cached for
-		  future use.  Default is
-		  <command>MaxRequestsPerChild</command> / 5, or 50,
-		  if <command>MaxRequestsPerChild</command> is 0.
-		</para>
-		<para>
-		  This option is completely global, even when using
-		  separate, per-virtual host interpreters.
-		</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
+			   <listitem>
+					<para>
+					  Sets the size of the internal page cache, where
+					  <option><replaceable>size</replaceable></option> is
+					  the number of byte-compiled pages to be cached for
+					  future use.  Default is
+					  <command>MaxRequestsPerChild</command> / 5, or 50,
+					  if <command>MaxRequestsPerChild</command> is 0.
+					</para>
+					<para>
+					  This option is completely global, even when using
+					  separate, per-virtual host interpreters.
+					</para>
+				</listitem>
+	   </varlistentry>
+	   <varlistentry>
+	   	<term>
+	   		<cmdsynopsis>
+	   			<arg choice="plain">ServerInitScript</arg>
+	   			<arg><replaceable>script</replaceable></arg>
+	   		</cmdsynopsis>
+	   	</term>
+	   	<listitem>
+	   		<para>
+	   			Tcl script which is to run when the master interpreter is created. 
+	   			Namespaces, variables and packages loaded during this stage will 
+	   			be copied later on in the startup process, when child
+	   			processes are created. In general any sort of I/O channel 
+	   			that is opened during this stage must be closed before the 
+	   			execution of the script completes.
+	   		</para>
+	   		<para>
+					This option is only available at the global level	   		
+	   		</para>
+	   	</listitem>
+		</varlistentry>
+	   <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">GlobalInitScript</arg>
-		  <arg><replaceable>script</replaceable></arg>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">GlobalInitScript</arg>
+				  <arg><replaceable>script</replaceable></arg>
+				</cmdsynopsis>
 	      </term>
 	      <listitem>
-		<para>
-		  Tcl script that is run when each interpreter is
-		  initialized. <replaceable><option>script</option></replaceable>
-		  is an actual Tcl script, so to run a file, you would
-		  do:
-
-		  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
-		</para>
-		<para>
-		  This option is ignored in virtual hosts.
-		</para>
+				<para>
+				  Tcl script that is run as part of a child process initialization. 
+				  If the option <option>SeparateVirtualInterp</option> is not used this is
+				  the right place where file handles, database connections or sockets can 
+				  be opened.
+				  The argument <replaceable><option>script</option></replaceable>
+				  is an actual Tcl script, so to run a file, you would
+				  do:
+		
+				  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
+				</para>
+				<para>
+				  This option is ignored in virtual hosts.
+				</para>
 	      </listitem>
-	    </varlistentry>
+	  </varlistentry>
 
-	    <varlistentry>
+	  <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">ChildInitScript</arg>
-		  <arg><replaceable>script</replaceable></arg>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">ChildInitScript</arg>
+				  <arg><replaceable>script</replaceable></arg>
+				</cmdsynopsis>
 	      </term>
 	      <listitem>
-		<para>
-		  Script to be evaluated when each Apache child
-		  process is initialized.  This is the recommended
-		  place to load modules, create global variables, open
-		  connections to other facilities (such as databases)
-		  and so on.
-		</para>
-		<para>
-		  In virtual hosts, this script is run in addition to
-		  any global childinitscript.
-		</para>
+				<para>
+				  Script to be evaluated when each Apache child
+				  process is initialized.  This is the recommended
+				  place to load modules, create global variables, open
+				  connections to other facilities (such as databases)
+				  and so on.
+				</para>
+				<para>
+				  In virtual hosts, this script is run in addition to
+				  any global childinitscript.
+				</para>
 	      </listitem>
-	    </varlistentry>
+		</varlistentry>
 
-	    <varlistentry>
+		<varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">ChildExitScript</arg>
-		  <arg><replaceable>script</replaceable></arg>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">ChildExitScript</arg>
+				  <arg><replaceable>script</replaceable></arg>
+				</cmdsynopsis>
 	      </term>
 	      <listitem>
-		<para>
-		  Script to be evaluated when each Apache child
-		  process exits.  This is the logical place to clean
-		  up resources created in
-		  <option>ChildInitScript</option>, if necessary.
-		</para>
-		<para>
-		  In virtual hosts, this script is run in addition to
-		  any global childexitscript.
-		</para>
+				<para>
+				  Script to be evaluated when each Apache child
+				  process exits.  This is the logical place to clean
+				  up resources created in <option>ChildInitScript</option>, 
+				  if necessary.
+				</para>
+				<para>
+				  In virtual hosts, this script is run in addition to
+				  any global childexitscript.
+				</para>
 	      </listitem>
-	    </varlistentry>
+		</varlistentry>
 
-	    <varlistentry>
+	   <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">BeforeScript</arg>
-		  <arg><replaceable>script</replaceable></arg>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">BeforeScript</arg>
+				  <arg><replaceable>script</replaceable></arg>
+				</cmdsynopsis>
 	      </term>
 	      <listitem>
-		<para>
-		  Script to be evaluated before each server parsed
-		  (.rvt) page.  This can be used to create a standard
-		  header, for instance.  It could also be used to load
-		  code that you need for every page, if you don't want
-		  to put it in a <option>GlobalInitScript</option>
-		  <option>ChildInitScript</option> when you are first
-		  developing a web site.
-		  <note>
-		    This code is evaluated at the global level, not
-		    inside the request namespace where pages are
-		    evaluated.
-		  </note>
-		</para>
-		<para>
-		  In virtual hosts, this option takes precedence over
-		  the global setting.
-		</para>
-	      </listitem>
-	    </varlistentry>
+				<para>
+				  Script to be evaluated before each server parsed
+				  (.rvt) page.  This can be used to create a standard
+				  header, for instance.  It could also be used to load
+				  code that you need for every page, if you don't want
+				  to put it in a <option>GlobalInitScript</option>
+				  <option>ChildInitScript</option> when you are first
+				  developing a web site.
+				  <note>
+				    This code is evaluated at the global level, not
+				    inside the request namespace where pages are
+				    evaluated.
+				  </note>
+				</para>
+				<para>
+				  In virtual hosts, this option takes precedence over
+				  the global setting.
+				</para>
+	    	</listitem>
+		</varlistentry>
 
-	    <varlistentry>
+	   <varlistentry>
 	      <term>
 		<cmdsynopsis>
 		  <arg choice="plain">AfterScript</arg>
