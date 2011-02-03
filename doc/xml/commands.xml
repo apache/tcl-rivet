@@ -750,7 +750,7 @@
     <refentry id="incr0">
       <refnamediv>
 	<refname>incr0</refname>
-	<refpurpose>increment a variable or set it to 1 if nonexistant.</refpurpose>
+	<refpurpose>increment a variable or set it to 1 if nonexistent.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>

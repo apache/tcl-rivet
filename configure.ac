@@ -554,12 +554,12 @@ AC_DEFUN([POST_MAX_SIZE],[
 AC_DEFUN([UPLOAD_TO_VAR],[
     AC_ARG_ENABLE(
     upload-var,
-    [  --enable-upload-var to enable automatic upload to variables ],
+    [  --disable-upload-var to enable automatic upload to variables ],
     [ upload_var=$enable_upload_var ],
     [ upload_var="yes"]
     )
 
-    AC_MSG_CHECKING(if files are uploaded to Tcl variables)
+    AC_MSG_CHECKING(whether files are uploaded to Tcl variables)
     if test "$upload_var" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(UPLOAD_FILES_TO_VAR,1,[Files are uploaded to Tcl variables])
