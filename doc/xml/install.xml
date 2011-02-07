@@ -6,7 +6,20 @@
         <para>
             To install Rivet 2.1.0, you will need Tcl 8.5 or greater and the Apache HTTP server version 2.2.x. 
             It is known to run on Linux, FreeBSD, OpenBSD, Solaris and HPUX. Windows NT is also possible
-            - please see the directions in the distribution.  
+            - please see the directions in the distribution. 
+			</para>
+			<para>
+				<note>
+					Check your Apache installation for
+	         	Rivet requires Apache HTTP Webserver to run 
+	         	prefork as mpm.
+	         </note>
+			</para>
+         <para>
+            If you're building Apache yourself from sources be careful to specify 
+            <command>--with-mpm=prefork</command> when running ./configure. 
+            Rivet doesn't support the run time mpm specification available in the Apache 2.3
+            development version.
         </para>
       </step>
       <step>
@@ -20,8 +33,8 @@
       <step performance="required">
         <title>Install Tcl</title>
         <para>
-          If you don't have Tcl already, you need it!  If you already
-          have it, you should just be able to use your system Tcl as
+          If you don't have <ulink url="http://www.tcl.tk">Tcl</ulink> already, you need it!  
+          If you already have it, you should just be able to use your system Tcl as
           long as it is recent.  You can tell Rivet build scripts where Tcl is via
           the <option>--with-tcl</option> option to <command>configure</command> (see below).
         </para>
@@ -53,7 +66,7 @@
           wish to compile them.
 
           <programlisting>gunzip rivet-X.X.X.tar.gz
-    tar -xvf rivet-X.X.X.tar.gz</programlisting>
+tar -xvf rivet-X.X.X.tar.gz</programlisting>
 
         </para>
     </step>
