@@ -53,6 +53,10 @@
 extern module rivet_module;
 extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
+/* declarations for commands in rivetWWW.c */
+
+EXTERN int Rivet_InitWWW( Tcl_Interp *interp, Tcl_Namespace* ns);
+
 #define POOL (globals->r->pool)
 
 /*
@@ -1318,6 +1322,8 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("no_body",Rivet_NoBody,rivet_ns);
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd,rivet_ns);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd,rivet_ns);
+
+    Rivet_InitWWW( interp, rivet_ns);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,rivet_ns);

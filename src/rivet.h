@@ -47,7 +47,6 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); \
 Tcl_Export(interp,ns,name,0);
 
-
 EXTERN int Rivet_Init( Tcl_Interp *interp );
 EXTERN int Rivet_InitList( Tcl_Interp *interp, Tcl_Namespace* ns);
 EXTERN int Rivet_InitCrypt( Tcl_Interp *interp, Tcl_Namespace* ns);

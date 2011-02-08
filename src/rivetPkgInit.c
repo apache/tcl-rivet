@@ -22,11 +22,9 @@
 #include <rivet_config.h>
 #endif
 
-
 #include <tcl.h>
 #include "rivet.h"
 #include "mod_rivet.h"
-
 
 static Tcl_Namespace* 
 Rivet_GetNamespace( Tcl_Interp* interp)
@@ -43,9 +41,7 @@ Rivet_GetNamespace( Tcl_Interp* interp)
     else
     {
 //      fprintf(stderr,"no Associated data found, running standalone\n");
-        rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
-                                        (Tcl_NamespaceDeleteProc *)NULL);
-        
+        rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,(Tcl_NamespaceDeleteProc *)NULL);
     }
 
     return rivet_ns;
@@ -53,28 +49,31 @@ Rivet_GetNamespace( Tcl_Interp* interp)
 
 
 /*-----------------------------------------------------------------------------
- * Rivet_Init --
+ * Rivetlib_Init --
+ *
  *   Install the commands provided by librivet into an interpreter.
  *
  * Parameters:
+ *
  *   o interp - Interpreter to add commands to.
+ *
  *-----------------------------------------------------------------------------
  */
 int
-Rivet_Init( Tcl_Interp *interp )
+Rivetlib_Init( Tcl_Interp *interp )
 {
     Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
 
-    Rivet_InitList( interp, rivet_ns );
+    Rivet_InitList ( interp, rivet_ns );
     Rivet_InitCrypt( interp, rivet_ns );
-    Rivet_InitWWW( interp, rivet_ns );
+    Rivet_InitWWW  ( interp, rivet_ns );
 
     return Tcl_PkgProvide( interp, "RivetLib", "1.2" );
 }
 
 
 /*-----------------------------------------------------------------------------
- * Rivet_SafeInit --
+ * Rivetlib_SafeInit --
  *   Install the commands provided by librivet that are believed to be
  *   safe for use in safe interpreters, into a safe interpreter.
  *
@@ -82,8 +81,9 @@ Rivet_Init( Tcl_Interp *interp )
  *   o interp - Interpreter to add commands to.
  *-----------------------------------------------------------------------------
  */
+
 int
-Rivet_SafeInit( Tcl_Interp *interp )
+Rivetlib_SafeInit( Tcl_Interp *interp )
 {
     Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
 
@@ -93,5 +93,4 @@ Rivet_SafeInit( Tcl_Interp *interp )
 
     return Tcl_PkgProvide( interp, "RivetLib", "1.2" );
 }
-
 

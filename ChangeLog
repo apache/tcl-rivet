@@ -1,4 +1,11 @@
-2011-02-03 Massimo Manghi <mxmanghi@apache.org>
+2011-02-08 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: call to Rivet_InitWWW to include into Rivet's core the commands provided in
+    src/rivetWWW.c
+    * src/apache-2/mod_rivet.c: the inclusion into the module of RivetLib through Tcl_PkgRequire proved
+    to cause segfaults in Rivet_ServerConf. The commands in rivetWWW.c are temporarily loaded by rivetCore.c
+    * src/apache-2/Makefile.am: build of mod_rivet.so includes also code from src/libWWW.o
+
+2011-02-07 Massimo Manghi <mxmanghi@apache.org>
     * branches/rivet-namespace: new branch to experiment with the Rivet namespace and Rivet package 
     * src/rivetPkgInit.c: Provides RivetLib package now when loaded by mod_rivet. Commands are now
     in the ::Rivet namespace

@@ -898,8 +898,15 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                 "init.tcl must be installed correctly for Apache Rivet to function: %s",
                 Tcl_GetStringResult(interp) );
         exit(1);
-    } 
-
+    }
+ 
+/*
+ * It's been so far impossible to understand why the following call to Tcl_PkgRequire
+ * causes a segfault later on in Rivet_ServerConf when Apache reconstructs the 
+ * configuration record (weird behavior of the framework, still it was confirmed by 
+ * the people at Apache). Commands in rivetWWW.c are now setup by rivetCore.c
+ */
+/*
     if (Tcl_PkgRequire(interp, "RivetLib", "1.2", 1) == NULL)
     {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
@@ -907,7 +914,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                 Tcl_GetStringResult(interp) );
         exit(1);
     } 
-
+*/
     /* Set the output buffer size to the largest allowed value, so that we 
      * won't send any result packets to the browser unless the Rivet
      * programmer does a "flush stdout" or the page is completed.
