@@ -1,4 +1,4 @@
-			  Rivet 2.0 Installation
+			  Rivet 2.1 Installation
 			  ======================
 
 For more detailed instructions, see the docs/html/ directory.
@@ -36,24 +36,24 @@ if your configuration doesn't require you to have administrative privileges.
 Along with the usual 'configure' variables Rivet's configure script 
 handles other specific options. 
 
---with-tcl=DIR			Directory where tclConfig.sh is
-				stored. This is a shell script that
-				defines all the relevant symbols needed
-				to build Tcl related applications.
---with-apache-version=VER	Values are 1 or 2 depending
-				on the apache server you're 
-				builing the module for.
---with-apache=DIR		Apache server's root directory.
---with-apxs=FILE		Path to the apxs program to
-				be used in the compilation
-				process.
---with-apache-include=DIR	Apache's include files path.
---with-apr-config=FILE		Apache Portable Runtime 
-				metainformation program
+--with-tcl=DIR              Directory where tclConfig.sh is
+                            stored. This is a shell script that
+				            defines all the relevant symbols needed
+				            to build Tcl related applications.
+--with-apache-version=VER   Values are 1 or 2 depending
+				            on the apache server you're 
+                            builing the module for.
+--with-apache=DIR           Apache server's root directory.
+--with-apxs=FILE            Path to the apxs program to
+                            be used in the compilation
+                            process.
+--with-apache-include=DIR   Apache's include files path.
+--with-apr-config=FILE      Apache Portable Runtime 
+                            metainformation program
 --with-rivet-target-dir=DIR	Rivet library installation directory.
---enable-version-display	Apache signature shows Rivet 
-				version number in the form Rivet/2.0.x. 
-				Default=no
+--enable-version-display    Apache signature shows Rivet 
+                            version number in the form Rivet/2.0.x. 
+                            Default=no
 
 These are the basic Apache configuration directives that are needed:
 
@@ -74,7 +74,7 @@ located. E.g.: on a Debian system apxs for Apache2.x is named apxs2
 
 ./configure --with-apache-include=/usr/include/apr-1.0 		\
 	    --with-apache-version=2 --with-apxs=/usr/bin/apxs2 	\
-	    --with-tcl=/usr/lib/tcl8.4 --with-apache=/usr
+	    --with-tcl=/usr/lib/tcl8.6 --with-apache=/usr
 
 Here is another example reported by a user who successfully built 
 Rivet on Slackware 12.1

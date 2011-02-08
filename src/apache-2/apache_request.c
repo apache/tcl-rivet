@@ -46,11 +46,8 @@ util_read(ApacheRequest *req, const char **rbuf)
         long length = r->remaining;
 
         if (length > req->post_max && req->post_max > 0) {
-            //TODO: fix logging apr_log_rerror
-            //ap_log_error(REQ_ERROR, "[libapreq] entity too large (%d, max=%d)",
-            //        (int)length, req->post_max);
-            //apr_log_rerror(REQ_ERROR, "[libapreq] entity too large (%d, max=%d)",
-            //        (int)length, req->post_max);
+            ap_log_rerror(REQ_ERROR,"entity too large (%d, max=%d)",
+					(int)length, req->post_max);
             return HTTP_REQUEST_ENTITY_TOO_LARGE;
         }
 
@@ -391,7 +388,6 @@ int ApacheRequest___parse(ApacheRequest *req)
         } else if (ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) {
             result = ApacheRequest_parse_multipart(req,ct);
         } else {
-            //TODO: fix logging apr_log_rerror
             ap_log_rerror(REQ_ERROR, "unknown content-type: `%s'", ct);
             result = HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -493,14 +489,14 @@ apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
 int
 ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
 {
-    request_rec *r = req->r;
-    int rc = OK;
-    long length;
-    char *boundary;
-    multipart_buffer *mbuff;
-    ApacheUpload *upload = NULL;
-    apr_status_t  status;
-    char error[1024];
+    request_rec 	*r = req->r;
+    int 		rc = OK;
+    long 		length;
+    char 		*boundary;
+    multipart_buffer 	*mbuff;
+    ApacheUpload 	*upload = NULL;
+    apr_status_t  	status;
+    char 		error[1024];
 
     if ((rc = ap_setup_client_block(r, REQUEST_CHUNKED_ERROR))) {
         return rc;
@@ -511,9 +507,8 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
     }
 
     if ((length = r->remaining) > req->post_max && req->post_max > 0) {
-        //TODO: fix logging apr_log_rerror
-        //apr_log_rerror(REQ_ERROR, "entity too large (%d, max=%d)",
-        //        (int)length, req->post_max);
+        ap_log_rerror(REQ_ERROR,"entity too large (%d, max=%d)",
+				(int)length,req->post_max);
         return HTTP_REQUEST_ENTITY_TOO_LARGE;
     }
 
@@ -542,7 +537,7 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
 
         if (!header) {
 #ifdef DEBUG
-            apr_log_rerror(REQ_ERROR,"Silently dropping remaining '%ld' bytes", r->remaining);
+            ap_log_rerror(REQ_ERROR,"Silently dropping remaining '%ld' bytes", r->remaining);
 #endif
 	    do { } while ( ap_get_client_block(r, buff, sizeof(buff)) > 0 );
             	
@@ -576,8 +571,9 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
             if (!param) continue; /* shouldn't happen, but just in case. */
 
             if (req->disable_uploads) {
-                //TODO: fix logging apr_log_rerror
-                //apr_log_rerror(REQ_ERROR, "[libapreq] file upload forbidden");
+#if DEBUG
+                ap_log_rerror(REQ_ERROR, "[libapreq] file upload forbidden");
+#endif
                 return HTTP_FORBIDDEN;
             }
 

@@ -1,3 +1,18 @@
+2011-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * branches/rivet-namespace: new branch to experiment with the Rivet namespace and Rivet package 
+    * src/rivetPkgInit.c: Provides RivetLib package now when loaded by mod_rivet. Commands are now
+    in the ::Rivet namespace
+    * src/rivet.h: new macro RIVET_OBJ_CMD creates a command in the ::Rivet namespace
+    and puts the command object on the namespace export list
+    * src/apache-2/mod_rivet.h: the globals structure now holds a pointer to the Tcl_Namespace object
+    representing ::Rivet namespace
+    * src/apache-2/rivetCore.c: commands are now created with the RIVET_OBJ_CMD macro 
+    * rivet/init.tcl: provides package RivetTcl 2.1. This makes possible to consistently peek the 
+    init.tcl associated to the module. Command 'incr0' is now aliased by Tcl standard 'incr'
+    * rivet/apache-2/mod_rivet.c: Rivet_PerInterpInit loads package RivetTcl 2.1 and package RivetLib 1.2.
+    the latter ships the commands in rivetWWW.c rivetCrypt.c and rivetList.c
+    * rivet/rivet-tcl/tclIndex: Command 'incr0' removed (see init.tcl)
+
 2011-01-31 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: default value for directive SeparateVirtualInterps changed to 'yes'.
     * VERSION: version number set as 2.1.0r1 ('r' is for 'revision')

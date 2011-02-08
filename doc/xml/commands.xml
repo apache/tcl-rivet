@@ -750,7 +750,7 @@
     <refentry id="incr0">
       <refnamediv>
 	<refname>incr0</refname>
-	<refpurpose>increment a variable or set it to 1 if nonexistant.</refpurpose>
+	<refpurpose>increment a variable or set it to 1 if nonexistent.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
@@ -770,6 +770,12 @@
 	  variable doesn't exist, create it instead of returning an
 	  error.
 	</para>
+
+        <note> 
+            incr0 functionality is now provided by <command>incr</command>, 
+            therefore this command is obsolete and it's kept 
+            only for compatibility. It will be removed in future versions of Rivet
+        </note>
       </refsect1>
     </refentry>
 

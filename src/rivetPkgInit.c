@@ -19,12 +19,37 @@
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <rivet_config.h>
 #endif
 
 
 #include <tcl.h>
 #include "rivet.h"
+#include "mod_rivet.h"
+
+
+static Tcl_Namespace* 
+Rivet_GetNamespace( Tcl_Interp* interp)
+{
+    rivet_interp_globals *globals; 
+    Tcl_Namespace *rivet_ns;
+
+    globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    if (globals != NULL)
+    {
+//      fprintf(stderr,"Associated data found, getting Rivet ns from mod_rivet\n");
+        rivet_ns = globals->rivet_ns;
+    }
+    else
+    {
+//      fprintf(stderr,"no Associated data found, running standalone\n");
+        rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
+                                        (Tcl_NamespaceDeleteProc *)NULL);
+        
+    }
+
+    return rivet_ns;
+}
 
 
 /*-----------------------------------------------------------------------------
@@ -38,13 +63,13 @@
 int
 Rivet_Init( Tcl_Interp *interp )
 {
-    Rivet_InitList( interp );
+    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
 
-    Rivet_InitCrypt( interp );
+    Rivet_InitList( interp, rivet_ns );
+    Rivet_InitCrypt( interp, rivet_ns );
+    Rivet_InitWWW( interp, rivet_ns );
 
-    Rivet_InitWWW( interp );
-
-    return Tcl_PkgProvide( interp, "Rivet", "1.1" );
+    return Tcl_PkgProvide( interp, "RivetLib", "1.2" );
 }
 
 
@@ -60,13 +85,13 @@ Rivet_Init( Tcl_Interp *interp )
 int
 Rivet_SafeInit( Tcl_Interp *interp )
 {
-    Rivet_InitList( interp );
+    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
 
-    Rivet_InitCrypt( interp );
+    Rivet_InitList( interp, rivet_ns );
+    Rivet_InitCrypt( interp, rivet_ns );
+    Rivet_InitWWW( interp, rivet_ns );
 
-    Rivet_InitWWW( interp );
-
-    return Tcl_PkgProvide( interp, "Rivet", "1.1" );
+    return Tcl_PkgProvide( interp, "RivetLib", "1.2" );
 }
 
 

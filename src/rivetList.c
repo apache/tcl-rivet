@@ -532,14 +532,19 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
  *   o interp - Interpreter to add commands to.
  *-----------------------------------------------------------------------------
  */
-int
-Rivet_InitList( interp )
-    Tcl_Interp *interp;
-{
-    TCL_OBJ_CMD( "lremove", Rivet_LremoveObjCmd );
-    TCL_OBJ_CMD( "comma_split", Rivet_CommaSplitObjCmd );
-    TCL_OBJ_CMD( "comma_join", Rivet_CommaJoinObjCmd );
-    TCL_OBJ_CMD( "lassign_array", Rivet_LassignArrayObjCmd );
 
+int 
+Rivet_InitList( Tcl_Interp *interp, Tcl_Namespace* rivet_ns)
+{
+    RIVET_OBJ_CMD( "lremove", Rivet_LremoveObjCmd ,rivet_ns);
+    RIVET_OBJ_CMD( "comma_split", Rivet_CommaSplitObjCmd ,rivet_ns);
+    RIVET_OBJ_CMD( "comma_join", Rivet_CommaJoinObjCmd ,rivet_ns);
+    RIVET_OBJ_CMD( "lassign_array", Rivet_LassignArrayObjCmd ,rivet_ns);
+/*
+    Tcl_Export (interp,rivet_ns,"lremove",0);
+    Tcl_Export (interp,rivet_ns,"comma_split",0);
+    Tcl_Export (interp,rivet_ns,"comma_join",0);
+    Tcl_Export (interp,rivet_ns,"lassign_array",0);
+*/
     return TCL_OK;
 }

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package provide RivetTcl 1.1
+package provide RivetTcl 2.1
 
 namespace eval ::Rivet {
 
@@ -24,15 +24,15 @@ namespace eval ::Rivet {
     ## namespace.  So, everything gets deleted when the request is finished.
     ###
     proc initialize_request {} {
-	catch { namespace delete ::request }
+        catch { namespace delete ::request }
 
-	namespace eval ::request { }
+        namespace eval ::request { }
 
-	proc ::request::global {args} {
-	    foreach arg $args {
-		uplevel "::global ::request::$arg"
-	    }
-	}
+        proc ::request::global {args} {
+            foreach arg $args {
+                uplevel "::global ::request::$arg"
+            }
+        }
     }
 
     ###
@@ -41,14 +41,14 @@ namespace eval ::Rivet {
     ## If an ErrorScript has been specified, this routine will not be called.
     ###
     proc handle_error {} {
-	global errorInfo
-	global errorOutbuf
+        global errorInfo
+        global errorOutbuf
 
-	puts <PRE>
-	puts "<HR>$errorInfo<HR>"
-	puts "<P><B>OUTPUT BUFFER:</B></P>"
-	puts $errorOutbuf
-	puts </PRE>
+        puts <PRE>
+        puts "<HR>$errorInfo<HR>"
+        puts "<P><B>OUTPUT BUFFER:</B></P>"
+        puts $errorOutbuf
+        puts </PRE>
     }
 
     ###
@@ -62,42 +62,53 @@ namespace eval ::Rivet {
     ## The main initialization procedure for Rivet.
     ###
     proc init {} {
-	global auto_path
-	global server
+        global auto_path
+        global server
 
-	## Add the rivet-tcl directory to Tcl's auto search path.
-	## We insert it at the head of the list because we want any of
-	## our procs named the same as Tcl's procs to be overridden.
-	## Example: parray
-	set tclpath [file join [file dirname [info script]] rivet-tcl]
-	set auto_path [linsert $auto_path 0 $tclpath]
+        ## Add the rivet-tcl directory to Tcl's auto search path.
+        ## We insert it at the head of the list because we want any of
+        ## our procs named the same as Tcl's procs to be overridden.
+        ## Example: parray
+        set tclpath [file join [file dirname [info script]] rivet-tcl]
+        set auto_path [linsert $auto_path 0 $tclpath]
 
-	## Add the packages directory to the auto_path.
-	## If we have a packages$tcl_version directory
-	## (IE: packages8.3, packages8.4) append that as well.
+        ## Add the packages directory to the auto_path.
+        ## If we have a packages$tcl_version directory
+        ## (IE: packages8.3, packages8.4) append that as well.
 
-	## The packages directory come right after the rivet-tcl directory.
-	set pkgpath [file join [file dirname [info script]] packages]
-	set auto_path [linsert $auto_path 1 $pkgpath]
-	set auto_path [linsert $auto_path 2 ${pkgpath}-local]
+        ## The packages directory come right after the rivet-tcl directory.
+        set pkgpath [file join [file dirname [info script]] packages]
+        set auto_path [linsert $auto_path 1 $pkgpath]
+        set auto_path [linsert $auto_path 2 ${pkgpath}-local]
 
-	if { [file exists ${pkgpath}$::tcl_version] } {
-	    lappend auto_path ${pkgpath}$::tcl_version
-	}
+        if { [file exists ${pkgpath}$::tcl_version] } {
+            lappend auto_path ${pkgpath}$::tcl_version
+        }
 
-	## Likewise we have also to add to auto_path the directory containing 
-	## this script since it holds the pkgIndex.tcl file for package Rivet. 
+        ## Likewise we have also to add to auto_path the directory containing 
+        ## this script since it holds the pkgIndex.tcl file for package Rivet. 
 
-#	set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+        # set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
-	## This will allow users to create proc libraries and tclIndex files
-	## in the local directory that can be autoloaded.
-	## Perhaps this must go to the front of the list to allow the user
-	## to override even Rivet's procs.
-	lappend auto_path .
+        ## This will allow users to create proc libraries and tclIndex files
+        ## in the local directory that can be autoloaded.
+        ## Perhaps this must go to the front of the list to allow the user
+        ## to override even Rivet's procs.
+        lappend auto_path .
     }
 
 } ;## namespace eval ::Rivet
 
+
+## Rivet 2.1.x supports Tcl >= 8.5, therefore there's no more need for
+## the command incr0, as the functionality of creating a not yet
+## existing variable is now provided by 'incr'. Being incr0 a command
+## in Rivet < 2.1.0, before the move into the ::Rivet namespace, 
+## we alias this command only in the global namespace
+
+interp alias {} incr0 {} incr
+
 ## Initialize Rivet.
 ::Rivet::init
+
+#package require RivetLib 1.2

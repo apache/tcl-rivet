@@ -15,6 +15,7 @@
    limitations under the License.
 */
 
+/* $Id: $ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
@@ -857,18 +858,14 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     Tcl_SetStdChannel(*(rsc->outchannel), TCL_STDOUT);
 
-    /* Initialize the interpreter with Rivet's Tcl commands. */
-    Rivet_InitCore( interp );
-
-    /* Create a global array with information about the server. */
-    Rivet_InitServerVariables( interp, p );
-    Rivet_PropagateServerConfArray( interp, rsc );
-
     /* Set up interpreter associated data */
-    globals = apr_pcalloc(p, sizeof(rivet_interp_globals));
-    Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
-    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
+    globals = apr_pcalloc(p, sizeof(rivet_interp_globals));
+    Tcl_SetAssocData(interp,"rivet",NULL,globals);
+
+    /* Rivet commands namespace is created */
+    globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
+                                            (Tcl_NamespaceDeleteProc *)NULL);
 
     /* We put in front the auto_path list the path to the directory where
      * init.tcl is located (provides package RivetTcl)
@@ -878,14 +875,32 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     rivet_tcl = Tcl_NewStringObj(RIVET_DIR,-1);
     Tcl_IncrRefCount(rivet_tcl);
+
     if (Tcl_ListObjReplace(interp,auto_path,0,0,1,&rivet_tcl) == TCL_ERROR)
     {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                     "error setting auto_path: %s",Tcl_GetStringFromObj(auto_path,NULL));
     } 
     Tcl_DecrRefCount(rivet_tcl);
-    
-    if (Tcl_PkgRequire(interp, "RivetTcl", "1.1", 1) == NULL)
+
+    /* Initialize the interpreter with Rivet's Tcl commands. */
+    Rivet_InitCore(interp);
+
+    /* Create a global array with information about the server. */
+    Rivet_InitServerVariables(interp, p );
+    Rivet_PropagateServerConfArray( interp, rsc );
+
+    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
+
+    if (Tcl_PkgRequire(interp, "RivetTcl", "2.1", 1) == NULL)
+    {
+        ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                "init.tcl must be installed correctly for Apache Rivet to function: %s",
+                Tcl_GetStringResult(interp) );
+        exit(1);
+    } 
+
+    if (Tcl_PkgRequire(interp, "RivetLib", "1.2", 1) == NULL)
     {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                 "init.tcl must be installed correctly for Apache Rivet to function: %s",
@@ -897,6 +912,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
      * won't send any result packets to the browser unless the Rivet
      * programmer does a "flush stdout" or the page is completed.
      */
+
 //  Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
     Tcl_SetChannelBufferSize (*(rsc->outchannel), 1000000);
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
@@ -993,6 +1009,7 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc,
  * Implements the RivetServerConf Apache Directive
  *
  * Command Arguments:
+ *
  *  RivetServerConf GlobalInitScript <script>
  *  RivetServerConf ChildInitScript <script>
  *  RivetServerConf ChildExitScript <script>
@@ -1500,7 +1517,6 @@ Rivet_CreateCache (server_rec *s, apr_pool_t *p)
         Tcl_InitHashTable(rsc->objCache, TCL_STRING_KEYS);
     }
 }
-
 
 /*
  *-----------------------------------------------------------------------------

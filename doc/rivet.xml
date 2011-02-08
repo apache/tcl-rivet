@@ -9,7 +9,7 @@
     <!ENTITY upload.html	   SYSTEM	"examples/upload.html" >
     <!ENTITY upload.rvt		   SYSTEM	"examples/upload.rvt" >
     <!ENTITY download.tcl	   SYSTEM	"examples/download.tcl" >
-    <!ENTITY rivet_web_service.tcl  SYSTEM  	"examples/rivet_web_service.tcl" >
+    <!ENTITY rivet_web_service.tcl  SYSTEM  "examples/rivet_web_service.tcl" >
     <!ENTITY intro.xml		    SYSTEM  	"xml/intro.xml" >
     <!ENTITY install.xml	    SYSTEM  	"xml/install.xml" >
     <!ENTITY directives.xml	    SYSTEM  	"xml/directives.xml" >
@@ -48,25 +48,26 @@
   <articleinfo>
     <title>Apache Rivet</title>
     <copyright>
-      <year>2002</year>
-      <year>2003</year>
-      <year>2004</year>
-      <year>2005</year>
-      <year>2006</year>
-      <year>2007</year>
-      <year>2008</year>
-      <year>2009</year>
-      <year>2010</year>
-      <holder>Apache Software Foundation</holder>
+        <year>2002</year>
+        <year>2003</year>
+        <year>2004</year>
+        <year>2005</year>
+        <year>2006</year>
+        <year>2007</year>
+        <year>2008</year>
+        <year>2009</year>
+        <year>2010</year>
+        <year>2011</year>
+        <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
-      <firstname>The Rivet Team</firstname>
-      <affiliation>
-	<orgname>The Apache Software Foundation</orgname>
-	<address>
-	  <email>rivet-dev@tcl.apache.org</email>
-	</address>
-      </affiliation>
+        <firstname>The Rivet Team</firstname>
+        <affiliation>
+	        <orgname>The Apache Software Foundation</orgname>
+	        <address>
+	            <email>rivet-dev@tcl.apache.org</email>
+	        </address>
+        </affiliation>
     </author>
   </articleinfo>
 

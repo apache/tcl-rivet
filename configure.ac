@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.1.0r1])
+AC_INIT([Rivet],[2.1.0r1-ns])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
@@ -390,6 +390,7 @@ AC_DEFUN([APACHE_VERSION],[
         apache_version_dir="apache-2"
         AC_DEFINE(APACHE2,1,[APACHE2 definition in config.h])
     fi
+    MOD_RIVET_INCLUDES="-I ${apache_version_dir}"
 ])
 
 AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
@@ -516,7 +517,7 @@ AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
     [ separate_virtual_interps="yes"]
     )
 
-    AC_MSG_CHECKING(whether Rivet will crate an interpreter for each virtual host)
+    AC_MSG_CHECKING(whether Rivet will create an interpreter for each virtual host)
     if test "$separate_virtual_interps" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,1,[virtual hosts will have their own interp])
@@ -554,12 +555,12 @@ AC_DEFUN([POST_MAX_SIZE],[
 AC_DEFUN([UPLOAD_TO_VAR],[
     AC_ARG_ENABLE(
     upload-var,
-    [  --enable-upload-var to enable automatic upload to variables ],
+    [  --disable-upload-var to enable automatic upload to variables ],
     [ upload_var=$enable_upload_var ],
     [ upload_var="yes"]
     )
 
-    AC_MSG_CHECKING(if files are uploaded to Tcl variables)
+    AC_MSG_CHECKING(whether files are uploaded to Tcl variables)
     if test "$upload_var" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(UPLOAD_FILES_TO_VAR,1,[Files are uploaded to Tcl variables])
@@ -583,6 +584,7 @@ VIRTUAL_INTERPS_SEPARATION
 POST_MAX_SIZE
 UPLOAD_TO_VAR
 AC_SUBST(apache_version_dir)
+AC_SUBST(MOD_RIVET_INCLUDES)
 
 AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
