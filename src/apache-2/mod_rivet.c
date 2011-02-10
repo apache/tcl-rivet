@@ -327,6 +327,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
          */
 
         errorCodeListObj = Tcl_GetVar2Ex (interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
+
         /* errorCode is guaranteed to be set to NONE, but let's make sure
          * anyway rather than causing a SIGSEGV
          */
