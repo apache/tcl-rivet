@@ -1,3 +1,8 @@
+2011-02-11 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[c|h]: new conf scripts rivet_abort_script and rivet_force_script. rivet_abort_script
+    is run when an abort_page command is called in the page content generation
+    * src/apache-2/rivetCode.c: add new command abort_code that returns the code passed to abort_page
+
 2011-01-31 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: default value for directive SeparateVirtualInterps changed to 'yes'.
     * VERSION: version number set as 2.1.0r1 ('r' is for 'revision')
