@@ -899,11 +899,11 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     
 /* 
  * abort_page status variables in globals are set here and then 
- * reset in Rivet_SendContent before the request processing is 
+ * reset in Rivet_SendContent just before the request processing is 
  * completed 
  */
 
-    globals->page_aborting = 1;
+    globals->page_aborting = 0;
     globals->abort_code = NULL;
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
