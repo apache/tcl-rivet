@@ -1,3 +1,7 @@
+2011-02-14 Karl Lehenbauer <karl@apache.org>
+    * src/apache-2/mod_rivet.c: Only create root interpreter once, not twice.  In Rivet_CopyConfig cache_size and cache_free were getting copied twice.  Only once now.
+    * src/apache-2/rivetCore.c: Remove unused command var from Rivet_Upload.  Remove unneeded loglevel var from Rivet_LogErrorCmd.
+
 2011-02-08 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: call to Rivet_InitWWW to include into Rivet's core the commands provided in
     src/rivetWWW.c

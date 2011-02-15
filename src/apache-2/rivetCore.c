@@ -822,7 +822,6 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
 TCL_CMD_HEADER( Rivet_Upload )
 {
     char *varname = NULL;
-    char *command = NULL;
 
     int subcommandindex;
 
@@ -854,7 +853,6 @@ TCL_CMD_HEADER( Rivet_Upload )
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    command = Tcl_GetString(objv[1]);
     if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
                         "channel|save|data|exists|size|type|filename|names|tempname"
                         "|tempname|names",
@@ -1149,7 +1147,6 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
 
 TCL_CMD_HEADER( Rivet_LogErrorCmd )
 {
-    char *loglevel = NULL;
     char *message = NULL;
 
     server_rec *serverRec;
@@ -1187,7 +1184,6 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
         return TCL_ERROR;
     }
 
-    loglevel = Tcl_GetString(objv[1]);
     message = Tcl_GetString (objv[2]);
     if (Tcl_GetIndexFromObj(interp, objv[1], logLevel,
                         "emerg|alert|crit|err|warning|notice|info|debug",

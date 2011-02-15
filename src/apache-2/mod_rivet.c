@@ -640,8 +640,6 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     /* These are pointers so that they can be passed around... */
     newrsc->cache_size = oldrsc->cache_size;
     newrsc->cache_free = oldrsc->cache_free;
-    newrsc->cache_size = oldrsc->cache_size;
-    newrsc->cache_free = oldrsc->cache_free;
     newrsc->upload_max = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
     newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
@@ -986,8 +984,7 @@ Rivet_AssignStringToConf (Tcl_Obj** objPnt, const char* string_value)
 
 
 static const char *
-Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, 
-                 const char *script, const char *string)
+Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, const char *string)
 {
     Tcl_Obj *objarg = NULL;
 
@@ -1452,7 +1449,7 @@ Rivet_ChildExit(void *data)
 static Tcl_Interp*
 Rivet_CreateTclInterp (server_rec* s)
 {
-    Tcl_Interp* interp = Tcl_CreateInterp();
+    Tcl_Interp* interp;
 
     /* Initialize TCL stuff  */
     Tcl_FindExecutable(RIVET_NAMEOFEXECUTABLE);
