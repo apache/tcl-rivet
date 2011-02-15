@@ -111,4 +111,3 @@ interp alias {} incr0 {} incr
 ## Initialize Rivet.
 ::Rivet::init
 
-#package require RivetLib 1.2

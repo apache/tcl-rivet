@@ -1,5 +1,14 @@
+2011-02-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[h|c],src/apache-2/rivetCore.c: Removed loading of RivetLib by default. Getting
+    RivetLib into the module keeps Apache to segfault in other calls. In order to gain access to commands
+    provided by RivetLib (formerly called Rivet) a 'package require RivetLib' must be in a Rivet script or
+    in one of the initialization script (e.g. ServerInitScript ChildInitScript or GlobalInitScript). Notice:
+    RivetLib exports the commands to the '::Rivet' namespace.
+    * src/rivetCrypt.c, src/rivetWWW.c, src/rivetList.c: they now export their commands to the '::Rivet'
+
 2011-02-14 Karl Lehenbauer <karl@apache.org>
-    * src/apache-2/mod_rivet.c: Only create root interpreter once, not twice.  In Rivet_CopyConfig cache_size and cache_free were getting copied twice.  Only once now.
+    * src/apache-2/mod_rivet.c: Only create root interpreter once, not twice.  
+    In Rivet_CopyConfig cache_size and cache_free were getting copied twice.  Only once now.
     * src/apache-2/rivetCore.c: Remove unused command var from Rivet_Upload.  Remove unneeded loglevel var from Rivet_LogErrorCmd.
 
 2011-02-08 Massimo Manghi <mxmanghi@apache.org>

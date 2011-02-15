@@ -38,8 +38,7 @@ mod_rivet_la_SOURCES = 			        \
 	        TclWebapache.c 				\
 	        rivetCore.c					\
 	        ../rivetChannel.c 			\
-            ../rivetParser.c            \
-            ../rivetWWW.c
+            ../rivetParser.c
 
 ##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 

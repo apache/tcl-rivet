@@ -167,10 +167,5 @@ Rivet_InitCrypt( Tcl_Interp *interp, Tcl_Namespace* rivet_ns )
     RIVET_OBJ_CMD( "encrypt", Rivet_EncryptCmd, rivet_ns);
     RIVET_OBJ_CMD( "decrypt", Rivet_DecryptCmd, rivet_ns);
     RIVET_OBJ_CMD( "crypt", Rivet_CryptCmd, rivet_ns);
-/*
-    Tcl_Export (interp,rivet_ns,"encrypt",0);
-    Tcl_Export (interp,rivet_ns,"decrypt",0);
-    Tcl_Export (interp,rivet_ns,"crypt",0);
-*/
     return TCL_OK;
 }

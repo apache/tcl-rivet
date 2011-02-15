@@ -540,11 +540,5 @@ Rivet_InitList( Tcl_Interp *interp, Tcl_Namespace* rivet_ns)
     RIVET_OBJ_CMD( "comma_split", Rivet_CommaSplitObjCmd ,rivet_ns);
     RIVET_OBJ_CMD( "comma_join", Rivet_CommaJoinObjCmd ,rivet_ns);
     RIVET_OBJ_CMD( "lassign_array", Rivet_LassignArrayObjCmd ,rivet_ns);
-/*
-    Tcl_Export (interp,rivet_ns,"lremove",0);
-    Tcl_Export (interp,rivet_ns,"comma_split",0);
-    Tcl_Export (interp,rivet_ns,"comma_join",0);
-    Tcl_Export (interp,rivet_ns,"lassign_array",0);
-*/
     return TCL_OK;
 }

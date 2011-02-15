@@ -268,6 +268,15 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             obj,
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
+
+    obj = Tcl_NewStringObj(RIVET_PACKAGE_VERSION, -1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+            "server",
+            "RIVET_PACKAGE_VERSION",
+            obj,
+            TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
 }
 
 static void
@@ -897,22 +906,25 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                 Tcl_GetStringResult(interp) );
         exit(1);
     }
- 
+
+    /* Loading into the module commands provided by librivet.so */
+
 /*
  * It's been so far impossible to understand why the following call to Tcl_PkgRequire
  * causes a segfault later on in Rivet_ServerConf when Apache reconstructs the 
  * configuration record (weird behavior of the framework, still it was confirmed by 
  * the people at Apache). Commands in rivetWWW.c are now setup by rivetCore.c
  */
-/*
-    if (Tcl_PkgRequire(interp, "RivetLib", "1.2", 1) == NULL)
+    /*
+    if (Tcl_PkgRequire(interp, "FakeLib", "1.2", 1) == NULL)
     {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                 "init.tcl must be installed correctly for Apache Rivet to function: %s",
                 Tcl_GetStringResult(interp) );
         exit(1);
     } 
-*/
+    */
+ 
     /* Set the output buffer size to the largest allowed value, so that we 
      * won't send any result packets to the browser unless the Rivet
      * programmer does a "flush stdout" or the page is completed.

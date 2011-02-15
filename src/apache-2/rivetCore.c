@@ -1306,8 +1306,8 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv,rivet_ns);
     RIVET_OBJ_CMD ("load_headers",Rivet_LoadHeaders,rivet_ns);
     RIVET_OBJ_CMD ("var",Rivet_Var,rivet_ns);
-    RIVET_OBJ_CMD ("abort_page", Rivet_AbortPageCmd ,rivet_ns);
-    RIVET_OBJ_CMD ("virtual_filename", Rivet_VirtualFilenameCmd ,rivet_ns);
+    RIVET_OBJ_CMD ("abort_page",Rivet_AbortPageCmd ,rivet_ns);
+    RIVET_OBJ_CMD ("virtual_filename",Rivet_VirtualFilenameCmd ,rivet_ns);
     RIVET_OBJ_CMD ("apache_table",Rivet_ApacheTable,rivet_ns);
     RIVET_OBJ_CMD ("var_qs",Rivet_Var,rivet_ns);
     RIVET_OBJ_CMD ("var_post",Rivet_Var,rivet_ns);
@@ -1318,8 +1318,6 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("no_body",Rivet_NoBody,rivet_ns);
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd,rivet_ns);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd,rivet_ns);
-
-    Rivet_InitWWW( interp, rivet_ns);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,rivet_ns);

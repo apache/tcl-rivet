@@ -358,11 +358,5 @@ Rivet_InitWWW( Tcl_Interp *interp, Tcl_Namespace* rivet_ns)
     RIVET_OBJ_CMD ("escape_string",Rivet_EscapeStringCmd,rivet_ns);
     RIVET_OBJ_CMD ("escape_sgml_chars",Rivet_EscapeSgmlCharsCmd,rivet_ns);
     RIVET_OBJ_CMD ("escape_shell_command",Rivet_EscapeShellCommandCmd,rivet_ns);
-/*
-    Tcl_Export (interp,rivet_ns,"unescape_string",0);
-    Tcl_Export (interp,rivet_ns,"escape_string",0);
-    Tcl_Export (interp,rivet_ns,"escape_sgml_chars",0);
-    Tcl_Export (interp,rivet_ns,"escape_shell_ccommand",0);
-*/
     return TCL_OK;
 }
