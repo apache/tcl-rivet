@@ -1323,5 +1323,5 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,rivet_ns);
 #endif
 
-    return Tcl_PkgProvide( interp, "Rivet", "1.2" );
+    return Tcl_PkgProvide( interp, RIVET_TCL_PACKAGE, "1.2" );
 }

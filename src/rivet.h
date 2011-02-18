@@ -23,7 +23,9 @@
 
 #define STREQU(s1, s2)  (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 #define STRNEQU(s1, s2) (s1[0] == s2[0] && strncmp(s1, s2, strlen(s2)) == 0)
-#define RIVET_NS   "::Rivet"
+#define RIVET_NS            "::rivet"
+#define RIVET_TCL_PACKAGE   "rivet"
+#define RIVETLIB_TCL_PACKAGE "rivetlib"
 
 #define TCL_CMD_HEADER(cmd)	\
 static int cmd(\

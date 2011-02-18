@@ -67,7 +67,7 @@ Rivetlib_Init( Tcl_Interp *interp )
     Rivet_InitList ( interp, rivet_ns );
     Rivet_InitCrypt( interp, rivet_ns );
     Rivet_InitWWW  ( interp, rivet_ns );
-    return Tcl_PkgProvide( interp, "RivetLib", "1.2" );
+    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
 }
 
 
@@ -89,5 +89,6 @@ Rivetlib_SafeInit( Tcl_Interp *interp )
     Rivet_InitList( interp, rivet_ns );
     Rivet_InitCrypt( interp, rivet_ns );
     Rivet_InitWWW( interp, rivet_ns );
-    return Tcl_PkgProvide( interp, "RivetLib", "1.2" );
+    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
 }
+

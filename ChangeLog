@@ -1,3 +1,7 @@
+2011-02-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h,src/apache-2/rivetCore.c,src/rivetPkgInit.c: Core commands namespace is now '::rivet' and 
+    the package provided by the core module is "::rivet". Also package RivetLib was renamed as 'rivetlib'.
+
 2011-02-14 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.[h|c],src/apache-2/rivetCore.c: Removed loading of RivetLib by default. Getting
     RivetLib into the module keeps Apache to segfault in other calls. In order to gain access to commands
