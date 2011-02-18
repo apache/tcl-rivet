@@ -1,34 +1,37 @@
 <section id="directives">
-    <title>Rivet Apache Directives</title>
-
-    <para>
-      These directives are used within the Apache httpd server
-      configuration files to modify Apache Rivet's behavior.  Their
-      precedence is as follows: <command>RivetDirConf</command>,
-      <command>RivetUserConf</command>,
-      <command>RivetServerConf</command>, meaning that DirConf will
-      override UserConf, which will in turn override ServerConf.
-    </para>
-    <para>
-    	The directive <command>ServerInitScript</command> plays a special
-    	role since the script runs within the master interpreter,
-    	an interpreter created before the Apache parent process spawns
-    	the children that actually will serve the requests coming from
-    	the network. During this
-    	stage Apache is still running as a single process, so this
-    	is the right place for doing initialization of anything that 
-    	might work as an IPC infrastructure. Moreover everything
-    	created and initialized in this stage will be handed on to the
-    	interpreters run by the child processes, as they are
-    	created by copying the memory of the parent process.
-    </para>
-
-    <variablelist>
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>RivetServerConf</command>
-	    <group choice="req">
+   <title>Rivet Apache Directives</title>
+	<section>
+	   <para>
+	      Rivet directives are used within the Apache httpd server
+	      configuration to set up the environment where Rivet script
+	      will be run.  Their precedence is as follows: 
+	      <command>RivetDirConf</command>,
+	      <command>RivetUserConf</command>,
+	      <command>RivetServerConf</command>, meaning that DirConf will
+	      override UserConf, which will in turn override ServerConf.
+	   </para>
+	   <para>
+	    	The directive <command>ServerInitScript</command> plays a special
+	    	role since the script runs within the master interpreter,
+	    	an interpreter created before the Apache parent process spawns
+	    	the children that actually will serve the requests coming from
+	    	the network. During this
+	    	stage Apache is still running as a single process, so this
+	    	is the right place for doing initializations or loading packages 
+	    	that have be common to all the interpreters that are to be created
+	    	when Apache forks its child processes, even when the option 
+	    	<command>SeparateVirtualInterps</command> is set. The 
+	    	<command>ServerInitScript</command> is also the right place for
+	    	doing the creation and initialization of a IPC system. 
+	   </para>
+	</section>
+	<section>
+	   <variablelist>	
+   		<varlistentry>
+			<term>
+				<cmdsynopsis>
+			   	<command>RivetServerConf</command>
+			   	<group choice="req">
 	      <arg>CacheSize</arg>
 	      <arg>ServerInitScript</arg>
 	      <arg>GlobalInitScript</arg>
@@ -43,86 +46,87 @@
 	      <arg>SeparateVirtualInterps</arg>
 	      <arg>HonorHeaderOnlyRequests</arg>
 	    </group>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para><command>RivetServerConf</command> specifies a global
-	    option that is valid for the whole server.  If you have a
-	    virtual host, in some cases, the option specified in the
-	    virtualhost takes precedence over the 'global' version.
-	  </para>
-	</listitem>
-	<listitem>
-	  <variablelist>
-	    <varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">CacheSize</arg>
-				  <arg><replaceable>size</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-			   <listitem>
-					<para>
-					  Sets the size of the internal page cache, where
-					  <option><replaceable>size</replaceable></option> is
-					  the number of byte-compiled pages to be cached for
-					  future use.  Default is
-					  <command>MaxRequestsPerChild</command> / 5, or 50,
-					  if <command>MaxRequestsPerChild</command> is 0.
-					</para>
-					<para>
-					  This option is completely global, even when using
-					  separate, per-virtual host interpreters.
-					</para>
-				</listitem>
-	   </varlistentry>
-	   <varlistentry>
-	   	<term>
-	   		<cmdsynopsis>
-	   			<arg choice="plain">ServerInitScript</arg>
-	   			<arg><replaceable>script</replaceable></arg>
-	   		</cmdsynopsis>
-	   	</term>
-	   	<listitem>
-	   		<para>
-	   			Tcl script which is to run when the master interpreter is created. 
-	   			Namespaces, variables and packages loaded during this stage will 
-	   			be copied later on in the startup process, when child
-	   			processes are created. In general any sort of I/O channel 
-	   			that is opened during this stage must be closed before the 
-	   			execution of the script completes.
-	   		</para>
-	   		<para>
-					This option is only available at the global level	   		
-	   		</para>
-	   	</listitem>
-		</varlistentry>
-	   <varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">GlobalInitScript</arg>
-				  <arg><replaceable>script</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-	      <listitem>
+			  </cmdsynopsis>
+			</term>
+			<listitem>
 				<para>
-				  Tcl script that is run as part of a child process initialization. 
-				  If the option <option>SeparateVirtualInterp</option> is not used this is
-				  the right place where file handles, database connections or sockets can 
-				  be opened.
-				  The argument <replaceable><option>script</option></replaceable>
-				  is an actual Tcl script, so to run a file, you would
-				  do:
-		
-				  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
+					<command>RivetServerConf</command> specifies a global
+			    	option that is valid for the whole server.  If you have a
+			    	virtual host, in some cases, the option specified in the
+			    	virtualhost takes precedence over the 'global' version.
 				</para>
-				<para>
-				  This option is ignored in virtual hosts.
-				</para>
-	      </listitem>
-	  </varlistentry>
+			</listitem>
+			<listitem>
+				<variablelist>
+	   		<varlistentry>
+	      		<term>
+						<cmdsynopsis>
+				  			<arg choice="plain">CacheSize</arg>
+				  			<arg><replaceable>size</replaceable></arg>
+						</cmdsynopsis>
+	      		</term>
+			   	<listitem>
+						<para>
+						  Sets the size of the internal page cache, where
+						  <option><replaceable>size</replaceable></option> is
+						  the number of byte-compiled pages to be cached for
+						  future use.  Default is
+						  <command>MaxRequestsPerChild</command> / 5, or 50,
+						  if <command>MaxRequestsPerChild</command> is 0.
+						</para>
+						<para>
+						  This option is completely global, even when using
+						  separate, per-virtual host interpreters.
+						</para>
+					</listitem>
+	   		</varlistentry>
+	   		<varlistentry>
+	   			<term>
+	   				<cmdsynopsis>
+			   			<arg choice="plain">ServerInitScript</arg>
+			   			<arg><replaceable>script</replaceable></arg>
+	   				</cmdsynopsis>
+	   			</term>
+	   			<listitem>
+			   		<para>
+			   			Tcl script which is to run when the master interpreter is created. 
+			   			Namespaces, variables and packages loaded during this stage will 
+			   			be copied later on in the startup process, when child
+			   			processes are created. In general any sort of I/O channel 
+			   			that is opened during this stage must be closed before the 
+			   			execution of the script completes.
+			   		</para>
+			   		<para>
+							This option is only available at the global level	   		
+			   		</para>
+	   			</listitem>
+				</varlistentry>
+	   		<varlistentry>
+			      <term>
+						<cmdsynopsis>
+						  <arg choice="plain">GlobalInitScript</arg>
+						  <arg><replaceable>script</replaceable></arg>
+						</cmdsynopsis>
+			      </term>
+			      <listitem>
+						<para>
+						  Tcl script that is run as part of a child process initialization. 
+						  If the option <option>SeparateVirtualInterp</option> is not used this is
+						  the right place where file handles, database connections or sockets can 
+						  be opened.
+						  The argument <replaceable><option>script</option></replaceable>
+						  is an actual Tcl script, so to run a file, you would
+						  do:
+				
+						  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
+						</para>
+						<para>
+						  This option is ignored in virtual hosts.
+						</para>
+			      </listitem>
+	  			</varlistentry>
 
-	  <varlistentry>
+			  <varlistentry>
 	      <term>
 				<cmdsynopsis>
 				  <arg choice="plain">ChildInitScript</arg>
@@ -334,52 +338,49 @@
 	  </variablelist>
 	</listitem>
       </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>RivetDirConf</command>
-	    <group choice="req">
-	      <arg>BeforeScript</arg>
-	      <arg>AfterScript</arg>
-	      <arg>ErrorScript</arg>
-	      <arg>UploadDirectory</arg>
-	    </group>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    These options are the same as for
-	    <command>RivetServerConf</command>, except that they are
-	    only valid for the directory where they are specified, and
-	    its subdirectories.  It may be specified in <command>Directory</command> 
-	    sections.
-	  </para>
-	</listitem>
+      	<varlistentry>
+			<term>
+			  <cmdsynopsis>
+			    <command>RivetDirConf</command>
+			    <group choice="req">
+			      <arg>BeforeScript</arg>
+			      <arg>AfterScript</arg>
+			      <arg>ErrorScript</arg>
+			      <arg>UploadDirectory</arg>
+			    </group>
+			  </cmdsynopsis>
+			</term>
+			<listitem>
+			  <para>
+			    These options are the same as for
+			    <command>RivetServerConf</command>, except that they are
+			    only valid for the directory where they are specified, and
+			    its subdirectories.  It may be specified in <command>Directory</command> 
+			    sections.
+			  </para>
+			</listitem>
       </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-	    <command>RivetUserConf</command>
-	    <group choice="req">
-	      <arg>BeforeScript</arg>
-	      <arg>AfterScript</arg>
-	      <arg>ErrorScript</arg>
-	      <arg>UploadDirectory</arg>
-	    </group>
-	  </cmdsynopsis>
-	</term>
-	<listitem>
-	  <para>
-	    These options are the same as for
-	    <command>RivetServerConf</command>, except that they are
-	    only valid for the directory where they are specified, and
-	    its subdirectories.
-	  </para>
-	</listitem>
+      	<varlistentry>
+			<term>
+			  <cmdsynopsis>
+			    <command>RivetUserConf</command>
+			    <group choice="req">
+			      <arg>BeforeScript</arg>
+			      <arg>AfterScript</arg>
+			      <arg>ErrorScript</arg>
+			      <arg>UploadDirectory</arg>
+			    </group>
+			  </cmdsynopsis>
+			</term>
+			<listitem>
+			  <para>
+			    These options are the same as for
+			    <command>RivetServerConf</command>, except that they are
+			    only valid for the directory where they are specified, and
+			    its subdirectories.
+			  </para>
+			</listitem>
       </varlistentry>
-    </variablelist>
-
+		</variablelist>
+	</section>
 </section>
-
