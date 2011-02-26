@@ -392,11 +392,11 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
     /* Make sure to flush the output if buffer_add was the only output */
 good:
     
-    if (conf->rivet_force_script) {
-        if (Tcl_EvalObjEx(interp,conf->rivet_force_script,0) == TCL_ERROR)
+    if (conf->after_every_script) {
+        if (Tcl_EvalObjEx(interp,conf->after_every_script,0) == TCL_ERROR)
         {
             CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
-            TclWeb_PrintError("<b>Rivet ForceAfterScript failed!</b>",1,globals->req);
+            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
             TclWeb_PrintError( errorinfo, 0, globals->req );
         }
     }
@@ -653,7 +653,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_after_script = oldrsc->rivet_after_script;
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
     newrsc->rivet_abort_script = oldrsc->rivet_abort_script;
-    newrsc->rivet_force_script = oldrsc->rivet_force_script;
+    newrsc->after_every_script = oldrsc->after_every_script;
 
     newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
 
@@ -695,8 +695,8 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
         add->rivet_error_script : base->rivet_error_script;
     new->rivet_abort_script = add->rivet_abort_script ?
         add->rivet_abort_script : base->rivet_abort_script;
-    new->rivet_force_script = add->rivet_force_script ?
-        add->rivet_force_script : base->rivet_force_script;
+    new->after_every_script = add->after_every_script ?
+        add->after_every_script : base->after_every_script;
 
     new->user_scripts_updated = add->user_scripts_updated ?
         add->user_scripts_updated : base->user_scripts_updated;
@@ -763,7 +763,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->rivet_after_script         = NULL;
     rsc->rivet_error_script         = NULL;
     rsc->rivet_abort_script         = NULL;
-    rsc->rivet_force_script         = NULL;
+    rsc->after_every_script         = NULL;
 
     rsc->user_scripts_updated = 0;
 
@@ -1020,8 +1020,8 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc,
         objarg = Rivet_AssignStringToConf(&(rsc->rivet_server_init_script),string);
     } else if( STREQU( script, "AbortScript" ) ) {
         objarg = Rivet_AssignStringToConf(&(rsc->rivet_abort_script),string);
-    } else if( STREQU( script, "ForceAfterScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_force_script),string);
+    } else if( STREQU( script, "AfterEveryScript" ) ) {
+        objarg = Rivet_AssignStringToConf(&(rsc->after_every_script),string);
     }
 
     if( !objarg ) return string;
@@ -1275,8 +1275,8 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     rsc->rivet_abort_script = overrides->rivet_abort_script ?
         overrides->rivet_abort_script : base->rivet_abort_script;
 
-    rsc->rivet_force_script = overrides->rivet_force_script ?
-        overrides->rivet_force_script : base->rivet_force_script;
+    rsc->after_every_script = overrides->after_every_script ?
+        overrides->after_every_script : base->after_every_script;
 
     /* cache_size is global, and set up later. */
     /* cache_free is not set up at this point. */
