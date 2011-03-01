@@ -1,6 +1,17 @@
+2011-03-01 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCode.c: 'abort_code' command is now created through the RIVET_CMD_OBJ macro
+
 2011-02-14 Karl Lehenbauer <karl@apache.org>
-    * src/apache-2/mod_rivet.c: Only create root interpreter once, not twice.  In Rivet_CopyConfig cache_size and cache_free were getting copied twice.  Only once now.
-    * src/apache-2/rivetCore.c: Remove unused command var from Rivet_Upload.  Remove unneeded loglevel var from Rivet_LogErrorCmd.
+    * src/apache-2/mod_rivet.c: Only create root interpreter once, not twice.  
+    In Rivet_CopyConfig cache_size and cache_free were getting copied twice.  
+    Only once now.
+    * src/apache-2/rivetCore.c: Remove unused command var from Rivet_Upload.
+    Remove unneeded loglevel var from Rivet_LogErrorCmd.
+
+2011-02-11 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[c|h]: new conf scripts rivet_abort_script and rivet_force_script. rivet_abort_script
+    is run when an abort_page command is called in the page content generation
+    * src/apache-2/rivetCode.c: add new command abort_code that returns the code passed to abort_page
 
 2011-01-31 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: default value for directive SeparateVirtualInterps changed to 'yes'.

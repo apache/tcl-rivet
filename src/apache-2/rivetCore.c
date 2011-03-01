@@ -591,200 +591,200 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
     int subcommandindex;
 
     static CONST84 char *SubCommand[] = {
-	"get",
-	"set",
-	"exists",
-	"unset",
-	"names",
-	"array_get",
-	"clear",
-	NULL
+        "get",
+        "set",
+        "exists",
+        "unset",
+        "names",
+        "array_get",
+        "clear",
+        NULL
     };
 
     enum subcommand {
-	SUB_GET,
-	SUB_SET,
-	SUB_EXISTS,
-	SUB_UNSET,
-	SUB_NAMES,
-	SUB_ARRAY_GET,
-	SUB_CLEAR
+        SUB_GET,
+        SUB_SET,
+        SUB_EXISTS,
+        SUB_UNSET,
+        SUB_NAMES,
+        SUB_ARRAY_GET,
+        SUB_CLEAR
     };
 
     static CONST84 char *tableNames[] = {
-	"notes",
-	"headers_in",
-	"headers_out",
-	"err_headers_out",
-	"subprocess_env",
-	NULL
+        "notes",
+        "headers_in",
+        "headers_out",
+        "err_headers_out",
+        "subprocess_env",
+        NULL
     };
 
     int tableindex;
 
     enum tablename {
-	TABLE_NOTES,
-	TABLE_HEADERS_IN,
-	TABLE_HEADERS_OUT,
-	TABLE_ERR_HEADERS_OUT,
-	TABLE_SUBPROCESS_ENV
+        TABLE_NOTES,
+        TABLE_HEADERS_IN,
+        TABLE_HEADERS_OUT,
+        TABLE_ERR_HEADERS_OUT,
+        TABLE_SUBPROCESS_ENV
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if ((objc < 3) || (objc > 5)) {
-	Tcl_WrongNumArgs(interp, 1, objv, "option tablename ?args?");
-	return TCL_ERROR;
+        Tcl_WrongNumArgs(interp, 1, objv, "option tablename ?args?");
+        return TCL_ERROR;
     }
 
-    if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
-			"get|set|unset|list",
-			0, &subcommandindex) == TCL_ERROR) {
-	return TCL_ERROR;
+    if (Tcl_GetIndexFromObj(interp, objv[1],SubCommand,
+                        "get|set|unset|list",
+			            0, &subcommandindex) == TCL_ERROR) {
+        return TCL_ERROR;
     }
 
     if (Tcl_GetIndexFromObj (interp, objv[2], tableNames,
-			"notes|headers_in|headers_out|err_header_out|subprocess_env",
-			0, &tableindex) == TCL_ERROR) {
-	return TCL_ERROR;
+                    "notes|headers_in|headers_out|err_header_out|subprocess_env",
+                    0, &tableindex) == TCL_ERROR) {
+	    return TCL_ERROR;
     }
 
     switch ((enum tablename)tableindex)
     {
-	case TABLE_NOTES: {
-	    table = globals->r->notes;
-	    break;
-	}
+        case TABLE_NOTES: {
+            table = globals->r->notes;
+            break;
+        }
 
-	case TABLE_HEADERS_IN: {
-	    table = globals->r->headers_in;
-	    break;
-	}
+        case TABLE_HEADERS_IN: {
+            table = globals->r->headers_in;
+            break;
+        }
 
-	case TABLE_HEADERS_OUT: {
-	    table = globals->r->headers_out;
-	    break;
-	}
+        case TABLE_HEADERS_OUT: {
+            table = globals->r->headers_out;
+            break;
+        }
 
-	case TABLE_ERR_HEADERS_OUT: {
-	    table = globals->r->err_headers_out;
-	    break;
-	}
+        case TABLE_ERR_HEADERS_OUT: {
+            table = globals->r->err_headers_out;
+            break;
+        }
 
-	case TABLE_SUBPROCESS_ENV: {
-	    table = globals->r->subprocess_env;
-	    break;
-	}
+        case TABLE_SUBPROCESS_ENV: {
+            table = globals->r->subprocess_env;
+            break;
+        }
     }
 
     switch ((enum subcommand)subcommandindex)
     {
-	case SUB_GET: {
-	    const char *key;
-	    const char *value;
+        case SUB_GET: {
+            const char *key;
+            const char *value;
 
-	    if (objc != 4) {
-		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
-		return TCL_ERROR;
-	    }
+            if (objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+            return TCL_ERROR;
+            }
 
-	    key = Tcl_GetString (objv[3]);
-	    value = apr_table_get (table, key);
+            key = Tcl_GetString (objv[3]);
+            value = apr_table_get (table, key);
 
-	    if (value != NULL) {
-		Tcl_SetObjResult (interp, Tcl_NewStringObj (value, -1));
-	    }
-	    break;
-	}
+            if (value != NULL) {
+            Tcl_SetObjResult (interp, Tcl_NewStringObj (value, -1));
+            }
+            break;
+        }
 
-	case SUB_EXISTS: {
-	    const char *key;
-	    const char *value;
+        case SUB_EXISTS: {
+            const char *key;
+            const char *value;
 
-	    if (objc != 4) {
-		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
-		return TCL_ERROR;
-	    }
+            if (objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+            return TCL_ERROR;
+            }
 
-	    key = Tcl_GetString (objv[3]);
-	    value = apr_table_get (table, key);
+            key = Tcl_GetString (objv[3]);
+            value = apr_table_get (table, key);
 
-	    Tcl_SetObjResult (interp, Tcl_NewBooleanObj (value != NULL));
-	    break;
-	}
+            Tcl_SetObjResult (interp, Tcl_NewBooleanObj (value != NULL));
+            break;
+        }
 
 
-	case SUB_SET: {
-	    int i;
-	    char *key;
-	    char *value;
+        case SUB_SET: {
+            int i;
+            char *key;
+            char *value;
 
-	    if (objc == 4) {
-		int listObjc;
-		Tcl_Obj **listObjv;
+            if (objc == 4) {
+                int listObjc;
+                Tcl_Obj **listObjv;
 
-		if (Tcl_ListObjGetElements (interp, objv[3], &listObjc, &listObjv) == TCL_ERROR) {
-		    return TCL_ERROR;
-		}
+                if (Tcl_ListObjGetElements (interp, objv[3], &listObjc, &listObjv) == TCL_ERROR) {
+                    return TCL_ERROR;
+                }
 
-		if (listObjc % 2 == 1) {
-		    Tcl_SetObjResult (interp, Tcl_NewStringObj ("list must have even number of elements", -1));
-		    return TCL_ERROR;
-		}
+                if (listObjc % 2 == 1) {
+                    Tcl_SetObjResult (interp, Tcl_NewStringObj ("list must have even number of elements", -1));
+                    return TCL_ERROR;
+                }
 
-		for (i = 0; i < listObjc; i += 2) {
-		    apr_table_set (table, Tcl_GetString (listObjv[i]), Tcl_GetString (listObjv[i+1]));
-		}
+                for (i = 0; i < listObjc; i += 2) {
+                    apr_table_set (table, Tcl_GetString (listObjv[i]), Tcl_GetString (listObjv[i+1]));
+                }
 
-		break;
-	    }
+                break;
+            }
 
-	    if (objc != 5) {
-		Tcl_WrongNumArgs(interp, 2, objv, "tablename key value");
-		return TCL_ERROR;
-	    }
+            if (objc != 5) {
+                Tcl_WrongNumArgs(interp, 2, objv, "tablename key value");
+                return TCL_ERROR;
+            }
 
-	    key = Tcl_GetString (objv[3]);
-	    value = Tcl_GetString (objv[4]);
+            key = Tcl_GetString (objv[3]);
+            value = Tcl_GetString (objv[4]);
 
-	    apr_table_set (table, key, value);
-	    break;
-	}
+            apr_table_set (table, key, value);
+            break;
+        }
 
-	case SUB_UNSET: {
-	    char *key;
+        case SUB_UNSET: {
+            char *key;
 
-	    if (objc != 4) {
-		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
-		return TCL_ERROR;
-	    }
+            if (objc != 4) {
+                Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+                return TCL_ERROR;
+            }
 
-	    key = Tcl_GetString (objv[3]);
-	    apr_table_unset (table, key);
-	    break;
-	}
+            key = Tcl_GetString (objv[3]);
+            apr_table_unset (table, key);
+            break;
+        }
 
-	case SUB_NAMES: {
+        case SUB_NAMES: {
             Tcl_Obj *list = Tcl_NewObj ();
 
-	    apr_table_do(append_key_callback, (void*)list, table, NULL);
+            apr_table_do(append_key_callback, (void*)list, table, NULL);
 
-	    Tcl_SetObjResult (interp, list);
-	    break;
-	}
+            Tcl_SetObjResult (interp, list);
+            break;
+        }
 
-	case SUB_ARRAY_GET: {
+        case SUB_ARRAY_GET: {
             Tcl_Obj *list = Tcl_NewObj ();
 
-	    apr_table_do(append_key_value_callback, (void*)list, table, NULL);
+            apr_table_do(append_key_value_callback, (void*)list, table, NULL);
 
-	    Tcl_SetObjResult (interp, list);
-	    break;
-	}
+            Tcl_SetObjResult (interp, list);
+            break;
+        }
 
-	case SUB_CLEAR: {
-	    apr_table_clear (table);
-	}
+        case SUB_CLEAR: {
+            apr_table_clear (table);
+        }
     }
 
     return TCL_OK;
@@ -826,28 +826,28 @@ TCL_CMD_HEADER( Rivet_Upload )
     Tcl_Obj *result = NULL;
 
     static CONST84 char *SubCommand[] = {
-	"channel",
-	"save",
-	"data",
-	"exists",
-	"size",
-	"type",
-	"filename",
-	"tempname",
-	"names",
-	NULL
+        "channel",
+        "save",
+        "data",
+        "exists",
+        "size",
+        "type",
+        "filename",
+        "tempname",
+        "names",
+        NULL
     };
 
     enum subcommand {
-	CHANNEL,
-	SAVE,
-	DATA,
-	EXISTS,
-	SIZE,
-	TYPE,
-	FILENAME,
-	TEMPNAME,
-	NAMES
+        CHANNEL,
+        SAVE,
+        DATA,
+        EXISTS,
+        SIZE,
+        TYPE,
+        FILENAME,
+        TEMPNAME,
+        NAMES
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
@@ -863,96 +863,115 @@ TCL_CMD_HEADER( Rivet_Upload )
     /* Excluded case is NAMES. */
 
     if ((enum subcommand)subcommandindex == CHANNEL 	||
-	(enum subcommand)subcommandindex == SAVE 	||
-	(enum subcommand)subcommandindex == DATA 	||
-	(enum subcommand)subcommandindex == EXISTS 	||
-	(enum subcommand)subcommandindex == SIZE 	||
-	(enum subcommand)subcommandindex == TYPE 	||
-	(enum subcommand)subcommandindex == FILENAME 	||
-	(enum subcommand)subcommandindex == TEMPNAME)
+        (enum subcommand)subcommandindex == SAVE 	    ||
+        (enum subcommand)subcommandindex == DATA 	    ||
+        (enum subcommand)subcommandindex == EXISTS 	    ||
+        (enum subcommand)subcommandindex == SIZE 	    ||
+        (enum subcommand)subcommandindex == TYPE 	    ||
+        (enum subcommand)subcommandindex == FILENAME 	||
+        (enum subcommand)subcommandindex == TEMPNAME)
     {
-	varname = Tcl_GetString(objv[2]);
-	if ((enum subcommand)subcommandindex != EXISTS)
-	{
-	    if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
-	    {
-		Tcl_AddErrorInfo(interp, "Unable to find variable");
-		return TCL_ERROR;
-	    }
-	}
+        varname = Tcl_GetString(objv[2]);
+        if ((enum subcommand)subcommandindex != EXISTS)
+        {
+            if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
+            {
+            Tcl_AddErrorInfo(interp, "Unable to find variable");
+            return TCL_ERROR;
+            }
+        }
 
-	/* If it's not the 'save' command, then it has to have an objc
-	   of 3. */
-	if ((enum subcommand)subcommandindex != SAVE && objc != 3)
-	{
-	    Tcl_WrongNumArgs(interp, 2, objv, "varname");
-	    return TCL_ERROR;
-	}
+        /* If it's not the 'save' command, then it has to have an objc
+           of 3. */
+        if ((enum subcommand)subcommandindex != SAVE && objc != 3)
+        {
+            Tcl_WrongNumArgs(interp, 2, objv, "varname");
+            return TCL_ERROR;
+        }
     }
 
     result = Tcl_NewObj();
 
     switch ((enum subcommand)subcommandindex)
     {
-    case CHANNEL: {
-	Tcl_Channel chan;
-	char *channelname = NULL;
+        case CHANNEL: 
+        {
+            Tcl_Channel chan;
+            char *channelname = NULL;
 
-	if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	channelname = (char *)Tcl_GetChannelName(chan);
-	Tcl_SetStringObj(result, channelname, -1);
-	break;
-    }
-    case SAVE:
-	/* save data to a specified filename  */
-	if (objc != 4) {
-	    Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
-	    return TCL_ERROR;
-	}
+            if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            channelname = (char *)Tcl_GetChannelName(chan);
+            Tcl_SetStringObj(result, channelname, -1);
+            break;
+        }
+        case SAVE:
+        {
+            /* save data to a specified filename  */
+            if (objc != 4) {
+                Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
+                return TCL_ERROR;
+            }
 
-	if (TclWeb_UploadSave(varname, objv[3], globals->req) != TCL_OK)
-	{
-	    return TCL_ERROR;
-	}
-	break;
-    case DATA:
-	if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	break;
-    case EXISTS:
-	if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
-	{
-	    Tcl_SetIntObj(result, 0);
-	} else {
-	    Tcl_SetIntObj(result, 1);
-	}
-	break;
-    case SIZE:
-	TclWeb_UploadSize(result, globals->req);
-	break;
-    case TYPE:
-	TclWeb_UploadType(result, globals->req);
-	break;
-    case FILENAME:
-	TclWeb_UploadFilename(result, globals->req);
-	break;
-    case TEMPNAME:
-	TclWeb_UploadTempname(result,globals->req);
-	break;
-    case NAMES:
-	if (objc != 2)
-	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "names");
-	    return TCL_ERROR;
-	}
-	TclWeb_UploadNames(result, globals->req);
-	break;
-    default:
-	Tcl_WrongNumArgs(interp, 1, objv,
-			 "channel|save ?name?|data|exists|size|type|filename|names|tempname");
+            if (TclWeb_UploadSave(varname, objv[3], globals->req) != TCL_OK)
+            {
+                return TCL_ERROR;
+            }
+            break;
+        }
+        case DATA:
+        {
+            if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
+        }
+        case EXISTS:
+        {
+            if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
+            {
+                Tcl_SetIntObj(result, 0);
+            } else {
+                Tcl_SetIntObj(result, 1);
+            }
+            break;
+        }
+        case SIZE:
+        {
+            TclWeb_UploadSize(result, globals->req);
+            break;
+        }
+        case TYPE:
+        {
+            TclWeb_UploadType(result, globals->req);
+            break;
+        }
+        case FILENAME:
+        {
+            TclWeb_UploadFilename(result, globals->req);
+            break;
+        }
+        case TEMPNAME:
+        {
+            TclWeb_UploadTempname(result,globals->req);
+            break;
+        }
+        case NAMES:
+        {
+            if (objc != 2)
+            {
+                Tcl_WrongNumArgs(interp, 1, objv, "names");
+                return TCL_ERROR;
+            }
+            TclWeb_UploadNames(result, globals->req);
+            break;
+        }
+        default:
+        {
+            Tcl_WrongNumArgs(interp, 1, objv,
+                 "channel|save ?name?|data|exists|size|type|filename|names|tempname");
+        }
     }
     Tcl_SetObjResult(interp, result);
     return TCL_OK;
@@ -983,7 +1002,7 @@ TCL_CMD_HEADER ( Rivet_RawPost )
     data = TclWeb_GetRawPost(globals->req);
 
     if (!data) {
-	data = "";
+        data = "";
     }
     retval = Tcl_NewStringObj(data, -1);
     Tcl_SetObjResult(interp, retval);
@@ -1012,8 +1031,8 @@ TCL_CMD_HEADER( Rivet_NoBody )
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if (globals->req->content_sent == 1) {
-	Tcl_AddErrorInfo(interp, "Content already sent");
-	return TCL_ERROR;
+        Tcl_AddErrorInfo(interp, "Content already sent");
+        return TCL_ERROR;
     }
 
     globals->req->content_sent = 1;
@@ -1041,17 +1060,77 @@ TCL_CMD_HEADER( Rivet_NoBody )
 
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
     static char *errorMessage = "Page generation terminated by abort_page directive";
 
-    if (objc != 1)
+    if (objc > 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "");
-	return TCL_ERROR;
+        Tcl_WrongNumArgs(interp, 1, objv, "");
+        return TCL_ERROR;
     }
+
+    if (objc == 2)
+    {
+        char* cmd_arg = Tcl_GetStringFromObj(objv[1],NULL);
+        
+        if (strcmp(cmd_arg,"-aborting") == 0)
+        {
+            Tcl_SetObjResult (interp,Tcl_NewBooleanObj(globals->page_aborting));
+            return TCL_OK;
+        }
+ 
+    /* 
+     * we assume abort_code to be null, as abort_page shouldn't run twice while
+     * processing the same request 
+     */
+       
+        if (globals->abort_code == NULL)
+        {
+            globals->abort_code = objv[1];
+            Tcl_IncrRefCount(globals->abort_code);
+        }
+    }
+
+    /* 
+     * If page_aborting is true then this is the second call to abort_page
+     * processing the same request: we ignore it and return a normal
+     * completion code
+     */
+
+    if (globals->page_aborting)
+    {
+        return TCL_OK;
+    }
+
+    /* this is the first (and supposedly unique) abort_page call during this request */
+
+    globals->page_aborting = 1;
 
     Tcl_AddErrorInfo (interp, errorMessage);
     Tcl_SetErrorCode (interp, "RIVET", "ABORTPAGE", errorMessage, (char *)NULL);
     return TCL_ERROR;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ * Rivet_AbortCodeCmd -- 
+ *
+ * Returns the abort code stored internally by passing a user defined parameter 
+ * to the command 'abort_page'.
+ *
+ *
+ *-----------------------------------------------------------------------------
+ */
+TCL_CMD_HEADER( Rivet_AbortCodeCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    
+    if (globals->abort_code != NULL)
+    {
+        Tcl_SetObjResult(interp,globals->abort_code);
+    }
+
+    return TCL_OK;
 }
 
 /*
@@ -1078,8 +1157,8 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
     char *val;
 
     if( objc != 2 ) {
-	Tcl_WrongNumArgs( interp, 1, objv, "variable" );
-	return TCL_ERROR;
+        Tcl_WrongNumArgs( interp, 1, objv, "variable" );
+        return TCL_ERROR;
     }
 
     key = Tcl_GetStringFromObj( objv[1], NULL );
@@ -1114,8 +1193,8 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
     char *virtual;
 
     if( objc != 2 ) {
-	Tcl_WrongNumArgs( interp, 1, objv, "filename" );
-	return TCL_ERROR;
+        Tcl_WrongNumArgs( interp, 1, objv, "filename" );
+        return TCL_ERROR;
     }
 
     virtual   = Tcl_GetStringFromObj( objv[1], NULL );
@@ -1193,7 +1272,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
     {
       case EMERG:
         apLogLevel = APLOG_EMERG;
-	break;
+        break;
 
       case ALERT:
         apLogLevel = APLOG_ALERT;
@@ -1389,6 +1468,7 @@ Rivet_InitCore( Tcl_Interp *interp )
 #endif
 
     TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
+    TCL_OBJ_CMD( "abort_code", Rivet_AbortCodeCmd );
     TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
 
     return TCL_OK;

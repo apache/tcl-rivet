@@ -37,6 +37,8 @@
 	      <arg>BeforeScript</arg>
 	      <arg>AfterScript</arg>
 	      <arg>ErrorScript</arg>
+	      <arg>AbortScript</arg>
+	      <arg>AfterEveryScript</arg>
 	      <arg>UploadDirectory</arg>
 	      <arg>UploadMaxSize</arg>
 	      <arg>UploadFilesToVar</arg>
@@ -214,45 +216,86 @@
 
 	    <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">ErrorScript</arg>
-		  <arg><replaceable>script</replaceable></arg>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">ErrorScript</arg>
+				  <arg><replaceable>script</replaceable></arg>
+				</cmdsynopsis>
 	      </term>
 	      <listitem>
-		<para>
-		  When Rivet encounters an error in a script, it
-		  constructs an HTML page with some information about
-		  the error, and the script that was being
-		  evaluated. If an <option>ErrorScript</option> is
-		  specified, it is possible to create custom error
-		  pages.  This may be useful if you want to make sure
-		  that users never view your source code.
-		</para>
-		<para>
-		  In virtual hosts, this option takes precedence over
-		  the global setting.
-		</para>
+				<para>
+				  When Rivet encounters an error in a script, it
+				  constructs an HTML page with some information about
+				  the error, and the script that was being
+				  evaluated. If an <option>ErrorScript</option> is
+				  specified, it is possible to create custom error
+				  pages.  This may be useful if you want to make sure
+				  that users never view your source code.
+				</para>
+				<para>
+				  In virtual hosts, this option takes precedence over
+				  the global setting.
+				</para>
 	      </listitem>
 	    </varlistentry>
 
 	    <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">UploadDirectory</arg>
-		  <arg><replaceable>directory</replaceable></arg>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">AfterEveryScript</arg>
+				  <arg><replaceable>script</replaceable></arg>
+				</cmdsynopsis>
 	      </term>
 	      <listitem>
-		<para>Directory to place uploaded files.</para>
-		<para>
-		  In virtual hosts, this option takes precedence over
-		  the global setting.
-		</para>
+				<para>
+					<option>AfterEveryScript</option> is a script that is to
+					be run anyway before requests processing ends. This script
+					is therefore run both when the content generation script
+					completes successfully and when its execution is interrupted
+					by <xref linkend="abort_page" />. The code in this script
+					can tell whether we are running after an abort condition
+					occurred by passing the argument <arg>-aborting</arg> to
+					<xref linkend="abort_page" /> which in turn returns 1 if
+					abort_page had been called earlier in the request processing.
+				</para>
 	      </listitem>
 	    </varlistentry>
 
-	    <varlistentry>
+		<varlistentry>
+			<term>
+				<cmdsynopsis>
+					<arg choice="plain">AbortScript</arg>
+					<arg><replaceable>script</replaceable></arg>
+				</cmdsynopsis>
+			</term>
+			<listitem>
+				<para>
+					Execution of a content generating script can be
+					done by invoking <xref linkend="abort_page" />. When 
+					an <option>AbortScript</option> is defined for the page
+					being generated, control is passed to it as a way
+					to undertake specific action that might be necessary
+					to catch resources left dangling by the sudden interruption.				
+				</para>			
+			</listitem>
+		</varlistentry>
+
+	   <varlistentry>
+	      <term>
+				<cmdsynopsis>
+				  <arg choice="plain">UploadDirectory</arg>
+				  <arg><replaceable>directory</replaceable></arg>
+				</cmdsynopsis>
+	      </term>
+	      <listitem>
+				<para>Directory to place uploaded files.</para>
+				<para>
+		  			In virtual hosts, this option takes precedence over
+		  			the global setting.
+				</para>
+	      </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
 	      <term>
 		<cmdsynopsis>
 		  <arg choice="plain">UploadMaxSize</arg>

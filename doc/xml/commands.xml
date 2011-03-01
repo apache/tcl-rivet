@@ -749,42 +749,42 @@
 
     <refentry id="incr0">
       <refnamediv>
-	<refname>incr0</refname>
-	<refpurpose>increment a variable or set it to 1 if nonexistent.</refpurpose>
+			<refname>incr0</refname>
+			<refpurpose>increment a variable or set it to 1 if nonexistent.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>incr0</command>
-	  <arg><replaceable>varname</replaceable></arg>
-	  <arg><replaceable>num</replaceable></arg>
-	</cmdsynopsis>
+			<cmdsynopsis>
+			  <command>incr0</command>
+			  <arg><replaceable>varname</replaceable></arg>
+			  <arg><replaceable>num</replaceable></arg>
+			</cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
-	<title>Description</title>
-	<para>
-	  Increment a variable
-	  <option><replaceable>varname</replaceable></option> by
-	  <option><replaceable>num</replaceable></option>.  If the
-	  variable doesn't exist, create it instead of returning an
-	  error.
-	</para>
+			<title>Description</title>
+			<para>
+			  Increment a variable
+			  <option><replaceable>varname</replaceable></option> by
+			  <option><replaceable>num</replaceable></option>.  If the
+			  variable doesn't exist, create it instead of returning an
+			  error.
+			</para>
       </refsect1>
     </refentry>
 
     <refentry id="parray">
       <refnamediv>
-	<refname>parray</refname>
-	<refpurpose>Tcl's <command>parray</command> with html formatting.</refpurpose>
+			<refname>parray</refname>
+			<refpurpose>Tcl's <command>parray</command> with html formatting.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>parray</command>
-	  <arg><replaceable>arrayName</replaceable></arg>
-	  <arg><replaceable><optional>pattern</optional></replaceable></arg>
-	</cmdsynopsis>
+			<cmdsynopsis>
+	  			<command>parray</command>
+	  			<arg><replaceable>arrayName</replaceable></arg>
+	  			<arg><replaceable><optional>pattern</optional></replaceable></arg>
+				</cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
@@ -801,79 +801,129 @@
 
     <refentry id="abort_page">
       <refnamediv>
-	<refname>abort_page</refname>
-	<refpurpose>Stops outputing data to web page, similar in
-	  purpose to PHP's <command>die</command> command.</refpurpose>
+			<refname>abort_page</refname>
+			<refpurpose>
+				Stops outputing data to web page, similar in
+			  	purpose to PHP's <command>die</command> command.
+			</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>abort_page</command>
-	</cmdsynopsis>
+			<cmdsynopsis>
+			  	<command>abort_page</command>
+			  	<group choice="req">
+					<arg><replaceable>abort code</replaceable></arg>
+					<arg><replaceable>-aborting</replaceable></arg>
+				</group>
+			</cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
-	<title>Description</title> <para>This command flushes the
-	output buffer and stops the Tcl script from sending any more
-	data to the client.  A normal Tcl script might use the
-	<command>exit</command> command, but that cannot be used in
-	Rivet without actually exiting the apache child
-	process!</para>
+			<title>Description</title> 
+			<para>
+				This command flushes the output buffer and stops the Tcl 
+				script from sending any more data to the client.
+				A normal Tcl script might use the
+				<command>exit</command> command, but that cannot be used in
+				Rivet without actually exiting the apache child
+				process!
+				<command>abort_page</command> triggers
+				the execution of an optional AbortScript that has to be
+				specified in the configuration. The value of the
+				argument <arg>abort code</arg> can be retrieved with the 
+				<command>abort_code</command> command during the
+				execution of AbortScript or AfterEveryScript, allowing 
+				the script to take appropriate actions in order to deal
+				with the cause of the abort. 
+			</para>
+			<para>
+				When passed the argument <option>-aborting</option> the
+				command returns 1 if <option>abort_page</option>
+				had been called earlier in the request processing, thus
+				providing a tool for code in AfterEveryScript to tell
+				if the an abort condition took place.
+			</para>
       </refsect1>
-    </refentry>
+   </refentry>
 
-    <refentry id="no_body">
+	<refentry id="abort_code">
+		<refnamediv>
+			<refname>abort_code</refname>
+			<refpurpose>
+				Returns the code passed to <command>abort_page</command>
+				earlier during the request processing
+			</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+			  <command>abort_page</command>
+			  <arg><replaceable>abort code</replaceable></arg>
+			</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+			<title>Description</title> 
+			<para>
+				Usage of this command is meaningful only in code that runs as
+				AbortScript or AfterEveryScript. 
+				<command>abort_code</command> returns the value of the optional 
+				parameter passed to <command>abort_page</command> earlier in
+				the same request processing.
+			</para>
+      </refsect1>
+	</refentry>
+	
+   <refentry id="no_body">
       <refnamediv>
-	<refname>no_body</refname>
-	<refpurpose>Prevents Rivet from sending any content.</refpurpose>
+			<refname>no_body</refname>
+			<refpurpose>Prevents Rivet from sending any content.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>no_body</command>
-	</cmdsynopsis>
+			<cmdsynopsis>
+			  <command>no_body</command>
+			</cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
-	<title>Description</title>
-	<para>
-	  This command is useful for situations where it is necessary
-	  to only return HTTP headers and no actual content.  For
-	  instance, when returning a 304 redirect.
-	</para>
-      </refsect1>
-    </refentry>
+			<title>Description</title>
+			<para>
+			  This command is useful for situations where it is necessary
+			  to only return HTTP headers and no actual content.  For
+			  instance, when returning a 304 redirect.
+			</para>
+   	</refsect1>
+	</refentry>
 
-    <refentry id="escape_string">
+   <refentry id="escape_string">
       <refnamediv>
 			<refname>escape_string</refname>
 			<refpurpose>convert a string into escaped characters.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>escape_string</command>
-	  <arg>string</arg>
-	</cmdsynopsis>
+			<cmdsynopsis>
+			  <command>escape_string</command>
+			  <arg>string</arg>
+			</cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
-	<title>Description</title>
-	<para>
-	    Scans through each character in the specified string looking
-	    for special characters, escaping them as needed, mapping
-	    special characters to a quoted hexadecimal equivalent,
-	    returning the result.
-	</para>
-	<para>
-	    This is useful for quoting strings that are going to be
-	    part of a URL.
-	</para>
-	<note> 
-	    You must require the Rivet package in order to gain access to this command
-	</note>
+			<title>Description</title>
+			<para>
+			    Scans through each character in the specified string looking
+			    for special characters, escaping them as needed, mapping
+			    special characters to a quoted hexadecimal equivalent,
+			    returning the result.
+			</para>
+			<para>
+			    This is useful for quoting strings that are going to be
+			    part of a URL.
+			</para>
+			<note> 
+			    You must require the Rivet package in order to gain access to this command
+			</note>
       </refsect1>
-    </refentry>
+	</refentry>
 
     <refentry id="escape_sgml_chars">
       <refnamediv>
