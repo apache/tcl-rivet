@@ -782,28 +782,77 @@
 
     <refentry id="abort_page">
       <refnamediv>
-	<refname>abort_page</refname>
-	<refpurpose>Stops outputing data to web page, similar in
-	  purpose to PHP's <command>die</command> command.</refpurpose>
+			<refname>abort_page</refname>
+			<refpurpose>
+				Stops outputing data to web page, similar in
+			  	purpose to PHP's <command>die</command> command.
+			</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>abort_page</command>
-	</cmdsynopsis>
+			<cmdsynopsis>
+			  	<command>abort_page</command>
+			  	<group choice="req">
+					<arg><replaceable>abort code</replaceable></arg>
+					<arg><replaceable>-aborting</replaceable></arg>
+				</group>
+			</cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
-	<title>Description</title> <para>This command flushes the
-	output buffer and stops the Tcl script from sending any more
-	data to the client.  A normal Tcl script might use the
-	<command>exit</command> command, but that cannot be used in
-	Rivet without actually exiting the apache child
-	process!</para>
+			<title>Description</title> 
+			<para>
+				This command flushes the output buffer and stops the Tcl 
+				script from sending any more data to the client.
+				A normal Tcl script might use the
+				<command>exit</command> command, but that cannot be used in
+				Rivet without actually exiting the apache child
+				process!
+				<command>abort_page</command> triggers
+				the execution of an optional AbortScript that has to be
+				specified in the configuration. The value of the
+				argument <arg>abort code</arg> can be retrieved with the 
+				<command>abort_code</command> command during the
+				execution of AbortScript or AfterEveryScript, allowing 
+				the script to take appropriate actions in order to deal
+				with the cause of the abort. 
+			</para>
+			<para>
+				When passed the argument <option>-aborting</option> the
+				command returns 1 if <option>abort_page</option>
+				had been called earlier in the request processing, thus
+				providing a tool for code in AfterEveryScript to tell
+				if the an abort condition took place.
+			</para>
       </refsect1>
-    </refentry>
+   </refentry>
 
-    <refentry id="no_body">
+	<refentry id="abort_code">
+		<refnamediv>
+			<refname>abort_code</refname>
+			<refpurpose>
+				Returns the code passed to <command>abort_page</command>
+				earlier during the request processing
+			</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+			  <command>abort_code</command>
+			</cmdsynopsis>
+      </refsynopsisdiv>
+      <refsect1>
+			<title>Description</title> 
+			<para>
+				Usage of this command is meaningful only in scripts run as
+				AbortScript or AfterEveryScript. 
+				<command>abort_code</command> returns the value of the optional 
+				parameter passed to <command>abort_page</command> earlier during
+				the same request processing.
+			</para>
+      </refsect1>
+	</refentry>
+	
+   <refentry id="no_body">
       <refnamediv>
 	<refname>no_body</refname>
 	<refpurpose>Prevents Rivet from sending any content.</refpurpose>
