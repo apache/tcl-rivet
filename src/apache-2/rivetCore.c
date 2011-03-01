@@ -1462,18 +1462,13 @@ Rivet_InitCore( Tcl_Interp *interp )
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
 
-    Tcl_CreateObjCommand(interp,
-			 "abort_code",
-			 Rivet_AbortCodeCmd,
-			 NULL,
-			 (Tcl_CmdDeleteProc *)NULL);
-
 #ifdef TESTPANIC
     Tcl_CreateCommand(interp, "testpanic", TestpanicCmd, (ClientData) 0,
             (Tcl_CmdDeleteProc *) NULL);
 #endif
 
     TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
+    TCL_OBJ_CMD( "abort_code", Rivet_AbortCodeCmd );
     TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
 
     return TCL_OK;

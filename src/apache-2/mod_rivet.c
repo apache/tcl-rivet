@@ -895,11 +895,11 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     globals = apr_pcalloc(p, sizeof(rivet_interp_globals));
     Tcl_SetAssocData(interp, "rivet", NULL, globals);
     
-/* 
- * abort_page status variables in globals are set here and then 
- * reset in Rivet_SendContent just before the request processing is 
- * completed 
- */
+    /* 
+     * abort_page status variables in globals are set here and then 
+     * reset in Rivet_SendContent just before the request processing is 
+     * completed 
+     */
 
     globals->page_aborting = 0;
     globals->abort_code = NULL;
