@@ -134,9 +134,19 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 	    ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
 
 	    errorCodeSubString = Tcl_GetString (errorCodeElementObj);
-	    if (strcmp (errorCodeSubString, "ABORTPAGE") == 0) {
-		goto good;
-	    }
+            if (strcmp (errorCodeSubString, "ABORTPAGE") == 0) 
+            {
+                if (conf->rivet_abort_script) 
+                {
+                    if (Tcl_EvalObjEx(interp,conf->rivet_abort_script,0) == TCL_ERROR)
+                    {
+                        CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+                        TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
+                        TclWeb_PrintError( errorinfo, 0, globals->req );
+                    }
+                }
+                goto good;
+            }
 	}
 
 	Tcl_SetVar( interp, "errorOutbuf",
@@ -145,7 +155,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
 
 	/* If we don't have an error script, use the default error handler. */
 	if (conf->rivet_error_script ) {
-	    errscript = Tcl_NewStringObj(conf->rivet_error_script, -1);
+	    errscript = conf->rivet_error_script;
 	} else {
 	    errscript = conf->rivet_default_error_script;
 	}
@@ -164,7 +174,16 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
     }
 
     /* Make sure to flush the output if buffer_add was the only output */
-    good:
+good:
+
+    if (conf->after_every_script) {
+        if (Tcl_EvalObjEx(interp,conf->after_every_script,0) == TCL_ERROR)
+        {
+            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
+            TclWeb_PrintError( errorinfo, 0, globals->req );
+        }
+    }
 
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
 	char* ct_header = ap_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL);
@@ -281,7 +300,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 
 	if (toplevel) {
 	    if (rsc->rivet_before_script) {
-		Tcl_AppendObjToObj(outbuf, Tcl_NewStringObj(rsc->rivet_before_script, -1));
+		Tcl_AppendObjToObj(outbuf, rsc->rivet_before_script);
 	    }
 	}
 
@@ -303,8 +322,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 	}
 	if (toplevel) {
 	    if (rsc->rivet_after_script) {
-		Tcl_AppendObjToObj(outbuf,
-				   Tcl_NewStringObj(rsc->rivet_after_script, -1));
+		Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
 	    }
 	}
 
@@ -633,6 +651,14 @@ Rivet_SendContent(request_rec *r)
     retval = OK;
 sendcleanup:
     globals->req->content_sent = 0;
+
+    globals->page_aborting = 0;
+    if (globals->abort_code != NULL)
+    {
+        Tcl_DecrRefCount(globals->abort_code);
+        globals->abort_code = NULL;
+    }
+
     Tcl_MutexUnlock(&sendMutex);
     return retval;
 }
@@ -767,8 +793,15 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, pool *p)
     globals = ap_pcalloc(p, sizeof(rivet_interp_globals));
     Tcl_SetAssocData(interp, "rivet", NULL, globals);
 
+    /* abort_page status variables in globals are set here and then 
+     * reset in Rivet_SendContent just before the request processing is 
+     * completed */
+
+    globals->page_aborting = 0;
+    globals->abort_code = NULL;
+
     /* Eval Rivet's init.tcl file to load in the Tcl-level
-    commands. */
+	commands. */
 
     /* We call Tcl_EvalFile on init.tcl. This call sets up
      * some variables and adds RIVETLIB_DESTDIR to auto_path.
@@ -954,6 +987,45 @@ Rivet_InitTclStuff(server_rec *s, pool *p)
     }
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * Rivet_AssignStringtoConf --
+ *
+ *  Assign a string to a Tcl_Obj valued configuration parameter
+ *
+ * Arguments:
+ *
+ *  - objPnt: Pointer to a pointer to a Tcl_Obj. If the pointer *objPnt
+ *  is NULL (configuration script obj pointers are initialized to NULL)
+ *      a new Tcl_Obj is created
+ *  - string_value: a string to be assigned to the Tcl_Obj
+ *
+ * Results:
+ *  
+ *  - Pointer to a Tcl_Obj containing the parameter value.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static Tcl_Obj* 
+Rivet_AssignStringToConf (Tcl_Obj** objPnt, const char* string_value)
+{
+    Tcl_Obj *objarg = NULL;
+    
+    if (*objPnt == NULL)
+    {
+        objarg = Tcl_NewStringObj(string_value,-1);
+        Tcl_IncrRefCount(objarg);
+        *objPnt = objarg;
+    } else {
+        objarg = *objPnt;
+        Tcl_AppendToObj(objarg, string_value, -1);
+    }
+    Tcl_AppendToObj( objarg, "\n", 1 );
+    return objarg;
+}
+
 
 /*
  *----------------------------------------------------------------------
@@ -980,44 +1052,21 @@ Rivet_SetScript( ap_pool *pool, rivet_server_conf *rsc, char *script, char *stri
     Tcl_Obj *objarg = NULL;
 
     if( STREQU( script, "GlobalInitScript" ) ) {
-	if( rsc->rivet_global_init_script == NULL ) {
-	    objarg = Tcl_NewStringObj( string, -1 );
-	    Tcl_IncrRefCount( objarg );
-	    Tcl_AppendToObj( objarg, "\n", 1 );
-	    rsc->rivet_global_init_script = objarg;
-	} else {
-	    objarg = rsc->rivet_global_init_script;
-	    Tcl_AppendToObj( objarg, string, -1 );
-	    Tcl_AppendToObj( objarg, "\n", 1 );
-	}
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_global_init_script),string);
     } else if( STREQU( script, "ChildInitScript" ) ) {
-	if( rsc->rivet_child_init_script == NULL ) {
-	    objarg = Tcl_NewStringObj( string, -1 );
-	    Tcl_IncrRefCount( objarg );
-	    Tcl_AppendToObj( objarg, "\n", 1 );
-	    rsc->rivet_child_init_script = objarg;
-	} else {
-	    objarg = rsc->rivet_child_init_script;
-	    Tcl_AppendToObj( objarg, string, -1 );
-	    Tcl_AppendToObj( objarg, "\n", 1 );
-	}
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_child_init_script),string);
     } else if( STREQU( script, "ChildExitScript" ) ) {
-	if( rsc->rivet_child_exit_script == NULL ) {
-	    objarg = Tcl_NewStringObj( string, -1 );
-	    Tcl_IncrRefCount( objarg );
-	    Tcl_AppendToObj( objarg, "\n", 1 );
-	    rsc->rivet_child_exit_script = objarg;
-	} else {
-	    objarg = rsc->rivet_child_exit_script;
-	    Tcl_AppendToObj( objarg, string, -1 );
-	    Tcl_AppendToObj( objarg, "\n", 1 );
-	}
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_child_exit_script),string);
     } else if( STREQU( script, "BeforeScript" ) ) {
-	rsc->rivet_before_script = ap_pstrcat(pool, string, "\n", NULL);
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_before_script),string);
     } else if( STREQU( script, "AfterScript" ) ) {
-	rsc->rivet_after_script = ap_pstrcat(pool, string, "\n", NULL);
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_after_script),string);
     } else if( STREQU( script, "ErrorScript" ) ) {
-	rsc->rivet_error_script = ap_pstrcat(pool, string, "\n", NULL);
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_error_script),string);
+    } else if( STREQU( script, "AbortScript" ) ) {
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_abort_script),string);
+    } else if( STREQU( script, "AfterEveryScript" ) ) {
+        objarg = Rivet_AssignStringToConf(&(rsc->after_every_script),string);
     }
 
     if( !objarg ) return string;
@@ -1151,6 +1200,10 @@ Rivet_MergeDirConfigVars( pool *p, rivet_server_conf *new,
 	add->rivet_after_script : base->rivet_after_script;
     new->rivet_error_script = add->rivet_error_script ?
 	add->rivet_error_script : base->rivet_error_script;
+    new->rivet_abort_script = add->rivet_abort_script ?
+        add->rivet_abort_script : base->rivet_abort_script;
+    new->after_every_script = add->after_every_script ?
+        add->after_every_script : base->after_every_script;
 
     new->user_scripts_updated = add->user_scripts_updated ?
 	add->user_scripts_updated : base->user_scripts_updated;
@@ -1227,6 +1280,8 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_before_script = oldrsc->rivet_before_script;
     newrsc->rivet_after_script = oldrsc->rivet_after_script;
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
+    newrsc->rivet_abort_script = oldrsc->rivet_abort_script;
+    newrsc->after_every_script = oldrsc->after_every_script;
 
     newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
 
@@ -1259,13 +1314,15 @@ Rivet_CreateConfig( pool *p, server_rec *s )
 
     FILEDEBUGINFO;
 
-    rsc->server_interp = NULL;
-    rsc->rivet_global_init_script = NULL;
-    rsc->rivet_child_init_script = NULL;
-    rsc->rivet_child_exit_script = NULL;
-    rsc->rivet_before_script = NULL;
-    rsc->rivet_after_script = NULL;
-    rsc->rivet_error_script = NULL;
+    rsc->server_interp		    = NULL;
+    rsc->rivet_global_init_script   = NULL;
+    rsc->rivet_child_init_script    = NULL;
+    rsc->rivet_child_exit_script    = NULL;
+    rsc->rivet_before_script	    = NULL;
+    rsc->rivet_after_script	    = NULL;
+    rsc->rivet_error_script	    = NULL;
+    rsc->rivet_abort_script         = NULL;
+    rsc->after_every_script         = NULL;
 
     rsc->user_scripts_updated = 0;
 
@@ -1373,6 +1430,12 @@ Rivet_MergeConfig(pool *p, void *basev, void *overridesv)
 
     rsc->rivet_error_script = overrides->rivet_error_script ?
 	overrides->rivet_error_script : base->rivet_error_script;
+
+    rsc->rivet_abort_script = overrides->rivet_abort_script ?
+	overrides->rivet_abort_script : base->rivet_abort_script;
+
+    rsc->after_every_script = overrides->after_every_script ?
+	overrides->after_every_script : base->after_every_script;
 
     rsc->rivet_default_error_script = overrides->rivet_default_error_script ?
 	overrides->rivet_default_error_script : base->rivet_default_error_script;

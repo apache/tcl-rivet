@@ -58,9 +58,11 @@ typedef struct {
     Tcl_Obj *rivet_global_init_script;   /* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
-    char *rivet_before_script;        /* script run before each page */
-    char *rivet_after_script;         /*            after            */
-    char *rivet_error_script;         /*            for errors */
+    Tcl_Obj *rivet_before_script;     /* script run before each page */
+    Tcl_Obj *rivet_after_script;      /*            after            */
+    Tcl_Obj *rivet_error_script;      /*            for errors */
+    Tcl_Obj *rivet_abort_script;      /* script run upon abort_page call  */
+    Tcl_Obj *after_every_script;      /* script to be run always	    */
 
     /* This flag is used with the above directives.  If any of them
        have changed, it gets set. */
@@ -90,8 +92,11 @@ typedef struct {
    'de-globalize' them */
 
 typedef struct {
-    request_rec *r;             /* request rec */
-    TclWebRequest *req;         /* TclWeb API request */
+    request_rec *r;         /* request rec */
+    TclWebRequest *req;     /* TclWeb API request */
+    int page_aborting;	    /* set by abort_page. */
+			    /* to be reset by Rivet_SendContent */
+    Tcl_Obj* abort_code;
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);

@@ -36,6 +36,8 @@
 
 #include <tcl.h>
 #include <string.h>
+#include <apr_tables.h>
+#include <apr_errno.h>
 
 #include "apache_request.h"
 #include "mod_rivet.h"
@@ -536,6 +538,257 @@ TCL_CMD_HEADER ( Rivet_Var )
 /*
 */
 
+static int append_key_callback (void *data, const char *key, const char *val)
+{
+    Tcl_Obj *list = data;
+
+    Tcl_ListObjAppendElement (NULL, list, Tcl_NewStringObj (key, -1));
+    return 1;
+}
+
+static int
+append_key_value_callback (void *data, const char *key, const char *val)
+{
+    Tcl_Obj *list = data;
+
+    Tcl_ListObjAppendElement (NULL, list, Tcl_NewStringObj (key, -1));
+    Tcl_ListObjAppendElement (NULL, list, Tcl_NewStringObj (val, -1));
+    return 1;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_ApacheTable --
+ *
+ * 	Deals with Rivet key-value tables in the request structure
+ *
+ *	apache_table get tablename key
+ *      apache_table set tablename key value
+ *      apache_table set tablename list
+ *      apache_table exists tablename key
+ *      apache_table unset tablename key
+ *      apache_table names tablename
+ *      apache_table array_get tablename
+ *      apache_table clear tablename
+ *
+ *      Table names can be "notes", "headers_in", "headers_out",
+ *      "err_headers_out", and "subprocess_env".
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_ApacheTable )
+{
+    table *table = NULL;
+    int subcommandindex;
+
+    static CONST84 char *SubCommand[] = {
+	"get",
+	"set",
+	"exists",
+	"unset",
+	"names",
+	"array_get",
+	"clear",
+	NULL
+    };
+
+    enum subcommand {
+	SUB_GET,
+	SUB_SET,
+	SUB_EXISTS,
+	SUB_UNSET,
+	SUB_NAMES,
+	SUB_ARRAY_GET,
+	SUB_CLEAR
+    };
+
+    static CONST84 char *tableNames[] = {
+	"notes",
+	"headers_in",
+	"headers_out",
+	"err_headers_out",
+	"subprocess_env",
+	NULL
+    };
+
+    int tableindex;
+
+    enum tablename {
+	TABLE_NOTES,
+	TABLE_HEADERS_IN,
+	TABLE_HEADERS_OUT,
+	TABLE_ERR_HEADERS_OUT,
+	TABLE_SUBPROCESS_ENV
+    };
+
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    if ((objc < 3) || (objc > 5)) {
+	Tcl_WrongNumArgs(interp, 1, objv, "option tablename ?args?");
+	return TCL_ERROR;
+    }
+
+    if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
+			"get|set|unset|list",
+			0, &subcommandindex) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    if (Tcl_GetIndexFromObj (interp, objv[2], tableNames,
+			"notes|headers_in|headers_out|err_header_out|subprocess_env",
+			0, &tableindex) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    switch ((enum tablename)tableindex)
+    {
+	case TABLE_NOTES: {
+	    table = globals->r->notes;
+	    break;
+	}
+
+	case TABLE_HEADERS_IN: {
+	    table = globals->r->headers_in;
+	    break;
+	}
+
+	case TABLE_HEADERS_OUT: {
+	    table = globals->r->headers_out;
+	    break;
+	}
+
+	case TABLE_ERR_HEADERS_OUT: {
+	    table = globals->r->err_headers_out;
+	    break;
+	}
+
+	case TABLE_SUBPROCESS_ENV: {
+	    table = globals->r->subprocess_env;
+	    break;
+	}
+    }
+
+    switch ((enum subcommand)subcommandindex)
+    {
+	case SUB_GET: {
+	    const char *key;
+	    const char *value;
+
+	    if (objc != 4) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    value = ap_table_get (table, key);
+
+	    if (value != NULL) {
+		Tcl_SetObjResult (interp, Tcl_NewStringObj (value, -1));
+	    }
+	    break;
+	}
+
+	case SUB_EXISTS: {
+	    const char *key;
+	    const char *value;
+
+	    if (objc != 4) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    value = ap_table_get (table, key);
+
+	    Tcl_SetObjResult (interp, Tcl_NewBooleanObj (value != NULL));
+	    break;
+	}
+
+
+	case SUB_SET: {
+	    int i;
+	    char *key;
+	    char *value;
+
+	    if (objc == 4) {
+		int listObjc;
+		Tcl_Obj **listObjv;
+
+		if (Tcl_ListObjGetElements (interp, objv[3], &listObjc, &listObjv) == TCL_ERROR) {
+		    return TCL_ERROR;
+		}
+
+		if (listObjc % 2 == 1) {
+		    Tcl_SetObjResult (interp, Tcl_NewStringObj ("list must have even number of elements", -1));
+		    return TCL_ERROR;
+		}
+
+		for (i = 0; i < listObjc; i += 2) {
+		    ap_table_set (table, Tcl_GetString (listObjv[i]), Tcl_GetString (listObjv[i+1]));
+		}
+
+		break;
+	    }
+
+	    if (objc != 5) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key value");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    value = Tcl_GetString (objv[4]);
+
+	    ap_table_set (table, key, value);
+	    break;
+	}
+
+	case SUB_UNSET: {
+	    char *key;
+
+	    if (objc != 4) {
+		Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
+		return TCL_ERROR;
+	    }
+
+	    key = Tcl_GetString (objv[3]);
+	    ap_table_unset (table, key);
+	    break;
+	}
+
+	case SUB_NAMES: {
+            Tcl_Obj *list = Tcl_NewObj ();
+
+	    ap_table_do(append_key_callback, (void*)list, table, NULL);
+
+	    Tcl_SetObjResult (interp, list);
+	    break;
+	}
+
+	case SUB_ARRAY_GET: {
+            Tcl_Obj *list = Tcl_NewObj ();
+
+	    ap_table_do(append_key_value_callback, (void*)list, table, NULL);
+
+	    Tcl_SetObjResult (interp, list);
+	    break;
+	}
+
+	case SUB_CLEAR: {
+	    ap_clear_table (table);
+	}
+    }
+
+    return TCL_OK;
+}
+
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -784,17 +1037,77 @@ TCL_CMD_HEADER( Rivet_NoBody )
 
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
     static char *errorMessage = "Page generation terminated by abort_page directive";
 
-    if (objc != 1)
+    if (objc > 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "");
-	return TCL_ERROR;
+        Tcl_WrongNumArgs(interp, 1, objv, "");
+        return TCL_ERROR;
     }
+
+    if (objc == 2)
+    {
+        char* cmd_arg = Tcl_GetStringFromObj(objv[1],NULL);
+        
+        if (strcmp(cmd_arg,"-aborting") == 0)
+        {
+            Tcl_SetObjResult (interp,Tcl_NewBooleanObj(globals->page_aborting));
+            return TCL_OK;
+        }
+ 
+    /* 
+     * we assume abort_code to be null, as abort_page shouldn't run twice while
+     * processing the same request 
+     */
+       
+        if (globals->abort_code == NULL)
+        {
+            globals->abort_code = objv[1];
+            Tcl_IncrRefCount(globals->abort_code);
+        }
+    }
+
+    /* 
+     * If page_aborting is true then this is the second call to abort_page
+     * processing the same request: we ignore it and return a normal
+     * completion code
+     */
+
+    if (globals->page_aborting)
+    {
+        return TCL_OK;
+    }
+
+    /* this is the first (and supposedly unique) abort_page call during this request */
+
+    globals->page_aborting = 1;
 
     Tcl_AddErrorInfo (interp, errorMessage);
     Tcl_SetErrorCode (interp, "RIVET", "ABORTPAGE", errorMessage, (char *)NULL);
     return TCL_ERROR;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ * Rivet_AbortCodeCmd -- 
+ *
+ * Returns the abort code stored internally by passing a user defined parameter 
+ * to the command 'abort_page'.
+ *
+ *
+ *-----------------------------------------------------------------------------
+ */
+TCL_CMD_HEADER( Rivet_AbortCodeCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    
+    if (globals->abort_code != NULL)
+    {
+        Tcl_SetObjResult(interp,globals->abort_code);
+    }
+
+    return TCL_OK;
 }
 
 /*
@@ -868,6 +1181,116 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
     return TCL_OK;
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_LogError --
+ *
+ * 	Log an error from Rivet
+ *
+ *	log_error priority message
+ *
+ *        priority can be one of "emerg", "alert", "crit", "err",
+ *            "warning", "notice", "info", "debug"
+ *
+ * Results:
+ *      A message is logged to the Apache error log.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_LogErrorCmd )
+{
+    char *loglevel = NULL;
+    char *message = NULL;
+
+    server_rec *serverRec;
+
+    int loglevelindex;
+    int  apLogLevel = 0;
+
+    static CONST84 char *logLevel[] = {
+	"emerg",
+	"alert",
+	"crit",
+	"err",
+	"warning",
+	"notice",
+	"info",
+	"debug",
+	NULL
+    };
+
+    enum loglevel {
+	EMERG,
+	ALERT,
+	CRIT,
+	ERR,
+	WARNING,
+	NOTICE,
+	INFO,
+	DEBUG
+    };
+
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    if( objc != 3 ) {
+	Tcl_WrongNumArgs( interp, 1, objv, "loglevel message" );
+	return TCL_ERROR;
+    }
+
+    loglevel = Tcl_GetString(objv[1]);
+    message = Tcl_GetString (objv[2]);
+    if (Tcl_GetIndexFromObj(interp, objv[1], logLevel,
+			"emerg|alert|crit|err|warning|notice|info|debug",
+			0, &loglevelindex) == TCL_ERROR) {
+	return TCL_ERROR;
+    }
+
+    switch ((enum loglevel)loglevelindex)
+    {
+      case EMERG:
+        apLogLevel = APLOG_EMERG;
+	break;
+
+      case ALERT:
+        apLogLevel = APLOG_ALERT;
+        break;
+
+      case CRIT:
+        apLogLevel = APLOG_CRIT;
+        break;
+
+      case ERR:
+        apLogLevel = APLOG_ERR;
+        break;
+
+      case WARNING:
+        apLogLevel = APLOG_WARNING;
+        break;
+
+      case NOTICE:
+        apLogLevel = APLOG_NOTICE;
+        break;
+
+      case INFO:
+        apLogLevel = APLOG_INFO;
+        break;
+
+      case DEBUG:
+      default:
+        apLogLevel = APLOG_DEBUG;
+        break;
+    }
+
+    /* if we are serving a page, we know our server, 
+     * else send null for server
+     */
+    serverRec = (globals->r == NULL) ? NULL : globals->r->server;
+
+    ap_log_error (APLOG_MARK, apLogLevel, serverRec, "%s", message);
+    return TCL_OK;
+}
 #define TESTPANIC 0
 
 #ifdef TESTPANIC
@@ -993,13 +1416,23 @@ Rivet_InitCore( Tcl_Interp *interp )
 			 Rivet_EnvCmd,
 			 NULL,
 			 (Tcl_CmdDeleteProc *)NULL);
-
+    Tcl_CreateObjCommand(interp,
+			 "apache_log_error",
+			 Rivet_LogErrorCmd,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
+    Tcl_CreateObjCommand(interp,
+			 "apache_table",
+			 Rivet_ApacheTable,
+			 NULL,
+			 (Tcl_CmdDeleteProc *)NULL);
 #ifdef TESTPANIC
     Tcl_CreateCommand(interp, "testpanic", TestpanicCmd, (ClientData) 0,
             (Tcl_CmdDeleteProc *) NULL);
 #endif
 
     TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
+    TCL_OBJ_CMD( "abort_code", Rivet_AbortCodeCmd );
     TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
 
 /*
