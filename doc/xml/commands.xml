@@ -856,8 +856,7 @@
 		</refnamediv>
 		<refsynopsisdiv>
 			<cmdsynopsis>
-			  <command>abort_page</command>
-			  <arg><replaceable>abort code</replaceable></arg>
+			  <command>abort_code</command>
 			</cmdsynopsis>
       </refsynopsisdiv>
       <refsect1>
