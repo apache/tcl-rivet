@@ -12,18 +12,23 @@
 ## $Id$
 ##
 ###
-proc random {args} {
-    global _ran
 
-    if {[llength $args] > 1} {
-	set _ran [lindex $args 1]
-    } else {
-	set period 233280
-	if {[info exists _ran]} {
-	    set _ran [expr { ($_ran*9301 + 49297) % $period }]
-	} else {
-	    set _ran [expr { [clock seconds] % $period } ]
-	}
-	return [expr { int($args*($_ran/double($period))) } ]
+namespace eval ::rivet {
+
+    proc random {args} {
+        global _ran
+
+        if {[llength $args] > 1} {
+            set _ran [lindex $args 1]
+        } else {
+            set period 233280
+            if {[info exists _ran]} {
+                set _ran [expr { ($_ran*9301 + 49297) % $period }]
+            } else {
+                set _ran [expr { [clock seconds] % $period } ]
+            }
+            return [expr { int($args*($_ran/double($period))) } ]
+        }
     }
+
 }

@@ -74,15 +74,18 @@ typedef struct _rivet_server_conf {
     Tcl_Obj *rivet_global_init_script;	/* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
-    Tcl_Obj *rivet_before_script;	    /* script run before each page	*/
-    Tcl_Obj *rivet_after_script;	    /*            after             */
-    Tcl_Obj *rivet_error_script;	    /*            for errors        */
+    Tcl_Obj *rivet_before_script;	    /* script run before each page	    */
+    Tcl_Obj *rivet_after_script;	    /*            after                 */
+    Tcl_Obj *rivet_error_script;	    /*            for errors            */
+    Tcl_Obj *rivet_abort_script;	    /* script run upon abort_page call  */
+    Tcl_Obj *after_every_script;	    /* script to be run always	        */
 
-    /* This flag is used with the above directives.  If any of them
-       have changed, it gets set. */
+    /*  This flag is used with the above directives.  
+        If any of them have changed, it gets set. */
+
     int user_scripts_updated;
 
-    Tcl_Obj *rivet_default_error_script;    /* for errors */
+    Tcl_Obj *rivet_default_error_script; /* for errors */
     int *cache_size;
     int *cache_free;
     int upload_max;
@@ -97,16 +100,18 @@ typedef struct _rivet_server_conf {
     char **objCacheList;		        /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache;		    /* Objects cache - the key is the script name */
 
-    Tcl_Channel *outchannel;		    /* stuff for buffering output */
+    Tcl_Channel *outchannel;		/* stuff for buffering output */
 } rivet_server_conf;
 
-/* eventually we will transfer 'global' variables in here and
-   'de-globalize' them */
+/* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
     request_rec     *r;			    /* request rec */
     TclWebRequest   *req;			/* TclWeb API request */
     Tcl_Namespace   *rivet_ns;      /* Rivet commands namespace */
+    int             page_aborting;	/* set by abort_page. */
+					                /* to be reset by Rivet_SendContent */
+    Tcl_Obj*        abort_code;
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);
@@ -125,7 +130,6 @@ rivet_server_conf *Rivet_GetConf(request_rec *r);
 
 #define RIVET_NEW_CONF(p) \
 	(rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
-
 
 #endif /* MOD_RIVET_H */
 

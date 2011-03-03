@@ -77,7 +77,9 @@ Rivetlib_Init( Tcl_Interp *interp )
  *   safe for use in safe interpreters, into a safe interpreter.
  *
  * Parameters:
+ *
  *   o interp - Interpreter to add commands to.
+ *
  *-----------------------------------------------------------------------------
  */
 

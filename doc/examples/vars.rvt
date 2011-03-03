@@ -1,13 +1,13 @@
 &lt;?
 set errlist {}
-if { [var exists title] } {
-    set title [var get title]
+if { [::rivet::var exists title] } {
+    set title [::rivet::var get title]
 } else {
     set errlist "You need to enter a title"
 }
 
-if { [var exists salary] } {
-    set salary [var get salary]
+if { [::rivet::var exists salary] } {
+    set salary [::rivet::var get salary]
     if { ! [string is digit $salary] } {
 	lappend errlist "Salary must be a number"
     }
@@ -15,14 +15,14 @@ if { [var exists salary] } {
     lappend errlist "You need to enter a salary"
 }
 
-if { [var exists boss] } {
-    set boss [var get boss]
+if { [::rivet::var exists boss] } {
+    set boss [::rivet::var get boss]
 } else {
     set boss "Mr. Burns"
 }
 
-if { [var exists skills] } {
-    set skills [var list skills]
+if { [::rivet::var exists skills] } {
+    set skills [::rivet::var list skills]
 } else {
     lappend errlist "You need to enter some skills"
 }

@@ -337,6 +337,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
          */
 
         errorCodeListObj = Tcl_GetVar2Ex (interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
+
         /* errorCode is guaranteed to be set to NONE, but let's make sure
          * anyway rather than causing a SIGSEGV
          */
@@ -360,7 +361,17 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
             ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
 
             errorCodeSubString = Tcl_GetString (errorCodeElementObj);
-            if (strcmp (errorCodeSubString, "ABORTPAGE") == 0) {
+            if (strcmp (errorCodeSubString, "ABORTPAGE") == 0) 
+            {
+                if (conf->rivet_abort_script) 
+                {
+                    if (Tcl_EvalObjEx(interp,conf->rivet_abort_script,0) == TCL_ERROR)
+                    {
+                        CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+                        TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
+                        TclWeb_PrintError( errorinfo, 0, globals->req );
+                    }
+                }
                 goto good;
             }
         }
@@ -371,7 +382,6 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
 
         /* If we don't have an error script, use the default error handler. */
         if (conf->rivet_error_script ) {
-//          errscript = Tcl_NewStringObj(conf->rivet_error_script, -1);
             errscript = conf->rivet_error_script;
         } else {
             errscript = conf->rivet_default_error_script;
@@ -391,6 +401,15 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
 
     /* Make sure to flush the output if buffer_add was the only output */
 good:
+    
+    if (conf->after_every_script) {
+        if (Tcl_EvalObjEx(interp,conf->after_every_script,0) == TCL_ERROR)
+        {
+            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
+            TclWeb_PrintError( errorinfo, 0, globals->req );
+        }
+    }
 
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
         TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
@@ -575,6 +594,8 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 static void
 Rivet_CleanupRequest( request_rec *r )
 {
+
+
 #if 0
     apr_table_t *t;
     apr_array_header_t *arr;
@@ -641,6 +662,8 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_before_script = oldrsc->rivet_before_script;
     newrsc->rivet_after_script = oldrsc->rivet_after_script;
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
+    newrsc->rivet_abort_script = oldrsc->rivet_abort_script;
+    newrsc->after_every_script = oldrsc->after_every_script;
 
     newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
 
@@ -680,6 +703,10 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
         add->rivet_after_script : base->rivet_after_script;
     new->rivet_error_script = add->rivet_error_script ?
         add->rivet_error_script : base->rivet_error_script;
+    new->rivet_abort_script = add->rivet_abort_script ?
+        add->rivet_abort_script : base->rivet_abort_script;
+    new->after_every_script = add->after_every_script ?
+        add->after_every_script : base->after_every_script;
 
     new->user_scripts_updated = add->user_scripts_updated ?
         add->user_scripts_updated : base->user_scripts_updated;
@@ -745,6 +772,8 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->rivet_before_script        = NULL;
     rsc->rivet_after_script         = NULL;
     rsc->rivet_error_script         = NULL;
+    rsc->rivet_abort_script         = NULL;
+    rsc->after_every_script         = NULL;
 
     rsc->user_scripts_updated = 0;
 
@@ -869,10 +898,20 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     globals = apr_pcalloc(p, sizeof(rivet_interp_globals));
     Tcl_SetAssocData(interp,"rivet",NULL,globals);
+    
+    /* 
+     * abort_page status variables in globals are set here and then 
+     * reset in Rivet_SendContent just before the request processing is 
+     * completed 
+     */
 
     /* Rivet commands namespace is created */
     globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                             (Tcl_NamespaceDeleteProc *)NULL);
+    globals->page_aborting = 0;
+    globals->abort_code = NULL;
+
+    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
     /* We put in front the auto_path list the path to the directory where
      * init.tcl is located (provides package RivetTcl)
@@ -913,18 +952,17 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
  * It's been so far impossible to understand why the following call to Tcl_PkgRequire
  * causes a segfault later on in Rivet_ServerConf when Apache reconstructs the 
  * configuration record (weird behavior of the framework, still it was confirmed by 
- * the people at Apache). Commands in rivetWWW.c are now setup by rivetCore.c
+ * the people at Apache). 
  */
     /*
-    if (Tcl_PkgRequire(interp, "FakeLib", "1.2", 1) == NULL)
+    if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, "1.2", 1) == NULL)
     {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                "init.tcl must be installed correctly for Apache Rivet to function: %s",
-                Tcl_GetStringResult(interp) );
+                "Error loading rivetlib package: %s", Tcl_GetStringResult(interp) );
         exit(1);
     } 
     */
- 
+
     /* Set the output buffer size to the largest allowed value, so that we 
      * won't send any result packets to the browser unless the Rivet
      * programmer does a "flush stdout" or the page is completed.
@@ -1014,6 +1052,10 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
         objarg = Rivet_AssignStringToConf(&(rsc->rivet_error_script),string);
     } else if( STREQU( script, "ServerInitScript" ) ) {
         objarg = Rivet_AssignStringToConf(&(rsc->rivet_server_init_script),string);
+    } else if( STREQU( script, "AbortScript" ) ) {
+        objarg = Rivet_AssignStringToConf(&(rsc->rivet_abort_script),string);
+    } else if( STREQU( script, "AfterEveryScript" ) ) {
+        objarg = Rivet_AssignStringToConf(&(rsc->after_every_script),string);
     }
 
     if( !objarg ) return string;
@@ -1264,6 +1306,12 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
 
     rsc->rivet_default_error_script = overrides->rivet_default_error_script ?
         overrides->rivet_default_error_script : base->rivet_default_error_script;
+
+    rsc->rivet_abort_script = overrides->rivet_abort_script ?
+        overrides->rivet_abort_script : base->rivet_abort_script;
+
+    rsc->after_every_script = overrides->after_every_script ?
+        overrides->after_every_script : base->after_every_script;
 
     /* cache_size is global, and set up later. */
     /* cache_free is not set up at this point. */
@@ -1850,6 +1898,14 @@ Rivet_SendContent(request_rec *r)
     retval = OK;
 sendcleanup:
     globals->req->content_sent = 0;
+
+    globals->page_aborting = 0;
+    if (globals->abort_code != NULL)
+    {
+        Tcl_DecrRefCount(globals->abort_code);
+        globals->abort_code = NULL;
+    }
+
     Tcl_MutexUnlock(&sendMutex);
     return retval;
 }

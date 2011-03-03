@@ -646,9 +646,9 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
     }
 
     if (Tcl_GetIndexFromObj (interp, objv[2], tableNames,
-                        "notes|headers_in|headers_out|err_header_out|subprocess_env",
-                        0, &tableindex) == TCL_ERROR) {
-        return TCL_ERROR;
+                    "notes|headers_in|headers_out|err_header_out|subprocess_env",
+                    0, &tableindex) == TCL_ERROR) {
+	    return TCL_ERROR;
     }
 
     switch ((enum tablename)tableindex)
@@ -689,7 +689,6 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
                 Tcl_WrongNumArgs(interp, 2, objv, "tablename key");
                 return TCL_ERROR;
             }
-
             key = Tcl_GetString (objv[3]);
             value = apr_table_get (table, key);
 
@@ -698,7 +697,6 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
             }
             break;
         }
-
         case SUB_EXISTS: {
             const char *key;
             const char *value;
@@ -714,8 +712,6 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
             Tcl_SetObjResult (interp, Tcl_NewBooleanObj (value != NULL));
             break;
         }
-
-
         case SUB_SET: {
             int i;
             char *key;
@@ -1043,17 +1039,77 @@ TCL_CMD_HEADER( Rivet_NoBody )
 
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
     static char *errorMessage = "Page generation terminated by abort_page directive";
 
-    if (objc != 1)
+    if (objc > 2)
     {
         Tcl_WrongNumArgs(interp, 1, objv, "");
         return TCL_ERROR;
     }
 
+    if (objc == 2)
+    {
+        char* cmd_arg = Tcl_GetStringFromObj(objv[1],NULL);
+        
+        if (strcmp(cmd_arg,"-aborting") == 0)
+        {
+            Tcl_SetObjResult (interp,Tcl_NewBooleanObj(globals->page_aborting));
+            return TCL_OK;
+        }
+ 
+    /* 
+     * we assume abort_code to be null, as abort_page shouldn't run twice while
+     * processing the same request 
+     */
+       
+        if (globals->abort_code == NULL)
+        {
+            globals->abort_code = objv[1];
+            Tcl_IncrRefCount(globals->abort_code);
+        }
+    }
+
+    /* 
+     * If page_aborting is true then this is the second call to abort_page
+     * processing the same request: we ignore it and return a normal
+     * completion code
+     */
+
+    if (globals->page_aborting)
+    {
+        return TCL_OK;
+    }
+
+    /* this is the first (and supposedly unique) abort_page call during this request */
+
+    globals->page_aborting = 1;
+
     Tcl_AddErrorInfo (interp, errorMessage);
     Tcl_SetErrorCode (interp, "RIVET", "ABORTPAGE", errorMessage, (char *)NULL);
     return TCL_ERROR;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ * Rivet_AbortCodeCmd -- 
+ *
+ * Returns the abort code stored internally by passing a user defined parameter 
+ * to the command 'abort_page'.
+ *
+ *
+ *-----------------------------------------------------------------------------
+ */
+TCL_CMD_HEADER( Rivet_AbortCodeCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    
+    if (globals->abort_code != NULL)
+    {
+        Tcl_SetObjResult(interp,globals->abort_code);
+    }
+
+    return TCL_OK;
 }
 
 /*
@@ -1322,6 +1378,10 @@ Rivet_InitCore( Tcl_Interp *interp )
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,rivet_ns);
 #endif
+
+    TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
+    TCL_OBJ_CMD( "abort_code", Rivet_AbortCodeCmd );
+    TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
 
     return Tcl_PkgProvide( interp, RIVET_TCL_PACKAGE, "1.2" );
 }
