@@ -1120,7 +1120,7 @@ bxxb ccxxxxcc
 		</refnamediv>
 		<refsynopsisdiv>
 			<cmdsynopsis>
-			  <command>abort_code</command>
+			  <command>::rivet::abort_code</command>
 			</cmdsynopsis>
       </refsynopsisdiv>
       <refsect1>
