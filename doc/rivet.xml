@@ -40,7 +40,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
    implied.  See the License for the specific language governing
    permissions and limitations under the License.
--->
+	-->
 
 <!-- $Id$ -->
 
@@ -57,15 +57,16 @@
       <year>2008</year>
       <year>2009</year>
       <year>2010</year>
+      <year>2011</year>
       <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
       <firstname>The Rivet Team</firstname>
       <affiliation>
-	<orgname>The Apache Software Foundation</orgname>
-	<address>
-	  <email>rivet-dev@tcl.apache.org</email>
-	</address>
+			<orgname>The Apache Software Foundation</orgname>
+			<address>
+			  <email>rivet-dev@tcl.apache.org</email>
+			</address>
       </affiliation>
     </author>
   </articleinfo>

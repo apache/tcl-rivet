@@ -36,5 +36,10 @@
       <listitem>
 			<para>tclrivet</para>
       </listitem>
+      
+      <listitem>
+			<para>calendar - a package providing a simple configurable calendar</para>
+      </listitem>
+      
     </itemizedlist>
   </section>

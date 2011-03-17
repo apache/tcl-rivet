@@ -2,7 +2,7 @@
     * src/apache-1/mod_rivet.[c|h]: Add handling of AbortScript and AfterEveryScript configuration parameters
     * src/apache-1/rivetCode.c:	Add code for apache_log_error,apache_table, abort_code and abort_page 
     * src/apache-2/mod_rivet.[c|h]: Add handling of AbortScript and AfterEveryScript configuration parameters
-    * src/apache-1/rivetCode.c:	New code for abort_page and add new command abort_code
+    * src/apache-2/rivetCode.c:	New code for abort_page and add new command abort_code
     * configure.ac: module version bumped up to 2.0.3
 
 2010-10-20 Massimo Manghi <mxmanghi@apache.org>
