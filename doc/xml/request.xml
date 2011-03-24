@@ -43,14 +43,16 @@
 	    		<bridgehead>Child Process Initialization</bridgehead>
 	    		<para>
 		    		Right after the webserver has created the child processes that are 
-		    		to become the real "servers" responding to requests. In this phase there is
-		    		a chance to perform specific initialization for the each child process
-		    		such as opening I/O channels or database connections. If the option
-		    		<command>SeparateVirtualInterps</command> is turned off child processes
-		    		will have a single interpreter to serve requests. 
+		    		to become the real "servers", there is
+		    		a chance to perform specific initialization for the newly baked child process
+		    		For instance this is the stage where most likely you want to open I/O channels 
+		    		or database connections. 
+		    		If the option <command>SeparateVirtualInterps</command> is turned off child 
+		    		processes will have a single interpreter to serve requests. 
 		    		<command>GlobalInitScript</command>
-		   		is the directive to tell interpreter the Tcl code for the initialization.
-		   		This is right place where data and resources that have to be private
+		   		is the directive to tell interpreter which Tcl code has to be run
+		   		for the initialization.
+		   		This is right place where data and resources that have to be kept private
 		   		to the process can be created and initialized (e.g. I/O channels and
 		   		DBMS connectors).
 	    		</para>
@@ -58,8 +60,8 @@
 	    			When <command>SeparateVirtualInterps</command> is turned on 
 	    			each configured virtual host will have its own interpreter. 
 	    			<command>ChildInitScript</command> is the directive to be
-	    			placed withing a &lt;VirtualHost ...&gt; that will prepare
-	    			the specific environment.
+	    			placed withing a &lt;VirtualHost ...&gt; ... &lt;/VirtualHost ...&gt;
+	    			that will prepare	the specific environment.
 	    		</para>
 	    	</listitem>
 	    	<listitem>
