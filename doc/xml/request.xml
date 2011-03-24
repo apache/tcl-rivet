@@ -30,59 +30,53 @@
 		    		After the configuration has been read and parsed but before Apache
 		    		spawns the child processes the webserver is still
 		    		a single process application. In this phase 
-		    		<command>ServerInitScript</command>
-		    		can be specified to run a Tcl right after Rivet
-		    		has created and initialized a master interpreter, a Tcl interpreter
-		    		object from which child processes interpreters will be created by
-		    		copy. The master interpreter will be kept in the Apache's parent
-		    		process and also subsequent child processes interpreters will inherit 
-		    		the status of the parent process interpreter.
+		    		a configured <command>ServerInitScript</command> is run just after Rivet
+		    		has created and initialized the master interpreter, a Tcl_Interp 
+		    		instance from which child processes interpreters will be created by
+		    		copy. 
 	    		</para>
 	    	</listitem>
 	    	<listitem>
 	    		<bridgehead>Child Process Initialization</bridgehead>
 	    		<para>
 		    		Right after the webserver has created the child processes that are 
-		    		to become the real "servers", there is
-		    		a chance to perform specific initialization for the newly baked child process
-		    		For instance this is the stage where most likely you want to open I/O channels 
-		    		or database connections. 
-		    		If the option <command>SeparateVirtualInterps</command> is turned off child 
-		    		processes will have a single interpreter to serve requests. 
-		    		<command>GlobalInitScript</command>
-		   		is the directive to tell interpreter which Tcl code has to be run
-		   		for the initialization.
-		   		This is right place where data and resources that have to be kept private
-		   		to the process can be created and initialized (e.g. I/O channels and
-		   		DBMS connectors).
+		    		to become the real "servers", there is a chance to perform specific 
+		    		initialization of the interpreter. This is the stage where most 
+		    		likely you want to open I/O channels, database connections or any other
+		    		resource that has to be private to the interpreter.
+		    		When the option <command>SeparateVirtualInterps</command> is turned off 
+		    		child processes will have a single interpreter to serve requests regardless
+		    		the name of the virtual host they're aimed at. This interpreter as a
+		    		<command>GlobalInitScript</command> directive for the initialization code.
 	    		</para>
 	    		<para>
 	    			When <command>SeparateVirtualInterps</command> is turned on 
-	    			each configured virtual host will have its own interpreter. 
+	    			each configured virtual host will have its own slave interpreter.
 	    			<command>ChildInitScript</command> is the directive to be
-	    			placed withing a &lt;VirtualHost ...&gt; ... &lt;/VirtualHost ...&gt;
-	    			that will prepare	the specific environment.
+	    			placed within a &lt;VirtualHost ...&gt; ... &lt;/VirtualHost ...&gt;.
+	    			<command>GlobalInitScript</command> has no effect to working interpreters
+	    			when this flag is set.
 	    		</para>
 	    	</listitem>
 	    	<listitem>
 	    		<bridgehead>Request Processing and Content Generation</bridgehead>
 	    		<para>
-		   		After a child has been initialized it becomes ready to serve request. 
+		   		After a child has been initialized it's ready to serve requests. 
 		   		The child process life is spent almost completely in this phase, waiting
-		   		for connections and responding to requests. At every request the URL will
-		   		go the usual processing and (in case rewritten by metadata manipulators), 
-		   		variables passed to the webserver will be made available in the 
-		   		environment and finally the script coded in the URL will be run. 
-		   		The script execution can be preceded by a configured 
+		   		for connections and responding to requests. At every request the URL 
+		   		goes through the usual processing and in case rewritten by metadata manipulators, 
+		   		variables passed to the webserver are made available to the 
+		   		environment and finally the script coded in the URL is run. 
+		   		The requested script execution can be preceded by a configured 
 		   		<command>BeforeScript</command> and followed by a 
 		   		<command>AfterScript</command>. Actually the real script executed is 
-		   		formed by the concatenation of the <command>BeforeScript</command> ,
-		   		the script selected by the URL and by the <command>AfterScript</command>.
-		   		Thus it is  possible that the whole collection of scripts that make up a 
-		   		web application will have the same "before" and "after" scripts to which 
+		   		internally built by the concatenation of the <command>BeforeScript</command>,
+		   		the script encoded in the URL and the <command>AfterScript</command>.
+		   		Thus the whole collection of scripts that make up a web application usually
+		   		have the same "before" and "after" scripts to which 
 		   		the programmer can devolve tasks common to every page 
 		   		(they can access to request variables and environment so that
-		   		they can modulate their flow and vary their execution depending on 
+		   		they can modulate their execution flow and changing it depending on 
 					specific parameters) 
 	   		</para>
 	   	</listitem>
@@ -96,7 +90,7 @@
 		   		child process. Before the process quits an exit handler can be run
 		   		to do some housekeeping, just in case something the could have been 
 		   		left behind has to be cleaned up. Like the initialization scripts
-		   		<command>ChildExitScript</command> is a "one shot" script.
+		   		<command>ChildExitScript</command> too is a "one shot" script.
 	   		</para>
 	   	</listitem>
 	    </orderedlist>
@@ -111,12 +105,14 @@
 	    	the content generation can be caught and handled with specific scripts
 		</para>
 	   <para>
-	    	For instance Tcl errors will by default result in the printing of
-	    	a backtrace that usually shows the code fragment where the error occurred.
+	    	Tcl errors usually result in the printing of
+	    	a backtrace that shows the code fragment relevant to the error occurred.
 	    	Rivet configuration can set up scripts to trap these errors and instead run
 	    	an <command>ErrorScript</command> to handle the error and conceal details
-	    	of the code that usually have no relevant information for the end user and
-	    	can expose details of the code that ought to remain private. 
+	    	of the code that usually have no interest for the end user and
+	    	can expose details of the code that ought to remain private. The error
+	    	condition might be used to create a polite and nifty error page where things
+	    	can be explained in order to have a feedback from the user. 
 	    </para>
 	    <para>
 	    	In other cases an unmanageable conditions might take place in the data and
@@ -127,8 +123,32 @@
 	    </para>
 	</simplesect>
 	<simplesect>
-		<title>Handler Tcl Namespaces</title>
+		<title>Tcl Namespaces in Rivet and the <command>::request</command> Namespace</title>
 		<para>
+			Rivet run pure Tcl scripts at the global namespace. That means that
+			every variable or procedure resides by default in the "::" namespace and they
+			are persistent across different requests until they are explicitly unset or
+			the interpreter is deleted.
+			You can create your own application namespaces to store data but
+			it is important to remember that subsequent requests will in general be served 
+			by different child processes. Your application can rely on the fact that 
+			certain application data will be in the interpreter, but you shouldn't 
+			assume that a transaction state can be saved in this way and be safely available to 
+			a specific client. Sessions are for this purpose and Rivet ships its own 
+			<xref href="session_package" /> with support for most of popular DBMS. 
+			Storing data in the global namespace can be useful (and even then scoping 
+			in an application namespace is recommended) when it comes to I/O channel
+			or database connection which are usually specific to a process.
+		</para>
+		<para>
+			A special role in the interpreter is played by the <command>::request</command> 
+			namespace.	The <command>::request</command> namespace is deleted and recreated
+			at every request and Rivet templates (.rvt files) are executed within it. So,
+			unless your fully qualifying variable names outside the <command>::request</command> 
+			namespace, every variable and procedure created in .rvt files is by default place in
+			it and deleted before any other requests gets processed. It is therefore safe to
+			create variables or object instances in template files and foresake about them: Rivet
+			will take care of cleaning the namespace up. 
 		</para>
 	</simplesect>
 </section>
