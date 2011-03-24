@@ -23,9 +23,9 @@
 
 #define STREQU(s1, s2)  (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 #define STRNEQU(s1, s2) (s1[0] == s2[0] && strncmp(s1, s2, strlen(s2)) == 0)
-#define RIVET_NS            "::rivet"
-#define RIVET_TCL_PACKAGE   "rivet"
-#define RIVETLIB_TCL_PACKAGE "rivetlib"
+#define RIVET_NS                "::rivet"
+#define RIVET_TCL_PACKAGE       "rivet"
+#define RIVETLIB_TCL_PACKAGE    "rivetlib"
 
 #define TCL_CMD_HEADER(cmd)	\
 static int cmd(\
@@ -40,6 +40,12 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      func,   /* C function name */\
 		      NULL,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
+
+/* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace and
+ * it also exports the command using the Tcl_Export function. This
+ * is suboptimal, rivet_ns must point to a Tcl_Namespace structure
+ * created somewhere before the macro is called. 
+ */
 
 #define RIVET_OBJ_CMD(name,func,ns) \
 Tcl_CreateObjCommand( interp, /* Tcl interpreter */\

@@ -33,4 +33,5 @@ namespace eval ::rivet {
         puts stdout "</PRE>"
     }
 
+    namespace export parray
 }

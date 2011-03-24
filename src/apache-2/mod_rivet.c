@@ -15,7 +15,7 @@
    limitations under the License.
 */
 
-/* $Id: $ */
+/* $Id$ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
@@ -27,6 +27,8 @@
 
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
 #include <unistd.h>
+
+#include <dlfcn.h>
 
 /* Apache includes */
 #include <httpd.h>
@@ -946,29 +948,30 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
         exit(1);
     }
 
-    /* Loading into the module commands provided by librivet.so */
+    /* Loading into the interpreter the commands provided by librivet.so */
 
-/*
- * It's been so far impossible to understand why the following call to Tcl_PkgRequire
- * causes a segfault later on in Rivet_ServerConf when Apache reconstructs the 
- * configuration record (weird behavior of the framework, still it was confirmed by 
- * the people at Apache). 
- */
-    /*
+   /* It would be nice to have to whole set of Rivet commands
+    * loaded into the interpreter at this stage. Unfortunately
+    * a problem with the dynamic loader of some OS prevents us 
+    * from callingTcl_PkgRequire for 'rivetlib' because Apache segfaults
+    * shortly after the extension library is loaded.
+    * The problem was investigated on Linux and it became clear 
+    * that it's linked to the way Tcl calls dlopen (Bug #3216070)
+    * The problem could be solved in Tcl8.6
+    */
+
     if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, "1.2", 1) == NULL)
     {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                 "Error loading rivetlib package: %s", Tcl_GetStringResult(interp) );
         exit(1);
     } 
-    */
 
     /* Set the output buffer size to the largest allowed value, so that we 
      * won't send any result packets to the browser unless the Rivet
      * programmer does a "flush stdout" or the page is completed.
      */
 
-//  Tcl_SetChannelOption(interp, *(rsc->outchannel), "-buffersize", "1000000");
     Tcl_SetChannelBufferSize (*(rsc->outchannel), 1000000);
     Tcl_RegisterChannel(interp, *(rsc->outchannel));
     Tcl_Release(interp);

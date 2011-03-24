@@ -530,6 +530,8 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
  *
  * Parameters:
  *   o interp - Interpreter to add commands to.
+ *   o rivet_ns - Tcl_Namespace pointer to the RIVET_NS namespace.
+ *
  *-----------------------------------------------------------------------------
  */
 
@@ -540,5 +542,6 @@ Rivet_InitList( Tcl_Interp *interp, Tcl_Namespace* rivet_ns)
     RIVET_OBJ_CMD( "comma_split", Rivet_CommaSplitObjCmd ,rivet_ns);
     RIVET_OBJ_CMD( "comma_join", Rivet_CommaJoinObjCmd ,rivet_ns);
     RIVET_OBJ_CMD( "lassign_array", Rivet_LassignArrayObjCmd ,rivet_ns);
+
     return TCL_OK;
 }

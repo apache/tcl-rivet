@@ -26,6 +26,28 @@
 #include "rivet.h"
 #include "mod_rivet.h"
 
+
+/*-----------------------------------------------------------------------------
+ * Rivet_GetNamespace --
+ *
+ *   Get the rivet namespace pointer. The procedure attempts to retrieve a
+ *  pointer to the Tcl_Namespace structure for the ::rivet namespace. This
+ *  pointer is stored in the interpreter's associated data (pointing to a
+ *  rivet_interp_globals structure) if the interpreter is passed by mod_rivet.
+ *  Otherwise a new ::rivet namespace is created and its Tcl_Namespace
+ *  pointer is returned 
+ *
+ * Parameters:
+ *
+ *   o interp - Interpreter to add commands to.
+ *
+ * Returned value:
+ *
+ *   o rivet_ns - Tcl_Namespace* pointer to the RIVET_NS (::rivet) namespace
+ *
+ *-----------------------------------------------------------------------------
+ */
+
 static Tcl_Namespace* 
 Rivet_GetNamespace( Tcl_Interp* interp)
 {
@@ -35,7 +57,6 @@ Rivet_GetNamespace( Tcl_Interp* interp)
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
     if (globals != NULL)
     {
-//      fprintf(stderr,"Associated data found, getting Rivet ns from mod_rivet\n");
         rivet_ns = globals->rivet_ns;
     }
     else
@@ -62,7 +83,17 @@ Rivet_GetNamespace( Tcl_Interp* interp)
 int
 Rivetlib_Init( Tcl_Interp *interp )
 {
-    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
+    Tcl_Namespace *rivet_ns = NULL; 
+
+#ifdef USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+#else
+	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
+#endif    
+	    return TCL_ERROR;
+    }
+
+    rivet_ns = Rivet_GetNamespace(interp);
 
     Rivet_InitList ( interp, rivet_ns );
     Rivet_InitCrypt( interp, rivet_ns );
@@ -86,7 +117,17 @@ Rivetlib_Init( Tcl_Interp *interp )
 int
 Rivetlib_SafeInit( Tcl_Interp *interp )
 {
-    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
+    Tcl_Namespace *rivet_ns = NULL; 
+
+#ifdef USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+#else
+	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
+#endif    
+	    return TCL_ERROR;
+    }
+
+    rivet_ns = Rivet_GetNamespace(interp);
 
     Rivet_InitList( interp, rivet_ns );
     Rivet_InitCrypt( interp, rivet_ns );

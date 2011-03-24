@@ -1362,8 +1362,9 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv,rivet_ns);
     RIVET_OBJ_CMD ("load_headers",Rivet_LoadHeaders,rivet_ns);
     RIVET_OBJ_CMD ("var",Rivet_Var,rivet_ns);
-    RIVET_OBJ_CMD ("abort_page",Rivet_AbortPageCmd ,rivet_ns);
-    RIVET_OBJ_CMD ("virtual_filename",Rivet_VirtualFilenameCmd ,rivet_ns);
+    RIVET_OBJ_CMD ("abort_page",Rivet_AbortPageCmd,rivet_ns);
+    RIVET_OBJ_CMD ("abort_code", Rivet_AbortCodeCmd,rivet_ns);
+    RIVET_OBJ_CMD ("virtual_filename",Rivet_VirtualFilenameCmd,rivet_ns);
     RIVET_OBJ_CMD ("apache_table",Rivet_ApacheTable,rivet_ns);
     RIVET_OBJ_CMD ("var_qs",Rivet_Var,rivet_ns);
     RIVET_OBJ_CMD ("var_post",Rivet_Var,rivet_ns);
@@ -1379,9 +1380,5 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,rivet_ns);
 #endif
 
-    TCL_OBJ_CMD( "abort_page", Rivet_AbortPageCmd );
-    TCL_OBJ_CMD( "abort_code", Rivet_AbortCodeCmd );
-    TCL_OBJ_CMD( "virtual_filename", Rivet_VirtualFilenameCmd );
-
-    return Tcl_PkgProvide( interp, RIVET_TCL_PACKAGE, "1.2" );
+    return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");
 }
