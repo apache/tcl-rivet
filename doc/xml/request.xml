@@ -9,7 +9,7 @@
 	    	can be controlled in the Apache configuration and the optimum in the choice
 	    	of this number largely depends on the webserver workload and on the system
 	    	resources available. See
-	    	<ulink href="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">Apache
+	    	<ulink url="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">Apache
 	    	documentation</ulink> for further reading about this crucial point. 
 	    	Each of the child process is set up to respond to requests
 	    	that will come from the network accordingly to the configuration 
@@ -167,20 +167,20 @@
 			will take care of cleaning the namespace up and everything created inside the namespace
 			is so destroyed.
 		</para>
-		<table>
+		<table id="namespaces">
 			<thead>
 				<td>Stage</td><td>Script</td><td>Namespace</td>
 			</thead>
 			<tbody>
-				<tr><td>Apache Initialization</td><td>ServerInitScript</td><td>::</td></tr>
-				<tr><td rowspan="2">Child Initialization</td><td>GlobalInitScript</td><td>::</td></tr>
-				<tr><td>ChildInitScript</td><td>::</td></tr>
-				<tr><td rowspan="5">Request Processing</td><td>BeforeScript</td><td>::</td></tr>
-				<tr><td>.rvt</td><td>::request</td></tr>
-				<tr><td>.tcl</td><td>::</td></tr>
-				<tr><td>AfterScript</td><td>::</td></tr>
-				<tr><td>AfterEveryScript</td><td>::</td></tr>
-				<tr><td>Child Exits</td><td>ChildExitScript</td><td>::</td></tr>
+				<tr class="init"><td>Apache Initialization</td><td>ServerInitScript</td><td>::</td></tr>
+				<tr class="childinit"><td rowspan="2">Child Initialization</td><td>GlobalInitScript</td><td>::</td></tr>
+				<tr class="childinit"><td>ChildInitScript</td><td>::</td></tr>
+				<tr class="processing"><td rowspan="5">Request Processing</td><td>BeforeScript</td><td>::</td></tr>
+				<tr class="processing"><td>.rvt</td><td>::request</td></tr>
+				<tr class="processing"><td>.tcl</td><td>::</td></tr>
+				<tr class="processing"><td>AfterScript</td><td>::</td></tr>
+				<tr class="processing"><td>AfterEveryScript</td><td>::</td></tr>
+				<tr class="childexit"><td>Child Exit</td><td>ChildExitScript</td><td>::</td></tr>
 			</tbody>
 		</table>
 	</simplesect>

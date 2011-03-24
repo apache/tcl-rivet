@@ -11,13 +11,14 @@
     <example id="hello world">
       <title>Hello World</title>
       <para>
-	As with any tool, it's always nice to see something work, so
-	let's create a small "Hello World" page.</para>
+			As with any tool, it's always nice to see something work, so
+			let's create a small "Hello World" page.
+		</para>
       <para>
-	Assuming you have Apache configured correctly, create a file
-	called <filename>hello.rvt</filename> where Apache can find
-	it, with the following content:
-      </para>
+			Assuming you have Apache configured correctly, create a file
+			called <filename>hello.rvt</filename> where Apache can find
+			it, with the following content:
+		</para>
       <programlisting>&hello.rvt;</programlisting>
       <para>
 	If you then access it with your browser, you should see a
