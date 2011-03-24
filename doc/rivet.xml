@@ -18,12 +18,13 @@
     <!ENTITY packages.xml	    SYSTEM  	"xml/packages.xml" >
     <!ENTITY dio.xml		    SYSTEM  	"xml/dio.xml" >
     <!ENTITY diodisplay.xml	    SYSTEM  	"xml/diodisplay.xml" >
-    <!ENTITY session.xml	    SYSTEM  	"xml/session.xml" >
-    <!ENTITY form.xml		    SYSTEM  	"xml/form.xml" >
-    <!ENTITY calendar.xml	    SYSTEM  	"xml/calendar.xml" >
-    <!ENTITY help.xml		    SYSTEM  	"xml/help.xml" >
-    <!ENTITY internals.xml	    SYSTEM  	"xml/internals.xml" >
-    <!ENTITY upgrade.xml	    SYSTEM  	"xml/upgrade.xml" >
+    <!ENTITY session.xml	   SYSTEM  	"xml/session.xml" >
+    <!ENTITY form.xml		   SYSTEM  	"xml/form.xml" >
+    <!ENTITY calendar.xml	   SYSTEM  	"xml/calendar.xml" >
+    <!ENTITY help.xml		   SYSTEM  	"xml/help.xml" >
+    <!ENTITY internals.xml	   SYSTEM  	"xml/internals.xml" >
+    <!ENTITY upgrade.xml	   SYSTEM  	"xml/upgrade.xml" >
+    <!ENTITY request.xml	 	SYSTEM	"xml/request.xml" >
 ]>
 
 <!--
@@ -86,6 +87,9 @@
 
     <!-- Installation -->
    &install.xml;
+   
+   <!-- Configuration -->
+   &request.xml;
     
     <!-- Directives -->
    &directives.xml;

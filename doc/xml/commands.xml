@@ -118,13 +118,13 @@
 	  <varlistentry>
 	    <term>
 	      <cmdsynopsis>
-		<command>var</command>
-		<arg choice="plain">number</arg>
+				<command>var</command>
+				<arg choice="plain">number</arg>
 	      </cmdsynopsis>
 	    </term>
 	    <listitem>
 	      <para>
-		Returns the number of variables.
+				Returns the number of variables.
 	      </para>
 	    </listitem>
 	  </varlistentry>
@@ -803,7 +803,7 @@
       <refnamediv>
 			<refname>abort_page</refname>
 			<refpurpose>
-				Stops outputing data to web page, similar in
+				Stops outputting data to web page, similar in
 			  	purpose to PHP's <command>die</command> command.
 			</refpurpose>
       </refnamediv>
