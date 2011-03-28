@@ -11,8 +11,12 @@
 ##
 ###
 
-proc incr0 {varName {num 1}} {
-    upvar 1 $varName var
-    if {![info exists var]} { set var 0 }
-    return [incr var $num]
+namespace eval ::rivet {
+
+    proc incr0 {varName {num 1}} {
+        upvar 1 $varName var
+        if {![info exists var]} { set var 0 }
+        return [incr var $num]
+    }
+
 }
