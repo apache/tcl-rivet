@@ -14,7 +14,7 @@ if {[var exists pdfname]} {
 # original one. In this case, this is the point where a new file name
 # must be generated.
 
-	headers type			"application/pdf"
+	headers type			        "application/pdf"
 	headers add Content-Disposition "attachment; filename=${pdfname}.pdf"
 	headers add Content-Description "PDF Document"
 
