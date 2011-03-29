@@ -271,6 +271,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
+#if RIVET_DISPLAY_VERSION
     obj = Tcl_NewStringObj(RIVET_PACKAGE_VERSION, -1);
     Tcl_IncrRefCount(obj);
     Tcl_SetVar2Ex(interp,
@@ -279,6 +280,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             obj,
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
+#endif
 }
 
 static void
@@ -957,8 +959,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     * shortly after the extension library is loaded.
     * The problem was investigated on Linux and it became clear 
     * that it's linked to the way Tcl calls dlopen (Bug #3216070)
-    * The problem could be solved in Tcl8.6
-    */
+    * The problem could be solved in Tcl8.6 
 
     if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, "1.2", 1) == NULL)
     {
@@ -966,6 +967,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                 "Error loading rivetlib package: %s", Tcl_GetStringResult(interp) );
         exit(1);
     } 
+    */
 
     /* Set the output buffer size to the largest allowed value, so that we 
      * won't send any result packets to the browser unless the Rivet
