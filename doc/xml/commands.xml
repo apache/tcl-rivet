@@ -261,8 +261,7 @@ bxxb ccxxxxcc
 			</para>
 		</refsect1>
 	</refentry>	
-
-   <refentry id="var">
+    <refentry id="var">
       <refnamediv>
 			<refname>var</refname>
 			<refname>var_qs</refname>
@@ -580,6 +579,27 @@ bxxb ccxxxxcc
 	  			See <xref linkend="file_upload"/>.
 			</para>
       </refsect1>
+    </refentry>
+
+    <refentry id="raw_post">
+      <refnamediv>
+			<refname>raw_post</refname>
+			<refpurpose>get the unmodified body of a POST request sent by the client.</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+			<cmdsynopsis>
+	  			<command>::rivet::raw_post</command>
+			</cmdsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+			<title>Description</title>
+      </refsect1>
+      <para>
+			Returns the raw POST data from the request.  If the request was 
+			not a POST or there is no data, then "" - an empty string - is returned.
+      </para>
     </refentry>
 
     <refentry id="load_response">
@@ -1067,7 +1087,7 @@ bxxb ccxxxxcc
       <refnamediv>
 			<refname>abort_page</refname>
 			<refpurpose>
-				Stops outputing data to web page, similar in
+				Stops outputting data to web page, similar in
 			  	purpose to PHP's <command>die</command> command.
 			</refpurpose>
       </refnamediv>

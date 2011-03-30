@@ -13,6 +13,36 @@ div.navfooter {
     font-weight: bold;
 }
 
+#namespaces {
+	border: 1px solid black;
+}
+
+#namespaces td {
+	padding:	0.2em 1em;
+	font-weight: bold;
+}
+
+#namespaces thead {
+	background-color: #aaf;
+}
+
+#namespaces tr.init {
+	background-color: #e88;	
+}
+
+#namespaces tr.childinit {
+	background-color: #eee;		
+}
+
+#namespaces tr.processing {
+	background-color: #e88;	
+}	
+#namespaces tr.childexit {
+	background-color: #eee;		
+}
+
+
+
 a {
     text-decoration: none;
 }

@@ -166,7 +166,7 @@ interp alias {} ::rivet::incr0 {} incr
 ## Initialize Rivet.
 ::Rivet::init
 
-## And now we come to the import of the whole ::rivet namespace. 
+## And now we get to the import of the whole ::rivet namespace. 
 ## Some commands (namely lassign) replace the native lassign command
 ## so we have to  use the -force switch
 
