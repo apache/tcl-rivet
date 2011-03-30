@@ -96,10 +96,12 @@
 	   		<bridgehead>Child Process Exit</bridgehead>
 	   		<para>
 		   		If no error condition forces the child process to a premature exit, his
-		   		life is determined by the Apache configuration parameters. To avoid problems with
-		   		buggy applications the Apache webserver forces a child process to exit after a
-		   		certain number of requests served and replaces it with a brand new 
-		   		child process. Before the process quits an exit handler can be run
+		   		life is determined by the Apache configuration parameters. To reduce
+		   		the effects of memory leaks in buggy applications the Apache webserver 
+		   		forces a child process to exit after a
+		   		certain number of requests served. A child process gets replaced 
+		   		with a brand new one if the workload of webserver requires so. 
+		   		Before the process quits an exit handler can be run
 		   		to do some housekeeping, just in case something the could have been 
 		   		left behind has to be cleaned up. Like the initialization scripts
 		   		<command>ChildExitScript</command> too is a "one shot" script.
@@ -129,17 +131,17 @@
 	    	Tcl errors (conditions generated when a command exits with code TCL_ERROR) 
 	    	usually result in the printing of a backtrace of the code fragment
 	    	relevant to the error.
-	    	Rivet can set up scripts to trap these errors and instead run
+	    	Rivet can set up scripts to trap these errors and run instead
 	    	an <command>ErrorScript</command> to handle it and conceal details
-	    	of the code that usually have no interest for the end user and
-	    	may show part of the lines that ought to remain private. The ErrorScript
-	    	handler might be used to create a polite error page where things
+	    	that usually have no interest for the end user and it
+	    	may show lines of code that ought to remain private. The ErrorScript
+	    	handler might create a polite error page where things
 	    	can be explained in human readable form, thus enabling the end user
 	    	to provide meaningful feedback information. 
 	    </para>
 	    <para>
 	    	In other cases an unmanageable conditions might take place in the data and
-	    	this could demand a sudden interruption of the content generation. These abort 
+	    	this could demand an immediate interruption of the content generation. These abort 
 	    	conditions can be fired by the <xref linkend="abort_page"/> command, which
 	    	in turn fires the execution of an <command>AbortScript</command> to handle
 	    	the abnormal condition. Starting with Rivet 2.1.0 <xref linkend="abort_page"/>
