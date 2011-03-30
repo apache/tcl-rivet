@@ -14,7 +14,7 @@ namespace eval ::rivet {
     proc load_response {{arrayName response}} {
         upvar 1 $arrayName response
 
-        foreach {var elem} [var all] {
+        foreach {var elem} [::rivet::var all] {
             if {[info exists response(__$var)]} {
                 # we have seen var multiple times already, add to the list
                 lappend response($var) $elem

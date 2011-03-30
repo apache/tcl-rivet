@@ -9,7 +9,7 @@
 ##
 ###
 
-namespace ::rivet {
+namespace eval ::rivet {
 
     proc import_switch_args {arrayName argsList {switchList ""}} {
         upvar 1 $arrayName array
@@ -23,21 +23,20 @@ namespace ::rivet {
         }
 
         foreach arg $argsList {
-            if {[string index $args 0] != "-"} {
-                    set array(args) [lrange $argsList $index end]
-                    break
-                } elseif {$arg == "--"} {
+            if {[string index $arg 0] != "-"} {
+                set array(args) [lrange $argsList $index end]
+                break
+            } elseif {$arg == "--"} {
                 set array(args) [lrange $argsList [expr $index + 1] end]
                 break
             }
 
             set switch [string range $arg 1 end]
             if {!$proofSwitches || [lsearch -exact $switchList $switch] >= 0} {
-                    set array($switch) $index
+                set array($switch) $index
                 lappend array(switches) $switch
             }
             incr index
         }
     }
-
 }

@@ -64,7 +64,7 @@ namespace eval ::rivet {
         }
 
         if {[string tolower $data(subst)] != "on"} {
-            html [join $data(args)]
+            ::rivet::html [join $data(args)]
             return
         }
 
@@ -76,15 +76,15 @@ namespace eval ::rivet {
                 set lastWasArray 1
             } elseif {[info exists var]} {
                 if {!$lastWasArray} {
-                    html $data(separator)
+                    ::rivet::html $data(separator)
                 }
-                html $var
+                ::rivet::html $var
                 set lastWasArray 0
             } else {
                 if {!$lastWasArray} {
-                    html $data(separator)
+                    ::rivet::html $data(separator)
                 }
-                html $varName
+                ::rivet::html $varName
                 set lastWasArray 0
             }
         }
