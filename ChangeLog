@@ -1,3 +1,10 @@
+2011-04-01 Massimo Manghi <mxmanghi@apache.org>
+    * doc/: new directory doc/examples-sgml. This is the directory where examples ready for inclusion
+    in the manual must stay. The directory doc/examples is now meant to keep examples suitable for
+    actual test and exectution
+    * doc/convert_examples.tcl: New procedure that check for changes in doc/examples and, if needed,
+    creates/recreates the corrisponding file in doc/examples-sgml escaping characters
+
 2011-03-01 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCode.c: 'abort_code' command is now created through the RIVET_CMD_OBJ macro
 
