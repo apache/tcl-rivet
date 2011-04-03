@@ -101,7 +101,14 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
               <listitem>
                 <para>The location of the <filename>apxs</filename>
                   program that provides information about the
-                  configuration and compilation options of Apache modules.</para>
+                  configuration and compilation options of Apache modules.
+                  The name of this program varies depending on how Apache was
+                  packaged. For examples Debian Apache 2.2 packagers chose
+                  to rename apxs to allow cohexistence with Apache 1.3.
+                  <programlisting>--with-apxs=/usr/bin/apxs2</programlisting>
+                  SuSE apxs includes also the MPM name for which Apache was compiled
+                  <programlisting>--with-apxs=/usr/sbin/apxs2-prefork</programlisting>
+                </para>
               </listitem>
             </varlistentry>
             <varlistentry>

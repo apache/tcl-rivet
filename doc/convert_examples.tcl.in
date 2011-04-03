@@ -16,9 +16,11 @@
 #
 # tclsh ./convert_examples
 #
+# $Id: $
+#
 
-lappend auto_path /usr/local/lib/rivet2.1
-lappend auto_path [file join /usr/local/lib/rivet2.1 rivet-tcl]
+lappend auto_path @RIVET_TCL_TARGET@
+lappend auto_path [file join @RIVET_TCL_TARGET@ rivet-tcl]
 
 package require Rivet
 

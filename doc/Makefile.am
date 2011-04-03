@@ -20,6 +20,8 @@
 
 MANDIRS = html/ html/images
 PICTURES:=$(wildcard images/*.png)
+EXAMPLES_SGML:=$(wildcard examples-sgml/*.*)
+EXAMPLES:=$(wildcard examples/*.*)
 
 # English, multiple files.
 html/index.html: rivet.xml rivet-chunk.xsl rivet.xsl xml/*.xml
@@ -53,6 +55,9 @@ graphics: $(PICTURES)
 	done ; \
 	touch graphics
 
+examples: 
+	( echo 'set source_examples { $(EXAMPLES) }; source ./convert_examples.tcl' | @TCLSH_PROG@ ; )
+
 #  target that builds the essential directory tree that will get the html and 
 #  graphic files of the manual
 
@@ -74,3 +79,4 @@ distclean:
 	fi 
 	-rm Makefile
 
+.PHONY: examples

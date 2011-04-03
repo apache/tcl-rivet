@@ -1,3 +1,10 @@
+2011-04-03 Massimo Manghi <mxmanghi@apache.org>
+    * doc/convert_examples.tcl.in,doc/convert_examples_tcl: Added script to convert code examples
+    from their native form to a sgml escaped form.
+    * doc/Makefile.am: Target 'examples' added
+    * doc/xml/install.xml: Expanded --with-apxs explanation.
+    * doc/README: expanded with instructions for adding new examples to the docs.
+
 2011-04-01 Massimo Manghi <mxmanghi@apache.org>
     * doc/: new directory doc/examples-sgml. This is the directory where examples ready for inclusion
     in the manual must stay. The directory doc/examples is now meant to keep examples suitable for
