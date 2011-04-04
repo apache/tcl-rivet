@@ -3,36 +3,36 @@ set errlist {}
 if { [var exists title] } {
     set title [var get title]
 } else {
-    set errlist "You need to enter a title"
+    set errlist &quot;You need to enter a title&quot;
 }
 
 if { [var exists salary] } {
     set salary [var get salary]
     if { ! [string is digit $salary] } {
-	lappend errlist "Salary must be a number"
+	lappend errlist &quot;Salary must be a number&quot;
     }
 } else {
-    lappend errlist "You need to enter a salary"
+    lappend errlist &quot;You need to enter a salary&quot;
 }
 
 if { [var exists boss] } {
     set boss [var get boss]
 } else {
-    set boss "Mr. Burns"
+    set boss &quot;Mr. Burns&quot;
 }
 
 if { [var exists skills] } {
     set skills [var list skills]
 } else {
-    lappend errlist "You need to enter some skills"
+    lappend errlist &quot;You need to enter some skills&quot;
 }
 
 if { [llength $errlist] != 0 } {
     foreach err $errlist {
-	puts "&lt;b&gt; $err &lt;/b&gt;"
+	puts &quot;&lt;b&gt; $err &lt;/b&gt;&quot;
     }
 } else {
-    puts "Thanks for the information!"
+    puts &quot;Thanks for the information!&quot;
     ?&gt;
     &lt;table&gt;
       &lt;tbody&gt;
@@ -57,3 +57,4 @@ if { [llength $errlist] != 0 } {
     &lt;?
 }
 ?&gt;
+

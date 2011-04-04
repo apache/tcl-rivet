@@ -3,7 +3,7 @@
 if {[var exists pdfname]} {
     set pdfname [var get pdfname]
 
-# let's build the full path to the pdf file. The 'pdf_repository'
+# let&#39;s build the full path to the pdf file. The &#39;pdf_repository&#39;
 # directory must be readable by the apache children
 
     set pdf_full_path [file join $pdf_repository ${pdfname}.pdf]
@@ -14,9 +14,9 @@ if {[var exists pdfname]} {
 # original one. In this case, this is the point where a new file name
 # must be generated.
 
-	headers type			        "application/pdf"
-	headers add Content-Disposition "attachment; filename=${pdfname}.pdf"
-	headers add Content-Description "PDF Document"
+	headers type			        &quot;application/pdf&quot;
+	headers add Content-Disposition &quot;attachment; filename=${pdfname}.pdf&quot;
+	headers add Content-Description &quot;PDF Document&quot;
 
 # The pdf is read and stored in a Tcl variable. The file handle is
 # configured for a binary read: we are just shipping raw data to a
@@ -29,12 +29,12 @@ if {[var exists pdfname]} {
 	set pdf		    [read $paper]
 	close $paper
 
-# Now we got the data: let's tell the client how many bytes we are
+# Now we got the data: let&#39;s tell the client how many bytes we are
 # about to send (useful for the download progress bar of a dialog box)
 
 	headers add Content-Length  [string length $pdf]
 
-# Let's send the actual file content
+# Let&#39;s send the actual file content
 
 	puts $pdf
     } else {
@@ -43,3 +43,4 @@ if {[var exists pdfname]} {
 } else {
     source parameter_not_defined_error.rvt
 }
+
