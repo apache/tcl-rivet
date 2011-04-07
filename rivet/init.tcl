@@ -143,7 +143,7 @@ namespace eval ::Rivet {
         ## Likewise we have also to add to auto_path the directory containing 
         ## this script since it holds the pkgIndex.tcl file for package Rivet. 
 
-        # set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+        set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
         ## This will allow users to create proc libraries and tclIndex files
         ## in the local directory that can be autoloaded.
@@ -170,4 +170,9 @@ interp alias {} ::rivet::incr0 {} incr
 ## Some commands (namely lassign) replace the native lassign command
 ## so we have to  use the -force switch
 
-namespace import -force ::rivet::*
+# Do we actually want to import everything? Since we cannot safely
+# require package rivetlib (see bug #3216070) those commands have
+# to be loaded separately and in case a 'namespace import ::rivet::*'
+# reissued. 
+
+# namespace import -force ::rivet::*
