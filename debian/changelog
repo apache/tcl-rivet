@@ -1,3 +1,15 @@
+libapache2-mod-rivet (2.0.3-2) unstable; urgency=low
+
+  * Added installation targets for removing unneeded .la libtool files 
+    (Closes: #621613)
+  * Removed redundant lines of code from 
+    debian/libapache2-mod-rivet.postist
+  * Debian script examined in order to check compliance with package 
+    standard 3.9.2
+  * Added 'automake' to list of Build-Depends
+
+ -- Massimo Manghi <mxmanghi@apache.org>  Thu, 14 Apr 2011 22:40:27 +0200
+
 libapache2-mod-rivet (2.0.3-1) unstable; urgency=low
 
   * New release 2.0.3 

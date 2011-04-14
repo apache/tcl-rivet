@@ -64,3 +64,10 @@ librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
 librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 SUBDIRS = @apache_version_dir@
+
+# Removing libtool .la files from installation
+
+install-data-hook:
+	echo 'removing unwanted libtool .la files'
+	rm -fv $(DESTDIR)/$(lib_libexecdir)/*.la
+

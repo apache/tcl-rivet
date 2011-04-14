@@ -22,11 +22,9 @@ APACHE2CONF="/etc/apache2/"
 case "$1" in
     configure)
 	if [ -z "$2" ] ; then
-            CD=`pwd`
-            cd $APACHE2CONF/mods-enabled
-            ln -s ../mods-available/rivet.load ./rivet.load
-            ln -s ../mods-available/rivet.conf ./rivet.conf
-            cd $CD
+
+# enabling the module
+
             a2enmod -q rivet
 
             if [ -e /etc/apache2/mods-enabled/rivet.load ] ; then

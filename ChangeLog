@@ -1,3 +1,8 @@
+2011-04-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/Makefile.am,src/apache-2/Makefile.am: Add target install-data-hook with command line for
+    removing unneeded .la files from target directories
+    * debian/changelog,debian/control: changed to reflect improvement in the script for Debian
+
 2011-03-01 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-1/mod_rivet.[c|h]: Add handling of AbortScript and AfterEveryScript configuration parameters
     * src/apache-1/rivetCode.c:	Add code for apache_log_error,apache_table, abort_code and abort_page 
