@@ -340,8 +340,9 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
 
         /* if the error was thrown by Rivet, see if it's abort_page and,
          * if so, don't treat it as an error, i.e. don't execute the
-         * installed error handler or the default one, just let the
-         * page emit as normal
+         * installed error handler or the default one, just check if
+         * a rivet_abort_script is defined, otherwise the page emits 
+         * as normal
          */
         if (strcmp (Tcl_GetString (errorCodeElementObj), "RIVET") == 0) {
 

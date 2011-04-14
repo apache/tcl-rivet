@@ -1,5 +1,8 @@
-2011-04-06 Massimo Manghi <mxmanghi@apache.org>
-    * configure.ac: Added doc/convert_examples.tcl to files created from its .in template
+2011-04-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/Makefile.am,src/apache-2/Makefile.am: Add target install-data-hook with command line for
+    removing unneeded .la files from target directories
+    * configure.ac: doc/convert_examples.tcl is generated from template: added to AC_CONFIG_FILES 
+    * debian/changelog,debian/control: changed to reflect improvement in the script for Debian
 
 2011-04-03 Massimo Manghi <mxmanghi@apache.org>
     * doc/convert_examples.tcl.in,doc/convert_examples.tcl: Added script to convert code examples

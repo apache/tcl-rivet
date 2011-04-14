@@ -84,6 +84,6 @@ autoreconf
 ./configure --with-apache-version=2 --with-tcl=/usr/lib --with-apxs=/usr/bin/apxs 
 make
 
-Rivet was packaged for SuSE. See http://tcl.apache.org/download.html
+Rivet is packaged for various Linux flavours. A list is available at http://tcl.apache.org/download.html
 
 # RCS: @(#) $Id$
