@@ -48,18 +48,10 @@ mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@  @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPP
 
 # APXS_CPPFLAGS_SHLIB
 
-#
-# Rivet Library
-#
-##librivet_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
-##librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
-##librivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
-##librivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+# Removing libtool .la files from installation
 
-#
-# Rivet Parser Library
-#
-##librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
-##librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
-##librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
-##librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+install-data-hook:
+	echo 'removing unwanted libtool .la files'
+	rm -fv $(DESTDIR)/$(apxs_libexecdir)/*.la
+
+

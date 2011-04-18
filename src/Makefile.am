@@ -16,6 +16,7 @@
 
 # AM_CFLAGS = @TCL_INCLUDES@ @GM_CPPFLAGS@
 
+
 # The weird and wild magic of auto* associates these two.
 ##apxs_libexecdir = @APXS_LIBEXECDIR@
 ##apxs_libexec_LTLIBRARIES = mod_rivet.la
@@ -24,7 +25,6 @@ INCLUDES = -I@apache_include@
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
-
 lib_libexecdir = @RIVET_TCL_TARGET@
 lib_libexec_LTLIBRARIES = librivetlib.la librivetparser.la
 
@@ -64,4 +64,10 @@ librivetparser_la_LIBADD = @APXS_LIBS@
 librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS=1
  
 SUBDIRS = @apache_version_dir@
+
+# Removing libtool .la files from installation
+
+install-data-hook:
+	echo 'removing unwanted libtool .la files'
+	rm -fv $(DESTDIR)/$(lib_libexecdir)/*.la
 

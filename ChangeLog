@@ -1,3 +1,9 @@
+2011-04-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/Makefile.am,src/apache-2/Makefile.am: Add target install-data-hook with command line for
+    removing unneeded .la files from target directories
+    * configure.ac: doc/convert_examples.tcl is generated from template: added to AC_CONFIG_FILES 
+    * debian/changelog,debian/control: changed to reflect improvement in the script for Debian
+
 2011-06-07 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl: because of bug #3216070 of Tcl we cannot preload rivetlib, so it doesn't make
     sense to import the rivet namespace, because we cannot have all the command set loaded in and
