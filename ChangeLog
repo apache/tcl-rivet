@@ -1,3 +1,7 @@
+2011-05-05 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: APACHE_VERSION returns an error message for--with-apache-version=1. 
+    * src/apache-1/: removed from trunk
+
 2011-04-14 Massimo Manghi <mxmanghi@apache.org>
     * src/Makefile.am,src/apache-2/Makefile.am: Add target install-data-hook with command line for
     removing unneeded .la files from target directories
