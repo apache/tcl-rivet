@@ -380,10 +380,7 @@ AC_DEFUN([APACHE_VERSION],[
 
     AC_MSG_CHECKING(for apache version)
     if test "$with_apache_version" = "1"; then
-        AC_MSG_RESULT( building for apache 1.x )
-        AC_CONFIG_FILES([src/apache-1/Makefile])   
-        apache_version_dir="apache-1"
-        AC_DEFINE(APACHE1,1,[APACHE1 definition in config.h])
+        AC_MSG_ERROR([Apache 1.x no more supported])
     else
         AC_MSG_RESULT( building for apache 2.x )
         AC_CONFIG_FILES([src/apache-2/Makefile])
