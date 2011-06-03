@@ -1,3 +1,6 @@
+2011-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/ltmain.sh: new version shipped with libtool 
+
 2011-06-01 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/libtool.m4: autoconf 2.68 has a new IF..ELSE.. statement in m4 macros and
     libtool.m4 needs to get along it. New version copied into tclconfig.
