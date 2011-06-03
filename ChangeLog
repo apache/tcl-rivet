@@ -1,3 +1,7 @@
+2011-06-01 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/libtool.m4: autoconf 2.68 has a new IF..ELSE.. statement in m4 macros and
+    libtool.m4 needs to get along it. New version copied into tclconfig.
+
 2011-05-09 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: fixed misleading error message displayed when rivet_abort_script fails
     * 
