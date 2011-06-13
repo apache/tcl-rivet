@@ -141,7 +141,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *r)
                     if (Tcl_EvalObjEx(interp,conf->rivet_abort_script,0) == TCL_ERROR)
                     {
                         CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
-                        TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
+                        TclWeb_PrintError("<b>Rivet AbortScript failed!</b>",1,globals->req);
                         TclWeb_PrintError( errorinfo, 0, globals->req );
                     }
                 }

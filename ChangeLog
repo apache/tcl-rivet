@@ -1,3 +1,7 @@
+2011-06-20 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-1/mod_rivet.c,src/apache-2/mod_rivet.c: Wrong error message fixed when handling errors 
+    returned by evaluation of an AbortScript
+
 2011-04-14 Massimo Manghi <mxmanghi@apache.org>
     * src/Makefile.am,src/apache-2/Makefile.am: Add target install-data-hook with command line for
     removing unneeded .la files from target directories
