@@ -765,6 +765,30 @@ myform checkbox options -value opt4   -label "Option 4"</programlisting>
 					</varlistentry>
 				</variablelist>
 			</refsect2>
+            <refsect2>
+                <variablelist>
+                    <varlistentry>
+                        <listitem>
+                            <cmdsynopsis>
+                                <arg choice="plain">text</arg>
+                                <arg>name</arg>
+                                <arg>args</arg>
+                            </cmdsynopsis>
+                            <para>
+                                Emits a 'text' editable input form field. Example:
+                            </para>
+                            <programlisting>
+myform text text_entry -size 20</programlisting>
+                        <para>
+                            will output the following html line 
+                        </para>
+                        <programlisting>
+&lt;input type="text" name="text_entry" size="20" /&gt;
+</programlisting>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </refsect2>
 			<refsect2>
 				<variablelist>
 					<varlistentry>

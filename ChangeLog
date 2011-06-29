@@ -1,3 +1,9 @@
+2011-06-29 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: add paragraphs for so far undocumented commands. Commands paragraphs sorted
+    in alphabetical order
+    * doc/xml/form.xml: add paragraph for text entry example and explanation
+    * tclconfig/ltmain.sh,tclconfig/libtool.m4: new scripts from libtool distribution
+
 2011-06-20 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-1/mod_rivet.c,src/apache-2/mod_rivet.c: Wrong error message fixed when handling errors 
     returned by evaluation of an AbortScript
