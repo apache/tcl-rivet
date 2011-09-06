@@ -1,3 +1,15 @@
+2011-09-07 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: Add existing undocumented commands 
+        - import_keyvalue_pairs
+        - lempty
+        - lmatch 
+        - lassign (consider to remove, as it overlaps for name and features
+          with identical Tcl core command)
+        - read_file
+        - wrap
+        - wrapline
+    Changed 'makeurl' documentation to account for new features recently committed
+
 2011-09-06 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: Add Id svn keyword.
     * src/apache-2/TclWebapache.c: Command load_env and load_headers now resolve 
