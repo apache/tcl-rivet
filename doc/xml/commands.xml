@@ -1459,10 +1459,6 @@ bxxb ccxxxxcc
 				separated by html &lt;br&gt; line breaks, otherwise the lines are returned 
 				separated by newline characters.
 			</para>
-			<para>
-				If a third argument called "-html" is present, the string is put together
-				with html &lt;br&gt; line breaks, otherwise it's broken with newlines.
-			</para>
 		</refsect1>
 	</refentry>	
 </section>
