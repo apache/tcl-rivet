@@ -1,4 +1,8 @@
 2011-09-19 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: the new extended makeurl command description slipped out from
+    previous commit.
+
+2011-09-19 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/TclWebapache.c: Command load_env and load_headers now resolve 
     the array name parameter following the default method (removed 
     TCL_NAMESPACE_ONLY flag that prevented creation of an array in a

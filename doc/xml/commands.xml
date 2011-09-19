@@ -927,17 +927,31 @@ bxxb ccxxxxcc
       <refsect1>
         <title>Description</title>
         <para>
-          Create a self referencing URL from a filename.  For example:
-          <programlisting>makeurl /tclp.gif</programlisting>
-          returns
-          <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
-          where hostname and port are the hostname and port of the
-          server in question.
+          Create a self referencing URL from a filename. <command>makeurl</command>
+          can be used in three ways
+          <itemizedlist> 
+            <listitem> No argument is passed to the command (returns the current script URL)</listitem>
+            <listitem> 
+                A relative style path is passed (returns the argument prepended with the
+                current script's URL
+            </listitem>
+            <listitem> 
+                An absolute path is passed to the command: (returns the full URL to the
+                resource)
+            </listitem>
+
+          </itemizedlist>
+        </para>
+        <para>
+            Example of absolute path: <programlisting>makeurl /tclp.gif</programlisting> returns
+            <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
+            where hostname and port are the hostname and port of the
+            server in question.
         </para>
       </refsect1>
     </refentry>
 
-   <refentry id="no_body">
+    <refentry id="no_body">
       <refnamediv>
         <refname>no_body</refname>
         <refpurpose>Prevents Rivet from sending any content.</refpurpose>
@@ -961,26 +975,26 @@ bxxb ccxxxxcc
 
     <refentry id="parray">
       <refnamediv>
-	<refname>parray</refname>
-	<refpurpose>Tcl's <command>parray</command> with html formatting.</refpurpose>
+        <refname>parray</refname>
+        <refpurpose>Tcl's <command>parray</command> with html formatting.</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
-	<cmdsynopsis>
-	  <command>parray</command>
-	  <arg><replaceable>arrayName</replaceable></arg>
-	  <arg><replaceable><optional>pattern</optional></replaceable></arg>
-	</cmdsynopsis>
+        <cmdsynopsis>
+          <command>parray</command>
+          <arg><replaceable>arrayName</replaceable></arg>
+          <arg><replaceable><optional>pattern</optional></replaceable></arg>
+        </cmdsynopsis>
       </refsynopsisdiv>
 
       <refsect1>
-	<title>Description</title>
-	<para>
-	  An html version of the standard Tcl
-	  <command>parray</command> command.  Displays the entire
-	  contents of an array in a sorted, nicely-formatted way.
-	  Mostly used for debugging purposes.
-	</para>
+        <title>Description</title>
+        <para>
+          An html version of the standard Tcl
+          <command>parray</command> command.  Displays the entire
+          contents of an array in a sorted, nicely-formatted way.
+          Mostly used for debugging purposes.
+        </para>
 
       </refsect1>
     </refentry>
