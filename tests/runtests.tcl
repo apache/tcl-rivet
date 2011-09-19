@@ -29,13 +29,13 @@ proc runtests_usage {} {
 }
 
 proc get_httpd_version {httpd} {
-	catch {exec $httpd -v} raw_string
-	set version  [lindex [regexp -inline {([0-9]{1,}\.[0-9]{1,}\.[0-9]{1,})} $raw_string]  1]
-	if [string match "1.3.*" $version] {
-		return 1
-	} else {
-		return 2
-	}
+    catch {exec $httpd -v} raw_string
+    set version  [lindex [regexp -inline {([0-9]{1,}\.[0-9]{1,}\.[0-9]{1,})} $raw_string]  1]
+    if [string match "1.3.*" $version] {
+        return 1
+    } else {
+        return 2
+    }
 }
 
 if { [llength $argv] < 1 } {
@@ -66,22 +66,22 @@ if { [catch {
 
 
 if {$httpd_version == 1} {
-	apachetest::need_modules {
-		{mod_log_config		config_log_module}
-		{mod_mime		mime_module}
-		{mod_negotiation	negotiation_module}
-		{mod_dir		dir_module}
-		{mod_auth		auth_module}
-		{mod_access		access_module}
-	}
+    apachetest::need_modules {
+            {mod_log_config	config_log_module}
+            {mod_mime		mime_module}
+            {mod_negotiation	negotiation_module}
+            {mod_dir		dir_module}
+            {mod_auth		auth_module}
+            {mod_access		access_module}
+    }
 } else {
-	apachetest::need_modules {
-		{mod_mime           mime_module}
-		{mod_negotiation    negotiation_module}
-		{mod_dir            dir_module}
-		{mod_log_config     log_config_module}
-		{mod_authz_host     authz_host_module}
-	}
+    apachetest::need_modules {
+            {mod_mime           mime_module}
+            {mod_negotiation    negotiation_module}
+            {mod_dir            dir_module}
+            {mod_log_config     log_config_module}
+            {mod_authz_host     authz_host_module}
+    }
 }
 
 apachetest::makeconf server.conf {
@@ -91,25 +91,25 @@ apachetest::makeconf server.conf {
     Group $group
 
     <IfModule mod_mime.c>
-    TypesConfig $CWD/mime.types
-    AddLanguage en .en
-    AddLanguage it .it
-    AddLanguage es .es
-    AddType application/x-httpd-rivet .rvt
-    AddType application/x-rivet-tcl .tcl
+        TypesConfig $CWD/mime.types
+        AddLanguage en .en
+        AddLanguage it .it
+        AddLanguage es .es
+        AddType application/x-httpd-rivet .rvt
+        AddType application/x-rivet-tcl .tcl
     </IfModule>
 
 
     <IfDefine SERVERCONFTEST>
-    RivetServerConf BeforeScript 'puts "Page Header"'
-    RivetServerConf AfterScript 'puts "Page Footer"'
+        RivetServerConf BeforeScript 'puts "Page Header"'
+        RivetServerConf AfterScript 'puts "Page Footer"'
     </IfDefine>
 
     <IfDefine DIRTEST>
-    <Directory />
-    RivetDirConf BeforeScript 'puts "Page Header"'
-    RivetDirConf AfterScript 'puts "Page Footer"'
-    </Directory>
+        <Directory />
+            RivetDirConf BeforeScript 'puts "Page Header"'
+            RivetDirConf AfterScript 'puts "Page Footer"'
+        </Directory>
     </IfDefine>
 
     # We can use this to include our own stuff for each test.

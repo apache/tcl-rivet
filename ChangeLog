@@ -1,3 +1,18 @@
+2011-09-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/TclWebapache.c: Command load_env and load_headers now resolve 
+    the array name parameter following the default method (removed 
+    TCL_NAMESPACE_ONLY flag that prevented creation of an array in a
+    proc's scope). Still default values for the arguments create such arrays
+    in the ::request namespace 
+    * src/apache-2/rivetCode.c: preprocess macros ENV_ARRAY_NAME and HEADERS_ARRAY_NAME
+    modified to explicitly put in ::request namespace the default arrays. 
+    Procedure Rivet_MakeURL chages so that command 'makeurl' now accepts 
+    relative paths and prepends them with the value of the SCRIPT_NAME environment 
+    variable. When run without arguments 'makeurl' returns the value in the
+    SCRIPT_NAME env variable.
+    * VERSION,configure.ac: module version set as 2.0.4
+    * tests/runtests.tcl: reindented, tabs expanded into spaces.
+
 2011-07-26 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: removed variables initialized but not used as detected by gcc 4.6
 

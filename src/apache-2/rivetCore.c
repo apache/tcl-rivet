@@ -48,8 +48,8 @@
 #include "rivet.h"
 #include "TclWeb.h"
 
-#define ENV_ARRAY_NAME "env"
-#define HEADERS_ARRAY_NAME "headers"
+#define ENV_ARRAY_NAME     "::request::env"
+#define HEADERS_ARRAY_NAME "::request::headers"
 #define COOKIES_ARRAY_NAME "cookies"
 
 extern module rivet_module;
@@ -75,17 +75,64 @@ extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 TCL_CMD_HEADER( Rivet_MakeURL )
 {
-    Tcl_Obj *result = NULL;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    Tcl_Obj*                result  = NULL;
+    rivet_interp_globals*   globals = Tcl_GetAssocData(interp,"rivet",NULL);
+    char*                   url_target_name;
+    int                     target_length;
 
-    if (objc != 2)
+    if (objc > 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;
     }
-    result = Tcl_NewObj();
-    TclWeb_MakeURL(result, Tcl_GetString(objv[1]), globals->req);
+
+    if (objc == 1)
+    {
+        url_target_name = TclWeb_GetEnvVar (globals->req,"SCRIPT_NAME");
+    }
+    else
+    {
+        url_target_name = Tcl_GetStringFromObj(objv[1],&target_length);
+
+        // we check the first character for a '/' (absolute path)
+        // If we are dealing with a relative path we prepend it with
+        // the SCRIPT_NAME environment variable
+
+        if (url_target_name[0] != '/')
+        {
+            /* relative path */
+            char* script_name = TclWeb_GetEnvVar (globals->req,"SCRIPT_NAME");
+            int   script_name_l = strlen(script_name);
+
+            // regardless the reason for SCRIPT_NAME being undefined we
+            // prevent a segfault and we revert the behavior of makeurl
+            // to the case of an absolute path
+
+            if (script_name_l > 0)
+            {
+                // script name may have the form of a directory path (and mod_rewrite 
+                // could have mapped it to a .tcl or .rvt script)
+                
+                if (script_name[script_name_l-1] == '/')
+                {
+                    url_target_name = apr_pstrcat(globals->req->req->pool,script_name,url_target_name,NULL);
+                }
+                else
+                {
+                    url_target_name = apr_pstrcat(globals->req->req->pool,script_name,"/",url_target_name,NULL);
+                }
+            }
+            else
+            {
+                url_target_name = apr_pstrcat(globals->req->req->pool,"/",url_target_name,NULL);
+            }
+        }
+    }
+
+    result = Tcl_NewObj();   
+    TclWeb_MakeURL(result, url_target_name, globals->req);
     Tcl_SetObjResult(interp, result);
+
     return TCL_OK;
 }
 
@@ -896,65 +943,66 @@ TCL_CMD_HEADER( Rivet_Upload )
 
     switch ((enum subcommand)subcommandindex)
     {
-    case CHANNEL: {
-	Tcl_Channel chan;
-	char *channelname = NULL;
+        case CHANNEL:
+        {
+            Tcl_Channel chan;
+            char *channelname = NULL;
 
-	if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	channelname = (char *)Tcl_GetChannelName(chan);
-	Tcl_SetStringObj(result, channelname, -1);
-	break;
-    }
-    case SAVE:
-	/* save data to a specified filename  */
-	if (objc != 4) {
-	    Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
-	    return TCL_ERROR;
-	}
+            if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            channelname = (char *)Tcl_GetChannelName(chan);
+            Tcl_SetStringObj(result, channelname, -1);
+            break;
+        }
+        case SAVE:
+            /* save data to a specified filename  */
+            if (objc != 4) {
+                Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
+                return TCL_ERROR;
+            }
 
-	if (TclWeb_UploadSave(varname, objv[3], globals->req) != TCL_OK)
-	{
-	    return TCL_ERROR;
-	}
-	break;
-    case DATA:
-	if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	break;
-    case EXISTS:
-	if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
-	{
-	    Tcl_SetIntObj(result, 0);
-	} else {
-	    Tcl_SetIntObj(result, 1);
-	}
-	break;
-    case SIZE:
-	TclWeb_UploadSize(result, globals->req);
-	break;
-    case TYPE:
-	TclWeb_UploadType(result, globals->req);
-	break;
-    case FILENAME:
-	TclWeb_UploadFilename(result, globals->req);
-	break;
-    case TEMPNAME:
-	TclWeb_UploadTempname(result,globals->req);
-	break;
-    case NAMES:
-	if (objc != 2)
-	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "names");
-	    return TCL_ERROR;
-	}
-	TclWeb_UploadNames(result, globals->req);
-	break;
-    default:
-	Tcl_WrongNumArgs(interp, 1, objv,
-			 "channel|save ?name?|data|exists|size|type|filename|names|tempname");
+            if (TclWeb_UploadSave(varname, objv[3], globals->req) != TCL_OK)
+            {
+                return TCL_ERROR;
+            }
+            break;
+        case DATA:
+            if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
+        case EXISTS:
+            if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
+            {
+                Tcl_SetIntObj(result, 0);
+            } else {
+                Tcl_SetIntObj(result, 1);
+            }
+            break;
+        case SIZE:
+            TclWeb_UploadSize(result, globals->req);
+            break;
+        case TYPE:
+            TclWeb_UploadType(result, globals->req);
+            break;
+        case FILENAME:
+            TclWeb_UploadFilename(result, globals->req);
+            break;
+        case TEMPNAME:
+            TclWeb_UploadTempname(result,globals->req);
+            break;
+        case NAMES:
+            if (objc != 2)
+            {
+                Tcl_WrongNumArgs(interp, 1, objv, "names");
+                return TCL_ERROR;
+            }
+            TclWeb_UploadNames(result, globals->req);
+            break;
+        default:
+            Tcl_WrongNumArgs(interp, 1, objv,
+                             "channel|save ?name?|data|exists|size|type|filename|names|tempname");
     }
     Tcl_SetObjResult(interp, result);
     return TCL_OK;
