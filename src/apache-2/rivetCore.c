@@ -42,6 +42,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <apr_errno.h>
+#include <apr_strings.h>
 
 #include "apache_request.h"
 #include "mod_rivet.h"
