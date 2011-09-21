@@ -21,7 +21,7 @@
       </para>
       <note>
 	The Calendar package uses Tcl <command>dict</command> command to manage markup 
-	information. Hence either Tcl8.5 or Tcl8.4 with 
+	information. Hence either Tcl8.5+ or Tcl8.4 with 
 	<ulink url="http://wiki.tcl.tk/5042">package dict</ulink> are required.   
       </note>
    </section>

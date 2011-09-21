@@ -290,7 +290,7 @@ puts $html_txt
 	    with some CSS styling would print
 	 </para>
 	 <para>
-		<graphic fileref="calendar.png" />
+		<graphic fileref="images/calendar.png" />
 	 </para>
   </example>
 </section>
