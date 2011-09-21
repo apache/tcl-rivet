@@ -1,3 +1,6 @@
+2011-09-21 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: fixed wrong conversion of month expressed as numeric string
+
 2011-09-20 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: inclusion of apr_strings.h added.
 

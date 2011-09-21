@@ -280,8 +280,9 @@ package require Itcl
 	    set month [lindex $numeric_parameters 0]
 	    set year  [lindex $numeric_parameters 1]	    
 
-	    if  {[regexp {^\d{1,2}$} $month mat] && ($month > 0) && ($month <= 12)} {
-		return [cal [incr month -1] $year]
+	    if  {[regexp {^\d{1,2}$} $month matched_month] && ($month > 0) && ($month <= 12)} {
+	    	scan $month "%d" matched_month
+		return [cal [incr matched_month -1] $year]
 	    } elseif { [lsearch $month_names($language) $month] >= 0} {
 		return [cal [lsearch $month_names($language) $month] $year]
 	    }
@@ -293,7 +294,8 @@ package require Itcl
 
 	    set month [clock format [clock sec] -format %m]
 	    set year [clock format [clock sec] -format %Y]
-	    return [cal [incr month -1] $year]
+	    scan $month "%d" matched_month
+	    return [cal [incr matched_month -1] $year]
 	}
     }
 
