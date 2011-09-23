@@ -1,4 +1,7 @@
 2011-09-23 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-1/rivetCore.c: fixed declarations for various calls to ap_pstrcat.
+
+2011-09-23 Massimo Manghi <mxmanghi@apache.org>
     * debian/rules,debian/changelog: new lintian required targets, current Debian package version bumped up to 2.0.4-1
     * src/apache-1/TclWebapache.c,src/apache-1/rivetCode.c: latest changes for 'makeurl', 'load_env' and 'load_headers'
     ported to code for Apache 1.x
