@@ -421,7 +421,17 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 	val = TclWeb_StringToUtfToObj(env[i].val, req);
 	Tcl_IncrRefCount(key);
 	Tcl_IncrRefCount(val);
-	Tcl_ObjSetVar2(req->interp, envvar, key, val, TCL_NAMESPACE_ONLY);
+
+    /* Variable scope resolution changed to default (flags: 0)
+     * to enable creation of the array in the caller's local scope.
+     * Default behavior (creation in the ::request namespace)
+     * is now more consistently constrained by fully qualifying
+     * the default array names (see rivetCore.c). This should fix
+     * Bug 48963 
+     */
+
+    Tcl_ObjSetVar2(req->interp, envvar, key, val, 0);	
+
  	Tcl_DecrRefCount(key);
 	Tcl_DecrRefCount(val);
     }
@@ -455,8 +465,11 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar, TclWebRequest *req)
 	val = TclWeb_StringToUtfToObj(hdrs[i].val, req);
 	Tcl_IncrRefCount(key);
 	Tcl_IncrRefCount(val);
-	Tcl_ObjSetVar2(req->interp, headersvar,
-		       key, val, TCL_NAMESPACE_ONLY);
+
+    /* See comment in TclWeb_GetEnvVars concerning Bug 48963*/
+
+    Tcl_ObjSetVar2(req->interp, headersvar, key, val, 0);
+
  	Tcl_DecrRefCount(key);
 	Tcl_DecrRefCount(val);
     }

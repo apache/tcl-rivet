@@ -38,14 +38,15 @@
 #include <string.h>
 #include <apr_tables.h>
 #include <apr_errno.h>
+#include <apr_strings.h>
 
 #include "apache_request.h"
 #include "mod_rivet.h"
 #include "rivet.h"
 #include "TclWeb.h"
 
-#define ENV_ARRAY_NAME "env"
-#define HEADERS_ARRAY_NAME "headers"
+#define ENV_ARRAY_NAME     "::request::env"
+#define HEADERS_ARRAY_NAME "::request::headers"
 #define COOKIES_ARRAY_NAME "cookies"
 
 extern module rivet_module;
@@ -71,17 +72,64 @@ extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 TCL_CMD_HEADER( Rivet_MakeURL )
 {
-    Tcl_Obj *result = NULL;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    Tcl_Obj*                result  = NULL;
+    rivet_interp_globals*   globals = Tcl_GetAssocData(interp,"rivet",NULL);
+    char*                   url_target_name;
+    int                     target_length;
 
-    if (objc != 2)
+    if (objc > 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "filename");
 	return TCL_ERROR;
     }
-    result = Tcl_NewObj();
-    TclWeb_MakeURL(result, Tcl_GetString(objv[1]), globals->req);
+
+    if (objc == 1)
+    {
+        url_target_name = TclWeb_GetEnvVar (globals->req,"SCRIPT_NAME");
+    }
+    else
+    {
+        url_target_name = Tcl_GetStringFromObj(objv[1],&target_length);
+
+        // we check the first character for a '/' (absolute path)
+        // If we are dealing with a relative path we prepend it with
+        // the SCRIPT_NAME environment variable
+
+        if (url_target_name[0] != '/')
+        {
+            /* relative path */
+            char* script_name = TclWeb_GetEnvVar (globals->req,"SCRIPT_NAME");
+            int   script_name_l = strlen(script_name);
+
+            // regardless the reason for SCRIPT_NAME being undefined we
+            // prevent a segfault and we revert the behavior of makeurl
+            // to the case of an absolute path
+
+            if (script_name_l > 0)
+            {
+                // script name may have the form of a directory path (and mod_rewrite 
+                // could have mapped it to a .tcl or .rvt script)
+                
+                if (script_name[script_name_l-1] == '/')
+                {
+                    url_target_name = ap_pstrcat(POOL,script_name,url_target_name,NULL);
+                }
+                else
+                {
+                    url_target_name = ap_pstrcat(POOL,script_name,"/",url_target_name,NULL);
+                }
+            }
+            else
+            {
+                url_target_name = ap_pstrcat(POOL,"/",url_target_name,NULL);
+            }
+        }
+    }
+
+    result = Tcl_NewObj();   
+    TclWeb_MakeURL(result, url_target_name, globals->req);
     Tcl_SetObjResult(interp, result);
+
     return TCL_OK;
 }
 
@@ -818,7 +866,6 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
 TCL_CMD_HEADER( Rivet_Upload )
 {
     char *varname = NULL;
-    char *command = NULL;
 
     int subcommandindex;
 
@@ -850,7 +897,6 @@ TCL_CMD_HEADER( Rivet_Upload )
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    command = Tcl_GetString(objv[1]);
     Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
 			"channel|save|data|exists|size|type|filename|tempname|names",
 			0, &subcommandindex);
@@ -1201,7 +1247,6 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
 
 TCL_CMD_HEADER( Rivet_LogErrorCmd )
 {
-    char *loglevel = NULL;
     char *message = NULL;
 
     server_rec *serverRec;
@@ -1239,7 +1284,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
 	return TCL_ERROR;
     }
 
-    loglevel = Tcl_GetString(objv[1]);
+//  loglevel = Tcl_GetString(objv[1]);
     message = Tcl_GetString (objv[2]);
     if (Tcl_GetIndexFromObj(interp, objv[1], logLevel,
 			"emerg|alert|crit|err|warning|notice|info|debug",
