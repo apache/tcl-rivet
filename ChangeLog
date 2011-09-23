@@ -1,3 +1,40 @@
+2011-09-23 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c,src/apache-2/TclWebapache.c: merging changes
+    made to fix bugs and requests to command 'makeurl', 'load_env' and 'load_headers'
+
+2011-09-07 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: Add existing undocumented commands 
+        - import_keyvalue_pairs
+        - lempty
+        - lmatch 
+        - lassign (consider to remove, as it overlaps for name and features
+          with identical Tcl core command)
+        - read_file
+        - wrap
+        - wrapline
+    Changed 'makeurl' documentation to account for new features recently committed
+
+2011-09-06 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: Add Id svn keyword.
+    * src/apache-2/TclWebapache.c: Command load_env and load_headers now resolve 
+    the array name parameter following the default method (removed 
+    TCL_NAMESPACE_ONLY flag that prevented creation of an array in a
+    proc's scope). Still default values for the arguments create such arrays
+    in the ::request namespace 
+    * src/apache-2/rivetCode.c: preprocess macros ENV_ARRAY_NAME and HEADERS_ARRAY_NAME
+    modified to explicitly put in ::request namespace the default arrays. 
+    Procedure Rivet_MakeURL chages so that command 'makeurl' now accepts 
+    relative paths and prepends them with the value of the SCRIPT_NAME environment 
+    variable. When run without arguments 'makeurl' returns the value in the
+    SCRIPT_NAME env variable.
+     
+2011-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/ltmain.sh: new version shipped with libtool 
+
+2011-06-01 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/libtool.m4: autoconf 2.68 has a new IF..ELSE.. statement in m4 macros and
+    libtool.m4 needs to get along it. New version copied into tclconfig.
+
 2011-05-09 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: fixed misleading error message displayed when rivet_abort_script fails
     * 

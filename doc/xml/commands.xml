@@ -837,9 +837,8 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 		    elements is returned
 		</para>
 		<para>
-		    <programlisting># ::rivet::lmatch -regexp ::rivet::lmatch -regexp { aaxa bxxb ccxxxxcc } {.+[x]{2}.+}
-bxxb ccxxxxcc
-		    </programlisting>
+		    <programlisting>::rivet::lmatch -regexp { aaxa bxxb ccxxxxcc } {.+[x]{2}.+}
+bxxb ccxxxxcc</programlisting>
 		</para>
 	    </refsect1>
 	</refentry>	
@@ -1516,10 +1515,6 @@ bxxb ccxxxxcc
 		    If the third argument, "-html", is present, return the result with the lines 
 		    separated by html &lt;br&gt; line breaks, otherwise the lines are returned 
 		    separated by newline characters.
-		</para>
-		<para>
-		    If a third argument called "-html" is present, the string is put together
-		    with html &lt;br&gt; line breaks, otherwise it's broken with newlines.
 		</para>
 	    </refsect1>
 	</refentry>	

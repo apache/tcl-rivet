@@ -465,7 +465,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
                     rsc->objCacheList[ct]);
             if (delEntry != NULL) {
                 Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
-        }
+            }
             Tcl_DeleteHashEntry(delEntry);
 
             free(rsc->objCacheList[ct]);
@@ -1430,8 +1430,7 @@ Rivet_ChildHandlers(server_rec *s, int init)
     for (sr = s; sr; sr = sr->next)
     {
         rsc = RIVET_SERVER_CONF(sr->module_config);
-        function = init ? rsc->rivet_child_init_script :
-            rsc->rivet_child_exit_script;
+        function = init ? rsc->rivet_child_init_script : rsc->rivet_child_exit_script;
 
         if (!init && sr == s) {
             Tcl_Preserve(rsc->server_interp);
@@ -1439,10 +1438,11 @@ Rivet_ChildHandlers(server_rec *s, int init)
 
         /* Execute it if it exists and it's the top level, separate
          * virtual interps are turned on, or it's different than the
-         * main script. */
-        if(function &&
-                ( sr == s || rsc->separate_virtual_interps ||
-                  function != parentfunction))
+         * main script. 
+         */
+
+        if  (function &&
+             ( sr == s || rsc->separate_virtual_interps || function != parentfunction))
         {
             Tcl_Preserve (rsc->server_interp);
             if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
@@ -1527,6 +1527,7 @@ Rivet_CreateTclInterp (server_rec* s)
                 "Error in Tcl_CreateInterp, aborting\n");
         exit(1);
     }
+
     if (Tcl_Init(interp) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
@@ -1713,8 +1714,8 @@ Rivet_SendContent(request_rec *r)
     static Tcl_Obj  *request_cleanup = NULL;
 
     rivet_interp_globals *globals = NULL;
-    rivet_server_conf   *rsc = NULL;
-    rivet_server_conf   *rdc;
+    rivet_server_conf    *rsc = NULL;
+    rivet_server_conf    *rdc;
 
     ctype = Rivet_CheckType(r);  
     if (ctype == CTYPE_NOT_HANDLED) {
@@ -1752,10 +1753,8 @@ Rivet_SendContent(request_rec *r)
     if (r->finfo.filetype == 0)
     {
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server,
-                "File does not exist: %s",
-                (r->path_info
-                 ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL)
-                 : r->filename));
+                        "File does not exist: %s",
+        (r->path_info ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL) : r->filename));
         retval = HTTP_NOT_FOUND;
         goto sendcleanup;
     }
@@ -1768,13 +1767,16 @@ Rivet_SendContent(request_rec *r)
 //    apr_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
 //    apr_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
 
-    /* This one is the big catch when it comes to moving towards
-       Apache 2.0, or one of them, at least. */
+    /* 
+     * This one is the big catch when it comes to moving towards
+     * Apache 2.0, or one of them, at least.
+     */
+
     if (Rivet_chdir_file(r->filename) < 0)
     {
         /* something went wrong doing chdir into r->filename, we are not specific
-        at this. We simply emit an internal server error and print a log message
-        */
+         * at this. We simply emit an internal server error and print a log message
+         */
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
                     "Error accessing %s, could not chdir into directory", r->filename);
 
@@ -1791,6 +1793,7 @@ Rivet_SendContent(request_rec *r)
         request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
         Tcl_IncrRefCount(request_init);
     }
+
     if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
