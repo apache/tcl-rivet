@@ -1,3 +1,9 @@
+libapache2-mod-rivet (2.0.4-1) unstable; urgency=low
+
+  * New release 2.0.4
+
+ -- Massimo Manghi <mxmanghi@apache.org>  Wed, 21 Sep 2011 22:20:30 +0200
+
 libapache2-mod-rivet (2.0.3-2) unstable; urgency=low
 
   * Added installation targets for removing unneeded .la libtool files 

@@ -34,9 +34,7 @@
 #include "http_log.h"
 #include "http_main.h"
 #include "util_script.h"
-//#include "http_conf_globals.h"
 #include "http_config.h"
-
 
 #include <tcl.h>
 #include <string.h>
