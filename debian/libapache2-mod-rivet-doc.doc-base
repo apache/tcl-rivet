@@ -2,7 +2,7 @@ Document: libapache2-mod-rivet
 Title: The Apache Rivet Programming Manual
 Author: The Rivet Team
 Abstract: This manual explains how to script web pages using Rivet and the Tcl programming language
-Section: Help
+Section: Web Programming
 
 Format: HTML
 Index: /usr/share/doc/libapache2-mod-rivet-doc/html/index.html
