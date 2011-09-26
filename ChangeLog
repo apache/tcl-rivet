@@ -1,3 +1,6 @@
+2011-09-26 Massimo Manghi <mxmanghi@apache.org>
+    * m4/ax_compare_version.m4: add macro for version comparison from the GNU macro archive
+
 2011-09-23 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c,src/apache-2/TclWebapache.c: merging changes
     made to fix bugs and requests to command 'makeurl', 'load_env' and 'load_headers'
@@ -37,7 +40,7 @@
 
 2011-05-09 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: fixed misleading error message displayed when rivet_abort_script fails
-    * 
+
 2011-05-05 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: APACHE_VERSION returns an error message for--with-apache-version=1. 
     * src/apache-1/: removed from trunk
