@@ -1,3 +1,12 @@
+libapache2-mod-rivet (2.0.4-1) unstable; urgency=low
+
+  * New upstream release 2.0.4
+  * Remove debian/patches/makefile_am.diff - included upstream.
+  * Package documentation tag set to 'Web Programming' in 
+    debian/libapache2-mod-rivet-doc.doc-base
+
+ -- Massimo Manghi <mxmanghi@apache.org>  Wed, 21 Sep 2011 22:20:30 +0200
+
 libapache2-mod-rivet (2.0.3-2) unstable; urgency=low
 
   * Added installation targets for removing unneeded .la libtool files 

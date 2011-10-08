@@ -11,7 +11,7 @@ Package: libapache2-mod-rivet
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, itcl3, apache2-mpm-prefork
 Suggests: libapache2-mod-rivet-doc
-Description: Server-side Tcl programming system combining ease of use and power
+Description: server-side Tcl programming system combining ease of use and power
  Apache Rivet is a system for creating dynamic web content via the Tcl
  programming language integrated with Apache Web Server. It is
  designed to be fast, powerful and extensible, consume few system
@@ -26,7 +26,7 @@ Package: libapache2-mod-rivet-doc
 Section: doc
 Architecture: all
 Depends: ${misc:Depends}
-Description: Documentation for Rivet, a server-side Tcl programming system 
+Description: documentation for Rivet, a server-side Tcl programming system 
  Apache Rivet is a system for creating dynamic web content via the Tcl
  programming language integrated with Apache Web Server. It is
  designed to be fast, powerful and extensible, consume few system

@@ -1,3 +1,9 @@
+2011-10-09 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: preparing to move the debian stuff away from
+    development branches of Rivet. I'm committing the latest
+    changes done in the process of releasing the Debian package
+    for 2.0.4 
+
 2011-09-26 Massimo Manghi <mxmanghi@apache.org>
     * m4/ax_compare_version.m4: add macro for version comparison from the GNU macro archive
 

@@ -4,6 +4,7 @@
 #export DH_VERBOSE=1
 
 TCL_VERSION=8.5
+RIVET_LIBRARY_DIR=/usr/lib/tcltk/rivet2.1
 package=libapache2-mod-rivet
 LDFLAGS += -Wl,--as-needed
 CFLAGS = -Wall -g
@@ -28,8 +29,11 @@ clean:
 	dh_auto_clean
 	dh_clean
 
+build: build-arch build-indep
 
-build: configure build-stamp
+build-arch: build-stamp
+
+build-indep: build-stamp
 
 build-stamp: configure-stamp
 	dh_testdir
@@ -37,20 +41,18 @@ build-stamp: configure-stamp
 	( cd doc; $(MAKE) docs )
 	touch build-stamp
 
-configure: configure-stamp
-
 configure-stamp:
 	dh_testdir
 	chmod +x ./configure
 	CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"				\
 	./configure --host=$(DEB_HOST_GNU_TYPE) 			\
-		    --build=$(DEB_BUILD_GNU_TYPE) 			\
+		    --build=$(DEB_BUILD_GNU_TYPE) 			    \
 		    --with-tcl=/usr/lib/tcl$(TCL_VERSION)/		\
-		    --with-apache=/usr					\
-		    --with-apxs=/usr/bin/apxs2				\
-		    --with-tclsh=/usr/bin/tclsh$(TCL_VERSION)		\
-		    --with-apache-version=2				\
-		    --with-rivet-target-dir=/usr/lib/tcltk/rivet2.0	\
+		    --with-apache=/usr					        \
+		    --with-apxs=/usr/bin/apxs2				    \
+		    --with-tclsh=/usr/bin/tclsh$(TCL_VERSION)	\
+		    --with-apache-version=2				        \
+		    --with-rivet-target-dir=$(RIVET_LIBRARY_DIR) \
 		    --enable-version-display 
 	touch configure-stamp
 
@@ -99,4 +101,4 @@ libapache2-mod-rivet-doc: build
 	dh_md5sums -p$@
 	dh_builddeb -p$@ 
 
-.PHONY: build build-stamp clean binary binary-indep binary-arch configure
+.PHONY: build build-stamp clean binary binary-indep binary-arch
