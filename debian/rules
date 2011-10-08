@@ -29,16 +29,17 @@ clean:
 	dh_auto_clean
 	dh_clean
 
+build: build-arch build-indep
 
-build: configure build-stamp
+build-arch: build-stamp
+
+build-indep: build-stamp
 
 build-stamp: configure-stamp
 	dh_testdir
 	$(MAKE)
 	( cd doc; $(MAKE) docs )
 	touch build-stamp
-
-configure: configure-stamp
 
 configure-stamp:
 	dh_testdir
@@ -100,4 +101,4 @@ libapache2-mod-rivet-doc: build
 	dh_md5sums -p$@
 	dh_builddeb -p$@ 
 
-.PHONY: build build-stamp clean binary binary-indep binary-arch configure
+.PHONY: build build-stamp clean binary binary-indep binary-arch
