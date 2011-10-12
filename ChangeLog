@@ -1,3 +1,6 @@
+2011-10-12 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: actually removed from trunk (yesterday it was removed from branches/2.0)
+
 2011-10-11 Massimo Manghi <mxmanghi@apache.org>
     * debian/*: removed from trunk and moved into parent directory. Maintaining
     scripts and configuration for Debianizing a package in the same package
