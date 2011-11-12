@@ -933,7 +933,7 @@ bxxb ccxxxxcc
             <listitem> No argument is passed to the command (returns the current script URL)</listitem>
             <listitem> 
                 A relative style path is passed (returns the argument prepended with the
-                current script's URL
+                current script's URL)
             </listitem>
             <listitem> 
                 An absolute path is passed to the command: (returns the full URL to the

@@ -28,6 +28,7 @@ TEA_INIT([3.9])
 AC_CONFIG_AUX_DIR(tclconfig)
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 # AX_PREFIX_CONFIG_H is a macro taken from the autotools macro archive.
 # The typical configure generated 'config.h' can be renamed and 
