@@ -5,7 +5,7 @@
 ##
 
 
-namespace ::rivet {
+namespace eval ::rivet {
 
 ## clock_to_rfc850_gmt seconds -- Convert an integer-seconds-since-1970 
 ## click value to RFC850 format, with the additional requirement that it 

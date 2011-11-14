@@ -1007,15 +1007,21 @@ bxxb ccxxxxcc</programlisting>
 		</cmdsynopsis>
 	    </refsynopsisdiv>
 
-	    <refsect1>
-		<title>Description</title>
-		<para>
-		    This command is useful for situations where it is necessary
-		    to only return HTTP headers and no actual content.  For
-		    instance, when returning a 304 redirect.
-		</para>
-	    </refsect1>
-	</refentry>
+      <refsect1>
+        <title>Description</title>
+        <para>
+          Create a self referencing URL from a filename. <command>makeurl</command>
+          can be used in three ways
+          <itemizedlist> 
+            <listitem> No argument is passed to the command (returns the current script URL)</listitem>
+            <listitem> 
+                A relative style path is passed (returns the argument prepended with the
+                current script's URL)
+            </listitem>
+            <listitem> 
+                An absolute path is passed to the command: (returns the full URL to the
+                resource)
+            </listitem>
 
 	<refentry id="parray">
 	    <refnamediv>

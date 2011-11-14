@@ -28,6 +28,7 @@ TEA_INIT([3.9])
 AC_CONFIG_AUX_DIR(tclconfig)
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 # AX_PREFIX_CONFIG_H is a macro taken from the autotools macro archive.
 # The typical configure generated 'config.h' can be renamed and 
@@ -500,6 +501,29 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
     fi
 ])
 
+# RIVET_COMMANDS_EXPORT (--enable-rivet-commands-export).
+# Enable export of commands in Rivet's namespace. Definining this symbols
+# sets the boolean configuration variable rivet_commands_export 
+# Default: yes
+
+AC_DEFUN([RIVET_COMMANDS_EXPORT],[
+    AC_ARG_ENABLE(
+        rivet-commands-export,
+        [  --enable-rivet-commands-export to export commands from ::rivet namespace],
+        [ rivet_commands_export=$enable_rivet_commands_export ],
+        [ rivet_commands_export="yes"]
+    )
+
+    AC_MSG_CHECKING(whether the commands in ::rivet namespace will be exported)
+    if test "$rivet_commands_export" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(NAMESPACE_EXPORT,1,[commands will be exported])
+    else
+        AC_MSG_RESULT([no])
+        AC_DEFINE(NAMESPACE_EXPORT,0,[commands will not be exported])
+    fi
+])
+
 # SEPARATE_VIRTUAL_INTERPS (--enable-virtual-interps-separation)
 # Virtual hosts get their own interpreter and configuration. Different
 # applications running on different virtual hosts don't mix up variables
@@ -580,6 +604,7 @@ HONOR_HEAD_REQUESTS
 VIRTUAL_INTERPS_SEPARATION
 POST_MAX_SIZE
 UPLOAD_TO_VAR
+RIVET_COMMANDS_EXPORT
 AC_SUBST(apache_version_dir)
 AC_SUBST(MOD_RIVET_INCLUDES)
 

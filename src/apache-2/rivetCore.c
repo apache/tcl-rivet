@@ -114,7 +114,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
             if (script_name_l > 0)
             {
                 // script name may have the form a directory path (and mod_rewrite 
-                // could have mapped it to a .tcl or .rvt script
+                // could have mapped it to a .tcl or .rvt script)
                 
                 if (script_name[script_name_l-1] == '/')
                 {
@@ -1428,5 +1428,6 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,rivet_ns);
 #endif
 
-    return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");
+//  return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");
+    return TCL_OK;
 }

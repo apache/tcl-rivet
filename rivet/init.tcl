@@ -24,7 +24,7 @@ namespace eval ::Rivet {
     ## versions of Rivet (see code in ::Rivet::init)
     ##
 
-    proc export_tcl_commands {tclpath} {
+    proc tcl_commands_export_list {tclpath} {
 
         # we collect the commands in rivet-tcl by reading the tclIndex
         # file and then we extract the command list from auto_index
@@ -51,7 +51,7 @@ namespace eval ::Rivet {
         foreach c $command_list {
             if {[regexp {::rivet::(.*)} $c m cmd]} {
                 lappend export_list $cmd
-                namespace eval ::rivet [list namespace export $cmd]
+#               namespace eval ::rivet [list namespace export $cmd]
             }
         }
 
@@ -125,8 +125,21 @@ namespace eval ::Rivet {
 
         ## we keep in ::rivet::export_list a list of importable commands
 
-        set ::rivet::export_list [export_tcl_commands $tclpath]
+        namespace eval ::rivet [list set export_list [tcl_commands_export_list $tclpath]]
+        namespace eval ::rivet {
 
+        ## init.tcl is run by mod_rivet (which creates the ::rivet namespace) but it gets run
+        ## standalone by mkPkgindex during the installation phase. We have to make sure the
+        ## procedure won't fail in this case, so we check for the existence of the variable.
+
+            if {[info exists ::rivet::export_namespace_commands] && $::rivet::export_namespace_commands} {
+                apache_log_error debug "exporting ::rivet commands"
+                eval namespace export $::rivet::export_list
+            } else {
+                apache_log_error debug "::rivet commands won't be exported"
+            }
+
+        }
         ## Add the packages directory to the auto_path.
         ## If we have a packages$tcl_version directory
         ## (IE: packages8.3, packages8.4) append that as well.
@@ -161,7 +174,7 @@ namespace eval ::Rivet {
 ## in Rivet < 2.1.0, before the move into the ::Rivet namespace, 
 ## we alias this command only in the global namespace
 
-interp alias {} ::rivet::incr0 {} incr
+interp alias {} ::incr0 {} incr
 
 ## Initialize Rivet.
 ::Rivet::init

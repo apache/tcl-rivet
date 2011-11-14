@@ -47,6 +47,8 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
  * created somewhere before the macro is called. 
  */
 
+#if RIVET_NAMESPACE_EXPORT == 1
+
 #define RIVET_OBJ_CMD(name,func,ns) \
 Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      RIVET_NS "::" name,   /* Function name in Tcl */\
@@ -54,6 +56,17 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      NULL,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); \
 Tcl_Export(interp,ns,name,0);
+
+#else
+
+#define RIVET_OBJ_CMD(name,func,ns) \
+Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
+		      RIVET_NS "::" name,   /* Function name in Tcl */\
+		      func,   /* C function name */\
+		      NULL,   /* Client Data */\
+		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); 
+
+#endif
 
 EXTERN int Rivet_Init( Tcl_Interp *interp );
 EXTERN int Rivet_InitList( Tcl_Interp *interp, Tcl_Namespace* ns);

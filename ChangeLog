@@ -1,3 +1,17 @@
+2011-11-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: reindented to improve readability.
+    * doc/xml/commands.xml: typo corrected
+    * tclconfig/ltmain.sh: new script from recently released libtools
+    * configure.ac: new macro AC_CONFIG_MACRO_DIR to include macros in m4
+
+2011-10-12 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: actually removed from trunk (yesterday it was removed from branches/2.0)
+
+2011-10-11 Massimo Manghi <mxmanghi@apache.org>
+    * debian/*: removed from trunk and moved into parent directory. Maintaining
+    scripts and configuration for Debianizing a package in the same package
+    repository is deprecated and error prone.
+
 2011-10-09 Massimo Manghi <mxmanghi@apache.org>
     * debian/*: preparing to move the debian stuff away from
     development branches of Rivet. I'm committing the latest

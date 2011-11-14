@@ -21,7 +21,7 @@
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <rivet_config.h>
 #endif
 
 #include <tcl.h>

@@ -91,9 +91,9 @@ static void Rivet_CreateCache (server_rec *s, apr_pool_t *p);
  
 static int Rivet_chdir_file (const char *file)
 {
-    const  char *x;
-    int    chdir_retval = 0;
-    char chdir_buf[HUGE_STRING_LEN];
+    const char  *x;
+    int         chdir_retval = 0;
+    char        chdir_buf[HUGE_STRING_LEN];
 
     x = strrchr(file, '/');
     if (x == NULL) {
@@ -943,11 +943,22 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
+    /* Watch out! Calling Tcl_PkgRequire with a version number binds this module to
+     * the 'package provide' statement in rivet/init.tcl 
+     */
+
+    /*  If rivet was configured to export the ::rivet namespace commands we have to
+     *  set the variable ::rivet::export_namespace_commands before calling init.tcl
+     *  This variable will be unset after commands are exported.
+     */
+
+    Tcl_SetVar2Ex(interp,RIVET_NS"::export_namespace_commands",NULL,Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
+
     if (Tcl_PkgRequire(interp, "RivetTcl", "2.1", 1) == NULL)
     {
         ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                "init.tcl must be installed correctly for Apache Rivet to function: %s",
-                Tcl_GetStringResult(interp) );
+                "init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
+                Tcl_GetStringResult(interp), RIVET_DIR );
         exit(1);
     }
 
@@ -961,6 +972,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     * The problem was investigated on Linux and it became clear 
     * that it's linked to the way Tcl calls dlopen (Bug #3216070)
     * The problem could be solved in Tcl8.6 
+    */
 
     if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, "1.2", 1) == NULL)
     {
@@ -968,7 +980,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                 "Error loading rivetlib package: %s", Tcl_GetStringResult(interp) );
         exit(1);
     } 
-    */
+    /* */
 
     /* Set the output buffer size to the largest allowed value, so that we 
      * won't send any result packets to the browser unless the Rivet
