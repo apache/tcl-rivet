@@ -1,6 +1,6 @@
 <?
-headers type "image/jpeg"
-if { [var exists test1] } {
+::rivet::headers type "image/jpeg"
+if { [::rivet::var exists test1] } {
     set fl [ open AngeloFish.jpg r ]
     fconfigure $fl -encoding binary
     fconfigure $fl -translation binary
@@ -11,6 +11,6 @@ if { [var exists test1] } {
     puts -nonewline [read $fl]
     close $fl
 } else {
-    include AngeloFish.jpg
+    ::rivet::include AngeloFish.jpg
 }
 ?>

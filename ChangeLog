@@ -1,3 +1,23 @@
+2011-11-20 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h: Macro definition for Rivet command objects has rolled back to 
+    its previous form and doesn't call Tcl_Export anymore. In case commands are
+    exported by calling Tcl_Export in rivetCore.c and rivetPkgInit.c
+    * tests/*: test suite reviewed for new tests
+
+2011-11-16 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: code rationalization. namespace reference will not be
+    passed to the RIVET_OBJ_COMMAND macro and commands are exported by calling Tcl_Export
+    on the whole command set in ::rivet. The whole process is controlled by the macro
+    symbol RIVET_NAMESPACE_EXPORT 
+    * src/rivet.h: only one RIVET_OBJ_COMMAND object exists now. Call to Rivet_WWWInit,
+    Rivet_CryptInit and Rivet_ListInit haved changed. Rivet namespace pointer in not
+    passed around anymore and it's handled only in rivetPkgInit.c
+    * src/rivetPkgInit.c: 
+
+2011-11-14 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac:  new switch --enable-rivet-commands-export to enable/disable 
+    commands in ::rivet namespace
+
 2011-11-12 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: reindented to improve readability.
     * doc/xml/commands.xml: typo corrected

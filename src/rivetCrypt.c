@@ -8,7 +8,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-   	http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,19 +45,19 @@ Rivet_Crypt(char *string, const char *key, long offset, int mode)
 
     while (*string != '\0')
     {
-	if (*string >= 32 && *string <= 126)
-	{
-	    if (mode)
-		*string = (((*string - 32) + (*kp - 32)) % 94) + 32;
-	    else
-		*string = (((*string - 32) - (*kp - 32) + 94) % 94) + 32;
-	}
+        if (*string >= 32 && *string <= 126)
+        {
+            if (mode)
+                *string = (((*string - 32) + (*kp - 32)) % 94) + 32;
+            else
+                *string = (((*string - 32) - (*kp - 32) + 94) % 94) + 32;
+        }
 
-	string++;
-	kp++;
-	if (*kp == '\0') {
-	    kp = key;
-	}
+        string++;
+        kp++;
+        if (*kp == '\0') {
+            kp = key;
+        }
     }
 }
 
@@ -69,7 +69,7 @@ TCL_CMD_HEADER( Rivet_EncryptCmd )
     int keyIndex;
 
     if( objc < 3 ) {
-	Tcl_WrongNumArgs( interp, 1, objv, "data key" );
+        Tcl_WrongNumArgs( interp, 1, objv, "data key" );
         return TCL_ERROR;
     }
 
@@ -80,7 +80,7 @@ TCL_CMD_HEADER( Rivet_EncryptCmd )
 
     for( keyIndex = 2; keyIndex < objc; keyIndex++ )
     {
-	key = Tcl_GetStringFromObj( objv[keyIndex], NULL );
+        key = Tcl_GetStringFromObj( objv[keyIndex], NULL );
         Rivet_Crypt( resultBuffer, key, 0L, MODE_ENCRYPT );
     }
 
@@ -97,7 +97,7 @@ TCL_CMD_HEADER( Rivet_DecryptCmd )
     int keyIndex;
 
     if( objc < 3 ) {
-	Tcl_WrongNumArgs( interp, 1, objv, "data key" );
+    Tcl_WrongNumArgs( interp, 1, objv, "data key" );
         return TCL_ERROR;
     }
 
@@ -108,7 +108,7 @@ TCL_CMD_HEADER( Rivet_DecryptCmd )
 
     for( keyIndex = 2; keyIndex < objc; keyIndex++ )
     {
-	key = Tcl_GetStringFromObj( objv[keyIndex], NULL );
+        key = Tcl_GetStringFromObj( objv[keyIndex], NULL );
         Rivet_Crypt( resultBuffer, key, 0L, MODE_DECRYPT );
     }
 
@@ -124,7 +124,7 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
     const char *resultBuffer;
 
     if( objc != 3 ) {
-	Tcl_WrongNumArgs( interp, 1, objv, "key salt" );
+        Tcl_WrongNumArgs( interp, 1, objv, "key salt" );
         return TCL_ERROR;
     }
 
@@ -134,17 +134,16 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
     resultBuffer = crypt((const char *)key, (const char *)salt);
 
     if( resultBuffer == NULL ) {
-	Tcl_AppendResult (interp,
-		"crypt function failed: ",
-		Tcl_GetStringFromObj(objv[1], NULL),
-		(char *)NULL );
-	return TCL_ERROR;
+        Tcl_AppendResult (interp,
+                            "crypt function failed: ",
+                            Tcl_GetStringFromObj(objv[1], NULL),
+                            (char *)NULL );
+        return TCL_ERROR;
     }
     Tcl_SetObjResult( interp, Tcl_NewStringObj( resultBuffer, -1 ) );
     return TCL_OK;
 #else /* ! crypt */
-    Tcl_SetObjResult(interp, 
-                     Tcl_NewStringObj("error: command not available", -1));
+    Tcl_SetObjResult(interp,Tcl_NewStringObj("error: command not available", -1));
     return TCL_ERROR;
 #endif /* ! crypt */
 }
@@ -162,10 +161,10 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
  *-----------------------------------------------------------------------------
  */
 int
-Rivet_InitCrypt( Tcl_Interp *interp, Tcl_Namespace* rivet_ns )
+Rivet_InitCrypt( Tcl_Interp *interp)
 {
-    RIVET_OBJ_CMD( "encrypt", Rivet_EncryptCmd, rivet_ns);
-    RIVET_OBJ_CMD( "decrypt", Rivet_DecryptCmd, rivet_ns);
-    RIVET_OBJ_CMD( "crypt", Rivet_CryptCmd, rivet_ns);
+    RIVET_OBJ_CMD("encrypt", Rivet_EncryptCmd);
+    RIVET_OBJ_CMD("decrypt", Rivet_DecryptCmd);
+    RIVET_OBJ_CMD("crypt", Rivet_CryptCmd);
     return TCL_OK;
 }

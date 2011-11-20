@@ -6,6 +6,6 @@
 
   <body>
     <h1>Parse Test</h1>
-    <? parse hello.rvt ?>
+    <? ::rivet::parse hello.rvt ?>
   </body>
 </html>

@@ -54,10 +54,6 @@
 extern module rivet_module;
 extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
-/* declarations for commands in rivetWWW.c */
-
-EXTERN int Rivet_InitWWW( Tcl_Interp *interp, Tcl_Namespace* ns);
-
 #define POOL (globals->r->pool)
 
 /*
@@ -1399,33 +1395,39 @@ TestpanicCmd(dummy, interp, argc, argv)
 int
 Rivet_InitCore( Tcl_Interp *interp )
 {
+#if RIVET_NAMESPACE_EXPORT == 1
     rivet_interp_globals *globals = NULL;
     Tcl_Namespace *rivet_ns;
 
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_ns = globals->rivet_ns;
+#endif
 
-    RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,rivet_ns);
-    RIVET_OBJ_CMD ("headers",Rivet_Headers,rivet_ns);
-    RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv,rivet_ns);
-    RIVET_OBJ_CMD ("load_headers",Rivet_LoadHeaders,rivet_ns);
-    RIVET_OBJ_CMD ("var",Rivet_Var,rivet_ns);
-    RIVET_OBJ_CMD ("abort_page",Rivet_AbortPageCmd,rivet_ns);
-    RIVET_OBJ_CMD ("abort_code", Rivet_AbortCodeCmd,rivet_ns);
-    RIVET_OBJ_CMD ("virtual_filename",Rivet_VirtualFilenameCmd,rivet_ns);
-    RIVET_OBJ_CMD ("apache_table",Rivet_ApacheTable,rivet_ns);
-    RIVET_OBJ_CMD ("var_qs",Rivet_Var,rivet_ns);
-    RIVET_OBJ_CMD ("var_post",Rivet_Var,rivet_ns);
-    RIVET_OBJ_CMD ("raw_post",Rivet_RawPost,rivet_ns);
-    RIVET_OBJ_CMD ("upload",Rivet_Upload,rivet_ns);
-    RIVET_OBJ_CMD ("include",Rivet_Include,rivet_ns);
-    RIVET_OBJ_CMD ("parse",Rivet_Parse,rivet_ns);
-    RIVET_OBJ_CMD ("no_body",Rivet_NoBody,rivet_ns);
-    RIVET_OBJ_CMD ("env",Rivet_EnvCmd,rivet_ns);
-    RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd,rivet_ns);
+    RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL);
+    RIVET_OBJ_CMD ("headers",Rivet_Headers);
+    RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv);
+    RIVET_OBJ_CMD ("load_headers",Rivet_LoadHeaders);
+    RIVET_OBJ_CMD ("var",Rivet_Var);
+    RIVET_OBJ_CMD ("abort_page",Rivet_AbortPageCmd);
+    RIVET_OBJ_CMD ("abort_code", Rivet_AbortCodeCmd);
+    RIVET_OBJ_CMD ("virtual_filename",Rivet_VirtualFilenameCmd);
+    RIVET_OBJ_CMD ("apache_table",Rivet_ApacheTable);
+    RIVET_OBJ_CMD ("var_qs",Rivet_Var);
+    RIVET_OBJ_CMD ("var_post",Rivet_Var);
+    RIVET_OBJ_CMD ("raw_post",Rivet_RawPost);
+    RIVET_OBJ_CMD ("upload",Rivet_Upload);
+    RIVET_OBJ_CMD ("include",Rivet_Include);
+    RIVET_OBJ_CMD ("parse",Rivet_Parse);
+    RIVET_OBJ_CMD ("no_body",Rivet_NoBody);
+    RIVET_OBJ_CMD ("env",Rivet_EnvCmd);
+    RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd);
 
 #ifdef TESTPANIC
-    RIVET_OBJ_CMD ("testpanic",TestpanicCmd,rivet_ns);
+    RIVET_OBJ_CMD ("testpanic",TestpanicCmd);
+#endif
+
+#if RIVET_NAMESPACE_EXPORT == 1
+    Tcl_Export(interp,rivet_ns,"*",0);
 #endif
 
 //  return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");

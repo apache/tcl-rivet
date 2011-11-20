@@ -8,7 +8,7 @@ set binaryfile AngeloFish.jpg
     set fl [open $binaryfile r]
     fconfigure $fl -translation binary
     fconfigure $fl -encoding binary
-    set ret [string equal -length 42746 [::http::data $page] [read $fl]]
+    set ret [string equal -length 42747 [::http::data $page] [read $fl]]
     close $fl
     set ret
 } 1
@@ -18,7 +18,7 @@ set binaryfile AngeloFish.jpg
     set fl [open $binaryfile r]
     fconfigure $fl -translation binary
     fconfigure $fl -encoding binary
-    set ret [string equal -length 42746 [::http::data $page] [read $fl]]
+    set ret [string equal -length 42747 [::http::data $page] [read $fl]]
     close $fl
     set ret
 } 1

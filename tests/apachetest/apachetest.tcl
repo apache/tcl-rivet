@@ -30,7 +30,7 @@ source [file join [file dirname [info script]] http.tcl]
 
 namespace eval apachetest {
 
-    set debug 0
+    set debug 1
 
     # name of the apache binary, such as /usr/sbin/httpd
     variable binname ""
@@ -80,13 +80,13 @@ proc apachetest::connect { } {
     set diff 0
     # We try for 10 seconds.
     while { $diff < 10 } {
-	if { ! [catch {
-	    set sk [socket localhost 8081]
-	} err]} {
-	    close $sk
-	    return
-	}
-	set diff [expr {[clock seconds] - $starttime}]
+        if { ! [catch {
+            set sk [socket localhost 8081]
+        } err]} {
+            close $sk
+            return
+        }
+        set diff [expr {[clock seconds] - $starttime}]
     }
 }
 
@@ -133,10 +133,9 @@ proc apachetest::start { options conftext code } {
     if { $debug > 0 } {
 	    puts "Apache started as PID $serverpid"
     }
-    if { [catch {
-	uplevel $code
-    } err] } {
-    }
+
+    if { [catch { uplevel $code } err] } { }
+
     # Kill and wait are the only reasons we need TclX.
     # apache2 binary started with -X reacts to SIGQUIT and ignores TERM
     kill QUIT $serverpid 
@@ -153,14 +152,14 @@ proc apachetest::start { options conftext code } {
 proc apachetest::startserver { args } {
     variable binname
     variable debug
+
     if { [catch {
-	if { $debug } {
-	    puts "$binname -X -f [file join [pwd] server.conf] [concat $args]"
-	}
-	set serverpid [eval exec $binname -X -f \
-			   "[file join [pwd] server.conf]" [concat $args]]
+        if { $debug } {
+            puts "$binname -X -f [file join [pwd] server.conf] [concat $args]"
+        }
+        set serverpid [eval exec $binname -X -f "[file join [pwd] server.conf]" [concat $args]]
     } err] } {
-	puts "$err"
+        puts "$err"
     }
 }
 
@@ -169,9 +168,10 @@ proc apachetest::startserver { args } {
 
 proc apachetest::getbinname { argv } {
     variable binname
+
     set binname [lindex $argv 0]
     if { $binname == "" || ! [file executable $binname] } {
-	error "Please supply the full name and path of the Apache executable on the command line."
+	    error "Please supply the full name and path of the Apache executable on the command line."
     }
     return $binname
 }
@@ -182,6 +182,7 @@ proc apachetest::getbinname { argv } {
 
 proc apachetest::getcompiledin { binname } {
     variable module_assoc
+
     set bin [open [list | "$binname" -l] r]
     set compiledin [read $bin]
     close $bin
@@ -189,17 +190,17 @@ proc apachetest::getcompiledin { binname } {
     set compiledin [list]
     set mod_so_present 0
     foreach entry $modlist {
-	if { [regexp {(.*)\.c$} $entry match modname] } {
-	    if { $modname == "mod_so" } {
-		set mod_so_present 1
-	    }
-	    if { [info exists module_assoc($modname)] } {
-		lappend compiledin $module_assoc($modname)
-	    }
-	}
+        if { [regexp {(.*)\.c$} $entry match modname] } {
+            if { $modname == "mod_so" } {
+                set mod_so_present 1
+            }
+            if { [info exists module_assoc($modname)] } {
+                lappend compiledin $module_assoc($modname)
+            }
+        }
     }
     if { $mod_so_present == 0 } {
-	error "We need mod_so in Apache to run these tests"
+        error "We need mod_so in Apache to run these tests"
     }
     return $compiledin
 }
@@ -211,15 +212,19 @@ proc apachetest::gethttpdconf { binname } {
     set options [read $bin]
     close $bin
     regexp {SERVER_CONFIG_FILE="(.*?)"} "$options" match filename
+
     if { ! [file exists $filename] } {
-	# see if we can find something by combining HTTP_ROOT + SERVER_CONFIG_FILE
-	regexp {HTTPD_ROOT="(.*?)"} "$options" match httpdroot
-	set completename [file join $httpdroot $filename]
-	if { ! [file exists $completename] } {
-	    error "neither '$filename' or '$completename' exists"
-	}
-	return $completename
+
+# see if we can find something by combining HTTP_ROOT + SERVER_CONFIG_FILE
+
+        regexp {HTTPD_ROOT="(.*?)"} "$options" match httpdroot
+        set completename [file join $httpdroot $filename]
+        if { ! [file exists $completename] } {
+            error "neither '$filename' or '$completename' exists"
+        }
+        return $completename
     }
+
     return $filename
 }
 
@@ -238,7 +243,7 @@ proc apachetest::gethttpdconf { binname } {
 #	Text of configuration files.
 
 proc apachetest::getallincludes { conffile } {
-    if [file  exists $conffile] {
+    if [file exists $conffile] {
 	    set fl [open $conffile r]
 	    set data [read $fl]
 	    close $fl
@@ -246,41 +251,41 @@ proc apachetest::getallincludes { conffile } {
 	    set newdata {}
 	    foreach line [split $data \n] {
 		# Look for Include lines.
-		if { [regexp -line {^[^\#]*Include +(.*)} $line match file] } {
-		    puts "including files from $file"
-		    set file [string trim $file]
+            if { [regexp -line {^[^\#]*Include +(.*)} $line match file] } {
+                puts "including files from $file"
+                set file [string trim $file]
 
-		    # Include directives accept as argument a file, a directory
-		    # or a glob-style file matching pattern. Patterns usually match
-		    # many files, but are not directories, so we have to handle 
-		    # all these 3 cases
+                # Include directives accept as argument a file, a directory
+                # or a glob-style file matching pattern. Patterns usually match
+                # many files, but are not directories, so we have to handle 
+                # all these 3 cases
 
-		    # we use the glob command to tell whether we are dealing with
-		    # a pure file expression or a matching pattern
+                # we use the glob command to tell whether we are dealing with
+                # a pure file expression or a matching pattern
 
-		    set matched_files [glob -nocomplain $file]
-		    set matched_files_n [llength $matched_files]
-		    if {$matched_files_n > 1} {
-			foreach fl $matched_files {
-			    puts "including $fl"
-			    if [file  exists $fl] {
-				    append newdata [getallincludes $fl]
-			    }
-			}
-		    } elseif {$matched_files_n == 1} {
-			set file $matched_files
-			if { [file isdirectory $file] } {
-			    foreach fl [glob -nocomplain [file join $file *]] {
-				puts "including $fl"
-				if [file  exists $fl] {
-					append newdata [getallincludes $fl]
-				}
-			    }
-			} else {
-			    append newdata [getallincludes $file]
-			}
-		    }
-		}
+                set matched_files [glob -nocomplain $file]
+                set matched_files_n [llength $matched_files]
+                if {$matched_files_n > 1} {
+                    foreach fl $matched_files {
+                        puts "including $fl"
+                        if [file  exists $fl] {
+                            append newdata [getallincludes $fl]
+                        }
+                    }
+                } elseif {$matched_files_n == 1} {
+                    set file $matched_files
+                    if { [file isdirectory $file] } {
+                        foreach fl [glob -nocomplain [file join $file *]] {
+                            puts "including $fl"
+                            if [file  exists $fl] {
+                                append newdata [getallincludes $fl]
+                            }
+                        }
+                    } else {
+                        append newdata [getallincludes $file]
+                    }
+                }
+            }
 	    }
 	    append data $newdata
 	    return $data
@@ -311,18 +316,19 @@ proc apachetest::getloadmodules { conffile needtoget } {
     regexp -line {^[^#]*(ServerRoot[\s]?[\"]?)([^\"]+)()([\"]?)} $confdata \
     match sub1 server_root_path sub2 
     foreach mod $needtoget {
+
     	# Look for LoadModule lines.
-	puts -nonewline "check conf line for $mod module..."
-	flush stdout
+        puts -nonewline "check conf line for $mod module..."
+        flush stdout
         if { ! [regexp -line "^\[^\#\]*(LoadModule\\s+$mod\\s+.+)\$"\
-                $confdata match line] } {
+                        $confdata match line] } {
             error "No LoadModule line for $mod\!"
         } else {
-	    puts ok
+            puts ok
 
-	    set raw_path [join [lrange [split $line { }] 2 end]]
-	    #trimming leading whitespaces
-	    set path [string trimleft $raw_path]
+            set raw_path [join [lrange [split $line { }] 2 end]]
+            #trimming leading whitespaces
+            set path [string trimleft $raw_path]
             if ![string equal [file pathtype $line] "absolute"] {
                 set absolute_path [file join $server_root_path $path]
                 lappend loadline "[join [lrange [split $line " "]  0 1]] $absolute_path"
@@ -342,20 +348,20 @@ proc apachetest::determinemodules { binname } {
     set conffile [gethttpdconf $binname]
 
     foreach {n k} [array get module_assoc] {
-	lappend needed $k
+        lappend needed $k
     }
     set needed [lsort $needed]
 
     set needtoget [list]
     foreach mod $needed {
-	if { [lsearch $compiledin $mod] == -1 } {
-	    lappend needtoget $mod
-	}
+        if { [lsearch $compiledin $mod] == -1 } {
+            lappend needtoget $mod
+        }
     }
     if { $needtoget == "" } {
-	return ""
+        return ""
     } else {
-	return [getloadmodules $conffile $needtoget]
+        return [getloadmodules $conffile $needtoget]
     }
 }
 

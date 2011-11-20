@@ -381,9 +381,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
             }
         }
 
-        Tcl_SetVar( interp, "errorOutbuf",
-                Tcl_GetStringFromObj( outbuf, NULL ),
-                TCL_GLOBAL_ONLY );
+        Tcl_SetVar( interp, "errorOutbuf",Tcl_GetStringFromObj( outbuf, NULL ),TCL_GLOBAL_ONLY );
 
         /* If we don't have an error script, use the default error handler. */
         if (conf->rivet_error_script ) {
@@ -515,7 +513,6 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         if (toplevel) {
             if (rsc->rivet_before_script) {
                 Tcl_AppendObjToObj(outbuf,rsc->rivet_before_script);
-//              Tcl_NewStringObj(rsc->rivet_before_script, -1));
             }
         }
 
@@ -542,7 +539,6 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         }
         if (toplevel) {
             if (rsc->rivet_after_script) {
-//              Tcl_AppendObjToObj(outbuf,Tcl_NewStringObj(rsc->rivet_after_script, -1));
                 Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
             }
         }
@@ -599,8 +595,6 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 static void
 Rivet_CleanupRequest( request_rec *r )
 {
-
-
 #if 0
     apr_table_t *t;
     apr_array_header_t *arr;
@@ -1701,6 +1695,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
  *-----------------------------------------------------------------------------
  */
 
+
 static void
 Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
 {
@@ -1712,6 +1707,11 @@ Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
     //cleanup
     apr_pool_cleanup_register (pChild, s, Rivet_ChildExit, Rivet_ChildExit);
 }
+
+
+//TODO: clarify whether rsc or rdc
+
+#define USE_APACHE_RSC
 
 /* Set things up to execute a file, then execute */
 static int
@@ -1726,8 +1726,11 @@ Rivet_SendContent(request_rec *r)
     static Tcl_Obj  *request_cleanup = NULL;
 
     rivet_interp_globals *globals = NULL;
+#ifdef USE_APACHE_RSC
     rivet_server_conf    *rsc = NULL;
+#else
     rivet_server_conf    *rdc;
+#endif
 
     ctype = Rivet_CheckType(r);  
     if (ctype == CTYPE_NOT_HANDLED) {
@@ -1750,10 +1753,12 @@ Rivet_SendContent(request_rec *r)
 
     globals->req->charset = NULL;
 
+#ifndef USE_APACHE_RSC
     if (r->per_dir_config != NULL)
         rdc = RIVET_SERVER_CONF( r->per_dir_config );
     else
         rdc = rsc;
+#endif
 
     r->allowed |= (1 << M_GET);
     r->allowed |= (1 << M_POST);
@@ -1796,9 +1801,11 @@ Rivet_SendContent(request_rec *r)
         goto sendcleanup;
     }
 
-    //TODO: clarify whether rsc or rdc
-    //Rivet_PropagatePerDirConfArrays( interp, rdc );
+#ifdef USE_APACHE_RSC
     Rivet_PropagatePerDirConfArrays( interp, rsc );
+#else
+    Rivet_PropagatePerDirConfArrays( interp, rdc );
+#endif
 
     /* Initialize this the first time through and keep it around. */
     if (request_init == NULL) {
