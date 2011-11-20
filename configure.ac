@@ -509,7 +509,7 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
 AC_DEFUN([RIVET_COMMANDS_EXPORT],[
     AC_ARG_ENABLE(
         rivet-commands-export,
-        [  --enable-rivet-commands-export to export commands from ::rivet namespace],
+        [  --disable-rivet-commands-export to prevent export from ::rivet namespace],
         [ rivet_commands_export=$enable_rivet_commands_export ],
         [ rivet_commands_export="yes"]
     )

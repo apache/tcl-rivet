@@ -95,7 +95,7 @@
    &directives.xml;
 
     <!-- Commands -->
-   &commands.xml;
+    &commands.xml;
 
     <!-- examples-sgml -->
    &examples.xml;

@@ -1,4 +1,8 @@
 2011-11-20 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml,doc/xml/install.xml: documentation for building Rivet updated.
+    * configure.ac: corrected help message for --disable-rivet-commands-export
+
+2011-11-20 Massimo Manghi <mxmanghi@apache.org>
     * src/rivet.h: Macro definition for Rivet command objects has rolled back to 
     its previous form and doesn't call Tcl_Export anymore. In case commands are
     exported by calling Tcl_Export in rivetCore.c and rivetPkgInit.c
