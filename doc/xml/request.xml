@@ -38,8 +38,12 @@
 		    		creation of private data. Example of tasks that can be done
 		    		in this context are importing namespace commands and loading packages
 		    		providing code of general interest for every application to
-		    		be served.
+		    		be served. 
 	    		</para>
+	    		<para>
+	    			<note>This directive has effect when 
+		    		<command>SeparateVirtualInterps</command> is off</note>
+		    	</para>
 	    	</listitem>
 	    	<listitem>
 	    		<bridgehead>Child Process Initialization</bridgehead>
@@ -67,8 +71,10 @@
 	    			serving different web applications. 
 	    		</para>
 	    		<para>
-	    			<command>GlobalInitScript</command> has no effect to working interpreters
-	    			when <command>SeparateVirtualInterps</command> is set.
+	    			<note>
+	    				<command>GlobalInitScript</command> has no effect to working interpreters
+	    				when <command>SeparateVirtualInterps</command> is set.
+	    			</note>
 	    		</para>
 	    	</listitem>
 	    	<listitem>

@@ -1,3 +1,8 @@
+2011-11-21 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml,doc/xml/commands.xml: removed note about 'rivetlib' package
+    no more needed. Notes about ServerInitScript not having effect when virtual hosts
+    have their own private slave interpreters.
+
 2011-11-20 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml,doc/xml/install.xml: documentation for building Rivet updated.
     * configure.ac: corrected help message for --disable-rivet-commands-export

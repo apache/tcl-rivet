@@ -464,9 +464,9 @@
 		    For example, the right angle
 		    bracket is escaped to the corrected ampersand gt symbol.
 		</para>
-		<note> 
+		<!--note> 
 		    You must require the <command>rivetlib</command> package in order to gain access to this command
-		</note>
+		</note -->
 	    </refsect1>
 	</refentry>
 
@@ -496,9 +496,9 @@
 		    For each metacharacter found, it is quoted in the result by
 		    prepending it with a backslash, returning the result.
 		</para>
-		<note> 
-		    You must require the <command>Rivet</command> package in order to gain access to this command
-		</note>
+		<!-- note>
+		    You must require the <command>rivetlib</command> package in order to gain access to this command
+		</note -->
 	    </refsect1>
 	</refentry>
 	
@@ -527,10 +527,10 @@
 		    This is useful for quoting strings that are going to be
 		    part of a URL.
 		</para>
-		<note> 
+		<!-- note> 
 		    You must require the <command>rivetlib</command> package in order to gain access 
 		    to this command
-		</note>
+		</note -->
 	    </refsect1>
 	</refentry>
 
@@ -1145,10 +1145,10 @@ bxxb ccxxxxcc</programlisting>
 		    This is useful for unquoting strings that have been quoted to
 		    be part of a URL.
 		</para>
-		<note> 
+		<!-- note> 
 		    You must require the <command>rivetlib</command> package in order to gain 
 		    access to this command
-		</note>
+		</note -->
 	    </refsect1>
 	</refentry>
 
