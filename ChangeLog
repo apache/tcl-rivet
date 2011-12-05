@@ -1,3 +1,6 @@
+2011-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/request.xml,doc/xml/install.xml: documenting new configure switches
+
 2011-12-05 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: child init sets also the array module_conf to signal the
     compilation flags --enable-rivet-commands-export and --enable-import-namespace-commands

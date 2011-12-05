@@ -202,10 +202,18 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
             		definitions. For compatibility with existing code, commands are exported from
             		::rivet and can be thus imported into any namespace (global namespace included)
             		with the command
-            		<programlisting>
-      namespace import -force ::rivet::*
-            		</programlisting>
+            		<programlisting>namespace import -force ::rivet::*</programlisting>
             		The default value for this option may change in the future.
+            	</listitem>
+            </varlistentry>
+            <varlistentry>
+            	<term>--disable-import-rivet-commands</term>
+            	<listitem>
+            		Rivet commands can be imported imported into the global namespace. This
+            		is done by default and can be disabled using this option. In future
+            		versions of Rivet the default will be changed to off and eventually
+            		removed altogether. 
+            		<note>This option implicitly sets --enable-rivet-commands-export</note>
             	</listitem>
             </varlistentry>
         </variablelist>
