@@ -942,17 +942,18 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
      */
 
     /*  If rivet was configured to export the ::rivet namespace commands we have to
-     *  set the variable ::rivet::export_namespace_commands before calling init.tcl
+     *  set the array variable ::rivet::module_conf(export_namespace_commands) before calling init.tcl
      *  This variable will be unset after commands are exported.
      */
 
-    Tcl_SetVar2Ex(interp,RIVET_NS"::export_namespace_commands",NULL,Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
+    Tcl_SetVar2Ex(interp,"module_conf","export_namespace_commands",Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
+    Tcl_SetVar2Ex(interp,"module_conf","import_rivet_commands",Tcl_NewIntObj(RIVET_NAMESPACE_IMPORT),0);
 
     if (Tcl_PkgRequire(interp, "RivetTcl", "2.1", 1) == NULL)
     {
-        ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                "init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
-                Tcl_GetStringResult(interp), RIVET_DIR );
+        ap_log_error ( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                        "init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
+                        Tcl_GetStringResult(interp), RIVET_DIR );
         exit(1);
     }
 

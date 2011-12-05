@@ -524,6 +524,30 @@ AC_DEFUN([RIVET_COMMANDS_EXPORT],[
     fi
 ])
 
+# IMPORT_RIVET_COMMANDS (--enable-import-rivet-commands).
+# For compatibility the module can be compiled and installed forcing rivet
+# to import commands from ::rivet into the global namespace.
+# Default: yes
+
+AC_DEFUN([IMPORT_RIVET_COMMANDS],[
+    AC_ARG_ENABLE(
+        import-rivet-commands,
+        [ --disable-import-rivet-commands requires explicit namespace import if required],
+        [ import_rivet_commands=$enable_import_rivet_commands],
+        [ import_rivet_commands="yes"]
+    )
+
+    AC_MSG_CHECKING(if ::rivet namespace will be automatically imported for compatibility)
+    if test "$import_rivet_commands" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(NAMESPACE_IMPORT,1,[commands will be imported into the global namespace])
+    else
+        AC_MSG_RESULT([no])
+        AC_DEFINE(NAMESPACE_IMPORT,0,[good, no automatic import will be done])
+    fi
+])
+
+
 # SEPARATE_VIRTUAL_INTERPS (--enable-virtual-interps-separation)
 # Virtual hosts get their own interpreter and configuration. Different
 # applications running on different virtual hosts don't mix up variables
@@ -604,7 +628,14 @@ HONOR_HEAD_REQUESTS
 VIRTUAL_INTERPS_SEPARATION
 POST_MAX_SIZE
 UPLOAD_TO_VAR
-RIVET_COMMANDS_EXPORT
+IMPORT_RIVET_COMMANDS
+if test $import_rivet_commands = "yes"; then
+    AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
+    AC_DEFINE(NAMESPACE_EXPORT,1,[commands will be exported])
+else
+    RIVET_COMMANDS_EXPORT
+fi
+
 AC_SUBST(apache_version_dir)
 AC_SUBST(MOD_RIVET_INCLUDES)
 

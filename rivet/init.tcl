@@ -132,13 +132,15 @@ namespace eval ::Rivet {
         ## standalone by mkPkgindex during the installation phase. We have to make sure the
         ## procedure won't fail in this case, so we check for the existence of the variable.
 
-            if {[info exists ::rivet::export_namespace_commands] && $::rivet::export_namespace_commands} {
+            if {[info exists module_conf(export_namespace_commands)] && \
+                 $module_conf(export_namespace_commands)} {
+
                 apache_log_error debug "exporting ::rivet commands"
-                eval namespace export $::rivet::export_list
+                eval namespace export $export_list
+
             } else {
                 apache_log_error debug "::rivet commands won't be exported"
             }
-
         }
         ## Add the packages directory to the auto_path.
         ## If we have a packages$tcl_version directory
@@ -188,4 +190,7 @@ interp alias {} ::incr0 {} incr
 # to be loaded separately and in case a 'namespace import ::rivet::*'
 # reissued. 
 
-# namespace import -force ::rivet::*
+if {[info exists module_conf(import_rivet_commands)] && $module_conf(import_rivet_commands)} {
+    namespace import -force ::rivet::*
+}
+

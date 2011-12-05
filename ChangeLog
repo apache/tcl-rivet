@@ -1,3 +1,13 @@
+2011-12-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: child init sets also the array module_conf to signal the
+    compilation flags --enable-rivet-commands-export and --enable-import-namespace-commands
+    for the benefit of init.tcl
+    * configure.ac: new macro created to handle --enable-rivet-commands-export and 
+    --enable-import-namespace-commands
+    * rivet/init.tcl: module_conf signals when commands have to be exported from ::rivet
+    and when they have to be implicitly imported into the global namespace for compatibility
+    with previous versions of Rivet.
+
 2011-11-21 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/directives.xml,doc/xml/commands.xml: removed note about 'rivetlib' package
     no more needed. Notes about ServerInitScript not having effect when virtual hosts
