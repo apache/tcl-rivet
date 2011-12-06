@@ -1,4 +1,7 @@
 2011-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * configure_ac: add new test on Tcl version using AX_VERSION_COMPARE.
+
+2011-12-06 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/request.xml,doc/xml/install.xml: documenting new configure switches
 
 2011-12-05 Massimo Manghi <mxmanghi@apache.org>

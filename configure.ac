@@ -365,7 +365,25 @@ AC_DEFUN([APR_HANDLING],[
     fi
 ])
 
-# apache version
+
+#--------------------------------------------------------------------
+# 6-Dec-2011: Introducing new ::rivet namespace. Some components 
+# (namely RivetTcl, providing Tcl level initialization) are required 
+# within mod_rivet.c. Unfortunalely Tcl < 8.5.10 loaded shared
+# libs exporting names that clashed with Apache's own namespace and, 
+# hence we have to make sure we are running a Tcl compatible version.
+# (See bug #3216070). If you're running Tcl < 8.5.10 we won't go any
+# further ahead...
+
+AX_COMPARE_VERSION([$TCL_VERSION$TCL_PATCH_LEVEL],[lt],[8.5.10],[
+    AC_MSG_ERROR([Rivet 2.1 requires Tcl > 8.5.10 (current is $TCL_VERSION$TCL_PATCH_LEVEL)])
+] , [
+    AC_MSG_NOTICE([ok, we are running Tcl $TCL_VERSION$TCL_PATCH_LEVEL])
+])
+
+
+
+# APACHE_VERSION
 #
 # let's determine whether we are building for apache1.x or apache2.x.
 # This variable has consequences on the default values for the remaining 
@@ -381,7 +399,7 @@ AC_DEFUN([APACHE_VERSION],[
 
     AC_MSG_CHECKING(for apache version)
     if test "$with_apache_version" = "1"; then
-        AC_MSG_ERROR([Apache 1.x no more supported])
+        AC_MSG_ERROR([Apache 1.x no more supported starting with Rivet 2.1])
     else
         AC_MSG_RESULT( building for apache 2.x )
         AC_CONFIG_FILES([src/apache-2/Makefile])

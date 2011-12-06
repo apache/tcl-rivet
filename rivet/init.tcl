@@ -185,12 +185,13 @@ interp alias {} ::incr0 {} incr
 ## Some commands (namely lassign) replace the native lassign command
 ## so we have to  use the -force switch
 
-# Do we actually want to import everything? Since we cannot safely
-# require package rivetlib (see bug #3216070) those commands have
-# to be loaded separately and in case a 'namespace import ::rivet::*'
-# reissued. 
+# Do we actually want to import everything? If Rivet was configured
+# to import the ::rivet namespace for compatibility we do it right away.
+# This option is not guaranteed to be supported in future versions.
 
 if {[info exists module_conf(import_rivet_commands)] && $module_conf(import_rivet_commands)} {
     namespace import -force ::rivet::*
 }
+
+array unset module_conf
 
