@@ -1,4 +1,9 @@
 2011-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/tablearray.tcl: new procedure 'tablearray' prints an array content
+    in an HTML <table> construct. Test procedure, we maybe want to have something more
+    general for printing also dictionaries.
+
+2011-12-06 Massimo Manghi <mxmanghi@apache.org>
     * configure_ac: add new test on Tcl version using AX_VERSION_COMPARE.
 
 2011-12-06 Massimo Manghi <mxmanghi@apache.org>
