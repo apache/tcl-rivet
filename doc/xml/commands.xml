@@ -193,14 +193,14 @@
 		    <varlistentry>
 			<term>
 			    <cmdsynopsis>
-				<command>apache_table</command>
+				<command>::rivet::apache_table</command>
 				<arg choice="plain">set</arg>
 				<arg><replaceable>tablename</replaceable></arg>
 				<arg><replaceable>key</replaceable></arg>
 				<arg><replaceable>value</replaceable></arg>
 			    </cmdsynopsis>
 			    <cmdsynopsis>
-				<command>apache_table</command>
+				<command>::rivet::apache_table</command>
 				<arg choice="plain">set</arg>
 				<arg><replaceable>tablename</replaceable></arg>
 				<arg><replaceable>list</replaceable></arg>
