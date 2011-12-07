@@ -1,60 +1,60 @@
-&lt;?
+&amp;lt;?
 set errlist {}
-if { [var exists title] } {
-    set title [var get title]
+if { [::rivet::var exists title] } {
+    set title [::rivet::var get title]
 } else {
     set errlist &quot;You need to enter a title&quot;
 }
 
-if { [var exists salary] } {
-    set salary [var get salary]
+if { [::rivet::var exists salary] } {
+    set salary [::rivet::var get salary]
     if { ! [string is digit $salary] } {
-	lappend errlist &quot;Salary must be a number&quot;
+    lappend errlist &quot;Salary must be a number&quot;
     }
 } else {
     lappend errlist &quot;You need to enter a salary&quot;
 }
 
-if { [var exists boss] } {
-    set boss [var get boss]
+if { [::rivet::var exists boss] } {
+    set boss [::rivet::var get boss]
 } else {
     set boss &quot;Mr. Burns&quot;
 }
 
-if { [var exists skills] } {
-    set skills [var list skills]
+if { [::rivet::var exists skills] } {
+    set skills [::rivet::var list skills]
 } else {
     lappend errlist &quot;You need to enter some skills&quot;
 }
 
 if { [llength $errlist] != 0 } {
     foreach err $errlist {
-	puts &quot;&lt;b&gt; $err &lt;/b&gt;&quot;
+        puts &quot;&amp;lt;b&amp;gt; $err &amp;lt;/b&amp;gt;&quot;
     }
 } else {
     puts &quot;Thanks for the information!&quot;
-    ?&gt;
-    &lt;table&gt;
-      &lt;tbody&gt;
-	&lt;tr&gt;
-	  &lt;td&gt;&lt;b&gt;Title:&lt;/b&gt;&lt;/td&gt;
-	  &lt;td&gt;&lt;? puts $title ?&gt;&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-	  &lt;td&gt;&lt;b&gt;Boss:&lt;/b&gt;&lt;/td&gt;
-	  &lt;td&gt;&lt;? puts $boss ?&gt;&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-	  &lt;td&gt;&lt;b&gt;Salary:&lt;/b&gt;&lt;/td&gt;
-	  &lt;td&gt;&lt;? puts $salary ?&gt;&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-	  &lt;td&gt;&lt;b&gt;Skills:&lt;/b&gt;&lt;/td&gt;
-	  &lt;td&gt;&lt;? puts $skills ?&gt;&lt;/td&gt;
-	&lt;/tr&gt;
-      &lt;/tbody&gt;
-    &lt;/table&gt;
-    &lt;?
+    ?&amp;gt;
+    &amp;lt;table&amp;gt;
+      &amp;lt;tbody&amp;gt;
+    &amp;lt;tr&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;b&amp;gt;Title:&amp;lt;/b&amp;gt;&amp;lt;/td&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;? puts $title ?&amp;gt;&amp;lt;/td&amp;gt;
+    &amp;lt;/tr&amp;gt;
+    &amp;lt;tr&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;b&amp;gt;Boss:&amp;lt;/b&amp;gt;&amp;lt;/td&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;? puts $boss ?&amp;gt;&amp;lt;/td&amp;gt;
+    &amp;lt;/tr&amp;gt;
+    &amp;lt;tr&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;b&amp;gt;Salary:&amp;lt;/b&amp;gt;&amp;lt;/td&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;? puts $salary ?&amp;gt;&amp;lt;/td&amp;gt;
+    &amp;lt;/tr&amp;gt;
+    &amp;lt;tr&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;b&amp;gt;Skills:&amp;lt;/b&amp;gt;&amp;lt;/td&amp;gt;
+      &amp;lt;td&amp;gt;&amp;lt;? puts $skills ?&amp;gt;&amp;lt;/td&amp;gt;
+    &amp;lt;/tr&amp;gt;
+      &amp;lt;/tbody&amp;gt;
+    &amp;lt;/table&amp;gt;
+    &amp;lt;?
 }
-?&gt;
+?&amp;gt;
 

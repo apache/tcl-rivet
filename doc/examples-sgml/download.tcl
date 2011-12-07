@@ -1,7 +1,7 @@
 # Code example for the transmission of a pdf file. 
 
-if {[var exists pdfname]} {
-    set pdfname [var get pdfname]
+if {[::rivet::var exists pdfname]} {
+    set pdfname [::rivet::var get pdfname]
 
 # let&#39;s build the full path to the pdf file. The &#39;pdf_repository&#39;
 # directory must be readable by the apache children
@@ -14,9 +14,9 @@ if {[var exists pdfname]} {
 # original one. In this case, this is the point where a new file name
 # must be generated.
 
-	headers type			        &quot;application/pdf&quot;
-	headers add Content-Disposition &quot;attachment; filename=${pdfname}.pdf&quot;
-	headers add Content-Description &quot;PDF Document&quot;
+        ::rivet::headers type                       &quot;application/pdf&quot;
+        ::rivet::headers add Content-Disposition    &quot;attachment; filename=${pdfname}.pdf&quot;
+        ::rivet::headers add Content-Description    &quot;PDF Document&quot;
 
 # The pdf is read and stored in a Tcl variable. The file handle is
 # configured for a binary read: we are just shipping raw data to a
@@ -24,21 +24,21 @@ if {[var exists pdfname]} {
 # that is able to retrieve the data to be sent from any data source
 # (e.g. database, external program, other Tcl code)
 
-	set paper	    [open $pdf_full_path r]
-	fconfigure	    $paper -translation binary
-	set pdf		    [read $paper]
-	close $paper
+        set paper       [open $pdf_full_path r]
+        fconfigure      $paper -translation binary
+        set pdf         [read $paper]
+        close $paper
 
 # Now we got the data: let&#39;s tell the client how many bytes we are
 # about to send (useful for the download progress bar of a dialog box)
 
-	headers add Content-Length  [string length $pdf]
+        ::rivet::headers add Content-Length  [string length $pdf]
 
 # Let&#39;s send the actual file content
 
-	puts $pdf
+        puts $pdf
     } else {
-	source pdf_not_found_error.rvt
+        source pdf_not_found_error.rvt
     }
 } else {
     source parameter_not_defined_error.rvt

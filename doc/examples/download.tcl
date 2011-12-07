@@ -1,7 +1,7 @@
 # Code example for the transmission of a pdf file. 
 
 if {[::rivet::var exists pdfname]} {
-    set pdfname [var get pdfname]
+    set pdfname [::rivet::var get pdfname]
 
 # let's build the full path to the pdf file. The 'pdf_repository'
 # directory must be readable by the apache children

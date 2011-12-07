@@ -340,14 +340,14 @@
 
 	    <varlistentry>
 	      <term>
-		    <cmdsynopsis>
+		     <cmdsynopsis>
 		       <arg choice="plain">SeparateVirtualInterps</arg>
 		       <group choice="req">
 		          <arg>yes</arg>
 		          <arg>no</arg>
 		       </group>
-		       </cmdsynopsis>
-		   </term>
+		     </cmdsynopsis>
+		  </term>
 	      <listitem>
       		<para>
       		  If on, Rivet will create a separate Tcl interpreter
@@ -356,10 +356,16 @@
       		  clients into separate interpreters, so that they
       		  don't accidentally interfere with one another.
       		</para>
-   		   <para>
-   		     This option is, by nature, only available at the
-   		     global level.
-   		   </para>
+   		    <note>
+   		      This option is, by nature, only available at the
+   		      global level. By enabling <command>SeparateVirtualInterps</command>
+   		      you must rely only on <command>ChildInitScript</command> to
+   		      initialize the interpreters. Don't expect the 
+   		      initialization done in <command>ServerInitScript</command> and 
+   		      <command>GlobalInitScript</command> to be handed down to the
+   		      slave interpreters that are private to each configured 
+   		      virtual host.
+   		   </note>
 	      </listitem>
 	    </varlistentry>
 

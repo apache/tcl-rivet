@@ -1,7 +1,7 @@
-# convert_examples --
+# convert_examples.tcl --
 #
 #
-# reads the examples dir, checks if a file had been already converted
+# reads the examples dir, checks if a file has been already converted
 # in <target-dir> and compares their mtimes. If the file in
 # <source-dir> is more recent the target dir is recreated.
 
@@ -9,20 +9,20 @@
 # into text suitable to be inclued and displayed in XML/XHTML 
 # documentation
 
-# NOTICE: This script requires Rivet the rivet scripts and
-# libraries in the auto_path.
+# NOTICE: This script requires Rivet, its scripts and
+# libraries to be in the auto_path.
 
 # usage:
 #
 # tclsh ./convert_examples
 #
-# $Id: $
+# $Id$
 #
 
 lappend auto_path @RIVET_TCL_TARGET@
 lappend auto_path [file join @RIVET_TCL_TARGET@ rivet-tcl]
 
-package require Rivet
+package require rivetlib
 
 set source_dir examples
 set target_dir examples-sgml
@@ -44,12 +44,11 @@ foreach example $source_examples {
 
         puts "$example needs rebuild"
         
-        set example_text [read_file $example]
+        set example_text [::rivet::read_file $example]
 
         set example_sgml_fid [open $example_sgml w+]
-        puts $example_sgml_fid [escape_sgml_chars $example_text]
+        puts $example_sgml_fid [::rivet::escape_sgml_chars $example_text]
         close $example_sgml_fid
-
     }
 
 }

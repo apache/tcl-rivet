@@ -1,6 +1,0 @@
-&lt;?
-upload save MyUpload /tmp/uploadfiles/file1
-puts &quot;Saved file [upload filename MyUpload] \
-	([upload size MyUpload] bytes) to server&quot;
-?&gt;
-
