@@ -1,0 +1,6 @@
+&lt;?
+::rivet::upload save MyUpload /tmp/uploadfiles/file1
+puts &quot;Saved file [::rivet::upload filename MyUpload] \
+	([::rivet::upload size MyUpload] bytes) to server&quot;
+?&gt;
+

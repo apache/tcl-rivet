@@ -146,14 +146,6 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
                </listitem>
             </varlistentry>
             <varlistentry>
-                <term>--with-rivet-target-dir=DIR</term>
-               <listitem>
-                    <para>
-                    This option tells the install script where Rivet's Tcl packages have to be copied. 
-                    </para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
                 <term>--with-upload-dir=DIR (default: '/tmp')</term>
                 <listitem>
                     <para>

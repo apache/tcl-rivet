@@ -27,40 +27,40 @@ set composers [dict create  \
 # we use the 'load' argument in order to determine the type of query
 #
 # load=catalog:         we have to return a list of the names in the database
-# load=composer&amp;res_id=&lt;id&gt;: the script is supposed to return the record
-#               having &lt;id&gt; as record id
+# load=composer&amp;res_id=<id>: the script is supposed to return the record
+#               having <id> as record id
 
 if {[::rivet::var exists load]} {
 
 # the xml declaration is common to every message (error messages included)
 
-    set xml "&lt;?xml version=\"1.0\" encoding=\"ISO-8859-1\"?&gt;\n"
+    set xml "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"
     switch [::rivet::var get load] {
         catalog {
-            append xml "&lt;catalog&gt;\n"
+            append xml "<catalog>\n"
             foreach nm [dict keys $composers] {
                 set first_name  [dict get $composers $nm first_name]
                 set middle_name [dict get $composers $nm middle_name]
                 set last_name   [dict get $composers $nm last_name]
-                append xml "    &lt;composer key=\"$nm\"&gt;$first_name "
-                if {[string length [string trim $middle_name]] &gt; 0} {
+                append xml "    <composer key=\"$nm\">$first_name "
+                if {[string length [string trim $middle_name]] > 0} {
                     append xml "$middle_name "
                 }
-                append xml "$last_name&lt;/composer&gt;\n"
+                append xml "$last_name</composer>\n"
             }
-            append xml "&lt;/catalog&gt;\n"
+            append xml "</catalog>\n"
         }
         composer {
-            append xml "&lt;composer&gt;\n"
+            append xml "<composer>\n"
             if {[::rivet::var exists rec_id]} {
                 set rec_id [::rivet::var get rec_id]
                 if {[dict exists $composers $rec_id]} {
                     foreach {k v} [dict get $composers $rec_id] {
-                        append xml "&lt;$k&gt;$v&lt;/$k&gt;\n"
+                        append xml "<$k>$v</$k>\n"
                     }
                 }
             }
-            append xml "&lt;/composer&gt;\n"
+            append xml "</composer>\n"
         }
     }
 

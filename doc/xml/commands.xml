@@ -998,7 +998,7 @@ bxxb ccxxxxcc</programlisting>
 		  </itemizedlist>
 		</para>
 		<para>
-		    Example of absolute path: <programlisting>makeurl /tclp.gif</programlisting> returns
+		    Example of absolute path: <programlisting>::rivet::makeurl /tclp.gif</programlisting> returns
 		    <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
 		    where hostname and port are the hostname and port of the
 		    server in question.

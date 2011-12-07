@@ -27,40 +27,40 @@ set composers [dict create  \
 # we use the &#39;load&#39; argument in order to determine the type of query
 #
 # load=catalog:         we have to return a list of the names in the database
-# load=composer&amp;amp;res_id=&amp;lt;id&amp;gt;: the script is supposed to return the record
-#               having &amp;lt;id&amp;gt; as record id
+# load=composer&amp;amp;res_id=&lt;id&gt;: the script is supposed to return the record
+#               having &lt;id&gt; as record id
 
 if {[::rivet::var exists load]} {
 
 # the xml declaration is common to every message (error messages included)
 
-    set xml &quot;&amp;lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;ISO-8859-1\&quot;?&amp;gt;\n&quot;
+    set xml &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;ISO-8859-1\&quot;?&gt;\n&quot;
     switch [::rivet::var get load] {
         catalog {
-            append xml &quot;&amp;lt;catalog&amp;gt;\n&quot;
+            append xml &quot;&lt;catalog&gt;\n&quot;
             foreach nm [dict keys $composers] {
                 set first_name  [dict get $composers $nm first_name]
                 set middle_name [dict get $composers $nm middle_name]
                 set last_name   [dict get $composers $nm last_name]
-                append xml &quot;    &amp;lt;composer key=\&quot;$nm\&quot;&amp;gt;$first_name &quot;
-                if {[string length [string trim $middle_name]] &amp;gt; 0} {
+                append xml &quot;    &lt;composer key=\&quot;$nm\&quot;&gt;$first_name &quot;
+                if {[string length [string trim $middle_name]] &gt; 0} {
                     append xml &quot;$middle_name &quot;
                 }
-                append xml &quot;$last_name&amp;lt;/composer&amp;gt;\n&quot;
+                append xml &quot;$last_name&lt;/composer&gt;\n&quot;
             }
-            append xml &quot;&amp;lt;/catalog&amp;gt;\n&quot;
+            append xml &quot;&lt;/catalog&gt;\n&quot;
         }
         composer {
-            append xml &quot;&amp;lt;composer&amp;gt;\n&quot;
+            append xml &quot;&lt;composer&gt;\n&quot;
             if {[::rivet::var exists rec_id]} {
                 set rec_id [::rivet::var get rec_id]
                 if {[dict exists $composers $rec_id]} {
                     foreach {k v} [dict get $composers $rec_id] {
-                        append xml &quot;&amp;lt;$k&amp;gt;$v&amp;lt;/$k&amp;gt;\n&quot;
+                        append xml &quot;&lt;$k&gt;$v&lt;/$k&gt;\n&quot;
                     }
                 }
             }
-            append xml &quot;&amp;lt;/composer&amp;gt;\n&quot;
+            append xml &quot;&lt;/composer&gt;\n&quot;
         }
     }
 

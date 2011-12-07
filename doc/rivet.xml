@@ -2,29 +2,29 @@
 
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd" [
-    <!ENTITY hello.rvt		   SYSTEM	"examples-sgml/hello.rvt" >
-    <!ENTITY table.rvt		   SYSTEM  	"examples-sgml/table.rvt" >
-    <!ENTITY vars.html		   SYSTEM  	"examples-sgml/vars.html" >
-    <!ENTITY vars.rvt		   SYSTEM	"examples-sgml/vars.rvt" >
-    <!ENTITY upload.html	   SYSTEM	"examples-sgml/upload.html" >
-    <!ENTITY upload.rvt		   SYSTEM	"examples-sgml/upload.rvt" >
-    <!ENTITY download.tcl	   SYSTEM	"examples-sgml/download.tcl" >
+    <!ENTITY hello.rvt		        SYSTEM	"examples-sgml/hello.rvt" >
+    <!ENTITY table.rvt		        SYSTEM  "examples-sgml/table.rvt" >
+    <!ENTITY vars.html		        SYSTEM  "examples-sgml/vars.html" >
+    <!ENTITY vars.rvt		        SYSTEM	"examples-sgml/vars.rvt" >
+    <!ENTITY upload.html	        SYSTEM	"examples-sgml/upload.html" >
+    <!ENTITY upload.rvt		        SYSTEM	"examples-sgml/upload.rvt" >
+    <!ENTITY download.tcl	        SYSTEM	"examples-sgml/download.tcl" >
     <!ENTITY rivet_web_service.tcl  SYSTEM  "examples-sgml/rivet_web_service.tcl" >
-    <!ENTITY intro.xml		   SYSTEM  	"xml/intro.xml" >
-    <!ENTITY install.xml	   SYSTEM  	"xml/install.xml" >
-    <!ENTITY directives.xml	SYSTEM  	"xml/directives.xml" >
-    <!ENTITY commands.xml	   SYSTEM  	"xml/commands.xml" >
-    <!ENTITY examples.xml     SYSTEM   "xml/examples.xml" >
-    <!ENTITY packages.xml	   SYSTEM   "xml/packages.xml" >
-    <!ENTITY dio.xml		    	SYSTEM  	"xml/dio.xml" >
-    <!ENTITY diodisplay.xml	SYSTEM  	"xml/diodisplay.xml" >
-    <!ENTITY session.xml	   SYSTEM  	"xml/session.xml" >
-    <!ENTITY form.xml		   SYSTEM  	"xml/form.xml" >
-    <!ENTITY calendar.xml	   SYSTEM  	"xml/calendar.xml" >
-    <!ENTITY help.xml		   SYSTEM  	"xml/help.xml" >
-    <!ENTITY internals.xml	   SYSTEM  	"xml/internals.xml" >
-    <!ENTITY upgrade.xml	   SYSTEM  	"xml/upgrade.xml" >
-    <!ENTITY request.xml	 	SYSTEM	"xml/request.xml" >
+    <!ENTITY intro.xml		        SYSTEM  "xml/intro.xml" >
+    <!ENTITY install.xml	        SYSTEM  "xml/install.xml" >
+    <!ENTITY directives.xml	        SYSTEM  "xml/directives.xml" >
+    <!ENTITY commands.xml           SYSTEM  "xml/commands.xml" >
+    <!ENTITY examples.xml           SYSTEM  "xml/examples.xml" >
+    <!ENTITY packages.xml           SYSTEM  "xml/packages.xml" >
+    <!ENTITY dio.xml                SYSTEM  "xml/dio.xml" >
+    <!ENTITY diodisplay.xml         SYSTEM  "xml/diodisplay.xml" >
+    <!ENTITY session.xml            SYSTEM  "xml/session.xml" >
+    <!ENTITY form.xml               SYSTEM  "xml/form.xml" >
+    <!ENTITY calendar.xml           SYSTEM  "xml/calendar.xml" >
+    <!ENTITY help.xml               SYSTEM  "xml/help.xml" >
+    <!ENTITY internals.xml          SYSTEM  "xml/internals.xml" >
+    <!ENTITY upgrade.xml            SYSTEM  "xml/upgrade.xml" >
+    <!ENTITY request.xml            SYSTEM  "xml/request.xml" >
 ]>
 
 <!--

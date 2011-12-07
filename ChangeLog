@@ -1,6 +1,8 @@
 2011-12-07 Massimo Manghi <mxmanghi@apache.org>
     * doc/examples, doc/convert_examples.tcl.in: Add ::rivet namespace to examples and
     examples code converter
+    * doc/examples/*.rvt: removed unneeded sgml chars escaping
+    * doc/xml/install.xml: removed duplicated entry of a 'configure' switch
 
 2011-12-06 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/tablearray.tcl: new procedure 'tablearray' prints an array content
