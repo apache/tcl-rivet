@@ -4,18 +4,29 @@
     <simplesect>
     	<title>Apache Child Process Lifecycle</title>
 	    <para>
-	    	Apache responds to HTTP requests through child processes spawned at 
-	    	start up. The number of child processes that have to be initially created
+			At startup Apache spawns child processes which are to become the real
+			agents responding to incoming HTTP requests.
+
+	    	The number of child processes that have to be initially created
 	    	can be controlled in the configuration and the optimum choice
 	    	for this numbers basically depends on the webserver workload and on the 
 	    	available system resources. See
 	    	<ulink url="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">Apache
 	    	documentation</ulink> for further reading about this crucial point. 
-	    	Each of the child process is set up to respond to requests
-	    	that will come from the network accordingly to the configuration 
-	    	parameters. If your webserver has been properly configured you will have Tcl 
-	    	scripts executed (Rivet templates go through a parsing stage before execution).
-	    	Your web applications will be doing much of their work doing this job of
+	    	 If your webserver has been properly configured you will have Tcl 
+	    	scripts executed (Rivet templates go through a parsing stage before execution)
+	    	when tcl or rvt files are referenced in one of these cases
+	    	<itemizedlist>
+	    		<listitem>The script is explicitly referenced in the URL. E.g.:
+	    		<programlisting>http://&lt;myserver&gt;/&lt;path-to-script&gt;/&lt;script&gt;.tcl</programlisting></listitem>
+	    		<listitem>The script is implicitly referenced by rewriting the URL. See:
+		<ulink url="http://httpd.apache.org/docs/current/mod/mod_rewrite.html">mod_rewrite</ulink> 
+				documentation</listitem>
+	    		<listitem>The script is implicitly referenced by 
+	<ulink url="http://httpd.apache.org/docs/2.0/mod/mod_alias.html">redirecting or
+	    			aliasing</ulink> the URL to the real script</listitem>
+	    	</itemizedlist>
+	    	Your web applications will be doing much of their work doing this work of
 	    	responding to requests and creating content to be sent back to a client.
 	    </para>
 	    <para>
@@ -38,8 +49,13 @@
 		    		creation of private data. Example of tasks that can be done
 		    		in this context are importing namespace commands and loading packages
 		    		providing code of general interest for every application to
-		    		be served.
+		    		be served. 
 	    		</para>
+	    		<para>
+	    			<note>
+	    				<command>ServerInitScript</command> has effect for child processes when 
+		    			<command>SeparateVirtualInterps</command> is off</note>
+		    	</para>
 	    	</listitem>
 	    	<listitem>
 	    		<bridgehead>Child Process Initialization</bridgehead>
@@ -59,7 +75,7 @@
 	    			When <command>SeparateVirtualInterps</command> is turned on 
 	    			each configured virtual host will have its own slave interpreter.
 	    			<command>ChildInitScript</command> is the directive to be
-	    			placed within a &lt;VirtualHost ...&gt; ... &lt;/VirtualHost ...&gt;
+	    			placed within a &lt;VirtualHost...&gt;...&lt;/VirtualHost ...&gt;
 	    			stanza to have a special initialization of an interpreter bound to
 	    			a certain virtual host. This scenario of interpreter 
 	    			separation is extremely useful to
@@ -67,8 +83,10 @@
 	    			serving different web applications. 
 	    		</para>
 	    		<para>
-	    			<command>GlobalInitScript</command> has no effect to working interpreters
-	    			when <command>SeparateVirtualInterps</command> is set.
+	    			<note>
+	    				<command>GlobalInitScript</command> has no effect to working interpreters
+	    				when <command>SeparateVirtualInterps</command> is set.
+	    			</note>
 	    		</para>
 	    	</listitem>
 	    	<listitem>

@@ -19,54 +19,128 @@
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <rivet_config.h>
 #endif
-
 
 #include <tcl.h>
 #include "rivet.h"
+#include "mod_rivet.h"
 
-
 /*-----------------------------------------------------------------------------
- * Rivet_Init --
+ * Rivet_GetNamespace --
+ *
+ *   Get the rivet namespace pointer. The procedure attempts to retrieve a
+ *  pointer to the Tcl_Namespace structure for the ::rivet namespace. This
+ *  pointer is stored in the interpreter's associated data (pointing to a
+ *  rivet_interp_globals structure) if the interpreter is passed by mod_rivet.
+ *  Otherwise a new ::rivet namespace is created and its Tcl_Namespace
+ *  pointer is returned 
+ *
+ * Parameters:
+ *
+ *   o interp - Interpreter to add commands to.
+ *
+ * Returned value:
+ *
+ *   o rivet_ns - Tcl_Namespace* pointer to the RIVET_NS (::rivet) namespace
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+#if RIVET_NAMESPACE_EXPORT == 1
+
+static Tcl_Namespace* 
+Rivet_GetNamespace( Tcl_Interp* interp)
+{
+    rivet_interp_globals *globals; 
+    Tcl_Namespace *rivet_ns;
+
+    globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    if (globals != NULL)
+    {
+        rivet_ns = globals->rivet_ns;
+    }
+    else
+    {
+//      fprintf(stderr,"no Associated data found, running standalone\n");
+        rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,(Tcl_NamespaceDeleteProc *)NULL);
+    }
+
+    return rivet_ns;
+}
+#endif
+
+/*-----------------------------------------------------------------------------
+ * Rivetlib_Init --
+ *
  *   Install the commands provided by librivet into an interpreter.
  *
  * Parameters:
+ *
  *   o interp - Interpreter to add commands to.
+ *
  *-----------------------------------------------------------------------------
  */
 int
-Rivet_Init( Tcl_Interp *interp )
+Rivetlib_Init( Tcl_Interp *interp )
 {
-    Rivet_InitList( interp );
+#if RIVET_NAMESPACE_EXPORT == 1
+    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);; 
+#endif
 
-    Rivet_InitCrypt( interp );
+#ifdef USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+#else
+	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
+#endif    
+	    return TCL_ERROR;
+    }
 
-    Rivet_InitWWW( interp );
+    Rivet_InitList (interp);
+    Rivet_InitCrypt(interp);
+    Rivet_InitWWW  (interp);
 
-    return Tcl_PkgProvide( interp, "Rivet", "1.1" );
+#if RIVET_NAMESPACE_EXPORT == 1
+    Tcl_Export(interp,rivet_ns,"*",0);
+#endif
+    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
 }
 
 
 /*-----------------------------------------------------------------------------
- * Rivet_SafeInit --
+ * Rivetlib_SafeInit --
  *   Install the commands provided by librivet that are believed to be
  *   safe for use in safe interpreters, into a safe interpreter.
  *
  * Parameters:
+ *
  *   o interp - Interpreter to add commands to.
+ *
  *-----------------------------------------------------------------------------
  */
+
 int
-Rivet_SafeInit( Tcl_Interp *interp )
+Rivetlib_SafeInit( Tcl_Interp *interp )
 {
-    Rivet_InitList( interp );
+#if RIVET_NAMESPACE_EXPORT == 1
+    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
+#endif
 
-    Rivet_InitCrypt( interp );
+#ifdef USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+#else
+	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
+#endif    
+	    return TCL_ERROR;
+    }
 
-    Rivet_InitWWW( interp );
+    Rivet_InitList(interp);
+    Rivet_InitCrypt(interp);
+    Rivet_InitWWW(interp);
 
-    return Tcl_PkgProvide( interp, "Rivet", "1.1" );
+#if RIVET_NAMESPACE_EXPORT == 1
+    Tcl_Export(interp,rivet_ns,"*",0);
+#endif
+    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
 }
-
 

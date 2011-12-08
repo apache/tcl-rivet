@@ -26,7 +26,7 @@ INCLUDES = -I@apache_include@
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
 lib_libexecdir = @RIVET_TCL_TARGET@
-lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
+lib_libexec_LTLIBRARIES = librivetlib.la librivetparser.la
 
 #
 # Apache Rivet Module, mod_rivet.so / mod_rivet.dll
@@ -50,19 +50,19 @@ lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
 #
 # Rivet Library
 #
-librivet_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
-librivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
-librivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
-librivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+librivetlib_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
+librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
+librivetlib_la_LIBADD =  @APXS_LIBS@
+librivetlib_la_CPPFLAGS = @MOD_RIVET_INCLUDES@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS=1
 
 #
 # Rivet Parser Library
 #
 librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
-librivetparser_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
-librivetparser_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
-librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
-
+librivetparser_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
+librivetparser_la_LIBADD = @APXS_LIBS@
+librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS=1
+ 
 SUBDIRS = @apache_version_dir@
 
 # Removing libtool .la files from installation

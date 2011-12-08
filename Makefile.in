@@ -51,10 +51,10 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	tclconfig/config.sub tclconfig/depcomp tclconfig/install-sh \
 	tclconfig/ltmain.sh tclconfig/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/tclconfig/tcl.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compare_version.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/acinclude.m4 $(top_srcdir)/tclconfig/tcl.m4 \
 	$(top_srcdir)/tclconfig/libtool.m4 \
 	$(top_srcdir)/m4/ax_prefix_config_h.m4 \
 	$(top_srcdir)/configure.ac
@@ -188,6 +188,7 @@ MANIFEST_TOOL = @MANIFEST_TOOL@
 MATH_LIBS = @MATH_LIBS@
 MAX_POST = @MAX_POST@
 MKDIR_P = @MKDIR_P@
+MOD_RIVET_INCLUDES = @MOD_RIVET_INCLUDES@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@

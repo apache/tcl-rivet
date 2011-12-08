@@ -1,15 +1,13 @@
-Virtual Host1 Test
-
 <?
-set ::vhost1 1
-puts "vhost1 hello world<br>"
+if {[info exists ::childinit1]} {
+    puts "vhost1 hello world<br>"
+	puts "::childinit1 exists<br>"
 
-foreach var {
-    childinit1 childinit2 vhost1 vhost2
-} {
-    if { [info exists ::$var] } {
-	puts "$var exists<br>"
-    }
+} elseif {[info exists ::beforescript1]} {
+    ?>Virtual Host1 Test<?
+} 
+if {[info exists ::childinit2]} {
+	puts "::childinit2 exists<br>"
+
 }
-
 ?>

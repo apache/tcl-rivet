@@ -4,10 +4,10 @@ set testfilename1 broken.rvt
 
 ::tcltest::test broken-1.1 {error page test} {
     apachetest::start {} {} {
-	catch {
-	    set page [::http::geturl "${urlbase}$testfilename1"]
-	    set match [string trim [::http::data $page]]
-	}
+        catch {
+            set page [::http::geturl "${urlbase}$testfilename1"]
+            set match [string trim [::http::data $page]]
+        }
     }
     set match
 } {<PRE>
@@ -19,7 +19,7 @@ set testfilename1 broken.rvt
 "namespace eval request {
 puts -nonewline ""
 
-# non-existant command
+# non-existent command
 broken
 
 puts -nonewline "
@@ -30,7 +30,7 @@ puts -nonewline "
 namespace eval request {
 puts -nonewline ""
 
-# non-existant command
+# non-existent command
 broken
 
 puts -nonewline "

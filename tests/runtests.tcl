@@ -50,9 +50,9 @@ package require apachetest
 
 if { [encoding system] eq "utf-8" } {
     puts stderr {
-	System encoding is utf-8 - this is known to cause problems
-	with the test environment!  Continuing with tests in 5 seconds
-	using the iso8859-1 encoding.
+        System encoding is utf-8 - this is known to cause problems
+        with the test environment!  Continuing with tests in 5 seconds
+        using the iso8859-1 encoding.
     }
     after 5000
 }
@@ -68,11 +68,11 @@ if { [catch {
 if {$httpd_version == 1} {
 	apachetest::need_modules {
 		{mod_log_config		config_log_module}
-		{mod_mime		mime_module}
+		{mod_mime		    mime_module}
 		{mod_negotiation	negotiation_module}
-		{mod_dir		dir_module}
-		{mod_auth		auth_module}
-		{mod_access		access_module}
+		{mod_dir		    dir_module}
+		{mod_auth		    auth_module}
+		{mod_access		    access_module}
 	}
 } else {
 	apachetest::need_modules {
@@ -129,10 +129,10 @@ set env(TCLLIBPATH) [file normalize [file join [file dirname [info script]] rive
 
 switch -exact -- [lindex $argv 1] {
     startserver {
-	apachetest::startserver
+	    apachetest::startserver
     }
     default {
-	set argv [lrange $argv 1 end]
-	source [file join . rivet.test]
+        set argv [lrange $argv 1 end]
+        source [file join . rivet.test]
     }
 }

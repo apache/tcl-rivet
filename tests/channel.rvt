@@ -1,6 +1,6 @@
 HTML
 <?
-no_body
+::rivet::no_body
 puts "foo"
 ?>
 MORE HTML

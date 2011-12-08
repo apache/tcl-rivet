@@ -4,36 +4,36 @@ set testfilename1 post.rvt
 
 ::tcltest::test postvariables-1.1 {POST variables} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -query foobar=goober ]
-    regexp -line {^\[var get foobar\] = goober$} [ ::http::data $page ] match
+    regexp -line {^\[::rivet::var get foobar\] = goober$} [ ::http::data $page ] match
     set match
-} {[var get foobar] = goober}
+} {[::rivet::var get foobar] = goober}
 
 ::tcltest::test postvariables-2.1 {POST variables + I18N} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -query Más=Tú ]
-    regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
+    regexp -line {^\[::rivet::var get Más\] = Tú$} [ ::http::data $page ] match
     set match
-} {[var get Más] = Tú}
+} {[::rivet::var get Más] = Tú}
 
 ::tcltest::test postvariables-2.2 {POST variables + I18N + encoding} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -query [ ::http::formatQuery Más Tú ] ]
-    regexp -line {^\[var get Más\] = Tú$} [ ::http::data $page ] match
+    regexp -line {^\[::rivet::var get Más\] = Tú$} [ ::http::data $page ] match
     set match
-} {[var get Más] = Tú}
+} {[::rivet::var get Más] = Tú}
 
 ::tcltest::test postvariables-3.1 {POST multi-value variable} {
     set page [ ::http::geturl "${urlbase}get.rvt" -query [::http::formatQuery lstvar1 a lstvar1 b lstvar1 {c d}]]
-    regexp -line {\[var get lstvar1\] = a b c d$} [ ::http::data $page ] match
+    regexp -line {\[::rivet::var get lstvar1\] = a b c d$} [ ::http::data $page ] match
     set match
-} {[var get lstvar1] = a b c d}
+} {[::rivet::var get lstvar1] = a b c d}
 
 ::tcltest::test postvariables-3.2 {POST multi-value variable as list} {
     set page [ ::http::geturl "${urlbase}get.rvt" -query [::http::formatQuery lstvar2 a lstvar2 b lstvar2 {c d}]]
-    regexp -line {\[var list lstvar2\] = a b {c d}$} [ ::http::data $page ] match
+    regexp -line {\[::rivet::var list lstvar2\] = a b {c d}$} [ ::http::data $page ] match
     set match
-} {[var list lstvar2] = a b {c d}}
+} {[::rivet::var list lstvar2] = a b {c d}}
 
 ::tcltest::test postvariables-4.1 {var_post} {
     set page [ ::http::geturl "${urlbase}$testfilename1" -query foobar=goober ]
-    regexp -line {^\[var_post get foobar\] = goober$} [ ::http::data $page ] match
+    regexp -line {^\[::rivet::var_post get foobar\] = goober$} [ ::http::data $page ] match
     set match
-} {[var_post get foobar] = goober}
+} {[::rivet::var_post get foobar] = goober}

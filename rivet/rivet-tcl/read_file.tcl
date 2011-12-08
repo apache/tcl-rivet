@@ -8,9 +8,13 @@
 ##
 ###
 
-proc read_file {file} {
-    set fp [open $file]
-    set x [read $fp]
-    close $fp
-    return $x
+namespace eval ::rivet {
+
+    proc read_file {file} {
+        set fp [open $file]
+        set x [read $fp]
+        close $fp
+        return $x
+    }
+
 }

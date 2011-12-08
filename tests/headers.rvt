@@ -9,7 +9,7 @@
 
 <?
 
-load_headers hdrs
+::rivet::load_headers hdrs
 parray hdrs
 
 ?>
