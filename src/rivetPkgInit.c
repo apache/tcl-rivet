@@ -81,6 +81,7 @@ Rivet_GetNamespace( Tcl_Interp* interp)
  *
  *-----------------------------------------------------------------------------
  */
+
 int
 Rivetlib_Init( Tcl_Interp *interp )
 {
@@ -88,10 +89,10 @@ Rivetlib_Init( Tcl_Interp *interp )
     Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);; 
 #endif
 
-#ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+#ifdef RIVET_USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
 #else
-	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
+	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
 #endif    
 	    return TCL_ERROR;
     }
@@ -99,14 +100,13 @@ Rivetlib_Init( Tcl_Interp *interp )
     Rivet_InitList (interp);
     Rivet_InitCrypt(interp);
     Rivet_InitWWW  (interp);
-
 #if RIVET_NAMESPACE_EXPORT == 1
     Tcl_Export(interp,rivet_ns,"*",0);
 #endif
+
     return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
 }
 
-
 /*-----------------------------------------------------------------------------
  * Rivetlib_SafeInit --
  *   Install the commands provided by librivet that are believed to be
@@ -119,6 +119,7 @@ Rivetlib_Init( Tcl_Interp *interp )
  *-----------------------------------------------------------------------------
  */
 
+/*
 int
 Rivetlib_SafeInit( Tcl_Interp *interp )
 {
@@ -126,10 +127,10 @@ Rivetlib_SafeInit( Tcl_Interp *interp )
     Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);
 #endif
 
-#ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+#ifdef RIVET_USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
 #else
-	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
+	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
 #endif    
 	    return TCL_ERROR;
     }
@@ -143,4 +144,4 @@ Rivetlib_SafeInit( Tcl_Interp *interp )
 #endif
     return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
 }
-
+*/

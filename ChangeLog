@@ -1,3 +1,9 @@
+2011-12-09 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetPkgInit.c,src/parserPkgInit.c: libs now are fully based on stubs and
+    the tcl version parameter passed with Tcl_InitStubs is the same Tcl version their
+    linked against. Probably too strict, but a cautious point as we are moving towards
+    Tcl8.6 and Tcl9, which will probably require recompilation of the whole Tcl software
+
 2011-12-08 Massimo Manghi <mxmanghi@apache.org>
     * trunk/: Final commit merging changes to scoping commands in the ::rivet namespace
 

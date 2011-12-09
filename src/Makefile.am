@@ -53,7 +53,7 @@ lib_libexec_LTLIBRARIES = librivetlib.la librivetparser.la
 librivetlib_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
 librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 librivetlib_la_LIBADD =  @APXS_LIBS@
-librivetlib_la_CPPFLAGS = @MOD_RIVET_INCLUDES@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS=1
+librivetlib_la_CPPFLAGS = @MOD_RIVET_INCLUDES@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS
 
 #
 # Rivet Parser Library
@@ -61,7 +61,7 @@ librivetlib_la_CPPFLAGS = @MOD_RIVET_INCLUDES@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @A
 librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
 librivetparser_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 librivetparser_la_LIBADD = @APXS_LIBS@
-librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS=1
+librivetparser_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS
  
 SUBDIRS = @apache_version_dir@
 
