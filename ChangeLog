@@ -1,3 +1,8 @@
+2011-12-26 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/putsnnl.tcl: Add new command 'putsnnl', a wrapper for
+    'puts -nonewline' with the extra optional feature of prepending the output 
+    with a definite number of spaces (it helps pretty printing of HTML)
+
 2011-12-09 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetPkgInit.c,src/parserPkgInit.c: libs now are fully based on stubs and
     the tcl version parameter passed with Tcl_InitStubs is the same Tcl version their
