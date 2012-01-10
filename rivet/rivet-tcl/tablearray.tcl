@@ -1,5 +1,5 @@
 ##
-## tablearray <arrayName> ?pattern? ?html-attibutes?
+## -- parray_table <arrayName> ?pattern? ?html-attibutes?
 ##
 ##	tablearray prints an array data in HTML table
 ##	This is good when a table is enough to print consistently
@@ -8,8 +8,9 @@
 ##	arrayName - Name of the array to display
 ##	pattern   - Wildcard pattern of variables. An empty string 
 ##		        is tantamout a "*" and prints the whole array
-##	html-attributes - list of attribute,value pairs to be put
-##              in the <table> tag
+##	html-attributes - 
+##              list attribute-value pairs to be given
+##              to the <table> element tag
 ##
 ## $Id$
 ##
@@ -17,7 +18,7 @@
 
 namespace eval ::rivet {
 
-    proc tablearray {arrayName {pattern "*"} {htmlAttributes ""}} {
+    proc parray_table {arrayName {pattern "*"} {htmlAttributes ""}} {
         upvar 1 $arrayName array
         if {![array exists array]} {
             return -code error "\"$arrayName\" isn't an array"
