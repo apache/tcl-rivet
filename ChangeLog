@@ -1,3 +1,6 @@
+2012-01-16 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/tclIndex.tcl: regenerated with auto_mkindex.
+
 2012-01-15 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/parray_table.tcl: this file was erroneously introduced as
     tablearray.tcl. Renamed.
