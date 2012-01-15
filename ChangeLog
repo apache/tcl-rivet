@@ -1,3 +1,19 @@
+2012-01-15 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/parray_table.tcl: this file was erroneously introduced as
+    tablearray.tcl. Renamed.
+    * rivet/rivet-tcl/putsnnl.tcl: experimental putsnnl command rewritten to 
+    improve features and make it more flexible by adding option for padding 
+    with &nbsp; entities. 
+
+2012-01-10 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/parray_table.tcl: New command parray_table to print the
+    content of an array into an HTML table
+    * rivet/rivet-tcl/putsnnl.tcl: More consistent form for 'putsnnl'. If the
+    second argument is given and it's an integer then the string is at most <nchars>
+    characters long. If <nchars> > [string lenghth <output_string>] then the output
+    is still <nchars> wide. If <spaces> is a positive integer the string is printed 
+    right-aligned, if negative the string is left-aligned
+
 2011-12-26 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/putsnnl.tcl: Add new command 'putsnnl', a wrapper for
     'puts -nonewline' with the extra optional feature of prepending the output 
