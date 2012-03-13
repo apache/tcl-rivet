@@ -577,7 +577,7 @@ AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
     virtual-interps-separation,
     [  --enable-virtual-interps-separation to turn on virtual host separation],
     [ separate_virtual_interps=$enable_virtual_interps_separation ],
-    [ separate_virtual_interps="yes"]
+    [ separate_virtual_interps="no"]
     )
 
     AC_MSG_CHECKING(whether Rivet will create an interpreter for each virtual host)

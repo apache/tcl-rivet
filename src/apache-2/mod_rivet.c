@@ -58,6 +58,8 @@
 #include "rivetParser.h"
 #include "rivetChannel.h"
 
+#define MODNAME "mod_rivet"
+
 //module AP_MODULE_DECLARE_DATA rivet_module;
 
 /* This is used *only* in the PanicProc.  Otherwise, don't touch it! */
@@ -923,8 +925,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     if (Tcl_ListObjReplace(interp,auto_path,0,0,1,&rivet_tcl) == TCL_ERROR)
     {
-        ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                    "error setting auto_path: %s",Tcl_GetStringFromObj(auto_path,NULL));
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                     MODNAME ": error setting auto_path: %s",
+		     Tcl_GetStringFromObj(auto_path,NULL));
     } 
     Tcl_DecrRefCount(rivet_tcl);
 
@@ -951,9 +954,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     if (Tcl_PkgRequire(interp, "RivetTcl", "2.1", 1) == NULL)
     {
-        ap_log_error ( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                        "init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
-                        Tcl_GetStringResult(interp), RIVET_DIR );
+        ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                      MODNAME ": init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
+                      Tcl_GetStringResult(interp), RIVET_DIR );
         exit(1);
     }
 
@@ -971,8 +974,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, "1.2", 1) == NULL)
     {
-        ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                "Error loading rivetlib package: %s", Tcl_GetStringResult(interp) );
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                     MODNAME ": Error loading rivetlib package: %s",
+		     Tcl_GetStringResult(interp) );
         exit(1);
     } 
     /* */
@@ -1226,13 +1230,15 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp,
 
         if (Tcl_EvalObjEx(interp, rsc->rivet_server_init_script, 0) != TCL_OK)
         {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, "%s",
-                    Tcl_GetVar(interp, "errorInfo", 0));
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+			 MODNAME ": Error running ServerInitScript '%s': %s",
+			 Tcl_GetString(rsc->rivet_server_init_script),
+                         Tcl_GetVar(interp, "errorInfo", 0));
         } else {
-            ap_log_error(APLOG_MARK, APLOG_NOTICE, APR_EGENERAL, s, 
-                        "RivetServerInit has run");
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+		         MODNAME ": ServerInitScript '%s' successful", 
+			 Tcl_GetString(rsc->rivet_server_init_script));
         }
-
     }
     
     return OK;
@@ -1384,14 +1390,14 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
     buf = (char *) apr_pvsprintf(rivet_panic_pool, format, argList);
 
     if (rivet_panic_request_rec != NULL) {
-    ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
-         rivet_panic_server_rec,
-         "Critical error in request: %s", 
-         rivet_panic_request_rec->unparsed_uri);
+        ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
+                     rivet_panic_server_rec,
+                     MODNAME ": Critical error in request: %s", 
+                     rivet_panic_request_rec->unparsed_uri);
     }
 
     ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
-         rivet_panic_server_rec, buf);
+                 rivet_panic_server_rec, buf);
 
     abort();
 }
@@ -1426,11 +1432,11 @@ Rivet_ChildHandlers(server_rec *s, int init)
     top = RIVET_SERVER_CONF(s->module_config);
     if (init == 1) {
         parentfunction = top->rivet_child_init_script;
-        errmsg = "Error in Child init script: %s";
+        errmsg = MODNAME ": Error in Child init script: %s";
         //errmsg = (char *) apr_pstrdup(p, "Error in child init script: %s");
     } else {
         parentfunction = top->rivet_child_exit_script;
-        errmsg = "Error in Child exit script: %s";
+        errmsg = MODNAME ": Error in Child exit script: %s";
         //errmsg = (char *) apr_pstrdup(p, "Error in child exit script: %s");
     }
 
@@ -1454,12 +1460,13 @@ Rivet_ChildHandlers(server_rec *s, int init)
             Tcl_Preserve (rsc->server_interp);
             if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                        errmsg, Tcl_GetString(function));
+                             errmsg, 
+			     Tcl_GetString(function));
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                        "errorCode: %s",
+                             "errorCode: %s",
                         Tcl_GetVar(rsc->server_interp, "errorCode", 0));
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                        "errorInfo: %s",
+                             "errorInfo: %s",
                         Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
             }
             Tcl_Release (rsc->server_interp);
@@ -1531,14 +1538,15 @@ Rivet_CreateTclInterp (server_rec* s)
     if (interp == NULL)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                "Error in Tcl_CreateInterp, aborting\n");
+                     MODNAME ": Error in Tcl_CreateInterp, aborting\n");
         exit(1);
     }
 
     if (Tcl_Init(interp) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                Tcl_GetStringResult(interp));
+                     MODNAME ": Error in Tcl_Init: %s, aborting\n",
+		     Tcl_GetStringResult(interp));
         exit(1);
     }
     Tcl_SetPanicProc(Rivet_Panic);
@@ -1626,8 +1634,14 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
     if (rsc->rivet_global_init_script != NULL) {
         if (Tcl_EvalObjEx(interp, rsc->rivet_global_init_script, 0) != TCL_OK)
         {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, "%s",
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+			 MODNAME ": Error running GlobalInitScript '%s': %s",
+			 Tcl_GetString(rsc->rivet_global_init_script),
                          Tcl_GetVar(interp, "errorInfo", 0));
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+		         MODNAME ": GlobalInitScript '%s' successful",
+		         Tcl_GetString(rsc->rivet_global_init_script));
         }
     }
 
@@ -1655,12 +1669,17 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
                         sr->port,
                         interpCount++);
 
+		ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+			    MODNAME ": Rivet_InitTclStuff: creating slave interpreter '%s', hostname '%s', port '%d', separate interpreters %d",
+			    slavename, sr->server_hostname, sr->port, 
+			    rsc->separate_virtual_interps);
+
                 /* Separate virtual interps. */
                 myrsc->server_interp = Tcl_CreateSlave(interp, slavename, 0);
                 if (myrsc->server_interp == NULL) {
-                    ap_log_error( APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                                    "slave interp create failed: %s",
-                                    Tcl_GetStringResult(interp) );
+                    ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                                 MODNAME ": slave interp create failed: %s",
+                                 Tcl_GetStringResult(interp) );
                     exit(1);
                 }
                 Rivet_PerInterpInit(s, myrsc, p);
@@ -1770,9 +1789,10 @@ Rivet_SendContent(request_rec *r)
 
     if (r->finfo.filetype == 0)
     {
-        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server,
-                        "File does not exist: %s",
-        (r->path_info ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL) : r->filename));
+        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, 
+	             r->server,
+                     MODNAME ": File does not exist: %s",
+                     (r->path_info ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL) : r->filename));
         retval = HTTP_NOT_FOUND;
         goto sendcleanup;
     }
@@ -1796,7 +1816,8 @@ Rivet_SendContent(request_rec *r)
          * at this. We simply emit an internal server error and print a log message
          */
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
-                    "Error accessing %s, could not chdir into directory", r->filename);
+                     MODNAME ": Error accessing %s, could not chdir into directory", 
+		     r->filename);
 
         retval = HTTP_INTERNAL_SERVER_ERROR;
         goto sendcleanup;
@@ -1817,7 +1838,7 @@ Rivet_SendContent(request_rec *r)
     if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
-                "Could not create request namespace\n");
+                     MODNAME ": Could not create request namespace\n");
         retval = HTTP_BAD_REQUEST;
         goto sendcleanup;
     }
@@ -1907,8 +1928,10 @@ Rivet_SendContent(request_rec *r)
 
     if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, "%s",
-                Tcl_GetVar(interp, "errorInfo", 0));
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
+	             MODNAME ": Error parsing exec file '%s': %s",
+		     r->filename,
+                     Tcl_GetVar(interp, "errorInfo", 0));
     }
 
     if (request_cleanup == NULL) {
@@ -1917,8 +1940,9 @@ Rivet_SendContent(request_rec *r)
     }
 
     if (Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, "%s",
-                Tcl_GetVar(interp, "errorInfo", 0));
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
+	             MODNAME ": Error evaluating cleanup request: %s",
+                     Tcl_GetVar(interp, "errorInfo", 0));
     }
 
     /* Reset globals */

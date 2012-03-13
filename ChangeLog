@@ -1,9 +1,16 @@
-2012-03-08 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/rivet-tcl/,/rivet/packages/simpledb: various changes suggested by code profiler
-    (thanks to Harald Oehlmann)
-    * rivet/packages/tclrivetparse.tcl: wrong handling of swich cases made method 'parse'
-    unusable
-    * src/rivet.h: obsolete comment amended
+
+2012-03-13 Karl Lehenbauer <karl@apache.org>
+    * configure.ac: Default separate virtual interps to "no".
+    (--enable-virtual-interps-separation option implies disabled if not set.)
+    * rivet/packages/form/form.tcl: In the forms package, stop bleeding the 
+    raw value of radio buttons and checkboxes into the generated HTML.
+    * src/apache-2/mod_rivet.c: Rework ap_log_error calls to include the
+    mod_rivet module name.  Emit debug-level messages for successful
+    execution of GlobalInitScript and ServerInitScript.
+    * README.freebsd: Update to reflect the modern world.
+    * README.configure: Document how to regenerate the configure script, etc.
+    * tclconfig/depcomp, tclconfig/missing, tclconfig/config.guess,
+    tclconfig/config.sub, tclconfig/ltmain.sh: Update from newer libtools, etc.
 
 2012-01-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/tclIndex.tcl: regenerated with auto_mkindex.

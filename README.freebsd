@@ -4,16 +4,17 @@ $Id$
 
 Rivet can be built under FreeBSD without any special tweaks.
 
-We'd love some help in making this a port in the FreeBSD ports tree, so this 
-build could be even more automatic.
+Rivet is a port in the FreeBSD ports tree.  To build the latest one
+supported there, cd to /usr/ports/www/mod_rivet and do a make install
+or equivalent.
 
-For now, you need to build and install Tcl and Apache
+To build from source, first you need to build and install Tcl and Apache...
 
-    cd /usr/ports/lang/tcl84
+    cd /usr/ports/lang/tcl85
     make
     make install
 
-    cd /usr/ports/www/apache13
+    cd /usr/ports/www/apache22
     make
     make install
 
@@ -24,38 +25,10 @@ place.
 
 Run configure in this directory with the following parameters:
 
-./configure  --with-tcl=/usr/local/lib/tcl8.4 --with-tclinclude=/usr/local/include/tcl8.4
+./configure  --with-tcl=/usr/local/lib/tcl8.5
 
-...or equivalent.  Your mileage may vary.
+If you want to build with debugging symbols enabled for debugging Apache
+and mod_rivet with gdb or whatever, add "--enable-symbols" to the above.
 
+Your mileage may vary.
 
-
-RUNNING AUTOMAKE, AUTOCONF, ETC
-
-
-you gotta use automake 1.9 (and with it, aclocal 1.9)
-
-you gotta use autoconf 2.59 (and with it, autoheader 2.59)
-
-You need to build and install /usr/ports/devel/gnu-autotools
-to get a libtoolize that has no special adaptations to FreeBSD.
-
-PATH=/usr/local/gnu-autotools/bin:$PATH
-
-aclocal19
-automake19
-autoconf259
-autoheader259
-
-Karl has found that setting some environment variables makes it work better...
-
-export AUTOHEADER=autoheader259
-export AUTOCONF=autoconf259
-export AUTOMAKE=automake19
-export ACLOCAL=aclocal19
-
-But there's still a problem where it'll try to run aclocal as aclocal-1.9,
-and fail.  I usually just try to run aclocal19 there and see if that fixes
-the make dependency or whatever.
-
-I think the autoconf tools are moving towards that kind of naming scheme.
