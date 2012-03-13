@@ -194,12 +194,14 @@ proc simpledb::setitem { table oid properties } {
 # Results:
 #	None.
 
-proc simpledb::delitem { table oid } {
+proc simpledb::delitem { table oid properties } {
+    upvar $properties props
+
     foreach col [array names ${table}::cols] {
-	unset ${table}::${col}::data($oid)
-	set item [lsearch ${table}::${col}::values($props($col)) $oid]
-	set ${table}::${col}::values($props($col)) \
-	    [lreplace ${table}::${col}::values($props($col)) $item $item]
+        unset ${table}::${col}::data($oid)
+        set item [lsearch ${table}::${col}::values($props($col)) $oid]
+        set ${table}::${col}::values($props($col)) \
+            [lreplace ${table}::${col}::values($props($col)) $item $item]
     }
     unset ${table}::goodoids($oid)
     return $oid
@@ -225,21 +227,21 @@ proc simpledb::delitem { table oid } {
 proc simpledb::finditems { table propertymatch } {
     array set res {}
     foreach {col value} $propertymatch {
-	foreach {value oids} [array get ${table}::${col}::values $value] {
-	    foreach oid $oids {
-		if { [info exists res($oid)] } {
-		    incr res($oid)
-		} else {
-		    set res($oid) 1
-		}
-	    }
-	}
+        foreach {value oids} [array get ${table}::${col}::values $value] {
+            foreach oid $oids {
+                if { [info exists res($oid)] } {
+                    incr res($oid)
+                } else {
+                    set res($oid) 1
+                }
+            }
+        }
     }
     set retlist {}
     foreach {oid num} [array get res] {
-	if { $res($oid) == [expr {[llength $propertymatch] / 2}] } {
-	    lappend retlist $oid
-	}
+        if { $res($oid) == [llength $propertymatch] / 2 } {
+            lappend retlist $oid
+        }
     }
     return $retlist
 }
@@ -298,7 +300,7 @@ proc simpledb::synctostorage {savefile} {
 	set collist [array names ${ns}::cols]
 	puts $fl "namespace eval $ns \{"
 	puts $fl "    array set cols \{ [array get ${ns}::cols] \}"
-	puts $fl "    array set goodoids \{ [array get ${ns}::goodoids] \}".
+	puts $fl "    array set goodoids \{ [array get ${ns}::goodoids] \}"
 	foreach col $collist {
 	    puts $fl "    namespace eval ${col} \{"
 	    puts $fl "        array set data [list [array get ${ns}::${col}::data]]"

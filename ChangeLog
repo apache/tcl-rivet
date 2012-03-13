@@ -1,3 +1,10 @@
+2012-03-08 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/,/rivet/packages/simpledb: various changes suggested by code profiler
+    (thanks to Harald Oehlmann)
+    * rivet/packages/tclrivetparse.tcl: wrong handling of swich cases made method 'parse'
+    unusable
+    * src/rivet.h: obsolete comment amended
+
 2012-01-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/tclIndex.tcl: regenerated with auto_mkindex.
 

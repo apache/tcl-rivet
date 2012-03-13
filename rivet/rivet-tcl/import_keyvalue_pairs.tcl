@@ -37,7 +37,7 @@ namespace eval ::rivet {
                 if {$arg == "--"} {
                 # "--" appears as an argument, store the rest of the arg list
                 # in the args element of the array
-                    set data(args) [lrange $argsList [expr $index + 1] end]
+                    set data(args) [lrange $argsList [expr {$index + 1} ] end]
                     break
                 }
 

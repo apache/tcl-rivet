@@ -35,14 +35,14 @@ namespace eval ::rivet {
         upvar 1 $paramsArray params
 
         set cookieParams ""
-        set expiresIn 0
+        set expiresIn    0
 
         if { [info exists params(expires)] } {
             append cookieParams "; expires=$params(expires)"
         } else {
             foreach {time num} [list days 86400 hours 3600 minutes 60] {
-                if [info exists params($time)] {
-                    incr expiresIn [expr $params($time) * $num]
+                if {[info exists params($time)]} {
+                    incr expiresIn [expr {$params($time) * $num}]
                 }
             }
             if {$expiresIn != 0} {

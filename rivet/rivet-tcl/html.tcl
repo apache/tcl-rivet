@@ -19,7 +19,7 @@ namespace eval ::rivet {
     proc html {string args} {
         foreach arg $args { append output <$arg> }
         append output $string
-        for {set i [expr [llength $args] - 1]} {$i >= 0} {incr i -1} {
+        for {set i [expr {[llength $args] - 1} ]} {$i >= 0} {incr i -1} {
             append output </[lindex [lindex $args $i] 0]>
         }
         puts $output

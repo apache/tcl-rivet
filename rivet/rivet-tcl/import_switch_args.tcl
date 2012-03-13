@@ -27,7 +27,7 @@ namespace eval ::rivet {
                 set array(args) [lrange $argsList $index end]
                 break
             } elseif {$arg == "--"} {
-                set array(args) [lrange $argsList [expr $index + 1] end]
+                set array(args) [lrange $argsList [expr {$index + 1}] end]
                 break
             }
 

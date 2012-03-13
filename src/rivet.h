@@ -41,10 +41,10 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      NULL,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
 
-/* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace and
- * it also exports the command using the Tcl_Export function. This
- * is suboptimal, rivet_ns must point to a Tcl_Namespace structure
- * created somewhere before the macro is called. 
+/* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace. Commands
+ * are exported from the RIVET_NS (::rivet) namespace in the init.tcl 
+ * script accordingly to configuration switches passed to ./configure
+ * (see configure.ac)
  */
 
 #define RIVET_OBJ_CMD(name,func) \
