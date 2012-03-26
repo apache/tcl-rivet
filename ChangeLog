@@ -1,3 +1,7 @@
+2012-03-26 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/entities.tcl: new package RivetEntities, replacement for tcllib
+    ::html::entities but with no extra dependecies (as a matter of fact it 
+    works without Rivet too)
 
 2012-03-13 Karl Lehenbauer <karl@apache.org>
     * configure.ac: Default separate virtual interps to "no".
@@ -11,6 +15,13 @@
     * README.configure: Document how to regenerate the configure script, etc.
     * tclconfig/depcomp, tclconfig/missing, tclconfig/config.guess,
     tclconfig/config.sub, tclconfig/ltmain.sh: Update from newer libtools, etc.
+
+2012-03-08 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/,/rivet/packages/simpledb: various changes suggested by code profiler
+    (thanks to Harald Oehlmann)
+    * rivet/packages/tclrivetparse.tcl: wrong handling of swich cases made method 'parse'
+    unusable
+    * src/rivet.h: obsolete comment amended
 
 2012-01-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/tclIndex.tcl: regenerated with auto_mkindex.
