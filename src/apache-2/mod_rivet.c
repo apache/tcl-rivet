@@ -1397,7 +1397,7 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
     }
 
     ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
-                 rivet_panic_server_rec, buf);
+                 rivet_panic_server_rec, "%s", buf);
 
     abort();
 }

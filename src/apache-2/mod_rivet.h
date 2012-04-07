@@ -15,7 +15,7 @@
    limitations under the License.
 */
 
-/* $Id: $ */
+/* $Id$ */
 
 #ifndef MOD_RIVET_H
 #define MOD_RIVET_H 1
@@ -100,7 +100,7 @@ typedef struct _rivet_server_conf {
     char **objCacheList;		        /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache;		    /* Objects cache - the key is the script name */
 
-    Tcl_Channel *outchannel;		/* stuff for buffering output */
+    Tcl_Channel *outchannel;		    /* stuff for buffering output */
 } rivet_server_conf;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
