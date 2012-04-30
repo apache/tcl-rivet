@@ -1,5 +1,10 @@
+2012-04-30 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form.tcl: Patch provided by Jeff Lawson to manage -label switches.
+    The package now requires package uuid from Tcllib.
+    * : Entry of 2012-04-07 amended as the path to mod_rivet.[c|h] was clearly wrong
+
 2012-04-07 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/mod_rivet.[c|h]: One more change to an ap_log_error call suggested
+    * rivet/apache-2/mod_rivet.[c|h]: One more change to an ap_log_error call suggested
     by the compilation hardening flags
 
 2012-03-26 Massimo Manghi <mxmanghi@apache.org>

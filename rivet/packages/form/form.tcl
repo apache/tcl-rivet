@@ -192,38 +192,38 @@ package provide form 1.0
 	# field declaration
 	import_data $type $name data $args
 
-	# generate the field definition
-	set string "<input type=\"$type\" name=\"$name\""
-	append string [argstring data]
-
 	switch -- $type {
 	    "radio" -
 	    "checkbox" {
-		# if there's no value defined, create an empty value
-		if {![info exists data(value)]} { 
-		    set data(value) "" 
-		}
 
-		# if there's no label defined, make the label be the
-		# same as the value
-		if {![info exists data(label)]} { 
-		    set data(label) $data(value) 
+		# if there's a label then prepare to output it.
+		if {[info exists data(label)]} {
+			# if there's no id defined, generate something unique so we can reference it.
+			if {![info exists data(id)]} {
+				set data(id) "autogen_[::uuid::uuid generate]"
+			}
+			set label "<label for=\"$data(id)\">$data(label)</label>"
 		}
 
 		# ...and if the is a default value for this field
 		# and it matches the value we have for it, make
 		# the field show up as selected (checked)
-		if {[info exists DefaultValues($name)]} {
-		    if {[lsearch $DefaultValues($name) $data(value)] >= 0} {			
-			append string { checked="checked"}
+		if {[info exists DefaultValues($name)] && [info exists data(value)]} {
+		    if {[lsearch $DefaultValues($name) $data(value)] >= 0} {
+			set data(checked) "checked"
 		    }
 		}
 	    }
 	}
-	append string " />"
+	# generate the field definition
+	set string "<input type=\"$type\" name=\"$name\" [argstring data] />"
+	if {[info exists label]} {
+		append string $label
+	}
 
 	# ...and emit it
-	    html $string
+    html $string
+
     }
 
     #
