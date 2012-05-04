@@ -1,3 +1,121 @@
+2012-04-07 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/mod_rivet.[c|h]: One more change to an ap_log_error call suggested
+    by the compilation hardening flags
+
+2012-03-26 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/entities.tcl: new package RivetEntities, replacement for tcllib
+    ::html::entities but with no extra dependecies (as a matter of fact it 
+    works without Rivet too)
+
+2012-03-13 Karl Lehenbauer <karl@apache.org>
+    * configure.ac: Default separate virtual interps to "no".
+    (--enable-virtual-interps-separation option implies disabled if not set.)
+    * rivet/packages/form/form.tcl: In the forms package, stop bleeding the 
+    raw value of radio buttons and checkboxes into the generated HTML.
+    * src/apache-2/mod_rivet.c: Rework ap_log_error calls to include the
+    mod_rivet module name.  Emit debug-level messages for successful
+    execution of GlobalInitScript and ServerInitScript.
+    * README.freebsd: Update to reflect the modern world.
+    * README.configure: Document how to regenerate the configure script, etc.
+    * tclconfig/depcomp, tclconfig/missing, tclconfig/config.guess,
+    tclconfig/config.sub, tclconfig/ltmain.sh: Update from newer libtools, etc.
+
+2012-03-08 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/,/rivet/packages/simpledb: various changes suggested by code profiler
+    (thanks to Harald Oehlmann)
+    * rivet/packages/tclrivetparse.tcl: wrong handling of swich cases made method 'parse'
+    unusable
+    * src/rivet.h: obsolete comment amended
+
+2012-01-16 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/tclIndex.tcl: regenerated with auto_mkindex.
+
+2012-01-15 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/parray_table.tcl: this file was erroneously introduced as
+    tablearray.tcl. Renamed.
+    * rivet/rivet-tcl/putsnnl.tcl: experimental putsnnl command rewritten to 
+    improve features and make it more flexible by adding option for padding 
+    with &nbsp; entities. 
+
+2012-01-10 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/parray_table.tcl: New command parray_table to print the
+    content of an array into an HTML table
+    * rivet/rivet-tcl/putsnnl.tcl: More consistent form for 'putsnnl'. If the
+    second argument is given and it's an integer then the string is at most <nchars>
+    characters long. If <nchars> > [string lenghth <output_string>] then the output
+    is still <nchars> wide. If <spaces> is a positive integer the string is printed 
+    right-aligned, if negative the string is left-aligned
+
+2011-12-26 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/putsnnl.tcl: Add new command 'putsnnl', a wrapper for
+    'puts -nonewline' with the extra optional feature of prepending the output 
+    with a definite number of spaces (it helps pretty printing of HTML)
+
+2011-12-09 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetPkgInit.c,src/parserPkgInit.c: libs now are fully based on stubs and
+    the tcl version parameter passed with Tcl_InitStubs is the same Tcl version their
+    linked against. Probably too strict, but a cautious point as we are moving towards
+    Tcl8.6 and Tcl9, which will probably require recompilation of the whole Tcl software
+
+2011-12-08 Massimo Manghi <mxmanghi@apache.org>
+    * trunk/: Final commit merging changes to scoping commands in the ::rivet namespace
+
+2011-12-07 Massimo Manghi <mxmanghi@apache.org>
+    * doc/examples, doc/convert_examples.tcl.in: Add ::rivet namespace to examples and
+    examples code converter
+    * doc/examples/*.rvt: removed unneeded sgml chars escaping
+    * doc/xml/install.xml: removed duplicated entry of a 'configure' switch
+
+2011-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/tablearray.tcl: new procedure 'tablearray' prints an array content
+    in an HTML <table> construct. Test procedure, we maybe want to have something more
+    general for printing also dictionaries.
+
+2011-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * configure_ac: add new test on Tcl version using AX_VERSION_COMPARE.
+
+2011-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/request.xml,doc/xml/install.xml: documenting new configure switches
+
+2011-12-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: child init sets also the array module_conf to signal the
+    compilation flags --enable-rivet-commands-export and --enable-import-namespace-commands
+    for the benefit of init.tcl
+    * configure.ac: new macro created to handle --enable-rivet-commands-export and 
+    --enable-import-namespace-commands
+    * rivet/init.tcl: module_conf signals when commands have to be exported from ::rivet
+    and when they have to be implicitly imported into the global namespace for compatibility
+    with previous versions of Rivet.
+
+2011-11-21 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml,doc/xml/commands.xml: removed note about 'rivetlib' package
+    no more needed. Notes about ServerInitScript not having effect when virtual hosts
+    have their own private slave interpreters.
+
+2011-11-20 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml,doc/xml/install.xml: documentation for building Rivet updated.
+    * configure.ac: corrected help message for --disable-rivet-commands-export
+
+2011-11-20 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h: Macro definition for Rivet command objects has rolled back to 
+    its previous form and doesn't call Tcl_Export anymore. In case commands are
+    exported by calling Tcl_Export in rivetCore.c and rivetPkgInit.c
+    * tests/*: test suite reviewed for new tests
+
+2011-11-16 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: code rationalization. namespace reference will not be
+    passed to the RIVET_OBJ_COMMAND macro and commands are exported by calling Tcl_Export
+    on the whole command set in ::rivet. The whole process is controlled by the macro
+    symbol RIVET_NAMESPACE_EXPORT 
+    * src/rivet.h: only one RIVET_OBJ_COMMAND object exists now. Call to Rivet_WWWInit,
+    Rivet_CryptInit and Rivet_ListInit haved changed. Rivet namespace pointer in not
+    passed around anymore and it's handled only in rivetPkgInit.c
+    * src/rivetPkgInit.c: 
+
+2011-11-14 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac:  new switch --enable-rivet-commands-export to enable/disable 
+    commands in ::rivet namespace
+
 2011-11-12 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: reindented to improve readability.
     * doc/xml/commands.xml: typo corrected
@@ -17,6 +135,13 @@
     development branches of Rivet. I'm committing the latest
     changes done in the process of releasing the Debian package
     for 2.0.4 
+
+2011-09-26 Massimo Manghi <mxmanghi@apache.org>
+    * m4/ax_compare_version.m4: add macro for version comparison from the GNU macro archive
+
+2011-09-23 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c,src/apache-2/TclWebapache.c: merging changes
+    made to fix bugs and requests to command 'makeurl', 'load_env' and 'load_headers'
 
 2011-09-07 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: Add existing undocumented commands 
@@ -53,7 +178,7 @@
 
 2011-05-09 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: fixed misleading error message displayed when rivet_abort_script fails
-    * 
+
 2011-05-05 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: APACHE_VERSION returns an error message for--with-apache-version=1. 
     * src/apache-1/: removed from trunk
@@ -63,6 +188,17 @@
     removing unneeded .la files from target directories
     * configure.ac: doc/convert_examples.tcl is generated from template: added to AC_CONFIG_FILES 
     * debian/changelog,debian/control: changed to reflect improvement in the script for Debian
+
+2011-06-07 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl: because of bug #3216070 of Tcl we cannot preload rivetlib, so it doesn't make
+    sense to import the rivet namespace, because we cannot have all the command set loaded in and
+    an import has to be done for them in the application scripts
+    * rivet/rivet-tcl/incr0.tcl: Tcl8.5 provides identical functionalities, so this command is
+    now aliased in the interpreter by the native incr command.
+    * rivet/rivet-tcl/tclIndex: recreated
+
+2011-04-06 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: Added doc/convert_examples.tcl to files created from its .in template
 
 2011-04-03 Massimo Manghi <mxmanghi@apache.org>
     * doc/convert_examples.tcl.in,doc/convert_examples.tcl: Added script to convert code examples
@@ -78,8 +214,21 @@
     * doc/convert_examples.tcl: New procedure that check for changes in doc/examples and, if needed,
     creates/recreates the corrisponding file in doc/examples-sgml escaping characters
 
+2011-03-03 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/*.tcl: all the commands in here moved into ::rivet namespace. File tclIndex
+    recreated
+    * doc/xml/directives.xml,doc/xml/commands.tcl: Documentation changed to reflect the new scoping of
+    the command set. Commands in rivet-tcl/ not yet documented have been briefly explained with some
+    examples.
+    * src/apache-2/mod_rivet.[c|h],src/apache-2/rivetCore.c: changes in trunk merged into the
+    rivet-namespace branch
+
 2011-03-01 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCode.c: 'abort_code' command is now created through the RIVET_CMD_OBJ macro
+
+2011-02-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h,src/apache-2/rivetCore.c,src/rivetPkgInit.c: Core commands namespace is now '::rivet' and 
+    the package provided by the core module is "::rivet". Also package RivetLib was renamed as 'rivetlib'.
 
 2011-02-14 Karl Lehenbauer <karl@apache.org>
     * src/apache-2/mod_rivet.c: Only create root interpreter once, not twice.  
@@ -88,10 +237,40 @@
     * src/apache-2/rivetCore.c: Remove unused command var from Rivet_Upload.
     Remove unneeded loglevel var from Rivet_LogErrorCmd.
 
+2011-02-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[h|c],src/apache-2/rivetCore.c: Removed loading of RivetLib by default. Getting
+    RivetLib into the module keeps Apache to segfault in other calls. In order to gain access to commands
+    provided by RivetLib (formerly called Rivet) a 'package require RivetLib' must be in a Rivet script or
+    in one of the initialization script (e.g. ServerInitScript ChildInitScript or GlobalInitScript). Notice:
+    RivetLib exports the commands to the '::Rivet' namespace.
+    * src/rivetCrypt.c, src/rivetWWW.c, src/rivetList.c: they now export their commands to the '::Rivet'
+
 2011-02-11 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.[c|h]: new conf scripts rivet_abort_script and rivet_force_script. rivet_abort_script
     is run when an abort_page command is called in the page content generation
     * src/apache-2/rivetCode.c: add new command abort_code that returns the code passed to abort_page
+
+2011-02-08 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: call to Rivet_InitWWW to include into Rivet's core the commands provided in
+    src/rivetWWW.c
+    * src/apache-2/mod_rivet.c: the inclusion into the module of RivetLib through Tcl_PkgRequire proved
+    to cause segfaults in Rivet_ServerConf. The commands in rivetWWW.c are temporarily loaded by rivetCore.c
+    * src/apache-2/Makefile.am: build of mod_rivet.so includes also code from src/libWWW.o
+
+2011-02-07 Massimo Manghi <mxmanghi@apache.org>
+    * branches/rivet-namespace: new branch to experiment with the Rivet namespace and Rivet package 
+    * src/rivetPkgInit.c: Provides RivetLib package now when loaded by mod_rivet. Commands are now
+    in the ::Rivet namespace
+    * src/rivet.h: new macro RIVET_OBJ_CMD creates a command in the ::Rivet namespace
+    and puts the command object on the namespace export list
+    * src/apache-2/mod_rivet.h: the globals structure now holds a pointer to the Tcl_Namespace object
+    representing ::Rivet namespace
+    * src/apache-2/rivetCore.c: commands are now created with the RIVET_OBJ_CMD macro 
+    * rivet/init.tcl: provides package RivetTcl 2.1. This makes possible to consistently peek the 
+    init.tcl associated to the module. Command 'incr0' is now aliased by Tcl standard 'incr'
+    * rivet/apache-2/mod_rivet.c: Rivet_PerInterpInit loads package RivetTcl 2.1 and package RivetLib 1.2.
+    the latter ships the commands in rivetWWW.c rivetCrypt.c and rivetList.c
+    * rivet/rivet-tcl/tclIndex: Command 'incr0' removed (see init.tcl)
 
 2011-01-31 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: default value for directive SeparateVirtualInterps changed to 'yes'.

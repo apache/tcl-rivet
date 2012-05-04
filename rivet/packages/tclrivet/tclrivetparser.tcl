@@ -45,7 +45,7 @@ proc tclrivetparser::setoutputcmd { {newcmd ""} } {
     variable outputcmd
 
     if { $outputcmd == "" } {
-	return $outputcmd
+	    return $outputcmd
     }
     set outputcmd $newcmd
 }
@@ -80,69 +80,69 @@ proc tclrivetparser::parse { data outbufvar } {
     set len [expr {[string length $data] + 1}]
     set next [string index $data 0]
     while {$i < $len} {
-	incr i
-	set cur $next
-	set next [string index $data $i]
-	if { $inside == 0 } {
-	    # Outside the delimiting tags.
-	    if { $cur == [string index $starttag $p] } {
-		incr p
-		if { $p == [string length $starttag] } {
-		    append outbuf "\"\n"
-		    set inside 1
-		    set p 0
-		    continue
-		}
-	    } else {
-		if { $p > 0 } {
-		    append outbuf [string range $starttag 0 [expr {$p - 1}]]
-		    set p 0
-		}
-		switch -exact -- $cur {
-		    "\{" {
-			append outbuf "\\{"
-		    }
-		    "\}" {
-			append outbuf "\\}"
-		    }
-		    "\$" {
-			append outbuf "\\$"
-		    }
-		    "\[" {
-			append outbuf "\\["
-		    }
-		    "\]" {
-			append outbuf "\\]"
-		    }
-		    "\"" {
-			append outbuf "\\\""
-		    }
-		    "\\" {
-			append outbuf "\\\\"
-		    }
-		    default {
-			append outbuf $cur
-		    }
-		}
-		continue
-	    }
-	} else {
-	    # Inside the delimiting tags.
-	    if { $cur == [string index $endtag $p] } {
-		incr p
-		if { $p == [string length $endtag] } {
-		    append outbuf "\n$outputcmd \""
-		    set inside 0
-		    set p 0
-		}
-	    } else {
-		if { $p > 0 } {
-		    append outbuf [string range $endtag 0 $p]
-		    set p 0
-		}
-		append outbuf $cur
-	    }
-	}
+        incr i
+        set cur $next
+        set next [string index $data $i]
+        if { $inside == 0 } {
+            # Outside the delimiting tags.
+            if { $cur == [string index $starttag $p] } {
+                incr p
+                if { $p == [string length $starttag] } {
+                    append outbuf "\"\n"
+                    set inside 1
+                    set p 0
+                    continue
+                }
+            } else {
+                if { $p > 0 } {
+                    append outbuf [string range $starttag 0 [expr {$p - 1}]]
+                    set p 0
+                }
+                switch -exact -- $cur {
+                    "\{" {
+                        append outbuf \ $cur
+                    }
+                    "\}" {
+                        append outbuf \ $cur 
+                    }
+                    "\$" {
+                        append outbuf "\\$"
+                    }
+                    "\[" {
+                        append outbuf "\\["
+                    }
+                    "\]" {
+                        append outbuf "\\]"
+                    }
+                    "\"" {
+                        append outbuf "\\\""
+                    }
+                    "\\" {
+                        append outbuf "\\\\"
+                    }
+                    default {
+                        append outbuf $cur
+                    }
+                }
+                continue
+            }
+        } else {
+            # Inside the delimiting tags.
+            if { $cur == [string index $endtag $p] } {
+                incr p
+                if { $p == [string length $endtag] } {
+                    append outbuf "\n$outputcmd \""
+                    set inside 0
+                    set p 0
+                }
+            } else {
+                if { $p > 0 } {
+                    append outbuf [string range $endtag 0 $p]
+                    set p 0
+                }
+                append outbuf $cur
+            }
+        }
     }
     return $inside
 }
@@ -167,7 +167,7 @@ proc tclrivetparser::parserivetdata { data } {
     set outbuf {}
     append outbuf "$outputcmd \""
     if { [parse $data outbuf] == 0 } {
-	append outbuf "\"\n"
+        append outbuf "\"\n"
     }
     return $outbuf
 }

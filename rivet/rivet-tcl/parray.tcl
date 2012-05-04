@@ -11,22 +11,27 @@
 ##
 ###
 
-proc parray {arrayName {pattern *}} {
-    upvar 1 $arrayName array
-    if {![array exists array]} {
-        return -code error "\"$arrayName\" isn't an array"
-    }
-    set maxl 0
-    foreach name [lsort [array names array $pattern]] {
-        if {[string length $name] > $maxl} {
-            set maxl [string length $name]
+namespace eval ::rivet {
+
+    proc parray {arrayName {pattern *}} {
+        upvar 1 $arrayName array
+        if {![array exists array]} {
+            return -code error "\"$arrayName\" isn't an array"
         }
+        set maxl 0
+        foreach name [lsort [array names array $pattern]] {
+            if {[string length $name] > $maxl} {
+                set maxl [string length $name]
+            }
+        }
+        puts stdout "<PRE><B>$arrayName</B>"
+        set maxl [expr {$maxl + [string length $arrayName] + 2}]
+        foreach name [lsort [array names array $pattern]] {
+            set nameString [format %s(%s) $arrayName $name]
+            puts stdout [format "%-*s = %s" $maxl $nameString $array($name)]
+        }
+        puts stdout "</PRE>"
     }
-    puts stdout "<PRE><B>$arrayName</B>"
-    set maxl [expr {$maxl + [string length $arrayName] + 2}]
-    foreach name [lsort [array names array $pattern]] {
-        set nameString [format %s(%s) $arrayName $name]
-        puts stdout [format "%-*s = %s" $maxl $nameString $array($name)]
-    }
-    puts stdout "</PRE>"
+
+    namespace export parray
 }

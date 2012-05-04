@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.1.0r1])
+AC_INIT([Rivet],[2.1.0a1])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
@@ -218,7 +218,7 @@ TEA_MAKE_LIB
 
 # We have to either find a working tclsh or be told where it is 
 # using --with-tclsh
-AC_ARG_WITH(tclsh, [  --with-tclsh=FILE       location of a working tclsh executable], with_tclsh=${withval})
+AC_ARG_WITH(tclsh, [  --with-tclsh=FILE location of a working tclsh executable], with_tclsh=${withval})
 
 #
 # allow them to override the tclsh we think we found
@@ -365,7 +365,25 @@ AC_DEFUN([APR_HANDLING],[
     fi
 ])
 
-# apache version
+
+#--------------------------------------------------------------------
+# 6-Dec-2011: Introducing new ::rivet namespace. Some components 
+# (namely RivetTcl, providing Tcl level initialization) are required 
+# within mod_rivet.c. Unfortunalely Tcl < 8.5.10 loaded shared
+# libs exporting names that clashed with Apache's own namespace and, 
+# hence we have to make sure we are running a Tcl compatible version.
+# (See bug #3216070). If you're running Tcl < 8.5.10 we won't go any
+# further ahead...
+
+AX_COMPARE_VERSION([$TCL_VERSION$TCL_PATCH_LEVEL],[lt],[8.5.10],[
+    AC_MSG_ERROR([Rivet 2.1 requires Tcl > 8.5.10 (current is $TCL_VERSION$TCL_PATCH_LEVEL)])
+] , [
+    AC_MSG_NOTICE([ok, we are running Tcl $TCL_VERSION$TCL_PATCH_LEVEL])
+])
+
+
+
+# APACHE_VERSION
 #
 # let's determine whether we are building for apache1.x or apache2.x.
 # This variable has consequences on the default values for the remaining 
@@ -381,13 +399,14 @@ AC_DEFUN([APACHE_VERSION],[
 
     AC_MSG_CHECKING(for apache version)
     if test "$with_apache_version" = "1"; then
-        AC_MSG_ERROR([Apache 1.x no more supported])
+        AC_MSG_ERROR([Apache 1.x no more supported starting with Rivet 2.1])
     else
         AC_MSG_RESULT( building for apache 2.x )
         AC_CONFIG_FILES([src/apache-2/Makefile])
         apache_version_dir="apache-2"
         AC_DEFINE(APACHE2,1,[APACHE2 definition in config.h])
     fi
+    MOD_RIVET_INCLUDES="-I ${apache_version_dir}"
 ])
 
 AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
@@ -500,6 +519,53 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
     fi
 ])
 
+# RIVET_COMMANDS_EXPORT (--enable-rivet-commands-export).
+# Enable export of commands in Rivet's namespace. Definining this symbols
+# sets the boolean configuration variable rivet_commands_export 
+# Default: yes
+
+AC_DEFUN([RIVET_COMMANDS_EXPORT],[
+    AC_ARG_ENABLE(
+        rivet-commands-export,
+        [  --disable-rivet-commands-export to prevent export from ::rivet namespace],
+        [ rivet_commands_export=$enable_rivet_commands_export ],
+        [ rivet_commands_export="yes"]
+    )
+
+    AC_MSG_CHECKING(whether the commands in ::rivet namespace will be exported)
+    if test "$rivet_commands_export" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(NAMESPACE_EXPORT,1,[commands will be exported])
+    else
+        AC_MSG_RESULT([no])
+        AC_DEFINE(NAMESPACE_EXPORT,0,[commands will not be exported])
+    fi
+])
+
+# IMPORT_RIVET_COMMANDS (--enable-import-rivet-commands).
+# For compatibility the module can be compiled and installed forcing rivet
+# to import commands from ::rivet into the global namespace.
+# Default: yes
+
+AC_DEFUN([IMPORT_RIVET_COMMANDS],[
+    AC_ARG_ENABLE(
+        import-rivet-commands,
+        [ --disable-import-rivet-commands requires explicit namespace import if required],
+        [ import_rivet_commands=$enable_import_rivet_commands],
+        [ import_rivet_commands="yes"]
+    )
+
+    AC_MSG_CHECKING(if ::rivet namespace will be automatically imported for compatibility)
+    if test "$import_rivet_commands" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(NAMESPACE_IMPORT,1,[commands will be imported into the global namespace])
+    else
+        AC_MSG_RESULT([no])
+        AC_DEFINE(NAMESPACE_IMPORT,0,[good, no automatic import will be done])
+    fi
+])
+
+
 # SEPARATE_VIRTUAL_INTERPS (--enable-virtual-interps-separation)
 # Virtual hosts get their own interpreter and configuration. Different
 # applications running on different virtual hosts don't mix up variables
@@ -511,10 +577,10 @@ AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
     virtual-interps-separation,
     [  --enable-virtual-interps-separation to turn on virtual host separation],
     [ separate_virtual_interps=$enable_virtual_interps_separation ],
-    [ separate_virtual_interps="yes"]
+    [ separate_virtual_interps="no"]
     )
 
-    AC_MSG_CHECKING(whether Rivet will crate an interpreter for each virtual host)
+    AC_MSG_CHECKING(whether Rivet will create an interpreter for each virtual host)
     if test "$separate_virtual_interps" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,1,[virtual hosts will have their own interp])
@@ -580,7 +646,16 @@ HONOR_HEAD_REQUESTS
 VIRTUAL_INTERPS_SEPARATION
 POST_MAX_SIZE
 UPLOAD_TO_VAR
+IMPORT_RIVET_COMMANDS
+if test $import_rivet_commands = "yes"; then
+    AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
+    AC_DEFINE(NAMESPACE_EXPORT,1,[commands will be exported])
+else
+    RIVET_COMMANDS_EXPORT
+fi
+
 AC_SUBST(apache_version_dir)
+AC_SUBST(MOD_RIVET_INCLUDES)
 
 AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])

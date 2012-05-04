@@ -2,4 +2,4 @@
 
 # $Id$
 
-puts "afterscript1<br>"
+puts -nonewline "afterscript1"

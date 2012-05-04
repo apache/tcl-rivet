@@ -7,20 +7,18 @@ set testfilename1 include.rvt
     ::http::data $page
 } {<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-    <title>Include Test</title>
-  </head>
+  <head><title>Include Test</title></head>
 
   <body>
     <h1>Include Test</h1>
         <table>
       <tbody>
-	<tr>
-	  <td>row 1</td>
-	</tr>
-	<tr>
-	  <td>row 2</td>
-	</tr>
+    <tr>
+      <td>row 1</td>
+    </tr>
+    <tr>
+      <td>row 2</td>
+    </tr>
       </tbody>
     </table>
 <p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>

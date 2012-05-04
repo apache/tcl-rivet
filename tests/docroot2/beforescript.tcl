@@ -2,4 +2,5 @@
 
 # $Id$
 
+set  ::beforescript2 1
 puts "beforescript2"

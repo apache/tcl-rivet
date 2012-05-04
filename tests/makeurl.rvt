@@ -1,6 +1,25 @@
 <?
 
-# makeurl-1.1
-puts [makeurl /foo]
+    if {[::rivet::var exists urltype]} {
 
+        switch [::rivet::var get urltype] {
+
+            absolute {
+# makeurl-1.1
+                puts [::rivet::makeurl /foo]
+            }
+
+            relative {
+# makeurl-1.2
+                puts [::rivet::makeurl foo/]
+
+            }
+            
+        }
+    } else {
+
+# makeurl-1.3
+        puts [::rivet::makeurl]
+
+    }
 ?>

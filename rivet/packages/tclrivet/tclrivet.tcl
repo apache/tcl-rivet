@@ -38,7 +38,6 @@ proc var {} {}
 proc var_qs {} {}
 proc var_post {} {}
 proc upload {} {}
-proc include {} {}
 proc parse {} {}
 proc no_body {} {}
 proc env {} {}

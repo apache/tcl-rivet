@@ -223,11 +223,7 @@ package provide form 1.0
 	append string " />"
 
 	# ...and emit it
-	if {($type == "radio") || ($type == "checkbox")} {
-	    html $string$data(label)
-	} else {
 	    html $string
-	}
     }
 
     #

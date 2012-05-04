@@ -12,9 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package provide RivetTcl 1.1
+package provide RivetTcl 2.1
 
 namespace eval ::Rivet {
+
+    ###
+    ## export_tcl_commands --
+    ## this is temporary hack to export names of Tcl commands in rivet-tcl/.
+    ## This function will be removed in future versions of Rivet and it's
+    ## meant to provide a basic way to guarantee compatibility with older
+    ## versions of Rivet (see code in ::Rivet::init)
+    ##
+
+    proc tcl_commands_export_list {tclpath} {
+
+        # we collect the commands in rivet-tcl by reading the tclIndex
+        # file and then we extract the command list from auto_index
+
+        namespace eval ::rivet_temp { }
+        set ::rivet_temp::tclpath $tclpath
+
+        namespace eval ::rivet_temp {
+            variable auto_index
+            array set auto_index {}
+
+            # the auto_index in ${tclpath}/tclIndex is loaded
+            
+            set dir $tclpath
+            source [file join $tclpath tclIndex]
+        }
+        
+        set command_list [namespace eval ::rivet_temp {array names auto_index}]
+
+        # commands in 'command_list' are prefixed with ::rivet, so we have to
+        # remove it to build an export list 
+        
+        set export_list {}
+        foreach c $command_list {
+            if {[regexp {::rivet::(.*)} $c m cmd]} {
+                lappend export_list $cmd
+#               namespace eval ::rivet [list namespace export $cmd]
+            }
+        }
+
+        # we won't left anything behind
+        namespace delete ::rivet_temp
+
+        return $export_list
+    }
 
     ###
     ## This routine gets called each time a new request comes in.
@@ -72,6 +117,31 @@ namespace eval ::Rivet {
         set tclpath [file join [file dirname [info script]] rivet-tcl]
         set auto_path [linsert $auto_path 0 $tclpath]
 
+        ## As we moved the commands ensemble to ::rivet namespace we
+        ## we want to guarantee the commands are still accessible
+        ## at global level by putting them on the export list.
+        ## Importing the ::rivet namespace is deprecated and we should
+        ## make it clear that this will be removed in the future
+
+        ## we keep in ::rivet::export_list a list of importable commands
+
+        namespace eval ::rivet [list set export_list [tcl_commands_export_list $tclpath]]
+        namespace eval ::rivet {
+
+        ## init.tcl is run by mod_rivet (which creates the ::rivet namespace) but it gets run
+        ## standalone by mkPkgindex during the installation phase. We have to make sure the
+        ## procedure won't fail in this case, so we check for the existence of the variable.
+
+            if {[info exists module_conf(export_namespace_commands)] && \
+                 $module_conf(export_namespace_commands)} {
+
+                apache_log_error debug "exporting ::rivet commands"
+                eval namespace export $export_list
+
+            } else {
+                apache_log_error debug "::rivet commands won't be exported"
+            }
+        }
         ## Add the packages directory to the auto_path.
         ## If we have a packages$tcl_version directory
         ## (IE: packages8.3, packages8.4) append that as well.
@@ -88,7 +158,7 @@ namespace eval ::Rivet {
         ## Likewise we have also to add to auto_path the directory containing 
         ## this script since it holds the pkgIndex.tcl file for package Rivet. 
 
-        # set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+        set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
         ## This will allow users to create proc libraries and tclIndex files
         ## in the local directory that can be autoloaded.
@@ -99,5 +169,29 @@ namespace eval ::Rivet {
 
 } ;## namespace eval ::Rivet
 
+
+## Rivet 2.1.x supports Tcl >= 8.5, therefore there's no more need for
+## the command incr0, as the functionality of creating a not yet
+## existing variable is now provided by 'incr'. Being incr0 a command
+## in Rivet < 2.1.0, before the move into the ::Rivet namespace, 
+## we alias this command only in the global namespace
+
+interp alias {} ::incr0 {} incr
+
 ## Initialize Rivet.
 ::Rivet::init
+
+## And now we get to the import of the whole ::rivet namespace. 
+## Some commands (namely lassign) replace the native lassign command
+## so we have to  use the -force switch
+
+# Do we actually want to import everything? If Rivet was configured
+# to import the ::rivet namespace for compatibility we do it right away.
+# This option is not guaranteed to be supported in future versions.
+
+if {[info exists module_conf(import_rivet_commands)] && $module_conf(import_rivet_commands)} {
+    namespace import -force ::rivet::*
+}
+
+array unset module_conf
+

@@ -116,6 +116,14 @@ Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
 EXTERN int
 Rivetparser_Init( Tcl_Interp *interp )
 {
+#ifdef USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+#else
+	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
+#endif    
+	    return TCL_ERROR;
+    }
+
     Tcl_CreateObjCommand(interp,
 			 "rivet::parserivet",
 			 Parse_Rivet,
@@ -144,6 +152,15 @@ Rivetparser_SafeInit( Tcl_Interp *interp )
      * target string, which should by design prevent buffer overflow
      * attacks, etc.
      */
+
+#ifdef USE_TCL_STUBS
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
+#else
+	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
+#endif    
+	    return TCL_ERROR;
+    }
+
     Tcl_CreateObjCommand(interp,
 			 "rivet::parserivetdata",
 			 Parse_RivetData,

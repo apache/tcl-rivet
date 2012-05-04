@@ -13,38 +13,40 @@
 ##
 ###
 
-proc lmatch {args} {
-    set modes(-exact)  0
-    set modes(-glob)   1
-    set modes(-regexp) 2
+namespace eval ::rivet {
+    proc lmatch {args} {
+        set modes(-exact)  0
+        set modes(-glob)   1
+        set modes(-regexp) 2
 
-    if {[llength $args] == 3} {
-	lassign $args mode list pattern
-    } elseif {[llength $args] == 2} {
-	set mode -glob
-	lassign $args list pattern
-    } else {
-        return -code error \
-	    {wrong # args: should be "lmatch ?mode? list pattern"}
-    }
+        if {[llength $args] == 3} {
+            lassign $args mode list pattern
+        } elseif {[llength $args] == 2} {
+            set mode -glob
+            lassign $args list pattern
+        } else {
+            return -code error \
+                {wrong # args: should be "lmatch ?mode? list pattern"}
+        }
 
-    if {![info exists modes($mode)]} {
-	return -code error \
-	    "bad search mode \"$mode\": must be -exact, -glob, or -regexp"
-    }
-    set mode $modes($mode)
+        if {![info exists modes($mode)]} {
+            return -code error \
+                "bad search mode \"$mode\": must be -exact, -glob, or -regexp"
+        }
+        set mode $modes($mode)
 
-    set return {}
-    foreach elem $list {
-	if {$mode == 0} {
-	    if {[string compare $elem $pattern] == 0} { lappend return $elem }
-	}
-	if {$mode == 1} {
-	    if {[string match $pattern $elem]} { lappend return $elem }
-	}
-	if {$mode == 2} {
-	    if {[regexp $pattern $elem]} { lappend return $elem }
-	}
+        set return {}
+        foreach elem $list {
+            if {$mode == 0} {
+                if {[string compare $elem $pattern] == 0} { lappend return $elem }
+            }
+            if {$mode == 1} {
+                if {[string match $pattern $elem]} { lappend return $elem }
+            }
+            if {$mode == 2} {
+                if {[regexp $pattern $elem]} { lappend return $elem }
+            }
+        }
+        return $return
     }
-    return $return
 }

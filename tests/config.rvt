@@ -1,8 +1,8 @@
 <?
-if { [var exists brokenpage] } {
+if { [::rivet::var exists brokenpage] } {
     # config-1.1
     broken
-} elseif { [var exists goodpage] } {
+} elseif { [::rivet::var exists goodpage] } {
     puts "Page Body"
 }
 ?>

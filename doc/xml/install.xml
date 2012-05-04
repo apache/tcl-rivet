@@ -146,14 +146,6 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
                </listitem>
             </varlistentry>
             <varlistentry>
-                <term>--with-rivet-target-dir=DIR</term>
-               <listitem>
-                    <para>
-                    This option tells the install script where Rivet's Tcl packages have to be copied. 
-                    </para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
                 <term>--with-upload-dir=DIR (default: '/tmp')</term>
                 <listitem>
                     <para>
@@ -188,9 +180,33 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
             <varlistentry>
                 <term>--disable-upload-var</term>
                 <listitem>
-                    By default uploads are stored in Tcl variables. This switch sets the default for the configuration 
-                    parameter 'UploadFilesToVar' to 0. (Can be changed in the configuration)
+                    By default uploads are stored in Tcl variables. 
+                    This switch sets the default for the configuration 
+                    parameter 'UploadFilesToVar' to 0. 
+                    (Can be changed in the configuration)
                 </listitem>
+            </varlistentry>
+            <varlistentry>
+            	<term>--disable-rivet-commands-export</term>
+            	<listitem>
+            		Rivet commands are created in the ::rivet namespace. To improve code readability
+            		it is recommended you write your scripts using the fully qualified name
+            		definitions. For compatibility with existing code, commands are exported from
+            		::rivet and can be thus imported into any namespace (global namespace included)
+            		with the command
+            		<programlisting>namespace import -force ::rivet::*</programlisting>
+            		The default value for this option may change in the future.
+            	</listitem>
+            </varlistentry>
+            <varlistentry>
+            	<term>--disable-import-rivet-commands</term>
+            	<listitem>
+            		Rivet commands can be imported imported into the global namespace. This
+            		is done by default and can be disabled using this option. In future
+            		versions of Rivet the default will be changed to off and eventually
+            		removed altogether. 
+            		<note>This option implicitly sets --enable-rivet-commands-export</note>
+            	</listitem>
             </varlistentry>
         </variablelist>
             </para>

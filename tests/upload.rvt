@@ -1,2 +1,1 @@
-<? puts "[upload names] [upload exists uploadtest] [upload size uploadtest] -[upload type uploadtest]- [upload filename uploadtest]" ?>
-
+<? puts "[::rivet::upload names] [::rivet::upload exists uploadtest] [::rivet::upload size uploadtest] -[::rivet::upload type uploadtest]- [::rivet::upload filename uploadtest]" ?>
