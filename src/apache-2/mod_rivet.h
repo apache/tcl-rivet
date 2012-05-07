@@ -131,5 +131,14 @@ rivet_server_conf *Rivet_GetConf(request_rec *r);
 #define RIVET_NEW_CONF(p) \
 	(rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
 
+Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*        interp,
+                                    rivet_server_conf*  rivet_conf);
+
+Tcl_Obj* Rivet_ReadConfParameter (  Tcl_Interp*         interp,
+                                    rivet_server_conf*  rivet_conf,
+                                    Tcl_Obj*            par_name);
+
+Tcl_Obj* Rivet_CurrentConfDict (    Tcl_Interp*           interp,
+                                    rivet_server_conf*    rivet_conf);
 #endif /* MOD_RIVET_H */
 

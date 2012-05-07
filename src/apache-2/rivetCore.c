@@ -1230,6 +1230,84 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
 /*
  *-----------------------------------------------------------------------------
  *
+ * Rivet_Inspect --
+ *
+ *      Rivet configuration introspection. Command '::rivet::inspect' 
+ *      returns a dictionary of configuration data:
+ *
+ * Results:
+ *      A dictionary or parameter value
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_InspectCmd )
+{
+    rivet_interp_globals*   globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    rivet_server_conf*      rsc = Rivet_GetConf(globals->r); 
+    int                     status = TCL_OK;
+
+    if (objc == 1)
+    {
+        Tcl_Obj* dictObj;
+
+        dictObj = Rivet_BuildConfDictionary(interp,rsc);
+        if (dictObj != NULL) {
+            Tcl_SetObjResult(interp,dictObj);
+            Tcl_DecrRefCount(dictObj);
+        } else {
+            status = TCL_ERROR;
+        }
+    }
+    else if (objc == 2)
+    {
+        Tcl_Obj* par_name = objv[1];
+
+        Tcl_IncrRefCount(par_name);
+        if (STRNEQU(Tcl_GetStringFromObj(par_name,NULL),"-all"))
+        {
+            Tcl_Obj* dictObj;
+
+            dictObj = Rivet_CurrentConfDict(interp,rsc);
+            if (dictObj == NULL)
+            {
+                status = TCL_ERROR;
+            }
+            else
+            {
+                Tcl_SetObjResult(interp,dictObj);            
+                Tcl_DecrRefCount(dictObj);
+            }
+        }
+        else
+        {
+            Tcl_Obj* par_value = NULL;
+
+            par_value = Rivet_ReadConfParameter(interp,rsc,par_name);
+            if (par_value == NULL)
+            {
+                status = TCL_ERROR;
+            }
+            else
+            {
+                Tcl_SetObjResult(interp,par_value);
+                Tcl_DecrRefCount(par_value);
+            }
+        }
+
+        Tcl_DecrRefCount(par_name);
+    }
+    else 
+    {
+        Tcl_WrongNumArgs( interp, 1, objv, "?server | dir | user? ?parameter name?" );
+        status = TCL_ERROR;
+    }
+    return status;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
  * Rivet_LogError --
  *
  *      Log an error from Rivet
@@ -1421,6 +1499,7 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("no_body",Rivet_NoBody);
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd);
+    RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd);

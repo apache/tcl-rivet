@@ -1,3 +1,18 @@
+2012-05-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: new command ::rivet::inspect implementing function
+    Rivet_InspectCmd
+    * src/apache-2/rivetConf.c: Ancillary functions for instrospection procedure Rivet_InspectCmd
+    * src/apache-2/Makefile.am: Added handling of rivetConf.c
+    * src/apache-2/mod_rivet.c: Handling of configuration directives restricted to meaningful
+    options when RivetDirConf or RivetUserConf directives are set. An error message is printed
+    when child process initialization directives are set by RivetDirConf and RivetUserConf.
+    Rivet_PropagatePerDirConfArrays and Rivet_PropagateServerConfArray functions disabled as the
+    ::rivet::inspect command can work out a better alternative creating the RivetServerConf,
+    RivetDirConf and RivetUserConf on demand.
+    * src/apache-2/mod_rivet.h: Added declaration for functions in rivetConf.c
+    * rivet/rivet-tcl/lassign.tcl: removed, since Tcl 8.5 lassign implements and extends the
+    same functionalities 
+
 2012-04-30 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form.tcl: Patch provided by Jeff Lawson to manage -label switches.
     The package now requires package uuid from Tcllib.

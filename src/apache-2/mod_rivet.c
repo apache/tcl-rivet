@@ -285,6 +285,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
 #endif
 }
 
+#if 0
 static void
 Rivet_PropagateServerConfArray( Tcl_Interp *interp, rivet_server_conf *rsc )
 {
@@ -321,6 +322,7 @@ Rivet_PropagateServerConfArray( Tcl_Interp *interp, rivet_server_conf *rsc )
     }
     Tcl_DecrRefCount(arrayName);
 }
+#endif
 
 /* Calls Tcl_EvalObjEx() and checks for errors
  * Prints the error buffer if any.
@@ -697,6 +699,10 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
               rivet_server_conf *base, rivet_server_conf *add )
 {
     FILEDEBUGINFO;
+    new->rivet_child_init_script = add->rivet_child_init_script ?
+        add->rivet_child_init_script : base->rivet_child_init_script;
+    new->rivet_child_exit_script = add->rivet_child_exit_script ?
+        add->rivet_child_exit_script : base->rivet_child_exit_script;
 
     new->rivet_before_script = add->rivet_before_script ?
         add->rivet_before_script : base->rivet_before_script;
@@ -782,8 +788,8 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     Tcl_IncrRefCount(rsc->rivet_default_error_script);
 
     /* these are pointers so that they can be passed around...  */
-    rsc->cache_size = apr_pcalloc(p, sizeof(int));
-    rsc->cache_free = apr_pcalloc(p, sizeof(int));
+    rsc->cache_size                 = apr_pcalloc(p, sizeof(int));
+    rsc->cache_free                 = apr_pcalloc(p, sizeof(int));
     *(rsc->cache_size)              = -1;
     *(rsc->cache_free)              = 0;
     rsc->upload_max                 = RIVET_MAX_POST;
@@ -803,6 +809,8 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
 
     return rsc;
 }
+
+#if 0
 
 static void
 Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
@@ -861,6 +869,7 @@ Rivet_PropagatePerDirConfArrays( Tcl_Interp *interp, rivet_server_conf *rsc )
     }
     Tcl_DecrRefCount(arrayName);
 }
+#endif
 
 /*
  *-----------------------------------------------------------------------------
@@ -936,7 +945,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables(interp, p );
-    Rivet_PropagateServerConfArray( interp, rsc );
+//  Rivet_PropagateServerConfArray( interp, rsc );
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
@@ -962,15 +971,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     /* Loading into the interpreter the commands provided by librivet.so */
 
-   /* It would be nice to have to whole set of Rivet commands
-    * loaded into the interpreter at this stage. Unfortunately
-    * a problem with the dynamic loader of some OS prevents us 
-    * from callingTcl_PkgRequire for 'rivetlib' because Apache segfaults
-    * shortly after the extension library is loaded.
-    * The problem was investigated on Linux and it became clear 
-    * that it's linked to the way Tcl calls dlopen (Bug #3216070)
-    * The problem could be solved in Tcl8.6 
-    */
+    /* Bug #3216070 has been solved with 8.5.10 and commands shipped with
+     * Rivetlib can be mapped at this stage
+     */
 
     if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, "1.2", 1) == NULL)
     {
@@ -1085,12 +1088,14 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
  *
  * Command Arguments:
  *
+ *  RivetServerConf ServerInitScript <script>
  *  RivetServerConf GlobalInitScript <script>
  *  RivetServerConf ChildInitScript <script>
  *  RivetServerConf ChildExitScript <script>
  *  RivetServerConf BeforeScript <script>
  *  RivetServerConf AfterScript <script>
  *  RivetServerConf ErrorScript <script>
+ *  RivetServerConf AfterEveryScript <script>
  *  RivetServerConf CacheSize <integer>
  *  RivetServerConf UploadDirectory <directory>
  *  RivetServerConf UploadMaxSize <integer>
@@ -1140,6 +1145,7 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy,
  *  RivetDirConf BeforeScript <script>
  *  RivetDirConf AfterScript <script>
  *  RivetDirConf ErrorScript <script>
+ *  RivetDirConf AfterEveryScript <script>
  *  RivetDirConf UploadDirectory <directory>
  */
 
@@ -1159,7 +1165,19 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
     if( STREQU( var, "UploadDirectory" ) ) {
         rdc->upload_dir = val;
     } else {
-        string = Rivet_SetScript( cmd->pool, rdc, var, val );
+        if (STREQU(var,"BeforeScript")      || 
+            STREQU(var,"AfterScript")       || 
+            STREQU(var,"AbortScript")       ||
+            STREQU(var,"AfterEveryScript")  ||
+            STREQU(var,"ErrorScript"))
+        {
+            string = Rivet_SetScript( cmd->pool, rdc, var, val );
+        }
+        else
+        {
+            return apr_pstrcat(cmd->pool, "Rivet configuration error: '",var, 
+                                          "' not valid for RivetDirConf", NULL);
+        }
     }
 
     if (string != NULL) apr_table_set( rdc->rivet_dir_vars, var, string );
@@ -1176,7 +1194,8 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
  */
 
 static const char *
-Rivet_UserConf( cmd_parms *cmd, void *vrdc, 
+Rivet_UserConf( cmd_parms *cmd, 
+                void *vrdc, 
                 const char *var, 
                 const char *val )
 {
@@ -1192,9 +1211,23 @@ Rivet_UserConf( cmd_parms *cmd, void *vrdc,
     /* We have modified these scripts. */
     /* This is less than ideal though, because it will get set to 1
      * every time - FIXME. */
+
     rdc->user_scripts_updated = 1;
 
-    string = Rivet_SetScript( cmd->pool, rdc, var, val );
+    if (STREQU(var,"BeforeScript")  || 
+        STREQU(var,"AfterScript")   || 
+        STREQU(var,"AbortScript")   ||
+        STREQU(var,"AfterEveryScript") ||
+        STREQU(var,"ErrorScript"))
+    {
+        string = Rivet_SetScript( cmd->pool, rdc, var, val );
+    }
+    else
+    {
+        return apr_pstrcat(cmd->pool, "Rivet configuration error: '",var, 
+                                      "' not valid for RivetUserConf", NULL);
+    }
+
     /* XXX Need to figure out what to do about setting the table.  */
     if (string != NULL) apr_table_set( rdc->rivet_user_vars, var, string );
     return NULL;
@@ -1824,9 +1857,9 @@ Rivet_SendContent(request_rec *r)
     }
 
 #ifdef USE_APACHE_RSC
-    Rivet_PropagatePerDirConfArrays( interp, rsc );
+//  Rivet_PropagatePerDirConfArrays( interp, rsc );
 #else
-    Rivet_PropagatePerDirConfArrays( interp, rdc );
+//  Rivet_PropagatePerDirConfArrays( interp, rdc );
 #endif
 
     /* Initialize this the first time through and keep it around. */
