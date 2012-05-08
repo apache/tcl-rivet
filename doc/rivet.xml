@@ -25,6 +25,7 @@
     <!ENTITY internals.xml          SYSTEM  "xml/internals.xml" >
     <!ENTITY upgrade.xml            SYSTEM  "xml/upgrade.xml" >
     <!ENTITY request.xml            SYSTEM  "xml/request.xml" >
+    <!ENTITY entities.xml           SYSTEM  "xml/entities.xml" >
 ]>
 
 <!--
@@ -59,6 +60,7 @@
         <year>2009</year>
         <year>2010</year>
         <year>2011</year>
+        <year>2012</year>
         <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
@@ -117,6 +119,9 @@
 
     <!-- Calendar -->
     &calendar.xml;
+
+    <!-- Entities -->
+    &entities.xml;
 
     <!-- Help -->
     &help.xml;

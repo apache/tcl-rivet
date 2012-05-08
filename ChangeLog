@@ -1,3 +1,10 @@
+2012-05-09 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/http_accept.tcl: new command ::rivet::http_accept 
+    * doc/xml/commands.xml: new manual entry for ::rivet::http_accept 
+    * doc/rivet.xml: Add new file entities.xml describing package 'RivetEntities' 
+    (only a stub, to be elaborated)
+    * doc/xml/entities.xml: New manual page for package 'RivetEntities'
+
 2012-05-08 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetPkgInit.c: reinstated safe interpreters initialization
     * doc/xml/install.xml: corrections and further elaboration of explanation for
