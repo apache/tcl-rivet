@@ -1,3 +1,8 @@
+2012-05-08 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetPkgInit.c: reinstated safe interpreters initialization
+    * doc/xml/install.xml: corrections and further elaboration of explanation for
+    the --disable-import-rivet-commands
+
 2012-05-07 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: new command ::rivet::inspect implementing function
     Rivet_InspectCmd

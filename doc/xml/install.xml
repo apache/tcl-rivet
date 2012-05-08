@@ -201,10 +201,11 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
             <varlistentry>
             	<term>--disable-import-rivet-commands</term>
             	<listitem>
-            		Rivet commands can be imported imported into the global namespace. This
-            		is done by default and can be disabled using this option. In future
-            		versions of Rivet the default will be changed to off and eventually
-            		removed altogether. 
+            		By default Rivet commands are implicitly imported into the global namespace.
+            		This action can be disabled using the option --disable-import-rivet-commands. 
+                    In future versions of Rivet the default will be changed to off and eventually
+            		removed altogether, forcing the programmer to explicitly import the commands
+                    from the ::rivet namespace.
             		<note>This option implicitly sets --enable-rivet-commands-export</note>
             	</listitem>
             </varlistentry>
@@ -212,31 +213,30 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
             </para>
             <para>
                 Example: configuring the build system to compile Rivet for an apache 2.x server, using tcl8.5 and
-                specifying a custom name for the apxs program. 
+                specifying a custom name for the apxs program (as it's done for Debian Apache 2.2). 
             </para>
         <programlisting>
-    ./configure --with-tcl=/usr/lib/tcl8.5/ --with-tclsh=/usr/bin/tclsh8.5 \
-            --with-apxs=/usr/bin/apxs2 --with-apache=/usr --with-apache-version=2
+    ./configure --with-tcl=/usr/lib/tcl8.5/ --with-tclsh=/usr/bin/tclsh8.5 --with-apxs=/usr/bin/apxs2 --with-apache=/usr --with-apache-version=2
         </programlisting>
           </step>
           <step>
             <title>Run make</title>
             <para>
-              At this point, you are ready to run make, which should
-              run to completion without any errors (a warning or two
-              is ok, generally).
+                At this point, you are ready to run make, which should
+                run to completion without any errors (a warning or two
+                is ok, generally). Running 'make clean' beforehand can be useful
+                if you are rebuilding after having changed some parameters passed
+                to 'configure'
             </para>
           </step>
           <step>
             <title>Install</title>
             <para>
-                Now, you are ready to run the <command>make
-                install</command> to install the resulting files.
-                This should copy the shared object (like
-                <filename>mod_rivet.so</filename>, if one was
-                successfully created, into Apache's
-                <filename>libexec</filename> directory, as well as
-                install some support scripts and various code.
+                Now, you are ready to run the <command>make install</command> 
+                to install the resulting files. This should copy the shared object 
+                (like <filename>mod_rivet.so</filename>, if one was successfully
+                created, into Apache's <filename>libexec</filename> directory, 
+                as well as install some support scripts and various code.
             </para>
           </step>
         </substeps>

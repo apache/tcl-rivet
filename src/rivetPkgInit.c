@@ -86,7 +86,7 @@ int
 Rivetlib_Init( Tcl_Interp *interp )
 {
 #if RIVET_NAMESPACE_EXPORT == 1
-    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp);; 
+    Tcl_Namespace *rivet_ns = Rivet_GetNamespace(interp); 
 #endif
 
 #ifdef RIVET_USE_TCL_STUBS
@@ -119,7 +119,6 @@ Rivetlib_Init( Tcl_Interp *interp )
  *-----------------------------------------------------------------------------
  */
 
-/*
 int
 Rivetlib_SafeInit( Tcl_Interp *interp )
 {
@@ -144,4 +143,3 @@ Rivetlib_SafeInit( Tcl_Interp *interp )
 #endif
     return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
 }
-*/
