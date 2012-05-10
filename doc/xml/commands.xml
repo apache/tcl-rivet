@@ -896,8 +896,8 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 		<title>Description</title>
 		<para>
 		    Look for elements in &lt;list&gt; that match &lt;pattern&gt;.  
-		    This command emulates the TclX lmatch command, but if TclX isn't 
-		    available, it's a decent substitute.
+		    This command is a decent replacement for TclX lmatch command when TclX is
+            not available 
 		</para>
 		<para>
 		    In the following example a regular expression is matched against
@@ -910,7 +910,6 @@ bxxb ccxxxxcc</programlisting>
 		</para>
 	    </refsect1>
 	</refentry>	
-
 
 	<refentry id="load_cookies">
 	    <refnamediv>
