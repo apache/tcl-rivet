@@ -1,3 +1,16 @@
+2012-05-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetParser.c: add shorthand expression <?= ... ?> for <? puts -nonewline "..." ?> (contributed 
+    by Jeff Lawson,addresses #53217, tclrivetparser yet to be fixed)
+    * tests/shorthand.[test|rvt]: add test of shorthand notation for string output 
+    * rivet/rivet-tcl/cookie.tcl: add support for HttpOnly flag (contributed by Cyril Shtumf, 
+    fixes bug #53224)
+    * rivet/packages/session/session-class.tcl: support for HttpOnly flag improves security and reduces
+    the risk of cross-site scripting attacks (contributed by Cyril Shtumf, fixes #52224)
+    * rivet/packages/dio/dio.tcl: wrong SQL syntax generated in delete method when multiple fields are
+    used in the selection clause (contributed by Cyril Shtumf, fixes bug #53222)
+    * rivet/packages/dio/dio_Mysql.tcl: Mysql connection must be checked when connection reference is reused
+    because it could have dropped (contributed by Cyril Shtumf, fixes #53221)
+
 2011-09-23 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-1/rivetCore.c: fixed declarations for various calls to ap_pstrcat.
 
