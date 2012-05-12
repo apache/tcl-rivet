@@ -168,7 +168,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 
     int endseqlen = strlen(END_TAG);
     int startseqlen = strlen(START_TAG);
-    int inside = 0, p = 0;
+    int inside = 0, p = 0, check_echo = 0;
     int inLen = 0;
 
     next = Tcl_GetStringFromObj(inbuf, &inLen);
@@ -190,6 +190,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
                     /* We have matched the whole ending sequence. */
                     Tcl_AppendToObj(outbuf, "\"\n", 2);
                     inside = 1;
+                    check_echo = 1;
                     p = 0;
                     continue;
                 }
@@ -230,6 +231,15 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
             }
         } else {
             /* Inside the delimiting tags. */
+
+            if (check_echo)
+            {
+                check_echo = 0;
+                if (*cur == '=') {
+                    Tcl_AppendToObj(outbuf, "\nputs -nonewline ", -1);
+                    continue;
+                }
+            }
 
             if (*cur == strend[p])
             {

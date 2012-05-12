@@ -59,6 +59,9 @@ namespace eval ::rivet {
         if { [info exists params(secure)] && $params(secure) == 1} {
             append cookieParams "; secure"
         }
+        if { [info exists params(HttpOnly)] && $params(HttpOnly)} {
+            append cookieParams "; HttpOnly"
+        }
 
         return $cookieParams
     }

@@ -87,6 +87,9 @@ package require Itcl
     # specifies whether cookies should only be sent over secure connections
     public variable cookieSecure 0
 
+    # specifies whether cookies should only be sent over http connections
+    public variable cookieHttpOnly 0
+
     # the name of the table that session info will be stored in
     public variable sessionTable "rivet_session"
 
@@ -192,7 +195,8 @@ package require Itcl
 	cookie set $cookieName $value \
 	    -path $cookiePath \
 	    -minutes $cookieLifetime \
-	    -secure $cookieSecure
+	    -secure $cookieSecure \
+	    -HttpOnly $cookieHttpOnly
     }
 
     #
