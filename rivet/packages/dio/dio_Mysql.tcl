@@ -64,7 +64,7 @@ namespace eval DIO {
 	}
 
 	method exec {req} {
-	    if {![info exists conn]} { open }
+	    if {![info exists conn] || ![mysqlping $conn]} { open }
 
 	    set cmd mysqlexec
 #
@@ -89,7 +89,7 @@ namespace eval DIO {
 	}
 
 	method lastkey {} {
-	    if {![info exists conn]} { return }
+	    if {![info exists conn] || ![mysqlping $conn]} { return }
 	    return [mysqlinsertid $conn]
 	}
 
@@ -107,7 +107,7 @@ namespace eval DIO {
 	}
 
 	method handle {} {
-	    if {![info exists conn]} { open }
+	    if {![info exists conn] || ![mysqlping $conn]} { open }
 
 	    return $conn
 	}
@@ -158,7 +158,7 @@ namespace eval DIO {
 	}
 
 	public variable db "" {
-	    if {[info exists conn]} {
+	    if {[info exists conn] && [mysqlping $conn]} {
 		mysqluse $conn $db
 	    }
 	}
