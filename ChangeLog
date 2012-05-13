@@ -1,3 +1,8 @@
+2012-05-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/tclrivet/tclrivetparser.tcl: Tcl parser implements new shorthand echo syntax (closes
+    bug #53217)
+    * doc/xml/entities.xml: New manual page for package RivetEntities
+
 2012-05-12 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetParser.c: add shorthand expression <?= ... ?> for <? puts -nonewline "..." ?> (contributed 
     by Jeff Lawson, addresses #53217, tclrivetparser still to be fixed)

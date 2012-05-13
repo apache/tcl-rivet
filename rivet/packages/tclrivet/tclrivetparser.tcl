@@ -71,7 +71,8 @@ proc tclrivetparser::parse { data outbufvar } {
     variable outputcmd
     variable starttag
     variable endtag
-    set inside 0
+    set inside      0
+    set shorthand   0
 
     upvar $outbufvar outbuf
 
@@ -88,7 +89,17 @@ proc tclrivetparser::parse { data outbufvar } {
             if { $cur == [string index $starttag $p] } {
                 incr p
                 if { $p == [string length $starttag] } {
-                    append outbuf "\"\n"
+
+                    if {$next == "="} {
+#                       puts stderr "shorthand begin detected"
+                        append outbuf "\"\n $outputcmd "
+                        set shorthand   1
+                        incr i
+                        set next [string index $data $i]
+                    } else {
+                        append outbuf "\"\n"
+                    }
+
                     set inside 1
                     set p 0
                     continue
@@ -131,6 +142,10 @@ proc tclrivetparser::parse { data outbufvar } {
             if { $cur == [string index $endtag $p] } {
                 incr p
                 if { $p == [string length $endtag] } {
+                    if {$shorthand} {
+#                       puts stderr "shorthand end detected"
+                        set shorthand 0
+                    } 
                     append outbuf "\n$outputcmd \""
                     set inside 0
                     set p 0
