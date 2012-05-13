@@ -2,6 +2,11 @@
     * rivet/packages/tclrivet/tclrivetparser.tcl: Tcl parser implements new shorthand echo syntax (closes
     bug #53217)
     * doc/xml/entities.xml: New manual page for package RivetEntities
+    * rivet/packages/tclrivet/parse.tcl: auto_path handling improved (closes bug #52898)
+    * rivet/packages/form/form.tcl: indentation converted to spaces to improve editing across different
+    editors. Fixed problem with variable clash in constructor. Also removed unneeded [expr ...] in conditions
+    that prevented byte compiling (Closes bug #52650)
+    * doc/xml/commands.xml: improved manual entry for 'var list' (Fixes bug #52911)
 
 2012-05-12 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetParser.c: add shorthand expression <?= ... ?> for <? puts -nonewline "..." ?> (contributed 

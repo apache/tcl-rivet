@@ -1,33 +1,70 @@
 <section id="entities">
-    <title>Entities Package</title>
+    <title>RivetEntities</title>
     <section>
         <title>Introduction</title>
         <para>
-
+				The <command>RivetEntities</command> package was kindly provided by Harald Oehlmann and 
+				is largely taken from a simple yet clever encoder/decoder of HTML entities
+ 				starting from a utf-8 character string. The original code writted by Andy Goth is 
+				at http://wiki.tcl.tk/26403. Package entities extends the functionality in the 
+				original code combining it with Tcl's 'encoding' command to encode/decode from 
+				any supported encoding
         </para>
 
     </section>
-    <refentry id="entities">
+    <refentry id="encode">
         <refnamediv>
-            <refname>Entities</refname>
-            <refpurpose></refpurpose>
+            <refname>encode</refname>
+            <refpurpose>
+                encode a string replacing every occurrence of characters for 
+                which an SGML entity exists
+            </refpurpose>
         </refnamediv>
         <refsynopsisdiv>
             <cmdsynopsis>
-                <command></command>
-                <arg choice="plain"><replaceable></replaceable></arg>
+                <command>::rivet::encode</command>
+                <arg choice="plain">string</arg>
+                <arg><option>-encoding <replaceable>&lt;encoding&gt;</replaceable></option></arg>
             </cmdsynopsis>
         </refsynopsisdiv>
         <refsect1>
-            <title></title>
+            <title>Description</title>
             <para>
-
+                <command>::rivet::encode</command> returns a copy of the input string
+                after replacing every occurence of characters for which an SGML entity 
+                exists.  By default the command assumes the string is encoded in UTF-8,
+                other encodings are supported by passing the 
+                <command>-encoding &lt;encoding&gt;</command> argument. The list of
+                available encodings is returned by command
             </para>
+            <programlisting>encoding names</programlisting>
         </refsect1>
+    </refentry>
+    <refentry id="decode">
+        <refnamediv>
+            <refname>decode</refname>
+            <refpurpose>
+                decode an SGML encoded string replacing every entity with the
+                corresponding character
+            </refpurpose>
+        </refnamediv>
+        <refsynopsisdiv>
+            <cmdsynopsis>
+                <command>::rivet::decode</command>
+                <arg choice="plain">string</arg>
+                <arg><option>-encoding <replaceable>&lt;encoding&gt;</replaceable></option></arg>
+            </cmdsynopsis>
+        </refsynopsisdiv>
         <refsect1>
-            <variablelist>
-
-            </variablelist>
+            <title>Description</title>
+            <para>
+                    <command>::rivet::decode</command> implements the inverse function of
+                    <command>::rivet::encode</command>. The input string is scanned searching
+                    and replacing every SGML entity with its corresponding character.
+                    By default the command assumes the output string has to be encoded in UTF-8.
+                    Other encodings are supported by passing the 
+                    <command>-encoding &lt;encoding&gt;</command> argument.
+            </para>
         </refsect1>
     </refentry>
 </section>
