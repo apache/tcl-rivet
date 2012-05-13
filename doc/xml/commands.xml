@@ -1341,9 +1341,11 @@ bxxb ccxxxxcc
 	    </term>
 	    <listitem>
 	      <para>
-		Returns the value of variable
-		<option><replaceable>varname</replaceable></option> as a
-		list, if there are multiple values.
+            Returns the value of variable
+            <option><replaceable>varname</replaceable></option> as a list, 
+            one list element per reference. Radiobuttons or multiple 
+            selection listboxes are suited widgets which may 
+            return list data.
 	      </para>
 	    </listitem>
 	  </varlistentry>

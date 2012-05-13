@@ -1,6 +1,8 @@
 2012-05-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/tclrivet/tclrivetparser.tcl: Tcl parser implements new shorthand echo syntax (closes
     bug #53217)
+    * rivet/packages/tclrivet/parse.tcl: auto_path handling improved as suggested in bug #52898
+    * doc/xml/commands.xml: improved manual entry for 'var list' (Fixes bug #52911)
  
 2012-05-12 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetParser.c: add shorthand expression <?= ... ?> for <? puts -nonewline "..." ?> (contributed 

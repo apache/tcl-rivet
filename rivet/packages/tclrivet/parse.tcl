@@ -6,7 +6,11 @@
 
 if {![info exists argv]} { return }
 
-set auto_path "[file dirname [info script]] $auto_path"
+# more consistent manipulation of auto_path as suggested by
+# Harald Oehlmann. Fixes bug #52898
+
+set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+
 package require tclrivet
 
 proc main {} {
