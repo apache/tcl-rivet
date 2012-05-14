@@ -198,23 +198,23 @@ package provide form 1.0
             "radio" -
             "checkbox" {
 
-            # if there's a label then prepare to output it.
-            if {[info exists data(label)]} {
-                # if there's no id defined, generate something unique so we can reference it.
-                if {![info exists data(id)]} {
-                    set data(id) "autogen_[::uuid::uuid generate]"
+                # if there's a label then prepare to output it.
+                if {[info exists data(label)]} {
+                    # if there's no id defined, generate something unique so we can reference it.
+                    if {![info exists data(id)]} {
+                        set data(id) "autogen_[::uuid::uuid generate]"
+                    }
+                    set label "<label for=\"$data(id)\">$data(label)</label>"
                 }
-                set label "<label for=\"$data(id)\">$data(label)</label>"
-            }
 
-            # ...and if the is a default value for this field
-            # and it matches the value we have for it, make
-            # the field show up as selected (checked)
-            if {[info exists DefaultValues($name)] && [info exists data(value)]} {
-                if {[lsearch $DefaultValues($name) $data(value)] >= 0} {
-                set data(checked) "checked"
+                # ...and if the is a default value for this field
+                # and it matches the value we have for it, make
+                # the field show up as selected (checked)
+                if {[info exists DefaultValues($name)] && [info exists data(value)]} {
+                    if {[lsearch $DefaultValues($name) $data(value)] >= 0} {
+                        set data(checked) "checked"
+                    }
                 }
-            }
             }
         }
         # generate the field definition

@@ -216,8 +216,7 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
                 specifying a custom name for the apxs program (as it's done for Debian Apache 2.2). 
             </para>
         <programlisting>
-    ./configure --with-tcl=/usr/lib/tcl8.5/ --with-tclsh=/usr/bin/tclsh8.5 --with-apxs=/usr/bin/apxs2 --with-apache=/usr --with-apache-version=2
-        </programlisting>
+    ./configure --with-tcl=/usr/lib/tcl8.5/ --with-tclsh=/usr/bin/tclsh8.5 --with-apxs=/usr/bin/apxs2 --with-apache=/usr --with-apache-version=2</programlisting>
           </step>
           <step>
             <title>Run make</title>
@@ -248,8 +247,7 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
           adding the module itself:
         </para>
 
-        <programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache2/modules/mod_rivet.so</replaceable>
-        </programlisting>
+        <programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache2/modules/mod_rivet.so</replaceable></programlisting>
 
         <para>
           This tells Apache to load the Rivet shared object, wherever

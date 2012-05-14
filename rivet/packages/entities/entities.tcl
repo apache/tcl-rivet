@@ -1,4 +1,4 @@
-# -- package entities
+# -- package RivetEntities
 #
 # The code is largely taken from a simple yet clever encoder/decoder of HTML entities
 # starting from a utf-8 character string. The original code writted by Andy Goth is 
@@ -10,7 +10,7 @@
 
 package provide RivetEntities 1.0
 
-namespace eval rivet {
+namespace eval ::rivet {
 #   namespace ensemble create -subcommands {encode decode}
     namespace export encode decode
     variable utf8_entities_map {
@@ -91,13 +91,13 @@ namespace eval rivet {
 
 # -- encode
 #
-# input string is processed and its characted suitable to be transformed
+# input string is processed and its characters suitable to be transformed
 # into entities are replaced with their corrisponding HTML (SGML?) entity
 # 
 # if the input string encoding is diffrent from utf-8 the string is 
 # transformed into utf-8 and then processed for entity substitution
 #
-#   ::rivet::encode <input_string> ?-encode <encoding>?  
+#   ::rivet::encode <input_string> ?-encoding <encoding>?  
 #
 #  Arguments:
 #
@@ -123,7 +123,7 @@ namespace eval rivet {
 # has to be in some other encoding Tcl's command 'enconding' is 
 # invoked for final conversion
 #
-#   ::rivet::decode <input_string> ?-encode <encoding>?  
+#   ::rivet::decode <input_string> ?-encoding <encoding>?  
 #
 #  Arguments:
 #

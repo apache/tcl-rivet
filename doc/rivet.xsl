@@ -143,8 +143,7 @@
       <xsl:apply-templates select="term"/>
     </dt>
     <dd>
-      <div style="padding:4 ; margin-top:3 ;
-	margin-bottom:3 ; width:75%" >
+      <div style="padding:4 ; margin-top:3 ; margin-bottom:3 ; width:75%" >
 	<xsl:apply-templates select="listitem"/>
       </div>
     </dd>

@@ -1,3 +1,7 @@
+2012-05-14 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xsl,doc/rivet.css,doc/images/[prev.png,next.png,up.png]: new stylesheet and icons for
+    the page manual
+
 2012-05-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/tclrivet/tclrivetparser.tcl: Tcl parser implements new shorthand echo syntax (closes
     bug #53217)
