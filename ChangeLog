@@ -1,3 +1,6 @@
+2012-05-15 Massimo Manghi <mxmanghi@apache.org>
+    * doc/hello1.rvt: add new "Hello World!" example to explain the new shorthand syntax <?= ... ?>
+ 
 2012-05-14 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xsl,doc/rivet.css,doc/images/[prev.png,next.png,up.png]: new stylesheet and icons for
     the page manual
@@ -28,8 +31,8 @@
 2012-05-09 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/http_accept.tcl: new command ::rivet::http_accept 
     * doc/xml/commands.xml: new manual entry for ::rivet::http_accept 
-    * doc/rivet.xml: Add new file entities.xml describing package 'RivetEntities' 
-    (only a stub, to be elaborated)
+    * doc/rivet.xml: Add new file entities.xml describing package 'RivetEntities' (only a 
+    stub, to be elaborated)
     * doc/xml/entities.xml: New manual page for package 'RivetEntities'
 
 2012-05-08 Massimo Manghi <mxmanghi@apache.org>

@@ -3,6 +3,7 @@
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd" [
     <!ENTITY hello.rvt		        SYSTEM	"examples-sgml/hello.rvt" >
+    <!ENTITY hello1.rvt		        SYSTEM	"examples-sgml/hello1.rvt" >
     <!ENTITY table.rvt		        SYSTEM  "examples-sgml/table.rvt" >
     <!ENTITY vars.html		        SYSTEM  "examples-sgml/vars.html" >
     <!ENTITY vars.rvt		        SYSTEM	"examples-sgml/vars.rvt" >

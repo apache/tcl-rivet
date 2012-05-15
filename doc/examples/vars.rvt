@@ -38,19 +38,19 @@ if { [llength $errlist] != 0 } {
       <tbody>
         <tr>
           <td><b>Title:</b></td>
-          <td><? puts $title ?></td>
+          <td><?= $title ?></td>
         </tr>
         <tr>
           <td><b>Boss:</b></td>
-          <td><? puts $boss ?></td>
+          <td><?= $boss ?></td>
         </tr>
         <tr>
           <td><b>Salary:</b></td>
-          <td><? puts $salary ?></td>
+          <td><?= $salary ?></td>
         </tr>
         <tr>
           <td><b>Skills:</b></td>
-          <td><? puts $skills ?></td>
+          <td><?= $skills ?></td>
         </tr>
       </tbody>
     </table>

@@ -218,8 +218,8 @@
 				<tr class="processing"><td>AfterScript</td><td>::</td></tr>
 				<tr class="processing"><td>AbortScript</td><td>::</td></tr>
 				<tr class="processing"><td>AfterEveryScript</td><td>::</td></tr>
-				<tr class="childexit"><td>Child Exit</td><td>ChildExitScript</td><td>::</td></tr>
 				<tr class="processing"><td>Error Handling</td><td>ErrorScript</td><td>::</td></tr>
+				<tr class="childexit"><td>Child Termination</td><td>ChildExitScript</td><td>::</td></tr>
 			</tbody>
 		</table>
 	</simplesect>

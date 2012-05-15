@@ -1,29 +1,57 @@
 <section id="examples">
     <title>Examples and Usage</title>
     <para>
-      Some examples of Rivet usage follow.  Some prior Tcl knowledge
-      is assumed.  If you don't know much Tcl, don't worry, it's easy,
-      and there are some good resources available on the web that will
-      get you up to speed quickly.  Go to the 
-      <link linkend="websites">web sites</link> section and have a look.
+        Some examples of Rivet usage follow.  Some prior Tcl knowledge
+        is assumed.  If you don't know much Tcl, don't worry, it's easy,
+        and there are some good resources available on the web that will
+        get you up to speed quickly.  Go to the 
+        <link linkend="websites">web sites</link> section and have a look.
     </para>
 
     <example id="hello world">
-      <title>Hello World</title>
-      <para>
+        <title>Hello World</title>
+        <para>
 			As with any tool, it's always nice to see something work, so
 			let's create a small "Hello World" page.
-		</para>
-      <para>
+	    </para>
+        <para>
 			Assuming you have Apache configured correctly, create a file
 			called <filename>hello.rvt</filename> where Apache can find
 			it, with the following content:
-      </para>
-      <programlisting>&hello.rvt;</programlisting>
-      <para>
+        </para>
+        <programlisting>&hello.rvt;</programlisting>
+        <para>
 			If you then access it with your browser, you should see a
 			blank page with the text "Hello World" (without the quotes) on it.
-      </para>
+            The command <command>puts</command> is the good old Tcl command for
+            terminal printing, which appends to the argument string the control
+            characters needed to open a newline. When you don't have to run through
+            complex elaboration and the output can be condensated
+            in a single string (just like in the 'Hello World' example) you
+            can draw on the popular shorthand syntax for string
+            output that comes handy in many cases
+        </para>
+        <programlisting>&hello1.rvt;</programlisting>
+        <para>
+            which is translated into 
+            <programlisting>puts -nonewline "Hello World"</programlisting>
+        </para>
+        <para>
+            Unless you are printing a preformatted text within a &lt;pre&gt;...&lt;/pre&gt; 
+            structure, the lack or the presence of the newlines character usually 
+            appended by terminal oriented output functions (such as 
+            <command>puts</command>) doesn't mean anything in HTML. Nonetheless 
+            having a fine control of line breakings leads to more efficient
+            HTML code, easy to read and analyze also with a simple text editor.
+            Imagine you need to dynamically print HTML attributes values in an
+            anchor tag
+        </para>
+        <programlisting>&lt;a href="&lt;? puts -nonewline [::rivet::makeurl <replaceable>path_to_resource</replaceable>]?&gt;"&gt;Hello link!&lt;/a&gt;</programlisting>
+        <para>
+            It is good to have the output printed inline. This is a
+            typical case where you can more conveniently use the shorthand notation 
+        </para>
+        <programlisting>&lt;a href="&lt;?= [::rivet::makeurl <replaceable>path_to_resource</replaceable>]?&gt;"&gt;Hello link!&lt;/a&gt;</programlisting>
     </example>
 
     <example>
