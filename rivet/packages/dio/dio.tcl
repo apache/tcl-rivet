@@ -235,13 +235,13 @@ proc handle {interface args} {
 	## If we're not using multiple keyfields, just return a simple
 	## where clause.
 	if {[llength $myKeyfield] < 2} {
-	    return " WHERE `${myKeyfield}` = [makeDBFieldValue $table $myKeyfield $myKey]"
+	    return " WHERE $myKeyfield = [makeDBFieldValue $table $myKeyfield $myKey]"
 	}
 
 	# multiple fields, construct it as a where-and
 	set req " WHERE 1 = 1"
 	foreach field $myKeyfield key $myKey {
-	    append req " AND `${field}` = [makeDBFieldValue $table $field $key]"
+	    append req " AND $field = [makeDBFieldValue $table $field $key]"
 	}
 	return $req
     }
@@ -547,7 +547,7 @@ proc handle {interface args} {
     #
     method delete {key args} {
 	table_check $args
-	set req "delete from `${myTable}`"
+	set req "DELETE FROM $myTable"
 	append req [build_key_where_clause $myKeyfield $key]
 
 	set res [exec $req]

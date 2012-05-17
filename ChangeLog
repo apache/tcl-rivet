@@ -1,3 +1,7 @@
+2012-05-17 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: fixed SQL syntax that would break compatibility with Oracle (Fixes reopened
+    bug #53222)
+
 2012-05-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/tclrivet/tclrivetparser.tcl: Tcl parser implements new shorthand echo syntax (closes
     bug #53217)
