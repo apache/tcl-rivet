@@ -26,7 +26,7 @@
             The command <command>puts</command> is the good old Tcl command for
             terminal printing, which appends to the argument string the control
             characters needed to open a newline. When you don't have to run through
-            complex elaboration and the output can be condensated
+            complex elaboration and the output can be lumped
             in a single string (just like in the 'Hello World' example) you
             can draw on the popular shorthand syntax for string
             output that comes handy in many cases
@@ -36,22 +36,6 @@
             which is translated into 
             <programlisting>puts -nonewline "Hello World"</programlisting>
         </para>
-        <para>
-            Unless you are printing a preformatted text within a &lt;pre&gt;...&lt;/pre&gt; 
-            structure, the lack or the presence of the newlines character usually 
-            appended by terminal oriented output functions (such as 
-            <command>puts</command>) doesn't mean anything in HTML. Nonetheless 
-            having a fine control of line breakings leads to more efficient
-            HTML code, easy to read and analyze also with a simple text editor.
-            Imagine you need to dynamically print HTML attributes values in an
-            anchor tag
-        </para>
-        <programlisting>&lt;a href="&lt;? puts -nonewline [::rivet::makeurl <replaceable>path_to_resource</replaceable>]?&gt;"&gt;Hello link!&lt;/a&gt;</programlisting>
-        <para>
-            It is good to have the output printed inline. This is a
-            typical case where you can more conveniently use the shorthand notation 
-        </para>
-        <programlisting>&lt;a href="&lt;?= [::rivet::makeurl <replaceable>path_to_resource</replaceable>]?&gt;"&gt;Hello link!&lt;/a&gt;</programlisting>
     </example>
 
     <example>
