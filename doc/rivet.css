@@ -339,3 +339,7 @@ UL  {
 .note td {
     font-size: small;
 }
+
+li.listitem {
+    font-size: small;
+}

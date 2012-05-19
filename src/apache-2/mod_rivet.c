@@ -803,9 +803,9 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
 
     rsc->outchannel                 = NULL;
 
-    rsc->rivet_server_vars = (apr_table_t *) apr_table_make ( p, 4 );
-    rsc->rivet_dir_vars = (apr_table_t *) apr_table_make ( p, 4 );
-    rsc->rivet_user_vars = (apr_table_t *) apr_table_make ( p, 4 );
+    rsc->rivet_server_vars          = (apr_table_t *) apr_table_make ( p, 4 );
+    rsc->rivet_dir_vars             = (apr_table_t *) apr_table_make ( p, 4 );
+    rsc->rivet_user_vars            = (apr_table_t *) apr_table_make ( p, 4 );
 
     return rsc;
 }
@@ -971,7 +971,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 
     /* Loading into the interpreter the commands provided by librivet.so */
 
-    /* Bug #3216070 has been solved with 8.5.10 and commands shipped with
+    /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
      * Rivetlib can be mapped at this stage
      */
 
@@ -1005,7 +1005,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
  *
  *  - objPnt: Pointer to a pointer to a Tcl_Obj. If the pointer *objPnt
  *  is NULL (configuration script obj pointers are initialized to NULL)
- *      a new Tcl_Obj is created
+ *  a new Tcl_Obj is created
  *  - string_value: a string to be assigned to the Tcl_Obj
  *
  * Results:
@@ -1199,7 +1199,7 @@ Rivet_UserConf( cmd_parms *cmd,
                 const char *var, 
                 const char *val )
 {
-    const char *string = val;
+//  const char *string = val;
     rivet_server_conf *rdc = (rivet_server_conf *)vrdc;
 
     FILEDEBUGINFO;
@@ -1214,13 +1214,21 @@ Rivet_UserConf( cmd_parms *cmd,
 
     rdc->user_scripts_updated = 1;
 
-    if (STREQU(var,"BeforeScript")  || 
-        STREQU(var,"AfterScript")   || 
-        STREQU(var,"AbortScript")   ||
-        STREQU(var,"AfterEveryScript") ||
+    if (STREQU(var,"BeforeScript")      || 
+        STREQU(var,"AfterScript")       || 
+        STREQU(var,"AbortScript")       ||
+        STREQU(var,"AfterEveryScript")  ||
         STREQU(var,"ErrorScript"))
     {
-        string = Rivet_SetScript( cmd->pool, rdc, var, val );
+        apr_table_set( rdc->rivet_user_vars, var, 
+                        Rivet_SetScript( cmd->pool, rdc, var, val));
+    }
+    else if (STREQU(var,"Debug")        ||
+             STREQU(var,"DebugIp")      ||
+             STREQU(var,"DebugSubst")   ||
+             STREQU(var,"DebugSeparator"))
+    {
+        apr_table_set( rdc->rivet_user_vars, var, val);
     }
     else
     {
@@ -1229,7 +1237,7 @@ Rivet_UserConf( cmd_parms *cmd,
     }
 
     /* XXX Need to figure out what to do about setting the table.  */
-    if (string != NULL) apr_table_set( rdc->rivet_user_vars, var, string );
+    // if (string != NULL) apr_table_set( rdc->rivet_user_vars, var, string );
     return NULL;
 }
 

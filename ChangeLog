@@ -1,3 +1,12 @@
+2012-06-18 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/intro.xml: add acknowledgments for contributions made by Cyril, Jeff and Harald
+    * doc/xml/commands.xml: add page manual for ::rivet::inspect 
+    * src/apache-2/mod_rivet.c: add handling for Debug, DebugIp and DebugSeparator in 
+    user conf table.
+    * rivet/rivet-tcl/debug.tcl: Array ::RivetUserConf (which is used to convey control 
+    parameters for the command) is now created on demand using command ::rivet::inspect
+    * doc/rivet.css: adjustments needed to make characters size consistent and nice looking
+
 2012-05-17 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/examples.xml: "Hello World" example reworked
     * rivet/packages/dio/dio.tcl: fixed SQL syntax that would break compatibility with Oracle (fixes

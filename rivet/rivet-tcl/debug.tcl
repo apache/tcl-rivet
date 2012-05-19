@@ -23,7 +23,13 @@
 namespace eval ::rivet {
 
     proc debug {args} {
+
+        # starting with 2.1.0 ::RivetUserConf can be created on demand (see ::rivet::inspect)
+
+        array set ::RivetUserConf [dict get [::rivet::inspect] user]
+
         ## If they've turned off debugging, we don't do anything.
+
         if {[info exists ::RivetUserConf(Debug)] && !$::RivetUserConf(Debug)} {
             return
         }
