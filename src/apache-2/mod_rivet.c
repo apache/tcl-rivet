@@ -220,6 +220,7 @@ Rivet_ParseFileArgString (const char *szDocRoot, const char *szArgs, char **file
  * SERVER_CONF - Apache's configuration file
  * RIVET_DIR   - Rivet's Tcl source directory
  * RIVET_INIT  - Rivet's init.tcl file
+ * if RIVET_DISPLAY_VERSION is defined also RIVET_VERSION is created
  */
 static void
 Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
@@ -261,6 +262,17 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             obj,
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
+
+#if RIVET_DISPLAY_VERSION
+    obj = Tcl_NewStringObj(RIVET_VERSION, -1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+            "server",
+            "RIVET_VERSION",
+            obj,
+            TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
+#endif
 }
 
 static void
@@ -1567,12 +1579,14 @@ Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
     apr_pool_cleanup_register (pChild, s, Rivet_ChildExit, Rivet_ChildExit);
 }
 
+
+    //TODO: clarify whether rsc or rdc
+#define USE_APACHE_RSC
+
 /* Set things up to execute a file, then execute */
 static int
 Rivet_SendContent(request_rec *r)
 {
-//    char error[MAX_STRING_LEN];
-//    char timefmt[MAX_STRING_LEN];
     int errstatus;
     int retval;
     int ctype;
@@ -1582,8 +1596,11 @@ Rivet_SendContent(request_rec *r)
     static Tcl_Obj 	*request_cleanup = NULL;
 
     rivet_interp_globals *globals = NULL;
-    rivet_server_conf 	*rsc = NULL;
-    rivet_server_conf 	*rdc;
+#ifdef USE_APACHE_RSC
+    rivet_server_conf    *rsc = NULL;
+#else
+    rivet_server_conf    *rdc;
+#endif
 
     ctype = Rivet_CheckType(r);  
     if (ctype == CTYPE_NOT_HANDLED) {
@@ -1606,10 +1623,12 @@ Rivet_SendContent(request_rec *r)
 
     globals->req->charset = NULL;
 
+#ifndef USE_APACHE_RSC
     if (r->per_dir_config != NULL)
         rdc = RIVET_SERVER_CONF( r->per_dir_config );
     else
         rdc = rsc;
+#endif
 
     r->allowed |= (1 << M_GET);
     r->allowed |= (1 << M_POST);
@@ -1634,16 +1653,13 @@ Rivet_SendContent(request_rec *r)
         goto sendcleanup;
     }
 
-//    apr_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
-//    apr_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
-
     /* This one is the big catch when it comes to moving towards
        Apache 2.0, or one of them, at least. */
     if (Rivet_chdir_file(r->filename) < 0)
     {
         /* something went wrong doing chdir into r->filename, we are not specific
-        at this. We simply emit an internal server error and print a log message
-        */
+         * at this. We simply emit an internal server error and print a log message
+         */
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
                     "Error accessing %s, could not chdir into directory", r->filename);
 
@@ -1651,9 +1667,11 @@ Rivet_SendContent(request_rec *r)
         goto sendcleanup;
     }
 
-    //TODO: clarify whether rsc or rdc
-    //Rivet_PropagatePerDirConfArrays( interp, rdc );
+#ifdef USE_APACHE_RSC
     Rivet_PropagatePerDirConfArrays( interp, rsc );
+#else
+    Rivet_PropagatePerDirConfArrays( interp, rdc );
+#endif
 
     /* Initialize this the first time through and keep it around. */
     if (request_init == NULL) {

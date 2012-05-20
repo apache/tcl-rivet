@@ -597,6 +597,63 @@
       </refsect1>
     </refentry>
 
+<refentry id="http_accept">
+        <refnamediv>
+            <refname>http_accept</refname>
+            <refpurpose>Parse HTTP Accept header lines</refpurpose>
+        </refnamediv>
+        <refsynopsisdiv>
+            <cmdsynopsis>
+                <command>http_accept
+                <arg><replaceable>-zeroweight</replaceable></arg>
+                <arg><replaceable>-default</replaceable></arg>
+                <arg><replaceable>-list</replaceable></arg>
+                http_accept_line</command>
+            </cmdsynopsis>
+        </refsynopsisdiv>
+
+        <refsect1>
+            <title>Description</title>
+            <para>
+                Command for parsing HTTP Accept header lines that tell the
+                server about preferences and/or capabilities of the browser 
+                (e.g. content language,media type, etc.). The following 
+                script
+            </para>
+            <para>
+                <command>http_accept</command> returns a dictionary
+                value in which every content preference is matched to its
+                precedence value
+            </para>
+            <programlisting>load_headers
+set language_precedence [http_accept $headers(Accept-Language)]
+foreach lan [dict keys $language_precedence] {
+                puts "$lan -> [dict get $language_precedence $lan]"
+}</programlisting>
+            <para>
+                when run from a browser where 5 languages were chosen
+                would output
+            </para>
+            <programlisting>en-us -> 1
+en -> 0.8
+it -> 0.6
+de-de -> 0.4
+fr-fr -> 0.2</programlisting>
+            <para>
+                The <replaceable>-list</replaceable> switch would suppress
+                the precedence values and the accepted fields 
+                are returned listed with decreasing precedence order.
+            </para>
+            <programlisting> puts [http_accept -list $headers(Accept-Language)]
+text/html application/xhtml+xml application/xml */*
+            </programlisting>
+            <para>
+
+            </para>
+        </refsect1>
+
+    </refentry>
+
     <refentry id="html">
       <refnamediv>
         <refname>html</refname>

@@ -9,7 +9,7 @@
     <!ENTITY upload.html	   SYSTEM	"examples/upload.html" >
     <!ENTITY upload.rvt		   SYSTEM	"examples/upload.rvt" >
     <!ENTITY download.tcl	   SYSTEM	"examples/download.tcl" >
-    <!ENTITY rivet_web_service.tcl  SYSTEM  	"examples/rivet_web_service.tcl" >
+    <!ENTITY rivet_web_service.tcl  SYSTEM  "examples/rivet_web_service.tcl" >
     <!ENTITY intro.xml		    SYSTEM  	"xml/intro.xml" >
     <!ENTITY install.xml	    SYSTEM  	"xml/install.xml" >
     <!ENTITY directives.xml	    SYSTEM  	"xml/directives.xml" >
@@ -24,6 +24,7 @@
     <!ENTITY help.xml		    SYSTEM  	"xml/help.xml" >
     <!ENTITY internals.xml	    SYSTEM  	"xml/internals.xml" >
     <!ENTITY upgrade.xml	    SYSTEM  	"xml/upgrade.xml" >
+    <!ENTITY entities.xml       SYSTEM      "xml/entities.xml" >
 ]>
 
 <!--
@@ -113,6 +114,9 @@
 
     <!-- Calendar -->
     &calendar.xml;
+
+    <!-- Entities -->
+    &entities.xml;
 
     <!-- Help -->
     &help.xml;

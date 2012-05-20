@@ -1,3 +1,14 @@
+2012-05-20 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/{parray_table.tcl,http_accept.tcl}: new commands for printing arrays in HTML tables and
+    parsing of Accept HTTP header lines
+    * rivet/packages/entities/entities.tcl: backport from trunk of package RivetEntities
+    * doc/xml/entities.xml: page manual for package RivetEntities
+    * doc/xml/commands.xml: new manual page for http_accept
+    * src/apache-2/mod_rivet.c: if RIVET_DISPLAY_VERSION is defined then the symbol RIVET_SERVER is
+    stored in the 'server' array
+    * configure.ac,VERSION: Rivet version is now 2.0.5
+    * tclconfig/ltmain.sh: updated from recent autotools installation
+
 2012-05-17 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: fixed SQL syntax that would break compatibility with Oracle (Fixes reopened
     bug #53222)
