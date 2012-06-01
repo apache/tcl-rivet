@@ -1,4 +1,8 @@
-2012-06-18 Massimo Manghi <mxmanghi@apache.org>
+2012-06-01 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form2.tcl: New form2.tcl providing form 2.0 package (proposed name for 
+    the file)
+
+2012-05-18 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/intro.xml: add acknowledgments for contributions made by Cyril, Jeff and Harald
     * doc/xml/commands.xml: add page manual for ::rivet::inspect 
     * src/apache-2/mod_rivet.c: add handling for Debug, DebugIp and DebugSeparator in 
