@@ -1,3 +1,7 @@
+2012-06-04 Massimo Manghi <mxmanghi@apache.org>
+    * tests/shorthand.test,tests/shorthand.rvt: test failed because the same output line
+    appeared twice in shorthand.rvt, add Id keyword to shorthand.test
+
 2012-06-01 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form.tcl: automatic field ids generation. Removed dependency on tcllib package 'uuid'
 

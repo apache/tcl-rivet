@@ -1,4 +1,4 @@
-# $Id: $
+# $Id$
 
 ::tcltest::test shorthand {shorthand expression for simple output} {
     set page [ ::http::geturl "${urlbase}shorthand.rvt"]
