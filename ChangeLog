@@ -1,3 +1,6 @@
+2012-06-01 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form.tcl: automatic field ids generation. Removed dependency on tcllib package 'uuid'
+
 2012-05-20 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/{parray_table.tcl,http_accept.tcl}: new commands for printing arrays in HTML tables and
     parsing of Accept HTTP header lines
@@ -23,8 +26,7 @@
     * src/rivetParser.c: add shorthand expression <?= ... ?> for <? puts -nonewline "..." ?> (contributed 
     by Jeff Lawson,addresses #53217, tclrivetparser yet to be fixed)
     * tests/shorthand.[test|rvt]: add test of shorthand notation for string output 
-    * rivet/rivet-tcl/cookie.tcl: add support for HttpOnly flag (contributed by Cyril Shtumf, 
-    fixes bug #53224)
+    * rivet/rivet-tcl/cookie.tcl: add support for HttpOnly flag (contributed by Cyril Shtumf, fixes bug #53224)
     * rivet/packages/session/session-class.tcl: support for HttpOnly flag improves security and reduces
     the risk of cross-site scripting attacks (contributed by Cyril Shtumf, fixes #52224)
     * rivet/packages/dio/dio.tcl: wrong SQL syntax generated in delete method when multiple fields are
