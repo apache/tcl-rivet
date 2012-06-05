@@ -959,12 +959,23 @@ bxxb ccxxxxcc
 				it deals with multiple assignments: if a variable 
 				is assigned more than once the corresponding array element will be a 
 				list of the values for the variable. This can be useful in the case 
-				of forms with checkbox options that are given the same name.
+				of forms with checkbox options that are given the same name. 
+                This condition is signalled by the presence of an auxiliary array 
+                variable. 
+            </para>
+            <para>
+                Example: if a group of checkboxes are associated to the <option>var1</option>
+                variable then <command>response(var1)</command> will store 
+                the list of their values and the array will also have the extra variable 
+                <option>response(__var1)</option> which can be tested with
+                the usual <command>[info exists response(<option>__var1</option>)]</command>
+            </para>
+            <para>
 				Calling <command>load_response</command> several times for the same
 				array results in adding more values to the array at every call. 
 				When needed it is left to the caller to empty the array between 
-				two subsequent calls.  
-			</para>
+            two subsequent calls.  
+        </para>
       </refsect1>
     </refentry>
 

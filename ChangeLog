@@ -1,3 +1,6 @@
+2012-06-05 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: manual entry for 'load_response' now explains what the __var variables are for
+
 2012-06-04 Massimo Manghi <mxmanghi@apache.org>
     * tests/shorthand.test,tests/shorthand.rvt: test failed because the same output line
     appeared twice in shorthand.rvt, add Id keyword to shorthand.test
