@@ -1,3 +1,6 @@
+2012-06-06 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: wrong link to website fixed. Formatting improved by replacing tabs with spaces.
+
 2012-06-05 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: manual entry for 'load_response' now explains what the __var variables are for
 
