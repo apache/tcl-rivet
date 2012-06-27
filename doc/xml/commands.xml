@@ -789,32 +789,33 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 
 	<refentry id="incr0">
 	    <refnamediv>
-		<refname>incr0</refname>
-		<refpurpose>increment a variable or set it to 1 if nonexistent.</refpurpose>
+            <refname>incr0</refname>
+            <refpurpose>increment a variable or set it to 1 if nonexistent.</refpurpose>
 	    </refnamediv>
 
 	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>incr0</command>
-		    <arg><replaceable>varname</replaceable></arg>
-		    <arg><replaceable>num</replaceable></arg>
-		</cmdsynopsis>
+            <cmdsynopsis>
+                <command>incr0</command>
+                <arg><replaceable>varname</replaceable></arg>
+                <arg><replaceable>num</replaceable></arg>
+            </cmdsynopsis>
 	    </refsynopsisdiv>
 	    <refsect1>
-		<title>Description</title>
-		<para>
-		    Increment a variable
-		    <option><replaceable>varname</replaceable></option> by
-		    <option><replaceable>num</replaceable></option>.  If the
-		    variable doesn't exist, create it instead of returning an
-		    error.
-		</para>
+            <title>Description</title>
+            <para>
+                Increment a variable
+                <option><replaceable>varname</replaceable></option> by
+                <option><replaceable>num</replaceable></option>.  If the
+                variable doesn't exist, create it instead of returning an
+                error.
+            </para>
 
-		<note> 
-		    incr0 functionality is now provided by <command>incr</command>, 
-		    therefore this command is obsolete and it's kept 
-		    only for compatibility. It will be removed in future versions of Rivet
-		</note>
+            <note> 
+                incr0 functionality is provided by the native <command>incr</command> in 
+                Tcl &gt;= 8.5, therefore this command is deprecated and kept as an
+                interpreter alias only for compatibility and as such it wasn't moved to 
+                the ::rivet namespace. It will be removed in future versions of Rivet.
+            </note>
 	    </refsect1>
 	</refentry>
 
@@ -1062,6 +1063,17 @@ bxxb ccxxxxcc</programlisting>
 		    is assigned more than once the corresponding array element will be a 
 		    list of the values for the variable. This can be useful in the case 
 		    of forms with checkbox options that are given the same name.
+            This condition is signalled by the presence of an auxiliary array 
+            variable. 
+        </para>
+        <para>
+            Example: if a group of checkboxes are associated to the <option>var1</option>
+            variable then <command>response(var1)</command> will store 
+            the list of their values and the array will also have the extra variable 
+            <option>response(__var1)</option> which can be tested with
+            the usual <command>[info exists response(<option>__var1</option>)]</command>
+        </para>
+        <para>
 		    Calling <command>load_response</command> several times for the same
 		    array results in adding more values to the array at every call. 
 		    When needed it is left to the caller to empty the array between 

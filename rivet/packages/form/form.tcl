@@ -200,9 +200,12 @@ package provide form 1.0
 
                 # if there's a label then prepare to output it.
                 if {[info exists data(label)]} {
-                    # if there's no id defined, generate something unique so we can reference it.
+
+                    # if there's no id defined, generate something 
+                    # unique so we can reference it.
+
                     if {![info exists data(id)]} {
-                        set data(id) "autogen_[::uuid::uuid generate]"
+                        set data(id) "autogen[incr field_cnt]"
                     }
                     set label "<label for=\"$data(id)\">$data(label)</label>"
                 }
@@ -488,6 +491,7 @@ package provide form 1.0
         array set DefaultValues [array get array]
     }
 
+    private variable field_cnt       0
     private variable DefaultValues
     private variable DefaultArgs
 

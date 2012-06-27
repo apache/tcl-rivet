@@ -1,3 +1,11 @@
+2012-06-27 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: Version number set as 1.2.0b1
+    * rivet/packages/form/form.tcl: form package 1.0 taken from branches/2.0
+    * doc/xml/commands.xml: improved page manual about incr0 being declared deprecated
+
+2012-06-20 Massimo Manghi <mxmanghi@apache.org>
+    * contrib/form.tcl: Requiring package TclOO making explicit it's needed to run this version of form.tcl
+
 2012-06-01 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form2.tcl: New form2.tcl providing form 2.0 package (proposed name for 
     the file)
