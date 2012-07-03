@@ -1218,6 +1218,7 @@ Rivet_UserConf( cmd_parms *cmd,
         STREQU(var,"AfterScript")       || 
         STREQU(var,"AbortScript")       ||
         STREQU(var,"AfterEveryScript")  ||
+        STREQU(var,"UploadDirectory")  ||
         STREQU(var,"ErrorScript"))
     {
         apr_table_set( rdc->rivet_user_vars, var, 

@@ -1,3 +1,7 @@
+2012-07-03 Massimo Manghi <mxmanghi@apache.org>
+    * CHANGES: file emptied from obsolete notes
+    * src/apache-2/mod_rivet.c: Add UploadDirectory to the list of handled options for RivetUserConf
+
 2012-06-27 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: Version number set as 1.2.0b1
     * rivet/packages/form/form.tcl: form package 1.0 taken from branches/2.0
