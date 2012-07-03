@@ -1,13 +1,2 @@
-User visible changes in Apache Rivet:
 
 $Id$
-
-Changes for 0.4
----------------
-
-* New Apache 2.0 license.
-
-* DIO and DIODisplay docs.
-
-* Virtual Host modifications.  Rivet should interact better with
-  virtual hosts.
