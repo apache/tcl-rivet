@@ -1,5 +1,8 @@
+2012-07-12 Massimo Manghi <mxmanghi@apache.org>
+    * doc/examples/download.tcl: Wrong command 'source' (it had to be 'parse')
+
 2012-07-03 Massimo Manghi <mxmanghi@apache.org>
-    * CHANGES,TODO: emptied by obsolete content
+    * CHANGES,TODO: emptied from obsolete content
 
 2012-06-06 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: wrong link to website fixed. Formatting improved by replacing tabs with spaces.
