@@ -1,3 +1,7 @@
+2012-07-04 Massimo Manghi <mxmanghi@apache.org>
+    * doc/examples/download.tcl: The example has been having ever since an error in calling 'source' 
+    instead of 'parse'. The multitude of the userbase never realized.
+
 2012-07-03 Massimo Manghi <mxmanghi@apache.org>
     * CHANGES: file emptied from obsolete notes
     * src/apache-2/mod_rivet.c: Add UploadDirectory to the list of handled options for RivetUserConf

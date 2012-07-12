@@ -169,49 +169,49 @@
 			the user. 
       </para>
       <para>
-	Rivet can help if you have more sofisticated needs.  For
-	instance you may be developing an application that uses
-	webpages to collect input data. This information might be
-	passed on to scripts or programs for processing. 
-	In this case a real file representing the
-	data doesn't exist and the content is generated on demand 
-	by the server. 
-	In other circumstances you may need to dynamically inhibit 
-	the download of specific files and hide them away, 
-	Your scripts may expunge from the pages
-	every link to these files (your pages are dynamic, aren't
-	they?) and move them out of way, but it looks like a
-	cumbersome solution.
+            Rivet can help if you have more sofisticated needs.  For
+            instance you may be developing an application that uses
+            webpages to collect input data. This information might be
+            passed on to scripts or programs for processing. 
+            In this case a real file representing the
+            data doesn't exist and the content is generated on demand 
+            by the server. 
+            In other circumstances you may need to dynamically inhibit 
+            the download of specific files and hide them away, 
+            Your scripts may expunge from the pages
+            every link to these files (your pages are dynamic, aren't
+            they?) and move them out of way, but it looks like a
+            cumbersome solution.
       </para>
       <para>
-	Putting Tcl and Rivet in charge of the whole download
-	mechanism helps in building cleaner and safer approaches to
-	the download problem.
+            Putting Tcl and Rivet in charge of the whole download
+            mechanism helps in building cleaner and safer approaches to
+            the download problem.
       </para>
       <para>
-	In this example a procedure checks for the existence of a
-	parameter passed in by the browser. The parameter is the name
-	(without extension) of a pdf file.  
-	Pdf files are stored in a directory whose path is
-	in the <command>pdf_repository</command> variable.
+            In this example a procedure checks for the existence of a
+            parameter passed in by the browser. The parameter is the name
+            (without extension) of a pdf file.  
+            Pdf files are stored in a directory whose path is
+            in the <command>pdf_repository</command> variable.
       </para> 
       <para>
-	This code is reported as an example of how to control 
-	the protocol using the <command>headers</command> command.
+            This code is reported as an example of how to control 
+            the protocol using the <command>headers</command> command.
       </para>
       <programlisting>&download.tcl;</programlisting>
       <para>
-	Before the pdf is sent the procedure sets the
-	<constant>Content-Type</constant>, 
-	<constant>Content-Disposition</constant>,
-	<constant>Content-Description</constant> and
-	<constant>Content-Length</constant> headers to inform
-	the client about the file type, name and size. Notice that in
-	order to set the <constant>Content-Type</constant> header Rivet 
-	uses a specialiezed form of the <command>headers</command> 
-	command. Headers must be sent before data gets sent down the 
-	output channel. Messing with this prescription causes an error 
-	to be raised (in fact the protocol itself is been violated)
+            Before the pdf is sent the procedure sets the
+            <constant>Content-Type</constant>, 
+            <constant>Content-Disposition</constant>,
+            <constant>Content-Description</constant> and
+            <constant>Content-Length</constant> headers to inform
+            the client about the file type, name and size. Notice that in
+            order to set the <constant>Content-Type</constant> header Rivet 
+            uses a specialiezed form of the <command>headers</command> 
+            command. Headers must be sent before data gets sent down the 
+            output channel. Messing with this prescription causes an error 
+            to be raised (in fact the protocol itself is been violated)
       </para>
       <para>
 	More information about the meaning of the mime headers in the
