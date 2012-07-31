@@ -1,3 +1,8 @@
+2012-07-31 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Sqlite.tcl: Add search case for package sqlite3. Add method makeDBFieldValue
+    to handle time and date special fields support. Add method 'quote' which overrides the same method
+    in Database, as correct way to escape quotes (') characters for Sqlite is doubling them ('')
+
 2012-07-04 Massimo Manghi <mxmanghi@apache.org>
     * doc/examples/download.tcl: The example has been having ever since an error in calling 'source' 
     instead of 'parse'. The multitude of the userbase never realized.

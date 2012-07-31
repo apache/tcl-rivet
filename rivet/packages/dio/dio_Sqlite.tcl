@@ -28,7 +28,11 @@ namespace eval DIO {
 
 	private variable dbcmd ""
 	constructor {args} {eval configure $args} {
-	    package require sqlite
+	    if {[catch {package require sqlite}] && \
+                [catch {package require sqlite3}]} {
+
+		return -code error "No Sqlite Tcl package available"
+            }
 	    eval configure $args
 	}
 
@@ -96,6 +100,61 @@ namespace eval DIO {
 		set dbcmd ""
 	    }
 	}
+
+        #
+        # quote - given a string, return the same string with any single
+        #  quote characters preceded by a backslash
+        #
+        method quote {string} {
+            regsub -all {'} $string {''} string
+            return $string
+        }
+
+	method makeDBFieldValue {table_name field_name val {convert_to {}}} {
+            if {[info exists specialFields(${table_name}@${field_name})]} {
+                switch $specialFields(${table_name}@${field_name}) {
+                    DATE {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d}]
+                        return "date('$my_val')"
+                    }
+                    DATETIME {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                        return "datetime('$my_val')"
+                    }
+                    NOW {
+                        switch $convert_to {
+                            SECS {
+                                if {[::string compare $val "now"] == 0} {
+                                    set	secs    [clock seconds]
+                                    set	my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+                                    return	$my_val
+                                } else {
+                                    return  "strftime(session_update_time,'%Y%m%d%H%M%S')"
+                                }
+                            }
+                            default {
+                                if {[::string compare $val, "now"] == 0} {
+                                    set secs [clock seconds]
+                                } else {
+                                    set secs [clock scan $val]
+                                }
+                                set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                                return "datetime('$my_val')"
+                            }
+                        }
+                    }
+                    default {
+                        # no special code for that type!!
+                        return "'[quote $val]'"
+                    }
+                }
+            } else {
+                return "'[quote $val]'"
+            }
+	}
+
     }
 
     catch { ::itcl::delete class SqliteResult }
