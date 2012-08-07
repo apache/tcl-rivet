@@ -1,3 +1,9 @@
+2012-08-07 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.css: text in monospace characted made a little smaller
+    * rivet/packages/form/form.tcl: Workaround to avoid wrong parsing of form data when parameter
+    values have spaces in them
+    * src/apache-2/mod_rivet.c: 'server' array uses RIVET_VERSION instead of the lengthy RIVET_PACKAGE_VERSION
+
 2012-07-31 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Sqlite.tcl: Add search case for package sqlite3. Add method makeDBFieldValue
     to handle time and date special fields support. Add method 'quote' which overrides the same method

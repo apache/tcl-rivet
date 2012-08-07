@@ -274,11 +274,11 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
     Tcl_DecrRefCount(obj);
 
 #if RIVET_DISPLAY_VERSION
-    obj = Tcl_NewStringObj(RIVET_PACKAGE_VERSION, -1);
+    obj = Tcl_NewStringObj(RIVET_VERSION, -1);
     Tcl_IncrRefCount(obj);
     Tcl_SetVar2Ex(interp,
             "server",
-            "RIVET_PACKAGE_VERSION",
+            "RIVET_VERSION",
             obj,
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);

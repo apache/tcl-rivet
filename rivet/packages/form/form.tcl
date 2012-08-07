@@ -27,6 +27,11 @@ package provide form 1.0
 ::itcl::class form {
 
     constructor {args} {
+
+	# first of all we make sure DefaultValues is an array
+
+	array set DefaultValues {}
+
         # set the form method to be a post and the action to be
         # a refetching of the current page
         set arguments(method) post
@@ -41,6 +46,7 @@ package provide form 1.0
             set defaults $arguments(defaults)
 
             upvar 1 $arguments(defaults) callerDefaults
+
             array set DefaultValues [array get callerDefaults]
             unset arguments(defaults)
         }
@@ -213,10 +219,24 @@ package provide form 1.0
                 # ...and if the is a default value for this field
                 # and it matches the value we have for it, make
                 # the field show up as selected (checked)
+
                 if {[info exists DefaultValues($name)] && [info exists data(value)]} {
-                    if {[lsearch $DefaultValues($name) $data(value)] >= 0} {
-                        set data(checked) "checked"
-                    }
+
+		    # if there is no __$var variable in the defaults we are
+		    # dealing with a single value so we don't look it up 
+		    # with lsearch, but we compare the 2 variable as strings, 
+		    # so that spaces in the value won't be confused as a list of
+		    # multiple elements....
+
+		    if {![info exists DefaultValues(__${name})]} {
+			if {[string match $DefaultValues($name) $data(value)]} {
+			    set data(checked) "checked"
+			}			
+		    } else {
+			if {[lsearch $DefaultValues($name) $data(value)] >= 0} {
+			    set data(checked) "checked"
+			}
+		    }
                 }
             }
         }

@@ -5,8 +5,6 @@ BUGS
 TODO
 ====
 
-* Apache 2 interface.
-
 * getting the plain post data. I use mod_dtcl as an xml server and I
   need to collect the broken xml (due to query string proccessing). if
   the user enters in the xml "=" I am lost. (From yahalom emet).
@@ -74,3 +72,5 @@ DONE
 * Documentation in XML.
 
 * var_get and var_post commands.
+
+* Apache 2 interface.
