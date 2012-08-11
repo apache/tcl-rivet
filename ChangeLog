@@ -1,3 +1,7 @@
+2012-08-11 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-create-sqlite.sql: new file with schema of session package tables
+    for Sqlite.
+
 2012-08-07 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.css: text in monospace characted made a little smaller
     * rivet/packages/form/form.tcl: Workaround to avoid wrong parsing of form data when parameter
