@@ -415,10 +415,11 @@ proc handle {interface args} {
 	    $res destroy
 	    return -code error "Got '$errinf' executing '$req'"
 	}
-	set return [expr [$res numrows] > 0]
+	set rows_found [expr [$res numrows] > 0]
 	$res next -array $arrayName
 	$res destroy
-	return $return
+
+	return $rows_found
     }
 
     #
@@ -443,24 +444,14 @@ proc handle {interface args} {
 	    return -code error "Got '$errinf' executing '$req'"
 	}
 	set numrows [$res numrows]
-	set fields  [$res fields]
 	$res destroy
 
 	if {$numrows} {
-	    set req [build_update_query array $fields $myTable]
-	    append req [build_key_where_clause $myKeyfield $key]
+            return [eval $this update $arrayName $args]
 	} else {
-	    set req [build_insert_query array $fields $myTable]
+            return [eval $this insert $myTable $arrayName] 
 	}
 
-	set res [exec $req]
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
-	$res destroy
-	return 1
     }
 
     #
@@ -557,9 +548,9 @@ proc handle {interface args} {
 	    return -code error "Got '$errinf' executing '$req'"
 	}
 
-	set return [$res numrows]
+	set n_deleted_rows [$res numrows]
 	$res destroy
-	return $return
+	return $n_deleted_rows
     }
 
     #

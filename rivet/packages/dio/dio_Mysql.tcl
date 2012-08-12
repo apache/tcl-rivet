@@ -133,7 +133,7 @@ namespace eval DIO {
 					set	my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
 					return	$my_val
 				    } else {
-					return  "DATE_FORMAT(session_update_time,'%Y%m%d%H%i%S')"
+					return  "DATE_FORMAT($field_name,'%Y%m%d%H%i%S')"
 				    }
 				}
 				default {
@@ -148,8 +148,8 @@ namespace eval DIO {
 			    }
 			}
 			default {
-			  	# no special code for that type!!
-				return "'[quote $val]'"
+                            # no special code for that type!!
+                            return "'[quote $val]'"
 			}
 		    }
 		} else {

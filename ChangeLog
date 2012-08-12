@@ -1,3 +1,14 @@
+2012-08-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: Database's class fetch method was rewritten on a more simple 
+    assumption that methods 'insert' and 'update' know how to actually .... insert and update rows
+    * rivet/packages/dio/dio_Sqlite.tcl: The class was found to fail in various circumstances 
+    determining the number of rows affected  by a query and determining the set of fields in a 
+    table involved by a query. Since a 'select' query is treated in a rather distinctive way 
+    from other SQL queries, a new public variable 'select' was added to the properties of the
+    class in order to handle consistently the 2 cases within SqliteResult. The number of rows
+    affected rows is obtained from the 'changes' subcommand of Sqlite3 connector.
+    * rivet/packages/dio_Mysql.tcl: wrong special field handling fixed
+
 2012-08-11 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/session/session-create-sqlite.sql: new file with schema of session package tables
     for Sqlite.
