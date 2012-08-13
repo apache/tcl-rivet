@@ -1,3 +1,11 @@
+2012-08-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Sqlite.sql,rivet/packages/dio/dio_Mysql.tcl: These connector classes
+    didn't compute correctly the number of seconds as unix timestamp to be returned for comparison
+    with the same information returned by [clock seconds] (Bug #53703)
+    * rivet/packages/session/session-class.tcl: special datetime field were registered associated
+    to the rivet_session and rivet_session_cache names, whereas the class has member variables for
+    storing these definitions (Bug #53543)
+
 2012-08-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: Database's class fetch method was rewritten on a more simple 
     assumption that methods 'insert' and 'update' know how to actually .... insert and update rows
