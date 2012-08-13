@@ -105,8 +105,8 @@ package require Itcl
 
     constructor {args} {
 	eval configure $args
-    	$dioObject registerSpecialField rivet_session session_update_time NOW
-	$dioObject registerSpecialField rivet_session session_start_time NOW
+    	$dioObject registerSpecialField $sessionTable session_update_time NOW
+	$dioObject registerSpecialField $sessionTable session_start_time NOW
     }
 
     method status {args} {
