@@ -353,7 +353,6 @@ package require Itcl
     # sessions)
     #
     method delete_session {{session_id ""}} {
-	variable conf
 
 	set ip_address [env REMOTE_ADDR]
 
@@ -377,7 +376,6 @@ package require Itcl
     # returns the session_id
     #
     method create_session {} {
-	global conf
 
 	## Create their session by storing their session information in 
 	# the session table.

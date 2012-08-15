@@ -1,3 +1,14 @@
+2012-08-xx Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/dio.xml: Fixed wrong declariation of 'insert' subcommand in page manual (Bug #53670)
+    * rivet/packages/dio/dio_Postgresql.tcl: method makeDBFieldValue implemented and tested with
+    package Session.
+    * rivet/packages/session/session-create.sql: file renamed as session-create-postgresql.sql. 
+    Schema tested with package Session. 
+    * Changelog: entry of Aug 12 corrected: the method of Database (dio.tcl) in question was 'store' 
+    not 'fetch'
+    * rivet/packages/session/session-class.tcl: removed 'conf' variable that could clash with
+    application code (and in at least one case it did) (Fixes bug #53544) 
+
 2012-08-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Sqlite.sql,rivet/packages/dio/dio_Mysql.tcl: These connector classes
     didn't compute correctly the number of seconds as unix timestamp to be returned for comparison
@@ -7,7 +18,7 @@
     storing these definitions (Bug #53543)
 
 2012-08-12 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/dio/dio.tcl: Database's class fetch method was rewritten on a more simple 
+    * rivet/packages/dio/dio.tcl: Database's class 'store' method was rewritten on a more simple 
     assumption that methods 'insert' and 'update' know how to actually .... insert and update rows
     * rivet/packages/dio/dio_Sqlite.tcl: The class was found to fail in various circumstances 
     determining the number of rows affected  by a query and determining the set of fields in a 

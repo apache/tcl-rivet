@@ -134,12 +134,12 @@ namespace eval DIO {
 			  	set secs [clock scan $val]
 				set my_val [clock format $secs -format {%Y-%m-%d}]
 				return "to_date('$my_val', 'YYYY-MM-DD')"
-			  }
+			}
 			DATETIME {
 			  	set secs [clock scan $val]
 				set my_val [clock format $secs -format {%Y-%m-%d %T}]
 				return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
-			  }
+			}
 			NOW {
 			    switch $convert_to {
 				SECS {
@@ -148,7 +148,8 @@ namespace eval DIO {
 				    	set my_val [clock format $secs -format {%Y%m%d%H%M%S}]
 					return $my_val
 				    } else {
-				    	return "to_char($field_name, 'YYYYMMDDHH24MISS')"
+                                        return "($field_name - to_date('1970-01-01')) * 86400"
+				    	#return "to_char($field_name, 'YYYYMMDDHH24MISS')"
 				    }
 				}
 				default {
