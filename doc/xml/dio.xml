@@ -134,14 +134,14 @@
 		</group>
 	      </cmdsynopsis>
 	      <para>
-		If this option is set to 1, DIO will attempt to
-		determine an automatic key for
-		<option>keyField</option> when storing and fetching.
-		In most databases, this requires that the
-		<option>sequence</option> also be specified.  In the
-		case of MySQL, where sequences do not exist, autokey
-		must be used in conjunction with a table which has a
-		field specified as AUTO.</para>
+				If this option is set to 1, DIO will attempt to
+				determine an automatic key for
+				<option>keyField</option> when storing and fetching.
+				In most databases, this requires that the
+				<option>sequence</option> also be specified.  In the
+				case of MySQL, where sequences do not exist, autokey
+				must be used in conjunction with a table which has a
+				field specified as AUTO.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -151,10 +151,10 @@
 		<arg choice="plain">-sequence</arg>
 		<arg><replaceable>sequenceName</replaceable></arg>
 	      </cmdsynopsis>
-	      <para>
-		If DIO is automatically generating keys, it will use
-		this sequence as a means to gain a unique number for
-		the stored key.</para>
+			   <para>
+				If DIO is automatically generating keys, it will use
+				this sequence as a means to gain a unique number for
+				the stored key.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -358,6 +358,7 @@
 	      <cmdsynopsis>
 		<arg choice="plain"><replaceable>objectName</replaceable></arg>
 		<arg>insert</arg>
+		<arg><replaceable>table</replaceable></arg>
 		<arg><replaceable>arrayName</replaceable></arg>
 		<group choice="opt">
 		  <arg>-option</arg>
@@ -366,7 +367,7 @@
 		</group>
 	      </cmdsynopsis>
 	      <para>
-		Insert fields from <option>arrayName</option> into the specified table in the database.
+		Insert fields from <option>arrayName</option> into the specified <option>table</option> in the database.
 	      </para>
 	    </listitem>
 	  </varlistentry>

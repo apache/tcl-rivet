@@ -1,3 +1,12 @@
+2012-08-15 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/dio.xml: Fixed wrong declariation of 'insert' subcommand in page manual (Bug #53670)
+    * rivet/packages/dio/dio_Postgresql.tcl,rivet/packages/dio/dio_Oracle.tcl:: method 
+    makeDBFieldValue implemented and tested with package Sessiona (Bug #53703).
+    * rivet/packages/session/session-create.sql: file renamed as session-create-postgresql.sql. 
+    Schema tested with package Session. 
+    * rivet/packages/session/session-class.tcl: removed 'conf' variable that could clash with
+    application code (and in at least one case it did) (Fixes bug #53544) 
+    
 2012-08-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Sqlite.sql,rivet/packages/dio/dio_Mysql.tcl: These connector classes
     didn't compute correctly the number of seconds as unix timestamp to be returned for comparison
