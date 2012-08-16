@@ -1,7 +1,14 @@
-2012-08-xx Massimo Manghi <mxmanghi@apache.org>
+2012-08-16 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetPkgInit.c: improved namespace structure pointer handling (contributed by
+    Georgios Petasis)
+
+2012-08-15 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Oracle.tcl: fixed method makeDBFieldValue in class Oracle (Bug #53703)
+ 
+2012-08-15 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/dio.xml: Fixed wrong declariation of 'insert' subcommand in page manual (Bug #53670)
     * rivet/packages/dio/dio_Postgresql.tcl: method makeDBFieldValue implemented and tested with
-    package Session.
+    package Sessiona (Bug #53703).
     * rivet/packages/session/session-create.sql: file renamed as session-create-postgresql.sql. 
     Schema tested with package Session. 
     * Changelog: entry of Aug 12 corrected: the method of Database (dio.tcl) in question was 'store' 
