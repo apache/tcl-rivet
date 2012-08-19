@@ -1502,8 +1502,7 @@ Rivet_ChildHandlers(server_rec *s, int init)
             Tcl_Preserve (rsc->server_interp);
             if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                             errmsg, 
-			     Tcl_GetString(function));
+                             errmsg, Tcl_GetString(function));
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                              "errorCode: %s",
                         Tcl_GetVar(rsc->server_interp, "errorCode", 0));
@@ -1880,8 +1879,9 @@ Rivet_SendContent(request_rec *r)
     if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
-                     MODNAME ": Could not create request namespace\n");
-        retval = HTTP_BAD_REQUEST;
+                            MODNAME ": Could not create request namespace (%s)\n" ,
+                            Tcl_GetStringResult(interp));
+        retval = HTTP_INTERNAL_SERVER_ERROR;
         goto sendcleanup;
     }
 
