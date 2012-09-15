@@ -1,2 +1,1 @@
 <pre><?= "testing &lt;?= ... ?&gt; shorthand expression" ?></pre>
-<pre><?= "testing &lt;?= ... ?&gt; shorthand expression" ?></pre>

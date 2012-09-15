@@ -1,3 +1,9 @@
+2012-09-16 Massimo Manghi <mxmanghi@apache.org>
+    * tests/runtests.tcl,tests/apachetest.tcl: User and Group directives removed from conffile
+    template to make test suite independent from the output of command 'id' from which 
+    the values for this parameters were inferred (Bug #53396)
+    * tests/shorthand.rvt: oddly enough the template output the same line twice. 
+
 2012-09-03 Harald Oehlmann <oehhar@apache.org>
     * Thank you accepting me as committer
 
