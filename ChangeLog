@@ -1,3 +1,8 @@
+2012-09-16 Massimo Manghi <mxmanghi@apache.org>
+    * tests/runtests.tcl,tests/apachetest.tcl: User and Group directives removed from conffile
+    template to make test suite independent from the output of command 'id' from which 
+    the values for this parameters were inferred (Bug #53396)
+
 2012-08-15 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/dio.xml: Fixed wrong declariation of 'insert' subcommand in page manual (Bug #53670)
     * rivet/packages/dio/dio_Postgresql.tcl,rivet/packages/dio/dio_Oracle.tcl:: method 

@@ -380,8 +380,12 @@ proc apachetest::makeconf { outfile {extra ""} } {
 
     #getting uid and gid of user
     catch {exec id} raw_string		
-    set username  [lindex [regexp -inline {(uid=)([\d]+)(\()([^\)]+)(\))} $raw_string]  4]
-    set group  [lindex [regexp -inline {(groups=)([\d]+)(\()([^\)]+)(\))} $raw_string]  4]
+
+# username and group no longer needed. User and Group directives removed from
+# main conffile template (#Bug 53396)
+
+#    set username  [lindex [regexp -inline {(uid=)([\d]+)(\()([^\)]+)(\))} $raw_string]  4]
+#    set group  [lindex [regexp -inline {(groups=)([\d]+)(\()([^\)]+)(\))} $raw_string]  4]
 
     # replace with determinemodules
     set LOADMODULES [determinemodules $binname]
