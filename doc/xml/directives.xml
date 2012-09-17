@@ -97,13 +97,10 @@
 			   			Tcl script which is to run when the master interpreter is created. 
 			   			Namespaces, variables and packages loaded during this stage will 
 			   			be copied later on in the startup process, when child
-			   			processes are created. In general any sort of I/O channel 
-			   			that is opened during this stage must be closed before the 
-			   			execution of the script completes.
+			   			processes are created. 
 			   		</para>
 			   		<para>
-							This option is only available at the global level and has
-							effect only if <command>SeparateVirtualInterps</command> is off   		
+                        This option is only available at the global level.
 			   		</para>
 	   			</listitem>
 				</varlistentry>
@@ -116,15 +113,13 @@
 			      </term>
 			      <listitem>
 						<para>
-						  Tcl script that is run as part of a child process initialization. 
+						  Tcl script run as part of a child process initialization. 
 						  If the option <option>SeparateVirtualInterp</option> is not used this is
 						  the right place where file handles, database connections or sockets can 
 						  be opened.
 						  The argument <replaceable><option>script</option></replaceable>
 						  is an actual Tcl script, so to run a file, you would
-						  do:
-				
-						  <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
+						  do: <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
 						</para>
 						<para>
 						  This option is ignored in virtual hosts.
@@ -142,7 +137,7 @@
 	      <listitem>
 				<para>
 				  Script to be evaluated when each Apache child
-				  process is initialized.  This is the recommended
+				  process is initialized. This is the recommended
 				  place to load modules, create global variables, open
 				  connections to other facilities (such as databases)
 				  and so on.

@@ -14,8 +14,7 @@
 			to 'configure'. In the future we may change this option's default.
 		</para>
 		<para>
-			Commands must be imported into another namespace with the
-			command:
+			Commands must be imported into another namespace with the command:
 		</para>
 		<para>
 			<command>namespace import -force ::rivet::*</command>
@@ -461,8 +460,8 @@
 		    Scans through each character in the specified string looking
 		    for any special (with respect to SGML, and hence HTML) characters
 		    from the specified string, and returns the result.  
-		    For example, the right angle
-		    bracket is escaped to the corrected ampersand gt symbol.
+		    For example, the right angle bracket is escaped to the corrected
+            ampersand gt symbol.
 		</para>
 		<!--note> 
 		    You must require the <command>rivetlib</command> package in order to gain access to this command

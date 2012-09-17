@@ -1,3 +1,13 @@
+2012-09-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/librivet/rivet[Crypt|WWW|List|pkgInit].c,src/parser/rivetParser.[c|h],
+    src/parser/parserPkgInit.c: files for librivet and the Rivet parser moved into 
+    src/librivet and src/parser.
+    * src/Makefile.am,src/librivet/Makefile.am, src/parser/Makefile.am: new automake conf files
+    reflect libraries reorganization.
+    * src/apache-2/Makefile.am: mod_rivet builds from the newly located parser code. Is it 
+    sensible to let the module depend on a real package (provided by libparser.c)?
+    * configure.ac: add variable substitution for newly created Makefile.am
+
 2012-09-16 Massimo Manghi <mxmanghi@apache.org>
     * tests/runtests.tcl,tests/apachetest.tcl: User and Group directives removed from conffile
     template to make test suite independent from the output of command 'id' from which 

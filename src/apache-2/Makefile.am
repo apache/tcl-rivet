@@ -21,7 +21,7 @@
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-INCLUDES = -I@apache_include@ -I@RIVET_BASE_INCLUDE@ 
+INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I../parser
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
@@ -39,7 +39,7 @@ mod_rivet_la_SOURCES = 			        \
 	        rivetCore.c					\
             rivetConf.c                 \
 	        ../rivetChannel.c 			\
-            ../rivetParser.c
+            ../parser/rivetParser.c
 
 ##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 

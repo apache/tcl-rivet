@@ -399,14 +399,14 @@ AC_DEFUN([APACHE_VERSION],[
 
     AC_MSG_CHECKING(for apache version)
     if test "$with_apache_version" = "1"; then
-        AC_MSG_ERROR([Apache 1.x no more supported starting with Rivet 2.1])
+        AC_MSG_ERROR([Rivet 2.1 is no more supporting Apache 1.x])
     else
-        AC_MSG_RESULT( building for apache 2.x )
+        AC_MSG_RESULT([building for apache 2.x])
         AC_CONFIG_FILES([src/apache-2/Makefile])
         apache_version_dir="apache-2"
         AC_DEFINE(APACHE2,1,[APACHE2 definition in config.h])
     fi
-    MOD_RIVET_INCLUDES="-I ${apache_version_dir}"
+    MOD_RIVET_INCLUDES="-I${apache_version_dir}"
 ])
 
 AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
@@ -670,9 +670,9 @@ AC_SUBST(TCL_PACKAGE_PATH)
 
 # Finally, substitute all of the various values into the Makefile.
 # You may alternatively have a special pkgIndex.tcl.in or other files
-# which require substituting th AC variables in.  Include these here.
+# which require substituting the AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile doc/convert_examples.tcl])
+AC_CONFIG_FILES([Makefile src/Makefile src/librivet/Makefile src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
 
 #case $apache_version_dir in
 #    apache-1) AC_CONFIG_FILES([Makefile src/Makefile src/apache-1/Makefile doc/Makefile]) ;;
