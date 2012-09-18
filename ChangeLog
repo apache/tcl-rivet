@@ -1,3 +1,6 @@
+2012-09-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/pkgIndex.tcl: index file regenerated
+
 2012-09-17 Massimo Manghi <mxmanghi@apache.org>
     * src/librivet/rivet[Crypt|WWW|List|pkgInit].c,src/parser/rivetParser.[c|h],
     src/parser/parserPkgInit.c: files for librivet and the Rivet parser moved into 

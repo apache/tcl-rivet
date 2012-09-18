@@ -8,10 +8,12 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
+package ifneeded Calendar 1.0 [list source [file join $dir packages/calendar/calendar.tcl]]
 package ifneeded DIO 1.0 [list source [file join $dir packages/dio/dio.tcl]]
 package ifneeded DIODisplay 1.0 [list source [file join $dir packages/dio/diodisplay.tcl]]
 package ifneeded Dtcl 1.0 [list source [file join $dir packages/dtcl/dtcl.tcl]]
-package ifneeded RivetTcl 1.1 [list source [file join $dir init.tcl]]
+package ifneeded RivetEntities 1.0 [list source [file join $dir packages/entities/entities.tcl]]
+package ifneeded RivetTcl 2.1 [list source [file join $dir init.tcl]]
 package ifneeded Session 1.0 [list source [file join $dir packages/session/session-class.tcl]]
 package ifneeded commserver 0.1 [list source [file join $dir packages/commserver/commserver.tcl]]
 package ifneeded dio_Mysql 0.2 [list source [file join $dir packages/dio/dio_Mysql.tcl]]
@@ -19,6 +21,10 @@ package ifneeded dio_Oracle 0.1 [list source [file join $dir packages/dio/dio_Or
 package ifneeded dio_Postgresql 0.1 [list source [file join $dir packages/dio/dio_Postgresql.tcl]]
 package ifneeded dio_Sqlite 0.1 [list source [file join $dir packages/dio/dio_Sqlite.tcl]]
 package ifneeded form 1.0 [list source [file join $dir packages/form/form.tcl]]
+package ifneeded form 2.0 [list source [file join $dir packages/form/form2.tcl]]
 package ifneeded ncgi 1.0 [list source [file join $dir packages/rivet_ncgi/rivet_ncgi.tcl]]
+package ifneeded rivetlib 1.2 [list load [file join $dir librivetlib.so]]
+package ifneeded rivetparser 0.2 [list load [file join $dir librivetparser.so]]\n[list source [file join $dir packages/tclrivet/tclrivet.tcl]]
 package ifneeded simpledb 0.1 [list source [file join $dir packages/simpledb/simpledb.tcl]]
+package ifneeded tclrivet 0.1 [list source [file join $dir packages/tclrivet/tclrivet.tcl]]
 package ifneeded tclrivetparser 0.1 [list source [file join $dir packages/tclrivet/tclrivetparser.tcl]]
