@@ -15,8 +15,9 @@ Adding new examples to the documentation is a 4 step procedure now:
  2) Create a new code example in the doc/examples directory. The file has to keep code
 in native form, i.e. capable to run when placed in your webspace.
 
- 3) Run 'make examples'. This procedure will collect the files in 'examples' and spit them out
-in examples-sgml correctly escaped to make them fit for inclusion in XML/XHTML documentation
+ 3) Run 'make examples'. This procedure will collect the files in 'examples' and store them
+escaped into 'examples-sgml'. Thus files in this directory are fit for inclusion in 
+XML/XHTML documentation
 
  4) Update the manual to add the reference to the newly generated example.
 

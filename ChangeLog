@@ -1,3 +1,7 @@
+2012-09-21 Massimo Manghi <mxmanghi@apache.org>
+    * doc/README: improved instruction for code examples inclusion into XML manual
+    * doc/rivet-full.xml: removed
+
 2012-09-18 Massimo Manghi <mxmanghi@apache.org>
     * rivet/pkgIndex.tcl: index file regenerated
 
