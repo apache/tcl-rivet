@@ -26,7 +26,9 @@ namespace eval DIO {
     ::itcl::class Sqlite {
         inherit Database
 
-        private variable dbcmd ""
+        private variable dbcmd          ""
+	public  variable interface	"Sqlite"
+
         constructor {args} {eval configure $args} {
             if {[catch {package require sqlite}] && \
                 [catch {package require sqlite3}]} {

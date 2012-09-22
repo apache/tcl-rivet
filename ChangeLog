@@ -1,3 +1,22 @@
+2012-09-22 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: various methods used as
+    accessors to some property variables of the class Database were not returning their values
+    as expeected. This also surfaced a bug in method 'string' where a result object wasn't
+    used correctly. Method 'count' failed when no keyfield was set. Since it should be possible
+    to call this method also when there is no keyfield defined private method table_check is 
+    returning specific error codes making possible to catch this error and ignore 
+    it in 'count' (fixed bugs #53733 and #53732)
+    * rivet/packages/dio/dio_Sqlite.tcl: Class Sqlite did not set the variable 'interface' to
+    value 'Sqlite' as expected.
+    * doc/README: improved instruction for code examples inclusion into XML manual
+    * doc/rivet-full.xml: removed
+    * configure.ac: bumping up version number to 2.0.6
+    * VERSION: new version number
+
+2012-09-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/pkgIndex.tcl: index file regenerated
+
+
 2012-09-16 Massimo Manghi <mxmanghi@apache.org>
     * tests/runtests.tcl,tests/apachetest.tcl: User and Group directives removed from conffile
     template to make test suite independent from the output of command 'id' from which 

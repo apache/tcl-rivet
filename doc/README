@@ -1,8 +1,27 @@
-$Id: $
+$Id: README 1388379 2012-09-21 08:54:28Z mxmanghi $
 
 Graphic files that are to be displayed in the manual must be in the doc/images/ directory. 
 Files in this directory are copied into the doc/html/images directory where they are referenced 
-by the html pages. Files are to be added to svn manually. References to this files must be relative
-to the manual root and therefore look like
+by the html pages. Files have to be added to svn manually. References to this files must be relative
+to the manual root and therefore they look like
 
 <graphic fileref="images/calendar.png" />
+
+Code examples can be put in their native form in 'doc/examples'. 
+Adding new examples to the documentation is a 4 step procedure now:
+
+ 1) Compile and install Rivet
+
+ 2) Create a new code example in the doc/examples directory. The file has to keep code
+in native form, i.e. capable to run when placed in your webspace.
+
+ 3) Run 'make examples'. This procedure will collect the files in 'examples' and store them
+escaped into 'examples-sgml'. Thus files in this directory are fit for inclusion in 
+XML/XHTML documentation
+
+ 4) Update the manual to add the reference to the newly generated example.
+
+
+ 
+
+ 
