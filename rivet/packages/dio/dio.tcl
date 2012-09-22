@@ -299,7 +299,7 @@ proc handle {interface args} {
     #
     method string {req} {
 	set res [exec $req]
-	set val [$res next -list]
+	$res next -list val
 	$res destroy
 	return $val
     }
@@ -372,13 +372,14 @@ proc handle {interface args} {
 	::array set data $list
 
 	if {[lempty $data(-table)]} {
-	    return -code error "-table not specified in DIO object"
+	    return -code error -errorcode missing_table "-table not specified in DIO object"
 	}
+	set $tableVar $data(-table)
+
 	if {[lempty $data(-keyfield)]} {
-	    return -code error "-keyfield not specified in DIO object"
+	    return -code error -errorcode missing_keyfield "-keyfield not specified in DIO object"
 	}
 
-	set $tableVar $data(-table)
 	set $keyVar   $data(-keyfield)
     }
 
@@ -583,7 +584,18 @@ proc handle {interface args} {
     # count - return a count of the specified (or current) table.
     #
     method count {args} {
-	table_check $args
+
+        # table_check returns an error if either a keyfield or a table were not set. 
+        # In order to count the rows in a table we don't need a keyfield, so we check 
+        # if table_check is returning missing_table and in case we rethrow the error, 
+        # otherwise we continue 
+
+        if {[catch {table_check $args} e]} {
+            if {$e != "missing_keyfield"} {
+                return -code error -errorcode $e "error in table_check ($e)"
+            }
+        }
+
 	return [string "select count(*) from $myTable"]
     }
 
@@ -609,17 +621,17 @@ proc handle {interface args} {
     ##
     ## Functions to get and set public variables.
     ##
-    method interface {{string ""}} { configure_variable interface $string }
-    method errorinfo {{string ""}} { configure_variable errorinfo $string }
-    method db {{string ""}} { configure_variable db $string }
-    method table {{string ""}} { configure_variable table $string }
-    method keyfield {{string ""}} { configure_variable keyfield $string }
-    method autokey {{string ""}} { configure_variable autokey $string }
-    method sequence {{string ""}} { configure_variable sequence $string }
-    method user {{string ""}} { configure_variable user $string }
-    method pass {{string ""}} { configure_variable pass $string }
-    method host {{string ""}} { configure_variable host $string }
-    method port {{string ""}} { configure_variable port $string }
+    method interface {{string ""}} { return [configure_variable interface $string] }
+    method errorinfo {{string ""}} { return [configure_variable errorinfo $string] }
+    method db {{string ""}} { return [configure_variable db $string] }
+    method table {{string ""}} { return [configure_variable table $string] }
+    method keyfield {{string ""}} { return [configure_variable keyfield $string] }
+    method autokey {{string ""}} { return [configure_variable autokey $string] }
+    method sequence {{string ""}} { return [configure_variable sequence $string] }
+    method user {{string ""}} { return [configure_variable user $string] }
+    method pass {{string ""}} { return [configure_variable pass $string] }
+    method host {{string ""}} { return [configure_variable host $string] }
+    method port {{string ""}} { return [configure_variable port $string] }
 
     protected variable specialFields
 
@@ -787,14 +799,14 @@ proc handle {interface args} {
 	return [expr [lempty $list] == 0]
     }
 
-    method resultid {{string ""}} { configure_variable resultid $string }
-    method fields {{string ""}} { configure_variable fields $string }
-    method rowid {{string ""}} { configure_variable rowid $string }
-    method numrows {{string ""}} { configure_variable numrows $string }
-    method error {{string ""}} { configure_variable error $string }
-    method errorcode {{string ""}} { configure_variable errorcode $string }
-    method errorinfo {{string ""}} { configure_variable errorinfo $string }
-    method autocache {{string ""}} { configure_variable autocache $string }
+    method resultid {{string ""}} { return [configure_variable resultid $string] }
+    method fields {{string ""}} { return [configure_variable fields $string] }
+    method rowid {{string ""}} { return [configure_variable rowid $string] }
+    method numrows {{string ""}} { return [configure_variable numrows $string] }
+    method error {{string ""}} { return [configure_variable error $string] }
+    method errorcode {{string ""}} { return [configure_variable errorcode $string] }
+    method errorinfo {{string ""}} { return [configure_variable errorinfo $string] }
+    method autocache {{string ""}} { return [configure_variable autocache $string] }
 
     public variable resultid	""
     public variable fields	""

@@ -1,3 +1,14 @@
+2012-09-22 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: various methods used as
+    accessors to some property variables of the class Database were not returning their values
+    as expeected. This also surfaced a bug in method 'string' where a result object wasn't
+    used correctly. Method 'count' failed when no keyfield was set. Since it should be possible
+    to call this method also when there is no keyfield defined private method table_check is 
+    returning specific error codes making possible to catch this error and ignore 
+    it in 'count' (fixed bugs #53733 and #53732)
+    * rivet/packages/dio/dio_Sqlite.tcl: Class Sqlite did not set the variable 'interface' to
+    value 'Sqlite' as expected.
+
 2012-09-21 Massimo Manghi <mxmanghi@apache.org>
     * doc/README: improved instruction for code examples inclusion into XML manual
     * doc/rivet-full.xml: removed
