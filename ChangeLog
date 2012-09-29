@@ -1,3 +1,6 @@
+2012-09-29 Massimo Manghi <mxmanghi@apache.org>
+    * branches/2.1: branching trunk as branches/2.1
+
 2012-09-22 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: various methods used as
     accessors to some property variables of the class Database were not returning their values
