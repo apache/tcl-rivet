@@ -1681,8 +1681,9 @@ Rivet_SendContent(request_rec *r)
     if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
-                "Could not create request namespace\n");
-        retval = HTTP_BAD_REQUEST;
+                "Could not create request namespace (%s)\n",
+                Tcl_GetStringResult(interp));
+        retval = HTTP_INTERNAL_SERVER_ERROR;
         goto sendcleanup;
     }
 

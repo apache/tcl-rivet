@@ -1,3 +1,7 @@
+2012-09-29 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: Getting an error when evaluating request init script returns
+    now HTTP_INTERNAL_SERVER_ERROR
+
 2012-09-22 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: various methods used as
     accessors to some property variables of the class Database were not returning their values
@@ -15,7 +19,6 @@
 
 2012-09-18 Massimo Manghi <mxmanghi@apache.org>
     * rivet/pkgIndex.tcl: index file regenerated
-
 
 2012-09-16 Massimo Manghi <mxmanghi@apache.org>
     * tests/runtests.tcl,tests/apachetest.tcl: User and Group directives removed from conffile
