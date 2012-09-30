@@ -1,3 +1,6 @@
+2012-09-30 Massimo Manghi <mxmanghi@apache.org>
+    * tests/parsepackage.test: changed path to librivetparser.so
+
 2012-09-29 Massimo Manghi <mxmanghi@apache.org>
     * branches/2.1: branching trunk as branches/2.1
 
