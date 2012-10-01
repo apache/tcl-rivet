@@ -4,71 +4,61 @@
     <simplesect>
     	<title>Apache Child Process Lifecycle</title>
 	    <para>
-			At startup Apache spawns child processes which are to become the real
-			agents responding to incoming HTTP requests.
-
+            Apache Rivet delegates to the <ulink url="">Multi-Processing Module (MPM)</ulink>
+            the task of managing the agents responding to network requests. 
+            An MPM is responsible for creating such agents during the start-up, 
+            and is in charge for terminating existing ones and recreating new 
+            agents when the workload is requiring it. 
+        </para>
+        <para>
+            Apache Rivet is currently supporting only the
+            <ulink url="http://httpd.apache.org/docs/2.2/mod/prefork.html">prefork</ulink> MPM which creates full
+            fledge child processes as independent agents responding to network requests. 
+            Efforts are under way to extent the support to
+            the <ulink url="http://httpd.apache.org/docs/2.2/mod/worker.html">worker</ulink> MPM, a hybrid model where forked
+            child processes in turn create threads as real network agents. If we can achieve this the goal
+            would open the possibility of supporting also the Windows&copy; specific 
+            <ulink url="http://httpd.apache.org/docs/2.2/mod/mpm_winnt.html">winnt</ulink> MPM, where
+            a single process creates and manages a large number of thread agents.
+        </para>
+        <para>
 	    	The number of child processes that have to be initially created
-	    	can be controlled in the configuration and the optimum choice
-	    	for this numbers basically depends on the webserver workload and on the 
-	    	available system resources. See
+	    	can be controlled in the configuration. See the
 	    	<ulink url="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">Apache
-	    	documentation</ulink> for further reading about this crucial point. 
-	    	 If your webserver has been properly configured you will have Tcl 
-	    	scripts executed (Rivet templates go through a parsing stage before execution)
-	    	when tcl or rvt files are referenced in one of these cases
-	    	<itemizedlist>
-	    		<listitem>The script is explicitly referenced in the URL. E.g.:
-	    		<programlisting>http://&lt;myserver&gt;/&lt;path-to-script&gt;/&lt;script&gt;.tcl</programlisting></listitem>
-	    		<listitem>The script is implicitly referenced by rewriting the URL. See:
-		<ulink url="http://httpd.apache.org/docs/current/mod/mod_rewrite.html">mod_rewrite</ulink> 
-				documentation</listitem>
-	    		<listitem>The script is implicitly referenced by 
-	<ulink url="http://httpd.apache.org/docs/2.0/mod/mod_alias.html">redirecting or
-	    			aliasing</ulink> the URL to the real script</listitem>
-	    	</itemizedlist>
-	    	Your web applications will be doing much of their work doing this work of
-	    	responding to requests and creating content to be sent back to a client.
+	    	documentation</ulink> for further reading about this point. 
 	    </para>
 	    <para>
-	    	There are 4 stages in the life of an Apache webserver that are relevant
+	    	There are 4 stages in the lifetime of an Apache webserver that are relevant
 	    	to Rivet: 
 	    </para>
 	    <orderedlist>
 	    	<listitem>
 	    		<bridgehead>Single Process Initialization</bridgehead>
 	    		<para>
-		    		After Apache has parsed the configuration file the webserver is still
-		    		a single process application. This stage has a hook in Rivet
-		    		which does some checks and initialization before the server 
-		    		becomes operational. In this phase 
-		    		a configured <command>ServerInitScript</command> (if defined)
-		    		is run just after Rivet has created and initialized its master 
-		    		interpreter, a Tcl_Interp instance from which child process 
-		    		interpreters will be created by copy. <command>ServerInitScript</command>
+                    Apaches starts up as a single process and you can drop in the configuration
+                    a script to be run during this stage through the <command>ServerInitScript</command> 
+                    directive. Variables, arrays or dictionaries set up during this stage will be 
+                    replicated in a child process intepreter at high speed, since a fork() call 
+                    involves only in memory copy of sections of a process address space. Thus
+                    <command>ServerInitScript</command>
 		    		is a good place to do global initialization that doesn't involve
 		    		creation of private data. Example of tasks that can be done
 		    		in this context are importing namespace commands and loading packages
 		    		providing code of general interest for every application to
 		    		be served. 
 	    		</para>
-	    		<para>
-	    			<note>
-	    				<command>ServerInitScript</command> has effect for child processes when 
-		    			<command>SeparateVirtualInterps</command> is off</note>
-		    	</para>
 	    	</listitem>
 	    	<listitem>
 	    		<bridgehead>Child Process Initialization</bridgehead>
 	    		<para>
-		    		Right after the webserver has spawned the child processes that are 
-		    		to become the real "servers", there is a chance to perform specific 
-		    		initialization of their interpreters. This is the stage where most 
-		    		likely you want to open I/O channels, database connections or any other
-		    		resource that has to be private to an interpreter.
-		    		When the option <command>SeparateVirtualInterps</command> is turned off 
-		    		child processes will have a single interpreter regardless
-		    		the name of the virtual host a request is aimed at. 
-		    		This interpreter will have a <command>GlobalInitScript</command> 
+		    		Right after the webserver has forked the child processes 
+		    		there is a chance to perform specific initialization of their interpreters.
+                    This is the stage where most likely you want to open I/O channels, 
+                    database connections or any other resource that has to be private to an 
+                    interpreter. When the option <command>SeparateVirtualInterps</command> is 
+                    turned off child processes will have a single interpreter regardless
+		    		the number of virtual hosts for which a configuration block
+                    is defined. This interpreter will have a <command>GlobalInitScript</command> 
 		    		as initialization.
 	    		</para>
 	    		<para>
@@ -92,60 +82,61 @@
 	    	<listitem>
 	    		<bridgehead>Request Processing and Content Generation</bridgehead>
 	    		<para>
-		   		After a child has been initialized it's ready to serve requests. 
-		   		A child process' life is spent almost completely in this phase, waiting
-		   		for connections and responding to requests. At every request the URL 
-		   		goes through processing and, in case, rewritten by metadata manipulators
-		   		(mod_rewrite, Alias directives, etc). 
-		   		Parameter values encoded in the request are made available to the 
-		   		environment and finally the script encoded in the URL is run. 
-		   		The developer can tell Rivet 	if optionally the execution has to
-		   		be  preceded by a <command>BeforeScript</command> and followed by an
-		   		<command>AfterScript</command>. Actually the real script to be executed is 
-		   		built by concatenation of the <command>BeforeScript</command>,
-		   		the script encoded in the URL and the <command>AfterScript</command>.
-		   		Thus the whole ensemble of code that makes up a web application might
-		   		be running within the same "before" and "after" scripts to which 
-		   		the programmer can devolve tasks common to every 
-		   		page of an application.
-	   		</para>
-	   	</listitem>
-	   	<listitem>
-	   		<bridgehead>Child Process Exit</bridgehead>
-	   		<para>
-		   		If no error condition forces the child process to a premature exit, his
-		   		life is determined by the Apache configuration parameters. To reduce
-		   		the effects of memory leaks in buggy applications the Apache webserver 
-		   		forces a child process to exit after a
-		   		certain number of requests served. A child process gets replaced 
-		   		with a brand new one if the workload of webserver requires so. 
-		   		Before the process quits an exit handler can be run
-		   		to do some housekeeping, just in case something the could have been 
-		   		left behind has to be cleaned up. Like the initialization scripts
-		   		<command>ChildExitScript</command> too is a "one shot" script.
-	   		</para>
-	   		<para>
-	   			The Tcl <command>exit</command> command forces an interpreter to
-	   			quit, thus removing the ability of the process embedding it 
-	   			to run more Tcl scripts. The child process then is forced
-	   			to exit and be replaced by a new one when the workload demands it.
-	   			This operation implies the <command>ChildExitScript</command> be
-	   			run before the interpreter is actually deleted.
-	   		</para>
-	   	</listitem>
+                    After a child has been initialized it's ready to serve requests. 
+                    A child process' lifetime is almost entirely spent in this phase, waiting
+                    for connections and responding to requests. At every request the URL 
+                    goes through filter processing and, in case, rewritten
+                    (mod_rewrite, Alias directives, etc). 
+                    Parameter values encoded in the request are made available to the 
+                    environment and finally the script encoded in the URL is run. 
+                    The developer can tell Rivet if optionally the execution has to
+                    be  preceded by a <command>BeforeScript</command> and followed by an
+                    <command>AfterScript</command>. The real script mod_rivet will
+                    execute is the result of the concatenation of the 
+                    <command>BeforeScript</command>,
+                    the script encoded in the URL and the <command>AfterScript</command>.
+                    Thus the whole ensemble of code that makes up a web application might
+                    be running within the same "before" and "after" scripts to which 
+                    the programmer can devolve tasks common to every 
+                    page of an application.
+                </para>
+            </listitem>
+            <listitem>
+                <bridgehead>Child Process Exit</bridgehead>
+                <para>
+                    If no error condition forces the child process to a premature exit, his
+                    life is determined by the Apache configuration parameters. To reduce
+                    the effects of memory leaks in buggy applications the Apache webserver 
+                    forces a child process to exit after a
+                    certain number of requests served. A child process gets replaced 
+                    with a brand new one if the workload of webserver requires so. 
+                    Before the process quits an exit handler can be run
+                    to do some housekeeping, just in case something the could have been 
+                    left behind has to be cleaned up. Like the initialization scripts
+                    <command>ChildExitScript</command> too is a "one shot" script.
+                </para>
+                <para>
+                    The Tcl <command>exit</command> command forces an interpreter to
+                    quit, thus removing the ability of the process embedding it 
+                    to run more Tcl scripts. The child process then is forced
+                    to exit and be replaced by a new one when the workload demands it.
+                    This operation implies the <command>ChildExitScript</command> be
+                    run before the interpreter is actually deleted.
+                </para>
+            </listitem>
 	    </orderedlist>
 	</simplesect>
 	<simplesect>
     	<title>Apache Rivet Error and Exception Scripts Directives</title>
-	   <para>
-	    	Rivet is highly configurable and each of the webserver lifecycle stages 
-	    	can be exploited to control a web application. 
-	    	Not only the orderly sequence of stages
-	    	in a child lifecycle can be controlled with Tcl scripts, but also
-	    	Tcl error or abnormal conditions taking place during
-	    	the execution can be caught and handled with specific scripts.
-		</para>
-	   <para>
+        <para>
+            Rivet is highly configurable and each of the webserver lifecycle stages 
+            can be exploited to control a web application. 
+            Not only the orderly sequence of stages
+            in a child lifecycle can be controlled with Tcl scripts, but also
+            Tcl error or abnormal conditions taking place during
+            the execution can be caught and handled with specific scripts.
+        </para>
+	    <para>
 	    	Tcl errors (conditions generated when a command exits with code TCL_ERROR) 
 	    	usually result in the printing of a backtrace of the code fragment
 	    	relevant to the error.
