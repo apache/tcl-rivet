@@ -168,54 +168,54 @@ HTML>BODY P {
 
 /* Add an external-link icon to absolute links */
 a[href^="http:"] {
-        background: url(images/remote.gif) right center no-repeat;
+        background: url(images/remote.png) right center no-repeat;
         padding-right: 12px;
 }
 
 a[href^="http:"]:hover {
-        background: url(images/remote_a.gif) right center no-repeat;
+        background: url(images/remote.png) right center no-repeat;
 }
 
 /* Add a note icon to footnote links */
 a[href^="#FTN"] {
-        background: url(images/qbullet-note.gif) right center no-repeat;
+        background: url(images/qbullet-note.png) right center no-repeat;
         padding-right: 12px;
 }
 
 a[href^="#FTN"]:hover {
-        background: url(images/qbullet-note_a.gif) right center no-repeat;
+        background: url(images/qbullet-note.png) right center no-repeat;
 }
 
 /* ...and a back icon to the backlinks in the footnotes themselves */
 a[name^="FTN"] {
-        background: url(images/scrollup.gif) right center no-repeat;
+        background: url(images/scrollup.png) right center no-repeat;
         padding-right: 12px;
 }
 
 a[name^="FTN"]:hover {
-        background: url(images/scrollup_a.gif) right center no-repeat;
+        background: url(images/scrollup.png) right center no-repeat;
 }
 
 /* Add a download icon to .gz links */
 a[href$=".gz"],a[href$=".tar"],a[href$=".zip"] {
-        background: url(images/disk.gif) right center no-repeat;
+        background: url(images/disk.png) right center no-repeat;
         padding-right: 12px;
 }
 
 
 /* Add an Acrobat Reader icon to PDF links */
 a[href$=".pdf"] {
-        background: url(images/acrobat.gif) right center no-repeat;
+        background: url(images/acrobat.png) right center no-repeat;
         padding-right: 12px;
 }
 
 a[href$=".pdf"]:hover {
-        background: url(images/acrobat_a.gif) right center no-repeat;
+        background: url(images/acrobat.png) right center no-repeat;
 }
 
 /* Add a Word icon to RTF links */
 a[href$=".rtf"] {
-        background: url(images/word.gif) right center no-repeat;
+        background: url(images/word.png) right center no-repeat;
         padding-right: 12px;
 }
 

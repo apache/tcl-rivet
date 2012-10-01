@@ -1,8 +1,13 @@
+2012-10-01 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/request.xml,doc/xml/install.xml: attempting to improve the documentation
+    * doc/images/: Adding missing icons
+    * Changelog: merging from trunk before feature freeze for 2.1
+
 2012-09-30 Massimo Manghi <mxmanghi@apache.org>
     * tests/parsepackage.test: changed path to librivetparser.so
 
 2012-09-29 Massimo Manghi <mxmanghi@apache.org>
-    * branches/2.1: branching trunk as branches/2.1
+    * rivet/rivet-tcl/xml.tcl: Adding command for simple quick XML fragments generation
 
 2012-09-22 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: various methods used as
