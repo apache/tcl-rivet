@@ -1,3 +1,6 @@
+2012-10-01 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/install.xml: attempting to improve the documentation
+
 2012-09-29 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: Getting an error when evaluating request init script returns
     now HTTP_INTERNAL_SERVER_ERROR

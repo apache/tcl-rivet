@@ -1,63 +1,66 @@
 <section id="installation">
     <title>Apache Rivet Installation</title>
     <procedure>
-      <step>
-	<title>Check Dependencies</title>
-	<para>
-	  To install Rivet, you will need Tcl 8.4 or greater. Rivet can be compiled to work 
-	  with either Apache 1.3.xx or Apache 2.2.xx server.
-	  It is known to run on Linux, FreeBSD, OpenBSD, Solaris and HPUX. Windows NT is also possible
-	  - please see the directions in the distribution.  
-	</para>
-      </step>
-      <step>
-	<title>Get Rivet</title>
-	<para>
-	  Download the sources at <ulink url="http://tcl.apache.org/rivet/download.html"/>.  Currently
-	  the only way to obtain Rivet.  In the future, we hope to have a FreeBSD port, Debian package, RPM's, and windows
-	  binaries.
-	</para>
-      </step>
-      <step performance="required">
-	<title>Install Tcl</title>
-	<para>
-	  If you don't have Tcl already, you need it!  If you already
-	  have it, you should just be able to use your system Tcl as
-	  long as it is recent.  You can tell Rivet build scripts where Tcl is via
-	  the <option>--with-tcl</option> option to <command>configure</command> (see below).
-	</para>
-      </step>
-      <step performance="optional">
-	<title>Get and Install Apache Sources</title>
-	<para>
-          Rivet needs some Apache include (.h) files in order to build.  The easiest way 
-	  to get them is to download the source code of the Apache web server, although some systems
-	  (Debian GNU/Linux for example) make it possible to install only the headers and other 
-	  development files.  If you intend to build Rivet statically (compiled into the Apache web
-	  server instead of loaded dynamically), you definitely need the sources.  
-	    We recommend that you build Rivet as a loadable shared library, for maximum flexibility,
-	    meaning that you also build Apache to be able to load modules. Other than that, 
-	    the default Apache install is fine.  We will tell Rivet where it is located via the 
-	    <option>--with-apxs</option> option to <command>configure</command> (see below).
-	</para>
-	<para>
-          The source code for the Apache web server may be found by
-          following the links here: <ulink
-          url="http://httpd.apache.org/"/>.
-	</para>
-      </step>
-      <step>
-	<title>Uncompress Sources</title>
-	<para>
-	  We will assume that you have Apache installed at this point.
-	  You must uncompress the Rivet sources in the directory where you
-	  wish to compile them.
-
-	  <programlisting>gunzip rivet-X.X.X.tar.gz
+        <para>
+            Check your OS website for a binary package of Apache Rivet. 
+            Rivet runs with the Apache 1.3.xx or 
+            Apache 2.2.xx server. It is known to run on various Linux distributions 
+            (Debian &amp; Ubuntu, Redhat, SuSE and CentOS), FreeBSD and OpenBSD.
+            Currently there is no way to run Apache Rivet on Windows&copy; with Apache 2.2, since 
+            no <ulink url="http://httpd.apache.org/docs/2.2/mpm.html">Multi-Processing Module</ulink>
+            other than
+            <ulink url="http://httpd.apache.org/docs/2.2/mod/prefork.html">prefork</ulink> is supported.
+            Efforts are under way to extend the support to the 
+            <ulink url="http://httpd.apache.org/docs/2.2/mod/worker.html">worker</ulink> MPM, which could
+            open the possibility to run Apache Rivet also with the 
+            <ulink url="http://httpd.apache.org/docs/2.2/mod/mpm_winnt.html">winnt</ulink> MPM.
+        </para>
+        <para>
+            If you need to compile Apache Rivet yourself this is the procedure to follow
+        </para>
+        <step performance="required">
+            <title>Install Tcl</title>
+            <para>
+                To build Rivet, you will need to install the shell (<command>tclsh</command>), 
+                the development headers and the libraries from Tcl (&ge;8.4). You will tell Rivet 
+                build scripts where Tcl is located via the <option>--with-tcl</option> option to 
+                <command>configure</command> (see below).
+            </para>
+          </step>
+          <step>
+            <title>Get Rivet</title>
+            <para>
+                Download the sources at <ulink url="http://tcl.apache.org/rivet/download.html"/>.  
+            </para>
+          </step>
+          <step performance="optional">
+            <title>Get and Install Apache Sources</title>
+            <para>
+                Rivet needs some Apache include (.h) files in order to build.  The easiest way 
+                to get them is to download the source code of the Apache web server, although some systems
+                (Debian GNU/Linux for example) make it possible to install only the headers and other 
+                development files.  If you intend to build Rivet statically (compiled into the Apache web
+                server instead of loaded dynamically), you definitely need the sources.  
+                We recommend that you build Rivet as a loadable shared library, for maximum flexibility,
+                meaning that you also build Apache to be able to load modules. Other than that, 
+                the default Apache install is fine.  We will tell Rivet where it is located via the 
+                <option>--with-apxs</option> option to <command>configure</command> (see below).
+            </para>
+            <para>
+                The source code for the Apache web server may be found by following the links here: 
+                <ulink url="http://httpd.apache.org/"/>.
+            </para>
+          </step>
+          <step>
+            <title>Uncompress Sources</title>
+            <para>
+              We will assume that you have Apache installed at this point.
+              You must uncompress the Rivet sources in the directory where you
+              wish to compile them.
+              <programlisting>gunzip rivet-X.X.X.tar.gz
 tar -xvf rivet-X.X.X.tar.gz</programlisting>
-
-	</para>
-      </step>
+            </para>
+          </step>
       <step>
 	<title>Building Rivet</title>
 	<substeps>
@@ -166,8 +169,7 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
 	  adding the module itself:
 	</para>
 
-	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache2/modules/mod_rivet.so</replaceable>
-	</programlisting>
+	<programlisting>LoadModule rivet_module	<replaceable>/usr/lib/apache2/modules/mod_rivet.so</replaceable></programlisting>
 
 	<para>
 	  This tells Apache to load the Rivet shared object, wherever
