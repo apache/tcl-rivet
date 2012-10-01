@@ -14,7 +14,7 @@
             Apache Rivet is currently supporting only the
             <ulink url="http://httpd.apache.org/docs/2.2/mod/prefork.html">prefork</ulink> MPM which creates full
             fledge child processes as independent agents responding to network requests. 
-            Efforts are under way to extent the support to
+            Efforts are under way to extend the support to
             the <ulink url="http://httpd.apache.org/docs/2.2/mod/worker.html">worker</ulink> MPM, a hybrid model where forked
             child processes in turn create threads as real network agents. If we can achieve this the goal
             would open the possibility of supporting also the Windows&copy; specific 
@@ -22,10 +22,9 @@
             a single process creates and manages a large number of thread agents.
         </para>
         <para>
-	    	The number of child processes that have to be initially created
-	    	can be controlled in the configuration. See the
+	    	Configuration parameters about this critical point can be read in the
 	    	<ulink url="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">Apache
-	    	documentation</ulink> for further reading about this point. 
+	    	documentation</ulink>. 
 	    </para>
 	    <para>
 	    	There are 4 stages in the lifetime of an Apache webserver that are relevant
