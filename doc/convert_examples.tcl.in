@@ -44,7 +44,7 @@ foreach example $source_examples {
 
         puts "$example needs rebuild"
         
-        set example_text [::rivet::read_file $example]
+        set example_text [string trim [::rivet::read_file $example]]
 
         set example_sgml_fid [open $example_sgml w+]
         puts $example_sgml_fid [::rivet::escape_sgml_chars $example_text]

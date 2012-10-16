@@ -1,3 +1,8 @@
+2012-10-16 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml,doc/xml/commands.xml,doc/xml/install.xml,doc/xml/examples.xml,
+    doc/xml/request.xml,doc/convert_examples.tcl.in,doc/examples-sgml/hello1.rvt: Trying to
+    improve the manual revising and extending it
+
 2012-10-01 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/request.xml,doc/xml/install.xml: attempting to improve the documentation
     * doc/images/: Adding missing icons
