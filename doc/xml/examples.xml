@@ -1,5 +1,6 @@
 <section id="examples">
     <title>Examples and Usage</title>
+    
     <para>
         Some examples of Rivet usage follow.  Some prior Tcl knowledge
         is assumed.  If you don't know much Tcl, don't worry, it's easy,
@@ -8,7 +9,7 @@
         <link linkend="websites">web sites</link> section and have a look.
     </para>
 
-    <example id="hello world">
+    <example id="hello_world">
         <title>Hello World</title>
         <para>
 			As with any tool, it's always nice to see something work, so

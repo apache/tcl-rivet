@@ -17,19 +17,16 @@
 	    	the children that actually will serve the requests coming from
 	    	the network. During this stage Apache is still running as a 
 	    	single process, so this is the right place for doing 
-	    	initializations or loading packages 
-	    	that have be common to all the interpreters that will be created
-	    	when Apache forks its child processes, even when the option 
-	    	<command>SeparateVirtualInterps</command> is set. Since this
+	    	initializations or loading packages. Since this
 	    	script will be running in a single process environment (from the
 	    	Apache point of view) <command>ServerInitScript</command> 
-	    	is also the right place for doing everything that must avoid
-	    	resource concurrency among processes (e.g. the creation and 
+	    	is also the right place for doing anything needs to avoid
+        	resource concurrency among processes (e.g. the creation and 
 	    	initialization of an IPC system)
 	   </para>
 	</section>
 	<section>
-	   <variablelist>	
+	   <variablelist>
    		<varlistentry>
 			<term>
 				<cmdsynopsis>
@@ -128,76 +125,85 @@
 	  			</varlistentry>
 
 			  <varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">ChildInitScript</arg>
-				  <arg><replaceable>script</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-	      <listitem>
-				<para>
-				  Script to be evaluated when each Apache child
-				  process is initialized. This is the recommended
-				  place to load modules, create global variables, open
-				  connections to other facilities (such as databases)
-				  and so on.
-				</para>
-				<para>
-				  In virtual hosts, this script is run in addition to
-				  any global childinitscript.
-				</para>
-	      </listitem>
-		</varlistentry>
+		      <term>
+					<cmdsynopsis>
+					  <arg choice="plain">ChildInitScript</arg>
+					  <arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+		      </term>
+		      <listitem>
+					<para>
+					  Script to be evaluated when each Apache child
+					  process is initialized. This is the recommended
+					  place to load modules, create global variables, open
+					  connections to other facilities (such as databases)
+					  and so on.
+					</para>
+					<para>
+					  In virtual hosts, this script is run in addition to
+					  any global childinitscript. 
+	                  When <command>SeparateVirtualInterp</command>
+	                  any <command>ChildInitScript</command> placed within a 
+	                  <option>&lt;VirtualHost ...&gt;....&lt;/VirtualHost&gt;</option>
+	                  will be that Virtual Host specific ininitalization
+					</para>
+		      </listitem>
+			</varlistentry>
 
-		<varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">ChildExitScript</arg>
-				  <arg><replaceable>script</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-	      <listitem>
-				<para>
-				  Script to be evaluated when each Apache child
-				  process exits.  This is the logical place to clean
-				  up resources created in <option>ChildInitScript</option>, 
-				  if necessary.
-				</para>
-				<para>
-				  In virtual hosts, this script is run in addition to
-				  any global childexitscript.
-				</para>
-	      </listitem>
-		</varlistentry>
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+				  		<arg choice="plain">ChildExitScript</arg>
+				  		<arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+	      	</term>
+	      	<listitem>
+					<para>
+					  Script to be evaluated when each Apache child
+					  process exits. This is the logical place to clean
+					  up resources created in <option>ChildInitScript</option>, 
+					  if necessary.
+					</para>
+					<para>
+					  In virtual hosts, this script is run in addition to
+					  any global childexitscript.
+	              
+	              When <command>SeparateVirtualInterp</command>
+	              any <command>ChildExitScript</command> placed within a 
+	              <option>&lt;VirtualHost ...&gt;....&lt;/VirtualHost&gt;</option>
+	              will be that Virtual Host specific exit handler
+					</para>
+	      	</listitem>
+			</varlistentry>
 
-	   <varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">BeforeScript</arg>
-				  <arg><replaceable>script</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-	      <listitem>
-				<para>
-				  Script to be evaluated before each server parsed
-				  (.rvt) page.  This can be used to create a standard
-				  header, for instance.  It could also be used to load
-				  code that you need for every page, if you don't want
-				  to put it in a <option>GlobalInitScript</option>
-				  <option>ChildInitScript</option> when you are first
-				  developing a web site.
-				  <note>
-				    This code is evaluated at the global level, not
-				    inside the request namespace where pages are
-				    evaluated.
-				  </note>
-				</para>
-				<para>
-				  In virtual hosts, this option takes precedence over
-				  the global setting.
-				</para>
-	    	</listitem>
-		</varlistentry>
+		   <varlistentry>
+		      <term>
+					<cmdsynopsis>
+					  <arg choice="plain">BeforeScript</arg>
+					  <arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+		      </term>
+		      <listitem>
+					<para>
+					  Script to be evaluated before each server parsed
+					  (.rvt) page.  This can be used to create a standard
+					  header, for instance.  It could also be used to load
+					  code that you need for every page, if you don't want
+					  to put it in a <option>GlobalInitScript</option>
+					  <option>ChildInitScript</option> when you are first
+					  developing a web site.
+					  <note>
+					    This code is evaluated at the global level, not
+					    inside the request namespace where pages are
+					    evaluated.
+					  </note>
+					</para>
+					<para>
+					  In virtual hosts, this option takes precedence over
+					  the global setting.
+					</para>
+		    	</listitem>
+			</varlistentry>
 
 	   <varlistentry>
 	      <term>

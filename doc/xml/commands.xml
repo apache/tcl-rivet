@@ -25,6 +25,37 @@
 			that commands be specified with their fully qualified names.
 		</para>
 	</section>
+	<refentry id="shorthand">
+		<refnamediv>
+			<refname>&lt;?= ... ?&gt;</refname>
+			<refpurpose>
+				Shorthand construct for single strings output
+			</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+				<command>&lt;?= <arg choice="plain">$string</arg> ?&gt;</command>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<title>Description</title>
+			<para>
+				This construct is a simplified form to print a single string wherever
+				needed in a <arg>.rvt</arg> template. The contruct is equivalent to
+				writing the following line of Tcl code
+			</para>
+			<programlisting>put -nonewline $string</programlisting>
+			<para>			
+				The <arg>string</arg> argument to the shorthand construct can 
+				be any Tcl command returning a value
+			</para>
+			<para>
+				See <xref linkend="hello_world">Hello World</xref> or
+				<xref linkend="variable_access">Variable Access</xref>
+			</para>
+		</refsect1>
+	</refentry>	
+	
 	<refentry id="abort_code">
 		<refnamediv>
 			<refname>abort_code</refname>
@@ -81,8 +112,9 @@
 		    specified in the configuration. The value of the
 		    argument <arg>abort code</arg> can be retrieved with the 
 		    <command>abort_code</command> command during the
-		    execution of AbortScript or AfterEveryScript, allowing 
-		    the script to take appropriate actions in order to deal
+		    execution of <link linkend="directives">AbortScript or 
+		    AfterEveryScript</link>, 
+		    allowing the script to take appropriate actions in order to deal
 		    with the cause of the abort. 
 		</para>
 		<para>
@@ -331,55 +363,59 @@
     <!-- Reference page for command 'cookie' -->
 	<refentry id="cookie">
 	    <refnamediv>
-		<refname>cookie</refname>
-		<refpurpose>get, set and delete cookies.</refpurpose>
+			<refname>cookie</refname>
+			<refpurpose>get, set and delete cookies.</refpurpose>
 	    </refnamediv>
 
 	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>::rivet::cookie</command>
-		    <arg>set</arg>
-		    <arg><replaceable>cookieName</replaceable></arg>
-		    <arg><replaceable><optional>cookiValue</optional></replaceable></arg>
-		    <arg>-days <replaceable>expireInDays</replaceable></arg>
-		    <arg>-hours <replaceable>expireInHours</replaceable></arg>
-		    <arg>-minutes <replaceable>expireInMinutes</replaceable></arg>
-		    <arg>-expires <replaceable>Wdy, DD-Mon-YYYY HH:MM:SS GMT</replaceable></arg>
-		    <arg>-path <replaceable>uriPathCookieAppliesTo</replaceable></arg>
-		    <arg>-secure <replaceable>1/0</replaceable></arg>
-		</cmdsynopsis>
-		<cmdsynopsis>
-		    <command>::rivet::cookie</command>
-		    <arg>get</arg>
-		    <arg><replaceable>cookieName</replaceable></arg>
-		</cmdsynopsis>
-		<cmdsynopsis>
-		    <command>::rivet::cookie</command>
-		    <arg>delete</arg>
-		    <arg><replaceable>cookieName</replaceable></arg>
-		</cmdsynopsis>
-		<cmdsynopsis>
-		    <command>::rivet::cookie</command>
-		    <arg>unset</arg>
-		    <arg><replaceable>cookieName</replaceable></arg>
-		</cmdsynopsis>
+			<cmdsynopsis>
+			    <command>::rivet::cookie</command>
+			    <arg>set</arg>
+			    <arg><replaceable>cookieName</replaceable></arg>
+			    <arg><replaceable><optional>cookiValue</optional></replaceable></arg>
+			    <arg>-days <replaceable>expireInDays</replaceable></arg>
+			    <arg>-hours <replaceable>expireInHours</replaceable></arg>
+			    <arg>-minutes <replaceable>expireInMinutes</replaceable></arg>
+			    <arg>-expires <replaceable>Wdy, DD-Mon-YYYY HH:MM:SS GMT</replaceable></arg>
+			    <arg>-path <replaceable>uriPathCookieAppliesTo</replaceable></arg>
+			    <arg>-secure <replaceable>1/0</replaceable></arg>
+			    <arg>-HttpOnly <replaceable>1/0</replaceable></arg>
+			</cmdsynopsis>
+			<cmdsynopsis>
+			    <command>::rivet::cookie</command>
+			    <arg>get</arg>
+			    <arg><replaceable>cookieName</replaceable></arg>
+			</cmdsynopsis>
+			<cmdsynopsis>
+			    <command>::rivet::cookie</command>
+			    <arg>delete</arg>
+			    <arg><replaceable>cookieName</replaceable></arg>
+			</cmdsynopsis>
+			<cmdsynopsis>
+			    <command>::rivet::cookie</command>
+			    <arg>unset</arg>
+			    <arg><replaceable>cookieName</replaceable></arg>
+			</cmdsynopsis>
 	    </refsynopsisdiv>
 
 	    <refsect1>
-		<title>Description</title>
-		<para>
-		    <command>cookie</command> gets, sets, unsets or deletes a cookie.  When you
-		    get a cookie, the command returns the value of the cookie,
-		    or an empty string if no cookie exists.
-		</para>
-		<para>
-		    <command>cookie delete</command> will set the timeout value to -1 minutes - 
-		    deleting the cookie in the browser.
-		</para>
-		<para>
-		    <command>cookie unset</command> will remove the defined cookie in the server 
-		    (perhaps preparatory to checking/resetting the cookie).
-		</para>
+			<title>Description</title>
+			<para>
+			    <command>cookie</command> gets, sets, unsets or deletes a cookie.  When you
+			    get a cookie, the command returns the value of the cookie,
+			    or an empty string if no cookie exists.
+			</para>
+			<para>
+			    <command>cookie delete</command> will set the timeout value to -1 minutes - 
+			    deleting the cookie in the browser.
+			</para>
+			<para>
+			    <command>cookie unset</command> will remove the defined cookie in the server 
+			    (perhaps preparatory to checking/resetting the cookie).
+			</para>
+			<para>
+				The command has a number of switches setting a cookie attributes
+			</para>
 	    </refsect1>
 	</refentry>
 
@@ -808,12 +844,12 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
                 variable doesn't exist, create it instead of returning an
                 error.
             </para>
-
             <note> 
                 incr0 functionality is provided by the native <command>incr</command> in 
                 Tcl &gt;= 8.5, therefore this command is deprecated and kept as an
-                interpreter alias only for compatibility and as such it wasn't moved to 
-                the ::rivet namespace. It will be removed in future versions of Rivet.
+                interpreter alias only for compatibility. As such <command>incr0</command> 
+                wasn't moved to the ::rivet namespace and
+                it will be removed in future versions of Rivet.
             </note>
 	    </refsect1>
 	</refentry>
