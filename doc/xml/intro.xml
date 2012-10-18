@@ -27,13 +27,15 @@
         don't hesitate to let us know.  If you want to contribute
         directly, better yet!
     </para>
-
-    <para>
-        Rivet 2.1.0 comes with the invaluable contribution provided by 
-        <emphasis>Harald Oehlmann</emphasis> (page RivetEntitites, 
-        new command ::rivet::http_accept and bugfixes), 
-        <emphasis>Cyril Shtumf</emphasis> (important bugfixes) and
-        <emphasis>Jeff Lawson</emphasis> (who introduced the 
-        shorthand syntax for string output)
-    </para>
+    <simplesect>
+        <title>Acknowledgements</title>
+        <para>
+            Rivet 2.1.0 comes with relevant contributions provided by 
+            <emphasis>Harald Oehlmann</emphasis> (page RivetEntitites, 
+            new command ::rivet::http_accept and bugfixes), 
+            <emphasis>Cyril Shtumf</emphasis> (important bugfixes) and
+            <emphasis>Jeff Lawson</emphasis> (who introduced the 
+            shorthand syntax for string output)
+        </para>
+    </simplesect>
 </section>
