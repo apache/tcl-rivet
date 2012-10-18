@@ -1,5 +1,6 @@
 2012-10-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/intro.xml: merging latest changes
+    * VERSION,configure.ac: setting version as 2.1.0
 
 2012-10-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/directives.xml,doc/xml/commands.xml,doc/xml/install.xml,doc/xml/examples.xml,
