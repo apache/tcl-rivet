@@ -1138,12 +1138,12 @@ bxxb ccxxxxcc</programlisting>
 		  <itemizedlist> 
 		    <listitem> No argument is passed to the command (returns the current script URL)</listitem>
 		    <listitem> 
-			A relative style path is passed (returns the argument prepended with the
-			current script's URL
+					A relative style path is passed (returns the argument prepended with the
+					current script's URL
 		    </listitem>
 		    <listitem> 
-			An absolute path is passed to the command: (returns the full URL to the
-			resource)
+					An absolute path is passed to the command: (returns the full URL to the
+					resource)
 		    </listitem>
 
 		  </itemizedlist>
@@ -1152,7 +1152,8 @@ bxxb ccxxxxcc</programlisting>
 		    Example of absolute path: <programlisting>::rivet::makeurl /tclp.gif</programlisting> returns
 		    <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
 		    where hostname and port are the hostname and port of the
-		    server in question.
+		    server in question. The protocol prefix is inferred from the protocol in the URL referencing the
+		    script.
 		</para>
 	    </refsect1>
 	</refentry>
