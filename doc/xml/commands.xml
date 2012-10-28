@@ -1014,7 +1014,8 @@ bxxb ccxxxxcc
             Example of absolute path: <programlisting>makeurl /tclp.gif</programlisting> returns
             <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
             where hostname and port are the hostname and port of the
-            server in question.
+            server in question. The protocol prefix is inferred from the protocol in 
+            the URL referencing the script.
         </para>
       </refsect1>
     </refentry>
