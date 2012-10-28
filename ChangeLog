@@ -1,3 +1,7 @@
+2012-10-28 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: Manual entry for makeurl extented to clarify how the
+    protocol is determined.
+    
 2012-10-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/directives.xml,doc/xml/commands.xml,doc/xml/install.xml,doc/xml/examples.xml,
     doc/xml/request.xml,doc/convert_examples.tcl.in,doc/examples-sgml/hello1.rvt: Trying to
