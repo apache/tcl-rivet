@@ -1,3 +1,7 @@
+2012-10-29 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/[session-create-mysql.sql|session-create-sqlite.sql]: index
+    riv_sess_cache_ix had a uncomplete unique key definition that missed the 'package_' column (fixes bug #54063)
+
 2012-10-28 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: Manual entry for makeurl extented to clarify how the
     protocol is determined.
