@@ -14,4 +14,4 @@ CREATE TABLE rivet_session_cache (
 --  KEY rivet_session_cache_idx (session_id),
     CONSTRAINT session_cleanup FOREIGN KEY (session_id) REFERENCES rivet_session(session_id) ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX rvt_sess_cache_idx ON rivet_session_cache ( session_id, key_ );
+CREATE UNIQUE INDEX rvt_sess_cache_idx ON rivet_session_cache ( session_id, package_, key_ );
