@@ -576,6 +576,8 @@ package provide form 2.0
         if {[info exists data(value)]} {
             set value $data(value)
             unset data(value)
+        } elseif {[default_exists $name]} {
+            set value [default_value_get $name]
         }
         html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
     }
