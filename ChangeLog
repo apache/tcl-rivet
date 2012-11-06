@@ -1,3 +1,7 @@
+2012-11-05 Harald Oehlmann <oehhar@apache.org>
+    * rivet/packages/form/form2.tcl: Bug fixed: method textarea did not honor default values.
+    (reported on rivet-dev by Jeff Lawson)
+
 2012-10-29 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/session/[session-create-mysql.sql|session-create-sqlite.sql]: index
     riv_sess_cache_ix had a incomplete unique key definition that missed the 'package_' column (fixes bug #54063)
