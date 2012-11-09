@@ -1,3 +1,11 @@
+2012-11-09 Harald Oehlmann <oehhar@apache.org>
+    * rivet/packages/form/form2.tcl: Checkboxes with no value and an arbitrary
+    default value are initialy checked.
+    *** POTENTIAL INCOMPATIBILITY ***
+    The default value is not taken as checkbox value any more.
+    This was IMHO a security hole.
+    (reported on rivet-dev by Jeff Lawson)
+
 2012-11-05 Harald Oehlmann <oehhar@apache.org>
     * rivet/packages/form/form2.tcl: Bug fixed: method textarea did not honor default values.
     (reported on rivet-dev by Jeff Lawson)
