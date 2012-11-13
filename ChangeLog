@@ -1,3 +1,6 @@
+2012-11-13 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/form.xml: subcommand 'checkboxes' documented
+
 2012-11-09 Harald Oehlmann <oehhar@apache.org>
     * rivet/packages/form/form2.tcl: Checkboxes with no value and an arbitrary
     default value are initialy checked.
