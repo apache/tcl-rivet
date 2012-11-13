@@ -379,7 +379,55 @@ myform end</programlisting>
 								type input field with the name, label and value attributes set 
 								according to the parameters passed to the subcommand.
 							</para>
-								<refsect3>
+							<para>
+								Example:
+							</para>
+							<programlisting>form myform -defaults response -method get -name formname -action &lt;form_url&gt;
+myform start
+myform checkbox options -value opt1 -label "Option 1"
+myform checkbox options -value opt2 -label "Option 2"
+myform checkbox options -value opt3 -label "Option 3"
+myform checkbox options -value opt4 -label "Option 4"
+myform submit save_tps -value "Send Options"
+myform end
+myform destroy</programlisting>
+							<para>
+								Provided opt2 was in response array (in the list valued 'options' variable) that 
+								initialized the form, the output would look like this
+							</para>
+							<programlisting>&lt;form  action=&quot;&lt;form_url&gt;&quot; method=&quot;get&quot; name=&quot;formname&quot;&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_1&quot; label=&quot;Option 1&quot; value=&quot;sopt1&quot; /&gt;&lt;label for=&quot;autogen_1&quot;&gt;Option 1&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_2&quot; label=&quot;Option 2&quot; value=&quot;sopt2&quot; /&gt;&lt;label for=&quot;autogen_2&quot;&gt;Option 2&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_3&quot; label=&quot;Option 3&quot; value=&quot;sopt3&quot; /&gt;&lt;label for=&quot;autogen_3&quot;&gt;Option 3&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_4&quot; label=&quot;Option 4&quot; value=&quot;sopt4&quot; /&gt;&lt;label for=&quot;autogen_4&quot;&gt;Option 4&lt;/label&gt;
+&lt;input type=&quot;submit&quot; name=&quot;submit&quot;  value=&quot;Send&quot; /&gt;
+&lt;/form&gt;</programlisting>
+						</listitem>				
+					</varlistentry>
+				</variablelist>
+			</refsect2>
+
+			<!-- CHECKBOXES -->
+			
+			<refsect2>
+				<variablelist>
+					<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">checkboxes</arg>
+								<arg>name</arg>
+								<arg>-labels <replaceable>labels_list</replaceable></arg>
+								<arg>-values <replaceable>values_list</replaceable></arg>
+								<arg>args</arg>
+							</cmdsynopsis>
+							<para>
+								The <arg choice="plain">checkboxes</arg> is an extended form
+								of the <arg choice="plain">checkbox</arg> subcommand. 
+								<arg choice="plain">checkboxes</arg>
+								prints as many checkboxes as the number of elements in the 
+								<arg><replaceable>labels_list</replaceable></arg> argument								 
+							</para>
+							<refsect3>
 								<title>Options</title>
 								<variablelist>
 									<varlistentry>
@@ -405,29 +453,31 @@ myform end</programlisting>
 	 										</para>
 										</listitem>								
 									</varlistentry>
-								</variablelist>				
+								</variablelist>		
 							</refsect3>
 							<para>
 								Example:
 							</para>
-							<programlisting>myform checkbox options -value opt1   -label "Option 1"
-myform checkbox options -value opt2   -label "Option 2"
-myform checkbox options -value opt3   -label "Option 3"
-myform checkbox options -value opt4   -label "Option 4"</programlisting>
+							<programlisting>form myform -defaults response -method post -action &lt;form_url&gt;
+myform start
+myform checkboxes options -values {opt1 opt2 opt3 opt4} -labels {"Option 1" "Option 2" "Option 3" "Option 4"}
+myform submit save_tps -value "Send Options"
+myform end
+myform destroy</programlisting>
 							<para>
-								Provided opt2 was in response array (in the list valued 'options' variable) that 
-								initialized the form, the output would look like this
+								will print the following HTML code
 							</para>
-							<programlisting>&lt;input type="checkbox" name="options" label="Option 1" value="opt1" /&gt;Option 1
-&lt;input type="checkbox" name="options" label="Option 2" value="opt2" 
-       	 checked="checked" /&gt;Option 2
-&lt;input type="checkbox" name="options" label="Option 3" value="opt3" /&gt;Option 3
-&lt;input type="checkbox" name="options" label="Option 4" value="opt4" /&gt;Option 4</programlisting>
+							<programlisting>&lt;form  action=&quot;&lt;form_url&gt;&quot; method=&quot;post&quot;&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_1&quot; label=&quot;Option 1&quot; value=&quot;opt1&quot; /&gt;&lt;label for=&quot;autogen_1&quot;&gt;Option 1&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_2&quot; label=&quot;Option 2&quot; value=&quot;opt2&quot; /&gt;&lt;label for=&quot;autogen_2&quot;&gt;Option 2&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_3&quot; label=&quot;Option 3&quot; value=&quot;opt3&quot; /&gt;&lt;label for=&quot;autogen_3&quot;&gt;Option 3&lt;/label&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;options&quot;  id=&quot;autogen_4&quot; label=&quot;Option 4&quot; value=&quot;opt4&quot; /&gt;&lt;label for=&quot;autogen_4&quot;&gt;Option 4&lt;/label&gt;
+&lt;input type=&quot;submit&quot; name=&quot;save_tps&quot;  value=&quot;Send Options&quot; /&gt;
+&lt;/form&gt;</programlisting>
 						</listitem>				
 					</varlistentry>
 				</variablelist>
-			</refsect2>
-
+			</refsect2>				
 			<refsect2>
 				<variablelist>
 					<varlistentry>
@@ -536,22 +586,6 @@ myform checkbox options -value opt4   -label "Option 4"</programlisting>
 							</cmdsynopsis>
 							<para>
 								Emits an image input field
-							</para>
-						</listitem>
-					</varlistentry>
-				</variablelist>
-			</refsect2>
-			<refsect2>
-				<variablelist>
-					<varlistentry>
-						<listitem>
-							<cmdsynopsis>
-								<arg choice="plain">checkbox</arg>
-								<arg>name</arg>
-								<arg>args</arg>
-							</cmdsynopsis>
-							<para>
-								Emits a checkbox input field
 							</para>
 						</listitem>
 					</varlistentry>

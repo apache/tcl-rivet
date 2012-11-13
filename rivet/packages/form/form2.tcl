@@ -276,11 +276,16 @@ package provide form 2.0
                     append label ">" $data(label) "</label>"
                 }
 
-                # ...and if there is a default value for this field
+                # if there is a default value for this field
                 # and it matches the value we have for it, make
                 # the field show up as selected (checked)
-                if {[info exists data(value)]
-                        && [default_value_exists $name $data(value)]
+                # Alternatively, select a checkbox, if it has no value but a
+                # default value with arbitrary value.
+                if {    [info exists data(value)]
+                            && [default_value_exists $name $data(value)]
+                        || ![info exists data(value)]
+                            && $type eq "checkbox"
+                            && [info exists DefaultValues($name)]
                 } {
                     set data(checked) "checked"
                 }
@@ -576,7 +581,9 @@ package provide form 2.0
         if {[info exists data(value)]} {
             set value $data(value)
             unset data(value)
-        }
+        } elseif {[default_exists $name]} {
+			set value [default_value_get $name]
+		}
         html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
     }
 
