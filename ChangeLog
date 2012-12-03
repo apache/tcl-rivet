@@ -1,3 +1,6 @@
+2012-12-03 Massimo Manghi <mxmanghi@apache.org>
+    * doc/Makefile.am: Manual pages output encoding set to UTF-8
+
 2012-11-13 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/form.xml: subcommand 'checkboxes' documented
 
