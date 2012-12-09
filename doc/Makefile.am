@@ -23,13 +23,17 @@ PICTURES:=$(wildcard images/*.png)
 
 # English, multiple files.
 html/index.html: rivet.xml rivet-chunk.xsl rivet.xsl xml/*.xml
-	xsltproc --stringparam html.stylesheet rivet.css --stringparam \
-	html.ext ".html" --nonet -o html/ rivet-chunk.xsl rivet.xml
+	xsltproc --stringparam html.stylesheet rivet.css \
+	--stringparam html.ext ".html" \
+	--stringparam chunker.output.encoding UTF-8  \
+	--nonet -o html/ rivet-chunk.xsl rivet.xml
 
 # English, one big file.
 html/rivet.html: rivet.xml rivet-nochunk.xsl rivet.xsl xml/*.xml
-	xsltproc --stringparam html.stylesheet rivet.css --stringparam \
-	html.ext ".html" --nonet -o html/rivet.html rivet-nochunk.xsl \
+	xsltproc --stringparam html.stylesheet rivet.css \
+	--stringparam html.ext ".html" \
+	--stringparam chunker.output.encoding UTF-8  \
+	--nonet -o html/rivet.html rivet-nochunk.xsl \
 	rivet.xml
 
 # This means these are not build automatically, but at least

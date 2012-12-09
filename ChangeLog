@@ -1,3 +1,6 @@
+2012-12-03 Massimo Manghi <mxmanghi@apache.org>
+    * doc/Makefile.am: Manual pages output encoding set to UTF-8
+
 2012-10-29 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/session/[session-create-mysql.sql|session-create-sqlite.sql]: index
     riv_sess_cache_ix had a uncomplete unique key definition that missed the 'package_' column (fixes bug #54063)
