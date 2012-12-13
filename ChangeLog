@@ -1,3 +1,12 @@
+2012-12-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: Tcl_PkgRequire for packages Rivet and rivetlib
+    are exchanged so that commands in librivet.so can be imported when 
+    they are on the export list and a programmer issues a 'package require ::rivet'
+    * rivet/init.tcl: this script is now providing package 'Rivet' instead of
+    'RivetTcl'. init.tcl initializes the Tcl core of Rivet and a package rivet
+    has to exists for compatibility with version 2.0 where it was provided 
+    rather pointelessly by librivet.so.
+
 2012-12-03 Massimo Manghi <mxmanghi@apache.org>
     * doc/Makefile.am: Manual pages output encoding set to UTF-8
 

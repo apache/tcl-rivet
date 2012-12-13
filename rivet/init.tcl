@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package provide RivetTcl 2.1
+package provide Rivet 2.1
 
 namespace eval ::Rivet {
 
@@ -117,11 +117,11 @@ namespace eval ::Rivet {
         set tclpath [file join [file dirname [info script]] rivet-tcl]
         set auto_path [linsert $auto_path 0 $tclpath]
 
-        ## As we moved the commands ensemble to ::rivet namespace we
+        ## As we moved the commands set to ::rivet namespace we
         ## we want to guarantee the commands are still accessible
         ## at global level by putting them on the export list.
         ## Importing the ::rivet namespace is deprecated and we should
-        ## make it clear that this will be removed in the future
+        ## make it clear in the manual
 
         ## we keep in ::rivet::export_list a list of importable commands
 
@@ -190,7 +190,7 @@ interp alias {} ::incr0 {} incr
 # This option is not guaranteed to be supported in future versions.
 
 if {[info exists module_conf(import_rivet_commands)] && $module_conf(import_rivet_commands)} {
-    namespace import -force ::rivet::*
+    namespace eval :: { namespace import -force ::rivet::* }
 }
 
 array unset module_conf
