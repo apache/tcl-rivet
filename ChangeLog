@@ -1,7 +1,15 @@
+2012-12-16 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-class.tcl: method 'store' had a hardcoded 'parray' of 
+    the data when an error occurred. It also printed a message using 'puts' instead of 'debug'
+
+2012-12-15 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: command 'headers' returns a meaningful error in case
+    a subcommand is invalid
+
 2012-12-12 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: Tcl_PkgRequire for packages Rivet and rivetlib
     are exchanged so that commands in librivet.so can be imported when 
-    they are on the export list and a programmer issues a 'package require ::rivet'
+    they are on the export list and a programmer issues a 'package require ::rivet' (fixes bug #54290)
     * rivet/init.tcl: this script is now providing package 'Rivet' instead of
     'RivetTcl'. init.tcl initializes the Tcl core of Rivet and a package rivet
     has to exists for compatibility with version 2.0 where it was provided 
