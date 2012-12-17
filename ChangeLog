@@ -1,6 +1,17 @@
+2012-12-17 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/install.xml: fixed link to download page on the website
+    * rivet/packages/dio/dio.tcl: method store uses internally methods 'insert' or
+    'update' (depending on the existence of a row having the same keyfield). The
+    latest version of DIO shipped a 'store' method that returns the very same value
+    returned either by 'insert' or 'update'. Previous versions of DIO returned
+    invariably 1, which was undocumented and not very well thought out (handled 
+    errors in 'store' return a -code error, not necessarily 0). Previous behavior
+    is reinstated (bug #54313)
+
 2012-12-16 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/session/session-class.tcl: method 'store' had a hardcoded 'parray' of 
-    the data when an error occurred. It also printed a message using 'puts' instead of 'debug'
+    * rivet/packages/session/session-class.tcl: method 'store' had an hardcoded 
+    'parray' the ran  when an error occurred. It also printed a message using 
+    'puts' instead of 'debug' 
 
 2012-12-15 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: command 'headers' returns a meaningful error in case
@@ -9,7 +20,8 @@
 2012-12-12 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: Tcl_PkgRequire for packages Rivet and rivetlib
     are exchanged so that commands in librivet.so can be imported when 
-    they are on the export list and a programmer issues a 'package require ::rivet' (fixes bug #54290)
+    they are on the export list and a programmer issues a 'package require 
+    ::rivet' (fixes bug #54290)
     * rivet/init.tcl: this script is now providing package 'Rivet' instead of
     'RivetTcl'. init.tcl initializes the Tcl core of Rivet and a package rivet
     has to exists for compatibility with version 2.0 where it was provided 
