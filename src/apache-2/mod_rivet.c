@@ -959,9 +959,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                      MODNAME ": Error loading rivetlib package: %s",
 		     Tcl_GetStringResult(interp) );
         exit(1);
-    } 
+    }
 
-    /*  If rivet is configured to export the ::rivet namespace commands we set the 
+    /*  If rivet is configured to export the ::rivet namespace commands we set the
      *  array variable ::rivet::module_conf(export_namespace_commands) before calling init.tcl
      *  This array will be unset after commands are exported.
      */
@@ -972,7 +972,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
     /* Watch out! Calling Tcl_PkgRequire with a version number binds this module to
-     * the Rivet package revision number in rivet/init.tcl 
+     * the Rivet package revision number in rivet/init.tcl
      */
 
     if (Tcl_PkgRequire(interp, "Rivet", "2.1", 1) == NULL)

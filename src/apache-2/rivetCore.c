@@ -351,7 +351,7 @@ TCL_CMD_HEADER( Rivet_Headers )
             return TCL_ERROR;
         }
         TclWeb_SetHeaderType(Tcl_GetString(objv[2]), globals->req);
-    } 
+    }
     else if (!strcmp("numeric", opt)) /* ### numeric ### */
     {
         int st = 200;

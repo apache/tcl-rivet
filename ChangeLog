@@ -1,3 +1,10 @@
+2012-12-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/librivet/rivetPkgInit.c: package version taken from preprocessor symbol
+    RIVET_VERSION so that it's guaranteed mod_rivet.c will get the right library
+    version.
+    * src/apache-2/mod_rivet.c: removed trailing spaces from various lines (offends
+    some patch management tools such as quilt)
+
 2012-12-17 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/install.xml: fixed link to download page on the website
     * rivet/packages/dio/dio.tcl: method store uses internally methods 'insert' or
