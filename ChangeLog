@@ -1,3 +1,6 @@
+2012-12-30 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/xml.tcl: revised command for simple XML string mark up
+
 2012-12-18 Massimo Manghi <mxmanghi@apache.org>
     * src/librivet/rivetPkgInit.c: package version taken from preprocessor symbol
     RIVET_VERSION so that it's guaranteed mod_rivet.c will get the right library
