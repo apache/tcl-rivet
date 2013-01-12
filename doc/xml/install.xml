@@ -40,7 +40,7 @@
          <step>
             <title>Get Rivet</title>
             <para>
-                Download the sources at <ulink url="http://tcl.apache.org/rivet/download.html"/>.  
+                Download the sources at <ulink url="http://tcl.apache.org/rivet/static/download.html"/>.  
             </para>
          </step>
          <step performance="optional">

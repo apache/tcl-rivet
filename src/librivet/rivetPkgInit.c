@@ -110,7 +110,7 @@ Rivetlib_Init( Tcl_Interp *interp )
     Tcl_Export(interp,rivet_ns,"*",0);
 #endif
 
-    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
+    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION );
 }
 
 /*-----------------------------------------------------------------------------
@@ -148,5 +148,5 @@ Rivetlib_SafeInit( Tcl_Interp *interp )
     rivet_ns = Rivet_GetNamespace(interp);
     Tcl_Export(interp,rivet_ns,"*",0);
 #endif
-    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, "1.2" );
+    return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION );
 }

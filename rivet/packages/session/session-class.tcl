@@ -316,8 +316,8 @@ package require Itcl
 	set kf [list session_id package_ key_]
 
 	if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
-	    puts "Failed to store $sessionCacheTable '$kf'"
-	    parray a
+	    debug "Failed to store $sessionCacheTable '$kf'"
+	    #parray a
 	    error [$dioObject errorinfo]
 	}
     }

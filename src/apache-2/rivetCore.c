@@ -351,7 +351,8 @@ TCL_CMD_HEADER( Rivet_Headers )
             return TCL_ERROR;
         }
         TclWeb_SetHeaderType(Tcl_GetString(objv[2]), globals->req);
-    } else if (!strcmp("numeric", opt)) /* ### numeric ### */
+    }
+    else if (!strcmp("numeric", opt)) /* ### numeric ### */
     {
         int st = 200;
 
@@ -365,7 +366,15 @@ TCL_CMD_HEADER( Rivet_Headers )
         } else {
             return TCL_ERROR;
         }
+
     } else {
+
+        Tcl_Obj* result = Tcl_NewStringObj("unrecognized subcommand: ",-1);
+        Tcl_IncrRefCount(result);
+        Tcl_AppendStringsToObj(result,opt,NULL);
+
+        Tcl_SetObjResult(interp, result);
+        Tcl_DecrRefCount(result);
         return TCL_ERROR;
     }
     return TCL_OK;

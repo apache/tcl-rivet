@@ -924,7 +924,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
     /* We put in front the auto_path list the path to the directory where
-     * init.tcl is located (provides package RivetTcl)
+     * init.tcl is located (provides package Rivet, previously RivetTcl)
      */
 
     auto_path = Tcl_GetVar2Ex(interp,"auto_path",NULL,TCL_GLOBAL_ONLY);
@@ -947,21 +947,35 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     Rivet_InitServerVariables(interp, p );
 //  Rivet_PropagateServerConfArray( interp, rsc );
 
-    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
-    /* Watch out! Calling Tcl_PkgRequire with a version number binds this module to
-     * the 'package provide' statement in rivet/init.tcl 
+    /* Loading into the interpreter the commands provided by librivet.so */
+    /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
+     * Rivetlib can be mapped at this stage
      */
 
-    /*  If rivet was configured to export the ::rivet namespace commands we have to
-     *  set the array variable ::rivet::module_conf(export_namespace_commands) before calling init.tcl
+    if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION, 1) == NULL)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                     MODNAME ": Error loading rivetlib package: %s",
+		     Tcl_GetStringResult(interp) );
+        exit(1);
+    }
+
+    /*  If rivet is configured to export the ::rivet namespace commands we set the
+     *  array variable ::rivet::module_conf(export_namespace_commands) before calling init.tcl
      *  This array will be unset after commands are exported.
      */
 
     Tcl_SetVar2Ex(interp,"module_conf","export_namespace_commands",Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
     Tcl_SetVar2Ex(interp,"module_conf","import_rivet_commands",Tcl_NewIntObj(RIVET_NAMESPACE_IMPORT),0);
 
-    if (Tcl_PkgRequire(interp, "RivetTcl", "2.1", 1) == NULL)
+    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
+
+    /* Watch out! Calling Tcl_PkgRequire with a version number binds this module to
+     * the Rivet package revision number in rivet/init.tcl
+     */
+
+    if (Tcl_PkgRequire(interp, "Rivet", "2.1", 1) == NULL)
     {
         ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                       MODNAME ": init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
@@ -969,19 +983,6 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
         exit(1);
     }
 
-    /* Loading into the interpreter the commands provided by librivet.so */
-
-    /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
-     * Rivetlib can be mapped at this stage
-     */
-
-    if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, "1.2", 1) == NULL)
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                     MODNAME ": Error loading rivetlib package: %s",
-		     Tcl_GetStringResult(interp) );
-        exit(1);
-    } 
     /* */
 
     /* Set the output buffer size to the largest allowed value, so that we 
@@ -1549,9 +1550,13 @@ Rivet_ChildHandlers(server_rec *s, int init)
 static apr_status_t
 Rivet_ChildExit(void *data)
 {
-    server_rec *s = (server_rec*) data;
+    char        *errmsg = MODNAME ": Running ChildExit handler";
+    server_rec  *s = (server_rec*) data;
+
     Rivet_ChildHandlers(s, 0);
     Tcl_Finalize();
+
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, errmsg );
     return OK;
 }
 
@@ -1561,8 +1566,10 @@ Rivet_ChildExit(void *data)
  *
  * Arguments:
  *  server_rec* s: pointer to a server_rec structure
+ *
  * Results:
  *  pointer to a Tcl_Interp structure
+ *
  * Side Effects:
  *
  *-----------------------------------------------------------------------------
