@@ -1,3 +1,7 @@
+2013-01-20 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: added removal of libool created .la files for librivetparser and
+    librivet
+
 2012-12-30 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/xml.tcl: revised command for simple XML string mark up
 

@@ -6,7 +6,7 @@
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
 # 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
 #             before invoking pkg_mkIndex.
-#
+# 2013/01/20: removing libtool created .la files
 
 ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = LICENSE contrib debian doc rivet win/nmakehlp.c src/testing.c src/TclWebcgi.c
@@ -22,6 +22,7 @@ install-data-local:
 	-(  cd  $(DESTDIR)$(RIVETLIB_DESTDIR); \
 	    echo 'eval file delete [glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl' | @TCLSH_PROG@ ; \
 	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	-( cd $(DESTDIR)$(RIVETLIB_DESTDIR); rm -f *.la)
 
 uninstall-local:
 	rm -fr $(DESTDIR)$(RIVETLIB_DESTDIR)
