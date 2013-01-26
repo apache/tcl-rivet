@@ -13,8 +13,8 @@
 #
 # Example 3
 #
-# ::rivet::xml "anything ..." div [list a href "http://..../" alt "alternate message"] 
-# <== <div><a href="http://..../" alt="alternate message">anything ...</a></div>
+# ::rivet::xml "anything ..." div [list a href "http://..../" title "info message"] 
+# <== <div><a href="http://..../" title="info message">anything ...</a></div>
 #
 # $Id: $
 #

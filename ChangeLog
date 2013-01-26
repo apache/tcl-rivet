@@ -1,3 +1,7 @@
+2013-01-25 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/xml.tcl,rivet/rivet-tcl/tclIndex: New command for XML fragments
+    composition
+
 2013-01-20 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: added removal of libool created .la files for librivetparser and
     librivet
