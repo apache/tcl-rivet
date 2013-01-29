@@ -140,5 +140,10 @@ Tcl_Obj* Rivet_ReadConfParameter (  Tcl_Interp*         interp,
 
 Tcl_Obj* Rivet_CurrentConfDict (    Tcl_Interp*           interp,
                                     rivet_server_conf*    rivet_conf);
+
+/* error code set by command 'abort_page' */
+
+#define ABORTPAGE_CODE "ABORTPAGE"
+
 #endif /* MOD_RIVET_H */
 

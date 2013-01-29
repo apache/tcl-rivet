@@ -1139,7 +1139,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
     globals->page_aborting = 1;
 
     Tcl_AddErrorInfo (interp, errorMessage);
-    Tcl_SetErrorCode (interp, "RIVET", "ABORTPAGE", errorMessage, (char *)NULL);
+    Tcl_SetErrorCode (interp, "RIVET", ABORTPAGE_CODE, errorMessage, (char *)NULL);
     return TCL_ERROR;
 }
 

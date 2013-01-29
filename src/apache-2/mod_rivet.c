@@ -370,7 +370,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *outbuf, request_rec *req)
             ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
 
             errorCodeSubString = Tcl_GetString (errorCodeElementObj);
-            if (strcmp (errorCodeSubString, "ABORTPAGE") == 0) 
+            if (strcmp (errorCodeSubString, ABORTPAGE_CODE) == 0) 
             {
                 if (conf->rivet_abort_script) 
                 {
@@ -1252,7 +1252,7 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp,
     rivet_panic_server_rec = s;
 
 #if RIVET_DISPLAY_VERSION
-    ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_PACKAGE_VERSION);
+    ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
 #else
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME);
 #endif
