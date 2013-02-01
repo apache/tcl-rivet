@@ -53,6 +53,6 @@ mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPF
 
 install-data-hook:
 	echo 'removing unwanted libtool .la files'
-	rm -fv $(DESTDIR)/$(apxs_libexecdir)/*.la
+	rm -f $(DESTDIR)/$(apxs_libexecdir)/*.la
 
 

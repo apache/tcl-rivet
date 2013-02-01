@@ -20,5 +20,5 @@ SUBDIRS = librivet parser @apache_version_dir@
 
 install-data-hook:
 	echo 'removing unwanted libtool .la files'
-	rm -fv $(DESTDIR)/$(lib_libexecdir)/*.la
+	rm -f $(DESTDIR)/$(lib_libexecdir)/*.la
 
