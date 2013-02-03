@@ -1,3 +1,8 @@
+2013-02-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_request.c,src/apache-2/mod_rivet.c: extending request
+    handling also for PUT and DELETE. Applied patch provided by Jeff Lawson in
+    bug report #53892 
+
 2013-02-01 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/Makefile.am, src/Makefile.am: removed -v flag from rm command
     in install-data-hook: target to avoid incompatibility with same command's

@@ -1824,7 +1824,9 @@ Rivet_SendContent(request_rec *r)
 
     r->allowed |= (1 << M_GET);
     r->allowed |= (1 << M_POST);
-    if (r->method_number != M_GET && r->method_number != M_POST) {
+    r->allowed |= (1 << M_PUT);
+    r->allowed |= (1 << M_DELETE);
+    if (r->method_number != M_GET && r->method_number != M_POST && r->method_number != M_PUT && r->method_number != M_DELETE) {
         retval = DECLINED;
         goto sendcleanup;
     }
@@ -1843,9 +1845,6 @@ Rivet_SendContent(request_rec *r)
         retval = errstatus;
         goto sendcleanup;
     }
-
-//    apr_cpystrn(error, DEFAULT_ERROR_MSG, sizeof(error));
-//    apr_cpystrn(timefmt, DEFAULT_TIME_FORMAT, sizeof(timefmt));
 
     /* 
      * This one is the big catch when it comes to moving towards
