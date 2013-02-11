@@ -1,3 +1,12 @@
+2013-02-11 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: fixing nasty bug introduced with Rivet 2.1. When
+    method 'store' is updating the call to method update needs a flat list as
+    last argument, not just a sigle valued list argument
+    * doc/xml/commands.xml: Improved explanation for command abort_page
+    * src/apache-2/rivetConf.c: corrected typo in header
+    * src/apache-2/apache_request.c: new handling of apache requests largely
+    relaxes checks on the 'Content-Type' header (Bug #53661)
+
 2013-02-02 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_request.c,src/apache-2/mod_rivet.c: extending request
     handling also for PUT and DELETE. Applied patch provided by Jeff Lawson in

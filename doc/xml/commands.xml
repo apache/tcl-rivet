@@ -72,7 +72,7 @@
 		<refsect1>
 			<title>Description</title> 
 			<para>
-				Usage of this command is meaningful only in code that runs as
+				Usage of this command is meaningful only in a script set as
 				AbortScript or AfterEveryScript. 
 				<command>abort_code</command> returns the value of the optional 
 				parameter passed to <command>abort_page</command> earlier in
@@ -118,11 +118,11 @@
 		    with the cause of the abort. 
 		</para>
 		<para>
-		    When passed the argument <option>-aborting</option> the
-		    command returns 1 if <option>abort_page</option>
-		    had been called earlier in the request processing, thus
-		    providing a tool for code in AfterEveryScript to tell
-		    if the an abort condition took place.
+		    The argument <option>-aborting</option> causes <option>abort_page</option>
+		    to return 1 when the current execution is the outcome of an abort condition.
+		    In other words this query is meaningful in code specified as 
+		    <link linkend="directives">AfterEveryScript</link> to understand
+		    if an abort condition took place beforehand.
 		</para>
 	  </refsect1>
 	</refentry>

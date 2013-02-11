@@ -448,7 +448,7 @@ proc handle {interface args} {
 	$res destroy
 
 	if {$numrows} {
-            $this update $arrayName $args
+            $this update $arrayName {*}$args
 	} else {
             $this insert $myTable $arrayName
 	}

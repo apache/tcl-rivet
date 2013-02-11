@@ -74,7 +74,7 @@ enum confIndices {
                     separate_virtual_interps,
                     honor_header_only_requests,
                     conf_index_terminator 
-                };
+};
 
 /* 
  * -- Rivet_ReadConfParameter
@@ -203,13 +203,14 @@ Rivet_ReadConfParameter ( Tcl_Interp* interp,
  * Rivet_ReadConfTable: 
  * 
  * This procedure builds a key-value list from an apr table
- * It called from Rivet_BuildConfDictionary for Rivet configuration
- * tables but it could work for every apr table
+ * It's called by Rivet_BuildConfDictionary to read theRivet 
+ * configuration tables but it can work for every apr table
  *
  * Arguments:
  *
  *  - interp: Tcl_Interp pointer
  *  - table: an apr_table_t pointer
+ *
  */
 
 Tcl_Obj* Rivet_ReadConfTable (  Tcl_Interp*           interp,
