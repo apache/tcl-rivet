@@ -448,11 +448,11 @@ proc handle {interface args} {
 	$res destroy
 
 	if {$numrows} {
-            return [eval $this update $arrayName $args]
+            $this update $arrayName {*}$args
 	} else {
-            return [eval $this insert $myTable $arrayName] 
+            $this insert $myTable $arrayName 
 	}
-
+        return 1
     }
 
     #
