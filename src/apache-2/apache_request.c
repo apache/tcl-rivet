@@ -378,21 +378,28 @@ int ApacheRequest___parse(ApacheRequest *req)
         req->nargs = ((apr_array_header_t *)req->parms)->nelts;
     }
 
-    if (r->method_number == M_POST) {
+    if (r->method_number == M_POST || r->method_number == M_PUT || r->method_number == M_DELETE) {
         const char *ct = apr_table_get(r->headers_in, "Content-type");
-        if (ct) ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
-        if (ct && strncaseEQ(ct, DEFAULT_ENCTYPE, DEFAULT_ENCTYPE_LENGTH)) {
-            result = ApacheRequest_parse_urlencoded(req);
-        } else if (ct && strncaseEQ(ct, TEXT_XML_ENCTYPE, TEXT_XML_ENCTYPE_LENGTH)) {
-            result = ApacheRequest_parse_urlencoded(req);
-        } else if (ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) {
-            result = ApacheRequest_parse_multipart(req,ct);
+        if (ct)
+        {
+            ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
+            if (strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH))
+            {
+                result = ApacheRequest_parse_multipart(req,ct);
+            }
+            else
+            {
+                result = ApacheRequest_parse_urlencoded(req);
+            }
+
         } else {
-            ap_log_rerror(REQ_ERROR, "unknown content-type: `%s'", ct);
+            ap_log_rerror(REQ_ERROR, "unknown content-type");
             result = HTTP_INTERNAL_SERVER_ERROR;
         }
+
     }
-    else {
+    else
+    {
         result = ApacheRequest_parse_urlencoded(req);
     }
 
@@ -405,7 +412,7 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
     request_rec *r = req->r;
     int rc = OK;
 
-    if (r->method_number == M_POST) {
+    if (r->method_number == M_POST || r->method_number == M_PUT || r->method_number == M_DELETE) {
     	const char *data = NULL, *type;
     
     	type = apr_table_get(r->headers_in, "Content-Type");
