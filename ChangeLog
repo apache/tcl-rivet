@@ -1,4 +1,5 @@
 2013-02-11 Massimo Manghi <mxmanghi@apache.org>
+    * rivet-2.1.1rc1.tar.gz: Produced artifact for 2.1.1rc1 release candidate 
     * rivet/packages/dio/dio.tcl: fixing nasty bug introduced with Rivet 2.1. When
     method 'store' is updating the call to method update needs a flat list as
     last argument, not just a sigle valued list argument
