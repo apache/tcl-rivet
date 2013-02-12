@@ -1,4 +1,5 @@
 2013-02-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet-2.1.1rc2.tar.gz: Produced artifact for 2.1.1rc2 release candidate 
     * src/apache-2/mod_rivet.c: To avoid clash on freeing resources Tcl_Finalize
     is removed from child process cleanup (Bug #54162)
 
