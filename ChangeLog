@@ -1,3 +1,7 @@
+2013-02-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: To avoid clash on freeing resources Tcl_Finalize
+    is removed from child process cleanup (Bug #54162)
+
 2013-02-11 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: fixing nasty bug introduced with Rivet 2.1. When
     method 'store' is updating the call to method update needs a flat list as

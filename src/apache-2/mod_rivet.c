@@ -1552,7 +1552,11 @@ Rivet_ChildExit(void *data)
 {
     server_rec *s = (server_rec*) data;
     Rivet_ChildHandlers(s, 0);
-    Tcl_Finalize();
+
+/* Tcl_Finalize remove to meet requirement to coexist with mod_websh (Bug #54162) */
+
+    //Tcl_Finalize();
+
     return OK;
 }
 
