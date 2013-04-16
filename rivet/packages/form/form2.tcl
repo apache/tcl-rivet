@@ -149,7 +149,7 @@ package provide form 2.0
                         return [default_value_get $name]
                     }
                 } else {
-                    return ""
+                    return
                 }
             }
             2 { # Set default value
@@ -158,7 +158,7 @@ package provide form 2.0
                 if {[info exists isList]} {
                     set DefaultValues(__$name) 1
                 } else {
-                    unset -nocomplain DefaultValues(__$name) 0
+                    unset -nocomplain DefaultValues(__$name)
                 }
             }
             default { error "wrong argument count" }
@@ -217,7 +217,7 @@ package provide form 2.0
 
         # if only one argument was specified
         if {[lempty $args]} {
-            if {![info exists DefaultArgs($type)]} { return ""}
+            if {![info exists DefaultArgs($type)]} { return }
             return $DefaultArgs($type)
         }
 
