@@ -1,3 +1,8 @@
+2013-04-30 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: improved entry for ::rivet::var with an explanation
+    and example provided by Harald
+    * configure.ac,VERSION: version number bumped to 2.1.2
+
 2013-02-12 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: To avoid clash on freeing resources Tcl_Finalize
     is removed from child process cleanup (Bug #54162)
