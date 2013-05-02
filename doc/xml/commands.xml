@@ -1572,6 +1572,16 @@ bxxb ccxxxxcc</programlisting>
                     selection listboxes are suited widgets which may 
                     return list data.
 			    </para>
+			    <para>
+			     If the result list is passed as a default value to the form package, one
+                 could also set index "__varname" to get it interpreted as a list.
+                </para>
+                <programlisting>set response(countries) [::rivet::var list countries]
+set response(__countries) ""
+form form_request -defaults response
+form_request select countries -multiple 1 -values {USA Canada Mexico}
+form_request end</programlisting>
+
 			</listitem>
 		    </varlistentry>
 	    

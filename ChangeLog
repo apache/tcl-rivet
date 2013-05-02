@@ -1,3 +1,14 @@
+2013-05-02 Massimo Manghi <mxmanghi@apache.org
+    * doc/xml/commands.xml: improved entry for ::rivet::var with an explanation
+    and example provided by Harald
+    * configure.ac,VERSION: version number bumped to 2.1.2
+    * Changelog: merging latest changes done to 'trunk'
+ 
+2013-04-30 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: improved entry for ::rivet::var with an explanation
+    and example provided by Harald
+    * configure.ac,VERSION: version number bumped to 2.1.2
+
 2013-04-22 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form2.tcl: a few minor fixed provided by Harald
     * VERSION,configure.ac: new version number updated to 2.1.2
