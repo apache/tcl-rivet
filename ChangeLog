@@ -1,9 +1,14 @@
+2013-05-06 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/rivetCore.c: call to 'panic' changed to fulfill the hardening
+    flags that (quite oddly) fail when building against Tcl8.6 on some platforms
+    or Linux distros
+
 2013-05-02 Massimo Manghi <mxmanghi@apache.org
     * doc/xml/commands.xml: improved entry for ::rivet::var with an explanation
     and example provided by Harald
     * configure.ac,VERSION: version number bumped to 2.1.2
     * Changelog: merging latest changes done to 'trunk'
- 
+
 2013-04-30 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: improved entry for ::rivet::var with an explanation
     and example provided by Harald
