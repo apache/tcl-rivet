@@ -1551,6 +1551,8 @@ static apr_status_t
 Rivet_ChildExit(void *data)
 {
     server_rec *s = (server_rec*) data;
+
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running ChildExit handler");
     Rivet_ChildHandlers(s, 0);
 
 /* Tcl_Finalize remove to meet requirement to coexist with mod_websh (Bug #54162) */

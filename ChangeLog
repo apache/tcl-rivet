@@ -1,3 +1,8 @@
+2013-05-21 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_request.c: ApacheRequest___parse further simplified and
+    made less restrictive about the combination of method and mimetype of the request
+    * src/apache-2/mod_rivet.c: add debug message in exit handler
+
 2013-05-06 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: call to 'panic' changed to fulfill the hardening
     flags that (quite oddly) fail when building against Tcl8.6 on some platforms

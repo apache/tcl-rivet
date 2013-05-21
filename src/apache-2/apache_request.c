@@ -371,6 +371,7 @@ static void split_to_parms(ApacheRequest *req, const char *data)
 int ApacheRequest___parse(ApacheRequest *req)
 {
     request_rec *r = req->r;
+    const char *ct = apr_table_get(r->headers_in, "Content-type");
     int result;
 
     if (r->args) {
@@ -378,25 +379,10 @@ int ApacheRequest___parse(ApacheRequest *req)
         req->nargs = ((apr_array_header_t *)req->parms)->nelts;
     }
 
-    if (r->method_number == M_POST || r->method_number == M_PUT || r->method_number == M_DELETE) {
-        const char *ct = apr_table_get(r->headers_in, "Content-type");
-        if (ct)
-        {
-            ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
-            if (strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH))
-            {
-                result = ApacheRequest_parse_multipart(req,ct);
-            }
-            else
-            {
-                result = ApacheRequest_parse_urlencoded(req);
-            }
-
-        } else {
-            ap_log_rerror(REQ_ERROR, "unknown content-type");
-            result = HTTP_INTERNAL_SERVER_ERROR;
-        }
-
+    if ((r->method_number == M_POST) && ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) 
+    {
+        ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
+        result = ApacheRequest_parse_multipart(req,ct);
     }
     else
     {
@@ -413,18 +399,22 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
     int rc = OK;
 
     if (r->method_number == M_POST || r->method_number == M_PUT || r->method_number == M_DELETE) {
-    	const char *data = NULL, *type;
-    
+    	const char *data = NULL;
+
+    /*
+        const char *type;
     	type = apr_table_get(r->headers_in, "Content-Type");
     
     	if (!strncaseEQ(type, DEFAULT_ENCTYPE, DEFAULT_ENCTYPE_LENGTH) &&
     	    !strncaseEQ(type, TEXT_XML_ENCTYPE, TEXT_XML_ENCTYPE_LENGTH)) {
     	    return DECLINED;
     	}
+    */
 
     	if ((rc = util_read(req, &data)) != OK) {
     	    return rc;
     	}
+
     	if (data) {
     	    req->raw_post = (char*) data; /* Give people a way of getting at the raw data. */
     	    split_to_parms(req, data);
