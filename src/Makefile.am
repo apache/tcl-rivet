@@ -20,23 +20,25 @@ SUBDIRS = librivet parser @apache_version_dir@
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@ -Iparser -I@apache_version_dir@
+INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I@apache_version_dir@ -Iparser -I@apache_request@ -Ichannel
+
 #
 # Apache Rivet Module, mod_rivet.so / mod_rivet.dll
 #
 mod_rivet_la_SOURCES = 			                            \
-            @apache_version_dir@/apache_multipart_buffer.c 	\
-	        @apache_version_dir@/apache_request.c			\
+            @apache_request@/apache_multipart_buffer.c 	    \
+	        @apache_request@/apache_request.c			    \
 	        @apache_version_dir@/mod_rivet.c 				\
 	        @apache_version_dir@/TclWebapache.c 			\
-	        @apache_version_dir@/rivetCore.c				\
-            @apache_version_dir@/rivetConf.c                \
-	        rivetChannel.c 			                        \
+	        rivetcmds/rivetCore.c				            \
+            rivetcmds/rivetConf.c                           \
+	        channel/rivetChannel.c 			                \
             parser/rivetParser.c
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@  @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@
-mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ \
+                        @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 # Removing libtool .la files from installation
 

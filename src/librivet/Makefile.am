@@ -16,7 +16,7 @@
 
 # $Id$
 
-INCLUDES = @apache_include@ -I../@apache_version_dir@ -I..
+INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@/@apache_version_dir@ -I@RIVET_BASE_INCLUDE@ -I../request
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.

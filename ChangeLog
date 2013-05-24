@@ -1,3 +1,8 @@
+2013-05-24 Massimo Manghi <mxmanghi@apache.org>
+    * src/: branching trunk to branches/modular to reorganize mod_rivet in a
+    way that should enable the development of single components (apache request,
+    Rivet channel, parser) with minimal branching 
+ 
 2013-05-21 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_request.c: ApacheRequest___parse further simplified and
     made less restrictive about the combination of method and mimetype of the request

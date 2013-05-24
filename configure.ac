@@ -433,6 +433,23 @@ AC_DEFUN([GET_RIVET_BASE], [
     AC_SUBST(RIVET_BASE_INCLUDE)
 ])
 
+# APACHE_REQUEST
+#
+# Choosing where is located the code for handling Apache request data (like
+# form data etc). Default: 'request'  
+
+AC_DEFUN([APACHE_REQUEST],[
+    AC_ARG_WITH(
+        apache_request,
+        [  --with-apache-request[=dir] choose alternate code for Apache request handling],,
+        [apache_request="${RIVET_BASE_INCLUDE}/request"]
+    )
+
+    AC_MSG_CHECKING(for Apache request code)
+    AC_MSG_RESULT([$apache_request])
+    AC_SUBST(apache_request)
+])
+
 AC_DEFUN([RIVET_TCL_LIB],[
     AC_ARG_WITH(
         rivet_target_dir,
@@ -647,6 +664,8 @@ VIRTUAL_INTERPS_SEPARATION
 POST_MAX_SIZE
 UPLOAD_TO_VAR
 IMPORT_RIVET_COMMANDS
+APACHE_REQUEST
+
 if test $import_rivet_commands = "yes"; then
     AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
     AC_DEFINE(NAMESPACE_EXPORT,1,[commands will be exported])
