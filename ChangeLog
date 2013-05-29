@@ -1,3 +1,8 @@
+2013-05-29 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: changing Rivet_ChildExit to
+    comply with some strict requirements on the compilation of calls with
+    variable number of arguments
+
 2013-05-06 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: call to 'panic' changed to fulfill the hardening
     flags that (quite oddly) fail when building against Tcl8.6 on some platforms
