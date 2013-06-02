@@ -1,3 +1,7 @@
+2013-06-02 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/[install-sh,config.sub,config.guess]: new versions for script used by
+    the autoconf/automake/libtool toolchain
+
 2013-05-21 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_request.c: ApacheRequest___parse further simplified and
     made less restrictive about the combination of method and mimetype of the request
