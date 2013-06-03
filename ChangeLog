@@ -1,7 +1,22 @@
+2013-06-04 Massimo Manghi <mxmanghi@apache.org>
+    * 2.1/: merging and committing latest commits done to trunk
+
+2013-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/[ltmain.sh,compile,depcomp]: more libtool scripts updated 
+
+2013-06-02 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/[install-sh,config.sub,config.guess]: new versions for script used by
+    the autoconf/automake/libtool toolchain
+
 2013-05-29 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: changing Rivet_ChildExit to
     comply with some strict requirements on the compilation of calls with
     variable number of arguments
+
+2013-05-21 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_request.c: ApacheRequest___parse further simplified and
+    made less restrictive about the combination of method and mimetype of the request
+    * src/apache-2/mod_rivet.c: add debug message in exit handler
 
 2013-05-06 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/rivetCore.c: call to 'panic' changed to fulfill the hardening
