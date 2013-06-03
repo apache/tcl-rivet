@@ -1,3 +1,6 @@
+2013-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/[ltmain.sh,compile,depcomp]: more libtool scripts updated 
+
 2013-06-02 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/[install-sh,config.sub,config.guess]: new versions for script used by
     the autoconf/automake/libtool toolchain
