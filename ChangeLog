@@ -1,3 +1,12 @@
+2013-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/parser/Makefile.am: adding include paths to INCLUDE
+    * src/Makefile.am: Rivet library build moved to this script
+    * src/librivet/Makefile.am: Rivet library build removed from this file
+    
+2013-06-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/Makefile.am: including librivet.so build in this file
+    * src/librivet/Makefile.am: kept for reference but without effective code now
+
 2013-05-24 Massimo Manghi <mxmanghi@apache.org>
     * src/: branching trunk to branches/modular to reorganize mod_rivet in a
     way that should enable the development of single components (apache request,

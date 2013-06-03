@@ -16,19 +16,19 @@
 
 # $Id$
 
-INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@/@apache_version_dir@ -I@RIVET_BASE_INCLUDE@ -I../request
+#INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@/@apache_version_dir@ -I@RIVET_BASE_INCLUDE@ -I@apache_request@
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
-lib_libexecdir = @RIVET_TCL_TARGET@
-lib_libexec_LTLIBRARIES = librivetlib.la
+#lib_libexecdir = @RIVET_TCL_TARGET@
+#lib_libexec_LTLIBRARIES = librivetlib.la
 
 #
 # Rivet Library
 #
 
-librivetlib_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
-librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
-librivetlib_la_LIBADD  = @APXS_LIBS@
-librivetlib_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
+#librivetlib_la_SOURCES = rivetList.c rivetCrypt.c rivetWWW.c rivetPkgInit.c
+#librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
+#librivetlib_la_LIBADD  = @APXS_LIBS@
+#librivetlib_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
 

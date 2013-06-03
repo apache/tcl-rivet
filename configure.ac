@@ -441,13 +441,14 @@ AC_DEFUN([GET_RIVET_BASE], [
 AC_DEFUN([APACHE_REQUEST],[
     AC_ARG_WITH(
         apache_request,
-        [  --with-apache-request[=dir] choose alternate code for Apache request handling],,
-        [apache_request="${RIVET_BASE_INCLUDE}/request"]
+        [  --with-apache-request[=dir] choose subdirectory for Apache request handling code],,
+        [with_apache_request="request"]
     )
 
-    AC_MSG_CHECKING(for Apache request code)
-    AC_MSG_RESULT([$apache_request])
+    AC_MSG_CHECKING(for subdir storing code for request handling)
+    apache_request=${with_apache_request}
     AC_SUBST(apache_request)
+    AC_MSG_RESULT([$with_apache_request])
 ])
 
 AC_DEFUN([RIVET_TCL_LIB],[
@@ -650,6 +651,7 @@ AC_DEFUN([UPLOAD_TO_VAR],[
     fi
 
 ])
+
 APACHE_VERSION
 GET_RIVET_BASE
 APACHE
