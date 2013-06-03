@@ -1,3 +1,7 @@
+2013-06-04 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/* : merging into this branch the latest commits done from trunk
+    * tclconfig/[ltmain.sh,compile,depcomp]: more libtool scripts updated 
+
 2013-06-03 Massimo Manghi <mxmanghi@apache.org>
     * src/parser/Makefile.am: adding include paths to INCLUDE
     * src/Makefile.am: Rivet library build moved to this script
@@ -6,6 +10,8 @@
 2013-06-02 Massimo Manghi <mxmanghi@apache.org>
     * src/Makefile.am: including librivet.so build in this file
     * src/librivet/Makefile.am: kept for reference but without effective code now
+    * tclconfig/[install-sh,config.sub,config.guess]: new versions for script used by
+    the autoconf/automake/libtool toolchain
 
 2013-05-24 Massimo Manghi <mxmanghi@apache.org>
     * src/: branching trunk to branches/modular to reorganize mod_rivet in a
