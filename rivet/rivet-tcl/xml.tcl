@@ -16,7 +16,7 @@
 # ::rivet::xml "anything ..." div [list a href "http://..../" title "info message"] 
 # <== <div><a href="http://..../" title="info message">anything ...</a></div>
 #
-# $Id: $
+# $Id$
 #
 
 namespace eval ::rivet {

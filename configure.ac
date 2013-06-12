@@ -568,7 +568,7 @@ AC_DEFUN([RIVET_COMMANDS_EXPORT],[
 AC_DEFUN([IMPORT_RIVET_COMMANDS],[
     AC_ARG_ENABLE(
         import-rivet-commands,
-        [ --disable-import-rivet-commands requires explicit namespace import if required],
+        [ --disable-import-rivet-commands requires explicit namespace import],
         [ import_rivet_commands=$enable_import_rivet_commands],
         [ import_rivet_commands="yes"]
     )

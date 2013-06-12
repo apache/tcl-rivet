@@ -69,6 +69,8 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	tclconfig/ltmain.sh tclconfig/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compare_version.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/tclconfig/tcl.m4 \
 	$(top_srcdir)/tclconfig/libtool.m4 \
 	$(top_srcdir)/m4/ax_prefix_config_h.m4 \
@@ -333,7 +335,8 @@ with_apxs = @with_apxs@
 ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = LICENSE contrib debian doc rivet win/nmakehlp.c src/testing.c src/TclWebcgi.c
 SUBDIRS = src doc
-RIVETLIB_DESTDIR = @RIVET_TCL_TARGET@
+RIVETLIB_DESTDIR = $(DESTDIR)@RIVET_TCL_TARGET@
+RIVET_PACKAGES = $(RIVETLIB_DESTDIR)/packages
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -850,15 +853,33 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(RIVETLIB_DESTDIR)
-	cp -r rivet/* $(DESTDIR)$(RIVETLIB_DESTDIR)
-	-(  cd  $(DESTDIR)$(RIVETLIB_DESTDIR); \
-	    echo 'eval file delete [glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl' | @TCLSH_PROG@ ; \
-	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
-	-( cd $(DESTDIR)$(RIVETLIB_DESTDIR); rm -f *.la)
+	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
+	cp -v rivet/init.tcl $(RIVETLIB_DESTDIR)/
+	cp -rv rivet/rivet-tcl $(RIVETLIB_DESTDIR)/
+	-( cd $(RIVETLIB_DESTDIR); rm -f *.la)
 
 uninstall-local:
-	rm -fr $(DESTDIR)$(RIVETLIB_DESTDIR)
+	rm -f  $(RIVETLIB_DESTDIR)/init.tcl
+	rm -fr $(RIVETLIB_DESTDIR)/rivet-tcl
+	rm -f  $(RIVETLIB_DESTDIR)/librivetlib.so
+	rm -f  $(RIVETLIB_DESTDIR)/librivetparser.so
+	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
+		rmdir $(RIVETLIB_DESTDIR); \
+	fi
+
+install-packages:
+	$(mkinstalldirs) $(RIVET_PACKAGES)
+	cp -rv rivet/packages/* $(RIVET_PACKAGES)
+	-(  cd  $(RIVETLIB_DESTDIR); \
+	    echo 'eval file delete [glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl' | @TCLSH_PROG@ ; \
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+
+uninstall-packages:
+	rm -fr $(RIVET_PACKAGES)
+	rm -f  $(RIVETLIB_DESTDIR)/pkgIndex.tcl
+	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
+		@rmdir $(RIVETLIB_DESTDIR); \
+	fi
 
 # 
 distclean-local:

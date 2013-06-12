@@ -1,5 +1,18 @@
+2013-06-12 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: splitting install targets into 'make install' (mod_rivet.so,
+    librivet.so,librivetparser.so + Tcl commands in rivet/rivet-tcl) and 
+    'make install-packages' (whole content of rivet/packages), thus decoupling
+    binary and non binary installs. Notice: 'make install' creates a fully
+    functional install of Rivet in case packages such as 'form', 'session', 
+    'DIO' aren't needed.
+    * rivet/rivet-tcl/xml.tcl: Adding svn:keywords Id to svn properties
+    * doc/xml/install.xml: updating manual to document the new installation command
+    sequence
+    
 2013-06-04 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/* : merging into this branch the latest commits done from trunk
+
+2013-06-03 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/[ltmain.sh,compile,depcomp]: more libtool scripts updated 
 
 2013-06-03 Massimo Manghi <mxmanghi@apache.org>
