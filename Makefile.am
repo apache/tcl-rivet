@@ -11,21 +11,40 @@
 ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = LICENSE contrib debian doc rivet win/nmakehlp.c src/testing.c src/TclWebcgi.c
 SUBDIRS = src doc
-RIVETLIB_DESTDIR = @RIVET_TCL_TARGET@
+RIVETLIB_DESTDIR = $(DESTDIR)@RIVET_TCL_TARGET@
+RIVET_PACKAGES = $(RIVETLIB_DESTDIR)/packages
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(RIVETLIB_DESTDIR)
-	cp -r rivet/* $(DESTDIR)$(RIVETLIB_DESTDIR)
-	-(  cd  $(DESTDIR)$(RIVETLIB_DESTDIR); \
-	    echo 'eval file delete [glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl' | @TCLSH_PROG@ ; \
-	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
-	-( cd $(DESTDIR)$(RIVETLIB_DESTDIR); rm -f *.la)
+	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
+	cp -v rivet/init.tcl $(RIVETLIB_DESTDIR)/
+	cp -rv rivet/rivet-tcl $(RIVETLIB_DESTDIR)/
+	-( cd $(RIVETLIB_DESTDIR); rm -f *.la)
 
 uninstall-local:
-	rm -fr $(DESTDIR)$(RIVETLIB_DESTDIR)
+	rm -f  $(RIVETLIB_DESTDIR)/init.tcl
+	rm -fr $(RIVETLIB_DESTDIR)/rivet-tcl
+	rm -f  $(RIVETLIB_DESTDIR)/librivetlib.so
+	rm -f  $(RIVETLIB_DESTDIR)/librivetparser.so
+	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
+		rmdir $(RIVETLIB_DESTDIR); \
+	fi
+
+install-packages:
+	$(mkinstalldirs) $(RIVET_PACKAGES)
+	cp -rv rivet/packages/* $(RIVET_PACKAGES)
+	-(  cd  $(RIVETLIB_DESTDIR); \
+	    echo 'eval file delete [glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl' | @TCLSH_PROG@ ; \
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+
+uninstall-packages:
+	rm -fr $(RIVET_PACKAGES)
+	rm -f  $(RIVETLIB_DESTDIR)/pkgIndex.tcl
+	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
+		@rmdir $(RIVETLIB_DESTDIR); \
+	fi
 
 # 
 distclean-local:
