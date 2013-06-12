@@ -320,11 +320,11 @@ static int ap_unescape_url_u(char *url)
     }
     url[x] = '\0';
     if (badesc)
-	   return HTTP_BAD_REQUEST;
+	return HTTP_BAD_REQUEST;
     else if (badpath)
-	   return HTTP_NOT_FOUND;
+	return HTTP_NOT_FOUND;
     else
-	   return OK;
+	return OK;
 }
 
 //static int urlword_dlm[] = {'&', ';', 0};
