@@ -1,3 +1,8 @@
+2013-06-22 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: cleanup of unused code in mod_rivet.c. Adding comments
+    to undocumented functions
+    * src/parser/rivetParse.c: New TODO comment added 
+
 2013-06-12 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: splitting install targets into 'make install' (mod_rivet.so,
     librivet.so,librivetparser.so + Tcl commands in rivet/rivet-tcl) and 

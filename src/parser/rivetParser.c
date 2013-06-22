@@ -99,6 +99,14 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     Tcl_Obj *inbuf;
     Tcl_Channel rivetfile;
 
+    /*
+     * TODO There is much switching between Tcl and APR for calling
+     * utility routines. We should make up our minds and keep
+     * a coherent attitude deciding when Tcl should be called upon
+     * and when APR should be invoked instead for a certain class of
+     * tasks
+     */
+
     rivetfile = Tcl_OpenFileChannel(interp, filename, "r", 0664);
     if (rivetfile == NULL) {
         /* Don't need to adderrorinfo - Tcl_OpenFileChannel takes care
