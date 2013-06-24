@@ -1,3 +1,8 @@
+2013-06-24 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-class.tcl: two new methods 'load' (loads a
+    whole package data for a given package and session) and 'clear' (it deletes either 
+    a whole package or a single data like for a session)
+
 2013-06-22 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: cleanup of unused code in mod_rivet.c. Adding comments
     to undocumented functions
