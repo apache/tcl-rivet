@@ -1,4 +1,7 @@
 2013-06-24 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: It must be made explicit installation is a two stage operation now
+
+2013-06-24 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/session/session-class.tcl: two new methods 'load' (loads a
     whole package data for a given package and session) and 'clear' (it deletes either 
     a whole package or a single data like for a session)
