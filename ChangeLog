@@ -1,3 +1,7 @@
+2013-06-26 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: forcing install/unistall targets to recreate pkgIndex.tcl
+    in order to have a coherent directory of packages actually available
+
 2013-06-24 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: It must be made explicit installation is a two stage operation now
 
