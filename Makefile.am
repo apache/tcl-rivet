@@ -21,7 +21,8 @@ install-data-local:
 	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
 	cp -v rivet/init.tcl $(RIVETLIB_DESTDIR)/
 	cp -rv rivet/rivet-tcl $(RIVETLIB_DESTDIR)/
-	-( cd $(RIVETLIB_DESTDIR); rm -f *.la)
+	-(  cd $(RIVETLIB_DESTDIR); rm -f *.la; \
+        echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-local:
 	rm -f  $(RIVETLIB_DESTDIR)/init.tcl
@@ -45,6 +46,8 @@ uninstall-packages:
 	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
 		@rmdir $(RIVETLIB_DESTDIR); \
 	fi
+	-(  cd  $(RIVETLIB_DESTDIR); \
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 # 
 distclean-local:

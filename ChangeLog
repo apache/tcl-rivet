@@ -1,3 +1,7 @@
+2013-06-26 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: forcing install/unistall targets to recreate pkgIndex.tcl
+    in order to have a coherent directory of packages actually available
+
 2013-06-04 Massimo Manghi <mxmanghi@apache.org>
     * 2.1/: merging and committing latest commits done to trunk
 
