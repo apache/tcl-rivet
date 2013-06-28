@@ -337,7 +337,26 @@ good:
     return TCL_OK;
 }
 
-/* This is a separate function so that it may be called from 'Parse' */
+/*
+ * -- Rivet_ParseExecFile
+ *
+ * given a filename if the file exists it's either parsed (when a rivet
+ * template) and then executed as a Tcl_Obj instance or directly executed
+ * if a Tcl script.
+ *
+ * This is a separate function so that it may be called from command 'parse'
+ *
+ * Arguments:
+ *
+ *   - TclWebRequest: pointer to the structure collecting Tcl and Apache
+ *   data
+ *   - filename: pointer to a string storing the path to the template or
+ *   Tcl script
+ *   - toplevel: integer to be interpreted as a boolean meaning the
+ *   file is pointed by the request. When 0 that's a subtemplate being 
+ *   parsed and executed from another template
+ */
+
 int
 Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 {
@@ -506,6 +525,44 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         return res;
     }
 }
+
+/*
+ * -- Rivet_ParseExecString
+ *
+ * This function takes Tcl_Obj carrying a string to be interpreted as
+ * a Rivet template. This function is the core for command 'parsestr'
+ * 
+ * Arguments:
+ *
+ *   - TclWebRequest* req: pointer to the structure collecting Tcl and
+ *   Apache data
+ *   - Tcl_Obj* inbuf: Tcl object storing the template to be parsed.
+ */
+
+int
+Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf)
+{
+    int res = 0;
+    Tcl_Obj* outbuf = Tcl_NewObj();
+    Tcl_Interp *interp = req->interp;
+
+    Tcl_IncrRefCount(outbuf);
+    Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
+
+    /* If we are not inside a <? ?> section, add the closing ". */
+    if (Rivet_Parser(outbuf, inbuf) == 0)
+    {
+        Tcl_AppendToObj(outbuf, "\"\n", 2);
+    } 
+
+    Tcl_AppendToObj(outbuf, "\n", -1);
+
+    res = Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+    Tcl_DecrRefCount(outbuf);
+
+    return res;
+}
+
 
 static void
 Rivet_CleanupRequest( request_rec *r )

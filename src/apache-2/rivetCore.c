@@ -200,6 +200,39 @@ TCL_CMD_HEADER( Rivet_Parse )
 /*
  *-----------------------------------------------------------------------------
  *
+ * Rivet_Parse_String --
+ *
+ *  Include and parse a string containing a template fragment.
+ *  This command can be helpful if templates are not stored in ordinary
+ *  files but rather in some DBMS
+ *
+ * Results:
+ *      Standard Tcl result.
+ *
+ * Side Effects:
+ *      Whatever occurs when the Rivet template in inbuf gets parsed.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_Parse_String )
+{
+    Tcl_Obj* rivet_template;
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    if ( objc == 2 ) {
+        rivet_template = objv[1];
+    } else {
+        Tcl_WrongNumArgs( interp, 1, objv, "<string>" );
+        return TCL_ERROR;
+    }
+
+    return Rivet_ParseExecString(globals->req, rivet_template);
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
  * Rivet_Include --
  *
  *      Includes a file literally in the output stream.  Useful for
@@ -1505,6 +1538,7 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("upload",Rivet_Upload);
     RIVET_OBJ_CMD ("include",Rivet_Include);
     RIVET_OBJ_CMD ("parse",Rivet_Parse);
+    RIVET_OBJ_CMD ("parsestr",Rivet_Parse_String);
     RIVET_OBJ_CMD ("no_body",Rivet_NoBody);
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd);

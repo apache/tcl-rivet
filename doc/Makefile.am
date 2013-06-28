@@ -73,14 +73,8 @@ $(MANDIRS):
 # this target cleans everything up in the html directory
 
 distclean:
-	-rm html/*.html 
-	-rm html/*.css
-	-rm html/images/*.*
-	-rmdir html/images
-	-rmdir html
-	if [ -e graphics ]; then \
-	    rm graphics ; \
-	fi 
+	-rm -fr html/*.html 
+	-rm -f graphics
 	-rm Makefile
 
 .PHONY: examples

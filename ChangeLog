@@ -1,3 +1,8 @@
+2013-06-28 Massimo Manghi  <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c,rivetCore.c: command 'parsestr' to parse templates stored
+    in Tcl objects coded
+    * doc/Makefile.am: 'clean' target made a little terser
+
 2013-06-26 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: forcing install/unistall targets to recreate pkgIndex.tcl
     in order to have a coherent directory of packages actually available
