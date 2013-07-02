@@ -18,7 +18,7 @@
 #
 # top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
-# $Id: Makefile.am 1492454 2013-06-12 22:20:46Z mxmanghi $
+# $Id: Makefile.am 1496871 2013-06-26 10:17:34Z mxmanghi $
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
 # 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
@@ -69,8 +69,6 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	tclconfig/ltmain.sh tclconfig/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compare_version.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/tclconfig/tcl.m4 \
 	$(top_srcdir)/tclconfig/libtool.m4 \
 	$(top_srcdir)/m4/ax_prefix_config_h.m4 \
@@ -855,7 +853,8 @@ install-data-local:
 	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
 	cp -v rivet/init.tcl $(RIVETLIB_DESTDIR)/
 	cp -rv rivet/rivet-tcl $(RIVETLIB_DESTDIR)/
-	-( cd $(RIVETLIB_DESTDIR); rm -f *.la)
+	-(  cd $(RIVETLIB_DESTDIR); rm -f *.la; \
+        echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-local:
 	rm -f  $(RIVETLIB_DESTDIR)/init.tcl
@@ -879,6 +878,8 @@ uninstall-packages:
 	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
 		@rmdir $(RIVETLIB_DESTDIR); \
 	fi
+	-(  cd  $(RIVETLIB_DESTDIR); \
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 # 
 distclean-local:

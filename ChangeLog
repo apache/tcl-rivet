@@ -1,3 +1,7 @@
+2013-07-02 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: damn, I forgot to include in the rivet-2.1.2 the latest changes
+    to this file
+
 2013-06-26 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: forcing install/unistall targets to recreate pkgIndex.tcl
     in order to have a coherent directory of packages actually available
