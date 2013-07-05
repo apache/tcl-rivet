@@ -1,4 +1,8 @@
-2013-06-28 Massimo Manghi  <mxmanghi@apache.org>
+2013-07-05 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: changed the default path for installation dir 
+    * doc/xml/commands.xml: add manual page for command ::rivet::xml
+
+2013-06-28 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c,rivetCore.c: command 'parsestr' to parse templates stored
     in Tcl objects coded
     * doc/Makefile.am: 'clean' target made a little terser
