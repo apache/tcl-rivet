@@ -118,9 +118,9 @@ EXTERN int
 Rivetparser_Init( Tcl_Interp *interp )
 {
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.5", 0) == NULL)
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)
 #else
-    if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL)
+    if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL)
 #endif
     {   
         return TCL_ERROR;
@@ -146,18 +146,22 @@ Rivetparser_SafeInit( Tcl_Interp *interp )
      */
 
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) 
 #else
-    if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
-#endif    
+    if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) 
+#endif
+    {
         return TCL_ERROR;
     }
 
+/*
     Tcl_CreateObjCommand(interp,
                          "rivet::parserivetdata",
                          Parse_RivetData,
                          NULL,
                          (Tcl_CmdDeleteProc *)NULL);
+*/
 
+    RIVET_OBJ_CMD("parserivetdata",Parse_RivetData);
     return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }

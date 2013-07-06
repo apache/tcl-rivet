@@ -232,7 +232,6 @@ TCL_CMD_HEADER( Rivet_Parse_String )
 
 /*
  *-----------------------------------------------------------------------------
- *
  * Rivet_Include --
  *
  *      Includes a file literally in the output stream.  Useful for
