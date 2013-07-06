@@ -10,7 +10,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-   	http://www.apache.org/licenses/LICENSE-2.0
+        http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@
 #endif
 
 #include <tcl.h>
+#include "rivet.h"
 #include "rivetParser.h"
 
 /*
@@ -54,13 +55,13 @@ Parse_Rivet(
 
     if (objc != 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "filename");
-	return TCL_ERROR;
+        Tcl_WrongNumArgs(interp, 1, objv, "filename");
+        return TCL_ERROR;
     }
 
     if (Rivet_GetRivetFile(Tcl_GetString(objv[1]),
-			   1, outbuf, interp) == TCL_ERROR) {
-	return TCL_ERROR;
+                           1, outbuf, interp) == TCL_ERROR) {
+        return TCL_ERROR;
     }
     Tcl_SetObjResult(interp, outbuf);
     Tcl_DecrRefCount(outbuf);
@@ -72,21 +73,21 @@ Parse_Rivet(
  *
  * Parse_RivetData --
  *
- * 	Takes a Rivet script as an argument, and returns the parsed
- * 	tcl script version.
+ *      Takes a Rivet script as an argument, and returns the parsed
+ *      tcl script version.
  *
  * Results:
- *	A normal Tcl result.
+ *      A normal Tcl result.
  *
  * Side Effects:
- *	None.
+ *      None.
  *
  *-----------------------------------------------------------------------------
  */
 
 static int
 Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
-		int objc, Tcl_Obj *CONST objv[])
+                int objc, Tcl_Obj *CONST objv[])
 {
     Tcl_Obj *outbuf;
 
@@ -94,8 +95,8 @@ Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
 
     if (objc != 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "data");
-	return TCL_ERROR;
+        Tcl_WrongNumArgs(interp, 1, objv, "data");
+        return TCL_ERROR;
     }
     Tcl_IncrRefCount(outbuf);
 
@@ -103,7 +104,7 @@ Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
 
     if (Rivet_Parser(outbuf, objv[1]) == 0)
     {
-	Tcl_AppendToObj(outbuf, "\"\n", 2);
+        Tcl_AppendToObj(outbuf, "\"\n", 2);
     }
 
     Tcl_SetObjResult(interp, outbuf);
@@ -117,25 +118,16 @@ EXTERN int
 Rivetparser_Init( Tcl_Interp *interp )
 {
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.5", 0) == NULL) { 
+    if (Tcl_InitStubs(interp, "8.5", 0) == NULL)
 #else
-	if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL) { 
-#endif    
-	    return TCL_ERROR;
+    if (Tcl_PkgRequire(interp, "Tcl", "8.5", 0) == NULL)
+#endif
+    {   
+        return TCL_ERROR;
     }
 
-    Tcl_CreateObjCommand(interp,
-			 "rivet::parserivet",
-			 Parse_Rivet,
-			 NULL,
-			 (Tcl_CmdDeleteProc *)NULL);
-
-    Tcl_CreateObjCommand(interp,
-			 "rivet::parserivetdata",
-			 Parse_RivetData,
-			 NULL,
-			 (Tcl_CmdDeleteProc *)NULL);
-
+    RIVET_OBJ_CMD("parserivet",Parse_Rivet);
+    RIVET_OBJ_CMD("parserivetdata",Parse_RivetData);
     return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }
 
@@ -156,16 +148,16 @@ Rivetparser_SafeInit( Tcl_Interp *interp )
 #ifdef USE_TCL_STUBS
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
 #else
-	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
+    if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
 #endif    
-	    return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     Tcl_CreateObjCommand(interp,
-			 "rivet::parserivetdata",
-			 Parse_RivetData,
-			 NULL,
-			 (Tcl_CmdDeleteProc *)NULL);
+                         "rivet::parserivetdata",
+                         Parse_RivetData,
+                         NULL,
+                         (Tcl_CmdDeleteProc *)NULL);
 
     return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }
