@@ -914,14 +914,6 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     Rivet_InitServerVariables(interp, p );
 //  Rivet_PropagateServerConfArray( interp, rsc );
 
-    if (Tcl_PkgRequire(interp, "rivetparser","0.2", 1) == NULL)
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                     MODNAME ": Error loading package rivetparser: %s",
-                     Tcl_GetStringResult(interp) );
-        exit(1);
-    }
-
     /* Loading into the interpreter the commands provided by librivet.so */
     /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
      * Rivetlib can be mapped at this stage

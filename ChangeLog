@@ -1,5 +1,11 @@
 2013-07-06 Massimo Manghi <mxmanghi@apache.org>
     * src/parser/parserPkgInit.c: commands are created through the RIVET_OBJ_CMD macro
+    * rivet/packages/tclrivet/tclrivet.tcl: loading the rivetparser library caused 
+    weird side effects and the interpreter failed when this package was required
+    by a script. It's still to be understood why librivetparser was loaded using
+    command 'load' in tclrivet.tcl
+    * src/apache-2/mod_rivet.c: reverting an attempt to include rivetparser
+    as package required by default. 
 
 2013-07-05 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: changed the default path for installation dir 

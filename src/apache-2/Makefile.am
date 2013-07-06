@@ -38,13 +38,13 @@ mod_rivet_la_SOURCES = 			        \
 	        TclWebapache.c 				\
 	        rivetCore.c					\
             rivetConf.c                 \
-	        ../rivetChannel.c
-#           ../parser/rivetParser.c
+	        ../rivetChannel.c           \
+           ../parser/rivetParser.c
 
 ##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 
-mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@  @APR_LDFLAGS@ -module -avoid-version -L/usr/local/apache2/lib/rivet2.1
-mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ -lrivetparser
+mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@  @APR_LDFLAGS@ -module -avoid-version
+mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
 mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 # APXS_CPPFLAGS_SHLIB
