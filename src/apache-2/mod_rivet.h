@@ -114,6 +114,7 @@ typedef struct _rivet_interp_globals {
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);
+int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 

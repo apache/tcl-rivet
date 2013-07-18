@@ -1508,7 +1508,6 @@ Rivet_ChildHandlers(server_rec *s, int init)
  *  None.
  *
  * Side Effects:
- *  Runs Tcl_Finalize.
  *
  *-----------------------------------------------------------------------------
  */
@@ -1521,7 +1520,7 @@ Rivet_ChildExit(void *data)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running ChildExit handler");
     Rivet_ChildHandlers(s, 0);
 
-/* Tcl_Finalize remove to meet requirement to coexist with mod_websh (Bug #54162) */
+    /* Tcl_Finalize removed to meet requirement of coexistence with mod_websh (Bug #54162) */
 
     //Tcl_Finalize();
 

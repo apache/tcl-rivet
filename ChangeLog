@@ -1,3 +1,8 @@
+2013-07-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[h|c],rivetCore.c: reverting new command 'parsestr' and
+    turning string parsing command into the support for the new -string modifier of the 
+    ordinary parse command
+
 2013-07-06 Massimo Manghi <mxmanghi@apache.org>
     * src/parser/parserPkgInit.c: commands are created through the RIVET_OBJ_CMD macro
     * rivet/packages/tclrivet/tclrivet.tcl: loading the rivetparser library caused 

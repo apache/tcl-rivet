@@ -166,13 +166,30 @@ TCL_CMD_HEADER( Rivet_Parse )
     }
 
     if( objc == 2 ) {
+
         filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
+
     } else {
-        if( !STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual") ) {
-            Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
+
+        if (STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual")) {
+
+        /* */
+
+            filename = TclWeb_GetVirtualFile(globals->req,Tcl_GetStringFromObj(objv[2],(int *)NULL));
+
+        } else if ( STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-string")) {
+
+        /* we treat the argument as a string and we pass it as is to Rivet_ParseExecString */
+
+            return Rivet_ParseExecString(globals->req, objv[2]);
+
+        } else { 
+
+            Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename | -string template_string" );
             return TCL_ERROR;
+
         }
-        filename = TclWeb_GetVirtualFile(globals->req,Tcl_GetStringFromObj(objv[2],(int *)NULL));
+
     }
 
     if (!strcmp(filename, globals->r->filename))
@@ -197,38 +214,6 @@ TCL_CMD_HEADER( Rivet_Parse )
     }
 }
 
-/*
- *-----------------------------------------------------------------------------
- *
- * Rivet_Parse_String --
- *
- *  Include and parse a string containing a template fragment.
- *  This command can be helpful if templates are not stored in ordinary
- *  files but rather in some DBMS
- *
- * Results:
- *      Standard Tcl result.
- *
- * Side Effects:
- *      Whatever occurs when the Rivet template in inbuf gets parsed.
- *
- *-----------------------------------------------------------------------------
- */
-
-TCL_CMD_HEADER( Rivet_Parse_String )
-{
-    Tcl_Obj* rivet_template;
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
-
-    if ( objc == 2 ) {
-        rivet_template = objv[1];
-    } else {
-        Tcl_WrongNumArgs( interp, 1, objv, "<string>" );
-        return TCL_ERROR;
-    }
-
-    return Rivet_ParseExecString(globals->req, rivet_template);
-}
 
 /*
  *-----------------------------------------------------------------------------
@@ -1537,7 +1522,6 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("upload",Rivet_Upload);
     RIVET_OBJ_CMD ("include",Rivet_Include);
     RIVET_OBJ_CMD ("parse",Rivet_Parse);
-    RIVET_OBJ_CMD ("parsestr",Rivet_Parse_String);
     RIVET_OBJ_CMD ("no_body",Rivet_NoBody);
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd);
