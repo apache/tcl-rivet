@@ -1,3 +1,7 @@
+2013-07-19 Massimo Manghi <mxmanghi@apache.org>
+    * tests/parse.test,parsestring.rvt: adding test for 'parse -string' variant
+    to Rivet command 'parse'
+
 2013-07-17 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.[h|c],rivetCore.c: reverting new command 'parsestr' and
     turning string parsing command into the support for the new -string modifier of the 
