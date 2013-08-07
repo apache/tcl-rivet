@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.1.2])
+AC_INIT([Rivet],[2.1.3])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
@@ -245,7 +245,7 @@ AC_DEFUN([APACHE],[
     AC_ARG_WITH(
         apache,
         [  --with-apache[=DIR] Apache server base directory],
-    , [with_apache="/usr/local/apache"]
+    , [with_apache="/usr/local/apache2"]
     )
     apache_base="${with_apache}"
     AC_MSG_RESULT([$apache_base])
@@ -350,7 +350,7 @@ AC_DEFUN([APR_HANDLING],[
     fi]
 )
     if test "${apr_found+set}" = set ; then
-            AC_MSG_RESULT([$apr_found])
+        AC_MSG_RESULT([$apr_found])
         dnl At this point we already have apr sorted out
         dnl It actually calls another script, so the PATH needs to be set.
         export PATH=$PATH:`dirname ${apr_found}`
@@ -369,19 +369,40 @@ AC_DEFUN([APR_HANDLING],[
 #--------------------------------------------------------------------
 # 6-Dec-2011: Introducing new ::rivet namespace. Some components 
 # (namely RivetTcl, providing Tcl level initialization) are required 
-# within mod_rivet.c. Unfortunalely Tcl < 8.5.10 loaded shared
-# libs exporting names that clashed with Apache's own namespace and, 
-# hence we have to make sure we are running a Tcl compatible version.
-# (See bug #3216070). If you're running Tcl < 8.5.10 we won't go any
-# further ahead...
+# within mod_rivet.c. Unfortunalely Tcl < 8.5.10 shared
+# libs exporting names could clash with Apache's binary own names. 
+# Hence we have to make sure we are running a Tcl compatible version.
+# (See Tcl bug #3216070). 
+# 
+# Effect: If you're running Tcl < 8.5.10 we refuse to build Rivet...
 
 AX_COMPARE_VERSION([$TCL_VERSION$TCL_PATCH_LEVEL],[lt],[8.5.10],[
     AC_MSG_ERROR([Rivet 2.1 requires Tcl > 8.5.10 (current is $TCL_VERSION$TCL_PATCH_LEVEL)])
 ] , [
-    AC_MSG_NOTICE([ok, we are running Tcl $TCL_VERSION$TCL_PATCH_LEVEL])
+    AC_MSG_NOTICE([we are building Rivet with Tcl $TCL_VERSION$TCL_PATCH_LEVEL])
 ])
 
 
+print_fileevent_msg="0"
+AX_COMPARE_VERSION([$TCL_VERSION$TCL_PATCH_LEVEL],[lt],[8.5.15],[
+    print_fileevent_msg="1"
+] , )
+
+
+AX_COMPARE_VERSION([$TCL_VERSION],[eq],[8.6],[
+    if test "$TCL_PATCH_LEVEL" = ".0" ; then
+        print_fileevent_msg="1"
+    fi
+] , )
+
+
+if test "$print_fileevent_msg" = "1"; then
+    AC_MSG_NOTICE([------------------------------------------------------------------------])
+    AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) might not be working ])
+    AC_MSG_NOTICE([in Rivet with Tcl $TCL_VERSION$TCL_PATCH_LEVEL using the 'prefork' MPM. ])
+    AC_MSG_NOTICE([Recommended versions are Tcl >= 8.5.15 or Tcl >= 8.6.1])
+    AC_MSG_NOTICE([------------------------------------------------------------------------])
+fi 
 
 # APACHE_VERSION
 #

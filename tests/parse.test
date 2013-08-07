@@ -22,3 +22,26 @@ set testfilename1 parse.rvt
 
   </body>
 </html>}
+
+set testfilename2 parsestring.rvt
+
+::tcltest::test parse-1.2 {Parse command} {
+    set page [ ::http::geturl "${urlbase}$testfilename2" ]
+    ::http::data $page
+} {<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Parse String Test</title>
+  </head>
+
+  <body>
+    <h1>Parse String Test</h1>
+    Hello, World
+
+¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!
+
+
+<p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>
+
+  </body>
+</html>}
