@@ -36,10 +36,10 @@ mod_rivet_la_SOURCES = 			        \
 	        apache_request.c			\
 	        mod_rivet.c 				\
 	        TclWebapache.c 				\
-	        rivetCore.c					\
-            rivetConf.c                 \
+	        ../rivetcmds/rivetCore.c    \
+            ../rivetcmds/rivetInspect.c \
 	        ../rivetChannel.c           \
-           ../parser/rivetParser.c
+            ../parser/rivetParser.c
 
 ##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 

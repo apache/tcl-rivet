@@ -46,6 +46,8 @@
 #include <apr_strings.h>
 #include <apr_tables.h>
 
+#include <ap_mpm.h>
+
 /* Tcl includes */
 #include <tcl.h>
 /* There is code ifdef'ed out below which uses internal
@@ -182,6 +184,7 @@ Rivet_CheckType (request_rec *req)
 static void
 Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
 {
+    int     ap_mpm_result;
     Tcl_Obj *obj;
 
     obj = Tcl_NewStringObj(ap_server_root, -1);
@@ -1643,6 +1646,18 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
     server_rec *sr;
     extern int ap_max_requests_per_child;
     int interpCount = 0;
+
+/* This code is run once per child process. In a threaded Tcl builds the forking 
+ * of a child process most likely has not preserved the thread where the Tcl 
+ * notifier runs. The Notifier should have been restarted by one the 
+ * pthread_atfork callbacks (setup in Tcl >= 8.5.14 and Tcl >= 8.6.1). In
+ * case pthread_atfork is not supported we unconditionally call Tcl_InitNotifier
+ * hoping for the best (Bug #55153)      
+ */
+
+#if !defined(HAVE_PTHREAD_ATFORK)
+    Tcl_InitNotifier();
+#endif
 
     if (rsc->rivet_global_init_script != NULL) {
         if (Tcl_EvalObjEx(interp, rsc->rivet_global_init_script, 0) != TCL_OK)

@@ -1,3 +1,14 @@
+2013-08-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivetcmds/rivetCore.c,rivetInspect.c: moved core commands into this new directory. 
+    Their code is (nearly) independent from Apache version and in future it might be shared
+    between different versions/branches of the module
+    * src/apache-2/Makefile.am: changed reference to rivetCore.c and rivetConf.c to 
+    their new position and new names
+    * src/apache-2/mod_rivet.c: conditional compilation to Tcl_InitIdentifier might
+    help preserving event loop on Unices where no pthreads_atfork call exists (Bug #55153)
+    * configure.ac: Tcl version checked to detect when the notifier might
+    not be working (Tcl < 8.5.15 and Tcl < 8.6.1). In case a warning message is printed 
+
 2013-07-19 Massimo Manghi <mxmanghi@apache.org>
     * tests/parse.test,parsestring.rvt: adding test for 'parse -string' variant
     to Rivet command 'parse'
