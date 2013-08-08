@@ -1,3 +1,8 @@
+2013-08-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: adding MPM descripting fields to the 'server' array
+    * configure.ac: warning message about Tcl version not supporting fork correctly
+    moved to the end of configure.ac, so that it's more readable by the user
+
 2013-08-06 Massimo Manghi <mxmanghi@apache.org>
     * rivetcmds/rivetCore.c,rivetInspect.c: moved core commands into this new directory. 
     Their code is (nearly) independent from Apache version and in future it might be shared

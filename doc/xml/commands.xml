@@ -1691,7 +1691,8 @@ form_request end</programlisting>
 		    separated by newline characters.
 		</para>
 	    </refsect1>
-	</refentry>	
+	</refentry>
+		
     <refentry id="xml">
         <refnamediv>
             <refname>xml</refname>
@@ -1729,10 +1730,7 @@ form_request end</programlisting>
             <programlisting><command>::rivet::xml "a string" [list div class box id testbox] b i</command>
 &lt;== &lt;div class=&quot;box&quot; id=&quot;testbox&quot;&gt;&lt;b&gt;&lt;i&gt;a string&lt;/i&gt;&lt;/b&gt;&lt;/div&gt;</programlisting>
             <programlisting><command>::rivet::xml "text to be wrapped in XML" div [list a href "http://..../" title "info message"]</command> 
-&lt;== &lt;div&gt;&lt;a href=&quot;http://..../&quot; title=&quot;info message&quot;&gt;text to be wrapped in XML&lt;/a&gt;&lt;/div&gt;</programlisting>
-
-  
+&lt;== &lt;div&gt;&lt;a href=&quot;http://..../&quot; title=&quot;info message&quot;&gt;text to be wrapped in XML&lt;/a&gt;&lt;/div&gt;</programlisting>  
        </refsect1>
     </refentry>
-
 </section>
