@@ -18,7 +18,7 @@
 #
 # top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
-# $Id: Makefile.am 1500301 2013-07-06 16:26:05Z mxmanghi $
+# $Id: Makefile.am 1511397 2013-08-07 16:59:11Z mxmanghi $
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
 # 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
@@ -69,8 +69,6 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	tclconfig/ltmain.sh tclconfig/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compare_version.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/tclconfig/tcl.m4 \
 	$(top_srcdir)/tclconfig/libtool.m4 \
 	$(top_srcdir)/m4/ax_prefix_config_h.m4 \
@@ -322,6 +320,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+rivet_core_cmds = @rivet_core_cmds@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@

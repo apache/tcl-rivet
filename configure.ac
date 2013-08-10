@@ -395,15 +395,6 @@ AX_COMPARE_VERSION([$TCL_VERSION],[eq],[8.6],[
     fi
 ] , )
 
-
-if test "$print_fileevent_msg" = "1"; then
-    AC_MSG_NOTICE([------------------------------------------------------------------------])
-    AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) might not be working ])
-    AC_MSG_NOTICE([in Rivet with Tcl $TCL_VERSION$TCL_PATCH_LEVEL using the 'prefork' MPM. ])
-    AC_MSG_NOTICE([Recommended versions are Tcl >= 8.5.15 or Tcl >= 8.6.1])
-    AC_MSG_NOTICE([------------------------------------------------------------------------])
-fi 
-
 # APACHE_VERSION
 #
 # let's determine whether we are building for apache1.x or apache2.x.
@@ -471,6 +462,26 @@ AC_DEFUN([APACHE_REQUEST],[
     AC_SUBST(apache_request)
     AC_MSG_RESULT([$with_apache_request])
 ])
+
+# RIVET_CORE_CMDS
+#
+# selecting non default directory for Rivet code commands core
+#
+
+AC_DEFUN([RIVET_CORE_CMDS],[
+    AC_ARG_WITH(
+        rivet_core_cmds,
+        [  --with-rivet-core-cmds[=dir] select directory for Rivet core commands core],,
+        [with_rivet_core_cmds="rivetcmds"]
+    )
+
+    AC_MSG_CHECKING(for Rivet core commands code)
+    rivet_core_cmds=${with_rivet_core_cmds}
+    AC_SUBST(rivet_core_cmds)
+    AC_MSG_RESULT([$with_rivet_core_cmds])
+
+])
+
 
 AC_DEFUN([RIVET_TCL_LIB],[
     AC_ARG_WITH(
@@ -688,6 +699,7 @@ POST_MAX_SIZE
 UPLOAD_TO_VAR
 IMPORT_RIVET_COMMANDS
 APACHE_REQUEST
+RIVET_CORE_CMDS
 
 if test $import_rivet_commands = "yes"; then
     AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
@@ -721,4 +733,14 @@ AC_CONFIG_FILES([Makefile src/Makefile src/librivet/Makefile src/parser/Makefile
 #    apache-2) AC_CONFIG_FILES([Makefile src/Makefile src/apache-2/Makefile doc/Makefile]) ;;
 #esac
 AC_OUTPUT
+
+if test "$print_fileevent_msg" = "1"; then
+    AC_MSG_NOTICE([========================================================================])
+    AC_MSG_NOTICE([                             WARNING!])
+    AC_MSG_NOTICE([========================================================================])
+    AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) might not be working ])
+    AC_MSG_NOTICE([in Rivet running with Tcl $TCL_VERSION$TCL_PATCH_LEVEL and with the 'prefork' MPM.])
+    AC_MSG_NOTICE([Recommended versions are Tcl >= 8.5.15 (8.5 version) or Tcl >= 8.6.1])
+    AC_MSG_NOTICE([========================================================================])
+fi 
 

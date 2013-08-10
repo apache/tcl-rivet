@@ -30,8 +30,8 @@ mod_rivet_la_SOURCES = 			                            \
 	        @apache_request@/apache_request.c			    \
 	        @apache_version_dir@/mod_rivet.c 				\
 	        @apache_version_dir@/TclWebapache.c 			\
-	        rivetcmds/rivetCore.c				            \
-            rivetcmds/rivetConf.c                           \
+	        @rivet_core_cmds@/rivetCore.c				    \
+            @rivet_core_cmds@/rivetInspect.c                \
 	        channel/rivetChannel.c 			                \
             parser/rivetParser.c
 

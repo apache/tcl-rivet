@@ -233,6 +233,44 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 #endif
+
+    if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
+    {
+        switch (ap_mpm_result) 
+        {
+            case AP_MPMQ_STATIC:
+                obj = Tcl_NewStringObj("static", -1);
+                break;
+            case AP_MPMQ_NOT_SUPPORTED:
+                obj = Tcl_NewStringObj("unsupported", -1);
+                break;
+            default: 
+                obj = Tcl_NewStringObj("undefined", -1);
+                break;
+        }
+        Tcl_IncrRefCount(obj);
+        Tcl_SetVar2Ex(interp,"server","MPM_THREADED",obj,TCL_GLOBAL_ONLY);
+        Tcl_DecrRefCount(obj);
+    }
+
+    if (ap_mpm_query(AP_MPMQ_IS_FORKED,&ap_mpm_result) == APR_SUCCESS)
+    {
+        switch (ap_mpm_result) 
+        {
+            case AP_MPMQ_STATIC:
+                obj = Tcl_NewStringObj("static", -1);
+                break;
+            case AP_MPMQ_DYNAMIC:
+                obj = Tcl_NewStringObj("dynamic", -1);
+                break;
+            default: 
+                obj = Tcl_NewStringObj("undefined", -1);
+                break;
+        }
+        Tcl_IncrRefCount(obj);
+        Tcl_SetVar2Ex(interp,"server","MPM_FORKED",obj,TCL_GLOBAL_ONLY);
+        Tcl_DecrRefCount(obj);
+    }
 }
 
 
