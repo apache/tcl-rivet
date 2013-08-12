@@ -1,3 +1,11 @@
+2013-08-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form2.tcl,form.tcl: form packages called Rivet's command
+    '::rivet::env' in its unqualified form. Fixed adding the ::rivet namespace
+    specification.
+    * src/apache-2/rivetCore.c: errata corrige for entry added on 2013-07-19: 
+    command 'parse -string' superseded test command parsestr, thus removed from
+    rivetCore.c
+
 2013-08-07 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: adding MPM descripting fields to the 'server' array
     * configure.ac: warning message about Tcl version not supporting fork correctly

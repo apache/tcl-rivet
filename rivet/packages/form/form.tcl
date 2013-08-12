@@ -35,7 +35,7 @@ package provide form 1.0
         # set the form method to be a post and the action to be
         # a refetching of the current page
         set arguments(method) post
-        set arguments(action) [env DOCUMENT_URI]
+        set arguments(action) [::rivet::env DOCUMENT_URI]
 
         # use $this for the type for form-global stuff like form arguments
         import_data form $this arguments $args
