@@ -27,12 +27,6 @@ make
 
 sudo make install
 
-4) Install Rivet utils with
-
-sudo make install-packages
-
-if your configuration doesn't require you to have administrative privileges.
-
 Along with the usual 'configure' variables Rivet's configure script 
 handles other specific options. 
 

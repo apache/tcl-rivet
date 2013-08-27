@@ -1,3 +1,13 @@
+2013-08-26 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: expanded warning message about broken implementations
+    of Tcl when using forks and the event loop
+    * Makefile.am: target 'install' now depends on targets install-binaries and
+    install-packages, thus install the whole Rivet code as it did before 2.1.2.
+    Packagers wanting to separated binary and Tcl code can draw on those 2 
+    targets
+    * INSTALL,doc/xml/install.xml: changed documentation to reflect the restored
+    organization of install targets
+
 2013-08-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form2.tcl,form.tcl: form packages called Rivet's command
     '::rivet::env' in its unqualified form. Fixed adding the ::rivet namespace
