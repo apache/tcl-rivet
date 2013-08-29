@@ -207,19 +207,13 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
 	    <programlisting>make install</programlisting>
 	    <para> 
 	      to install the resulting files.
-		  This should copy the shared object (like <filename>mod_rivet.so</filename>, if one was
-		  successfully created, into Apache's <filename>libexec</filename> directory, as well as
-		  install some support scripts. This commands creates a functional Rivet module with its
-		  core language.
-	    </para>
-	    <para>
-	       Starting with 2.1.2 you need also to run
-	    </para>
-	    <programlisting>make install-packages</programlisting>
-	    <para>
-	       in order to have the Tcl packages (such as the 
-	       <code>Session</code> or <code>form</code>) installed
-	       into their target directory
+		   This should in turn invoke target <code>install-binaries</code>
+		   which copies the shared object <filename>mod_rivet.so</filename>
+		   into Apache's <filename>libexec</filename> directory as well as
+		   install some support scripts, and target
+		   <code>install-packages</code> which installs the utility
+		   packages.This commands creates a functional Rivet module with its
+		   core language.
 	    </para>
 	  </step>
 	</substeps>

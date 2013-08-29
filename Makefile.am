@@ -21,7 +21,9 @@ RIVET_LIBS_ARCH =
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
-install-data-local:
+install-data-local: install-binaries install-packages
+
+install-binaries:
 	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
 	cp -v rivet/init.tcl $(RIVETLIB_DESTDIR)/
 	cp -rv rivet/rivet-tcl $(RIVETLIB_DESTDIR)/
@@ -33,6 +35,8 @@ uninstall-local:
 	rm -fr $(RIVETLIB_DESTDIR)/rivet-tcl
 	rm -f  $(RIVETLIB_DESTDIR)/librivetlib.so
 	rm -f  $(RIVETLIB_DESTDIR)/librivetparser.so
+	rm -fr $(RIVETLIB_DESTDIR)/packages
+	rm -f  $(RIVETLIB_DESTDIR)/pkgIndex.tcl
 	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
 		rmdir $(RIVETLIB_DESTDIR); \
 	fi

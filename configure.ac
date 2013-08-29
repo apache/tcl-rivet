@@ -735,12 +735,14 @@ AC_CONFIG_FILES([Makefile src/Makefile src/librivet/Makefile src/parser/Makefile
 AC_OUTPUT
 
 if test "$print_fileevent_msg" = "1"; then
-    AC_MSG_NOTICE([========================================================================])
+    AC_MSG_NOTICE([=======================================================================])
     AC_MSG_NOTICE([                             WARNING!])
     AC_MSG_NOTICE([========================================================================])
     AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) might not be working ])
-    AC_MSG_NOTICE([in Rivet running with Tcl $TCL_VERSION$TCL_PATCH_LEVEL and with the 'prefork' MPM.])
-    AC_MSG_NOTICE([Recommended versions are Tcl >= 8.5.15 (8.5 version) or Tcl >= 8.6.1])
-    AC_MSG_NOTICE([========================================================================])
+    AC_MSG_NOTICE([in Rivet running Tcl $TCL_VERSION$TCL_PATCH_LEVEL and the 'prefork' MPM of Apache.])
+    AC_MSG_NOTICE([Recommended versions are:])
+    AC_MSG_NOTICE([   - threaded builds: Tcl >= 8.5.15 (8.5 version) or Tcl >= 8.6.1])
+    AC_MSG_NOTICE([   - any non-threaded build of Tcl >= 8.5.10])
+    AC_MSG_NOTICE([=======================================================================])
 fi 
 
