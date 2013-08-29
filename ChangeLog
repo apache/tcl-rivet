@@ -1,13 +1,87 @@
+2013-08-29 Massimo Manghi <mxmanghi@apache.org>
+    * 2.1: committing changes merged from trunk after release of 2.1.2
+
+2013-08-26 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: expanded warning message about broken implementations
+    of Tcl when using forks and the event loop
+    * Makefile.am: target 'install' now depends on targets install-binaries and
+    install-packages, thus install the whole Rivet code as it did before 2.1.2.
+    Packagers wanting to separated binary and Tcl code can draw on those 2 
+    targets
+    * INSTALL,doc/xml/install.xml: changed documentation to reflect the restored
+    organization of install targets
+
+2013-08-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form2.tcl,form.tcl: form packages called Rivet's command
+    '::rivet::env' in its unqualified form. Fixed adding the ::rivet namespace
+    specification.
+    * src/apache-2/rivetCore.c: errata corrige for entry added on 2013-07-19: 
+    command 'parse -string' superseded test command parsestr, thus removed from
+    rivetCore.c
+
+2013-08-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: adding MPM descripting fields to the 'server' array
+    * configure.ac: warning message about Tcl version not supporting fork correctly
+    moved to the end of configure.ac, so that it's more readable by the user
+
+2013-08-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivetcmds/rivetCore.c,rivetInspect.c: moved core commands into this new directory. 
+    Their code is (nearly) independent from Apache version and in future it might be shared
+    between different versions/branches of the module
+    * src/apache-2/Makefile.am: changed reference to rivetCore.c and rivetConf.c to 
+    their new position and new names
+    * src/apache-2/mod_rivet.c: conditional compilation to Tcl_InitIdentifier might
+    help preserving event loop on Unices where no pthreads_atfork call exists (Bug #55153)
+    * configure.ac: Tcl version checked to detect when the notifier might
+    not be working (Tcl < 8.5.15 and Tcl < 8.6.1). In case a warning message is printed 
+
+2013-07-19 Massimo Manghi <mxmanghi@apache.org>
+    * tests/parse.test,parsestring.rvt: adding test for 'parse -string' variant
+    to Rivet command 'parse'
+
+2013-07-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[h|c],rivetCore.c: reverting new command 'parsestr' and
+turning string parsing command into the support for the new -string modifier of the 
+    ordinary parse command
+
+2013-07-06 Massimo Manghi <mxmanghi@apache.org>
+    * src/parser/parserPkgInit.c: commands are created through the RIVET_OBJ_CMD macro
+    * rivet/packages/tclrivet/tclrivet.tcl: loading the rivetparser library caused 
+    weird side effects and the interpreter failed when this package was required
+    by a script. It's still to be understood why librivetparser was loaded using
+    command 'load' in tclrivet.tcl
+    * src/apache-2/mod_rivet.c: reverting an attempt to include rivetparser
+    as package required by default. 
+
+2013-07-05 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: changed the default path for installation dir 
+    * doc/xml/commands.xml: add manual page for command ::rivet::xml
+
 2013-07-02 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: damn, I forgot to include in the rivet-2.1.2 the latest changes
     to this file
+
+2013-06-28 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c,rivetCore.c: command 'parsestr' to parse templates stored
+    in Tcl objects coded
+    * doc/Makefile.am: 'clean' target made a little terser
 
 2013-06-26 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: forcing install/unistall targets to recreate pkgIndex.tcl
     in order to have a coherent directory of packages actually available
 
-2013-06-04 Massimo Manghi <mxmanghi@apache.org>
-    * 2.1/: merging and committing latest commits done to trunk
+2013-06-24 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: It must be made explicit installation is a two stage operation now
+
+2013-06-24 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-class.tcl: two new methods 'load' (loads a
+    whole package data for a given package and session) and 'clear' (it deletes either 
+    a whole package or a single data like for a session)
+
+2013-06-22 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: cleanup of unused code in mod_rivet.c. Adding comments
+    to undocumented functions
+    * src/parser/rivetParse.c: New TODO comment added 
 
 2013-06-12 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: splitting install targets into 'make install' (mod_rivet.so,

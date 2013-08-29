@@ -46,6 +46,8 @@
 #include <apr_strings.h>
 #include <apr_tables.h>
 
+#include <ap_mpm.h>
+
 /* Tcl includes */
 #include <tcl.h>
 /* There is code ifdef'ed out below which uses internal
@@ -109,24 +111,29 @@ static int Rivet_chdir_file (const char *file)
     return chdir_retval;
 }
 
-/* Function to be used should we desire to upload files to a variable */
 
-#if 0
-int
-Rivet_UploadHook(void *ptr, char *buf, int len, ApacheUpload *upload)
-{
-    Tcl_Interp *interp = ptr;
-    static int usenum = 0;
-    static int uploaded = 0;
-
-    if (oldptr != upload)
-    {
-    } else {
-    }
-
-    return len;
-}
-#endif /* 0 */
+/* 
+ * -- Rivet_CheckType (request_rec *r)
+ *
+ * Utility function internally used to determine which type
+ * of file (whether rvt template or plain Tcl script) we are
+ * dealing with. In order to speed up multiple tests the
+ * the test returns an integer (RIVET_FILE) for rvt templates
+ * or TCL_FILE for Tcl scripts
+ *
+ * Argument: 
+ *
+ *    request_rec*: pointer to the current request record
+ *
+ * Returns:
+ *
+ *    integer number meaning the type of file we are dealing with
+ *
+ * Side effects:
+ *
+ *    none.
+ *
+ */
 
 static int
 Rivet_CheckType (request_rec *req)
@@ -143,98 +150,41 @@ Rivet_CheckType (request_rec *req)
     return ctype; 
 }
 
+
 /*
- * Rivet_ParseFileArgString (char *szDocRoot, char *szArgs, char **file)
+ * -- Rivet_InitServerVariables
  *
- * parses a string like /path/file.ext?arg1=value1&arg2=value2 into
- * the filename and arguments. A Tcl_Hashtable is utilized for the
- * arguments and returned. The file name is appended to the szDocRoot
- * argument and stored in the *file pointer.
- */
-#if 0
-static int
-Rivet_ParseFileArgString (const char *szDocRoot, const char *szArgs, char **file,apr_pool_t *p, 
-        Tcl_HashTable *argTbl)
-{
-    int flen = 1, argslen, newEntry, i;
-    const char *rootPtr = szDocRoot, *argsPtr = szArgs, *argPos;
-    char *filePtr; 
-    char *argument, *value;
-    Tcl_HashEntry *entryPtr;
-    
-    /* 
-     * parse filename, that is everything before ? in the args string.
-     * Append it to the document root, if this is not NULL. 
-     */
-
-    while (*argsPtr != '?' && *argsPtr != '\0') {
-        argsPtr++;
-    }
-    if (*argsPtr == '?') 
-        argslen = argsPtr-szArgs ;
-    else
-        argslen = 0;
-    flen += strlen(szDocRoot) + argslen ;
-    *file = (char*)apr_palloc(p,flen);
-    strcat(*file,szDocRoot);
-    strncat(*file,szArgs,argslen);
-
-    if (argTbl == NULL)
-        return RIVET_OK;
-    
-    /*
-     * past this point, parse remainder of the args string. For every argument, 
-     * create a new entry in the argTbl Tcl_HashTable.
-     */
-    Tcl_InitHashTable (argTbl, TCL_STRING_KEYS);
-    
-    for (i = 0, argPos = argsPtr; i < strlen(argsPtr); i++) {
-        if (*(argsPtr + i) == '=') {
-            /* argument ends */
-            argument = (char*) malloc ((strlen(szArgs)+1) * sizeof(char));
-            char *ap = argument;
-            while ((*ap++ = *argPos++) != '=')
-                ;
-            *--ap = '\0';
-        } else if (*(argsPtr + i) == '&' || i == strlen(argsPtr)-1) {
-            /* value ends */
-            value = (char*) malloc ((strlen(szArgs)+1) * sizeof(char));
-            char *vp = value;
-            while ((*vp++ = *argPos++) != '&')
-                ;
-            *--vp = '\0';
-
-            if (argument == NULL) {
-                argument = value;
-                value = "1";
-            }
-            entryPtr = Tcl_CreateHashEntry (argTbl, (CONST char*) argument, 
-                    &newEntry);
-            Tcl_SetHashValue (entryPtr, value);
-            argument = NULL;
-            value = NULL;
-        }
-    }
-    
-    return RIVET_OK;
-}
-#endif
-
-/*
  * Setup an array in each interpreter to tell us things about Apache.
  * This saves us from having to do any real call to load an entire
  * environment.  This routine only gets called once, when the child process
  * is created.
  *
- * SERVER_ROOT - Apache's root location
- * SERVER_CONF - Apache's configuration file
- * RIVET_DIR   - Rivet's Tcl source directory
- * RIVET_INIT  - Rivet's init.tcl file
+ *  Arguments:
+ *
+ *      Tcl_Interp*: pointer to the Tcl interpreter
+ *      apr_pool_t*: pool used for calling Apache framework functions
+ *
+ * Returned value:
+ *      none
+ *
+ * Side effects:
+ *
+ *      within the global scope of the interpreter passed as first
+ *      argument a 'server' array is created and the variable associated
+ *      to the following keys are defined
+ *
+ *          SERVER_ROOT - Apache's root location
+ *          SERVER_CONF - Apache's configuration file
+ *          RIVET_DIR   - Rivet's Tcl source directory
+ *          RIVET_INIT  - Rivet's init.tcl file
+ *          RIVET_VERSION - Rivet version (only when RIVET_DISPLAY_VERSION is 1)
+ *
  */
 
 static void
-Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
+Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
 {
+    int     ap_mpm_result;
     Tcl_Obj *obj;
 
     obj = Tcl_NewStringObj(ap_server_root, -1);
@@ -246,7 +196,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
-    obj = Tcl_NewStringObj(ap_server_root_relative(p,SERVER_CONFIG_FILE), -1);
+    obj = Tcl_NewStringObj(ap_server_root_relative(pool,SERVER_CONFIG_FILE), -1);
     Tcl_IncrRefCount(obj);
     Tcl_SetVar2Ex(interp,
             "server",
@@ -255,7 +205,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
-    obj = Tcl_NewStringObj(ap_server_root_relative(p, RIVET_DIR), -1);
+    obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_DIR), -1);
     Tcl_IncrRefCount(obj);
     Tcl_SetVar2Ex(interp,
             "server",
@@ -264,7 +214,7 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
-    obj = Tcl_NewStringObj(ap_server_root_relative(p, RIVET_INIT), -1);
+    obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_INIT), -1);
     Tcl_IncrRefCount(obj);
     Tcl_SetVar2Ex(interp,
             "server",
@@ -283,46 +233,46 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *p )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 #endif
-}
 
-#if 0
-static void
-Rivet_PropagateServerConfArray( Tcl_Interp *interp, rivet_server_conf *rsc )
-{
-    apr_table_t *t;
-    apr_array_header_t *arr;
-    apr_table_entry_t  *elts;
-    int i, nelts;
-    Tcl_Obj *key;
-    Tcl_Obj *val;
-    Tcl_Obj *arrayName;
-
-    /* Propagate all of the ServerConf variables into an array. */
-    t = rsc->rivet_server_vars;
-    arr   = (apr_array_header_t*) apr_table_elts( t );
-    elts  = (apr_table_entry_t *) arr->elts;
-    nelts = arr->nelts;
-
-    arrayName = Tcl_NewStringObj("RivetServerConf", -1);
-    Tcl_IncrRefCount(arrayName);
-
-    for( i = 0; i < nelts; ++i )
+    if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
     {
-        key = Tcl_NewStringObj( elts[i].key, -1);
-        val = Tcl_NewStringObj( elts[i].val, -1);
-        Tcl_IncrRefCount(key);
-        Tcl_IncrRefCount(val);
-        Tcl_ObjSetVar2(interp,
-                arrayName,
-                key,
-                val,
-                TCL_GLOBAL_ONLY);
-        Tcl_DecrRefCount(key);
-        Tcl_DecrRefCount(val);
+        switch (ap_mpm_result) 
+        {
+            case AP_MPMQ_STATIC:
+                obj = Tcl_NewStringObj("static", -1);
+                break;
+            case AP_MPMQ_NOT_SUPPORTED:
+                obj = Tcl_NewStringObj("unsupported", -1);
+                break;
+            default: 
+                obj = Tcl_NewStringObj("undefined", -1);
+                break;
+        }
+        Tcl_IncrRefCount(obj);
+        Tcl_SetVar2Ex(interp,"server","MPM_THREADED",obj,TCL_GLOBAL_ONLY);
+        Tcl_DecrRefCount(obj);
     }
-    Tcl_DecrRefCount(arrayName);
+
+    if (ap_mpm_query(AP_MPMQ_IS_FORKED,&ap_mpm_result) == APR_SUCCESS)
+    {
+        switch (ap_mpm_result) 
+        {
+            case AP_MPMQ_STATIC:
+                obj = Tcl_NewStringObj("static", -1);
+                break;
+            case AP_MPMQ_DYNAMIC:
+                obj = Tcl_NewStringObj("dynamic", -1);
+                break;
+            default: 
+                obj = Tcl_NewStringObj("undefined", -1);
+                break;
+        }
+        Tcl_IncrRefCount(obj);
+        Tcl_SetVar2Ex(interp,"server","MPM_FORKED",obj,TCL_GLOBAL_ONLY);
+        Tcl_DecrRefCount(obj);
+    }
 }
-#endif
+
 
 /* Calls Tcl_EvalObjEx() and checks for errors
  * Prints the error buffer if any.
@@ -428,7 +378,26 @@ good:
     return TCL_OK;
 }
 
-/* This is a separate function so that it may be called from 'Parse' */
+/*
+ * -- Rivet_ParseExecFile
+ *
+ * given a filename if the file exists it's either parsed (when a rivet
+ * template) and then executed as a Tcl_Obj instance or directly executed
+ * if a Tcl script.
+ *
+ * This is a separate function so that it may be called from command 'parse'
+ *
+ * Arguments:
+ *
+ *   - TclWebRequest: pointer to the structure collecting Tcl and Apache
+ *   data
+ *   - filename: pointer to a string storing the path to the template or
+ *   Tcl script
+ *   - toplevel: integer to be interpreted as a boolean meaning the
+ *   file is pointed by the request. When 0 that's a subtemplate being 
+ *   parsed and executed from another template
+ */
+
 int
 Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 {
@@ -541,6 +510,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
             Tcl_DecrRefCount(outbuf);
             return result;
         }
+
         if (toplevel) {
             if (rsc->rivet_after_script) {
                 Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
@@ -587,6 +557,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
         Tcl_IncrRefCount(outbuf);
     }
+
     rsc->user_scripts_updated = 0;
     {
         int res = 0;
@@ -594,6 +565,43 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         Tcl_DecrRefCount(outbuf);
         return res;
     }
+}
+
+/*
+ * -- Rivet_ParseExecString
+ *
+ * This function takes Tcl_Obj carrying a string to be interpreted as
+ * a Rivet template. This function is the core for command 'parsestr'
+ * 
+ * Arguments:
+ *
+ *   - TclWebRequest* req: pointer to the structure collecting Tcl and
+ *   Apache data
+ *   - Tcl_Obj* inbuf: Tcl object storing the template to be parsed.
+ */
+
+int
+Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf)
+{
+    int res = 0;
+    Tcl_Obj* outbuf = Tcl_NewObj();
+    Tcl_Interp *interp = req->interp;
+
+    Tcl_IncrRefCount(outbuf);
+    Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
+
+    /* If we are not inside a <? ?> section, add the closing ". */
+    if (Rivet_Parser(outbuf, inbuf) == 0)
+    {
+        Tcl_AppendToObj(outbuf, "\"\n", 2);
+    } 
+
+    Tcl_AppendToObj(outbuf, "\n", -1);
+
+    res = Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+    Tcl_DecrRefCount(outbuf);
+
+    return res;
 }
 
 static void
@@ -936,7 +944,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                      MODNAME ": error setting auto_path: %s",
-		     Tcl_GetStringFromObj(auto_path,NULL));
+                     Tcl_GetStringFromObj(auto_path,NULL));
     } 
     Tcl_DecrRefCount(rivet_tcl);
 
@@ -947,7 +955,6 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     Rivet_InitServerVariables(interp, p );
 //  Rivet_PropagateServerConfArray( interp, rsc );
 
-
     /* Loading into the interpreter the commands provided by librivet.so */
     /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
      * Rivetlib can be mapped at this stage
@@ -957,7 +964,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                      MODNAME ": Error loading rivetlib package: %s",
-		     Tcl_GetStringResult(interp) );
+                     Tcl_GetStringResult(interp) );
         exit(1);
     }
 
@@ -1274,13 +1281,13 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp,
         if (Tcl_EvalObjEx(interp, rsc->rivet_server_init_script, 0) != TCL_OK)
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-			 MODNAME ": Error running ServerInitScript '%s': %s",
-			 Tcl_GetString(rsc->rivet_server_init_script),
+                         MODNAME ": Error running ServerInitScript '%s': %s",
+                         Tcl_GetString(rsc->rivet_server_init_script),
                          Tcl_GetVar(interp, "errorInfo", 0));
         } else {
             ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-		         MODNAME ": ServerInitScript '%s' successful", 
-			 Tcl_GetString(rsc->rivet_server_init_script));
+                         MODNAME ": ServerInitScript '%s' successful", 
+                         Tcl_GetString(rsc->rivet_server_init_script));
         }
     }
     
@@ -1542,7 +1549,6 @@ Rivet_ChildHandlers(server_rec *s, int init)
  *  None.
  *
  * Side Effects:
- *  Runs Tcl_Finalize.
  *
  *-----------------------------------------------------------------------------
  */
@@ -1555,7 +1561,7 @@ Rivet_ChildExit(void *data)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running ChildExit handler");
     Rivet_ChildHandlers(s, 0);
 
-/* Tcl_Finalize remove to meet requirement to coexist with mod_websh (Bug #54162) */
+    /* Tcl_Finalize removed to meet requirement of coexistence with mod_websh (Bug #54162) */
 
     //Tcl_Finalize();
 
@@ -1596,7 +1602,7 @@ Rivet_CreateTclInterp (server_rec* s)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                      MODNAME ": Error in Tcl_Init: %s, aborting\n",
-		     Tcl_GetStringResult(interp));
+                     Tcl_GetStringResult(interp));
         exit(1);
     }
     Tcl_SetPanicProc(Rivet_Panic);
@@ -1681,17 +1687,29 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
     extern int ap_max_requests_per_child;
     int interpCount = 0;
 
+/* This code is run once per child process. In a threaded Tcl builds the forking 
+ * of a child process most likely has not preserved the thread where the Tcl 
+ * notifier runs. The Notifier should have been restarted by one the 
+ * pthread_atfork callbacks (setup in Tcl >= 8.5.14 and Tcl >= 8.6.1). In
+ * case pthread_atfork is not supported we unconditionally call Tcl_InitNotifier
+ * hoping for the best (Bug #55153)      
+ */
+
+#if !defined(HAVE_PTHREAD_ATFORK)
+    Tcl_InitNotifier();
+#endif
+
     if (rsc->rivet_global_init_script != NULL) {
         if (Tcl_EvalObjEx(interp, rsc->rivet_global_init_script, 0) != TCL_OK)
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-			 MODNAME ": Error running GlobalInitScript '%s': %s",
-			 Tcl_GetString(rsc->rivet_global_init_script),
+                         MODNAME ": Error running GlobalInitScript '%s': %s",
+                         Tcl_GetString(rsc->rivet_global_init_script),
                          Tcl_GetVar(interp, "errorInfo", 0));
         } else {
             ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-		         MODNAME ": GlobalInitScript '%s' successful",
-		         Tcl_GetString(rsc->rivet_global_init_script));
+                         MODNAME ": GlobalInitScript '%s' successful",
+                         Tcl_GetString(rsc->rivet_global_init_script));
         }
     }
 
@@ -1719,10 +1737,10 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
                         sr->port,
                         interpCount++);
 
-		ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-			    MODNAME ": Rivet_InitTclStuff: creating slave interpreter '%s', hostname '%s', port '%d', separate interpreters %d",
-			    slavename, sr->server_hostname, sr->port, 
-			    rsc->separate_virtual_interps);
+                ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+                            MODNAME ": Rivet_InitTclStuff: creating slave interpreter '%s', hostname '%s', port '%d', separate interpreters %d",
+                            slavename, sr->server_hostname, sr->port, 
+                            rsc->separate_virtual_interps);
 
                 /* Separate virtual interps. */
                 myrsc->server_interp = Tcl_CreateSlave(interp, slavename, 0);
@@ -1842,7 +1860,7 @@ Rivet_SendContent(request_rec *r)
     if (r->finfo.filetype == 0)
     {
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, 
-	             r->server,
+                     r->server,
                      MODNAME ": File does not exist: %s",
                      (r->path_info ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL) : r->filename));
         retval = HTTP_NOT_FOUND;
@@ -1866,7 +1884,7 @@ Rivet_SendContent(request_rec *r)
          */
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
                      MODNAME ": Error accessing %s, could not chdir into directory", 
-		     r->filename);
+                     r->filename);
 
         retval = HTTP_INTERNAL_SERVER_ERROR;
         goto sendcleanup;
@@ -1979,8 +1997,8 @@ Rivet_SendContent(request_rec *r)
     if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
-	             MODNAME ": Error parsing exec file '%s': %s",
-		     r->filename,
+                     MODNAME ": Error parsing exec file '%s': %s",
+                     r->filename,
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
 
@@ -1991,7 +2009,7 @@ Rivet_SendContent(request_rec *r)
 
     if (Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
-	             MODNAME ": Error evaluating cleanup request: %s",
+                     MODNAME ": Error evaluating cleanup request: %s",
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
 

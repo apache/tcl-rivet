@@ -347,6 +347,35 @@ package require Itcl
     }
 
     #
+    # load - given a package names returns a dictionary storing the key - value pairs for this session
+    #
+    #
+    method load {packageName} {
+        set package_d [dict create]
+        
+        $dioObject forall "select key_,data from $sessionCacheTable where package_='$packageName' and session_id='[$this id]'" a {
+            dict set package_d $a(key_) $a(data)
+        }
+
+        return $package_d
+    } 
+
+    # clear - given a package name and optionally a key it deletes rows in the cache for this session.
+    #         when also the key value is specified only the row for that package-key pair is deleted
+    #
+    method clear {packageName {key ""}} {
+        if {$key == ""} {
+            set keyval      [list [$this id] $packageName]
+            set keyfield    {session_id package_}
+        } else {
+            set keyval      [list [$this id] $packageName $key]
+            set keyfield    {session_id package_ key_}
+        }
+
+        $dioObject delete $keyval -table $sessionCacheTable -keyfield $keyfield
+    }
+
+    #
     # delete - given a user ID and looking at their IP address we inherited
     # from the environment (thanks, webserver), remove them from the session
     # table.  (the session table is how the server remembers stuff about

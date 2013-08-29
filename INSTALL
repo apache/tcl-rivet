@@ -12,12 +12,12 @@ the source tree running 'aclocal; autoreconf' beforehand)
 
 Example:
 
-./configure --with-tcl=/usr/lib/tcl8.5/             \
-        --with-apxs=/usr/bin/apxs                   \
-        --with-tclsh=/usr/bin/tclsh8.5              \
-        --with-apache-version=2                     \
-        --with-rivet-target-dir=/usr/lib/rivet2.1   \
-        --enable-version-display
+./configure --with-tcl=/usr/lib/tcl8.5/                 \
+            --with-apxs=/usr/bin/apxs                   \
+            --with-tclsh=/usr/bin/tclsh8.5              \
+            --with-apache-version=2                     \
+            --with-rivet-target-dir=/usr/lib/rivet2.1   \
+            --enable-version-display
 
 2) if 'configure' was successful Rivet is ready for compilation
 
@@ -26,12 +26,6 @@ make
 3) Install Rivet with the usual 
 
 sudo make install
-
-4) Install Rivet utils with
-
-sudo make install-packages
-
-if your configuration doesn't require you to have administrative privileges.
 
 Along with the usual 'configure' variables Rivet's configure script 
 handles other specific options. 

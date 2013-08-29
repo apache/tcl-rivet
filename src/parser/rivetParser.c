@@ -12,7 +12,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-   	http://www.apache.org/licenses/LICENSE-2.0
+        http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,22 +57,22 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
     Tcl_Channel chan = Tcl_OpenFileChannel(interp, filename, "r", 0644);
     if (chan == (Tcl_Channel) NULL)
     {
-	Tcl_ResetResult(interp);
-	Tcl_AppendResult(interp, "couldn't read file \"", filename,
-			 "\": ", Tcl_PosixError(interp), (char *) NULL);
-	return TCL_ERROR;
+        Tcl_ResetResult(interp);
+        Tcl_AppendResult(interp, "couldn't read file \"", filename,
+                         "\": ", Tcl_PosixError(interp), (char *) NULL);
+        return TCL_ERROR;
     }
     result = Tcl_ReadChars(chan, outbuf, -1, 1);
     if (result < 0)
     {
-	Tcl_Close(interp, chan);
-	Tcl_AppendResult(interp, "couldn't read file \"", filename,
-			 "\": ", Tcl_PosixError(interp), (char *) NULL);
-	return TCL_ERROR;
+        Tcl_Close(interp, chan);
+        Tcl_AppendResult(interp, "couldn't read file \"", filename,
+                         "\": ", Tcl_PosixError(interp), (char *) NULL);
+        return TCL_ERROR;
     }
 
     if (Tcl_Close(interp, chan) != TCL_OK)
-	return TCL_ERROR;
+        return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -98,6 +98,14 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     int sz = 0;
     Tcl_Obj *inbuf;
     Tcl_Channel rivetfile;
+
+    /*
+     * TODO There is much switching between Tcl and APR for calling
+     * utility routines. We should make up our minds and keep
+     * a coherent attitude deciding when Tcl should be called upon
+     * and when APR should be invoked instead for a certain class of
+     * tasks
+     */
 
     rivetfile = Tcl_OpenFileChannel(interp, filename, "r", 0664);
     if (rivetfile == NULL) {
