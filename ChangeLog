@@ -1,3 +1,7 @@
+2013-08-30 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/parray.tcl: escaping SGML characters that might appear
+    in the output to avoid cross scripting
+
 2013-08-26 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: expanded warning message about broken implementations
     of Tcl when using forks and the event loop
