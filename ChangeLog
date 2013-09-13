@@ -1,3 +1,9 @@
+2013-09-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Mysql.tcl: attempting to correct detection of 
+    SELECT query by checking if a SELECT keyword exists at the beginning of
+    query either following a '(' or only space characters (their trimmed away
+    in any case)
+
 2013-08-30 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/parray.tcl: escaping SGML characters that might appear
     in the output to avoid cross scripting

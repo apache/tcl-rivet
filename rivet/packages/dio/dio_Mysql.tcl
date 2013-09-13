@@ -73,8 +73,10 @@ namespace eval DIO {
 #
 	    set q [::string trim $req]
 	    set q [::string tolower $q]
-	    set q [::string range $q 0 5]
-	    if {[::string match select $q]} { set cmd mysqlsel }
+#	    set q [::string range $q 0 5]
+#	    if {[::string match select $q]} { set cmd mysqlsel }
+
+	    if {[regexp {^\(*\s*select\s+} $pp]} { set cmd mysqlsel }
 
 	    set errorinfo ""
 	    if {[catch {$cmd $conn $req} error]} {
