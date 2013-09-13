@@ -76,7 +76,7 @@ namespace eval DIO {
 #	    set q [::string range $q 0 5]
 #	    if {[::string match select $q]} { set cmd mysqlsel }
 
-	    if {[regexp {^\(*\s*select\s+} $pp]} { set cmd mysqlsel }
+	    if {[regexp {^\(*\s*select\s+} $q]} { set cmd mysqlsel }
 
 	    set errorinfo ""
 	    if {[catch {$cmd $conn $req} error]} {
