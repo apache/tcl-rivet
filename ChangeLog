@@ -1,3 +1,13 @@
+2013-09-14 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: too restrictive test on Tcl versione fixed
+    * rivet/rivet-tcl/parray_table.tcl: also the parray putting out an HTML table
+    is now escaping SGML characters
+    * INSTALL: new installation instruction amending the rejected installation 
+    approach done in 2.1.2 and restoring old target 'install' to get everything
+    moved to their final directory
+    * doc/xml/install.xml: same for INSTALL
+    * doc/xml/commands.xml: new 'parse -string' form documented
+
 2013-09-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Mysql.tcl: attempting to correct detection of 
     SELECT query by checking if a SELECT keyword exists at the beginning of

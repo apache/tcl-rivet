@@ -27,6 +27,14 @@ make
 
 sudo make install
 
+binary module and Tcl packages can be installed separately by calling
+
+make install-binaries
+
+and 
+
+make install-packages
+
 Along with the usual 'configure' variables Rivet's configure script 
 handles other specific options. 
 
