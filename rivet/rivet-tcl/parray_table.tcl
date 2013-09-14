@@ -31,7 +31,8 @@ namespace eval ::rivet {
 	    puts "><thead><tr><th colspan=\"2\">$arrayName</th></tr></thead>"
         puts stdout "<tbody>"
         foreach name [lsort [array names array $pattern]] {
-            puts stdout [format "<tr><td>%s</td><td>%s</td></tr>" $name $array($name)]
+            puts stdout [format "<tr><td>%s</td><td>%s</td></tr>" [::rivet::escape_sgml_chars $name]    \
+                                                                  [::rivet::escape_sgml_chars $array($name)]]
         }
         puts stdout "</tbody></table>"
     }

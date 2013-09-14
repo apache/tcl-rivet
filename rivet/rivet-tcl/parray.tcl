@@ -27,8 +27,8 @@ namespace eval ::rivet {
         puts stdout "<PRE><B>$arrayName</B>"
         set maxl [expr {$maxl + [string length $arrayName] + 2}]
         foreach name [lsort [array names array $pattern]] {
-            set nameString [format %s(%s) $arrayName $name]
-            puts stdout [format "%-*s = %s" $maxl $nameString $array($name)]
+            set nameString [format %s(%s) $arrayName [::rivet::escape_sgml_chars $name]]
+            puts stdout [format "%-*s = %s" $maxl $nameString [::rivet::escape_sgml_chars $array($name)]]
         }
         puts stdout "</PRE>"
     }
