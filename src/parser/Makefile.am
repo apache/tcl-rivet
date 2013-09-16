@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-INCLUDES = @apache_include@ -I../@apache_version_dir@ -I..
+AM_CPPFLAGS = @apache_include@ -I../@apache_version_dir@ -I..
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
