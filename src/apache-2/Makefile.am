@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# AM_CFLAGS = @TCL_INCLUDES@ @GM_CPPFLAGS@
+AUTOMAKE_OPTIONS = subdir-objects
 
+# AM_CFLAGS = @TCL_INCLUDES@ @GM_CPPFLAGS@
 
 # The weird and wild magic of auto* associates these two.
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I../parser
+AM_CPPFLAGS = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I../parser
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
@@ -43,7 +44,7 @@ mod_rivet_la_SOURCES = 			        \
 
 ##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 
-mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@  @APR_LDFLAGS@ -module -avoid-version
+mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
 mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
@@ -54,5 +55,3 @@ mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPF
 install-data-hook:
 	echo 'removing unwanted libtool .la files'
 	rm -f $(DESTDIR)/$(apxs_libexecdir)/*.la
-
-
