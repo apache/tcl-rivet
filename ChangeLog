@@ -1,3 +1,9 @@
+2013-09-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/[parser|apache-2|librivet]/Makefile.am: AM_CPPFLAGS are not
+    a transparent replacement for INCLUDES at least when a Makefile.am is
+    in a subdirectory. Placing include directory switches in the target
+    specific <target>_CPPFLAGS variable
+    
 2013-09-15 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/missing: new version of 'missing' taken from automake 1.14
     * src/[parser|apache-2|librivet]/Makefile.am: depracated INCLUDES variables

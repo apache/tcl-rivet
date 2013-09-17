@@ -22,7 +22,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-AM_CPPFLAGS = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I../parser
+#AM_CPPFLAGS = 
 
 # ... and these two.  We want to put the libs in the package path,
 # rather than the standard library location for the system.
@@ -46,7 +46,7 @@ mod_rivet_la_SOURCES = 			        \
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
-mod_rivet_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I../parser @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 # APXS_CPPFLAGS_SHLIB
 
