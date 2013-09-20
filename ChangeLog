@@ -1,3 +1,7 @@
+2013-09-20 Massimo Manghi <mxmanghi@apache.org>
+    * contrib/tcl.vim: Vim's syntax highlighting extension including also
+    rivet's command set (experimental)
+
 2013-09-18 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl: removed paranoid debugging log messages
 
