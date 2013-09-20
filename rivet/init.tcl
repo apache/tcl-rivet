@@ -135,12 +135,9 @@ namespace eval ::Rivet {
             if {[info exists module_conf(export_namespace_commands)] && \
                  $module_conf(export_namespace_commands)} {
 
-                apache_log_error debug "exporting ::rivet commands"
                 eval namespace export $export_list
 
-            } else {
-                apache_log_error debug "::rivet commands won't be exported"
-            }
+            } 
         }
         ## Add the packages directory to the auto_path.
         ## If we have a packages$tcl_version directory

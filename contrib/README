@@ -2,9 +2,11 @@
  README file for 'contrib', directory that stores various contribution
  that don't fit well in the current distribution of Rivet
 =======================================================================
-$Id: $
+$Id$
 =======================================================================
 
  rvt.vim: Syntax highlighting of rvt files in Vim
  form.tcl: TclOO form package (contributed by Clif Flynt)
  two-mode-mode.el: Switches between tcl and sgml(html) modes (David Welton)
+ tcl.vim: Vim tcl syntax highlighting extension to include also Rivet's 
+          command set (Massimo Manghi)

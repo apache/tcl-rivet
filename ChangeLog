@@ -1,3 +1,17 @@
+2013-09-20 Massimo Manghi <mxmanghi@apache.org>
+    * 2.1: merging latest changes in trunk
+    * contrib/tcl.vim: Vim's syntax highlighting extension including also
+    rivet's command set (experimental)
+
+2013-09-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl: removed paranoid debugging log messages
+
+2013-09-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/[parser|apache-2|librivet]/Makefile.am: AM_CPPFLAGS are not
+    a transparent replacement for INCLUDES at least when a Makefile.am is
+    in a subdirectory. Placing include directory switches in the target
+    specific <target>_CPPFLAGS variable
+    
 2013-09-15 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/missing: new version of 'missing' taken from automake 1.14
     * src/[parser|apache-2|librivet]/Makefile.am: depracated INCLUDES variables
