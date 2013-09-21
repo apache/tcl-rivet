@@ -1,3 +1,7 @@
+2013-09-21 Massimo Manghi <mxmanghi@apache.org>
+    * 2.1: merging once again from trunk
+    * contrib/tcl.vim: list of subcommands completed
+
 2013-09-20 Massimo Manghi <mxmanghi@apache.org>
     * 2.1: merging latest changes in trunk
     * contrib/tcl.vim: Vim's syntax highlighting extension including also
