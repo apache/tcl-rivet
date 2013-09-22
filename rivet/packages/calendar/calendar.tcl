@@ -19,7 +19,7 @@
 #
 
 
-if {[catch {package require Tcl 8.5} e] && [catch {package require dict} e]} {
+if {[catch {package require Tcl 8.5} e] || [catch {package require dict} e]} {
     return -code error -errorinfo "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)" \
 	    "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)"
 }
@@ -60,16 +60,16 @@ package require Itcl
     public  variable	language	en 
 
     private method  numberOfDays    { month year }
-    private method  cal		    { month year }
+    private method  cal		        { month year }
 
-    protected method weekdays	 { }
-    protected method banner	 { mth yr }
-    protected method header	 { mth yr }
+    protected method weekdays	{ }
+    protected method banner	    { mth yr }
+    protected method header	    { mth yr }
     protected method first_week	 { mth yr wkday } 
     protected method formatDayCell { day } 
     protected method openRow	 { wkn }
     protected method closeRow	 { }
-    protected method table	 { mth yr }
+    protected method table	    { mth yr }
     protected method startOutput { } 
     protected method closeOutput { }
 

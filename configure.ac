@@ -26,9 +26,11 @@ AC_INIT([Rivet],[2.1.3])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
+#AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
+
 
 # AX_PREFIX_CONFIG_H is a macro taken from the autotools macro archive.
 # The typical configure generated 'config.h' can be renamed and 
@@ -738,11 +740,16 @@ if test "$print_fileevent_msg" = "1"; then
     AC_MSG_NOTICE([=======================================================================])
     AC_MSG_NOTICE([                             WARNING!])
     AC_MSG_NOTICE([========================================================================])
-    AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) might not be working ])
+    AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) will not be working])
     AC_MSG_NOTICE([in Rivet running Tcl $TCL_VERSION$TCL_PATCH_LEVEL and the 'prefork' MPM of Apache.])
-    AC_MSG_NOTICE([Recommended versions are:])
+    AC_MSG_NOTICE([In order to have asynchronous I/O working the required versions are:])
     AC_MSG_NOTICE([   - threaded builds: Tcl >= 8.5.15 (8.5 version) or Tcl >= 8.6.1])
     AC_MSG_NOTICE([   - any non-threaded build of Tcl >= 8.5.10])
-    AC_MSG_NOTICE([=======================================================================])
+    AC_MSG_NOTICE([])
+    AC_MSG_NOTICE([Nonetheless Rivet scripts are working with Tcl >= 8.5.10 provided])
+    AC_MSG_NOTICE([you do not have to rely on the event loop to do I/O (e.g. you])
+    AC_MSG_NOTICE([cannot use the 'fileevent' command to set up callbacks)])
+    AC_MSG_NOTICE([see issue https://issues.apache.org/bugzilla/show_bug.cgi?id=55153])
+    AC_MSG_NOTICE([========================================================================])
 fi 
 

@@ -1,3 +1,49 @@
+2013-09-22 Massimo Manghi <mxmanghi@apache.org>
+    * modular: committing changes from last merge
+
+2013-09-21 Massimo Manghi <mxmanghi@apache.org>
+    * contrib/tcl.vim: list of subcommands completed
+
+2013-09-20 Massimo Manghi <mxmanghi@apache.org>
+    * contrib/tcl.vim: Vim's syntax highlighting extension including also
+    rivet's command set (experimental)
+
+2013-09-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl: removed paranoid debugging log messages
+
+2013-09-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/[parser|apache-2|librivet]/Makefile.am: AM_CPPFLAGS are not
+    a transparent replacement for INCLUDES at least when a Makefile.am is
+    in a subdirectory. Placing include directory switches in the target
+    specific <target>_CPPFLAGS variable
+    
+2013-09-15 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/missing: new version of 'missing' taken from automake 1.14
+    * src/[parser|apache-2|librivet]/Makefile.am: depracated INCLUDES variables
+    replaces with their recommended counterparts AM_CPPFLAGS
+    * configure.ac: new message about the notifier failing to start in child
+    processes after the child processes fork
+
+2013-09-14 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/calendar/calendar.tcl: too restrictive test on Tcl versione fixed
+    * rivet/rivet-tcl/parray_table.tcl: also the parray putting out an HTML table
+    is now escaping SGML characters
+    * INSTALL: new installation instruction amending the rejected installation 
+    approach done in 2.1.2 and restoring old target 'install' to get everything
+    moved to their final directory
+    * doc/xml/install.xml: same for INSTALL
+    * doc/xml/commands.xml: new 'parse -string' form documented
+
+2013-09-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Mysql.tcl: attempting to correct detection of 
+    SELECT query by checking if a SELECT keyword exists at the beginning of
+    query either following a '(' or only space characters (their trimmed away
+    in any case)
+
+2013-08-30 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/parray.tcl: escaping SGML characters that might appear
+    in the output to avoid cross scripting
+
 2013-08-29 Massimo Manghi <mxmanghi@apache.org>
     * branches/modular: merging latest changes from trunk
 

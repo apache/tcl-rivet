@@ -20,8 +20,6 @@ SUBDIRS = librivet parser @apache_version_dir@
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-INCLUDES = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I@apache_version_dir@ -Iparser -I@apache_request@ -Ichannel
-
 #
 # Apache Rivet Module, mod_rivet.so / mod_rivet.dll
 #
@@ -52,9 +50,7 @@ lib_libexec_LTLIBRARIES = librivetlib.la
 librivetlib_la_SOURCES = librivet/rivetList.c librivet/rivetCrypt.c librivet/rivetWWW.c librivet/rivetPkgInit.c
 librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 librivetlib_la_LIBADD  = @APXS_LIBS@
-librivetlib_la_CPPFLAGS = @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
-
-
+librivetlib_la_CPPFLAGS = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I@apache_version_dir@ -Iparser -I@apache_request@ -Ichannel @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
 
 
 # Removing libtool .la files from installation

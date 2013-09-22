@@ -878,25 +878,26 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
              <command>::rivet::inspect</command> can be called in three forms
          </para>
          <itemizedlist mark="square">
-		    	<listitem>
-					Passing one of the configuration directive definitions to 
-					<command>::rivet::inspect</command> the current value
-					read from the configuration record is returned	
-				</listitem>
-				<listitem>
-					Passing simply the switch <arg>-all</arg> a dictionary is returned
-					carrying the whole configuration 
-				</listitem> 
+			<listitem>
+				Passing as argument the switch <arg>-all</arg> a dictionary
+				carrying the whole configuration is returned
+			</listitem> 
+			
+	    	<listitem>
+				With one argument (one of the Rivet configuration directives) 
+				<command>::rivet::inspect</command> returns the current value
+				in the configuration record	
+			</listitem>
+
             <listitem>            
                With no argument the command returns a dictionary with 3
                keys: server, dir, user. Each key is associated to a subdictionary 
-               where configuration lines explicitly set in the conf files
-               are stored. The configuration directives are used as keys in
-               the second level dictionary in order to retrieve a configuration
-               value. In this form the command is meant to provide a way to create 
-					the global arrays RivetServerConf, RivetDirConf and RivetUserConf 
-					which are internally used by ::rivet::debug
-				</listitem>>
+               carrying the configuration lines actually set. Configuration directives 
+               are the keys in the second level dictionary. In this form the command is 
+               meant to provide a way to create global arrays RivetServerConf, 
+               RivetDirConf and RivetUserConf which are internally used by ::rivet::debug
+			</listitem>
+			
          </itemizedlist>
 	    </refsect1>
 	</refentry>

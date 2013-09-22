@@ -72,9 +72,12 @@ namespace eval DIO {
 #	    select is a 6 characters word, so let's see if the query is a select
 #
 	    set q [::string trim $req]
-	    set q [::string tolower $q]
-	    set q [::string range $q 0 5]
-	    if {[::string match select $q]} { set cmd mysqlsel }
+
+#	    set q [::string tolower $q]
+#	    set q [::string range $q 0 5]
+#	    if {[::string match select $q]} { set cmd mysqlsel }
+
+	    if {[regexp -nocase {^\(*\s*select\s+} $q]} { set cmd mysqlsel }
 
 	    set errorinfo ""
 	    if {[catch {$cmd $conn $req} error]} {
