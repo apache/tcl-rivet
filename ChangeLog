@@ -1,3 +1,7 @@
+2013-09-26 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/session.xml: fixed code example indentation
+    * rivet/packages/calendar.xml: fixed class and tag for calendar banner
+
 2013-09-23 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/calendar/calendar.tcl: fixed zero length argument list
     calling method emit
