@@ -340,7 +340,7 @@ TCL_CMD_HEADER( Rivet_Headers )
         apr_table_set(globals->r->headers_out, "Location",
                      Tcl_GetStringFromObj (objv[2], (int *)NULL));
         TclWeb_SetStatus(301, globals->req);
-        return TCL_RETURN;
+        return TCL_OK;
     }
     else if (!strcmp("set", opt)) /* ### set ### */
     {

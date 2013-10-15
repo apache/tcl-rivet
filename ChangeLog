@@ -1,3 +1,10 @@
+2013-10-15 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetCore.c: 'headers redirect' used to return TCL_RETURN
+    to force the caller to terminate and interrupt the processing. It didn't 
+    actually worked exactly that way and starting with Tcl 8.6.1 it also failed
+    returning a Tcl invalid error code (Bug #55583). Turning it into TCL_OK
+    seems to cure the problem
+
 2013-09-26 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/session.xml: fixed code example indentation
     * rivet/packages/calendar.xml: fixed class and tag for calendar banner
