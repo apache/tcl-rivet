@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-AUTOMAKE_OPTIONS = subdir-objects
+#AUTOMAKE_OPTIONS = subdir-objects
 
-# AM_CFLAGS = @TCL_INCLUDES@ @GM_CPPFLAGS@
+## AM_CFLAGS = @TCL_INCLUDES@ @GM_CPPFLAGS@
 
 ## The weird and wild magic of auto* associates these two.
 #apxs_libexecdir = @APXS_LIBEXECDIR@
@@ -24,34 +24,34 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 #AM_CPPFLAGS = 
 
-# ... and these two.  We want to put the libs in the package path,
-# rather than the standard library location for the system.
-##lib_libexecdir = @TCL_PACKAGE_PATH@/rivet
-##lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
+## ... and these two.  We want to put the libs in the package path,
+## rather than the standard library location for the system.
+###lib_libexecdir = @TCL_PACKAGE_PATH@/rivet
+###lib_libexec_LTLIBRARIES = librivet.la librivetparser.la
 
 ##
 ## Apache Rivet Module, mod_rivet.so / mod_rivet.dll
 ##
-#mod_rivet_la_SOURCES = 			    \
+#mod_rivet_la_SOURCES = 			        \
 #	        apache_multipart_buffer.c 	\
 #	        apache_request.c			\
 #	        mod_rivet.c 				\
 #	        TclWebapache.c 				\
-#	        rivetCore.c					\
-#           rivetConf.c                 \
-#	        ../rivetChannel.c 			\
-#           ../parser/rivetParser.c
+#	        ../rivetcmds/rivetCore.c    \
+#            ../rivetcmds/rivetInspect.c \
+#	        ../rivetChannel.c           \
+#            ../parser/rivetParser.c
 
-##mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
+###mod_rivet_la_SOURCES = mod_rivet.c mod_rivet.h
 
-mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
-mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
-mod_rivet_la_CPPFLAGS = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I../parser -I../request -I../channel @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+#mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
+#mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
+#mod_rivet_la_CPPFLAGS = @apache_include@ -I@RIVET_BASE_INCLUDE@ -I../parser @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 # APXS_CPPFLAGS_SHLIB
 
 ## Removing libtool .la files from installation
-
+#
 #install-data-hook:
 #	echo 'removing unwanted libtool .la files'
 #	rm -f $(DESTDIR)/$(apxs_libexecdir)/*.la

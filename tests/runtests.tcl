@@ -85,7 +85,7 @@ if {$httpd_version == 1} {
 }
 
 apachetest::makeconf server.conf {
-    LoadModule rivet_module [file join $CWD .. src/apache-$apachetest::httpd_version .libs mod_rivet[info sharedlibextension]]
+    LoadModule rivet_module [file join $CWD .. src/.libs mod_rivet[info sharedlibextension]]
 
 # User and Group directives removed to ease dependency of test suite from the output of command 'id' (from which
 # the values for these directives were inferred (Bug #53396)
