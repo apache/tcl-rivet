@@ -18,13 +18,7 @@
 # $Id: calendar.tcl 916 2010-07-03 00:37:44Z massimo.manghi $
 #
 
-
-if {[catch {package require Tcl 8.5} e] || [catch {package require dict} e]} {
-    return -code error -errorinfo "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)" \
-	    "Tcl 8.5 or Tcl 8.4 with package 'dict' required ($e)"
-}
-
-package provide Calendar 1.0
+package provide Calendar 1.1
 package require Itcl
 
 # Calendar: base class to create a calendar table. 
@@ -191,7 +185,9 @@ package require Itcl
 
 }
 
-# emit args: emit returns the text of the calendar. If one argument is passed
+# emit args: 
+#
+# emit returns the text of the calendar. If one argument is passed
 # to this method its value is taken as a year number and the whole calendar for
 # that year is printed, thus cycling this same method for each month of the year and
 # concatenating the output in a single buffer.
@@ -290,10 +286,11 @@ package require Itcl
 	default {
 
 	    # no arguments, we take today as reference
+            
+            scan [clock format [clock seconds] -format %m] "%d" month
+	    set year    [format "%d" [clock format [clock sec] -format %Y]]
+	    return      [cal [incr month -1] $year]
 
-	    set month [clock format [clock sec] -format %m]
-	    set year [clock format [clock sec] -format %Y]
-	    return [cal [incr month -1] $year]
 	}
     }
 
