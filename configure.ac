@@ -22,11 +22,10 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.1.3])
+AC_INIT([Rivet],[2.1.4])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
-AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -51,7 +50,7 @@ AX_PREFIX_CONFIG_H([rivet_config.h],[rivet])
 # Init automake stuff
 #
 AC_DISABLE_STATIC
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
@@ -705,7 +704,7 @@ if test "$print_fileevent_msg" = "1"; then
     AC_MSG_NOTICE([Nonetheless Rivet scripts are working with Tcl >= 8.5.10 provided])
     AC_MSG_NOTICE([you do not have to rely on the event loop to do I/O (e.g. you])
     AC_MSG_NOTICE([cannot use the 'fileevent' command to set up callbacks)])
-    AC_MSG_NOTICE([see issue https://issues.apache.org/bugzilla/show_bug.cgi?id=55153])
+    AC_MSG_NOTICE([see https://issues.apache.org/bugzilla/show_bug.cgi?id=55153])
     AC_MSG_NOTICE([========================================================================])
 fi 
 

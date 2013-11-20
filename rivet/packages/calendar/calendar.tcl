@@ -54,18 +54,18 @@ package require Itcl
     public  variable	language	en 
 
     private method  numberOfDays    { month year }
-    private method  cal		        { month year }
+    private method  cal		    { month year }
 
-    protected method weekdays	{ }
+    protected method weekdays	    { }
     protected method banner	    { mth yr }
     protected method header	    { mth yr }
-    protected method first_week	 { mth yr wkday } 
-    protected method formatDayCell { day } 
-    protected method openRow	 { wkn }
-    protected method closeRow	 { }
+    protected method first_week	    { mth yr wkday } 
+    protected method formatDayCell  { day } 
+    protected method openRow	    { wkn }
+    protected method closeRow	    { }
     protected method table	    { mth yr }
-    protected method startOutput { } 
-    protected method closeOutput { }
+    protected method startOutput    { } 
+    protected method closeOutput    { }
 
     public method cal_processed {} { return $month_year_processed }
 
@@ -120,9 +120,6 @@ package require Itcl
 # first_week returns as many blank cells as the number of weekdays starting from Sun up to the first day of the
 # month.
 #
-
-
-
 ::itcl::body Calendar::first_week {month_idx year weekday} {
     return  [string repeat "   " $weekday]
 }
@@ -188,13 +185,14 @@ package require Itcl
 # emit args: 
 #
 # emit returns the text of the calendar. If one argument is passed
-# to this method its value is taken as a year number and the whole calendar for
-# that year is printed, thus cycling this same method for each month of the year and
-# concatenating the output in a single buffer.
-# If 2 arguments are passed emit interprets them as month and year. <month> can be
-# specified both in number (1-12) or abbreviated name (Jan,Feb,....,Dec). A minimal support
-# for other languages exists. If no arguments are passed to 'emit' the current month
-# calendar is displayed.
+# to this method its value is taken as a year number and the whole
+# calendar for that year is printed, thus cycling this same method
+# for each month of the year and concatenating the output in a single 
+# buffer. If 2 arguments are passed emit interprets them as month
+# and year. <month> can be specified both in number (1-12) or 
+# abbreviated name (Jan,Feb,....,Dec). A minimal support for other
+# languages exists. If no arguments are passed to 'emit' the current
+# month calendar is displayed.
 #
 
 ::itcl::body Calendar::emit { args } {
@@ -318,7 +316,7 @@ package require Itcl
 # for every key a 'tag' and 'attr' key is defined. attr is a even-length list storing 
 # attribute-value pairs
 
-    protected variable	parameters
+    public variable	parameters
 
 # we are emitting (x)html code that has to be encapsulated
 # in this root element. If the value is a list the first element is
@@ -374,7 +372,7 @@ package require Itcl
 				    foot	{tag "calfoot"	    attr "" } \
 				    banner	{tag "monthyear"    attr "" } \
 				    banner_month {tag "month"	    attr "" } \
-				    banner_year  {tag "year"	    attr "" } \
+				    banner_year {tag "year"	    attr "" } \
 				    wkdays_bar	{tag "weekdays"	    attr "" } \
 				    wkday_cell	{tag "wkday"	    attr "" } \
 				    days_row	{tag "week"	    attr "" } \
@@ -384,7 +382,6 @@ package require Itcl
 
 ::itcl::body XmlCalendar::getParameters {param what} {
     if {[dict exists $parameters $param $what]} {
-#	puts "getting $param ($what) from $parameters [dict get $parameters $param $what] "  
 	return [dict get $parameters $param $what]
     } else {
 	return ""
@@ -464,8 +461,8 @@ package require Itcl
     set year_open_tag  [mkOpenTag [getParameters banner_year tag]  [getParameters banner_year attr]]
 
     set banner_html	[mkOpenTag $header_tag]
-    append banner_html  "${month_open_tag}${month_name}[mkCloseTag [getParameters month_cell tag]]"
-    append banner_html	"${year_open_tag}$yr[mkCloseTag [getParameters year_cell tag]]"
+    append banner_html  "${month_open_tag}${month_name}[mkCloseTag [getParameters banner_month tag]]"
+    append banner_html	"${year_open_tag}$yr[mkCloseTag [getParameters banner_year tag]]"
     append banner_html	[mkCloseTag $header_tag]
     return $banner_html
 }
