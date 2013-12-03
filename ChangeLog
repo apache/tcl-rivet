@@ -1,3 +1,12 @@
+2013-12-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: Rivet template preprocessor symbols renamed in
+    the more expressive RIVET_TEMPLATE and RIVET_TCLFILE
+    * rivet/rivet-tcl/lassing_array.tcl: new command lassing_array taken
+    from DIO's result set class (inspired by Tclx)
+    * doc/xml/commands.xml: lassign_array documented in the manual
+    * rivet/packages/dio/dio.tcl: reformatted during analysis for supporting
+    tdbc based driver
+
 2013-11-04 Massimo Manghi <mxmanghi@apache.org>
     * src/Makefile.am: this Makefile.am is now in charge for building mod_rivet
     librivet.so and librivetparser.so. This fixes and problem with the 'distclean'
