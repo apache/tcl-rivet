@@ -1,3 +1,7 @@
+2013-12-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_request.c: log message in ApacheRequest___parse()
+    commented out
+
 2013-12-03 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: Rivet template preprocessor symbols renamed in
     the more expressive RIVET_TEMPLATE and RIVET_TCLFILE
