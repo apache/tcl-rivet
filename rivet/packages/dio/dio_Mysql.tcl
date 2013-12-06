@@ -86,8 +86,9 @@ namespace eval DIO {
                 return $obj
             }
             if {[catch {mysqlcol $conn -current name} fields]} { set fields "" }
-            set obj [result Mysql -resultid $conn \
-                         -numrows [::list $error] -fields [::list $fields]]
+            set obj [result Mysql   -resultid   $conn               \
+                                    -numrows    [::list $error]     \
+                                    -fields     [::list $fields]]
             return $obj
         }
 
@@ -111,66 +112,72 @@ namespace eval DIO {
 
         method handle {} {
             if {![info exists conn] || ![mysqlping $conn]} { open }
-
             return $conn
         }
 
         method makeDBFieldValue {table_name field_name val {convert_to {}}} {
-                if {[info exists specialFields(${table_name}@${field_name})]} {
-                    switch $specialFields(${table_name}@${field_name}) {
-                        DATE {
-                                set secs [clock scan $val]
-                                set my_val [clock format $secs -format {%Y-%m-%d}]
-                                return "DATE_FORMAT('$my_val', '%Y-%m-%d')"
-                        }
-                        DATETIME {
-                                set secs [clock scan $val]
-                                set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                                return "DATE_FORMAT('$my_val', '%Y-%m-%d %T')"
-                        }
-                        NOW {
-                            switch $convert_to {
 
-                                # we try to be coherent with the original purpose of this method whose
-                                # goal is to provide to the programmer a uniform way to handle timestamps. 
-                                # E.g.: Package session expects this case to return a timestamp in seconds
-                                # so that differences with timestamps returned by [clock seconds]
-                                # can be done and session expirations are computed consistently.
-                                # (Bug #53703)
+            if {[info exists specialFields(${table_name}@${field_name})]} {
+                switch $specialFields(${table_name}@${field_name}) {
+                    DATE {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d}]
+                        return "DATE_FORMAT('$my_val','%Y-%m-%d')"
+                    }
+                    DATETIME {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                        return "DATE_FORMAT('$my_val','%Y-%m-%d %T')"
+                    }
+                    NOW {
+                        switch $convert_to {
 
-                                SECS {
-                                    if {[::string compare $val "now"] == 0} {
-#                                       set     secs    [clock seconds]
-#                                       set     my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
-#                                       return  $my_val
-                                        return [clock seconds]
-                                    } else {
-                                        return  "UNIX_TIMESTAMP($field_name)"
-                                    }
-                                }
-                                default {
-                                    if {[::string compare $val, "now"] == 0} {
-                                        set secs [clock seconds]
-                                    } else {
-                                        set secs [clock scan $val]
-                                    }
+                            # we try to be coherent with the original purpose of this method whose
+                            # goal is endow the class with a uniform way to handle timestamps. 
+                            # E.g.: Package session expects this case to return a timestamp in seconds
+                            # so that differences with timestamps returned by [clock seconds]
+                            # can be done and session expirations are computed consistently.
+                            # (Bug #53703)
 
-                                    # this is kind of going back and forth from the same 
-                                    # format,
+                            SECS {
+                                if {[::string compare $val "now"] == 0} {
 
-                                    #set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                                    return "FROM_UNIXTIME('$secs')"
+#                                   set     secs    [clock seconds]
+#                                   set     my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+#                                   return  $my_val
+
+                                    return [clock seconds]
+
+                                } else {
+                                    return  "UNIX_TIMESTAMP($field_name)"
                                 }
                             }
-                        }
-                        default {
-                            # no special code for that type!!
-                            return "'[quote $val]'"
+                            default {
+
+                                if {[::string compare $val, "now"] == 0} {
+                                    set secs [clock seconds]
+                                } else {
+                                    set secs [clock scan $val]
+                                }
+
+                                # this is kind of going back and forth from the same 
+                                # format,
+
+                                #set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                                return "FROM_UNIXTIME('$secs')"
+                            }
                         }
                     }
-                } else {
+                    default {
+                        # no special code for that type!!
                         return "'[quote $val]'"
+                    }
                 }
+
+            } else {
+                return "'[quote $val]'"
+            }
+
         }
 
         public variable db "" {
@@ -179,7 +186,7 @@ namespace eval DIO {
             }
         }
 
-        public variable interface       "Mysql"
+        public  variable interface "Mysql"
         private variable conn
 
     } ; ## ::itcl::class Mysql

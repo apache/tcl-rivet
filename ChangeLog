@@ -1,6 +1,13 @@
+2013-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Postgres.tcl: minor changes (code indentation revised)
+    * rivet/packages/dio/dio_Tdbc.tcl: experimental support for the tdbc
+    abstraction library
+    * doc/xml/install.xml: the manual still suggested to call make install-packages,
+    whereas 'make install' does everything now as it was before 2.1.2
+
 2013-12-04 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_request.c: log message in ApacheRequest___parse()
-    commented out
+    commented out (Bug #55845)
 
 2013-12-03 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: Rivet template preprocessor symbols renamed in
