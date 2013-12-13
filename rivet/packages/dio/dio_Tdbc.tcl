@@ -16,7 +16,7 @@
 #
 # DIO compatibility layer with Tdbc
 # 
-# $Id: $ 
+# $Id$ 
 #
 
 package provide dio_Tdbc 0.1
@@ -28,14 +28,32 @@ namespace eval DIO {
         inherit Database
 
         private variable dbhandle
+        public  variable interface "Tdbc"
         private common   conncnt    0
 
-        public varabile backend "" {
+        public variable backend "" {
 
-            if {![string equal $backend "mysql"] && \
-                ![string equal $backend "postgres"] && \
-                ![string equal $backend "sqlite3"] && \
-                ![string equal $backend "odbc"]} {
+            if {$backend == "mysql"} {
+
+                package require tdbc::mysql
+
+            } elseif {$backend == "postgres"} {
+
+                package require tdbc::postgres
+
+            } elseif {$backend == "sqlite3"} {
+
+                package require tdbc::sqlite3
+
+            } elseif {$backend == "odbc"} {
+
+                package require tdbc::odbc
+
+            } elseif {$backend == ""} {
+
+                return -code error "DIO Tdbc needs a backend be specified"
+
+            } else {
 
                 return -code error "backend '$backend' not supported"
 
@@ -43,11 +61,22 @@ namespace eval DIO {
 
         }
 
+# -- 
+
         constructor {args} { eval configure $args } {
             if {[catch {package require tdbc}]} {
 
                 return -code error "No Tdbc package available"
 
+            }
+
+            eval configure $args
+
+            if {[lempty $db]} {
+                if {[lempty $user]} {
+                    set user $::env(USER)
+                }
+                set db $user
             }
         }
 
@@ -72,16 +101,21 @@ namespace eval DIO {
 #
 
         public method open {} {
-            set command [list ::tdbc::mysql::connection create [incr conncnt]]
+            if {$backend == ""} {
+                return -code error "no backend set"
+            }
+            set command [::list ::tdbc::${backend}::connection create tdbc[incr conncnt]]
 
             if {![lempty $user]} { lappend command -user $user }
             if {![lempty $pass]} { lappend command -password $pass }
             if {![lempty $port]} { lappend command -port $port }
             if {![lempty $host]} { lappend command -host $host }
+            if {![lempty $db]}   { lappend command -database $db }
 
             if {[catch {
                 set dbhandle [eval $command]
             } e]} { return -code error $e }
+
 
             return -code ok
         }
@@ -93,19 +127,24 @@ namespace eval DIO {
 #
 
         public method exec {sql} {
+
             if {![info exists dbhandle]} { $this open }
 
             set sqlstat [$dbhandle prepare $sql]
 
-            if {[catch {set res [$sqlstat execute]} err} {
+            if {[catch {set res [$sqlstat execute]} err]} {
                 set obj [result Tdbc -error 1 -errorinfo $err]
             } else {
                 set obj [result Tdbc -resultid $res           \
+                                     -sqlstatement $sqlstat   \
                                      -numrows [$res rowcount] \
-                                     -fields  [$res columns]]
+                                     -fields  [::list [$res columns]]]
             }
 
-            $sqlstat destroy
+            #$res nextlist cols
+            #puts "rows: [$res rowcount]"
+            #puts "cols: $cols"
+
             return $obj
         }
 
@@ -114,6 +153,7 @@ namespace eval DIO {
 #  extended version of the standard DIO method exec that
 # makes room for an extra argument storing the dictionary
 # of variables to be substituted in the SQL statement
+#
 
         public method execute {sql {substitute_d ""}} {
 
@@ -135,9 +175,8 @@ namespace eval DIO {
                                         -fields  [$res columns]]
             }
 
-            $sqlstat destroy
+            $sqlstat close
             return $obj
-
         }
 
 
@@ -152,23 +191,36 @@ namespace eval DIO {
 
     }
 
-# -- TdbcResult
+# 
+# -- Class TdbcResult
 #
-# Basically a wrapper around a Tdbc resultset object
+# Class wrapping a Tdbc resultset object and adapting it
+# to the DIO Results interface
 #
 
     ::itcl::class TdbcResult {
         inherit Result
 
+        public variable sqlstatement
+
         constructor {args} {
             eval configure $args
         }
 
-        public method nextrow {} {
+        destructor {
+            catch {$sqlstatement close}
+        }
 
+# -- nextrow
+#
+# Returns the list of values selected by a SQL command.
+# Values appear in the list with the same order of 
+# the columns names returned by the 'columns' object command
+#
+
+        public method nextrow {} {
             $resultid nextlist v
             return $v
-
         }
 
     }

@@ -1,3 +1,7 @@
+2013-12-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Tdbc.tcl: first version of Tdbc driver for DIO. This
+    class is able to execute basic queries and needs further development
+
 2013-12-08 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: version number bumped up to 2.1.4
 
