@@ -1,3 +1,8 @@
+2013-12-16 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/sql.tcl: trying to redesign rivet in order to comply with
+    Tdbc and aiming at making DIO a pure interface to Tdbc dropping the 
+    dependency with DBMS specific drivers
+
 2013-12-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Tdbc.tcl: first version of Tdbc driver for DIO. This
     class is able to execute basic queries and needs further development
