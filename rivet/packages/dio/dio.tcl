@@ -555,7 +555,7 @@ proc handle {interface args} {
     }
 
     #
-    # keys - return all keys in a tbale
+    # keys - return all keys in a table
     #
     method keys {args} {
         table_check $args

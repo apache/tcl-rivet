@@ -1,3 +1,8 @@
+2013-12-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/sql.tcl: further developments. Class Sql is now able
+    to build an abstract representation of a SELECT query
+    * rivet/packages/dio/dio.tcl: typo in a comment
+
 2013-12-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/sql.tcl: trying to redesign rivet in order to comply with
     Tdbc and aiming at making DIO a pure interface to Tdbc dropping the 

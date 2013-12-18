@@ -43,6 +43,8 @@ namespace eval ::DIO {
         }
 
         public variable backend
+        public variable what
+        public variable table
     }
     
     #
@@ -62,99 +64,134 @@ namespace eval ::DIO {
 
     ::itcl::body Sql::build_select_query {table args} {
 
-        set bool AND
-        set first 1
-        set req ""
+        set bool    AND
+        set first   1
+        set req     ""
         set myTable $table
-        set what "*"
+        set what    "*"
+
+        set parser_st   state0
+        set condition_count 0
+        set where_expr [dict create]
 
         # for each argument passed us...
         # (we go by integers because we mess with the index based on
         #  what we find)
-
+        #puts "args: $args"
         for {set i 0} {$i < [llength $args]} {incr i} {
 
             # fetch the argument we're currently processing
             set elem [lindex $args $i]
+            #puts "cycle: $i (elem: $elem, status: $parser_st, first: $first)"
+            
+            switch $parser_st {
+                state0 {
 
-            switch -- [::string tolower $elem] {
-                "-and" { 
-                    # -and -- switch to AND-style processing
-                    set bool AND 
-                }
+                    switch -- [::string tolower $elem] {
 
-                "-or"  { 
-                    # -or -- switch to OR-style processing
-                    set bool OR 
-                }
+                        # -table and -select don't drive the parser state machine
+                        # and whatever they have as arguments on the command
+                        # line they're set 
 
-                "-table" { 
-                    # -table -- identify which table the query is about
-                    set myTable [lindex $args [incr i]] 
-                }
+                        "-table" { 
+                            # -table -- identify which table the query is about
+                            set myTable [lindex $args [incr i]]
+                        }
+                        "-select" {
+                            # -select - 
+                            set what [lindex $args [incr i]]
+                        }
+                        "-or" - 
+                        "-and" {
+                            if {$first} {
+                                return -code error "$elem can not be the first element of a where clause"
+                            } else {
+                                incr condition_count
+                                dict set where_expr $condition_count logical [string range $elem 1 end] 
+                                set parser_st where_op
+                            }
+                        }    
+                        default {
+                            
+                            if {[::string index $elem 0] == "-"} {
+                                if {!$first} { 
+                                    incr condition_count 
+                                }
+                                dict set where_expr $condition_count column [string range $elem 1 end]
+                                set first 0
+                                set parser_st where_op
+                            } else {
 
-                "-select" {
-                    # -select - 
-                    set what [lindex $args [incr i]]
-                }
+                                return -code error "Error: expected -<column_name>"
+                            }
 
-                default {
-                    # it wasn't -and, -or, -table, or -select...
-
-                    # if the first character of the element is a dash,
-                    # it's a field name and a value
-
-                    if {[::string index $elem 0] == "-"} {
-
-                        set field [::string range $elem 1 end]
-                        set elem  [lindex $args [incr i]]
-
-                        # if it's the first field being processed, append
-                        # WHERE to the SQL request we're generating
-                        if {$first} {
-                            append req " WHERE"
-                            set first 0
-                        } else {
-                            # it's not the first variable in the comparison
-                            # expression, so append the boolean state, either
-                            # AND or OR
-                            append req " $bool"
                         }
 
-                        # convert any asterisks to percent signs in the
-                        # value field
-                        regsub -all {\*} $elem {%} elem
-
-                        # if there is a percent sign in the value
-                        # field now (having been there originally or
-                        # mapped in there a moment ago),  the SQL aspect 
-                        # is appended with a "field LIKE value"
-
-                        if {[::string first {%} $elem] != -1} {
-                            append req " $field LIKE [fieldValue $myTable $field $elem]"
-                        } elseif {[::string equal $elem "-null"]} {
-                            append req " $field IS NULL"
-                        } elseif {[::string equal $elem "-notnull"]} {
-                            append req " $field IS NOT NULL"
-                        } elseif {[regexp {^([<>]) *([0-9.]*)$} $elem _ fn val]} {
-                            # value starts with <, or >, then space, 
-                            # and a something
-                            append req " $field$fn$val"
-                        } elseif {[regexp {^([<>]=) *([0-9.]*)$} $elem _ fn val]} {
-                            # value starts with <= or >=, space, and something.
-                            append req " $field$fn$val"
-                        } else {
-                            # otherwise it's a straight key=value comparison
-                            append req " $field=[fieldValue $myTable $field $elem]"
-                        }
-
-                        continue
                     }
-                    append req " $elem"
+
+                }
+
+                where_op {
+
+                    switch -- [string tolower $elem] {
+
+                        "-lt" -
+                        "-gt" -
+                        "-ne" -
+                        "-eq" {
+
+                            dict set where_expr $condition_count operator [string range $elem 1 end]
+                            set parser_st cond_predicate
+
+                        }
+                         
+                        "-null" -
+                        "-notnull" {
+
+                            dict set where_expr $condition_count operator [string range $elem 1 end]
+                            set parser_st state0
+
+                        }
+
+                        default {
+                            if {[::string index $elem 0] == "-"} {
+                                dict set where_expr $condition_count column [string range $elem 1 end]
+                            } else {
+                                dict set where_expr $condition_count operator "eq"
+                                dict set where_expr $condition_count predicate $elem 
+                                set parser_st state0
+                            }
+                        }
+
+                    }
+                }
+
+                cond_predicate {
+                    
+                    switch -- [string tolower $elem] {
+
+                        "-expr" {
+                            dict set where_expr $condition_count predicate [lindex $args [incr i]] 
+                        }
+                        default  {
+
+                            # convert any asterisks to percent signs in the
+                            # value field
+                            regsub -all {\*} $elem {%} elem
+
+
+                            dict set where_expr $condition_count predicate $elem
+
+                        }
+                    }
+                    set parser_st state0
+                }
+                default {
+                    return -code error "invalid parser status"
                 }
             }
         }
-        return "select $what from $myTable $req"
+        return $where_expr
     }
 }
 
