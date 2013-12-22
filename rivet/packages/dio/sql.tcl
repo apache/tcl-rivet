@@ -19,7 +19,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id: $
+# $Id$
 
 package require Itcl
 
@@ -179,7 +179,6 @@ namespace eval ::DIO {
                             # value field
                             regsub -all {\*} $elem {%} elem
 
-
                             dict set where_expr $condition_count predicate $elem
 
                         }
@@ -191,7 +190,52 @@ namespace eval ::DIO {
                 }
             }
         }
-        return $where_expr
+
+        set sql "SELECT $what from $myTable WHERE"
+
+        for {set i 0} {$i < [llength [dict keys $where_expr]]} {incr i} {
+
+            set d [dict get $where_expr $i]
+
+            set col [dict get $d column]
+            set op  [dict get $d operator]
+            if {$i > 0} {
+
+                append sql " [dict get $d logical]"
+
+            }
+            switch $op {
+
+                "eq" {
+                    set sqlop "="
+                }
+                "ne" {
+                    set sqlop "!="
+                }
+                "lt" {
+                    set sqlop "<"
+                }
+                "gt" {
+                    set sqlop ">"
+                }
+                "notnull" {
+
+                    append sql " $col IS NOT NULL"
+                    continue
+                }
+                "null" {
+                    append sql " $col IS NULL"
+                    continue
+
+                }
+
+            }
+
+            append sql " $col $sqlop [dict get $d predicate]"
+
+
+        }
+        return $sql
     }
 }
 

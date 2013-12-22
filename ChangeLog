@@ -1,3 +1,7 @@
+2013-12-19 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Postgresql.tcl: reindented and tabs converted to spaces
+    * rivet/packages/dio/sql.tcl: class DIO::Sql now returning basic SELECT SQL statements
+
 2013-12-18 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/sql.tcl: further developments. Class Sql is now able
     to build an abstract representation of a SELECT query

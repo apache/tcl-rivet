@@ -102,19 +102,18 @@ namespace eval DIO {
         return $conn
     }
 
-
     method makeDBFieldValue {table_name field_name val {convert_to {}}} {
         if {[info exists specialFields(${table_name}@${field_name})]} {
             switch $specialFields(${table_name}@${field_name}) {
                 DATE {
-                        set secs [clock scan $val]
-                        set my_val [clock format $secs -format {%Y-%m-%d}]
-                        return "'$my_val'"
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d}]
+                    return "'$my_val'"
                 }
                 DATETIME {
-                        set secs [clock scan $val]
-                        set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                        return "'$my_val'"
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                    return "'$my_val'"
                 }
                 NOW {
                     switch $convert_to {
@@ -179,49 +178,49 @@ namespace eval DIO {
     #
     #
     ::itcl::class PostgresqlResult {
-    inherit Result
+        inherit Result
 
-    constructor {args} {
-        eval configure $args
+        constructor {args} {
+            eval configure $args
 
-        if {[lempty $resultid]} {
-        return -code error "No resultid specified while creating result"
+            if {[lempty $resultid]} {
+                return -code error "No resultid specified while creating result"
+            }
+
+            set numrows   [pg_result $resultid -numTuples]
+            set fields    [pg_result $resultid -attributes]
+            set errorcode [pg_result $resultid -status]
+            set errorinfo [pg_result $resultid -error]
+
+            # if numrows is zero, see if cmdrows returned anything and if it
+            # did, put that in in place of numrows, hiding a postgresql
+            # idiosyncracy from DIO
+            if {$numrows == 0} {
+                set cmdrows [pg_result $resultid -cmdTuples]
+                if {$cmdrows != ""} {
+                    set numrows $cmdrows
+                }
+            }
+
+            if {$errorcode != "PGRES_COMMAND_OK" && \
+                $errorcode != "PGRES_TUPLES_OK"} { set error 1 }
+
+            ## Reconfigure incase we want to overset the default values.
+            eval configure $args
         }
 
-        set numrows   [pg_result $resultid -numTuples]
-        set fields    [pg_result $resultid -attributes]
-        set errorcode [pg_result $resultid -status]
-        set errorinfo [pg_result $resultid -error]
-
-        # if numrows is zero, see if cmdrows returned anything and if it
-        # did, put that in in place of numrows, hiding a postgresql
-        # idiosyncracy from DIO
-        if {$numrows == 0} {
-            set cmdrows [pg_result $resultid -cmdTuples]
-        if {$cmdrows != ""} {
-            set numrows $cmdrows
-        }
+        destructor {
+            pg_result $resultid -clear
         }
 
-        if {$errorcode != "PGRES_COMMAND_OK" \
-            && $errorcode != "PGRES_TUPLES_OK"} { set error 1 }
+        method clear {} {
+            pg_result $resultid -clear
+        }
 
-        ## Reconfigure incase we want to overset the default values.
-        eval configure $args
-    }
-
-    destructor {
-        pg_result $resultid -clear
-    }
-
-    method clear {} {
-        pg_result $resultid -clear
-    }
-
-    method nextrow {} {
-        if {$rowid >= $numrows} { return }
-        return [pg_result $resultid -getTuple $rowid]
-    }
+        method nextrow {} {
+            if {$rowid >= $numrows} { return }
+            return [pg_result $resultid -getTuple $rowid]
+        }
 
     } ; ## ::itcl::class PostgresqlResult
 
