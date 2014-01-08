@@ -1,9 +1,4 @@
 # sql.tcl -- SQL code generator
-#
-# This class provides a way to abstract to some extent the
-# SQL code generation. It's supposed to provide a bridge to
-# different implementation in various backends for specific
-# functionalities
 
 # Copyright 2002-2004 The Apache Software Foundation
 
@@ -19,10 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This class provides a way to abstract to some extent the
+# SQL code generation. It's supposed to provide a bridge to
+# different implementation in various backends for specific
+# functionalities
+#
+# $Id$
+
+
 # $Id$
 
 package require Itcl
 
+### 
+catch { ::itcl::delete class ::DIO::Sql }
+###
 namespace eval ::DIO {
 
     proc generator {backend} {
@@ -31,22 +37,121 @@ namespace eval ::DIO {
 
     ::itcl::class Sql {
 
+        public variable backend
+        public variable what
+        public variable table
+
         constructor { backend } {
 
         }
 
-        public method build_select_query {table args}
+        private method where_clause {where_arguments}
+
+        public method build_select_query {table row_d}
         public method quote {field_value}
 
-        protected method fieldValue {table_name field_name val} {
+        protected method field_value {table_name field_name val} {
             return "'[quote $val]'"
         }
 
-        public variable backend
-        public variable what
-        public variable table
+        public method build_insert_query {table row_d}
+        public method build_update_query {table row_d}
+
     }
     
+    # -- build_insert_query
+    #
+    #
+
+    ::itcl::body Sql::build_insert_query {table row_d} {
+
+        set vars [dict keys $row_d]
+        foreach field $vars {
+        
+            lappend vals [$this field_value $table $field [dict get $row_d $field]]
+
+        }
+
+        return "INSERT INTO $table ([join $vars {,}]) VALUES ([join $vals {,}])"
+    }
+
+    # -- build_update_query
+    #
+    #
+
+    ::itcl::body Sql::build_update_query {table row_d} {
+      
+        foreach field [dict keys $row_d] {
+            lappend rowfields "$field=[field_value $table $field [dict get $row_d $field]]"
+        }
+
+        return "UPDATE $table SET [join $rowfields {,}]"
+    }
+
+
+    # build_where_clause 
+    #
+    #
+    ::itcl::body Sql::where_clause {where_expr} {
+
+        set sql ""
+        for {set i 0} {$i < [llength [dict keys $where_expr]]} {incr i} {
+
+            set d [dict get $where_expr $i]
+
+            set col [dict get $d column]
+            set op  [dict get $d operator]
+            if {$i > 0} {
+
+                append sql " [dict get $d logical]"
+
+            }
+            switch $op {
+
+                "eq" {
+                    set sqlop "="
+                }
+                "ne" {
+                    set sqlop "!="
+                }
+                "lt" {
+                    set sqlop "<"
+                }
+                "gt" {
+                    set sqlop ">"
+                }
+                "le" {
+                    set sqlop "<="
+                }
+                "ge" {
+                    set sqlop ">="
+                }
+                "notnull" {
+
+                    append sql " $col IS NOT NULL"
+                    continue
+
+                }
+                "null" {
+                    append sql " $col IS NULL"
+                    continue
+
+                }
+
+            }
+
+            set predicate [dict get $d predicate]
+            if {[::string first {%} $predicate] != -1} {
+                append sql " $col LIKE [$this field_value $table $col [[string range $predicate 1 end]]"
+            } else {
+                append sql " $col$sqlop[$this field_value $table $col $predicate]"
+            }
+        }
+
+        return $sql
+    }    
+
+
     #
     # quote - given a string, return the same string with any single
     #  quote characters preceded by a backslash
@@ -62,12 +167,12 @@ namespace eval ::DIO {
     # some key-value pairs that cause the where clause to be
     # generated accordingly
 
-    ::itcl::body Sql::build_select_query {table args} {
+    ::itcl::body Sql::build_select_query {from_table args} {
 
         set bool    AND
         set first   1
         set req     ""
-        set myTable $table
+        set table   $from_table
         set what    "*"
 
         set parser_st   state0
@@ -95,7 +200,7 @@ namespace eval ::DIO {
 
                         "-table" { 
                             # -table -- identify which table the query is about
-                            set myTable [lindex $args [incr i]]
+                            set table [lindex $args [incr i]]
                         }
                         "-select" {
                             # -select - 
@@ -191,50 +296,8 @@ namespace eval ::DIO {
             }
         }
 
-        set sql "SELECT $what from $myTable WHERE"
+        set sql "SELECT $what from $table WHERE[$this where_clause $where_expr]"
 
-        for {set i 0} {$i < [llength [dict keys $where_expr]]} {incr i} {
-
-            set d [dict get $where_expr $i]
-
-            set col [dict get $d column]
-            set op  [dict get $d operator]
-            if {$i > 0} {
-
-                append sql " [dict get $d logical]"
-
-            }
-            switch $op {
-
-                "eq" {
-                    set sqlop "="
-                }
-                "ne" {
-                    set sqlop "!="
-                }
-                "lt" {
-                    set sqlop "<"
-                }
-                "gt" {
-                    set sqlop ">"
-                }
-                "notnull" {
-
-                    append sql " $col IS NOT NULL"
-                    continue
-                }
-                "null" {
-                    append sql " $col IS NULL"
-                    continue
-
-                }
-
-            }
-
-            append sql " $col $sqlop [dict get $d predicate]"
-
-
-        }
         return $sql
     }
 }

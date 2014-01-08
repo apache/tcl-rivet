@@ -1,3 +1,9 @@
+2014-01-08 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/aida.tcl: adding aida.tcl experimental file
+    for a DIO compatible interface to TDBC. 
+    * rivet/packages/dio/sql.tcl: now able to produce same basic SQL queries
+    ::DIO::Database class is doing now
+
 2013-12-19 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Postgresql.tcl: reindented and tabs converted to spaces
     * rivet/packages/dio/sql.tcl: class DIO::Sql now returning basic SELECT SQL statements
