@@ -1,3 +1,53 @@
+2014-01-23 Massimo Manghi <mxmanghi@apache.org>
+    * : merging latest changes from trunk
+
+2014-01-08 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/aida.tcl: adding aida.tcl experimental file
+    for a DIO compatible interface to TDBC. 
+    * rivet/packages/dio/sql.tcl: now able to produce same basic SQL queries
+    ::DIO::Database class is doing now
+
+2013-12-19 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Postgresql.tcl: reindented and tabs converted to spaces
+    * rivet/packages/dio/sql.tcl: class DIO::Sql now returning basic SELECT SQL statements
+
+2013-12-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/sql.tcl: further developments. Class Sql is now able
+    to build an abstract representation of a SELECT query
+    * rivet/packages/dio/dio.tcl: typo in a comment
+
+2013-12-16 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/sql.tcl: trying to redesign rivet in order to comply with
+    Tdbc and aiming at making DIO a pure interface to Tdbc dropping the 
+    dependency with DBMS specific drivers
+
+2013-12-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Tdbc.tcl: first version of Tdbc driver for DIO. This
+    class is able to execute basic queries and needs further development
+
+2013-12-08 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: version number bumped up to 2.1.4
+
+2013-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Postgres.tcl: minor changes (code indentation revised)
+    * rivet/packages/dio/dio_Tdbc.tcl: experimental support for the tdbc
+    abstraction library
+    * doc/xml/install.xml: the manual still suggested to call make install-packages,
+    whereas 'make install' does everything now as it was before 2.1.2
+
+2013-12-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_request.c: log message in ApacheRequest___parse()
+    commented out (Bug #55845)
+
+2013-12-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: Rivet template preprocessor symbols renamed in
+    the more expressive RIVET_TEMPLATE and RIVET_TCLFILE
+    * rivet/rivet-tcl/lassing_array.tcl: new command lassing_array taken
+    from DIO's result set class (inspired by Tclx)
+    * doc/xml/commands.xml: lassign_array documented in the manual
+    * rivet/packages/dio/dio.tcl: reformatted during analysis for supporting
+    tdbc based driver
+
 2013-11-04 Massimo Manghi <mxmanghi@apache.org>
     * src/Makefile.am: this Makefile.am is now in charge for building mod_rivet
     librivet.so and librivetparser.so. This fixes and problem with the 'distclean'

@@ -933,6 +933,37 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 		</para>
 	    </refsect1>
 	</refentry -->
+	<refentry id="lassign_array">
+	   <refnamediv>
+	       <refname>lassign_array</refname>
+	       <refpurpose>Assign a list of values to array variables</refpurpose>
+	   </refnamediv>
+	   <refsynopsisdiv>
+    	   <cmdsynopsis>
+    	       <command>::rivet::lassign_array</command>
+    	       <arg>value_list</arg>
+    	       <arg>array_name</arg>
+    	       <arg>array_variables</arg>
+    	   </cmdsynopsis>
+        </refsynopsisdiv>
+        <refsect1>
+            <title>Description</title>
+            <para>
+                <command>lassign_array</command> is an utility command inspired by the same Tclx command.
+                The first argument is a list of values to be assigned to an array that must be 
+                given as second argument. The remaining arguments are the array's variable names to take
+                as values the elements of the list. The command exploit Tcl's <command>foreach</command> construct
+                ability to scan multiple lists. Variables names don't matching values in the list are given an empty string.
+	       </para>
+	       <programlisting>::rivet::lassign_array {1 2 3 4} assigned_array a b c d
+parray assigned_array
+<emphasis role="strong">assigned_list</emphasis>
+assigned_list(a) = 1
+assigned_list(b) = 2
+assigned_list(c) = 3
+assigned_list(d) = 4</programlisting>
+	   </refsect1>
+	</refentry>
 		
 	<refentry id="lempty">
 	    <refnamediv>

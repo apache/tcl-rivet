@@ -75,8 +75,8 @@ static server_rec   *rivet_panic_server_rec  = NULL;
 
 /* rivet or tcl file */
 #define CTYPE_NOT_HANDLED   0
-#define RIVET_FILE          1
-#define TCL_FILE            2
+#define RIVET_TEMPLATE      1
+#define RIVET_TCLFILE       2
 
 /* rivet return codes */
 #define RIVET_OK            0
@@ -84,14 +84,27 @@ static server_rec   *rivet_panic_server_rec  = NULL;
  
 TCL_DECLARE_MUTEX(sendMutex);
 
-#define RIVET_FILE_CTYPE    "application/x-httpd-rivet"
-#define TCL_FILE_CTYPE      "application/x-rivet-tcl"
+#define RIVET_TEMPLATE_CTYPE    "application/x-httpd-rivet"
+#define RIVET_TCLFILE_CTYPE     "application/x-rivet-tcl"
 
 static Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 static void Rivet_CreateCache (server_rec *s, apr_pool_t *p);
 
-
-/* This snippet of code came from the mod_ruby project, which is under a BSD license. */
+/*
+ * -- Rivet_chdir_file (const char* filename)
+ * 
+ * Determines the directory name from the filename argument
+ * and sets it as current working directory
+ *
+ * Argument:
+ * 
+ *   const char* filename:  file name to be used for determining
+ *                          the current directory (URI style path)
+ *                          the directory name is everything comes
+ *                          before the last '/' (slash) character
+ *
+ * This snippet of code came from the mod_ruby project, which is under a BSD license.
+ */
  
 static int Rivet_chdir_file (const char *file)
 {
@@ -118,8 +131,8 @@ static int Rivet_chdir_file (const char *file)
  * Utility function internally used to determine which type
  * of file (whether rvt template or plain Tcl script) we are
  * dealing with. In order to speed up multiple tests the
- * the test returns an integer (RIVET_FILE) for rvt templates
- * or TCL_FILE for Tcl scripts
+ * the test returns an integer (RIVET_TEMPLATE) for rvt templates
+ * or RIVET_TCLFILE for Tcl scripts
  *
  * Argument: 
  *
@@ -141,10 +154,10 @@ Rivet_CheckType (request_rec *req)
     int ctype = CTYPE_NOT_HANDLED;
 
     if ( req->content_type != NULL ) {
-        if( STRNEQU( req->content_type, RIVET_FILE_CTYPE) ) {
-            ctype  = RIVET_FILE;
-        } else if( STRNEQU( req->content_type, TCL_FILE_CTYPE) ) {
-            ctype = TCL_FILE;
+        if( STRNEQU( req->content_type, RIVET_TEMPLATE_CTYPE) ) {
+            ctype  = RIVET_TEMPLATE;
+        } else if( STRNEQU( req->content_type, RIVET_TCLFILE_CTYPE) ) {
+            ctype = RIVET_TCLFILE;
         } 
     }
     return ctype; 
@@ -495,11 +508,13 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
  * file (files included through the 'parse' command) is treated as a template.
  */
 
-        if (!toplevel || (Rivet_CheckType(req->req) == RIVET_FILE))
+        if (!toplevel || (Rivet_CheckType(req->req) == RIVET_TEMPLATE))
         {
             /* toplevel == 0 means we are being called from the parse
              * command, which only works on Rivet .rvt files. */
+
             result = Rivet_GetRivetFile(filename, toplevel, outbuf, interp);
+
         } else {
             /* It's a plain Tcl file */
             result = Rivet_GetTclFile(filename, outbuf, interp);
@@ -511,10 +526,8 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
             return result;
         }
 
-        if (toplevel) {
-            if (rsc->rivet_after_script) {
-                Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
-            }
+        if (toplevel && rsc->rivet_after_script) {
+            Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
         }
 
         if (*(rsc->cache_size)) {
@@ -1973,8 +1986,8 @@ Rivet_SendContent(request_rec *r)
     {
         int content_type_len = strlen(r->content_type);
 
-        if (((ctype==RIVET_FILE) && (content_type_len > strlen(RIVET_FILE_CTYPE))) || \
-             ((ctype==TCL_FILE)  && (content_type_len > strlen(TCL_FILE_CTYPE)))) {
+        if (((ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
+             ((ctype==RIVET_TCLFILE)  && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
             
             char* charset;
 
