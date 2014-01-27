@@ -1,3 +1,11 @@
+2014-01-27 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_config.[c|h]: new file with Apache module configuration
+    procedures moved here from mod_rivet.c. This code is likely to be Apache 2.x
+    but totally independent from the running MPM. Therefore it was moved here
+    to improved size and manageability of mod_rivet.c
+    * src/apache-2/mod_rivet.c: The module central code, from which configuration
+    handling procedures were removed
+
 2014-01-08 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/aida.tcl: adding aida.tcl experimental file
     for a DIO compatible interface to TDBC. 
