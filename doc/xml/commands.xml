@@ -44,7 +44,7 @@
 				needed in a <arg>.rvt</arg> template. The contruct is equivalent to
 				writing the following line of Tcl code
 			</para>
-			<programlisting>put -nonewline $string</programlisting>
+			<programlisting>puts -nonewline $string</programlisting>
 			<para>			
 				The <arg>string</arg> argument to the shorthand construct can 
 				be any Tcl command returning a value
