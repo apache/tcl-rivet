@@ -458,7 +458,7 @@ AC_DEFUN([APACHE_REQUEST],[
         [with_apache_request="request"]
     )
 
-    AC_MSG_CHECKING(for subdir storing code for request handling)
+    AC_MSG_CHECKING(code for request handling)
     apache_request=${with_apache_request}
     AC_SUBST(apache_request)
     AC_MSG_RESULT([$with_apache_request])

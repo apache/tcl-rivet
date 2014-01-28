@@ -51,6 +51,7 @@ mod_rivet_la_SOURCES = 			                            \
                         @apache_request@/apache_request.c			    \
                         @apache_version_dir@/mod_rivet.c 				\
                         @apache_version_dir@/TclWebapache.c 			\
+                        @apache_version_dir@/apache_config.c            \
                         @rivet_core_cmds@/rivetCore.c				    \
                         @rivet_core_cmds@/rivetInspect.c                \
                         channel/rivetChannel.c 			                \
