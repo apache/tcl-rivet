@@ -1,3 +1,10 @@
+2014-01-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: this ChangeLog entry is meant to amend the
+    2014-01-27 entry that missed to point out as small still important change
+    in mod_rivet.c. Rivet_SendContent is not calling Tcl anymore to coax 
+    command 'info script' to return the current Rivet script full path. This
+    will soon be solved by adding a new functionality to command '::rivet::inspect' 
+    
 2014-01-27 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_config.[c|h]: new file with Apache module configuration
     procedures moved here from mod_rivet.c. This code is likely to be Apache 2.x
