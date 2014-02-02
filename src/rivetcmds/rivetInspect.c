@@ -39,6 +39,8 @@
 
 #include "mod_rivet.h"
 
+/* These arrays must be kept aligned. confDirectives must be NULL terminated */
+
 static const char* confDirectives[] = 
 { 
                     "ServerInitScript", 
@@ -194,7 +196,7 @@ Rivet_ReadConfParameter ( Tcl_Interp* interp,
         par_value=Tcl_NewStringObj("<undef>",-1);
     }
 
-    Tcl_IncrRefCount(par_value);
+    //Tcl_IncrRefCount(par_value);
 
     return par_value;
 }
@@ -213,30 +215,23 @@ Rivet_ReadConfParameter ( Tcl_Interp* interp,
  *
  */
 
-Tcl_Obj* Rivet_ReadConfTable (  Tcl_Interp*           interp,
-                                apr_table_t*          table)
+static Tcl_Obj* 
+Rivet_ReadConfTable (Tcl_Interp*   interp,
+                     apr_table_t*  table)
 {
-    Tcl_Obj*                key;
-    Tcl_Obj*                val;
-    apr_array_header_t      *arr;
-    apr_table_entry_t       *elts;
-    int                     nelts,i;
-    int                     tcl_status = TCL_OK;
-    Tcl_Obj*                keyval_list = Tcl_NewObj();
+    Tcl_Obj*            key;
+    Tcl_Obj*            val;
+    apr_array_header_t *arr;
+    apr_table_entry_t  *elts;
+    int                 nelts,i;
+    int                 tcl_status  = TCL_OK;
+    Tcl_Obj*            keyval_list = Tcl_NewObj();
 
-    Tcl_IncrRefCount(keyval_list);
+    //Tcl_IncrRefCount(keyval_list);
 
     arr   = (apr_array_header_t*) apr_table_elts( table );
     elts  = (apr_table_entry_t *) arr->elts;
     nelts = arr->nelts;
-
-/*
-    if (Tcl_IsShared(keyval_list))
-    {
-        fprintf(stderr,"building duplicate keyval_list\n");
-        keyval_list = Tcl_DuplicateObj(keyval_list);
-    }
- */
 
     for (i = 0; i < nelts; i++)
     {
@@ -329,6 +324,8 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
             Tcl_Obj** objArrayPnt;
             int       objArrayCnt;
             Tcl_Obj*  val;
+            
+            Tcl_IncrRefCount(keyval_list);
 
             key_list[0] = Tcl_NewStringObj(section_names[it],-1);
             Tcl_IncrRefCount(key_list[0]);
@@ -398,6 +395,7 @@ Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
         par_value = Rivet_ReadConfParameter(interp,rivet_conf,par_name);
         if (par_value != NULL)
         {
+            Tcl_IncrRefCount(par_value);
             Tcl_DictObjPut(interp,dictObj,par_name,par_value);
             Tcl_DecrRefCount(par_value);
         }

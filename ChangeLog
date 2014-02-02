@@ -1,3 +1,10 @@
+2013-02-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[c|h]: further optimizing code avoiding to
+    allocate a TclWebRequest structure on every request. This structure
+    is allocate when the interpreter is initialized and a pointer
+    stored in rivet globals
+    * src/rivetcmd/rivetInspect.c: impoved consistence if Tcl objects handling
+
 2014-01-30 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: this ChangeLog entry is meant to amend the
     2014-01-27 entry that missed to point out as small still important change

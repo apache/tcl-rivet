@@ -55,15 +55,19 @@ else if (source == VAR_SRC_POST) { i = req->apachereq->nargs; }
 int
 TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
 {
-    request_rec *r;
+    request_rec *r = (request_rec *)arg;
 
-    r = (request_rec *)arg;
     req->interp = interp;
     req->req = r;
     req->apachereq = ApacheRequest_new(r);
     req->headers_printed = 0;
     req->headers_set = 0;
     req->environment_set = 0;
+
+    /* we will test against NULL to check if a charset 
+       was specified in the conf */
+
+    req->charset = NULL;
     return TCL_OK;
 }
 

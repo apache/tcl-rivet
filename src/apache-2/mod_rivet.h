@@ -96,7 +96,7 @@ typedef struct _rivet_server_conf {
     apr_table_t *rivet_server_vars;
     apr_table_t *rivet_dir_vars;
     apr_table_t *rivet_user_vars;
-    char **objCacheList;		    /* Array of cached objects (for priority handling) */
+    char **objCacheList;		        /* Array of cached objects (for priority handling) */
     Tcl_HashTable *objCache;		    /* Objects cache - the key is the script name */
 
     Tcl_Channel *outchannel;		    /* stuff for buffering output */
@@ -105,12 +105,14 @@ typedef struct _rivet_server_conf {
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
-    request_rec     *r;			    /* request rec */
-    TclWebRequest   *req;	            /* TclWeb API request */
-    Tcl_Namespace   *rivet_ns;              /* Rivet commands namespace */
-    int             page_aborting;	    /* set by abort_page. */
-					    /* to be reset by Rivet_SendContent */
-    Tcl_Obj*        abort_code;
+    request_rec     *r;			        /* request rec              */
+    TclWebRequest   *req;	            /* TclWeb API request       */
+    Tcl_Namespace   *rivet_ns;          /* Rivet commands namespace */
+    int             page_aborting;	    /* set by abort_page.       */
+    Tcl_Obj*        abort_code;			/* To be reset by Rivet_SendContent */
+    TclWebRequest   *tclwebreq;         /* We reset 'req' upon request processing completion
+                                           but we don't want to reallocate this on every req 
+                                           therefore this pointer stores the */
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);

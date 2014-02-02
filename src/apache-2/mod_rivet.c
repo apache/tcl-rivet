@@ -713,6 +713,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                                             (Tcl_NamespaceDeleteProc *)NULL);
     globals->page_aborting = 0;
     globals->abort_code = NULL;
+    globals->tclwebreq = (TclWebRequest *)apr_pcalloc(p, sizeof(TclWebRequest));
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
@@ -1254,11 +1255,6 @@ Rivet_SendContent(request_rec *r)
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
     globals->r = r;
-    globals->req = (TclWebRequest *)apr_pcalloc(r->pool, sizeof(TclWebRequest));
-
-/* we will test against NULL to check if a charset was specified in the conf */
-
-    globals->req->charset = NULL;
 
 #ifndef USE_APACHE_RSC
     if (r->per_dir_config != NULL)
@@ -1347,6 +1343,9 @@ Rivet_SendContent(request_rec *r)
     }
 
     /* Apache Request stuff */
+
+    //globals->req = (TclWebRequest *)apr_pcalloc(r->pool, sizeof(TclWebRequest));
+    globals->req = globals->tclwebreq;
     TclWeb_InitRequest(globals->req, interp, r);
     ApacheRequest_set_post_max(globals->req->apachereq, rsc->upload_max);
     ApacheRequest_set_temp_dir(globals->req->apachereq, rsc->upload_dir);
@@ -1391,7 +1390,7 @@ Rivet_SendContent(request_rec *r)
         int content_type_len = strlen(r->content_type);
 
         if (((ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
-             ((ctype==RIVET_TCLFILE)  && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
+             ((ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
             
             char* charset;
 
@@ -1441,6 +1440,10 @@ sendcleanup:
         Tcl_DecrRefCount(globals->abort_code);
         globals->abort_code = NULL;
     }
+
+    /* We reset this pointer to signal we have terminated the request processing */
+
+    globals->r = NULL;
 
     Tcl_MutexUnlock(&sendMutex);
     return retval;
