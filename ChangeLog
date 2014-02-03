@@ -1,3 +1,6 @@
+2013-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: globals->req had to be set to NULL in Rivet_PerInterpInit!
+
 2013-02-02 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.[c|h]: further optimizing code avoiding to
     allocate a TclWebRequest structure on every request. This structure

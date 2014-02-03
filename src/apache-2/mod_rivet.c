@@ -711,8 +711,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     /* Rivet commands namespace is created */
     globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                             (Tcl_NamespaceDeleteProc *)NULL);
-    globals->page_aborting = 0;
-    globals->abort_code = NULL;
+    globals->page_aborting  = 0;
+    globals->abort_code     = NULL;
+    globals->req            = NULL;
     globals->tclwebreq = (TclWebRequest *)apr_pcalloc(p, sizeof(TclWebRequest));
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
