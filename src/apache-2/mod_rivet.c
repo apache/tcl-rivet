@@ -713,8 +713,8 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                                             (Tcl_NamespaceDeleteProc *)NULL);
     globals->page_aborting  = 0;
     globals->abort_code     = NULL;
-    globals->req            = NULL;
-    globals->tclwebreq = (TclWebRequest *)apr_pcalloc(p, sizeof(TclWebRequest));
+    globals->req            = (TclWebRequest *)apr_pcalloc(p, sizeof(TclWebRequest));;
+    globals->r              = NULL;
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
@@ -1233,7 +1233,6 @@ Rivet_SendContent(request_rec *r)
     Tcl_Interp      *interp;
     static Tcl_Obj  *request_init = NULL;
     static Tcl_Obj  *request_cleanup = NULL;
-
     rivet_interp_globals *globals = NULL;
 #ifdef USE_APACHE_RSC
     rivet_server_conf    *rsc = NULL;
@@ -1346,7 +1345,6 @@ Rivet_SendContent(request_rec *r)
     /* Apache Request stuff */
 
     //globals->req = (TclWebRequest *)apr_pcalloc(r->pool, sizeof(TclWebRequest));
-    globals->req = globals->tclwebreq;
     TclWeb_InitRequest(globals->req, interp, r);
     ApacheRequest_set_post_max(globals->req->apachereq, rsc->upload_max);
     ApacheRequest_set_temp_dir(globals->req->apachereq, rsc->upload_dir);

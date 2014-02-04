@@ -110,9 +110,6 @@ typedef struct _rivet_interp_globals {
     Tcl_Namespace   *rivet_ns;          /* Rivet commands namespace */
     int             page_aborting;	    /* set by abort_page.       */
     Tcl_Obj*        abort_code;			/* To be reset by Rivet_SendContent */
-    TclWebRequest   *tclwebreq;         /* We reset 'req' upon request processing completion
-                                           but we don't want to reallocate this on every req 
-                                           therefore this pointer stores the */
 } rivet_interp_globals;
 
 int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);

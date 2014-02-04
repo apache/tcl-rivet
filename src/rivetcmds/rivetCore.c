@@ -1270,13 +1270,42 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
 TCL_CMD_HEADER( Rivet_InspectCmd )
 {
     rivet_interp_globals*   globals = Tcl_GetAssocData( interp, "rivet", NULL );
-    rivet_server_conf*      rsc = Rivet_GetConf(globals->r); 
+    rivet_server_conf*      rsc; 
     int                     status = TCL_OK;
 
-    if (objc == 1)
+    if (objc == 2)
+    {
+        Tcl_Obj* par_name = objv[1];
+
+        if (STRNEQU(Tcl_GetStringFromObj(par_name,NULL),"script"))
+        {
+            if (globals->r == NULL)
+            {
+                Tcl_Obj* cmd = Tcl_NewStringObj("return [info script]",-1);
+
+                Tcl_IncrRefCount(cmd); 
+                status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
+                Tcl_DecrRefCount(cmd); 
+            }            
+            else
+            {
+                Tcl_SetObjResult(interp,Tcl_NewStringObj(globals->r->filename,-1));
+            }
+            return TCL_OK;
+        }
+    }
+
+    if (globals->r == NULL)
+    {
+
+        Tcl_SetObjResult(interp,Tcl_NewStringObj("",-1));            
+
+    } 
+    else if (objc == 1)
     {
         Tcl_Obj* dictObj;
 
+        rsc = Rivet_GetConf(globals->r); 
         dictObj = Rivet_BuildConfDictionary(interp,rsc);
         if (dictObj != NULL) {
             Tcl_SetObjResult(interp,dictObj);
@@ -1284,6 +1313,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         } else {
             status = TCL_ERROR;
         }
+
     }
     else if (objc == 2)
     {
@@ -1293,7 +1323,8 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         if (STRNEQU(Tcl_GetStringFromObj(par_name,NULL),"-all"))
         {
             Tcl_Obj* dictObj;
-
+            
+            rsc = Rivet_GetConf(globals->r); 
             dictObj = Rivet_CurrentConfDict(interp,rsc);
             if (dictObj == NULL)
             {
@@ -1304,11 +1335,13 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
                 Tcl_SetObjResult(interp,dictObj);            
                 Tcl_DecrRefCount(dictObj);
             }
+
         }
         else
         {
             Tcl_Obj* par_value = NULL;
 
+            rsc = Rivet_GetConf(globals->r); 
             par_value = Rivet_ReadConfParameter(interp,rsc,par_name);
             if (par_value == NULL)
             {
@@ -1319,6 +1352,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
                 Tcl_SetObjResult(interp,par_value);
                 Tcl_DecrRefCount(par_value);
             }
+
         }
 
         Tcl_DecrRefCount(par_name);

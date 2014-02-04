@@ -1,3 +1,7 @@
+2013-02-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmd/rivetCore.c: testing globals->r against NULL and in case return a null string
+    * src/apache-2/mod_rivet.c: using only globals->r to flag a request processing under way
+ 
 2013-02-03 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: globals->req had to be set to NULL in Rivet_PerInterpInit!
 
