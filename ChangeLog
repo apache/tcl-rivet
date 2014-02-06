@@ -1,11 +1,17 @@
-2013-02-04 Massimo Manghi <mxmanghi@apache.org>
+2014-02-06 Massimo Manghi <mxmanghi@apache.org>
+    * ChangeLog: timestamps of latest entries of this file carried the wrong year (2013)
+    * rivet/packages/dio/dio_Mysql.tcl: fixed comment lines placed within the switch construct
+    that have become incompatibile with Tcl8.6. 
+    * configure.ac: add AC_C_INLINE macro
+
+2014-02-04 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmd/rivetCore.c: testing globals->r against NULL and in case return a null string
     * src/apache-2/mod_rivet.c: using only globals->r to flag a request processing under way
  
-2013-02-03 Massimo Manghi <mxmanghi@apache.org>
+2014-02-03 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: globals->req had to be set to NULL in Rivet_PerInterpInit!
 
-2013-02-02 Massimo Manghi <mxmanghi@apache.org>
+2014-02-02 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.[c|h]: further optimizing code avoiding to
     allocate a TclWebRequest structure on every request. This structure
     is allocate when the interpreter is initialized and a pointer

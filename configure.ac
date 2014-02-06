@@ -664,6 +664,7 @@ if test $import_rivet_commands = "yes"; then
 else
     RIVET_COMMANDS_EXPORT
 fi
+AC_C_INLINE
 
 AC_SUBST(apache_version_dir)
 AC_SUBST(MOD_RIVET_INCLUDES)
