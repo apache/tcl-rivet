@@ -21,9 +21,6 @@
 #
 # $Id$
 
-
-# $Id$
-
 package require Itcl
 
 ### 

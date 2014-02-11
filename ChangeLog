@@ -1,3 +1,9 @@
+2014-02-11 Massimo Manghi <mxmanghi@apache.org>
+    * tests/rivetlib.test: adding tests for rivetlib
+    * rivet/packages/dio/aida.tcl,sql.tcl: new files for development of DIO compatible interface to tdbc
+    * rivet/rivet-tcl/lassign_array.tcl: removed since already provided in rivetlib
+    * docs/xml/commands.xml: documenting features of lassign_array.tcl rivetlib version 
+
 2014-02-06 Massimo Manghi <mxmanghi@apache.org>
     * ChangeLog: timestamps of latest entries of this file carried the wrong year (2013)
     * rivet/packages/dio/dio_Mysql.tcl: fixed comment lines placed within the switch construct

@@ -1,0 +1,20 @@
+
+::tcltest::test rivetlib-1.1 {lassign_array basic assignement} { 
+    package require rivetlib
+    set array_vars {a b c d}
+    set list_vals {1 2 3 4}
+
+    ::rivet::lassign_array $list_vals assigned_array {*}$array_vars
+    set l {}
+    foreach av $array_vars { lappend l $assigned_array($av) }
+    set l
+} {1 2 3 4}
+
+::tcltest::test rivetlib-1.2 {lassign_array returned values} {
+    package require rivetlib
+    set array_vars {a b c d}
+    set list_vals {1 2 3 4 5 6 7}
+
+    set rem [::rivet::lassign_array $list_vals assigned_array {*}$array_vars]
+    set rem
+} {5 6 7}

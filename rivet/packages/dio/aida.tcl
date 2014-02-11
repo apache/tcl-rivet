@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id: aida.tcl 1552005 2013-12-18 16:27:15Z mxmanghi $
+# $Id$
 
 package require Tcl  8.6
 package require Itcl
