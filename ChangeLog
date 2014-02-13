@@ -1,3 +1,6 @@
+2014-02-13 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_request.c: removing redundant log message
+
 2013-11-19 Massimo Manghi <mxmanghi@apache.org>
     * 2.1: merging latest changes from trunk
     * Changelog: bumping up autoconf generated version number to 2.1.4

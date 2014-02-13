@@ -381,7 +381,9 @@ int ApacheRequest___parse(ApacheRequest *req)
 
     if ((r->method_number == M_POST) && ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) 
     {
-        ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
+        //
+        //ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
+        //
         result = ApacheRequest_parse_multipart(req,ct);
     }
     else
