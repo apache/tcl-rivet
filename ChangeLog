@@ -1,3 +1,8 @@
+2014-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetInspect.c,src/librivet/rivetList.c: removing lines of code commented and unused
+    * doc/xml/commands.xml: documenting command lremove 
+    * tests/rivetlib.test: adding more tests for lremove
+
 2014-02-11 Massimo Manghi <mxmanghi@apache.org>
     * tests/rivetlib.test: adding tests for rivetlib
     * rivet/packages/dio/aida.tcl,sql.tcl: new files for development of DIO compatible interface to tdbc

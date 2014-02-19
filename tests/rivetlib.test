@@ -1,6 +1,6 @@
+package require rivetlib
 
 ::tcltest::test rivetlib-1.1 {lassign_array basic assignement} { 
-    package require rivetlib
     set array_vars {a b c d}
     set list_vals {1 2 3 4}
 
@@ -11,10 +11,22 @@
 } {1 2 3 4}
 
 ::tcltest::test rivetlib-1.2 {lassign_array returned values} {
-    package require rivetlib
     set array_vars {a b c d}
     set list_vals {1 2 3 4 5 6 7}
 
     set rem [::rivet::lassign_array $list_vals assigned_array {*}$array_vars]
     set rem
 } {5 6 7}
+
+::tcltest::test rivetlib-2.1 {lremove regexp removal} {
+    set rem [::rivet::lremove -all -regexp {aa e111 bab aa} aa]
+} {e111 bab}
+
+
+::tcltest::test rivetlib-2.1 {lremove multiple regexp removal} {
+    set rem [::rivet::lremove -all -regexp {aa e111 bab aa} aa "e\\d+"]
+} {bab}
+
+::tcltest::test rivetlib-2.2 {lremove glob style multiple removal} {
+    set rem [::rivet::lremove -all -glob {aa e111 bab aa} e* b*]
+} {aa aa}

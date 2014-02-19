@@ -982,7 +982,7 @@ puts $rem
 	    <refsynopsisdiv>
 		<cmdsynopsis>
 		    <command>::rivet::lempty</command>
-		    <arg>list</arg>
+		    <arg choice="plain">list</arg>
 		</cmdsynopsis>
 	    </refsynopsisdiv>	
 	    <refsect1>
@@ -1009,8 +1009,8 @@ puts $rem
 			<arg>-glob</arg>
 			<arg>-regexp</arg>
 		    </group>
-		    <arg>list</arg>
-		    <arg>pattern</arg>
+		    <arg choice="plain">list</arg>
+		    <arg choice="plain">pattern</arg>
 		</cmdsynopsis>
 	    </refsynopsisdiv>	
 	    <refsect1>
@@ -1152,6 +1152,40 @@ bxxb ccxxxxcc</programlisting>
 		    two subsequent calls.  
 		</para>
 	    </refsect1>
+	</refentry>
+	
+	<refentry id="lremove">
+	   <refnamediv>
+	       <refname>lremove</refname>
+		   <refpurpose>remove from a list elements matching one or more patterns</refpurpose>
+	   </refnamediv>
+	   <refsynopsisdiv>
+           <command>::rivet::lremove</command> 
+           <group choice="req">
+           <arg>-regexp | -glob | -exact</arg></group> 
+           <arg choice="plain">list</arg>
+           <arg choice="plain">pattern</arg> 
+           <arg><replaceable>pattern</replaceable></arg>	   
+           <arg><replaceable>pattern</replaceable></arg>	   
+
+	   </refsynopsisdiv>
+	   <refsect1>
+		<title>Description</title>
+		<para>
+		  <command>lremove</command> removes from list <arg>list</arg> the first occurrence
+		  of an element matching one of the patterns listed in the command line. By specifying the
+		  <option>-all</option> option every occurrence of one the patterns is removed
+	    </para>
+	    <para>
+	       Pattern matching can be <option>-exact</option>,<option>-glob</option> style or following 
+	       regular expressions (<option>-regexp</option>). These options are globally valid across the 
+	       whole pattern list (default is glob style matching)  
+	    </para>
+	    <programlisting>::rivet::lremove -all -regexp {aa e111 bab aa} aa e111 bab
+e111 bab
+::rivet::lremove -all -regexp {aa e111 bab aa} aa "e\\d+"
+bab</programlisting>
+	   </refsect1>
 	</refentry>
 
 	<refentry id="makeurl">

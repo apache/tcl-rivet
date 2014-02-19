@@ -317,12 +317,12 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
                     c = *next;
 
                 /* 
-                 *if we get end-of-line here, it's fine... and we're done
+                 * if we get end-of-line here, it's fine... and we're done
                  */
 
                     if (c == '\0') return TCL_OK;
 
-                        /*
+                /*
                  * It's not end-of-line.  If the next character is
                  * not a comma, it's an error.
                  */
@@ -348,19 +348,23 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
         }
 
     /* If we get here, we're at the start of a field that didn't
-     * start with a quote */
+     * start with a quote
+     */
+
         next = first;
         while (1) {
             c = *next;
 
-                /* If we reach end of the string, append the last element
-             * and return to our caller. */
+            /* If we reach end of the string, append the last element
+             * and return to our caller. 
+             */
+
             if (c == '\0') {
                 Rivet_ListObjAppendString (interp, resultList, first, -1);
                 return TCL_OK;
             }
 
-                /* If we get a comma, that's the end of this piece,
+            /* If we get a comma, that's the end of this piece,
              * stick it into the list.
              */
             if (c == ',') {

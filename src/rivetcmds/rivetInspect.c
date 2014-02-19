@@ -101,15 +101,15 @@ enum confIndices {
  */
 
 Tcl_Obj*
-Rivet_ReadConfParameter ( Tcl_Interp* interp,
+Rivet_ReadConfParameter ( Tcl_Interp*        interp,
                           rivet_server_conf* rsc,
-                          Tcl_Obj*    par_name)
+                          Tcl_Obj*           par_name)
 {
     int parameter_i;
     Tcl_Obj* par_value;
 
     if (Tcl_GetIndexFromObj(interp, par_name, confDirectives,
-                "<one of conf directives>", 0, &parameter_i) == TCL_ERROR) {
+            "<one of mod_rivet configuration directives>", 0, &parameter_i) == TCL_ERROR) {
         return NULL;
     }
 
@@ -193,10 +193,8 @@ Rivet_ReadConfParameter ( Tcl_Interp* interp,
 
     if (par_value == NULL) 
     {
-        par_value=Tcl_NewStringObj("<undef>",-1);
+        par_value = Tcl_NewStringObj("<undef>",-1);
     }
-
-    //Tcl_IncrRefCount(par_value);
 
     return par_value;
 }
