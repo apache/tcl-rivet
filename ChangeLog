@@ -1,4 +1,9 @@
 2014-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetCore.c: spurious ref count decrement caused random crashes
+    * src/rivetcmds/rivetInspect.c: fixed behaviour when inspect is passed with an undefined argument value
+    * configure.ac: reindented some function to improve readability and editor independence
+
+2014-02-19 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetInspect.c,src/librivet/rivetList.c: removing lines of code commented and unused
     * doc/xml/commands.xml: documenting command lremove 
     * tests/rivetlib.test: adding more tests for lremove

@@ -1350,7 +1350,6 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             else
             {
                 Tcl_SetObjResult(interp,par_value);
-                Tcl_DecrRefCount(par_value);
             }
 
         }

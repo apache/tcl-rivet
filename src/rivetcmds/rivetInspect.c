@@ -95,8 +95,10 @@ enum confIndices {
  *
  * Returned value:
  *
- *  - A Tcl_Obj pointer to the parameter value whose refCount is
- *    set to 1 before returning to the caller
+ *  - A Tcl_Obj pointer to the parameter value. A NULL
+ * pointer works as a signal for an error (invalid parameter)
+ * - If the parameter value in the configuration is undefined
+ * then the Tcl_Obj string contains the string 'undefined'
  *
  */
 
@@ -106,7 +108,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
                           Tcl_Obj*           par_name)
 {
     int parameter_i;
-    Tcl_Obj* par_value;
+    Tcl_Obj* par_value = NULL;
 
     if (Tcl_GetIndexFromObj(interp, par_name, confDirectives,
             "<one of mod_rivet configuration directives>", 0, &parameter_i) == TCL_ERROR) {
@@ -193,7 +195,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
 
     if (par_value == NULL) 
     {
-        par_value = Tcl_NewStringObj("<undef>",-1);
+        par_value = Tcl_NewStringObj("undefined",-1);
     }
 
     return par_value;
