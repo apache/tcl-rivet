@@ -1,3 +1,6 @@
+2014-02-21 Massimo Manghi <mxmanghi@apache.org>
+    * tests/inspect.[test|tcl]: adding tests for introspection command
+
 2014-02-19 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetCore.c: spurious ref count decrement caused random crashes
     * src/rivetcmds/rivetInspect.c: fixed behaviour when inspect is passed with an undefined argument value
