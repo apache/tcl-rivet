@@ -1,3 +1,6 @@
+2014-02-22 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: further elaboration of the section about command ::rivet::inspect
+
 2014-02-21 Massimo Manghi <mxmanghi@apache.org>
     * tests/inspect.[test|tcl]: adding tests for introspection command
 

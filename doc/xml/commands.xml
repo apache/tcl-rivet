@@ -878,26 +878,30 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
              <command>::rivet::inspect</command> can be called in three forms
          </para>
          <itemizedlist mark="square">
+         
+            <listitem>            
+               With no argument the command returns a dictionary with 3
+               keys: server, dir, user. Each key is associated to a subdictionary 
+               carrying the configuration as set for that request.  In this form the command is 
+               meant to support compatibility with previous versions of mod_rivet 
+               where three global arrays RivetServerConf, 
+               RivetDirConf and RivetUserConf were created to be internally used by command
+               <command>::rivet::debug</command>
+            </listitem>
+			
 			<listitem>
-				Passing as argument the switch <arg>-all</arg> a dictionary
-				carrying the whole configuration is returned
+				With the <arg>-all</arg> argument the switch a dictionary
+				carrying the whole configuration for that specific request is returned. 
+				When a configuration parameter is not set it's given the
+				string <emphasis>undefined</emphasis>
 			</listitem> 
 			
 	    	<listitem>
 				With one argument (one of the Rivet configuration directives) 
 				<command>::rivet::inspect</command> returns the current value
-				in the configuration record	
+				in the configuration record
 			</listitem>
 
-            <listitem>            
-               With no argument the command returns a dictionary with 3
-               keys: server, dir, user. Each key is associated to a subdictionary 
-               carrying the configuration lines actually set. Configuration directives 
-               are the keys in the second level dictionary. In this form the command is 
-               meant to provide a way to create global arrays RivetServerConf, 
-               RivetDirConf and RivetUserConf which are internally used by ::rivet::debug
-			</listitem>
-			
          </itemizedlist>
 	    </refsect1>
 	</refentry>
