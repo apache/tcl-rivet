@@ -1,3 +1,7 @@
+2014-02-24 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: completed reworking of manual page for command ::rivet::inspect.
+    * .: Preparing RC1 archive for version 2.1.4
+ 
 2014-02-22 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: further elaboration of the section about command ::rivet::inspect
 
