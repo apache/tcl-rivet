@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 
-#	http://www.apache.org/licenses/LICENSE-2.0
+#       http://www.apache.org/licenses/LICENSE-2.0
 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,8 +26,8 @@ proc handle {interface args} {
     set obj \#auto
     set first [lindex $args 0]
     if {![lempty $first] && [string index $first 0] != "-"} {
-	set obj  [lindex $args 0]
-	set args [lreplace $args 0 0]
+        set obj  [lindex $args 0]
+        set args [lreplace $args 0 0]
     }
     uplevel \#0 package require dio_$interface
     return [uplevel \#0 ::DIO::$interface $obj $args]
@@ -38,11 +38,11 @@ proc handle {interface args} {
 ##
 ::itcl::class Database {
     constructor {args} {
-	eval configure $args
+        eval configure $args
     }
 
     destructor {
-	close
+        close
     }
 
     #
@@ -51,7 +51,7 @@ proc handle {interface args} {
     # result object.
     #
     protected method result {interface args} {
-	return [eval uplevel \#0 ::DIO::${interface}Result \#auto $args]
+        return [eval uplevel \#0 ::DIO::${interface}Result \#auto $args]
     }
 
     #
@@ -59,8 +59,8 @@ proc handle {interface args} {
     #  quote characters preceded by a backslash
     #
     method quote {string} {
-	regsub -all {'} $string {\'} string
-	return $string
+        regsub -all {'} $string {\'} string
+        return $string
     }
 
     #
@@ -72,92 +72,92 @@ proc handle {interface args} {
     #
     protected method build_select_query {args} {
 
-	set bool AND
-	set first 1
-	set req ""
-	set myTable $table
-	set what "*"
+        set bool AND
+        set first 1
+        set req ""
+        set myTable $table
+        set what "*"
 
-	# for each argument passed us...
-	# (we go by integers because we mess with the index based on
-	#  what we find)
-	for {set i 0} {$i < [llength $args]} {incr i} {
-	    # fetch the argument we're currently processing
-	    set elem [lindex $args $i]
+        # for each argument passed us...
+        # (we go by integers because we mess with the index based on
+        #  what we find)
+        for {set i 0} {$i < [llength $args]} {incr i} {
+            # fetch the argument we're currently processing
+            set elem [lindex $args $i]
 
-	    switch -- [::string tolower $elem] {
-		"-and" { 
-		    # -and -- switch to AND-style processing
-		    set bool AND 
-		}
+            switch -- [::string tolower $elem] {
+                "-and" { 
+                    # -and -- switch to AND-style processing
+                    set bool AND 
+                }
 
-		"-or"  { 
-		    # -or -- switch to OR-style processing
-		    set bool OR 
-		}
+                "-or"  { 
+                    # -or -- switch to OR-style processing
+                    set bool OR 
+                }
 
-		"-table" { 
-		    # -table -- identify which table the query is about
-		    set myTable [lindex $args [incr i]] 
-		}
+                "-table" { 
+                    # -table -- identify which table the query is about
+                    set myTable [lindex $args [incr i]] 
+                }
 
-		"-select" {
-		    # -select - 
-		    set what [lindex $args [incr i]]
-		}
+                "-select" {
+                    # -select - 
+                    set what [lindex $args [incr i]]
+                }
 
-		default {
-		    # it wasn't -and, -or, -table, or -select...
+                default {
+                    # it wasn't -and, -or, -table, or -select...
 
-		    # if the first character of the element is a dash,
-		    # it's a field name and a value
+                    # if the first character of the element is a dash,
+                    # it's a field name and a value
 
-		    if {[::string index $elem 0] == "-"} {
-			set field [::string range $elem 1 end]
-			set elem [lindex $args [incr i]]
+                    if {[::string index $elem 0] == "-"} {
+                        set field [::string range $elem 1 end]
+                        set elem [lindex $args [incr i]]
 
-			# if it's the first field being processed, append
-			# WHERE to the SQL request we're generating
-			if {$first} {
-			    append req " WHERE"
-			    set first 0
-			} else {
-			    # it's not the first variable in the comparison
-			    # expression, so append the boolean state, either
-			    # AND or OR
-			    append req " $bool"
-			}
+                        # if it's the first field being processed, append
+                        # WHERE to the SQL request we're generating
+                        if {$first} {
+                            append req " WHERE"
+                            set first 0
+                        } else {
+                            # it's not the first variable in the comparison
+                            # expression, so append the boolean state, either
+                            # AND or OR
+                            append req " $bool"
+                        }
 
-			# convert any asterisks to percent signs in the
-			# value field
-			regsub -all {\*} $elem {%} elem
+                        # convert any asterisks to percent signs in the
+                        # value field
+                        regsub -all {\*} $elem {%} elem
 
-			# if there is a percent sign in the value
-			# field now (having been there originally or
-			# mapped in there a moment ago),  the SQL aspect 
-			# is appended with a "field LIKE value"
+                        # if there is a percent sign in the value
+                        # field now (having been there originally or
+                        # mapped in there a moment ago),  the SQL aspect 
+                        # is appended with a "field LIKE value"
 
-			if {[::string first {%} $elem] != -1} {
-			    append req " $field LIKE [makeDBFieldValue $myTable $field $elem]"
-		        } elseif {[regexp {^([<>]) *([0-9.]*)$} $elem _ fn val]} {
-			    # value starts with <, or >, then space, 
-			    # and a something
-			    append req " $field$fn$val"
-		        } elseif {[regexp {^([<>]=) *([0-9.]*)$} $elem _ fn val]} {
-			    # value starts with <= or >=, space, and something.
-			    append req " $field$fn$val"
-			} else {
-			    # otherwise it's a straight key=value comparison
-			    append req " $field=[makeDBFieldValue $myTable $field $elem]"
-			}
+                        if {[::string first {%} $elem] != -1} {
+                            append req " $field LIKE [makeDBFieldValue $myTable $field $elem]"
+                        } elseif {[regexp {^([<>]) *([0-9.]*)$} $elem _ fn val]} {
+                            # value starts with <, or >, then space, 
+                            # and a something
+                            append req " $field$fn$val"
+                        } elseif {[regexp {^([<>]=) *([0-9.]*)$} $elem _ fn val]} {
+                            # value starts with <= or >=, space, and something.
+                            append req " $field$fn$val"
+                        } else {
+                            # otherwise it's a straight key=value comparison
+                            append req " $field=[makeDBFieldValue $myTable $field $elem]"
+                        }
 
-			continue
-		    }
-		    append req " $elem"
-		}
-	    }
-	}
-	return "select $what from $myTable $req"
+                        continue
+                    }
+                    append req " $elem"
+                }
+            }
+        }
+        return "select $what from $myTable $req"
     }
 
     #
@@ -168,17 +168,17 @@ proc handle {interface args} {
     # coming from the array
     #
     protected method build_insert_query {arrayName fields {myTable ""}} {
-	upvar 1 $arrayName array
+        upvar 1 $arrayName array
 
-	if {[lempty $myTable]} { set myTable $table }
-	set vals [::list]
-	set vars [::list]
-	foreach field $fields {
-	    if {![info exists array($field)]} { continue }
-	    lappend vars "$field"
-	    lappend vals "[makeDBFieldValue $myTable $field $array($field)]"
-	}
-	return "insert into $myTable ([join $vars {,}]) VALUES ([join $vals {,}])"
+        if {[lempty $myTable]} { set myTable $table }
+        set vals [::list]
+        set vars [::list]
+        foreach field $fields {
+            if {![info exists array($field)]} { continue }
+            lappend vars "$field"
+            lappend vals "[makeDBFieldValue $myTable $field $array($field)]"
+        }
+        return "insert into $myTable ([join $vars {,}]) VALUES ([join $vals {,}])"
     }
 
     #
@@ -192,14 +192,14 @@ proc handle {interface args} {
     # you might update a lot more than you bargained for
     #
     protected method build_update_query {arrayName fields {myTable ""}} {
-	upvar 1 $arrayName array
-	if {[lempty $myTable]} { set myTable $table }
-	set string [::list]
-	foreach field $fields {
-	    if {![info exists array($field)]} { continue }
-	    lappend string "$field=[makeDBFieldValue $myTable $field $array($field)]"
-	}
-	return "update $myTable SET [join $string {,}]"
+        upvar 1 $arrayName array
+        if {[lempty $myTable]} { set myTable $table }
+        set string [::list]
+        foreach field $fields {
+            if {![info exists array($field)]} { continue }
+            lappend string "$field=[makeDBFieldValue $myTable $field $array($field)]"
+        }
+        return "update $myTable SET [join $string {,}]"
     }
 
     #
@@ -209,10 +209,10 @@ proc handle {interface args} {
     # arguments, into the named array.  From TclX.
     #
     protected method lassign_array {list arrayName args} {
-	upvar 1 $arrayName array
-	foreach elem $list field $args {
-	    set array($field) $elem
-	}
+        upvar 1 $arrayName array
+        foreach elem $list field $args {
+            set array($field) $elem
+        }
     }
 
     #
@@ -221,8 +221,8 @@ proc handle {interface args} {
     # variable to the string.
     #
     protected method configure_variable {varName string} {
-	if {[lempty $string]} { return [cget -$varName] }
-	configure -$varName $string
+        if {[lempty $string]} { return [cget -$varName] }
+        configure -$varName $string
     }
 
     #
@@ -232,18 +232,18 @@ proc handle {interface args} {
     # together.
     #
     protected method build_key_where_clause {myKeyfield myKey} {
-	## If we're not using multiple keyfields, just return a simple
-	## where clause.
-	if {[llength $myKeyfield] < 2} {
-	    return " WHERE $myKeyfield = [makeDBFieldValue $table $myKeyfield $myKey]"
-	}
+        ## If we're not using multiple keyfields, just return a simple
+        ## where clause.
+        if {[llength $myKeyfield] < 2} {
+            return " WHERE $myKeyfield = [makeDBFieldValue $table $myKeyfield $myKey]"
+        }
 
-	# multiple fields, construct it as a where-and
-	set req " WHERE 1 = 1"
-	foreach field $myKeyfield key $myKey {
-	    append req " AND $field = [makeDBFieldValue $table $field $key]"
-	}
-	return $req
+        # multiple fields, construct it as a where-and
+        set req " WHERE 1 = 1"
+        foreach field $myKeyfield key $myKey {
+            append req " AND $field = [makeDBFieldValue $table $field $key]"
+        }
+        return $req
     }
 
     ##
@@ -257,51 +257,51 @@ proc handle {interface args} {
     # values as a list
     ##
     method makekey {arrayName {myKeyfield ""}} {
-	if {[lempty $myKeyfield]} { set myKeyfield $keyfield }
-	if {[lempty $myKeyfield]} {
-	    return -code error "No -keyfield specified in object"
-	}
-	upvar 1 $arrayName array
+        if {[lempty $myKeyfield]} { set myKeyfield $keyfield }
+        if {[lempty $myKeyfield]} {
+            return -code error "No -keyfield specified in object"
+        }
+        upvar 1 $arrayName array
 
-	## If we're not using multiple keyfields, we want to check and see
-	## if we're using auto keys.  If we are, create a new key and
-	## return it.  If not, just return the value of the single keyfield
-	## in the array.
-	if {[llength $myKeyfield] < 2} {
-	    if {$autokey} {
-		set array($myKeyfield) [$this nextkey]
-	    } else {
-		if {![info exists array($myKeyfield)]} {
-		    return -code error \
-			"${arrayName}($myKeyfield) does not exist"
-		}
-	    }
-	    return $array($myKeyfield)
-	}
+        ## If we're not using multiple keyfields, we want to check and see
+        ## if we're using auto keys.  If we are, create a new key and
+        ## return it.  If not, just return the value of the single keyfield
+        ## in the array.
+        if {[llength $myKeyfield] < 2} {
+            if {$autokey} {
+                set array($myKeyfield) [$this nextkey]
+            } else {
+                if {![info exists array($myKeyfield)]} {
+                    return -code error \
+                        "${arrayName}($myKeyfield) does not exist"
+                }
+            }
+            return $array($myKeyfield)
+        }
 
-	## We're using multiple keys.  Return a list of all the keyfield
-	## values.
-	foreach field $myKeyfield {
-	    if {![info exists array($field)]} {
-		return -code error "$field does not exist in $arrayName"
-	    }
-	    lappend key $array($field)
-	}
-	return $key
+        ## We're using multiple keys.  Return a list of all the keyfield
+        ## values.
+        foreach field $myKeyfield {
+            if {![info exists array($field)]} {
+                return -code error "$field does not exist in $arrayName"
+            }
+            lappend key $array($field)
+        }
+        return $key
     }
 
     method destroy {} {
-    	::itcl::delete object $this
+        ::itcl::delete object $this
     }
 
     #
     # string - execute a SQL request and only return a string of one row.
     #
     method string {req} {
-	set res [exec $req]
-	$res next -list val
-	$res destroy
-	return $val
+        set res [exec $req]
+        $res next -list val
+        $res destroy
+        return $val
     }
 
     #
@@ -309,13 +309,13 @@ proc handle {interface args} {
     # row returned.
     #
     method list {req} {
-	set res [exec $req]
-	set list ""
-	$res forall -list line {
-	    lappend list [lindex $line 0]
-	}
-	$res destroy
-	return $list
+        set res [exec $req]
+        set list ""
+        $res forall -list line {
+            lappend list [lindex $line 0]
+        }
+        $res destroy
+        return $list
     }
 
     #
@@ -324,11 +324,11 @@ proc handle {interface args} {
     # the values
     #
     method array {req arrayName} {
-	upvar 1 $arrayName $arrayName
-	set res [exec $req]
-	set ret [$res next -array $arrayName]
-	$res destroy
-	return $ret
+        upvar 1 $arrayName $arrayName
+        set res [exec $req]
+        set ret [$res next -array $arrayName]
+        $res destroy
+        return $ret
     }
 
     #
@@ -337,23 +337,23 @@ proc handle {interface args} {
     # matching values, executing the specified code body for each, in turn.
     #
     method forall {req arrayName body} {
-	upvar 1 $arrayName $arrayName
+        upvar 1 $arrayName $arrayName
 
-	set res [exec $req]
+        set res [exec $req]
 
-	$res forall -array $arrayName {
-	    uplevel 1 $body
+        $res forall -array $arrayName {
+            uplevel 1 $body
         }
 
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
+        if {[$res error]} {
+            set errinf [$res errorinfo]
+            $res destroy
+            return -code error "Got '$errinf' executing '$req'"
+        }
 
         set ret [$res numrows]
-	$res destroy
-	return $ret
+        $res destroy
+        return $ret
     }
 
     #
@@ -366,21 +366,21 @@ proc handle {interface args} {
     # determined.
     #
     protected method table_check {list {tableVar myTable} {keyVar myKeyfield}} {
-	upvar 1 $tableVar $tableVar $keyVar $keyVar
-	set data(-table) $table
-	set data(-keyfield) $keyfield
-	::array set data $list
+        upvar 1 $tableVar $tableVar $keyVar $keyVar
+        set data(-table) $table
+        set data(-keyfield) $keyfield
+        ::array set data $list
 
-	if {[lempty $data(-table)]} {
-	    return -code error -errorcode missing_table "-table not specified in DIO object"
-	}
-	set $tableVar $data(-table)
+        if {[lempty $data(-table)]} {
+            return -code error -errorcode missing_table "-table not specified in DIO object"
+        }
+        set $tableVar $data(-table)
 
-	if {[lempty $data(-keyfield)]} {
-	    return -code error -errorcode missing_keyfield "-keyfield not specified in DIO object"
-	}
+        if {[lempty $data(-keyfield)]} {
+            return -code error -errorcode missing_keyfield "-keyfield not specified in DIO object"
+        }
 
-	set $keyVar   $data(-keyfield)
+        set $keyVar   $data(-keyfield)
     }
 
     #
@@ -389,13 +389,13 @@ proc handle {interface args} {
     # autokey, there can't be more than one key.
     #
     protected method key_check {myKeyfield myKey} {
-	if {[llength $myKeyfield] < 2} { return }
-	if {$autokey} {
-	    return -code error "Cannot have autokey and multiple keyfields"
-	}
-	if {[llength $myKeyfield] != [llength $myKey]} {
-	    return -code error "Bad key length."
-	}
+        if {[llength $myKeyfield] < 2} { return }
+        if {$autokey} {
+            return -code error "Cannot have autokey and multiple keyfields"
+        }
+        if {[llength $myKeyfield] != [llength $myKey]} {
+            return -code error "Bad key length."
+        }
     }
 
     #
@@ -404,23 +404,23 @@ proc handle {interface args} {
     # the key into the array
     #
     method fetch {key arrayName args} {
-	table_check $args
-	key_check $myKeyfield $key
-	upvar 1 $arrayName $arrayName
-	set req "select * from $myTable"
-	append req [build_key_where_clause $myKeyfield $key]
+        table_check $args
+        key_check $myKeyfield $key
+        upvar 1 $arrayName $arrayName
+        set req "select * from $myTable"
+        append req [build_key_where_clause $myKeyfield $key]
 
-	set res [$this exec $req]
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
-	set rows_found [expr [$res numrows] > 0]
-	$res next -array $arrayName
-	$res destroy
+        set res [$this exec $req]
+        if {[$res error]} {
+            set errinf [$res errorinfo]
+            $res destroy
+            return -code error "Got '$errinf' executing '$req'"
+        }
+        set rows_found [expr [$res numrows] > 0]
+        $res next -array $arrayName
+        $res destroy
 
-	return $rows_found
+        return $rows_found
     }
 
     #
@@ -429,29 +429,29 @@ proc handle {interface args} {
     # corresponding table entry.
     #
     method store {arrayName args} {
-	table_check $args
-	upvar 1 $arrayName $arrayName $arrayName array
-	if {[llength $myKeyfield] > 1 && $autokey} {
-	    return -code error "Cannot have autokey and multiple keyfields"
-	}
+        table_check $args
+        upvar 1 $arrayName $arrayName $arrayName array
+        if {[llength $myKeyfield] > 1 && $autokey} {
+            return -code error "Cannot have autokey and multiple keyfields"
+        }
 
-	set key [makekey $arrayName $myKeyfield]
-	set req "select * from $myTable"
-	append req [build_key_where_clause $myKeyfield $key]
-	set res [exec $req]
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
-	set numrows [$res numrows]
-	$res destroy
+        set key [makekey $arrayName $myKeyfield]
+        set req "select * from $myTable"
+        append req [build_key_where_clause $myKeyfield $key]
+        set res [exec $req]
+        if {[$res error]} {
+            set errinf [$res errorinfo]
+            $res destroy
+            return -code error "Got '$errinf' executing '$req'"
+        }
+        set numrows [$res numrows]
+        $res destroy
 
-	if {$numrows} {
+        if {$numrows} {
             $this update $arrayName {*}$args
-	} else {
+        } else {
             $this insert $myTable $arrayName
-	}
+        }
         return 1
     }
 
@@ -461,27 +461,27 @@ proc handle {interface args} {
     # an insert 
     #
     method update {arrayName args} {
-	table_check $args
-	upvar 1 $arrayName $arrayName $arrayName array
+        table_check $args
+        upvar 1 $arrayName $arrayName $arrayName array
 
-	set key [makekey $arrayName $myKeyfield]
+        set key [makekey $arrayName $myKeyfield]
 
-	set fields [::array names array]
-	set req [build_update_query array $fields $myTable]
-	append req [build_key_where_clause $myKeyfield $key]
+        set fields [::array names array]
+        set req [build_update_query array $fields $myTable]
+        append req [build_key_where_clause $myKeyfield $key]
 
-	set res [exec $req]
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
+        set res [exec $req]
+        if {[$res error]} {
+            set errinf [$res errorinfo]
+            $res destroy
+            return -code error "Got '$errinf' executing '$req'"
+        }
 
-	# this doesn't work on postgres, you've got to use cmdRows,
-	# we need to figure out what to do with this
-	set numrows [$res numrows]
-	$res destroy
-	return $numrows
+        # this doesn't work on postgres, you've got to use cmdRows,
+        # we need to figure out what to do with this
+        set numrows [$res numrows]
+        $res destroy
+        return $numrows
     }
 
     #
@@ -493,26 +493,26 @@ proc handle {interface args} {
     # want to change the value of a key field
     #
     method update_with_explicit_key {key arrayName args} {
-	table_check $args
-	key_check $myKeyfield $key
-	upvar 1 $arrayName $arrayName $arrayName array
+        table_check $args
+        key_check $myKeyfield $key
+        upvar 1 $arrayName $arrayName $arrayName array
 
-	set fields [::array names array]
-	set req [build_update_query array $fields $myTable]
-	append req [build_key_where_clause $myKeyfield $key]
+        set fields [::array names array]
+        set req [build_update_query array $fields $myTable]
+        append req [build_key_where_clause $myKeyfield $key]
 
-	set res [exec $req]
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
+        set res [exec $req]
+        if {[$res error]} {
+            set errinf [$res errorinfo]
+            $res destroy
+            return -code error "Got '$errinf' executing '$req'"
+        }
 
-	# this doesn't work on postgres, you've got to use cmdRows,
-	# we need to figure out what to do with this
-	set numrows [$res numrows]
-	$res destroy
-	return $numrows
+        # this doesn't work on postgres, you've got to use cmdRows,
+        # we need to figure out what to do with this
+        set numrows [$res numrows]
+        $res destroy
+        return $numrows
     }
 
     #
@@ -521,54 +521,54 @@ proc handle {interface args} {
     # an insert -- this shouldn't require fields, it's broken
     #
     method insert {table arrayName} {
-	upvar 1 $arrayName $arrayName $arrayName array
-	set req [build_insert_query array [::array names array] $table]
+        upvar 1 $arrayName $arrayName $arrayName array
+        set req [build_insert_query array [::array names array] $table]
 
-	set res [exec $req]
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
-	$res destroy
-	return 1
+        set res [exec $req]
+        if {[$res error]} {
+            set errinf [$res errorinfo]
+            $res destroy
+            return -code error "Got '$errinf' executing '$req'"
+        }
+        $res destroy
+        return 1
     }
 
     #
     # delete - delete matching record from the specified table
     #
     method delete {key args} {
-	table_check $args
-	set req "DELETE FROM $myTable"
-	append req [build_key_where_clause $myKeyfield $key]
+        table_check $args
+        set req "DELETE FROM $myTable"
+        append req [build_key_where_clause $myKeyfield $key]
 
-	set res [exec $req]
-	if {[$res error]} {
-	    set errinf [$res errorinfo]
-	    $res destroy
-	    return -code error "Got '$errinf' executing '$req'"
-	}
+        set res [exec $req]
+        if {[$res error]} {
+            set errinf [$res errorinfo]
+            $res destroy
+            return -code error "Got '$errinf' executing '$req'"
+        }
 
-	set n_deleted_rows [$res numrows]
-	$res destroy
-	return $n_deleted_rows
+        set n_deleted_rows [$res numrows]
+        $res destroy
+        return $n_deleted_rows
     }
 
     #
-    # keys - return all keys in a tbale
+    # keys - return all keys in a table
     #
     method keys {args} {
-	table_check $args
-	set req "select * from $myTable"
-	set obj [$this exec $req]
+        table_check $args
+        set req "select * from $myTable"
+        set obj [$this exec $req]
 
-	set keys ""
-	$obj forall -array a {
-	    lappend keys [makekey a $myKeyfield]
-	}
-	$obj destroy
+        set keys ""
+        $obj forall -array a {
+            lappend keys [makekey a $myKeyfield]
+        }
+        $obj destroy
 
-	return $keys
+        return $keys
     }
 
     #
@@ -576,8 +576,8 @@ proc handle {interface args} {
     # build_select_query style and return the result handle.
     #
     method search {args} {
-	set req [eval build_select_query $args]
-	return [exec $req]
+        set req [eval build_select_query $args]
+        return [exec $req]
     }
 
     #
@@ -596,15 +596,15 @@ proc handle {interface args} {
             }
         }
 
-	return [string "select count(*) from $myTable"]
+        return [string "select count(*) from $myTable"]
     }
 
     method makeDBFieldValue {table_name field_name val} {
-    	return "'[quote $val]'"
+        return "'[quote $val]'"
     }
 
     method registerSpecialField {table_name field_name type} {
-    	set specialFields(${table_name}@${field_name}) $type
+        set specialFields(${table_name}@${field_name}) $type
     }
 
     ##
@@ -635,28 +635,28 @@ proc handle {interface args} {
 
     protected variable specialFields
 
-    public variable interface	""
-    public variable errorinfo	""
+    public variable interface   ""
+    public variable errorinfo   ""
 
-    public variable db		""
-    public variable table	""
-    public variable sequence	""
+    public variable db          ""
+    public variable table       ""
+    public variable sequence    ""
 
-    public variable user	""
-    public variable pass	""
-    public variable host	""
-    public variable port	""
+    public variable user        ""
+    public variable pass        ""
+    public variable host        ""
+    public variable port        ""
 
-    public variable keyfield	"" {
-	if {[llength $keyfield] > 1 && $autokey} {
-	    return -code error "Cannot have autokey and multiple keyfields"
-	}
+    public variable keyfield    "" {
+        if {[llength $keyfield] > 1 && $autokey} {
+            return -code error "Cannot have autokey and multiple keyfields"
+        }
     }
 
-    public variable autokey	0 {
-	if {[llength $keyfield] > 1 && $autokey} {
-	    return -code error "Cannot have autokey and multiple keyfields"
-	}
+    public variable autokey     0 {
+        if {[llength $keyfield] > 1 && $autokey} {
+            return -code error "Cannot have autokey and multiple keyfields"
+        }
     }
 
 } ; ## ::itcl::class Database
@@ -666,13 +666,13 @@ proc handle {interface args} {
 #
 ::itcl::class Result {
     constructor {args} {
-	eval configure $args
+        eval configure $args
     }
 
     destructor { }
 
     method destroy {} {
-	::itcl::delete object $this
+        ::itcl::delete object $this
     }
 
     #
@@ -681,8 +681,8 @@ proc handle {interface args} {
     # variable to the string.
     #
     protected method configure_variable {varName string} {
-	if {[lempty $string]} { return [cget -$varName] }
-	configure -$varName $string
+        if {[lempty $string]} { return [cget -$varName] }
+        configure -$varName $string
     }
 
     #
@@ -692,10 +692,10 @@ proc handle {interface args} {
     # arguments, into the named array.  From TclX.
     #
     protected method lassign_array {list arrayName args} {
-	upvar 1 $arrayName array
-	foreach elem $list field $args {
-	    set array($field) $elem
-	}
+        upvar 1 $arrayName array
+        foreach elem $list field $args {
+            set array($field) $elem
+        }
     }
 
     #
@@ -703,100 +703,100 @@ proc handle {interface args} {
     # to the specified row ID
     #
     method seek {newrowid} {
-	set rowid $newrowid
+        set rowid $newrowid
     }
 
     method cache {{size "all"}} {
-	set cacheSize $size
-	if {$size == "all"} { set cacheSize $numrows }
+        set cacheSize $size
+        if {$size == "all"} { set cacheSize $numrows }
 
-	## Delete the previous cache array.
-	catch {unset cacheArray}
+        ## Delete the previous cache array.
+        catch {unset cacheArray}
 
-	set autostatus $autocache
-	set currrow    $rowid
-	set autocache 1
-	seek 0
-	set i 0
-	while {[next -list list]} {
-	    if {[incr i] >= $cacheSize} { break }
-	}
-	set autocache $autostatus
-	seek $currrow
-	set cached 1
+        set autostatus $autocache
+        set currrow    $rowid
+        set autocache 1
+        seek 0
+        set i 0
+        while {[next -list list]} {
+            if {[incr i] >= $cacheSize} { break }
+        }
+        set autocache $autostatus
+        seek $currrow
+        set cached 1
     }
 
     #
     # forall -- walk the result object, executing the code body over it
     #
     method forall {type varName body} {
-	upvar 1 $varName $varName
-	set currrow $rowid
-	seek 0
-	while {[next $type $varName]} {
-	    uplevel 1 $body
-	}
-	set rowid $currrow
-	return
+        upvar 1 $varName $varName
+        set currrow $rowid
+        seek 0
+        while {[next $type $varName]} {
+            uplevel 1 $body
+        }
+        set rowid $currrow
+        return
     }
 
     method next {type {varName ""}} {
-	set return 1
-	if {![lempty $varName]} {
-	    upvar 1 $varName var
-	    set return 0
-	}
+        set return 1
+        if {![lempty $varName]} {
+            upvar 1 $varName var
+            set return 0
+        }
 
-	catch {unset var}
+        catch {unset var}
 
-	set list ""
-	## If we have a cached result for this row, use it.
-	if {[info exists cacheArray($rowid)]} {
-	    set list $cacheArray($rowid)
-	} else {
-	    set list [$this nextrow]
-	    if {[lempty $list]} {
-		if {$return} { return }
-		set var ""
-		return 0
-	    }
-	    if {$autocache} { set cacheArray($rowid) $list }
-	}
+        set list ""
+        ## If we have a cached result for this row, use it.
+        if {[info exists cacheArray($rowid)]} {
+            set list $cacheArray($rowid)
+        } else {
+            set list [$this nextrow]
+            if {[lempty $list]} {
+                if {$return} { return }
+                set var ""
+                return 0
+            }
+            if {$autocache} { set cacheArray($rowid) $list }
+        }
 
-	incr rowid
+        incr rowid
 
-	switch -- $type {
-	    "-list" {
-		if {$return} {
-		    return $list
-		} else {
-		    set var $list
-		}
-	    }
-	    "-array" {
-		if {$return} {
-		    foreach field $fields elem $list {
-			lappend var $field $elem
-		    }
-		    return $var
-		} else {
-		    eval lassign_array [list $list] var $fields
-		}
-	    }
-	    "-keyvalue" {
-		foreach field $fields elem $list {
-		    lappend var -$field $elem
-		}
-		if {$return} { return $var }
-	    }
+        switch -- $type {
+            "-list" {
+                if {$return} {
+                    return $list
+                } else {
+                    set var $list
+                }
+            }
+            "-array" {
+                if {$return} {
+                    foreach field $fields elem $list {
+                        lappend var $field $elem
+                    }
+                    return $var
+                } else {
+                    eval lassign_array [list $list] var $fields
+                }
+            }
+            "-keyvalue" {
+                foreach field $fields elem $list {
+                    lappend var -$field $elem
+                }
+                if {$return} { return $var }
+            }
 
-	    default {
-		incr rowid -1
-		return -code error \
-		    "In-valid type: must be -list, -array or -keyvalue"
-	    }
-	}
-	return [expr [lempty $list] == 0]
+            default {
+                incr rowid -1
+                return -code error \
+                    "In-valid type: must be -list, -array or -keyvalue"
+            }
+        }
+        return [expr [lempty $list] == 0]
     }
 
     method resultid {{string ""}} { return [configure_variable resultid $string] }
@@ -808,17 +808,17 @@ proc handle {interface args} {
     method errorinfo {{string ""}} { return [configure_variable errorinfo $string] }
     method autocache {{string ""}} { return [configure_variable autocache $string] }
 
-    public variable resultid	""
-    public variable fields	""
-    public variable rowid	0
-    public variable numrows	0
-    public variable error	0
-    public variable errorcode	0
-    public variable errorinfo	""
-    public variable autocache	1
+    public variable resultid    ""
+    public variable fields      ""
+    public variable rowid       0
+    public variable numrows     0
+    public variable error       0
+    public variable errorcode   0
+    public variable errorinfo   ""
+    public variable autocache   1
 
-    protected variable cached		0
-    protected variable cacheSize	0
+    protected variable cached           0
+    protected variable cacheSize        0
     protected variable cacheArray
 
 } ; ## ::itcl::class Result

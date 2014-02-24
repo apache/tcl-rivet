@@ -1,5 +1,114 @@
+<<<<<<< .mine
+2014-02-24 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: completed reworking of manual page for command ::rivet::inspect.
+    * .: Preparing RC1 archive for version 2.1.4
+ 
+2014-02-22 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: further elaboration of the section about command ::rivet::inspect
+
+2014-02-21 Massimo Manghi <mxmanghi@apache.org>
+    * tests/inspect.[test|tcl]: adding tests for introspection command
+
+2014-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetCore.c: spurious ref count decrement caused random crashes
+    * src/rivetcmds/rivetInspect.c: fixed behaviour when inspect is passed with an undefined argument value
+    * configure.ac: reindented some function to improve readability and editor independence
+
+2014-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetInspect.c,src/librivet/rivetList.c: removing lines of code commented and unused
+    * doc/xml/commands.xml: documenting command lremove 
+    * tests/rivetlib.test: adding more tests for lremove
+
 2014-02-13 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_request.c: removing redundant log message
+
+2014-02-11 Massimo Manghi <mxmanghi@apache.org>
+    * tests/rivetlib.test: adding tests for rivetlib
+    * rivet/packages/dio/aida.tcl,sql.tcl: new files for development of DIO compatible interface to tdbc
+    * rivet/rivet-tcl/lassign_array.tcl: removed since already provided in rivetlib
+    * docs/xml/commands.xml: documenting features of lassign_array.tcl rivetlib version 
+
+2014-02-06 Massimo Manghi <mxmanghi@apache.org>
+    * ChangeLog: timestamps of latest entries of this file carried the wrong year (2013)
+    * rivet/packages/dio/dio_Mysql.tcl: fixed comment lines placed within the switch construct
+    that have become incompatibile with Tcl8.6. 
+    * configure.ac: add AC_C_INLINE macro
+
+2014-02-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmd/rivetCore.c: testing globals->r against NULL and in case return a null string
+    * src/apache-2/mod_rivet.c: using only globals->r to flag a request processing under way
+ 
+2014-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: globals->req had to be set to NULL in Rivet_PerInterpInit!
+
+2014-02-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[c|h]: further optimizing code avoiding to
+    allocate a TclWebRequest structure on every request. This structure
+    is allocate when the interpreter is initialized and a pointer
+    stored in rivet globals
+    * src/rivetcmd/rivetInspect.c: impoved consistence if Tcl objects handling
+
+2014-01-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: this ChangeLog entry is meant to amend the
+    2014-01-27 entry that missed to point out as small still important change
+    in mod_rivet.c. Rivet_SendContent is not calling Tcl anymore to coax 
+    command 'info script' to return the current Rivet script full path. This
+    will soon be solved by adding a new functionality to command '::rivet::inspect' 
+    
+2014-01-27 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_config.[c|h]: new file with Apache module configuration
+    procedures moved here from mod_rivet.c. This code is likely to be Apache 2.x
+    but totally independent from the running MPM. Therefore it was moved here
+    to improved size and manageability of mod_rivet.c
+    * src/apache-2/mod_rivet.c: The module central code, from which configuration
+    handling procedures were removed
+
+2014-01-08 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/aida.tcl: adding aida.tcl experimental file
+    for a DIO compatible interface to TDBC. 
+    * rivet/packages/dio/sql.tcl: now able to produce same basic SQL queries
+    ::DIO::Database class is doing now
+
+2013-12-19 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Postgresql.tcl: reindented and tabs converted to spaces
+    * rivet/packages/dio/sql.tcl: class DIO::Sql now returning basic SELECT SQL statements
+
+2013-12-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/sql.tcl: further developments. Class Sql is now able
+    to build an abstract representation of a SELECT query
+    * rivet/packages/dio/dio.tcl: typo in a comment
+
+2013-12-16 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/sql.tcl: trying to redesign rivet in order to comply with
+    Tdbc and aiming at making DIO a pure interface to Tdbc dropping the 
+    dependency with DBMS specific drivers
+
+2013-12-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Tdbc.tcl: first version of Tdbc driver for DIO. This
+    class is able to execute basic queries and needs further development
+
+2013-12-08 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: version number bumped up to 2.1.4
+
+2013-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Postgres.tcl: minor changes (code indentation revised)
+    * rivet/packages/dio/dio_Tdbc.tcl: experimental support for the tdbc
+    abstraction library
+    * doc/xml/install.xml: the manual still suggested to call make install-packages,
+    whereas 'make install' does everything now as it was before 2.1.2
+
+2013-12-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_request.c: log message in ApacheRequest___parse()
+    commented out (Bug #55845)
+
+2013-12-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: Rivet template preprocessor symbols renamed in
+    the more expressive RIVET_TEMPLATE and RIVET_TCLFILE
+    * rivet/rivet-tcl/lassing_array.tcl: new command lassing_array taken
+    from DIO's result set class (inspired by Tclx)
+    * doc/xml/commands.xml: lassign_array documented in the manual
+    * rivet/packages/dio/dio.tcl: reformatted during analysis for supporting
+    tdbc based driver
 
 2013-11-19 Massimo Manghi <mxmanghi@apache.org>
     * 2.1: merging latest changes from trunk

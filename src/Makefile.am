@@ -50,6 +50,7 @@ mod_rivet_la_SOURCES = 	@apache_version_dir@/apache_multipart_buffer.c 	\
 	                    @apache_version_dir@/apache_request.c			\
 	                    @apache_version_dir@/mod_rivet.c 				\
 	                    @apache_version_dir@/TclWebapache.c 			\
+                        @apache_version_dir@/apache_config.c            \
 	                    rivetcmds/rivetCore.c                           \
                         rivetcmds/rivetInspect.c                        \
 	                    rivetChannel.c                                  \
