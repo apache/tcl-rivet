@@ -1,4 +1,6 @@
-<<<<<<< .mine
+2014-02-28 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/upgrading.xml: Adding Karl's note about upgrading from NeoWebScript
+
 2014-02-24 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: completed reworking of manual page for command ::rivet::inspect.
     * .: Preparing RC1 archive for version 2.1.4
