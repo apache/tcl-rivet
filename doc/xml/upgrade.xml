@@ -18,7 +18,33 @@
     </section>
     <section>
       <title>NeoWebScript</title>
-      <para>TODO</para>
+      <para>
+      	NWS was a server-side scripting environment based on the Apache
+        HTTP server and Safe-Tcl and it's not maintained anymore.      
+      </para>
+      <para>
+      	The biggest difference between Rivet and Neowebscript is that 
+      	Neowebscript was designed for shared hosting while Rivet is more oriented 
+      	toward a site that owns all of its content. In the words of Karl Lehenbauer,
+      	NWS author and Rivet Team member:
+      	</para> 
+      	<para>
+      	Rivet, however, is considerably more efficient, powerful, and 
+      	evolved, though it still can support multiple independent sites on a single 
+      	machine through its <quote>separate virtual interpreters</quote> mechanism.
+      	<itemizedlist>
+      		<listitem>By powerful, the difference is that the full power of Tcl is available 
+      		to webpage authors, not the restricted version that NWS provides. 
+      		For instance, you can read or write any file in the system that you 
+      		have permission to, require any package, open sockets and pipes, etc.</listitem>
+      		<listitem>By efficient, the difference is that Tcl interpreters survive past 
+      		the generation of a webpage and are reused again and again, reducing the 
+      		overhead of generating a page.
+      		</listitem>
+				<listitem>By evolved, all of our efforts have gone toward Rivet for many 
+				years and so, you know, Rivet does more out of the box than Neowebscript did.</listitem>
+			</itemizedlist>
+      </para>
     </section>
   </section>
 
