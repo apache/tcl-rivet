@@ -21,9 +21,6 @@
 #
 # $Id$
 
-
-# $Id$
-
 package require Itcl
 
 ### 
@@ -287,6 +284,7 @@ namespace eval ::DIO {
                             dict set where_expr $condition_count predicate $elem
 
                         }
+
                     }
                     set parser_st state0
                 }

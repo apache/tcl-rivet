@@ -44,7 +44,7 @@
 				needed in a <arg>.rvt</arg> template. The contruct is equivalent to
 				writing the following line of Tcl code
 			</para>
-			<programlisting>put -nonewline $string</programlisting>
+			<programlisting>puts -nonewline $string</programlisting>
 			<para>			
 				The <arg>string</arg> argument to the shorthand construct can 
 				be any Tcl command returning a value
@@ -875,29 +875,54 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
              into the configuration, but it can be used in any script. 
          </para>
          <para>
-             <command>::rivet::inspect</command> can be called in three forms
+             <command>::rivet::inspect</command> can be called in 4 different forms
          </para>
          <itemizedlist mark="square">
-			<listitem>
-				Passing as argument the switch <arg>-all</arg> a dictionary
-				carrying the whole configuration is returned
-			</listitem> 
-			
-	    	<listitem>
-				With one argument (one of the Rivet configuration directives) 
-				<command>::rivet::inspect</command> returns the current value
-				in the configuration record	
-			</listitem>
-
+         
             <listitem>            
                With no argument the command returns a dictionary with 3
                keys: server, dir, user. Each key is associated to a subdictionary 
-               carrying the configuration lines actually set. Configuration directives 
-               are the keys in the second level dictionary. In this form the command is 
-               meant to provide a way to create global arrays RivetServerConf, 
-               RivetDirConf and RivetUserConf which are internally used by ::rivet::debug
-			</listitem>
+               carrying the configuration as set for that request.  In this form the command is 
+               meant to support compatibility with previous versions of mod_rivet 
+               where three global array RivetUserConf was created to be internally used by command
+               <command>::rivet::debug</command>.
+            </listitem>
 			
+				<listitem>
+					With the <arg>-all</arg> argument a dictionary
+					carrying the whole configuration for that specific request is returned. 
+					If a configuration parameter is not set it's given the
+					string <emphasis>undefined</emphasis>. Returned configuration paramenters
+					are<programlisting>    "ServerInitScript",
+    "GlobalInitScript",
+    "ChildInitScript",
+    "ChildExitScript",
+    "BeforeScript",
+    "AfterScript",
+    "AfterEveryScript",
+    "AbortScript",
+    "ErrorScript",
+    "UploadMaxSize",
+    "UploadDirectory",
+    "UploadFilesToVar",
+    "SeparateVirtualInterps",
+    "HonorHeaderOnlyRequests"</programlisting>
+				</listitem> 
+			
+		    	<listitem>
+					With one argument (one of the Rivet configuration directives listed above) 
+					<command>::rivet::inspect</command> returns the current value
+					in the configuration record. 
+				</listitem>
+				<listitem>
+					Passing the argument "script" <command>::rivet::inspect</command>
+					returns a path to the current script in a similar way 
+					core command <command>[info script]</command> does. The basic
+					difference is that the core command returns a relative path with
+					respect to the current working directory, whereas mod_rivet's command
+					returns the full path.
+				</listitem>
+
          </itemizedlist>
 	    </refsect1>
 	</refentry>
@@ -949,11 +974,12 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
         <refsect1>
             <title>Description</title>
             <para>
-                <command>lassign_array</command> is an utility command inspired by the same Tclx command.
-                The first argument is a list of values to be assigned to an array that must be 
-                given as second argument. The remaining arguments are the array's variable names to take
-                as values the elements of the list. The command exploit Tcl's <command>foreach</command> construct
-                ability to scan multiple lists. Variables names don't matching values in the list are given an empty string.
+                <command>lassign_array</command> is an utility command inspired by the same Tclx command and 
+                with a close resemblance with Tcl's <command>lassign</command> for assigning list elements to variables.
+                <command>lassign_array</command> first argument is a list of values to be assigned to an array that must be 
+                given as second argument. The remaining arguments are the array's variable names which will store
+                as values the elements of the list. Variables names don't matching values in the list are given an empty string. 
+                Unassigned list elements are returned as a list.
 	       </para>
 	       <programlisting>::rivet::lassign_array {1 2 3 4} assigned_array a b c d
 parray assigned_array
@@ -961,7 +987,11 @@ parray assigned_array
 assigned_list(a) = 1
 assigned_list(b) = 2
 assigned_list(c) = 3
-assigned_list(d) = 4</programlisting>
+assigned_list(d) = 4
+
+set rem [::rivet::lassign_array {1 2 3 4 5 6 7} assigned_array a b c d]
+puts $rem
+5 6 7</programlisting>
 	   </refsect1>
 	</refentry>
 		
@@ -977,7 +1007,7 @@ assigned_list(d) = 4</programlisting>
 	    <refsynopsisdiv>
 		<cmdsynopsis>
 		    <command>::rivet::lempty</command>
-		    <arg>list</arg>
+		    <arg choice="plain">list</arg>
 		</cmdsynopsis>
 	    </refsynopsisdiv>	
 	    <refsect1>
@@ -1004,8 +1034,8 @@ assigned_list(d) = 4</programlisting>
 			<arg>-glob</arg>
 			<arg>-regexp</arg>
 		    </group>
-		    <arg>list</arg>
-		    <arg>pattern</arg>
+		    <arg choice="plain">list</arg>
+		    <arg choice="plain">pattern</arg>
 		</cmdsynopsis>
 	    </refsynopsisdiv>	
 	    <refsect1>
@@ -1147,6 +1177,40 @@ bxxb ccxxxxcc</programlisting>
 		    two subsequent calls.  
 		</para>
 	    </refsect1>
+	</refentry>
+	
+	<refentry id="lremove">
+	   <refnamediv>
+	       <refname>lremove</refname>
+		   <refpurpose>remove from a list elements matching one or more patterns</refpurpose>
+	   </refnamediv>
+	   <refsynopsisdiv>
+           <command>::rivet::lremove</command> 
+           <group choice="req">
+           <arg>-regexp | -glob | -exact</arg></group> 
+           <arg choice="plain">list</arg>
+           <arg choice="plain">pattern</arg> 
+           <arg><replaceable>pattern</replaceable></arg>	   
+           <arg><replaceable>pattern</replaceable></arg>	   
+
+	   </refsynopsisdiv>
+	   <refsect1>
+		<title>Description</title>
+		<para>
+		  <command>lremove</command> removes from list <arg>list</arg> the first occurrence
+		  of an element matching one of the patterns listed in the command line. By specifying the
+		  <option>-all</option> option every occurrence of one the patterns is removed
+	    </para>
+	    <para>
+	       Pattern matching can be <option>-exact</option>,<option>-glob</option> style or following 
+	       regular expressions (<option>-regexp</option>). These options are globally valid across the 
+	       whole pattern list (default is glob style matching)  
+	    </para>
+	    <programlisting>::rivet::lremove -all -regexp {aa e111 bab aa} aa e111 bab
+e111 bab
+::rivet::lremove -all -regexp {aa e111 bab aa} aa "e\\d+"
+bab</programlisting>
+	   </refsect1>
 	</refentry>
 
 	<refentry id="makeurl">

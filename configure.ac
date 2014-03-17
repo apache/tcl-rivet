@@ -245,8 +245,8 @@ AC_DEFUN([APACHE],[
     AC_MSG_CHECKING(for Apache base)
     AC_ARG_WITH(
         apache,
-        [  --with-apache[=DIR] Apache server base directory],
-    , [with_apache="/usr/local/apache2"]
+        [  --with-apache[=DIR] Apache server base directory],, 
+        [with_apache="/usr/local/apache2"]
     )
     apache_base="${with_apache}"
     AC_MSG_RESULT([$apache_base])
@@ -259,11 +259,11 @@ AC_DEFUN([CHECK_APXS],[
     AC_MSG_CHECKING(for Apache apxs)
     AC_ARG_WITH(
         apxs,
-        [  --with-apxs=FILE        location of Apache's apxs tool],  
-    [if test -x "${with_apxs}" ; then
-        apxs_found="${with_apxs}"
-            AC_MSG_RESULT([$apxs_found])
-    fi]
+        [  --with-apxs=FILE        location of Apache apxs tool],  
+        [if test -x "${with_apxs}" ; then
+            apxs_found="${with_apxs}"
+                AC_MSG_RESULT([$apxs_found])
+        fi]
         ,
         [ 
         APXS_NAMES=apxs
@@ -708,6 +708,7 @@ if test $import_rivet_commands = "yes"; then
 else
     RIVET_COMMANDS_EXPORT
 fi
+AC_C_INLINE
 
 AC_SUBST(apache_version_dir)
 AC_SUBST(MOD_RIVET_INCLUDES)

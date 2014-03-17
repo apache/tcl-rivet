@@ -1,3 +1,62 @@
+2014-03-16 Massimo Manghi <mxmanghi@apache.org>
+    * doc/images/Rivetlogo_small.png: removed because already in doc/ and dupicate to home.png
+
+2014-02-28 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/upgrading.xml: Adding Karl's note about upgrading from NeoWebScript
+
+2014-02-24 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: completed reworking of manual page for command ::rivet::inspect.
+    * .: Preparing RC1 archive for version 2.1.4
+ 
+2014-02-22 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: further elaboration of the section about command ::rivet::inspect
+
+2014-02-21 Massimo Manghi <mxmanghi@apache.org>
+    * tests/inspect.[test|tcl]: adding tests for introspection command
+
+2014-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetCore.c: spurious ref count decrement caused random crashes
+    * src/rivetcmds/rivetInspect.c: fixed behaviour when inspect is passed with an undefined argument value
+    * configure.ac: reindented some function to improve readability and editor independence
+
+2014-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetInspect.c,src/librivet/rivetList.c: removing lines of code commented and unused
+    * doc/xml/commands.xml: documenting command lremove 
+    * tests/rivetlib.test: adding more tests for lremove
+
+2014-02-11 Massimo Manghi <mxmanghi@apache.org>
+    * tests/rivetlib.test: adding tests for rivetlib
+    * rivet/packages/dio/aida.tcl,sql.tcl: new files for development of DIO compatible interface to tdbc
+    * rivet/rivet-tcl/lassign_array.tcl: removed since already provided in rivetlib
+    * docs/xml/commands.xml: documenting features of lassign_array.tcl rivetlib version 
+
+2014-02-06 Massimo Manghi <mxmanghi@apache.org>
+    * ChangeLog: timestamps of latest entries of this file carried the wrong year (2013)
+    * rivet/packages/dio/dio_Mysql.tcl: fixed comment lines placed within the switch construct
+    that have become incompatibile with Tcl8.6. 
+    * configure.ac: add AC_C_INLINE macro
+
+2014-02-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmd/rivetCore.c: testing globals->r against NULL and in case return a null string
+    * src/apache-2/mod_rivet.c: using only globals->r to flag a request processing under way
+ 
+2014-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: globals->req had to be set to NULL in Rivet_PerInterpInit!
+
+2014-02-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.[c|h]: further optimizing code avoiding to
+    allocate a TclWebRequest structure on every request. This structure
+    is allocate when the interpreter is initialized and a pointer
+    stored in rivet globals
+    * src/rivetcmd/rivetInspect.c: impoved consistence if Tcl objects handling
+
+2014-01-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: this ChangeLog entry is meant to amend the
+    2014-01-27 entry that missed to point out as small still important change
+    in mod_rivet.c. Rivet_SendContent is not calling Tcl anymore to coax 
+    command 'info script' to return the current Rivet script full path. This
+    will soon be solved by adding a new functionality to command '::rivet::inspect' 
+    
 2014-01-27 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_config.[c|h]: new file with Apache module configuration
     procedures moved here from mod_rivet.c. This code is likely to be Apache 2.x

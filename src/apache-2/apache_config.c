@@ -15,7 +15,7 @@
    limitations under the License.
 */
 
-/* $Id: apache_config.c 1547463 2013-12-03 16:35:08Z mxmanghi $ */
+/* $Id$ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
