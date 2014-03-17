@@ -30,7 +30,7 @@
     <simplesect>
         <title>Acknowledgements</title>
         <para>
-            Rivet 2.1.0 comes with relevant contributions provided by 
+            Rivet 2.1 comes with relevant contributions provided by 
             <emphasis>Harald Oehlmann</emphasis> (page RivetEntitites, 
             new command ::rivet::http_accept and bugfixes), 
             <emphasis>Cyril Shtumf</emphasis> (important bugfixes) and
