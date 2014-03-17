@@ -1391,7 +1391,7 @@ Rivet_SendContent(request_rec *r)
         int content_type_len = strlen(r->content_type);
 
         if (((ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
-             ((ctype==RIVET_TCLFILE)  && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
+             ((ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
             
             char* charset;
 
