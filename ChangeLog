@@ -1,3 +1,6 @@
+2014-03-16 Massimo Manghi <mxmanghi@apache.org>
+    * doc/images/Rivetlogo_small.png: removed because already in doc/ and dupicate to home.png
+
 2014-02-28 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/upgrading.xml: Adding Karl's note about upgrading from NeoWebScript
 
