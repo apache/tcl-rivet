@@ -1,3 +1,8 @@
+2014-03-26 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: wrong example for lassign_array corrected
+    * src/apache-2/mod_rivet.c: Adding comment explaining the meaning of setting/resetting globals->r as
+    a way to detect if a script is running in the context of a request processing
+
 2014-03-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/images/Rivetlogo_small.png: removed because already in doc/ and dupicate to home.png
 

@@ -1254,6 +1254,14 @@ Rivet_SendContent(request_rec *r)
     rsc = Rivet_GetConf(r);
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    /* Setting this pointer in globals is crucial as by assigning it
+     * we signal to Rivet commands we are processing an HTTP request.
+     * This pointer gets set to NULL just before we leave this function
+     * making possible to invalidate command execution that could depend
+     * on a valid request_rec
+     */
+
     globals->r = r;
 
 #ifndef USE_APACHE_RSC

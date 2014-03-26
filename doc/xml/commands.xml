@@ -983,11 +983,11 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 	       </para>
 	       <programlisting>::rivet::lassign_array {1 2 3 4} assigned_array a b c d
 parray assigned_array
-<emphasis role="strong">assigned_list</emphasis>
-assigned_list(a) = 1
-assigned_list(b) = 2
-assigned_list(c) = 3
-assigned_list(d) = 4
+<emphasis role="strong">assigned_array</emphasis>
+assigned_array(a) = 1
+assigned_array(b) = 2
+assigned_array(c) = 3
+assigned_array(d) = 4
 
 set rem [::rivet::lassign_array {1 2 3 4 5 6 7} assigned_array a b c d]
 puts $rem
