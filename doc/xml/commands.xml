@@ -862,7 +862,7 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 
 	    <refsynopsisdiv>
 		<cmdsynopsis>
-		    <command>inspect</command>
+		    <command>::rivet::inspect</command>
 		    <arg><replaceable>configuration_section</replaceable></arg>
 		    <arg><replaceable>configuration_parameter</replaceable></arg>
 		</cmdsynopsis>

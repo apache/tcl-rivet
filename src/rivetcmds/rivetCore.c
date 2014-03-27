@@ -1308,6 +1308,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         rsc = Rivet_GetConf(globals->r); 
         dictObj = Rivet_BuildConfDictionary(interp,rsc);
         if (dictObj != NULL) {
+            Tcl_IncrRefCount(dictObj);
             Tcl_SetObjResult(interp,dictObj);
             Tcl_DecrRefCount(dictObj);
         } else {
@@ -1326,15 +1327,9 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             
             rsc = Rivet_GetConf(globals->r); 
             dictObj = Rivet_CurrentConfDict(interp,rsc);
-            if (dictObj == NULL)
-            {
-                status = TCL_ERROR;
-            }
-            else
-            {
-                Tcl_SetObjResult(interp,dictObj);            
-                Tcl_DecrRefCount(dictObj);
-            }
+            Tcl_IncrRefCount(dictObj);
+            Tcl_SetObjResult(interp,dictObj);            
+            Tcl_DecrRefCount(dictObj);
 
         }
         else
@@ -1345,11 +1340,19 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             par_value = Rivet_ReadConfParameter(interp,rsc,par_name);
             if (par_value == NULL)
             {
+                Tcl_Obj* errorinfo = Tcl_NewStringObj("mod_rivet internal error invalid argument: ",-1);
+
+                Tcl_IncrRefCount(errorinfo);
+                Tcl_AppendObjToObj(errorinfo,par_name);
+                Tcl_AppendObjToErrorInfo(interp,errorinfo);
+                Tcl_DecrRefCount(errorinfo);
                 status = TCL_ERROR;
             }
             else
             {
+                Tcl_IncrRefCount(par_value);
                 Tcl_SetObjResult(interp,par_value);
+                Tcl_DecrRefCount(par_value);
             }
 
         }

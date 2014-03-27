@@ -312,7 +312,7 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
     conf_tables[1] = rivet_conf->rivet_user_vars;
     conf_tables[2] = rivet_conf->rivet_server_vars;
 
-    Tcl_IncrRefCount(conf_dict);
+    // Tcl_IncrRefCount(conf_dict);
 
     for (it=0; it < 3; it++)
     {
@@ -372,8 +372,9 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
  *
  * Returned value_
  *
- * - a Tcl_Obj* pointer to a dictionary. The dictionary object
- *  refCount is set to 1
+ * - a Tcl_Obj* pointer to a dictionary. The function is guaranteed to
+ *  return a Tcl_Obj pointer
+ *   
  */
 
 Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
@@ -383,8 +384,6 @@ Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
     Tcl_Obj* par_name; 
     static const char** p;
 
-    Tcl_IncrRefCount(dictObj);
-
     for (p = confDirectives; (*p) != NULL; p++)
     {
         Tcl_Obj* par_value;
@@ -393,28 +392,13 @@ Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
         Tcl_IncrRefCount(par_name);
 
         par_value = Rivet_ReadConfParameter(interp,rivet_conf,par_name);
-        if (par_value != NULL)
-        {
-            Tcl_IncrRefCount(par_value);
-            Tcl_DictObjPut(interp,dictObj,par_name,par_value);
-            Tcl_DecrRefCount(par_value);
-        }
-        else
-        {
-            Tcl_Obj* message = Tcl_NewStringObj("Invalid configuration option: ",-1);
-            
-            Tcl_IncrRefCount(message);
-            Tcl_AppendObjToObj(message,par_name);
-            Tcl_AddErrorInfo(interp, Tcl_GetStringFromObj(message,NULL));
+        ap_assert(par_value != NULL);
 
-            Tcl_DecrRefCount(message);
-            Tcl_DecrRefCount(par_name);
-            Tcl_DecrRefCount(dictObj);
-            dictObj = NULL;
-            break;
-        }
+        Tcl_IncrRefCount(par_value);
+        Tcl_DictObjPut(interp,dictObj,par_name,par_value);
+        Tcl_DecrRefCount(par_value);
+
         Tcl_DecrRefCount(par_name);
-
     }
 
     return dictObj;

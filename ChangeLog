@@ -2,6 +2,10 @@
     * doc/xml/commands.xml: wrong example for lassign_array corrected
     * src/apache-2/mod_rivet.c: Adding comment explaining the meaning of setting/resetting globals->r as
     a way to detect if a script is running in the context of a request processing
+    * src/rivetcmds/rivetCore.c,rivetInspect.c: Tcl object handling improved. Code simplified and
+    ap_assert call added in Rivet_CurrentConfDict if there is no handling of a configuration parameter
+    by Rivet_ReadConfParameter (which should never happen)
+    * configure.ac, VERSION: version number bumped to 2.1.5
 
 2014-03-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/images/Rivetlogo_small.png: removed because already in doc/ and dupicate to home.png
