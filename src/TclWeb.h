@@ -24,16 +24,20 @@
 #define DEFAULT_TIME_FORMAT "%A, %d-%b-%Y %H:%M:%S %Z"
 
 typedef struct TclWebRequest {
-    Tcl_Interp *interp;
-    request_rec *req;
-    ApacheRequest *apachereq;
-    ApacheUpload *upload;
-    int headers_printed;	/* has the header been printed yet? */
-    int headers_set;		/* has the header been set yet? */
-    int content_sent;
-    int environment_set;	/* have we setup the environment variables? */
-    char* charset;
+    Tcl_Interp*     interp;
+    request_rec*    req;
+    ApacheRequest*  apachereq;
+    ApacheUpload*   upload;
+    int             headers_printed;	/* has the header been printed yet? */
+    int             headers_set;		/* has the header been set yet? */
+    int             content_sent;
+    int             environment_set;	/* have we setup the environment variables? */
+    char*           charset;
 } TclWebRequest;
+
+/* Creates a TclWebRequest object */
+
+TclWebRequest* TclWeb_NewRequestObject (apr_pool_t *p);
 
 /*
  *-----------------------------------------------------------------------------
@@ -45,7 +49,6 @@ typedef struct TclWebRequest {
  */
 
 int TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg);
-
 
 /*
  *-----------------------------------------------------------------------------

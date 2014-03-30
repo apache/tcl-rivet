@@ -52,20 +52,56 @@ extern module rivet_module;
 if (source == VAR_SRC_QUERYSTRING) { j = req->apachereq->nargs; } \
 else if (source == VAR_SRC_POST) { i = req->apachereq->nargs; }
 
+/* 
+ * -- TclWeb_NewRequestObject
+ *
+ *
+ */
+
+TclWebRequest*
+TclWeb_NewRequestObject (apr_pool_t *p)
+{
+    TclWebRequest*  req = (TclWebRequest *)apr_pcalloc(p, sizeof(TclWebRequest));
+
+    req->interp     = NULL;
+    req->req        = NULL;
+    req->apachereq  = ApacheRequest_new(p);
+    req->headers_printed    = 0;
+    req->headers_set        = 0;
+    req->environment_set    = 0;
+    req->charset    = NULL;  /* we will test against NULL to check if a charset */
+                             /* was specified in the conf */
+    return req;
+}
+
+
+/*
+ * -- TclWeb_InitRequest
+ *
+ * called once on every HTTP request initializes fields and
+ * objects referenced in a TclWebRequest object
+ *
+ * Arguments:
+ *
+ *  *req:    a pointer to a TclWebRequest object to be intialized
+ *  *interp: current Tcl_Interp object serving the request
+ *  *arg:    generic pointer. Current implementation passes the
+ *           request_rec object pointer 
+ *
+ */
+
 int
 TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg)
 {
     request_rec *r = (request_rec *)arg;
 
-    req->interp = interp;
-    req->req = r;
-    req->apachereq = ApacheRequest_new(r);
-    req->headers_printed = 0;
-    req->headers_set = 0;
-    req->environment_set = 0;
+    req->interp             = interp;
+    req->req                = r;
+    req->apachereq          = ApacheRequest_init(req->apachereq,r);
+    req->headers_printed    = 0;
+    req->headers_set        = 0;
+    req->environment_set    = 0;
 
-    /* we will test against NULL to check if a charset 
-       was specified in the conf */
 
     req->charset = NULL;
     return TCL_OK;

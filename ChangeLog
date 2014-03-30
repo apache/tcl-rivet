@@ -1,3 +1,17 @@
+2014-03-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetInspect.c: Add function Rivet_CurrentServerRec returning a dictionary of
+    some field values stored in the server_rec object
+    * src/rivetcmds/rivetCore.c: Add support for 'server' argument returning the dictionary built
+    by Rivet_CurrentServerRec
+    * src/TclWeb.h: adding declaration of function constructor of a TclWebRequest object
+    * src/apache-2/TclWebapache.c: Add functions TclWeb_NewRequestObject and TclWeb_InitRequest to
+    reinitialize a TclWebRequest object on each request
+    * src/apache-2/apache_request.[c|h]: API change for ApacheRequest_new taking now an apr_pool_t
+    object instance for creating an ApacheRequest oject pointer. Task to reset this object
+    to initial values is now delegated to ApacheRequest_init.
+    * src/apache-2/mod_rivet.[c|h]: new field in globals stores the current server_rec object pointer.
+    This pointer is used in RivetInspect.c to access to field of the object for introspection
+    
 2014-03-26 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: wrong example for lassign_array corrected
     * src/apache-2/mod_rivet.c: Adding comment explaining the meaning of setting/resetting globals->r as

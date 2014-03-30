@@ -92,7 +92,8 @@ struct ApacheUpload {
  extern "C" {
 #endif 
 
-ApacheRequest *ApacheRequest_new(request_rec *r);
+ApacheRequest*  ApacheRequest_new(apr_pool_t *);
+ApacheRequest*  ApacheRequest_init(ApacheRequest* req, request_rec *r);
 /* int ApacheRequest_save_post_data(request_rec *r, int flag);
 char *ApacheRequest_fetch_post_data(request_rec *r);  */
 int ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct);

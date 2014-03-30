@@ -403,3 +403,65 @@ Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
 
     return dictObj;
 }
+
+/*
+ * -- Rivet_CurrentServerRec
+ *
+ * ::rivet::inspect provides also some basic access to 
+ * fields of the server_rec object.
+ *
+ * 
+ */
+
+Tcl_Obj* 
+Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s )
+{
+    Tcl_Obj* dictObj; 
+    Tcl_Obj* field_name;
+    Tcl_Obj* field_value;
+    
+    dictObj = Tcl_NewObj();
+
+    field_value = Tcl_NewStringObj(s->server_hostname,-1);
+    field_name  = Tcl_NewStringObj("hostname",-1);
+    Tcl_IncrRefCount(field_value);
+    Tcl_IncrRefCount(field_name);
+
+    Tcl_DictObjPut(interp,dictObj,field_name,field_value);
+
+    Tcl_DecrRefCount(field_value);
+    Tcl_DecrRefCount(field_name);
+
+    field_value = Tcl_NewStringObj(s->error_fname,-1);
+    field_name  = Tcl_NewStringObj("errorlog",-1);
+    Tcl_IncrRefCount(field_value);
+    Tcl_IncrRefCount(field_name);
+
+    Tcl_DictObjPut(interp,dictObj,field_name,field_value);
+
+    Tcl_DecrRefCount(field_value);
+    Tcl_DecrRefCount(field_name);
+
+
+    field_value = Tcl_NewStringObj(s->server_admin,-1);
+    field_name  = Tcl_NewStringObj("admin",-1);
+    Tcl_IncrRefCount(field_value);
+    Tcl_IncrRefCount(field_name);
+
+    Tcl_DictObjPut(interp,dictObj,field_name,field_value);
+
+    Tcl_DecrRefCount(field_value);
+    Tcl_DecrRefCount(field_name);
+
+    field_value = Tcl_NewStringObj(s->path,-1);
+    field_name  = Tcl_NewStringObj("server_path",-1);
+    Tcl_IncrRefCount(field_value);
+    Tcl_IncrRefCount(field_name);
+
+    Tcl_DictObjPut(interp,dictObj,field_name,field_value);
+
+    Tcl_DecrRefCount(field_value);
+    Tcl_DecrRefCount(field_name);
+
+    return dictObj;
+}
