@@ -1,3 +1,8 @@
+2014-04-04 Massimo Manghi <mxmanghi@apache.org>
+    * tests/failtest.tcl,failtest.test,checkfail.tcl: adding script for commands that must fail
+    outside of a request processing (to be completed)
+    * src/rivetcmds/rivetCore.c: comment rephrased
+
 2014-03-30 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetInspect.c: Add function Rivet_CurrentServerRec returning a dictionary of
     some field values stored in the server_rec object

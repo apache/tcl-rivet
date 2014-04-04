@@ -1,0 +1,17 @@
+# This test is for those commands that must not run outside of a request processing
+
+::tcltest::test failtest-1.1 {commands that must refuse to run in child init or exit} {
+    apachetest::start { 
+            -c "RivetServerConf ChildInitScript \" source checkfails.tcl \"" } {} {
+        catch {
+            set inspect_page [::http::geturl "${urlbase}failtest.tcl"]
+            set match [::http::data $inspect_page]
+            ::http::cleanup $inspect_page
+
+        }
+    }
+    set match
+} {env->1
+makeurl->1
+}
+

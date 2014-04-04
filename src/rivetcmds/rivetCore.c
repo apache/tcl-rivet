@@ -68,7 +68,7 @@ if (r == NULL)\
  *
  * Adds standard error information to the interpreter. This procedure makes 
  * sense only when called by C functions implementing Tcl commands that
- * make sense only if a valid requiest_rec object is required. These
+ * are meaningful only if a valid requiest_rec object is defined. These
  * procedures must return TCL_ERROR right away after Rivet_NoRequestRecord
  * returns
  *
