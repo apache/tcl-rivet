@@ -11,7 +11,18 @@
         }
     }
     set match
-} {env->1
+} {apache_table->1
+env->1
+headers->1
+include->1
+inspect->1
+load_env->1
+load_headers->1
 makeurl->1
+no_body->1
+parse->1
+raw_post->1
+var->1
+virtual_filename->1
 }
 

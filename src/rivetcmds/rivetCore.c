@@ -55,6 +55,7 @@ extern module rivet_module;
 extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 #define POOL (globals->r->pool)
+
 #define CHECK_REQUEST_REC(r,cmd_name) \
 if (r == NULL)\
 {\
@@ -749,7 +750,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    CHECK_REQUEST_REC(globals->r,"::rivet::apache_tables");
+    CHECK_REQUEST_REC(globals->r,"::rivet::apache_table");
     if ((objc < 3) || (objc > 5)) {
         Tcl_WrongNumArgs(interp, 1, objv, "option tablename ?args?");
         return TCL_ERROR;

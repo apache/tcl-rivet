@@ -1,3 +1,9 @@
+2014-04-07 Massimo Manghi <mxmanghi@apache.org>
+    * tests/failtest.[test|tcl],failcheck.tcl: implementing test for consistent error
+    handling by commands that are supposed to refuse execution outside of a request processing
+    * tests/inspect.tcl: implementing test of command '::rivet::inspect script'
+    * src/rivetcmds/rivetCore.c: typo in command ::rivet::apache_table
+
 2014-04-04 Massimo Manghi <mxmanghi@apache.org>
     * tests/failtest.tcl,failtest.test,checkfail.tcl: adding script for commands that must fail
     outside of a request processing (to be completed)
