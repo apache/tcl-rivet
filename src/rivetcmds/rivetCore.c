@@ -1368,12 +1368,12 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         Tcl_Obj* par_name = objv[1];
         char*    cmd_arg  = Tcl_GetStringFromObj(par_name,NULL);
 
-        CHECK_REQUEST_REC(globals->r,"::rivet::inspect <conf_parameter>");
         Tcl_IncrRefCount(par_name);
         if (STRNEQU(cmd_arg,"-all"))
         {
             Tcl_Obj* dictObj;
             
+            CHECK_REQUEST_REC(globals->r,"::rivet::inspect -all");
             rsc = Rivet_GetConf(globals->r); 
             dictObj = Rivet_CurrentConfDict(interp,rsc);
             Tcl_IncrRefCount(dictObj);

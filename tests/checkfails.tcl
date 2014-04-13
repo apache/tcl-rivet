@@ -1,9 +1,27 @@
 
+# -- check_inspect 
+#
+# tests ::rivet::inspect in its different forms
+#
+
+proc check_inspect { cmd_form args } {
+
+    set ::failtest(inspect${cmd_form}) 0
+    
+    set cmdeval [list ::rivet::inspect {*}$args]
+    if {[catch {eval $cmdeval}]} { set ::failtest(inspect${cmd_form}) 1 }
+
+}
+
+# -- check_fail
+#
+# general purpose test function for commands having a single form 
+#
+
 proc check_fail {cmd args} {
     set ::failtest($cmd) 0
 
     set cmdeval [list $cmd {*}$args]
-    
     if {[catch {eval $cmdeval}]} { set ::failtest($cmd) 1 }
 }
 
@@ -23,4 +41,9 @@ check_fail raw_post
 check_fail var all
 check_fail no_body
 check_fail virtual_filename unkn
-check_fail inspect 
+check_inspect 0 
+check_inspect 1 ChildInitScript
+check_inspect 2 -all
+check_inspect 3 server
+check_inspect 4 script
+
