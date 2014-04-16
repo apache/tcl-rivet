@@ -442,7 +442,6 @@ Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s )
     Tcl_DecrRefCount(field_value);
     Tcl_DecrRefCount(field_name);
 
-
     field_value = Tcl_NewStringObj(s->server_admin,-1);
     field_name  = Tcl_NewStringObj("admin",-1);
     Tcl_IncrRefCount(field_value);
@@ -463,5 +462,14 @@ Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s )
     Tcl_DecrRefCount(field_value);
     Tcl_DecrRefCount(field_name);
 
+    field_value = Tcl_NewIntObj(s->is_virtual);
+    field_name  = Tcl_NewStringObj("virtual",-1);
+    Tcl_IncrRefCount(field_value);
+    Tcl_IncrRefCount(field_name);
+
+    Tcl_DictObjPut(interp,dictObj,field_name,field_value);
+
+    Tcl_DecrRefCount(field_value);
+    Tcl_DecrRefCount(field_name);
     return dictObj;
 }
