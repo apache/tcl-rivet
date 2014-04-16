@@ -61,7 +61,9 @@ namespace eval DIO {
 
         }
 
-# -- 
+# -- destructor 
+#
+#
 
         constructor {args} { eval configure $args } {
             if {[catch {package require tdbc}]} {

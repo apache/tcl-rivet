@@ -1,5 +1,7 @@
 2014-04-16 Massimo Manghi <mxmanghi@apache.org>
-    * src/rivetcmds/rivetInpect.c: adding is_virtual flag to values returned by '::rivet::inspect server'
+    * rivet/packages/dio/aida.tcl,dio_Tdbc.tcl,sql.tcl: more methods implemented in aida.tcl
+    * doc/xml/commands.xml: new for '::rivet::inspect server' documented
+    * src/rivetcmds/rivetInspect.c: adding is_virtual flag to values returned by '::rivet::inspect server'
 
 2014-04-11 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetCore.c: misplaced check on request_rec in Rivet_InspectCmd

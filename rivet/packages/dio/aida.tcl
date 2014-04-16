@@ -60,6 +60,11 @@ proc handle {interface args} {
     private variable sql
 }
 
+    ::itcl::body Aida::build_select_query {args} {
+        return [$sqlobj build_select_query {*}$args]
+    }
+
+
     # -- result
     #
     # returns a return object

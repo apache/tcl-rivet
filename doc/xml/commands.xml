@@ -875,7 +875,7 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
              into the configuration, but it can be used in any script. 
          </para>
          <para>
-             <command>::rivet::inspect</command> can be called in 4 different forms
+             <command>::rivet::inspect</command> can be called in 5 different forms
          </para>
          <itemizedlist mark="square">
          
@@ -884,7 +884,7 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
                keys: server, dir, user. Each key is associated to a subdictionary 
                carrying the configuration as set for that request.  In this form the command is 
                meant to support compatibility with previous versions of mod_rivet 
-               where three global array RivetUserConf was created to be internally used by command
+               where three global arrays were created to be internally used by command
                <command>::rivet::debug</command>.
             </listitem>
 			
@@ -910,10 +910,11 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 				</listitem> 
 			
 		    	<listitem>
-					With one argument (one of the Rivet configuration directives listed above) 
-					<command>::rivet::inspect</command> returns the current value
-					in the configuration record. 
+					With one of the Rivet configuration directives listed above as
+					single argument <command>::rivet::inspect</command> returns the 
+					current value in the configuration record. 
 				</listitem>
+				
 				<listitem>
 					Passing the argument "script" <command>::rivet::inspect</command>
 					returns a path to the current script in a similar way 
@@ -923,6 +924,17 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 					returns the full path.
 				</listitem>
 
+                <listitem>
+                    Passing the argument "server" <command>::rivet::inspect</command>
+                    returns a dictionary with these fields taken from the server record
+                    descriptor
+                    <itemizedlist>
+                        <listitem>hostname: The server hostname </listitem>
+                        <listitem>admin: The admin's contact information</listitem>
+                        <listitem>errorlog: The name of the error log</listitem>
+                        <listitem>server_path: Pathname for ServerPath</listitem>
+                    </itemizedlist>  
+                </listitem>
          </itemizedlist>
 	    </refsect1>
 	</refentry>
