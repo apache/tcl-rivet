@@ -110,9 +110,10 @@ typedef struct _rivet_interp_globals {
     Tcl_Namespace   *rivet_ns;          /* Rivet commands namespace */
     int             page_aborting;	    /* set by abort_page.       */
     Tcl_Obj*        abort_code;			/* To be reset by Rivet_SendContent */
+    server_rec*     srec;               /* pointer to the current server rec obj */
 } rivet_interp_globals;
 
-int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);
+int Rivet_ParseExecFile   (TclWebRequest *req, char *filename, int toplevel);
 int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
@@ -139,6 +140,8 @@ Tcl_Obj* Rivet_ReadConfParameter (  Tcl_Interp*         interp,
 
 Tcl_Obj* Rivet_CurrentConfDict (    Tcl_Interp*           interp,
                                     rivet_server_conf*    rivet_conf);
+
+Tcl_Obj* Rivet_CurrentServerRec (   Tcl_Interp*         interp, server_rec* s );
 
 /* error code set by command 'abort_page' */
 

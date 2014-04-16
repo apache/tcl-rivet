@@ -25,3 +25,16 @@
 } {server {ChildInitScript {set init 1
 }}}
 
+::tcltest::test inspect-1.2 {basic introspection} {
+    file copy -force inspect.tcl /tmp/
+    apachetest::start {
+        -c "DocumentRoot /tmp" } {} {
+        catch {
+            set inspect_page [::http::geturl "${urlbase}inspect.tcl?p=script"]
+            set match [::http::data $inspect_page]
+            ::http::cleanup $inspect_page
+        }
+    }
+    file delete /tmp/inspect.tcl
+    set match
+} {/tmp/inspect.tcl}

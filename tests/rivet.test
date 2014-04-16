@@ -61,6 +61,7 @@ if { $testgroup2 } {
 
 if { $testgroup3 } {
     foreach Test {
+        failtest.test
         broken.test
         config.test
         lang.test

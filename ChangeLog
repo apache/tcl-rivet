@@ -1,3 +1,45 @@
+2014-04-16 Massimo Manghi <mxmanghi@apache.org>
+    * branches/modular: merging latest changes in trunk
+    * trunk/src/rivetcmds/rivetInpect.c: adding is_virtual flag to values returned by '::rivet::inspect server'
+
+2014-04-11 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetCore.c: misplaced check on request_rec in Rivet_InspectCmd
+    * tests/failtest.tcl,failtest.test,checkfail.tcl: adding tests for ::rivet::inspect
+
+2014-04-07 Massimo Manghi <mxmanghi@apache.org>
+    * tests/failtest.[test|tcl],failcheck.tcl: implementing test for consistent error
+    handling by commands that are supposed to refuse execution outside of a request processing
+    * tests/inspect.tcl: implementing test of command '::rivet::inspect script'
+    * src/rivetcmds/rivetCore.c: typo in command ::rivet::apache_table
+
+2014-04-04 Massimo Manghi <mxmanghi@apache.org>
+    * tests/failtest.tcl,failtest.test,checkfail.tcl: adding script for commands that must fail
+    outside of a request processing (to be completed)
+    * src/rivetcmds/rivetCore.c: comment rephrased
+
+2014-03-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetInspect.c: Add function Rivet_CurrentServerRec returning a dictionary of
+    some field values stored in the server_rec object
+    * src/rivetcmds/rivetCore.c: Add support for 'server' argument returning the dictionary built
+    by Rivet_CurrentServerRec
+    * src/TclWeb.h: adding declaration of function constructor of a TclWebRequest object
+    * src/apache-2/TclWebapache.c: Add functions TclWeb_NewRequestObject and TclWeb_InitRequest to
+    reinitialize a TclWebRequest object on each request
+    * src/apache-2/apache_request.[c|h]: API change for ApacheRequest_new taking now an apr_pool_t
+    object instance for creating an ApacheRequest oject pointer. Task to reset this object
+    to initial values is now delegated to ApacheRequest_init.
+    * src/apache-2/mod_rivet.[c|h]: new field in globals stores the current server_rec object pointer.
+    This pointer is used in RivetInspect.c to access to field of the object for introspection
+    
+2014-03-26 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: wrong example for lassign_array corrected
+    * src/apache-2/mod_rivet.c: Adding comment explaining the meaning of setting/resetting globals->r as
+    a way to detect if a script is running in the context of a request processing
+    * src/rivetcmds/rivetCore.c,rivetInspect.c: Tcl object handling improved. Code simplified and
+    ap_assert call added in Rivet_CurrentConfDict if there is no handling of a configuration parameter
+    by Rivet_ReadConfParameter (which should never happen)
+    * configure.ac, VERSION: version number bumped to 2.1.5
+
 2014-03-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/images/Rivetlogo_small.png: removed because already in doc/ and dupicate to home.png
 

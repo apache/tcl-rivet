@@ -90,6 +90,7 @@ TCL_DECLARE_MUTEX(sendMutex);
 
 static Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 static void Rivet_CreateCache (server_rec *s, apr_pool_t *p);
+static apr_status_t Rivet_ChildExit(void *data);
 
 /*
  * -- Rivet_chdir_file (const char* filename)
@@ -713,7 +714,8 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
                                             (Tcl_NamespaceDeleteProc *)NULL);
     globals->page_aborting  = 0;
     globals->abort_code     = NULL;
-    globals->req            = (TclWebRequest *)apr_pcalloc(p, sizeof(TclWebRequest));;
+    globals->req            = TclWeb_NewRequestObject (p); 
+    globals->srec           = s;
     globals->r              = NULL;
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
@@ -873,122 +875,6 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
                  rivet_panic_server_rec, "%s", buf);
 
     abort();
-}
-
-
-/*
- *-----------------------------------------------------------------------------
- *
- * Rivet_ChildHandlers --
- *
- *  Handles, depending on the situation, the scripts for the init
- *  and exit handlers.
- *
- * Results:
- *  None.
- *
- * Side Effects:
- *  Runs the rivet_child_init/exit_script scripts.
- *
- *-----------------------------------------------------------------------------
- */
-static void
-Rivet_ChildHandlers(server_rec *s, int init)
-{
-    server_rec *sr;
-    rivet_server_conf *rsc;
-    rivet_server_conf *top;
-    void *function;
-    void *parentfunction;
-    char *errmsg;
-
-    top = RIVET_SERVER_CONF(s->module_config);
-    if (init == 1) {
-        parentfunction = top->rivet_child_init_script;
-        errmsg = MODNAME ": Error in Child init script: %s";
-        //errmsg = (char *) apr_pstrdup(p, "Error in child init script: %s");
-    } else {
-        parentfunction = top->rivet_child_exit_script;
-        errmsg = MODNAME ": Error in Child exit script: %s";
-        //errmsg = (char *) apr_pstrdup(p, "Error in child exit script: %s");
-    }
-
-    for (sr = s; sr; sr = sr->next)
-    {
-        rsc = RIVET_SERVER_CONF(sr->module_config);
-        function = init ? rsc->rivet_child_init_script : rsc->rivet_child_exit_script;
-
-        if (!init && sr == s) {
-            Tcl_Preserve(rsc->server_interp);
-        }
-
-        /* Execute it if it exists and it's the top level, separate
-         * virtual interps are turned on, or it's different than the
-         * main script. 
-         */
-
-        if  (function &&
-             ( sr == s || rsc->separate_virtual_interps || function != parentfunction))
-        {
-            Tcl_Preserve (rsc->server_interp);
-            if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                             errmsg, Tcl_GetString(function));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                             "errorCode: %s",
-                        Tcl_GetVar(rsc->server_interp, "errorCode", 0));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                             "errorInfo: %s",
-                        Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
-            }
-            Tcl_Release (rsc->server_interp);
-        }
-    }
-
-    if (!init) {
-
-    /*
-     * Upon child exit we delete the master interpreter before the 
-     * caller invokes Tcl_Finalize.  Even if we're running separate
-     * virtual interpreters, we don't delete the slaves
-     * as deleting the master implicitly deletes its slave interpreters.
-     */
-
-        rsc = RIVET_SERVER_CONF(s->module_config);
-        if (!Tcl_InterpDeleted (rsc->server_interp)) {
-            Tcl_DeleteInterp(rsc->server_interp);
-        }
-        Tcl_Release (rsc->server_interp);
-    }
-}
-/*
- *-----------------------------------------------------------------------------
- *
- * Rivet_ChildExit --
- *
- *  Run when each Apache child process is about to exit.
- *
- * Results:
- *  None.
- *
- * Side Effects:
- *
- *-----------------------------------------------------------------------------
- */
-
-static apr_status_t
-Rivet_ChildExit(void *data)
-{
-    server_rec *s = (server_rec*) data;
-
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running ChildExit handler");
-    Rivet_ChildHandlers(s, 0);
-
-    /* Tcl_Finalize removed to meet requirement of coexistence with mod_websh (Bug #54162) */
-
-    //Tcl_Finalize();
-
-    return OK;
 }
 
 /*
@@ -1159,7 +1045,8 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
                         interpCount++);
 
                 ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-                            MODNAME ": Rivet_InitTclStuff: creating slave interpreter '%s', hostname '%s', port '%d', separate interpreters %d",
+                            MODNAME 
+": Rivet_InitTclStuff: creating slave interpreter '%s', hostname '%s', port '%d', separate interpreters %d",
                             slavename, sr->server_hostname, sr->port, 
                             rsc->separate_virtual_interps);
 
@@ -1184,6 +1071,95 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
             myrsc->objCacheList = rsc->objCacheList;
         }
         myrsc->server_name = (char*)apr_pstrdup(p, sr->server_hostname);
+    }
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_ChildHandlers --
+ *
+ *  Handles, depending on the situation, the scripts for the init
+ *  and exit handlers.
+ *
+ * Results:
+ *  None.
+ *
+ * Side Effects:
+ *  Runs the rivet_child_init/exit_script scripts.
+ *
+ *-----------------------------------------------------------------------------
+ */
+static void
+Rivet_ChildHandlers(server_rec *s, int init)
+{
+    server_rec *sr;
+    rivet_server_conf *rsc;
+    rivet_server_conf *top;
+    void *function;
+    void *parentfunction;
+    char *errmsg;
+
+    top = RIVET_SERVER_CONF(s->module_config);
+    if (init == 1) {
+        parentfunction = top->rivet_child_init_script;
+        errmsg = MODNAME ": Error in Child init script: %s";
+        //errmsg = (char *) apr_pstrdup(p, "Error in child init script: %s");
+    } else {
+        parentfunction = top->rivet_child_exit_script;
+        errmsg = MODNAME ": Error in Child exit script: %s";
+        //errmsg = (char *) apr_pstrdup(p, "Error in child exit script: %s");
+    }
+
+    for (sr = s; sr; sr = sr->next)
+    {
+        rsc = RIVET_SERVER_CONF(sr->module_config);
+        function = init ? rsc->rivet_child_init_script : rsc->rivet_child_exit_script;
+
+        if (!init && sr == s) {
+            Tcl_Preserve(rsc->server_interp);
+        }
+
+        /* Execute it if it exists and it's the top level, separate
+         * virtual interps are turned on, or it's different than the
+         * main script. 
+         */
+
+        if  (function &&
+             ( sr == s || rsc->separate_virtual_interps || function != parentfunction))
+        {
+            rivet_interp_globals* globals = Tcl_GetAssocData( rsc->server_interp, "rivet", NULL );
+            Tcl_Preserve (rsc->server_interp);
+
+            globals->srec = sr;
+            if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                             errmsg, Tcl_GetString(function));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                             "errorCode: %s",
+                        Tcl_GetVar(rsc->server_interp, "errorCode", 0));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                             "errorInfo: %s",
+                        Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
+            }
+            Tcl_Release (rsc->server_interp);
+        }
+    }
+
+    if (!init) {
+
+    /*
+     * Upon child exit we delete the master interpreter before the 
+     * caller invokes Tcl_Finalize.  Even if we're running separate
+     * virtual interpreters, we don't delete the slaves
+     * as deleting the master implicitly deletes its slave interpreters.
+     */
+
+        rsc = RIVET_SERVER_CONF(s->module_config);
+        if (!Tcl_InterpDeleted (rsc->server_interp)) {
+            Tcl_DeleteInterp(rsc->server_interp);
+        }
+        Tcl_Release (rsc->server_interp);
     }
 }
 
@@ -1217,6 +1193,32 @@ Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
     apr_pool_cleanup_register (pChild, s, Rivet_ChildExit, Rivet_ChildExit);
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_ChildExit --
+ *
+ *  Run when each Apache child process is about to exit.
+ *
+ * Results:
+ *  None.
+ *
+ * Side Effects:
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static apr_status_t
+Rivet_ChildExit(void *data)
+{
+    server_rec *s = (server_rec*) data;
+    ap_assert (s != (server_rec *)NULL);
+
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running ChildExit handler");
+    Rivet_ChildHandlers(s, 0);
+
+    return OK;
+}
 
 //TODO: clarify whether rsc or rdc
 
@@ -1254,7 +1256,16 @@ Rivet_SendContent(request_rec *r)
     rsc = Rivet_GetConf(r);
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    /* Setting this pointer in globals is crucial as by assigning it
+     * we signal to Rivet commands we are processing an HTTP request.
+     * This pointer gets set to NULL just before we leave this function
+     * making possible to invalidate command execution that could depend
+     * on a valid request_rec
+     */
+
     globals->r = r;
+    globals->srec = r->server;
 
 #ifndef USE_APACHE_RSC
     if (r->per_dir_config != NULL)
@@ -1344,7 +1355,6 @@ Rivet_SendContent(request_rec *r)
 
     /* Apache Request stuff */
 
-    //globals->req = (TclWebRequest *)apr_pcalloc(r->pool, sizeof(TclWebRequest));
     TclWeb_InitRequest(globals->req, interp, r);
     ApacheRequest_set_post_max(globals->req->apachereq, rsc->upload_max);
     ApacheRequest_set_temp_dir(globals->req->apachereq, rsc->upload_dir);

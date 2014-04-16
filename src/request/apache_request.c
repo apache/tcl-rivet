@@ -184,34 +184,55 @@ ApacheUpload *ApacheUpload_find(ApacheUpload *upload, char *name)
     ApacheUpload *uptr;
 
     for (uptr = upload; uptr; uptr = uptr->next) {
-	if (strEQ(uptr->name, name)) {
-	    return uptr;
-	}
+        if (strEQ(uptr->name, name)) {
+            return uptr;
+        }
     }
 
     return NULL;
 }
 
-ApacheRequest *ApacheRequest_new(request_rec *r)
+ApacheRequest *ApacheRequest_new(apr_pool_t *pool)
 {
     ApacheRequest *req = (ApacheRequest *)
-	apr_pcalloc(r->pool, sizeof(ApacheRequest));
+	apr_pcalloc(pool, sizeof(ApacheRequest));
 
-    req->status = OK;
-    req->parms = apr_table_make(r->pool, DEFAULT_TABLE_NELTS);
-    req->upload = NULL;
-    req->post_max = -1;
+    req->status         = OK;
+    req->parms          = apr_table_make(pool, DEFAULT_TABLE_NELTS);
+    req->upload         = NULL;
+    req->post_max       = -1;
     req->disable_uploads = 0;
-    req->upload_hook = NULL;
-    req->hook_data = NULL;
-    req->temp_dir = NULL;
-    req->raw_post = NULL;
-    req->parsed = 0;
-    req->r = r;
-    req->nargs = 0;
+    req->upload_hook    = NULL;
+    req->hook_data      = NULL;
+    req->temp_dir       = NULL;
+    req->raw_post       = NULL;
+    req->parsed         = 0;
+    req->r              = NULL;
+    req->nargs          = 0;
 
     return req;
 }
+
+ApacheRequest *ApacheRequest_init(ApacheRequest* req, request_rec *r)
+{
+
+    req->status         = OK;
+    apr_table_clear(req->parms);
+    req->upload         = NULL;
+    req->post_max       = -1;
+    req->disable_uploads = 0;
+    req->upload_hook    = NULL;
+    req->hook_data      = NULL;
+    req->temp_dir       = NULL;
+    req->raw_post       = NULL;
+    req->parsed         = 0;
+    req->r              = r;
+    req->nargs          = 0;
+
+    return req;
+}
+
+
 static char x2c(const char *what)
 {
     register char digit;

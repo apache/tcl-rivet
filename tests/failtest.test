@@ -1,0 +1,34 @@
+# This test is for those commands that must not run outside of a request processing
+# Also command ::rivet::inspect is tested in either forms, those that allow a call from
+# outside request processing and those that must denied it.
+
+::tcltest::test failtest-1.1 {commands that must refuse to run in child init or exit} {
+    apachetest::start { 
+            -c "RivetServerConf ChildInitScript \" source checkfails.tcl \"" } {} {
+        catch {
+            set inspect_page [::http::geturl "${urlbase}failtest.tcl"]
+            set match [::http::data $inspect_page]
+            ::http::cleanup $inspect_page
+
+        }
+    }
+    set match
+} {apache_table->1
+env->1
+headers->1
+include->1
+inspect0->1
+inspect1->1
+inspect2->1
+inspect3->0
+inspect4->0
+load_env->1
+load_headers->1
+makeurl->1
+no_body->1
+parse->1
+raw_post->1
+var->1
+virtual_filename->1
+}
+

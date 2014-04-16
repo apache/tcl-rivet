@@ -56,6 +56,43 @@ extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 #define POOL (globals->r->pool)
 
+#define CHECK_REQUEST_REC(r,cmd_name) \
+if (r == NULL)\
+{\
+    Rivet_NoRequestRec(interp,Tcl_NewStringObj(cmd_name,-1));\
+    return TCL_ERROR;\
+}
+   
+
+/*
+ * -- Rivet_NoRequestRec
+ *
+ * Adds standard error information to the interpreter. This procedure makes 
+ * sense only when called by C functions implementing Tcl commands that
+ * are meaningful only if a valid requiest_rec object is defined. These
+ * procedures must return TCL_ERROR right away after Rivet_NoRequestRecord
+ * returns
+ *
+ * Arguments:
+ *
+ *  Tcl_Interp*: current Tcl interpreter
+ *  Tcl_Obj*: Tcl string object with the command name
+ *
+ * Results:
+ *
+ *  None
+ *
+ */
+
+static void
+Rivet_NoRequestRec (Tcl_Interp* interp, Tcl_Obj* command)
+{
+    Tcl_AddErrorInfo(interp, "Cannot call ");
+    Tcl_AppendObjToErrorInfo(interp,command);
+    Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(" outside a request processing",-1));
+}
+
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -78,6 +115,8 @@ TCL_CMD_HEADER( Rivet_MakeURL )
     rivet_interp_globals*   globals = Tcl_GetAssocData(interp,"rivet",NULL);
     char*                   url_target_name;
     int                     target_length;
+
+    CHECK_REQUEST_REC(globals->r,"::rivet::makeurl");
 
     if (objc > 2)
     {
@@ -156,8 +195,9 @@ TCL_CMD_HEADER( Rivet_Parse )
     char            *filename;
     apr_status_t    stat_s;
     apr_finfo_t     finfo_b;
-
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    CHECK_REQUEST_REC(globals->r,"::rivet::parse");
 
     if( objc < 2 || objc > 3 )
     {
@@ -223,7 +263,6 @@ TCL_CMD_HEADER( Rivet_Include )
     char *filename;
     Tcl_DString transoptions;
     Tcl_DString encoptions;
-
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     if( objc < 2 || objc > 3 )
@@ -239,6 +278,8 @@ TCL_CMD_HEADER( Rivet_Include )
             Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
             return TCL_ERROR;
         }
+
+        CHECK_REQUEST_REC(globals->r,"::rivet::include -virtual");
         filename = TclWeb_GetVirtualFile( globals->req,
                                           Tcl_GetStringFromObj(objv[2], (int *)NULL) );
     }
@@ -299,6 +340,8 @@ TCL_CMD_HEADER( Rivet_Headers )
 {
     char *opt;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    CHECK_REQUEST_REC(globals->r,"::rivet::headers");
 
     if (objc < 2)
     {
@@ -404,6 +447,7 @@ TCL_CMD_HEADER( Rivet_LoadEnv )
     Tcl_Obj *ArrayObj;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::load_env");
     if( objc > 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
         return TCL_ERROR;
@@ -441,6 +485,7 @@ TCL_CMD_HEADER ( Rivet_LoadHeaders )
     Tcl_Obj *ArrayObj;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::load_headers");
     if( objc > 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
         return TCL_ERROR;
@@ -490,6 +535,7 @@ TCL_CMD_HEADER ( Rivet_Var )
     int source;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::var,var_post,var_qs");
     if (objc < 2 || objc > 4)
     {
         Tcl_WrongNumArgs(interp, 1, objv,
@@ -687,6 +733,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::apache_table");
     if ((objc < 3) || (objc > 5)) {
         Tcl_WrongNumArgs(interp, 1, objv, "option tablename ?args?");
         return TCL_ERROR;
@@ -902,6 +949,7 @@ TCL_CMD_HEADER( Rivet_Upload )
     };
 
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    CHECK_REQUEST_REC(globals->r,"::rivet::upload");
     if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
                         "channel|save|data|exists|size|type|filename|names|tempname"
                         "|tempname|names",
@@ -945,65 +993,65 @@ TCL_CMD_HEADER( Rivet_Upload )
 
     switch ((enum subcommand)subcommandindex)
     {
-    case CHANNEL: {
-        Tcl_Channel chan;
-        char *channelname = NULL;
+        case CHANNEL: {
+            Tcl_Channel chan;
+            char *channelname = NULL;
 
-        if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
-            return TCL_ERROR;
+            if (TclWeb_UploadChannel(varname, &chan, globals->req) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            channelname = (char *)Tcl_GetChannelName(chan);
+            Tcl_SetStringObj(result, channelname, -1);
+            break;
         }
-        channelname = (char *)Tcl_GetChannelName(chan);
-        Tcl_SetStringObj(result, channelname, -1);
-        break;
-    }
-    case SAVE:
-        /* save data to a specified filename  */
-        if (objc != 4) {
-            Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
-            return TCL_ERROR;
-        }
+        case SAVE:
+            /* save data to a specified filename  */
+            if (objc != 4) {
+                Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
+                return TCL_ERROR;
+            }
 
-        if (TclWeb_UploadSave(varname, objv[3], globals->req) != TCL_OK)
-        {
-            return TCL_ERROR;
-        }
-        break;
-    case DATA:
-        if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
-            return TCL_ERROR;
-        }
-        break;
-    case EXISTS:
-        if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
-        {
-            Tcl_SetIntObj(result, 0);
-        } else {
-            Tcl_SetIntObj(result, 1);
-        }
-        break;
-    case SIZE:
-        TclWeb_UploadSize(result, globals->req);
-        break;
-    case TYPE:
-        TclWeb_UploadType(result, globals->req);
-        break;
-    case FILENAME:
-        TclWeb_UploadFilename(result, globals->req);
-        break;
-    case TEMPNAME:
-        TclWeb_UploadTempname(result,globals->req);
-        break;
-    case NAMES:
-        if (objc != 2)
-        {
-            Tcl_WrongNumArgs(interp, 1, objv, "names");
-            return TCL_ERROR;
-        }
-        TclWeb_UploadNames(result, globals->req);
-        break;
-    default:
-        Tcl_WrongNumArgs(interp, 1, objv,
-                         "channel|save ?name?|data|exists|size|type|filename|names|tempname");
+            if (TclWeb_UploadSave(varname, objv[3], globals->req) != TCL_OK)
+            {
+                return TCL_ERROR;
+            }
+            break;
+        case DATA:
+            if (TclWeb_UploadData(varname, result, globals->req) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
+        case EXISTS:
+            if (TclWeb_PrepareUpload(varname, globals->req) != TCL_OK)
+            {
+                Tcl_SetIntObj(result, 0);
+            } else {
+                Tcl_SetIntObj(result, 1);
+            }
+            break;
+        case SIZE:
+            TclWeb_UploadSize(result, globals->req);
+            break;
+        case TYPE:
+            TclWeb_UploadType(result, globals->req);
+            break;
+        case FILENAME:
+            TclWeb_UploadFilename(result, globals->req);
+            break;
+        case TEMPNAME:
+            TclWeb_UploadTempname(result,globals->req);
+            break;
+        case NAMES:
+            if (objc != 2)
+            {
+                Tcl_WrongNumArgs(interp, 1, objv, "names");
+                return TCL_ERROR;
+            }
+            TclWeb_UploadNames(result, globals->req);
+            break;
+        default:
+            Tcl_WrongNumArgs(interp, 1, objv,
+                             "channel|save ?name?|data|exists|size|type|filename|names|tempname");
     }
     Tcl_SetObjResult(interp, result);
     return TCL_OK;
@@ -1031,6 +1079,7 @@ TCL_CMD_HEADER ( Rivet_RawPost )
     Tcl_Obj *retval;
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::raw_post");
     data = TclWeb_GetRawPost(globals->req);
 
     if (!data) {
@@ -1062,6 +1111,7 @@ TCL_CMD_HEADER( Rivet_NoBody )
 {
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::no_body");
     if (globals->req->content_sent == 1) {
         Tcl_AddErrorInfo(interp, "Content already sent");
         return TCL_ERROR;
@@ -1188,6 +1238,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
     char *key;
     char *val;
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::env");
     if( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "variable" );
         return TCL_ERROR;
@@ -1224,6 +1275,7 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
     char *filename;
     char *virtual;
 
+    CHECK_REQUEST_REC(globals->r,"::rivet::virtual_filename");
     if( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "filename" );
         return TCL_ERROR;
@@ -1278,19 +1330,15 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         }
     }
 
-    if (globals->r == NULL)
-    {
-
-        Tcl_SetObjResult(interp,Tcl_NewStringObj("",-1));            
-
-    } 
-    else if (objc == 1)
+    if (objc == 1)
     {
         Tcl_Obj* dictObj;
 
+        CHECK_REQUEST_REC(globals->r,"::rivet::inspect");
         rsc = Rivet_GetConf(globals->r); 
         dictObj = Rivet_BuildConfDictionary(interp,rsc);
         if (dictObj != NULL) {
+            Tcl_IncrRefCount(dictObj);
             Tcl_SetObjResult(interp,dictObj);
             Tcl_DecrRefCount(dictObj);
         } else {
@@ -1301,38 +1349,54 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
     else if (objc == 2)
     {
         Tcl_Obj* par_name = objv[1];
+        char*    cmd_arg  = Tcl_GetStringFromObj(par_name,NULL);
 
         Tcl_IncrRefCount(par_name);
-        if (STRNEQU(Tcl_GetStringFromObj(par_name,NULL),"-all"))
+        if (STRNEQU(cmd_arg,"-all"))
         {
             Tcl_Obj* dictObj;
             
+            CHECK_REQUEST_REC(globals->r,"::rivet::inspect -all");
             rsc = Rivet_GetConf(globals->r); 
             dictObj = Rivet_CurrentConfDict(interp,rsc);
-            if (dictObj == NULL)
-            {
-                status = TCL_ERROR;
-            }
-            else
-            {
-                Tcl_SetObjResult(interp,dictObj);            
-                Tcl_DecrRefCount(dictObj);
-            }
+            Tcl_IncrRefCount(dictObj);
+            Tcl_SetObjResult(interp,dictObj);            
+            Tcl_DecrRefCount(dictObj);
+
+        }
+        else if (STRNEQU(cmd_arg,"server"))
+        {
+            /* we read data from the server_rec */
+            Tcl_Obj* dictObj;
+
+            dictObj = Rivet_CurrentServerRec(interp,globals->srec);
+            Tcl_IncrRefCount(dictObj);
+            Tcl_SetObjResult(interp,dictObj);            
+            Tcl_DecrRefCount(dictObj);
 
         }
         else
         {
             Tcl_Obj* par_value = NULL;
 
+            CHECK_REQUEST_REC(globals->r,"::rivet::inspect");
             rsc = Rivet_GetConf(globals->r); 
             par_value = Rivet_ReadConfParameter(interp,rsc,par_name);
             if (par_value == NULL)
             {
+                Tcl_Obj* errorinfo = Tcl_NewStringObj("mod_rivet internal error invalid argument: ",-1);
+
+                Tcl_IncrRefCount(errorinfo);
+                Tcl_AppendObjToObj(errorinfo,par_name);
+                Tcl_AppendObjToErrorInfo(interp,errorinfo);
+                Tcl_DecrRefCount(errorinfo);
                 status = TCL_ERROR;
             }
             else
             {
+                Tcl_IncrRefCount(par_value);
                 Tcl_SetObjResult(interp,par_value);
+                Tcl_DecrRefCount(par_value);
             }
 
         }
