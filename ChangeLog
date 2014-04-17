@@ -1,7 +1,13 @@
+2014-04-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/: reintegrating modularization branch. Now every subsystem mod_rivet is made of (module, 
+    channel, parser, commands, request multipart handling) can be developed separately
+
 2014-04-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/aida.tcl,dio_Tdbc.tcl,sql.tcl: more methods implemented in aida.tcl
     * doc/xml/commands.xml: new for '::rivet::inspect server' documented
     * src/rivetcmds/rivetInspect.c: adding is_virtual flag to values returned by '::rivet::inspect server'
+    * branches/modular: merging latest changes in trunk
+    * trunk/src/rivetcmds/rivetInpect.c: adding is_virtual flag to values returned by '::rivet::inspect server'
 
 2014-04-11 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetCore.c: misplaced check on request_rec in Rivet_InspectCmd
@@ -161,7 +167,7 @@
     target and keeps us from further customization of automake (subdir-objects
     property)
     * src/runtests.tcl: changed path to mod_rivet.so and librivetparser.so
- 
+
 2013-10-15 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetCore.c: 'headers redirect' used to return TCL_RETURN
     to force the caller to terminate and interrupt the processing. It didn't 
@@ -176,6 +182,9 @@
 2013-09-23 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/calendar/calendar.tcl: fixed zero length argument list
     calling method emit
+
+2013-09-22 Massimo Manghi <mxmanghi@apache.org>
+    * modular: committing changes from last merge
 
 2013-09-21 Massimo Manghi <mxmanghi@apache.org>
     * contrib/tcl.vim: list of subcommands completed
@@ -220,6 +229,9 @@
     * rivet/rivet-tcl/parray.tcl: escaping SGML characters that might appear
     in the output to avoid cross scripting
 
+2013-08-29 Massimo Manghi <mxmanghi@apache.org>
+    * branches/modular: merging latest changes from trunk
+
 2013-08-26 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: expanded warning message about broken implementations
     of Tcl when using forks and the event loop
@@ -237,6 +249,9 @@
     * src/apache-2/rivetCore.c: errata corrige for entry added on 2013-07-19: 
     command 'parse -string' superseded test command parsestr, thus removed from
     rivetCore.c
+
+2013-08-07 Massimo Manghi <mxmanghi@apache.org>
+    * ./: merging changes done in trunk
 
 2013-08-07 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: adding MPM descripting fields to the 'server' array
@@ -309,13 +324,28 @@
     * doc/xml/install.xml: updating manual to document the new installation command
     sequence
     
+2013-06-04 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/* : merging into this branch the latest commits done from trunk
+
 2013-06-03 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/[ltmain.sh,compile,depcomp]: more libtool scripts updated 
 
+2013-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/parser/Makefile.am: adding include paths to INCLUDE
+    * src/Makefile.am: Rivet library build moved to this script
+    * src/librivet/Makefile.am: Rivet library build removed from this file
+    
 2013-06-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/Makefile.am: including librivet.so build in this file
+    * src/librivet/Makefile.am: kept for reference but without effective code now
     * tclconfig/[install-sh,config.sub,config.guess]: new versions for script used by
     the autoconf/automake/libtool toolchain
 
+2013-05-24 Massimo Manghi <mxmanghi@apache.org>
+    * src/: branching trunk to branches/modular to reorganize mod_rivet in a
+    way that should enable the development of single components (apache request,
+    Rivet channel, parser) with minimal branching 
+ 
 2013-05-21 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_request.c: ApacheRequest___parse further simplified and
     made less restrictive about the combination of method and mimetype of the request

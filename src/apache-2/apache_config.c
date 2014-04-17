@@ -646,3 +646,5 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy,
     return( NULL );
 }
 
+/* apache_config.c */
+

@@ -26,5 +26,5 @@ lib_libexec_LTLIBRARIES = librivetparser.la
 librivetparser_la_SOURCES = rivetParser.c parserPkgInit.c
 librivetparser_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 librivetparser_la_LIBADD  = @APXS_LIBS@
-librivetparser_la_CPPFLAGS = @apache_include@ -I../@apache_version_dir@ -I.. @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS
+librivetparser_la_CPPFLAGS = @apache_include@ -I@RIVET_BASE_INCLUDE@/@apache_version_dir@ -I@RIVET_BASE_INCLUDE@ -I../@apache_version_dir@ -I.. @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS
 

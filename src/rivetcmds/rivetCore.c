@@ -206,30 +206,13 @@ TCL_CMD_HEADER( Rivet_Parse )
     }
 
     if( objc == 2 ) {
-
         filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
-
     } else {
-
-        if (STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual")) {
-
-        /* */
-
-            filename = TclWeb_GetVirtualFile(globals->req,Tcl_GetStringFromObj(objv[2],(int *)NULL));
-
-        } else if ( STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-string")) {
-
-        /* we treat the argument as a string and we pass it as is to Rivet_ParseExecString */
-
-            return Rivet_ParseExecString(globals->req, objv[2]);
-
-        } else { 
-
-            Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename | -string template_string" );
+        if( !STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual") ) {
+            Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
             return TCL_ERROR;
-
         }
-
+        filename = TclWeb_GetVirtualFile(globals->req,Tcl_GetStringFromObj(objv[2],(int *)NULL));
     }
 
     if (!strcmp(filename, globals->r->filename))
@@ -254,9 +237,9 @@ TCL_CMD_HEADER( Rivet_Parse )
     }
 }
 
-
 /*
  *-----------------------------------------------------------------------------
+ *
  * Rivet_Include --
  *
  *      Includes a file literally in the output stream.  Useful for

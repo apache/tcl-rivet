@@ -31,4 +31,3 @@
 #librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 #librivetlib_la_LIBADD  = @APXS_LIBS@
 #librivetlib_la_CPPFLAGS = -I.. -I../@apache_version_dir@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
-

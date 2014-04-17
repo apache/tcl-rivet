@@ -26,8 +26,10 @@ AC_INIT([Rivet],[2.1.5])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
+AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
+
 
 # AX_PREFIX_CONFIG_H is a macro taken from the autotools macro archive.
 # The typical configure generated 'config.h' can be renamed and 
@@ -444,6 +446,44 @@ AC_DEFUN([GET_RIVET_BASE], [
     AC_SUBST(RIVET_BASE_INCLUDE)
 ])
 
+# APACHE_REQUEST
+#
+# Choosing where is located the code for handling Apache request data (like
+# form data etc). Default: 'request'  
+
+AC_DEFUN([APACHE_REQUEST],[
+    AC_ARG_WITH(
+        apache_request,
+        [  --with-apache-request[=dir] choose subdirectory for Apache request handling code],,
+        [with_apache_request="request"]
+    )
+
+    AC_MSG_CHECKING(code for request handling)
+    apache_request=${with_apache_request}
+    AC_SUBST(apache_request)
+    AC_MSG_RESULT([$with_apache_request])
+])
+
+# RIVET_CORE_CMDS
+#
+# selecting non default directory for Rivet code commands core
+#
+
+AC_DEFUN([RIVET_CORE_CMDS],[
+    AC_ARG_WITH(
+        rivet_core_cmds,
+        [  --with-rivet-core-cmds[=dir] select directory for Rivet core commands core],,
+        [with_rivet_core_cmds="rivetcmds"]
+    )
+
+    AC_MSG_CHECKING(for Rivet core commands code)
+    rivet_core_cmds=${with_rivet_core_cmds}
+    AC_SUBST(rivet_core_cmds)
+    AC_MSG_RESULT([$with_rivet_core_cmds])
+
+])
+
+
 AC_DEFUN([RIVET_TCL_LIB],[
     AC_ARG_WITH(
         rivet_target_dir,
@@ -644,6 +684,7 @@ AC_DEFUN([UPLOAD_TO_VAR],[
     fi
 
 ])
+
 APACHE_VERSION
 GET_RIVET_BASE
 APACHE
@@ -658,6 +699,9 @@ VIRTUAL_INTERPS_SEPARATION
 POST_MAX_SIZE
 UPLOAD_TO_VAR
 IMPORT_RIVET_COMMANDS
+APACHE_REQUEST
+RIVET_CORE_CMDS
+
 if test $import_rivet_commands = "yes"; then
     AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
     AC_DEFINE(NAMESPACE_EXPORT,1,[commands will be exported])
@@ -693,7 +737,7 @@ AC_CONFIG_FILES([Makefile src/Makefile src/librivet/Makefile src/parser/Makefile
 AC_OUTPUT
 
 if test "$print_fileevent_msg" = "1"; then
-    AC_MSG_NOTICE([========================================================================])
+    AC_MSG_NOTICE([=======================================================================])
     AC_MSG_NOTICE([                             WARNING!])
     AC_MSG_NOTICE([========================================================================])
     AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) will not be working])
