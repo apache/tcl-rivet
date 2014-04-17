@@ -587,7 +587,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
 /*
  * -- Rivet_ParseExecString
  *
- * This function takes Tcl_Obj carrying a string to be interpreted as
+ * This function accepts a Tcl_Obj carrying a string to be interpreted as
  * a Rivet template. This function is the core for command 'parsestr'
  * 
  * Arguments:

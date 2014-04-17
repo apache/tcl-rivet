@@ -1,6 +1,9 @@
 2014-04-17 Massimo Manghi <mxmanghi@apache.org>
     * src/: reintegrating modularization branch. Now every subsystem mod_rivet is made of (module, 
     channel, parser, commands, request multipart handling) can be developed separately
+    * src/rivetcmds/rivetCore.c: reintroduced handling of the -string argument that disappeared 
+    from Rivet_ParseCmd probably because of the merge with modular.
+    * src/apache-2/mod-rivet.c: Corrected comments to Rivet_ParseExecString
 
 2014-04-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/aida.tcl,dio_Tdbc.tcl,sql.tcl: more methods implemented in aida.tcl
