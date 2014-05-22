@@ -1,3 +1,6 @@
+2014-05-22 Massimo Manghi <mxmanghi@apache.org>
+    * rive/packages/dio/aida.sql: redifining responsability of class Aida (not to be officially released)
+
 2014-04-17 Massimo Manghi <mxmanghi@apache.org>
     * src/: reintegrating modularization branch. Now every subsystem mod_rivet is made of (module, 
     channel, parser, commands, request multipart handling) can be developed separately
@@ -7,10 +10,10 @@
 
 2014-04-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/aida.tcl,dio_Tdbc.tcl,sql.tcl: more methods implemented in aida.tcl
-    * doc/xml/commands.xml: new for '::rivet::inspect server' documented
-    * src/rivetcmds/rivetInspect.c: adding is_virtual flag to values returned by '::rivet::inspect server'
+    * doc/xml/commands.xml: new form '::rivet::inspect server' documented
+    * src/rivetcmds/rivetInspect.c: adding is_virtual flag to dictionary returned by '::rivet::inspect server'
     * branches/modular: merging latest changes in trunk
-    * trunk/src/rivetcmds/rivetInpect.c: adding is_virtual flag to values returned by '::rivet::inspect server'
+    * trunk/src/rivetcmds/rivetInpect.c: adding is_virtual flag to dictionary returned by '::rivet::inspect server'
 
 2014-04-11 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetCore.c: misplaced check on request_rec in Rivet_InspectCmd
@@ -51,7 +54,7 @@
     * configure.ac, VERSION: version number bumped to 2.1.5
 
 2014-03-16 Massimo Manghi <mxmanghi@apache.org>
-    * doc/images/Rivetlogo_small.png: removed because already in doc/ and dupicate to home.png
+    * doc/images/Rivetlogo_small.png: removed because already in doc/ and duplicate to home.png
 
 2014-02-28 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/upgrading.xml: Adding Karl's note about upgrading from NeoWebScript
