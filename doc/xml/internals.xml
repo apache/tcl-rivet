@@ -83,14 +83,82 @@
       </note>
       </para>
       <para>
-	After a script has been loaded and parsed into it's "pure Tcl"
-	form, it is also cached, so that it may be used in the future
-	without having to reload it (and re-parse it) from the disk.
-	The number of scripts stored in memory is configurable.  This
-	feature can significantly improve performance.
+    	After a script has been loaded and parsed into it's "pure Tcl"
+    	form, it is also cached, so that it may be used in the future
+    	without having to reload it (and re-parse it) from the disk.
+    	The number of scripts stored in memory is configurable.  This
+    	feature can significantly improve performance.
       </para>
     </section>
-
+    <section>
+        <title>Extending Rivet by developing C procedures implementing new commands</title>
+        <para>
+            Rivet endows the Tcl interpreter with new commands
+            to provide an interface from the application layer to the
+            Apache web server internal data. Many of these commands
+            are meaningful only when HTTP request are being processed
+            and a fundamental data structure has been allocated and
+            intialized by the Apache framework: the request_rec object. 
+            In case commands have to be written that have to gain access 
+            to a valid request_rec object pointer they must check if such 
+            a pointer exists and it's initialized
+            with valid data. 
+        </para>
+        <para>            
+            For this purpose in <option>src/rivet.h</option> the macro
+            CHECK_REQUEST_REC was defined accepting to arguments: the pointer
+            to the request_rec object (stored in the 
+            <structname>rivet_interp_globals</structname>
+            structure) and the command name. If the pointer is NULL
+            the macro calls Tcl_NoRequestRec and returns TCL_ERROR
+            causing the command to fail. These are the step to follow
+            to implement a new C language command for mod_rivet 
+        </para>
+        <itemizedlist>
+            <listitem>
+                Define the command and associated C language procedure
+                in src/rivetcmds/rivetCore.c using the macro
+                <option>RIVET_OBJ_CMD</option>
+                <programlisting>RIVET_OBJ_CMD("mycmd",Rivet_MyCmd)</programlisting>
+                This macro ensures the command is defined as <command>::rivet::mycmd</command>
+            </listitem>
+            <listitem>
+                Add the code of Rivet_MyCmd to src/rivetcmd/rivetCore.c (in case
+                the code resides in a different file also src/Makefile.am should be
+                changed to tell the build system how to compile the code and
+                link it into mod_rivet.so)
+            </listitem>
+            <listitem>
+                If the code must gain access to <command>globals->r</command>
+                put add the macro testing for the pointer
+                <programlisting>TCL_CMD_HEADER( Rivet_MyCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    ....
+    CHECK_REQUEST_REC(globals->r,"::rivet::mycmd");
+    ...   
+}</programlisting>
+            </listitem>
+            <listitem>
+                Add a test for this command in <option>tests/checkfails.tcl</option>. For 
+                instance
+                <programlisting>...
+check_fail no_body
+check_fail virtual_filename unkn
+check_fail my_cmd &lt;arg1&gt; &lt;arg2&gt;
+....</programlisting>
+                Where <option>&lt;arg1&gt; &lt;arg2&gt;</option> are optional 
+                arguments in case the command needs to check for <command>globals->r</command>
+                in special cases. Then, if <command>::rivet::mycmd</command> must fail also
+                <option>tests/failtest.tcl</option> should modified as
+                <programlisting>virtual_filename->1
+mycmd->1</programlisting>
+                The value associated to the test must be <option>0</option> in case the
+                command doesn't need to test the <command>globals->r</command> pointer.
+            </listitem>
+            
+        </itemizedlist>
+    </section>
     <section>
       <title>Debugging Rivet and Apache</title>
       <para>

@@ -54,6 +54,21 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      NULL,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); 
 
+/* 
+ * Pointer in r is checked and in case Rivet_NoRequestRec is
+ * called returning TCL_ERROR. This macro is used (and often
+ * is the first code like) in commands that must ascertain
+ * the request_rec object pointer in globals is valid 
+ * (when a request processing ends it's set to NULL)
+ */
+
+#define CHECK_REQUEST_REC(r,cmd_name) \
+if (r == NULL)\
+{\
+    Rivet_NoRequestRec(interp,Tcl_NewStringObj(cmd_name,-1));\
+    return TCL_ERROR;\
+}
+
 EXTERN int Rivet_Init(Tcl_Interp *interp);
 EXTERN int Rivet_InitList(Tcl_Interp *interp);
 EXTERN int Rivet_InitCrypt(Tcl_Interp *interp);

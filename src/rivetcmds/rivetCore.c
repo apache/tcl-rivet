@@ -56,12 +56,6 @@ extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 #define POOL (globals->r->pool)
 
-#define CHECK_REQUEST_REC(r,cmd_name) \
-if (r == NULL)\
-{\
-    Rivet_NoRequestRec(interp,Tcl_NewStringObj(cmd_name,-1));\
-    return TCL_ERROR;\
-}
    
 
 /*

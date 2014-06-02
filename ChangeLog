@@ -1,5 +1,9 @@
+2014-06-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h,src/rivetcmds/rivetCore.c: macro CHECK_REQUEST_REC moved from rivetCore.c to rivet.h
+    * doc/xml/internals.xml: New section documenting how to extend mod_rivet with new commands written in C
+
 2014-05-22 Massimo Manghi <mxmanghi@apache.org>
-    * rive/packages/dio/aida.sql: redifining responsability of class Aida (not to be officially released)
+    * rivet/packages/dio/aida.sql: redifining responsability of class Aida (not to be officially released)
 
 2014-04-17 Massimo Manghi <mxmanghi@apache.org>
     * src/: reintegrating modularization branch. Now every subsystem mod_rivet is made of (module, 
