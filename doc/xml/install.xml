@@ -2,7 +2,7 @@
     <title>Apache Rivet Installation</title>
     <procedure>
         <para> 
-            Rivet 2.1 runs with the Apache 2.2.x and 2.4.x HTTP web server. 
+            Rivet 2.2 runs with the Apache 2.2.x and 2.4.x HTTP web server. 
             It is known to build and run on various Linux distributions 
             (Debian &amp; Ubuntu, Redhat, SuSE and CentOS), FreeBSD and OpenBSD. For some
             of these Unix-like operative systems 
@@ -10,7 +10,7 @@
             are already available for download.
         </para>
         <para>
-            Currently there is no way to run Apache Rivet 2.1 on Windows&copy; because            
+            Currently there is no way to run Apache Rivet 2.2 on Windows&copy; because            
             Rivet currently requires the 
             <ulink url="http://httpd.apache.org/docs/2.2/mod/prefork.html">prefork</ulink>, which
             is supported only on Unix/Linux systems. Efforts are under way to extend the support to the 

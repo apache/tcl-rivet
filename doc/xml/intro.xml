@@ -11,7 +11,6 @@
       meet these goals, we have chosen the Tcl programming language to
       combine with the Apache Web Server.
     </para>
-
     <para>
       In this manual, we aim to help get you started, and then
       writing productive code as quickly as possible, as well as
@@ -27,15 +26,23 @@
         don't hesitate to let us know.  If you want to contribute
         directly, better yet!
     </para>
+    
     <simplesect>
         <title>Acknowledgements</title>
         <para>
-            Rivet 2.1 comes with relevant contributions provided by 
-            <emphasis>Harald Oehlmann</emphasis> (page RivetEntitites, 
-            new command ::rivet::http_accept and bugfixes), 
-            <emphasis>Cyril Shtumf</emphasis> (important bugfixes) and
-            <emphasis>Jeff Lawson</emphasis> (who introduced the 
-            shorthand syntax for string output)
+        		Rivet's development took advantage from contributions from 
+        		several users who provided whole new componenents, bug fixes and 
+        		enhancements. 
         </para>
-    </simplesect>
+        <itemizedlist>
+         	<listitem>
+         		<emphasis>Harald Oehlmann</emphasis> (now member of the Apache Tcl Team) 
+         		who wrote package RivetEntitites, command ::rivet::http_accept and filed
+         		several bug reports with relative patches
+         	</listitem>
+         	<listitem><emphasis>Cyril Shtumf</emphasis> filed several important bugfixes</listitem>
+         	<listitem><emphasis>Jeff Lawson</emphasis> who patched Rivet parser to add the 
+         	shorthand syntax for string output and filed several bug reports</listitem>
+			</itemizedlist>
+   </simplesect>
 </section>
