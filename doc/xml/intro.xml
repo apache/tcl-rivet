@@ -1,5 +1,4 @@
 <section id="introduction">
-
     <title>Introduction to Apache Rivet</title>
     <para>
       Apache Rivet is a system for creating dynamic web content via a
@@ -12,7 +11,6 @@
       meet these goals, we have chosen the Tcl programming language to
       combine with the Apache Web Server.
     </para>
-
     <para>
       In this manual, we aim to help get you started, and then
       writing productive code as quickly as possible, as well as
