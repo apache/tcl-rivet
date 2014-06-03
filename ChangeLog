@@ -1,3 +1,6 @@
+2014-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/intro.xml: Acknowledgements reworded
+
 2014-06-02 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: tagging this code as 2.2.0
     * src/rivet.h,src/rivetcmds/rivetCore.c: macro CHECK_REQUEST_REC moved from rivetCore.c to rivet.h
