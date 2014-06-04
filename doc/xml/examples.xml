@@ -40,20 +40,23 @@
     </example>
 
     <example>
-		<title>Generate a Table</title>
+		<title>Generate a Colorful Table</title>
 	  	<para>
-	   	In another simple example, we dynamically generate a table:
+	   	In another simple example, we dynamically generate a table selecting
+	   	a different background color for each cell. The font color is determined
+	   	through a simple CSS rule embedded in a HTML &lt;style&gt; element. Create
+	   	the file color-table.tcl and put the following code in it
 	  	</para>
-	  	<programlisting>&table.rvt;</programlisting>
+	  	<programlisting>&color-table.tcl;</programlisting>
 	  	<para>
 	    	If you read the code, you can see that this is pure Tcl.  We
 	    	could take the same code, run it outside of Rivet, and it
-	    	would generate the same HTML!
+	    	would generate the same HTML
 	  	</para>
 	  	<para>
 	    	The result should look something like this:
 	  	</para>
-	  	<graphic fileref="images/table.png"/>
+	  	<graphic fileref="images/color-table.png"/>
     </example>
 
     <example id="variable_access">

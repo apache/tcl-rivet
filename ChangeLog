@@ -1,3 +1,7 @@
+2014-06-04 Massimo Manghi <mxmanghi@apache.org>
+    * doc/images/color-table.png, doc/xml/examples.xml,doc/examples/color-table-tcl: Changing old table.rvt
+    example in a more enticing colorful table generation
+
 2014-06-03 Massimo Manghi <mxmanghi@apache.org>
     * 2.2/: merging changes from trunk
     * doc/xml/intro.xml: Acknowledgements reworded into a list
