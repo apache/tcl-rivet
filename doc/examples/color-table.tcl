@@ -1,6 +1,5 @@
 puts "<html><head>"
-puts "<style>"
-puts "td { font-size: 12px; }\n td.bright { color: #ccc; }\n td.dark { color: #222; }\n</style>"
+puts "<style>\n  td { font-size: 12px; }\n  td.bright { color: #ccc; }\n  td.dark { color: #222; }\n</style>"
 puts "</head><body>"
 puts "<table>"
 

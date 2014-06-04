@@ -1,6 +1,5 @@
 puts &quot;&lt;html&gt;&lt;head&gt;&quot;
-puts &quot;&lt;style&gt;&quot;
-puts &quot;td { font-size: 12px; }\n td.bright { color: #ccc; }\n td.dark { color: #222; }\n&lt;/style&gt;&quot;
+puts &quot;&lt;style&gt;\n  td { font-size: 12px; }\n  td.bright { color: #ccc; }\n  td.dark { color: #222; }\n&lt;/style&gt;&quot;
 puts &quot;&lt;/head&gt;&lt;body&gt;&quot;
 puts &quot;&lt;table&gt;&quot;
 
