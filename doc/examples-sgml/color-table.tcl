@@ -10,9 +10,9 @@ for {set i 0} { $i &lt; 9 } {incr i} {
     puts &quot;&lt;tr&gt;&quot;
     for {set j 0} {$j &lt; 9} {incr j} {
 
-        set r [expr int(255 * ($i + $j) * 32 / 512)] 
-        set g [expr int(255 * (8 - $i + $j) * 32 / 512)]
-        set b [expr int(255 * ($i + 8 - $j) * 32 / 512)]
+        set r [expr int(255 * ($i + $j) / 16)] 
+        set g [expr int(255 * (8 - $i + $j) / 16)]
+        set b [expr int(255 * ($i + 8 - $j) / 16)]
 
 # determining the background luminosity (NTSC) and choosing the foreground
 # color accordingly in order maintain maximum contrast
