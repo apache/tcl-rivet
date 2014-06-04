@@ -1,5 +1,5 @@
 puts &quot;&lt;html&gt;&lt;head&gt;&quot;
-puts &quot;&lt;style&gt;\n  td { font-size: 12px; }\n  td.bright { color: #ccc; }\n  td.dark { color: #222; }\n&lt;/style&gt;&quot;
+puts &quot;&lt;style&gt;\n  td { font-size: 12px; }\n  td.bright { color: #eee; }\n  td.dark { color: #222; }\n&lt;/style&gt;&quot;
 puts &quot;&lt;/head&gt;&lt;body&gt;&quot;
 puts &quot;&lt;table&gt;&quot;
 
@@ -13,10 +13,10 @@ for {set i 0} { $i &lt; 9 } {incr i} {
         set g [expr int(255 * (8 - $i + $j) / 16)]
         set b [expr int(255 * ($i + 8 - $j) / 16)]
 
-# determining the background luminosity (NTSC) and choosing the foreground
-# color accordingly in order maintain maximum contrast
+# determining the background luminosity (YIQ space of NTSC) and choosing
+# the foreground color accordingly in order maintain maximum contrast
 
-        if { [expr ($r*0.2126)+($g*0.7152)+($b*0.0722)] &gt; 128} {
+        if { [expr ($r*0.29894)+($g*0.58704)+($b*0.11402)] &gt; 128} {
             set cssclass &quot;dark&quot;
         } else {
             set cssclass &quot;bright&quot;
