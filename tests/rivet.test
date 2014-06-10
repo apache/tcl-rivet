@@ -64,7 +64,6 @@ if { $testgroup3 } {
         failtest.test
         broken.test
         config.test
-        lang.test
         parsepackage.test
         virtualhost.test
         inspect.test 

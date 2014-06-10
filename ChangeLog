@@ -1,3 +1,6 @@
+2014-06-10 Massimo Manghi <mxmanghi@apache.org>
+    * tests/rivet.test: removed lang.test as it was testing just a tautology
+
 2014-06-04 Massimo Manghi <mxmanghi@apache.org>
     * doc/images/color-table.png, doc/xml/examples.xml,doc/examples/color-table-tcl: Changing old table.rvt
     example in a more enticing colorful table generation
