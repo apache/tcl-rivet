@@ -1,3 +1,11 @@
+2014-06-22 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: new macros MOD_RIVET_CORE and RIVET_CHANNEL. Macro APACHE_VERSION preserved but not 
+    called anymore
+    * rivet/init.tcl.in: Add template for rivet/init.tcl
+    * src/Makefile.am: building mod_rivet with code entirely selected by autoconf defined symbols
+    * src/apache-2/mod_rivet.c: comments added. Rivet package version depends now on preprocessor
+     symbol RIVET_TCL_PACKAGE_VERSION
+
 2014-06-10 Massimo Manghi <mxmanghi@apache.org>
     * tests/rivet.test: removed lang.test as it was testing just a tautology
 

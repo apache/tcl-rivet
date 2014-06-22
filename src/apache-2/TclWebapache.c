@@ -130,7 +130,7 @@ int
 TclWeb_SetHeaderType(char *header, TclWebRequest *req)
 {
     
-    if(req->headers_set)
+    if (req->headers_set)
         return TCL_ERROR;
 
 //    req->req->content_type = (char *) apr_pstrdup(req->req->pool, header);
