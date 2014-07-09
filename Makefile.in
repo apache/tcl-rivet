@@ -102,6 +102,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/tclconfig/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compare_version.m4 \
+	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/tclconfig/tcl.m4 \
 	$(top_srcdir)/tclconfig/libtool.m4 \
 	$(top_srcdir)/m4/ax_prefix_config_h.m4 \

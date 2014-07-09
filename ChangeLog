@@ -1,3 +1,6 @@
+2014-07-09 Massimo Manghi <mxmanghi@apache.org>
+    * m4/ax_split_version.m4: adding macro for version number manipulation
+
 2014-06-22 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: new macros MOD_RIVET_CORE and RIVET_CHANNEL. Macro APACHE_VERSION preserved but not 
     called anymore
