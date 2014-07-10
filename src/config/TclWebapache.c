@@ -1,13 +1,15 @@
 /*
  * TclWeb.c --
+ *
  * 	Common API layer.
  *
  * This file contains the Apache-based versions of the functions in
  * TclWeb.h.  They rely on Apache and apreq to perform the underlying
  * operations.
+ *
  */
 
-/* Copyright 2002-2004 The Apache Software Foundation
+/* Copyright 2002-2014 The Apache Software Foundation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -63,14 +65,14 @@ TclWeb_NewRequestObject (apr_pool_t *p)
 {
     TclWebRequest*  req = (TclWebRequest *)apr_pcalloc(p, sizeof(TclWebRequest));
 
-    req->interp     = NULL;
-    req->req        = NULL;
-    req->apachereq  = ApacheRequest_new(p);
+    req->interp             = NULL;
+    req->req                = NULL;
+    req->apachereq          = ApacheRequest_new(p);
     req->headers_printed    = 0;
     req->headers_set        = 0;
     req->environment_set    = 0;
-    req->charset    = NULL;  /* we will test against NULL to check if a charset */
-                             /* was specified in the conf */
+    req->charset            = NULL;  /* we will test against NULL to check if a charset */
+                                     /* was specified in the conf */
     return req;
 }
 

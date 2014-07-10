@@ -44,7 +44,9 @@ static int
 outputproc(ClientData instancedata, CONST84 char *buf,
 	   int toWrite, int *errorCodePtr)
 {
-    rivet_server_conf *rsc = (rivet_server_conf *)instancedata;
+    mod_rivet_globals* rivet_module_globals = (mod_rivet_globals *)instancedata;
+
+    rivet_server_conf *rsc = rivet_module_globals->rsc_p;
     rivet_interp_globals *globals =
         Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
 

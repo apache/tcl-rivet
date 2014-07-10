@@ -1,3 +1,15 @@
+2014-07-10 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_config.[h|c]: moved to src/config
+    * src/apache-2/TclWebapache.c: this file moved temporarily into src/config to separate it from
+    the specific module implementation
+    * src/experimental: making room to a new implementation of mod_rivet
+    * src/channel/rivetChannel.c: the request_rec pointer is passed through another pointer
+    as this channel is now the only channel handled by mod_rivet and it's shared across virutal hosts
+    * src/apache-2/mod_rivet.c: now creating only one Rivet channel instance and storing a pointer
+    to the current request_rec in the structure mod_rivet_globals, as the running the prefork MPM
+    we can only handle a request at a time.
+    * src/apache-2/*.tcl: removing obsolete tcl files
+
 2014-07-09 Massimo Manghi <mxmanghi@apache.org>
     * m4/ax_split_version.m4: adding macro for version number manipulation
 

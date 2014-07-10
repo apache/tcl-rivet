@@ -43,16 +43,16 @@ apxs_libexec_LTLIBRARIES = mod_rivet.la
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
-mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -Iparser -I@apache_request@  @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -Iconfig -Iparser -I@apache_request@  @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 mod_rivet_la_SOURCES =  @apache_request@/apache_multipart_buffer.c 	    \
                         @apache_request@/apache_request.c               \
                         @rivet_core@/mod_rivet.c                        \
-                        @rivet_core@/TclWebapache.c                     \
-                        @rivet_core@/apache_config.c                    \
                         @rivet_core_cmds@/rivetCore.c                   \
                         @rivet_core_cmds@/rivetInspect.c                \
                         @rivet_channel@/rivetChannel.c                  \
+                        config/TclWebapache.c                           \
+                        config/apache_config.c                          \
                         parser/rivetParser.c
 
 # Removing libtool .la files from installation

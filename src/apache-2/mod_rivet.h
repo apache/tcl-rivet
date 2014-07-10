@@ -113,6 +113,14 @@ typedef struct _rivet_interp_globals {
     server_rec*     srec;               /* pointer to the current server rec obj */
 } rivet_interp_globals;
 
+/* 
+ * we need also a place where to store module wide globals
+ */
+
+typedef struct _mod_rivet_globals {
+    rivet_server_conf* rsc_p;
+} mod_rivet_globals;
+
 int Rivet_ParseExecFile   (TclWebRequest *req, char *filename, int toplevel);
 int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
@@ -125,11 +133,8 @@ rivet_server_conf *Rivet_GetConf(request_rec *r);
 #undef ap_set_module_config
 #endif
 
-#define RIVET_SERVER_CONF(module) \
-	(rivet_server_conf *)ap_get_module_config(module, &rivet_module)
-
-#define RIVET_NEW_CONF(p) \
-	(rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
+#define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
+#define RIVET_NEW_CONF(p)         (rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
 
 Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*        interp,
                                     rivet_server_conf*  rivet_conf);

@@ -88,9 +88,18 @@ TCL_DECLARE_MUTEX(sendMutex);
 #define RIVET_TEMPLATE_CTYPE    "application/x-httpd-rivet"
 #define RIVET_TCLFILE_CTYPE     "application/x-rivet-tcl"
 
+/* 
+ * for some reason the max buffer size definition is not exported by Tcl 
+ * we steal and reproduce it here prepending the name with TCL
+ */
+
+#define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
+
 static Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 static void Rivet_CreateCache (server_rec *s, apr_pool_t *p);
 static apr_status_t Rivet_ChildExit(void *data);
+
+mod_rivet_globals* rivet_module_globals = NULL;
 
 /*
  * -- Rivet_chdir_file (const char* filename)
@@ -499,8 +508,6 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         ctime = buf.st_ctime;
         mtime = buf.st_mtime;
     } else {
-        //ctime = req->req->finfo.st_ctime;
-        //mtime = req->req->finfo.st_mtime;
         ctime = req->req->finfo.ctime;
         mtime = req->req->finfo.mtime;
     }
@@ -713,10 +720,9 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
 
-    /* Create TCL commands to deal with Apache's BUFFs. */
-    rsc->outchannel = apr_pcalloc (p, sizeof(Tcl_Channel));
-    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rsc, TCL_WRITABLE);
-    Tcl_SetStdChannel (*(rsc->outchannel), TCL_STDOUT);
+    /* We register the Tcl channel to the interpreter */
+
+    Tcl_RegisterChannel(interp, *(rsc->outchannel));
 
     /* Set up interpreter associated data */
 
@@ -803,24 +809,18 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
         exit(1);
     }
 
-    /* Set the output buffer size to the largest allowed value, so that we 
-     * won't send any result packets to the browser unless the Rivet
-     * programmer does a "flush stdout" or the page is completed.
-     */
-
-    Tcl_SetChannelBufferSize (*(rsc->outchannel), 1000000);
-    Tcl_RegisterChannel(interp, *(rsc->outchannel));
     Tcl_Release(interp);
 }
 
 static int
-Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp,
-       server_rec *s)
+Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
-    rivet_panic_pool = pPool;
+    rivet_panic_pool       = pPool;
     rivet_panic_server_rec = s;
 
+    rivet_module_globals = apr_palloc(pPool,sizeof(mod_rivet_globals));
+    rivet_module_globals->rsc_p = rsc;
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
 #else
@@ -829,14 +829,35 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp,
 
     FILEDEBUGINFO;
 
+    /* we create and initialize a master (server) interpreter */
+
     rsc->server_interp = Rivet_CreateTclInterp(s) ; /* root interpreter */
 
-    Rivet_PerInterpInit(s, rsc, pPool);
-    Rivet_CreateCache(s,pPool);
+    /* Create TCL channel and store a pointer in the rivet_server_conf object */
 
-    /* we create and initialize a master (server) interpreter
-     * Rivet_InitTclStuff(s,pPool);
+    rsc->outchannel    = apr_pcalloc (pPool, sizeof(Tcl_Channel));
+    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_module_globals, TCL_WRITABLE);
+
+    /* The channel we have just created replaces Tcl's stdout */
+
+    Tcl_SetStdChannel (*(rsc->outchannel), TCL_STDOUT);
+
+    /* Set the output buffer size to the largest allowed value, so that we 
+     * won't send any result packets to the browser unless the Rivet
+     * programmer does a "flush stdout" or the page is completed.
      */
+
+    Tcl_SetChannelBufferSize (*(rsc->outchannel), TCL_MAX_CHANNEL_BUFFER_SIZE);
+
+    /* We register the Tcl channel to the interpreter */
+
+    Tcl_RegisterChannel(rsc->server_interp, *(rsc->outchannel));
+
+    Rivet_PerInterpInit(s, rsc, pPool);
+
+    /* we create also the cache */
+
+    Rivet_CreateCache(s,pPool);
 
     if (rsc->rivet_server_init_script != NULL) {
         Tcl_Interp* interp = rsc->server_interp;
@@ -1059,6 +1080,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
         }
 
         myrsc->outchannel = rsc->outchannel;
+
         /* This sets up slave interpreters for other virtual hosts. */
         if (sr != s) /* not the first one  */
         {
@@ -1168,6 +1190,12 @@ Rivet_ChildHandlers(server_rec *s, int init)
             }
             Tcl_Release (rsc->server_interp);
         }
+
+        if (!init) 
+        {
+            Tcl_UnregisterChannel(rsc->server_interp,*(rsc->outchannel));
+        }
+
     }
 
     if (!init) {
@@ -1233,7 +1261,7 @@ Rivet_ChildInit(apr_pool_t *pChild, server_rec *s)
  */
 
 static apr_status_t
-Rivet_ChildExit(void *data)
+Rivet_ChildExit (void *data)
 {
     server_rec *s = (server_rec*) data;
     ap_assert (s != (server_rec *)NULL);
@@ -1278,6 +1306,7 @@ Rivet_SendContent(request_rec *r)
     rivet_panic_request_rec = r;
 
     rsc = Rivet_GetConf(r);
+    rivet_module_globals->rsc_p = rsc;
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
@@ -1353,28 +1382,6 @@ Rivet_SendContent(request_rec *r)
                             Tcl_GetStringResult(interp));
         retval = HTTP_INTERNAL_SERVER_ERROR;
         goto sendcleanup;
-    }
-
-    /* Set the script name. */
-    {
-#if 1
-    /*
-        Tcl_Obj *infoscript = Tcl_NewStringObj("info script ", -1);
-        Tcl_IncrRefCount(infoscript);
-        Tcl_AppendToObj(infoscript, r->filename, -1);
-        Tcl_EvalObjEx(interp, infoscript, TCL_EVAL_DIRECT);
-        Tcl_DecrRefCount(infoscript);
-    */
-#else
-        /* This speeds things up, but you have to use Tcl internal
-         * declerations, which is not so great... */
-        Interp *iPtr = (Interp *) interp;
-        if (iPtr->scriptFile != NULL) {
-            Tcl_DecrRefCount(iPtr->scriptFile);
-        }
-        iPtr->scriptFile = Tcl_NewStringObj(r->filename, -1);
-        Tcl_IncrRefCount(iPtr->scriptFile);
-#endif
     }
 
     /* Apache Request stuff */

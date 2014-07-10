@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.2.0])
+AC_INIT([Rivet],[2.2.1])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
@@ -428,7 +428,7 @@ AC_DEFUN([APACHE_VERSION],[
 AC_DEFUN([MOD_RIVET_CORE],[
     AC_ARG_WITH(
        rivet_core,
-       [ --with-rivet-core[=path] mod_rivet core directory],,
+       [  --with-rivet-core[=path] mod_rivet core directory],,
        [with_rivet_core="apache-2"]
     )
 
@@ -508,7 +508,7 @@ AC_DEFUN([RIVET_CORE_CMDS],[
 AC_DEFUN([RIVET_CHANNEL],[
     AC_ARG_WITH(
         rivet_channel,
-        [ --with-rivet-channel=DIR Rivet channel code path ],,
+        [  --with-rivet-channel=DIR Rivet channel code path ],,
         [with_rivet_channel="channel"]
     )
 
@@ -522,7 +522,7 @@ AC_DEFUN([RIVET_CHANNEL],[
 AC_DEFUN([RIVET_TCL_LIB],[
     AC_ARG_WITH(
         rivet_target_dir,
-        [ --with-rivet-target-dir=DIR  Rivet tcl library target dir ],,
+        [  --with-rivet-target-dir=DIR  Rivet tcl library target dir ],,
         with_rivet_target_dir="${apache_base}/lib/rivet${PACKAGE_VERSION}"
     )
     AC_MSG_CHECKING(for Rivet tcl library target)
@@ -569,7 +569,7 @@ AC_DEFUN([DISPLAY_RIVET_VERSION],[
 AC_DEFUN([UPLOAD_DIRECTORY],[
     AC_ARG_WITH(
     upload_dir,
-    [ --with-upload-dir=DIR Default directory for uploads],,
+    [  --with-upload-dir=DIR Default directory for uploads],,
         with_upload_dir="/tmp"
     )
     AC_MSG_CHECKING(where Rivet will save uploads)
@@ -636,7 +636,7 @@ AC_DEFUN([RIVET_COMMANDS_EXPORT],[
 AC_DEFUN([IMPORT_RIVET_COMMANDS],[
     AC_ARG_ENABLE(
         import-rivet-commands,
-        [ --disable-import-rivet-commands requires explicit namespace import],
+        [  --disable-import-rivet-commands requires explicit namespace import],
         [ import_rivet_commands=$enable_import_rivet_commands],
         [ import_rivet_commands="yes"]
     )
