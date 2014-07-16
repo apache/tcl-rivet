@@ -1,3 +1,6 @@
+2014-07-16 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental: add experimental code for threaded module
+
 2014-07-10 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/apache_config.[h|c]: moved to src/config
     * src/apache-2/TclWebapache.c: this file moved temporarily into src/config to separate it from
