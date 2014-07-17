@@ -1,3 +1,6 @@
+2014-07-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/channel/rivetChannel.[c|h]: add preprocessor symbol to prevent multiple includes
+
 2014-07-16 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental: add experimental code for threaded module
 

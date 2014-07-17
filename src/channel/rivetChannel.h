@@ -1,3 +1,8 @@
+
+
+#ifndef _RIVET_CHANNEL_H_
+#define _RIVET_CHANNEL_H_
+
 /* Functions for mod_dtcl Tcl output channel .*/
 
 #include "mod_rivet.h"
@@ -11,4 +16,4 @@ extern void watchproc(ClientData, int);
 extern int gethandleproc(ClientData, int, ClientData *);
 
 extern Tcl_ChannelType RivetChan;
-
+#endif
