@@ -171,14 +171,17 @@ static int RivetHandler(request_rec *r)
     Tcl_Preserve(module_globals.interp_a[interp_id]);
 
     /*
+    script = Tcl_NewStringObj("puts \"<html><head><title>experimental</title></head><body>OK</body></html>\"\n",-1);
+    */
+
     script = Tcl_NewStringObj("puts \"<html><head><title>experimental module</title></head><body><h2>\"\n",-1);
     Tcl_AppendStringsToObj(script,"puts -nonewline \"current interp index: \"\nputs ",NULL);
     Tcl_AppendObjToObj(script,Tcl_NewIntObj(interp_id));
     Tcl_AppendStringsToObj(script,"\nputs \"</h2></body></html>\"",NULL);
-    */
 
-    script = Tcl_NewStringObj("puts \"<html><head><title>experimental</title></head><body>OK</body></html>\"\n",-1);
     apr_thread_mutex_lock(module_globals.channel_mutex);
+
+    Tcl_SetStdChannel (*(module_globals.outchannel), TCL_STDOUT);
 
     TclWeb_InitRequest(module_globals.req,interp,r);
     module_globals.r = r;
