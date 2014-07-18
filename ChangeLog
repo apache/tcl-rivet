@@ -1,3 +1,7 @@
+2014-07-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: working toy module capable of running Tcl scripts with a worker MPM
+    * src/experimental/rivetChannel.c: now depending on the thread private data
+
 2014-07-17 Massimo Manghi <mxmanghi@apache.org>
     * src/channel/rivetChannel.[c|h]: add preprocessor symbol to prevent multiple includes
 

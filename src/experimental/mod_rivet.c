@@ -23,6 +23,7 @@ rivet_server_conf       rsc;
 rivet_interp_globals    interp_globals;
 
 extern Tcl_ChannelType RivetChan;
+apr_threadkey_t*        rivet_thread_key;
 
 int
 Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf)
@@ -45,7 +46,7 @@ static void RivetReleaseInterp(int interp_id)
     apr_thread_mutex_unlock(module_globals.mutex);
 }
 
-static int RivetFetchInterp(Tcl_Interp** interp_p, request_rec* req)
+static int RivetFetchInterp(request_rec* req)
 {
     int c;
     int interp_id;
@@ -71,7 +72,6 @@ static int RivetFetchInterp(Tcl_Interp** interp_p, request_rec* req)
                 module_globals.interp_idx = interp_id;
                 module_globals.status[interp_id] = request_processing;
                 module_globals.busy_cnt++;
-                *interp_p = module_globals.interp_a[interp_id];
                 break;
             }
         }
@@ -108,6 +108,7 @@ RivetChildInit (apr_pool_t *pChild, server_rec *s)
     apr_thread_mutex_create(&module_globals.mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
     apr_thread_mutex_create(&module_globals.channel_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
     apr_thread_cond_create(&module_globals.cond, pChild);
+    apr_threadkey_private_create (&rivet_thread_key, NULL, pChild);
 
     for (i = 0; i < TCL_INTERPS; i++)
     {
@@ -123,43 +124,33 @@ RivetChildInit (apr_pool_t *pChild, server_rec *s)
         }
         module_globals.interp_a[i] = interp;
         module_globals.status[i]   = idle;
+
+        outchannel  = apr_pcalloc (pChild, sizeof(Tcl_Channel));
+        *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
+
+        /* The channel we have just created replaces Tcl's stdout */
+
+        Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
+
+        /* Set the output buffer size to the largest allowed value, so that we 
+         * won't send any result packets to the browser unless the Rivet
+         * programmer does a "flush stdout" or the page is completed.
+         */
+
+        Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
+        module_globals.outchannel[i] = outchannel;
     }
 
-    outchannel  = apr_pcalloc (pChild, sizeof(Tcl_Channel));
-    *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", &module_globals, TCL_WRITABLE);
-
-    /* The channel we have just created replaces Tcl's stdout */
-
-    Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
-
-    /* Set the output buffer size to the largest allowed value, so that we 
-     * won't send any result packets to the browser unless the Rivet
-     * programmer does a "flush stdout" or the page is completed.
-     */
-
-    Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
-
-    module_globals.outchannel = outchannel;
-
-    for (i = 0; i < TCL_INTERPS; i++)
-    {
-        Tcl_Preserve (module_globals.interp_a[i]);
-
-        /* We register the Tcl channel to the interpreter */
-
-        Tcl_RegisterChannel(module_globals.interp_a[i], *outchannel);
-        Tcl_Release (module_globals.interp_a[i]);
-    }
     module_globals.interp_idx = 0;
-    module_globals.req = TclWeb_NewRequestObject (pChild);
 }
 
 static int RivetHandler(request_rec *r)
 {
-    Tcl_Interp* interp;
-    Tcl_Obj*    script = NULL;
-    int         interp_id;
-
+    Tcl_Interp*             interp;
+    Tcl_Obj*                script = NULL;
+    int                     interp_id;
+    rivet_thread_private*   private;
+    
     if (strcmp(r->handler, "application/x-httpd-rivet")) {
         return DECLINED;
     }
@@ -170,10 +161,17 @@ static int RivetHandler(request_rec *r)
     if (r->header_only) return OK;
     //if (r->args == 0) return OK;
 
-    interp_id = RivetFetchInterp(&interp,r);
+    /*
+    script = Tcl_NewStringObj("puts \"<html><head><title>experimental</title></head><body>OK</body></html>\"\n",-1);
+    */
+
+    /* */
+
+    interp_id = RivetFetchInterp(r);
+
+    interp = module_globals.interp_a[interp_id];
     Tcl_Preserve(module_globals.interp_a[interp_id]);
 
-    /*
     script = Tcl_NewStringObj("puts \"<html><head><title>experimental</title></head><body>OK</body></html>\"\n",-1);
     */
 
@@ -182,24 +180,44 @@ static int RivetHandler(request_rec *r)
     Tcl_AppendObjToObj(script,Tcl_NewIntObj(interp_id));
     Tcl_AppendStringsToObj(script,"\nputs \"</h2></body></html>\"",NULL);
 
+
+    if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
+    {
+        RivetReleaseInterp(interp_id);
+        return DECLINED;
+
+    } else {
+
+        if (private == NULL)
+        {
+            apr_thread_mutex_lock(module_globals.channel_mutex);
+            private         = apr_palloc(module_globals.pool,sizeof(*private));
+            private->req    = TclWeb_NewRequestObject (module_globals.pool);
+            apr_thread_mutex_unlock(module_globals.channel_mutex);
+        }
+
+    }
+
+    private->interp  = module_globals.interp_a[interp_id];
+    private->channel = module_globals.outchannel[interp_id];
+    private->r       = r;
+    TclWeb_InitRequest(private->req,interp,r);
+    apr_threadkey_private_set (private,rivet_thread_key);
+
+    Tcl_SetStdChannel (*(module_globals.outchannel[interp_id]), TCL_STDOUT);
+
     apr_thread_mutex_lock(module_globals.channel_mutex);
-
-    Tcl_SetStdChannel (*(module_globals.outchannel), TCL_STDOUT);
-
-    TclWeb_InitRequest(module_globals.req,interp,r);
-    module_globals.r = r;
-
     if (Tcl_EvalObjEx(interp, script, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                      "Error evaluating script: %s", Tcl_GetVar(interp, "errorInfo", 0));
     }
+    apr_thread_mutex_unlock(module_globals.channel_mutex);
 
-    TclWeb_PrintHeaders(module_globals.req);
-    Tcl_Flush(*(module_globals.outchannel));
+    TclWeb_PrintHeaders(private->req);
+    Tcl_Flush(*(module_globals.outchannel[interp_id]));
     Tcl_Release(module_globals.interp_a[interp_id]);
 
-    apr_thread_mutex_unlock(module_globals.channel_mutex);
     RivetReleaseInterp(interp_id);
 
     return OK;

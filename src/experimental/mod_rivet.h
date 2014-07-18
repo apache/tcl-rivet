@@ -133,10 +133,17 @@ typedef struct _mod_rivet_globals {
     int                 interp_idx;
     int                 busy_cnt;
     rivet_server_conf*  rsc_p;
-    request_rec*        r;			     /* request rec                 */
-    TclWebRequest*      req;
-    Tcl_Channel*        outchannel;		 /* stuff for buffering output  */
+    Tcl_Channel*        outchannel[TCL_INTERPS]; /* stuff for buffering output  */
 } mod_rivet_globals;
+
+typedef struct _thread_worker_private {
+
+    request_rec*        r;			    /* request rec                 */
+    TclWebRequest*      req;
+    Tcl_Interp*         interp;
+    Tcl_Channel*        channel;
+
+} rivet_thread_private;
 
 enum
 {
