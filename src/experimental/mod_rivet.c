@@ -41,10 +41,11 @@ static void RivetReleaseInterp(int interp_id)
     apr_thread_mutex_lock(module_globals.mutex);
     module_globals.status[interp_id] = idle;
     module_globals.busy_cnt--;
+    apr_thread_cond_signal(module_globals.cond);
     apr_thread_mutex_unlock(module_globals.mutex);
 }
 
-static int RivetFetchInterp(Tcl_Interp** interp_p)
+static int RivetFetchInterp(Tcl_Interp** interp_p, request_rec* req)
 {
     int c;
     int interp_id;
@@ -55,6 +56,8 @@ static int RivetFetchInterp(Tcl_Interp** interp_p)
     {
         while (module_globals.busy_cnt >= TCL_INTERPS)
         {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, req->server, 
+                     MODNAME ": no available interpreter from the pool.");
             apr_thread_cond_wait(module_globals.cond, module_globals.mutex);
         }
 
@@ -85,7 +88,7 @@ static int RivetFetchInterp(Tcl_Interp** interp_p)
 static int
 RivetServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
-    ap_add_version_component(pPool, "Rivet-experimental");
+    ap_add_version_component(pPool, "Rivet/Experimental");
     return OK;
 }
 
@@ -167,7 +170,7 @@ static int RivetHandler(request_rec *r)
     if (r->header_only) return OK;
     //if (r->args == 0) return OK;
 
-    interp_id = RivetFetchInterp(&interp);
+    interp_id = RivetFetchInterp(&interp,r);
     Tcl_Preserve(module_globals.interp_a[interp_id]);
 
     /*
