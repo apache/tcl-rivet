@@ -19,6 +19,9 @@
 #ifdef HAVE_CONFIG_H
 #include <rivet_config.h>
 #endif
+#include <apr_general.h>
+#include <apr_thread_proc.h>
+#include <apr_thread_cond.h>
 
 #include "httpd.h"
 #include "http_config.h"
@@ -43,18 +46,18 @@ inputproc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
 static int
 outputproc(ClientData instancedata, CONST84 char *buf, int toWrite, int *errorCodePtr)
 {
-    mod_rivet_globals* rivet_module_globals = (mod_rivet_globals *)instancedata;
+    apr_threadkey_t*        rivet_thread_key = (apr_threadkey_t*) instancedata;
+    rivet_thread_private*   private;
+    
+    apr_threadkey_private_get ((void **)&private,rivet_thread_key);
 
-    rivet_server_conf *rsc = rivet_module_globals->rsc_p;
-    rivet_interp_globals *globals =
-        Tcl_GetAssocData(rsc->server_interp, "rivet", NULL);
-
-    TclWeb_PrintHeaders(globals->req);
-    if (globals->req->content_sent == 0)
+    TclWeb_PrintHeaders(private->req);
+    if (private->req->content_sent == 0)
     {
-        ap_rwrite(buf, toWrite, globals->r);
-        ap_rflush(globals->r);
+        ap_rwrite(buf, toWrite, private->r);
+        ap_rflush(private->r);
     }
+
     return toWrite;
 }
 
@@ -100,6 +103,7 @@ Tcl_ChannelType RivetChan = {
     NULL,                       /* flush proc - can be null */
     NULL,                       /* handler proc - can be null */
     NULL,                       /* wide seek proc - can be null if seekproc is*/
-    NULL                        /* thread action proc - can be null */
+    NULL,                       /* thread action proc - can be null */
+    NULL                        /* truncate proc */
 };
 

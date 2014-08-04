@@ -1,3 +1,42 @@
+2014-08-04 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: adding support for --with-rivet-channel switch for alternate implementations
+    of a Rivet Tcl channel
+    * src/: further modularized to make refactoring a bit easier. But it's still the code
+    we released as 2.2.0
+
+2014-07-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: working toy module capable of running Tcl scripts with a worker MPM
+    * src/experimental/rivetChannel.c: now depending on the thread private data
+
+2014-07-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/channel/rivetChannel.[c|h]: add preprocessor symbol to prevent multiple includes
+
+2014-07-16 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental: add experimental code for threaded module
+
+2014-07-10 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/apache_config.[h|c]: moved to src/config
+    * src/apache-2/TclWebapache.c: this file moved temporarily into src/config to separate it from
+    the specific module implementation
+    * src/experimental: making room to a new implementation of mod_rivet
+    * src/channel/rivetChannel.c: the request_rec pointer is passed through another pointer
+    as this channel is now the only channel handled by mod_rivet and it's shared across virutal hosts
+    * src/apache-2/mod_rivet.c: now creating only one Rivet channel instance and storing a pointer
+    to the current request_rec in the structure mod_rivet_globals, as the running the prefork MPM
+    we can only handle a request at a time.
+    * src/apache-2/*.tcl: removing obsolete tcl files
+
+2014-07-09 Massimo Manghi <mxmanghi@apache.org>
+    * m4/ax_split_version.m4: adding macro for version number manipulation
+
+2014-06-22 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: new macros MOD_RIVET_CORE and RIVET_CHANNEL. Macro APACHE_VERSION preserved but not 
+    called anymore
+    * rivet/init.tcl.in: Add template for rivet/init.tcl
+    * src/Makefile.am: building mod_rivet with code entirely selected by autoconf defined symbols
+    * src/apache-2/mod_rivet.c: comments added. Rivet package version depends now on preprocessor
+     symbol RIVET_TCL_PACKAGE_VERSION
+
 2014-06-10 Massimo Manghi <mxmanghi@apache.org>
     * tests/rivet.test: removed lang.test as it was testing just a tautology
 

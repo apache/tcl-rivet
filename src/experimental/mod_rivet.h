@@ -15,11 +15,14 @@
    limitations under the License.
 */
 
-/* $Id$ */
+/* $Id: mod_rivet.h 1609472 2014-07-10 15:08:52Z mxmanghi $ */
 
-#ifndef MOD_RIVET_H
-#define MOD_RIVET_H 1
+#ifndef _MOD_RIVET_H_
+#define _MOD_RIVET_H_
 
+#include <apr_queue.h>
+#include <apr_thread_proc.h>
+#include <apr_thread_cond.h>
 #include <tcl.h>
 #include "apache_request.h"
 #include "TclWeb.h"
@@ -84,22 +87,21 @@ typedef struct _rivet_server_conf {
 
     int user_scripts_updated;
 
-    Tcl_Obj *rivet_default_error_script;    /* for errors */
-    int *cache_size;
-    int *cache_free;
-    int upload_max;
-    int upload_files_to_var;
-    int separate_virtual_interps;
-    int honor_header_only_reqs;
-    char *server_name;
-    const char *upload_dir;
-    apr_table_t *rivet_server_vars;
-    apr_table_t *rivet_dir_vars;
-    apr_table_t *rivet_user_vars;
-    char **objCacheList;		        /* Array of cached objects (for priority handling) */
-    Tcl_HashTable *objCache;		    /* Objects cache - the key is the script name */
-
-    Tcl_Channel *outchannel;		    /* stuff for buffering output */
+    Tcl_Obj*        rivet_default_error_script;    /* for errors */
+    int*            cache_size;
+    int*            cache_free;
+    int             upload_max;
+    int             upload_files_to_var;
+    int             separate_virtual_interps;
+    int             honor_header_only_reqs;
+    char*           server_name;
+    const char*     upload_dir;
+    apr_table_t*    rivet_server_vars;
+    apr_table_t*    rivet_dir_vars;
+    apr_table_t*    rivet_user_vars;
+    char**          objCacheList;		/* Array of cached objects (for priority handling) */
+    Tcl_HashTable*  objCache;		    /* Objects cache - the key is the script name */
+    Tcl_Channel*    outchannel;		    /* stuff for buffering output */
 } rivet_server_conf;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
@@ -117,9 +119,37 @@ typedef struct _rivet_interp_globals {
  * we need also a place where to store module wide globals
  */
 
+#define TCL_INTERPS 4
+typedef int rivet_thr_status;
+
 typedef struct _mod_rivet_globals {
-    rivet_server_conf* rsc_p;
+    apr_thread_mutex_t  *mutex;
+    apr_thread_cond_t   *cond;
+    apr_queue_t         *queue;
+    apr_pool_t          *pool;
+    apr_thread_mutex_t  *channel_mutex;
+    Tcl_Interp*         interp_a[TCL_INTERPS];
+    rivet_thr_status    status[TCL_INTERPS];
+    int                 interp_idx;
+    int                 busy_cnt;
+    rivet_server_conf*  rsc_p;
+    Tcl_Channel*        outchannel[TCL_INTERPS]; /* stuff for buffering output  */
 } mod_rivet_globals;
+
+typedef struct _thread_worker_private {
+
+    request_rec*        r;			    /* request rec                 */
+    TclWebRequest*      req;
+    Tcl_Interp*         interp;
+    Tcl_Channel*        channel;
+
+} rivet_thread_private;
+
+enum
+{
+    idle,
+    request_processing
+};
 
 int Rivet_ParseExecFile   (TclWebRequest *req, char *filename, int toplevel);
 int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
@@ -153,4 +183,3 @@ Tcl_Obj* Rivet_CurrentServerRec (   Tcl_Interp*         interp, server_rec* s );
 #define ABORTPAGE_CODE "ABORTPAGE"
 
 #endif /* MOD_RIVET_H */
-

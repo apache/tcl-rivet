@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.2.0])
+AC_INIT([Rivet],[2.2.1])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
@@ -422,6 +422,24 @@ AC_DEFUN([APACHE_VERSION],[
     MOD_RIVET_INCLUDES="-I${apache_version_dir}"
 ])
 
+# MOD_RIVET_CORE
+#
+
+AC_DEFUN([MOD_RIVET_CORE],[
+    AC_ARG_WITH(
+       rivet_core,
+       [  --with-rivet-core[=path] mod_rivet core directory],,
+       [with_rivet_core="apache-2"]
+    )
+
+    rivet_core=${with_rivet_core}
+    AC_MSG_CHECKING(mod_rivet core)
+    AC_SUBST(rivet_core)
+    AC_MSG_RESULT([$with_rivet_core])
+])
+
+# 
+
 AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
     # shamelessly stolen from TEA_LOAD_TCLCONFIG
     AC_MSG_CHECKING([Debian TCL_PACKAGE_PATH workaround])
@@ -483,11 +501,28 @@ AC_DEFUN([RIVET_CORE_CMDS],[
 
 ])
 
+# RIVET_CHANNEL
+#
+# selecting the Rivet channel code directory
+
+AC_DEFUN([RIVET_CHANNEL],[
+    AC_ARG_WITH(
+        rivet_channel,
+        [  --with-rivet-channel=DIR Rivet channel code path ],,
+        [with_rivet_channel="channel"]
+    )
+
+    AC_MSG_CHECKING(for Rivet channel code path)
+    rivet_channel=${with_rivet_channel}
+    AC_SUBST(rivet_channel)
+    AC_MSG_RESULT([$with_rivet_channel])
+])
+
 
 AC_DEFUN([RIVET_TCL_LIB],[
     AC_ARG_WITH(
         rivet_target_dir,
-        [ --with-rivet-target-dir=DIR  Rivet tcl library target dir ],,
+        [  --with-rivet-target-dir=DIR  Rivet tcl library target dir ],,
         with_rivet_target_dir="${apache_base}/lib/rivet${PACKAGE_VERSION}"
     )
     AC_MSG_CHECKING(for Rivet tcl library target)
@@ -534,7 +569,7 @@ AC_DEFUN([DISPLAY_RIVET_VERSION],[
 AC_DEFUN([UPLOAD_DIRECTORY],[
     AC_ARG_WITH(
     upload_dir,
-    [ --with-upload-dir=DIR Default directory for uploads],,
+    [  --with-upload-dir=DIR Default directory for uploads],,
         with_upload_dir="/tmp"
     )
     AC_MSG_CHECKING(where Rivet will save uploads)
@@ -601,7 +636,7 @@ AC_DEFUN([RIVET_COMMANDS_EXPORT],[
 AC_DEFUN([IMPORT_RIVET_COMMANDS],[
     AC_ARG_ENABLE(
         import-rivet-commands,
-        [ --disable-import-rivet-commands requires explicit namespace import],
+        [  --disable-import-rivet-commands requires explicit namespace import],
         [ import_rivet_commands=$enable_import_rivet_commands],
         [ import_rivet_commands="yes"]
     )
@@ -685,7 +720,8 @@ AC_DEFUN([UPLOAD_TO_VAR],[
 
 ])
 
-APACHE_VERSION
+#APACHE_VERSION
+MOD_RIVET_CORE
 GET_RIVET_BASE
 APACHE
 CHECK_APXS
@@ -701,6 +737,16 @@ UPLOAD_TO_VAR
 IMPORT_RIVET_COMMANDS
 APACHE_REQUEST
 RIVET_CORE_CMDS
+RIVET_CHANNEL
+
+# Let's separate the point version from the major and minor version
+# to build a Rivet version to be substituted as basic version for 
+# package Rivet, central initialization of the Tcl environment
+
+VERSION=${PACKAGE_VERSION}
+AX_SPLIT_VERSION
+AC_DEFINE_UNQUOTED(TCL_PACKAGE_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}",[Rivet Tcl package version])
+AC_MSG_NOTICE([Rivet package version is ${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}])
 
 if test $import_rivet_commands = "yes"; then
     AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
@@ -728,7 +774,7 @@ AC_SUBST(TCL_PACKAGE_PATH)
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting the AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile src/Makefile src/librivet/Makefile src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
+AC_CONFIG_FILES([Makefile src/Makefile rivet/init.tcl src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
 
 #case $apache_version_dir in
 #    apache-1) AC_CONFIG_FILES([Makefile src/Makefile src/apache-1/Makefile doc/Makefile]) ;;
@@ -737,7 +783,7 @@ AC_CONFIG_FILES([Makefile src/Makefile src/librivet/Makefile src/parser/Makefile
 AC_OUTPUT
 
 if test "$print_fileevent_msg" = "1"; then
-    AC_MSG_NOTICE([=======================================================================])
+    AC_MSG_NOTICE([========================================================================])
     AC_MSG_NOTICE([                             WARNING!])
     AC_MSG_NOTICE([========================================================================])
     AC_MSG_NOTICE([The Tcl notifier (and consequently the event loop) does not work with])
