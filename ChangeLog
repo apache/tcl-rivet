@@ -1,4 +1,7 @@
-2014-07-31 Massimo Manghi <mxmanghi@apache.org>
+2014-08-04: Massimo Manghi <mxmanghi@apache.org>
+    * src/common: renaming src/config to a more specific name
+
+2014-07-31: Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.[c|h],rivetChannel.c: better implementation where Tcl interpreters are 
     running within their own threads communicating to a supervisor. Also implemented APR callback functions
     to cleanup memory and interpreters data
