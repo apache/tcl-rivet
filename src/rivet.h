@@ -15,6 +15,9 @@
 
 /* $Id$ */
 
+#ifndef _RIVET_H_
+#define _RIVET_H_
+
 /* This is for windows. */
 #ifdef BUILD_rivet
 #undef TCL_STORAGE_CLASS
@@ -74,3 +77,7 @@ EXTERN int Rivet_InitList(Tcl_Interp *interp);
 EXTERN int Rivet_InitCrypt(Tcl_Interp *interp);
 EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
 EXTERN int Rivet_InitCore(Tcl_Interp *interp); 
+
+#endif
+
+/* _RIVET_H_ */

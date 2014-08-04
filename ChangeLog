@@ -1,3 +1,13 @@
+2014-07-31 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.[c|h],rivetChannel.c: better implementation where Tcl interpreters are 
+    running within their own threads communicating to a supervisor. Also implemented APR callback functions
+    to cleanup memory and interpreters data
+    * src/config/parse_exec.c: adding this file which is to hold most of model independent code: 
+    Rivet_ParseExecFile, Rivet_chdir_file, Rivet_CheckType, Rivet_ParseExecString
+    * src/apache-2/mod_rivet.c: Removed code to be common to the experimental module
+    * src/Makefile.am: now compiling also new files needed to build the module.
+    * src/rivet.h: adding preprocessor checks to avoid recursive includes
+
 2014-07-14 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: working toy module capable of running Tcl scripts with a worker MPM
     * src/experimental/rivetChannel.c: now depending on the thread private data

@@ -21,6 +21,7 @@
 #define _MOD_RIVET_H_
 
 #include <apr_queue.h>
+#include <apr_tables.h>
 #include <apr_thread_proc.h>
 #include <apr_thread_cond.h>
 #include <tcl.h>
@@ -121,38 +122,61 @@ typedef struct _rivet_interp_globals {
 
 #define TCL_INTERPS 4
 typedef int rivet_thr_status;
+typedef int rivet_job_t;
 
 typedef struct _mod_rivet_globals {
-    apr_thread_mutex_t  *mutex;
-    apr_thread_cond_t   *cond;
-    apr_queue_t         *queue;
-    apr_pool_t          *pool;
-    apr_thread_mutex_t  *channel_mutex;
-    Tcl_Interp*         interp_a[TCL_INTERPS];
-    rivet_thr_status    status[TCL_INTERPS];
-    int                 interp_idx;
+    apr_thread_cond_t*  job_cond;
+    apr_thread_mutex_t* job_mutex;
+    apr_array_header_t* exiting;
+    apr_thread_mutex_t* pool_mutex;
+    apr_queue_t*        queue;
+    apr_pool_t*         pool;
     int                 busy_cnt;
-    rivet_server_conf*  rsc_p;
-    Tcl_Channel*        outchannel[TCL_INTERPS]; /* stuff for buffering output  */
+    apr_thread_t*       workers[TCL_INTERPS];
+    apr_thread_t*       supervisor;
+    server_rec*         server;
 } mod_rivet_globals;
 
 typedef struct _thread_worker_private {
 
-    request_rec*        r;			    /* request rec                 */
-    TclWebRequest*      req;
     Tcl_Interp*         interp;
     Tcl_Channel*        channel;
-
+    rivet_thr_status    status;
+                                        /* the request_rec and TclWebRequest 
+                                           are copied here to be passed to a 
+                                           channel                      */
+    request_rec*        r;			    /* request rec                  */
+    TclWebRequest*      req;
+    int                 req_cnt;
+    int                 keep_going;
+    
 } rivet_thread_private;
+
+/* data private to the Apache callback handling the request */
+
+typedef struct _handler_private 
+{
+    apr_thread_cond_t*  cond;
+    apr_thread_mutex_t* mutex;
+    request_rec*        r;			    /* request rec                 */
+    TclWebRequest*      req;
+    int                 code;
+    int                 status;
+    rivet_job_t         job_type;
+} handler_private;
+
+enum {
+    request,
+    orderly_exit
+};
 
 enum
 {
+    init,
     idle,
-    request_processing
+    request_processing,
+    done
 };
-
-int Rivet_ParseExecFile   (TclWebRequest *req, char *filename, int toplevel);
-int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
@@ -169,14 +193,29 @@ rivet_server_conf *Rivet_GetConf(request_rec *r);
 Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*        interp,
                                     rivet_server_conf*  rivet_conf);
 
-Tcl_Obj* Rivet_ReadConfParameter (  Tcl_Interp*         interp,
-                                    rivet_server_conf*  rivet_conf,
-                                    Tcl_Obj*            par_name);
+Tcl_Obj* Rivet_ReadConfParameter ( Tcl_Interp*         interp,
+                                   rivet_server_conf*  rivet_conf,
+                                   Tcl_Obj*            par_name);
 
-Tcl_Obj* Rivet_CurrentConfDict (    Tcl_Interp*           interp,
-                                    rivet_server_conf*    rivet_conf);
+Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
+                                 rivet_server_conf*    rivet_conf);
 
-Tcl_Obj* Rivet_CurrentServerRec (   Tcl_Interp*         interp, server_rec* s );
+Tcl_Obj* Rivet_CurrentServerRec ( Tcl_Interp* interp, server_rec* s );
+
+/* rivet or tcl file */
+
+#define RIVET_TEMPLATE_CTYPE    "application/x-httpd-rivet"
+#define RIVET_TCLFILE_CTYPE     "application/x-rivet-tcl"
+
+#define CTYPE_NOT_HANDLED   0
+#define RIVET_TEMPLATE      1
+#define RIVET_TCLFILE       2
+
+EXTERN int Rivet_chdir_file (const char *file);
+EXTERN int Rivet_CheckType (request_rec* r);
+EXTERN int Rivet_ExecuteAndCheck (Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *req);
+EXTERN int Rivet_ParseExecFile (TclWebRequest *req, char *filename, int toplevel);
+EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
 /* error code set by command 'abort_page' */
 

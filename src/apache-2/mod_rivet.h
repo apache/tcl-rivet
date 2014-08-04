@@ -20,6 +20,7 @@
 #ifndef MOD_RIVET_H
 #define MOD_RIVET_H 1
 
+#include <httpd.h>
 #include <tcl.h>
 #include "apache_request.h"
 #include "TclWeb.h"
@@ -121,9 +122,6 @@ typedef struct _mod_rivet_globals {
     rivet_server_conf* rsc_p;
 } mod_rivet_globals;
 
-int Rivet_ParseExecFile   (TclWebRequest *req, char *filename, int toplevel);
-int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
-
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
 #ifdef ap_get_module_config
@@ -147,6 +145,21 @@ Tcl_Obj* Rivet_CurrentConfDict (    Tcl_Interp*           interp,
                                     rivet_server_conf*    rivet_conf);
 
 Tcl_Obj* Rivet_CurrentServerRec (   Tcl_Interp*         interp, server_rec* s );
+
+/* rivet or tcl file */
+
+#define RIVET_TEMPLATE_CTYPE    "application/x-httpd-rivet"
+#define RIVET_TCLFILE_CTYPE     "application/x-rivet-tcl"
+
+#define CTYPE_NOT_HANDLED   0
+#define RIVET_TEMPLATE      1
+#define RIVET_TCLFILE       2
+
+EXTERN int Rivet_chdir_file (const char *file);
+EXTERN int Rivet_CheckType (request_rec* r);
+EXTERN int Rivet_ExecuteAndCheck (Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *req);
+EXTERN int Rivet_ParseExecFile (TclWebRequest *req, char *filename, int toplevel);
+EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
 /* error code set by command 'abort_page' */
 
