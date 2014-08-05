@@ -90,11 +90,12 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in $(top_srcdir)/rivet/init.tcl.in \
-	ChangeLog tclconfig/ChangeLog INSTALL README TODO \
-	tclconfig/compile tclconfig/config.guess tclconfig/config.sub \
-	tclconfig/depcomp tclconfig/install-sh tclconfig/missing \
-	tclconfig/ltmain.sh $(top_srcdir)/tclconfig/compile \
+	$(srcdir)/config.h.in $(top_srcdir)/${rivet_core}/Makefile.in \
+	$(top_srcdir)/rivet/init.tcl.in ChangeLog tclconfig/ChangeLog \
+	INSTALL README TODO tclconfig/compile tclconfig/config.guess \
+	tclconfig/config.sub tclconfig/depcomp tclconfig/install-sh \
+	tclconfig/missing tclconfig/ltmain.sh \
+	$(top_srcdir)/tclconfig/compile \
 	$(top_srcdir)/tclconfig/config.guess \
 	$(top_srcdir)/tclconfig/config.sub \
 	$(top_srcdir)/tclconfig/install-sh \
@@ -113,7 +114,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = rivet/init.tcl
+CONFIG_CLEAN_FILES = ${rivet_core}/Makefile rivet/init.tcl
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -311,6 +312,7 @@ PKG_TCL_SOURCES = @PKG_TCL_SOURCES@
 RANLIB = @RANLIB@
 RANLIB_STUB = @RANLIB_STUB@
 RIVET_BASE_INCLUDE = @RIVET_BASE_INCLUDE@
+RIVET_SOURCE_BASE = @RIVET_SOURCE_BASE@
 RIVET_TCL_TARGET = @RIVET_TCL_TARGET@
 RIVET_UPLOAD_DIR = @RIVET_UPLOAD_DIR@
 SED = @SED@
@@ -467,6 +469,8 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+${rivet_core}/Makefile: $(top_builddir)/config.status $(top_srcdir)/${rivet_core}/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 rivet/init.tcl: $(top_builddir)/config.status $(top_srcdir)/rivet/init.tcl.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 

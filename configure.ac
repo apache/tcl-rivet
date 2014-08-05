@@ -424,6 +424,8 @@ AC_DEFUN([APACHE_VERSION],[
 
 # MOD_RIVET_CORE
 #
+# Determining the path to the mod_rivet.* source files
+#
 
 AC_DEFUN([MOD_RIVET_CORE],[
     AC_ARG_WITH(
@@ -432,10 +434,16 @@ AC_DEFUN([MOD_RIVET_CORE],[
        [with_rivet_core="apache-2"]
     )
 
-    rivet_core=${with_rivet_core}
     AC_MSG_CHECKING(mod_rivet core)
+
+    if [[ -d "src/${with_rivet_core}" ]]; then
+        rivet_core=$(pwd)/src/${with_rivet_core}
+    else
+        rivet_core=${with_rivet_core}
+    fi
+    AC_CONFIG_FILES([${rivet_core}/Makefile])
     AC_SUBST(rivet_core)
-    AC_MSG_RESULT([$with_rivet_core])
+    AC_MSG_RESULT([$rivet_core])
 ])
 
 # 
@@ -462,6 +470,8 @@ AC_DEFUN([HANDLE_TCL_PACKAGE_PATH],[
 AC_DEFUN([GET_RIVET_BASE], [
     RIVET_BASE_INCLUDE=`pwd`/src    
     AC_SUBST(RIVET_BASE_INCLUDE)
+    RIVET_SOURCE_BASE=`pwd`/src    
+    AC_SUBST(RIVET_SOURCE_BASE)
 ])
 
 # APACHE_REQUEST
@@ -472,14 +482,14 @@ AC_DEFUN([GET_RIVET_BASE], [
 AC_DEFUN([APACHE_REQUEST],[
     AC_ARG_WITH(
         apache_request,
-        [  --with-apache-request[=dir] choose subdirectory for Apache request handling code],,
+        [  --with-apache-request[=dir] path to Apache request handling code],,
         [with_apache_request="request"]
     )
 
     AC_MSG_CHECKING(code for request handling)
     apache_request=${with_apache_request}
     AC_SUBST(apache_request)
-    AC_MSG_RESULT([$with_apache_request])
+    AC_MSG_RESULT([$apache_request])
 ])
 
 # RIVET_CORE_CMDS
@@ -490,14 +500,14 @@ AC_DEFUN([APACHE_REQUEST],[
 AC_DEFUN([RIVET_CORE_CMDS],[
     AC_ARG_WITH(
         rivet_core_cmds,
-        [  --with-rivet-core-cmds[=dir] select directory for Rivet core commands core],,
+        [  --with-rivet-core-cmds[=dir] path to Rivet core commands code],,
         [with_rivet_core_cmds="rivetcmds"]
     )
 
     AC_MSG_CHECKING(for Rivet core commands code)
     rivet_core_cmds=${with_rivet_core_cmds}
     AC_SUBST(rivet_core_cmds)
-    AC_MSG_RESULT([$with_rivet_core_cmds])
+    AC_MSG_RESULT([$rivet_core_cmds])
 
 ])
 
@@ -514,18 +524,22 @@ AC_DEFUN([RIVET_CHANNEL],[
 
     AC_MSG_CHECKING(for Rivet channel code path)
     rivet_channel=${with_rivet_channel}
+
     AC_SUBST(rivet_channel)
-    AC_MSG_RESULT([$with_rivet_channel])
+    AC_MSG_RESULT([$rivet_channel])
 ])
 
+# RIVET_TCL_LIB
+#
+#
 
 AC_DEFUN([RIVET_TCL_LIB],[
     AC_ARG_WITH(
         rivet_target_dir,
-        [  --with-rivet-target-dir=DIR  Rivet tcl library target dir ],,
+        [  --with-rivet-target-dir=DIR  Rivet tcl and binary libraries target dir ],,
         with_rivet_target_dir="${apache_base}/lib/rivet${PACKAGE_VERSION}"
     )
-    AC_MSG_CHECKING(for Rivet tcl library target)
+    AC_MSG_CHECKING(for Rivet libraries target)
     RIVET_TCL_TARGET=${with_rivet_target_dir}
     AC_SUBST(RIVET_TCL_TARGET)
     AC_MSG_RESULT([$with_rivet_target_dir])
@@ -774,7 +788,7 @@ AC_SUBST(TCL_PACKAGE_PATH)
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting the AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile src/Makefile rivet/init.tcl src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
+AC_CONFIG_FILES([Makefile src/apache-2/Makefile src/experimental/Makefile src/Makefile rivet/init.tcl src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
 
 #case $apache_version_dir in
 #    apache-1) AC_CONFIG_FILES([Makefile src/Makefile src/apache-1/Makefile doc/Makefile]) ;;

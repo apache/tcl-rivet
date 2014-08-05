@@ -1,4 +1,4 @@
-/* mod_rivet.h -- The apache module itself, for Apache 2.x. */
+/* mod_rivet.h -- The apache module itself, for Apache 2.4. */
 
 /* Copyright 2000-2005 The Apache Software Foundation
 
@@ -100,9 +100,9 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_server_vars;
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
-    char**          objCacheList;		/* Array of cached objects (for priority handling) */
-    Tcl_HashTable*  objCache;		    /* Objects cache - the key is the script name */
-    Tcl_Channel*    outchannel;		    /* stuff for buffering output */
+    char**          objCacheList;		/* Array of cached objects (for priority handling)  */
+    Tcl_HashTable*  objCache;		    /* Objects cache - the key is the script name       */
+    Tcl_Channel*    outchannel;		    /* stuff for buffering output                       */
 } rivet_server_conf;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
@@ -112,64 +112,12 @@ typedef struct _rivet_interp_globals {
     TclWebRequest   *req;	            /* TclWeb API request       */
     Tcl_Namespace   *rivet_ns;          /* Rivet commands namespace */
     int             page_aborting;	    /* set by abort_page.       */
-    Tcl_Obj*        abort_code;			/* To be reset by Rivet_SendContent */
+    Tcl_Obj*        abort_code;			/* To be reset by Rivet_SendContent      */
     server_rec*     srec;               /* pointer to the current server rec obj */
 } rivet_interp_globals;
 
-/* 
- * we need also a place where to store module wide globals
- */
-
 #define TCL_INTERPS 4
 typedef int rivet_thr_status;
-typedef int rivet_job_t;
-
-typedef struct _mod_rivet_globals {
-    apr_thread_cond_t*  job_cond;
-    apr_thread_mutex_t* job_mutex;
-    apr_array_header_t* exiting;
-    apr_thread_mutex_t* pool_mutex;
-    apr_queue_t*        queue;
-    apr_pool_t*         pool;
-    int                 busy_cnt;
-    apr_thread_t*       workers[TCL_INTERPS];
-    apr_thread_t*       supervisor;
-    server_rec*         server;
-} mod_rivet_globals;
-
-typedef struct _thread_worker_private {
-
-    Tcl_Interp*         interp;
-    Tcl_Channel*        channel;
-    rivet_thr_status    status;
-                                        /* the request_rec and TclWebRequest 
-                                           are copied here to be passed to a 
-                                           channel                      */
-    request_rec*        r;			    /* request rec                  */
-    TclWebRequest*      req;
-    int                 req_cnt;
-    int                 keep_going;
-    
-} rivet_thread_private;
-
-/* data private to the Apache callback handling the request */
-
-typedef struct _handler_private 
-{
-    apr_thread_cond_t*  cond;
-    apr_thread_mutex_t* mutex;
-    request_rec*        r;			    /* request rec                 */
-    TclWebRequest*      req;
-    int                 code;
-    int                 status;
-    rivet_job_t         job_type;
-} handler_private;
-
-enum {
-    request,
-    orderly_exit
-};
-
 enum
 {
     init,
@@ -177,6 +125,59 @@ enum
     request_processing,
     done
 };
+
+/* Job types a worker thread is supposed to respond to */
+
+typedef int rivet_job_t;
+enum {
+    request,
+    orderly_exit
+};
+
+/* we need also a place where to store module wide globals */
+
+typedef struct _mod_rivet_globals {
+    apr_dso_handle_t*   dso_handle;
+    apr_thread_t*       supervisor;
+    apr_thread_cond_t*  job_cond;
+    apr_thread_mutex_t* job_mutex;
+    apr_array_header_t* exiting;            /* */
+    apr_thread_mutex_t* pool_mutex;         /* threads commmon pool mutex */
+    apr_pool_t*         pool;               /* threads common memory pool */
+    apr_queue_t*        queue;              /* jobs queue */
+    apr_thread_t*       workers[TCL_INTERPS]; /* thread pool ids */
+    server_rec*         server;             /* default host server_rec obj */
+    int                 (*mpm_init)(apr_pool_t* pPool,server_rec* s);
+    int                 (*mpm_request)(request_rec*);
+    void                (*mpm_finalize)(void);
+} mod_rivet_globals;
+
+typedef struct _thread_worker_private {
+
+    Tcl_Interp*         interp;
+    Tcl_Channel*        channel;
+                                        /* the request_rec and TclWebRequest 
+                                           are copied here to be passed to a 
+                                           channel                      */
+    request_rec*        r;			    
+    TclWebRequest*      req;
+    int                 req_cnt;        /* requests served by thread */
+    int                 keep_going;     /* thread loop controlling variable */
+    
+} rivet_thread_private;
+
+/* data private to the Apache callback handling the request */
+
+typedef struct _handler_private 
+{
+    rivet_job_t         job_type;
+    apr_thread_cond_t*  cond;
+    apr_thread_mutex_t* mutex;
+    request_rec*        r;			    /* request rec                 */
+    TclWebRequest*      req;
+    int                 code;
+    int                 status;
+} handler_private;
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
@@ -217,8 +218,14 @@ EXTERN int Rivet_ExecuteAndCheck (Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, r
 EXTERN int Rivet_ParseExecFile (TclWebRequest *req, char *filename, int toplevel);
 EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
+EXTERN int RivetContent (rivet_thread_private* private);
 /* error code set by command 'abort_page' */
 
 #define ABORTPAGE_CODE "ABORTPAGE"
+
+#define MOD_RIVET_QUEUE_SIZE        100
+#define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
+
+#define MODNAME                     "mod_rivet"
 
 #endif /* MOD_RIVET_H */

@@ -1,3 +1,17 @@
+2014-08-05: Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/Makefile.am: build of mod_rivet moved again into the directory containing the code
+    * configure.ac: new symbol RIVET_SOURCE_BASE pointing to <rivet-root>/src/, various fixes, 
+    generation of Makefile.in in both src/apache-2 and src/experimental
+    * src/Makefile.am: still keeping here the magic symbols triggering build of librivetparser and librivet
+    build of mod_rivet moved in src/apache-2 and experimental
+    * src/experimental/mod_rivet.c: dynamic object load implemented for rivet_mpm_worker. Code handling
+    Tcl threads moved to this new shared lib
+    * src/experimental/rivet_worker_mpm.c: this file keeps the whole mechanics of handling APR threads
+    running Tcl interpreters
+    * src/experimental/mod_rivet.h: new fields added to module globals for function pointers to 
+    rivet_worker_mpm.so
+    * tclconfig/: new version of scripts
+
 2014-08-04: Massimo Manghi <mxmanghi@apache.org>
     * src/common: renaming src/config to a more specific name
 
