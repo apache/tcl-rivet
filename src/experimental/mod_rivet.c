@@ -70,6 +70,7 @@ RivetServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                          MODNAME " Error loading symbol Rivet_MPM_Init: %s", 
                          apr_dso_error(module_globals.dso_handle,errorbuf,ERRORBUF_SZ));
+            exit(1);   
         }
 
         rv = apr_dso_sym(&func,module_globals.dso_handle,"Rivet_MPM_Request");
@@ -82,6 +83,7 @@ RivetServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                          MODNAME " Error loading symbol Rivet_MPM_Request: %s", 
                          apr_dso_error(module_globals.dso_handle,errorbuf,ERRORBUF_SZ));
+            exit(1);   
         }
 
 
@@ -92,8 +94,7 @@ RivetServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                      MODNAME " Error loading MPM manager: %s", 
                      apr_dso_error(module_globals.dso_handle,errorbuf,1024));
-        
-        return 1;
+        exit(1);   
     }
 
     return OK;
