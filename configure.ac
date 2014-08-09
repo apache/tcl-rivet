@@ -436,12 +436,15 @@ AC_DEFUN([MOD_RIVET_CORE],[
 
     AC_MSG_CHECKING(mod_rivet core)
 
-    if [[ -d "src/${with_rivet_core}" ]]; then
-        rivet_core=$(pwd)/src/${with_rivet_core}
-    else
-        rivet_core=${with_rivet_core}
-    fi
-    AC_CONFIG_FILES([${rivet_core}/Makefile])
+    #if [[ -d "src/${with_rivet_core}" ]]; then
+    #    rivet_core=$(pwd)/src/${with_rivet_core}
+    #else
+    #    rivet_core=${with_rivet_core}
+    #fi
+    
+    rivet_core=${with_rivet_core}
+
+    AC_CONFIG_FILES([src/${rivet_core}/Makefile])
     AC_SUBST(rivet_core)
     AC_MSG_RESULT([$rivet_core])
 ])

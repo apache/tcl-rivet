@@ -5,8 +5,6 @@
 
 /* Functions for mod_dtcl Tcl output channel .*/
 
-#include "mod_rivet.h"
-
 extern int closeproc(ClientData, Tcl_Interp *);
 extern int inputproc(ClientData, char *, int, int *);
 extern int outputproc(ClientData, char *, int, int *);

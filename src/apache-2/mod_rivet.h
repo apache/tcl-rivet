@@ -20,6 +20,11 @@
 #ifndef MOD_RIVET_H
 #define MOD_RIVET_H 1
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <rivet_config.h>
+#endif
+
 #include <httpd.h>
 #include <tcl.h>
 #include "apache_request.h"
@@ -119,7 +124,11 @@ typedef struct _rivet_interp_globals {
  */
 
 typedef struct _mod_rivet_globals {
-    rivet_server_conf* rsc_p;
+/* This is used *only* in the PanicProc.  Otherwise, don't touch it! */
+    request_rec*        rivet_panic_request_rec;
+    apr_pool_t*         rivet_panic_pool;
+    server_rec*         rivet_panic_server_rec;
+    rivet_server_conf*  rsc_p;
 } mod_rivet_globals;
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
@@ -155,15 +164,20 @@ Tcl_Obj* Rivet_CurrentServerRec (   Tcl_Interp*         interp, server_rec* s );
 #define RIVET_TEMPLATE      1
 #define RIVET_TCLFILE       2
 
-EXTERN int Rivet_chdir_file (const char *file);
-EXTERN int Rivet_CheckType (request_rec* r);
-EXTERN int Rivet_ExecuteAndCheck (Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *req);
-EXTERN int Rivet_ParseExecFile (TclWebRequest *req, char *filename, int toplevel);
-EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
+int Rivet_ParseExecFile   (TclWebRequest *req, char *filename, int toplevel);
+int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 
 /* error code set by command 'abort_page' */
 
 #define ABORTPAGE_CODE "ABORTPAGE"
+
+/* 
+ * for some reason the max buffer size definition is not exported by Tcl 
+ * we steal and reproduce it here prepending the name with TCL
+ */
+
+#define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
+#define MODNAME "mod_rivet"
 
 #endif /* MOD_RIVET_H */
 

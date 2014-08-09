@@ -1,21 +1,120 @@
+/* rivet_worker_mpm.c: dynamically loaded MPM aware functions for threaded MPM */
+
+/*
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+ */
+
+/* Id: */
 
 #include "mod_rivet.h"
 #include "httpd.h"
 #include "rivetChannel.h"
 
-extern mod_rivet_globals module_globals;
-extern apr_threadkey_t*        rivet_thread_key;
-extern apr_threadkey_t*        handler_thread_key;
+extern mod_rivet_globals* module_globals;
+extern apr_threadkey_t*  rivet_thread_key;
+extern apr_threadkey_t*  handler_thread_key;
 
 static void processor_cleanup (void *data)
 {
     rivet_thread_private*   private = (rivet_thread_private *) data;
+    rivet_server_conf*      rsc;
 
     Tcl_UnregisterChannel(private->interp,*private->channel);
-    Tcl_DeleteInterp(private->interp);
 
-    ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals.server, 
+    rsc  = RIVET_SERVER_CONF( private->server->module_config );
+    Tcl_DeleteHashTable(rsc->objCache);
+    Tcl_DeleteInterp(private->interp);
+    
+    ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals->server, 
             "Thread exiting after %d requests served", private->req_cnt);
+
+    apr_pool_destroy(private->pool);
+}
+
+/*
+ * I think we are correctly allocating from a thread private pool as
+ * configuration record must be freed upon thread exit
+ *
+ */
+
+static void Rivet_InitVirtualHostsInterps (server_rec *server, apr_pool_t *p)
+{
+    rivet_server_conf*  rsc  = RIVET_SERVER_CONF( server->module_config );
+    rivet_server_conf*  myrsc; 
+    server_rec*         sr;
+    int                 interpCount = 0;
+
+    for (sr = s; sr; sr = sr->next)
+    {
+        myrsc = RIVET_SERVER_CONF(sr->module_config);
+
+        /* We only have a different rivet_server_conf if MergeConfig
+         * was called. We really need a separate one for each server,
+         * so we go ahead and create one here, if necessary. */
+
+        if (sr != s && myrsc == rsc) {
+            myrsc = RIVET_NEW_CONF(p);
+            ap_set_module_config(sr->module_config, &rivet_module, myrsc);
+            Rivet_CopyConfig( rsc, myrsc );
+        }
+
+        // myrsc->outchannel = rsc->outchannel;
+
+        /* This sets up slave interpreters for other virtual hosts. */
+        if (sr != s) /* not the first one  */
+        {
+            if (rsc->separate_virtual_interps != 0) 
+            {
+                char *slavename = (char*) apr_psprintf (p, "%s_%d_%d", 
+                        sr->server_hostname, 
+                        sr->port,
+                        interpCount++);
+
+                ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+                            MODNAME 
+                            ": Rivet_InitTclStuff: creating slave interpreter '%s', "\
+                            "hostname '%s', port '%d', separate interpreters %d",
+                            slavename, sr->server_hostname, sr->port, 
+                            rsc->separate_virtual_interps);
+
+                /* Separate virtual interps. */
+                myrsc->server_interp = Tcl_CreateSlave(interp, slavename, 0);
+                if (myrsc->server_interp == NULL) {
+                    ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                                 MODNAME ": slave interp create failed: %s",
+                                 Tcl_GetStringResult(interp) );
+                    exit(1);
+                }
+                Rivet_PerInterpInit(myrsc->server_interp, s, p);
+            } else {
+                myrsc->server_interp = rsc->server_interp;
+            }
+
+            /* Since these things are global, we copy them into the
+             * rivet_server_conf struct. */
+            myrsc->cache_size = rsc->cache_size;
+            myrsc->cache_free = rsc->cache_free;
+            myrsc->objCache = rsc->objCache;
+            myrsc->objCacheList = rsc->objCacheList;
+        }
+        myrsc->server_name = (char*)apr_pstrdup(p, sr->server_hostname);
+    }
+
 }
 
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
@@ -24,6 +123,10 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     rivet_thread_private*   private;
     Tcl_Channel             *outchannel;		    /* stuff for buffering output */
     apr_threadkey_t*        thread_key = (apr_threadkey_t *) data;  
+    rivet_server_conf*      rsc;
+    server_rec*             server;
+
+    server = module_globals->server;
 
     if (apr_threadkey_private_get ((void **)&private,thread_key) != APR_SUCCESS)
     {
@@ -34,16 +137,36 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         if (private == NULL)
         {
-            apr_thread_mutex_lock(module_globals.pool_mutex);
+            apr_thread_mutex_lock(module_globals->pool_mutex);
+            private             = apr_palloc (module_globals->pool,sizeof(*private));
+            private->channel    = apr_pcalloc (module_globals->pool,sizeof(Tcl_Channel));
+            apr_thread_mutex_unlock(module_globals->pool_mutex);
 
-            private             = apr_palloc (module_globals.pool,sizeof(*private));
-            private->channel    = apr_pcalloc (module_globals.pool, sizeof(Tcl_Channel));
             private->req_cnt    = 0;
             private->keep_going = 2;
-            apr_thread_mutex_unlock(module_globals.pool_mutex);
+            private->r          = NULL;
+            private->req        = NULL;
+            private->interp     = NULL;
+
+            if (apr_pool_create(&private->pool, NULL) != APR_SUCCESS) 
+            {
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                             MODNAME ": could not initialize thread private pool");
+                apr_thread_exit(thd,APR_SUCCESS);
+                return NULL;
+                exit(1);
+            }
+            apr_threadkey_private_set (private,rivet_thread_key);
+
         }
 
     }
+    
+        /*
+         * From here on stuff differs substantially wrt rivet_mpm_prefork
+         * We cannot draw on Rivet_InitTclStuff that knows nothing about threads
+         * private data.
+         */
 
     interp = Tcl_CreateInterp();
     if (Tcl_Init(interp) == TCL_ERROR)
@@ -51,6 +174,13 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         return NULL;
     }
     private->interp  = interp;
+
+    /* We will allocate structures (Tcl_HashTable) from this cache but they cannot
+     * survive a thread termination, thus we need to implement a method for releasing
+     * them in processor_cleanup
+     */
+
+    Rivet_CreateCache(server,private->pool);
 
     outchannel  = private->channel;
     *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
@@ -65,12 +195,40 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
          */
 
     Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
-    apr_threadkey_private_set (private,rivet_thread_key);
+
+        /* So far nothing differs much with what we did for the prefork bridge */
+    
+        /* At this stage we have toset up private interpreters for virtual hosts (if needed)
+         * we assume the server_rec stored in the module globals can be used to retrieve the
+         * reference to the root interpreter configuration and to the rivet global script */
+
+    rsc  = RIVET_SERVER_CONF( server->module_config );
+
+    if (rsc->rivet_global_init_script != NULL) {
+        if (Tcl_EvalObjEx(private->interp, rsc->rivet_global_init_script, 0) != TCL_OK)
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                         MODNAME ": Error running GlobalInitScript '%s': %s",
+                         Tcl_GetString(rsc->rivet_global_init_script),
+                         Tcl_GetVar(private->interp, "errorInfo", 0));
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, server, 
+                         MODNAME ": GlobalInitScript '%s' successful",
+                         Tcl_GetString(rsc->rivet_global_init_script));
+        }
+    }
+
+    Rivet_InitVirtualHostsInterps (server, private->pool)
+
+
+        /* eventually we increment the number of active threads */
+
+    apr_atomic_inc32(module_globals->threads_count);
     do
     {
         apr_status_t        rv;
         void*               v;
-        apr_queue_t*        q = module_globals.queue;
+        apr_queue_t*        q = module_globals->queue;
         handler_private*    request_obj;
 
         do {
@@ -97,9 +255,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         request_obj = (handler_private *) v;
         if (request_obj->job_type == orderly_exit)
         {
-            ap_log_error(APLOG_MARK, APLOG_INFO, APR_EGENERAL, module_globals.server, "consumer thread exit");
-            apr_thread_exit(thd, rv);
-            return NULL;
+            private->keep_going = 0;
+            continue;
         }
 
         TclWeb_InitRequest(request_obj->req, private->interp, request_obj->r);
@@ -114,17 +271,20 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         apr_thread_cond_signal(request_obj->cond);
         apr_thread_mutex_unlock(request_obj->mutex);
     
-        apr_threadkey_private_set (private,rivet_thread_key);
         private->req_cnt++;
 
     } while (private->keep_going-- > 0);
+            
+    ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals->server, "processor thread orlderly exit");
 
-    apr_thread_mutex_lock(module_globals.job_mutex);
-    *(apr_thread_t **) apr_array_push(module_globals.exiting) = thd;
-    apr_thread_cond_signal(module_globals.job_cond);
-    apr_thread_mutex_unlock(module_globals.job_mutex);
+    apr_thread_mutex_lock(module_globals->job_mutex);
+    *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
+    apr_thread_cond_signal(module_globals->job_cond);
+    apr_thread_mutex_unlock(module_globals->job_mutex);
 
-    //ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": thread %lp exits", thd);
+    /* the counter of active threads has to be decremented */
+
+    apr_atomic_dec32(module_globals->threads_count);
 
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
@@ -132,7 +292,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
 static apr_status_t create_worker_thread (apr_thread_t** thd)
 {
-    return apr_thread_create(thd, NULL, request_processor, module_globals.queue, module_globals.pool);
+    return apr_thread_create(thd, NULL, request_processor, module_globals->queue, module_globals->pool);
 }
 
 static void start_thread_pool (int nthreads)
@@ -143,13 +303,13 @@ static void start_thread_pool (int nthreads)
     {
         apr_status_t rv;
 
-        rv = create_worker_thread( &module_globals.workers[i]);
+        rv = create_worker_thread( &module_globals->workers[i]);
 
         if (rv != APR_SUCCESS) {
             char    errorbuf[512];
 
             apr_strerror(rv, errorbuf,200);
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals.server, 
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
                 "Error starting request_processor thread (%d) rv=%d:%s\n",i,rv,errorbuf);
             exit(1);
 
@@ -162,37 +322,37 @@ static void* APR_THREAD_FUNC supervisor_thread(apr_thread_t *thd, void *data)
     server_rec* s = (server_rec *)data;
 
     start_thread_pool(TCL_INTERPS);
-    while (1)
+    do
     {
         apr_thread_t*   p;
       
-        apr_thread_mutex_lock(module_globals.job_mutex);
-        while (apr_is_empty_array(module_globals.exiting))
+        apr_thread_mutex_lock(module_globals->job_mutex);
+        while (apr_is_empty_array(module_globals->exiting) && !module_globals->server_shutdown)
         {
-            apr_thread_cond_wait(module_globals.job_cond,module_globals.job_mutex);
+            apr_thread_cond_wait(module_globals->job_cond,module_globals->job_mutex);
         }
 
-        while (!apr_is_empty_array(module_globals.exiting))
+        while (!apr_is_empty_array(module_globals->exiting) && !module_globals->server_shutdown)
         {
             int i;
-            p = *(apr_thread_t **)apr_array_pop(module_globals.exiting);
+            p = *(apr_thread_t **)apr_array_pop(module_globals->exiting);
             
-            for (i = 0; i < TCL_INTERPS; i++)
+            for (i = 0; (i < TCL_INTERPS) && !module_globals->server_shutdown; i++)
             {
-                if (p == module_globals.workers[i])
+                if (p == module_globals->workers[i])
                 {
                     apr_status_t rv;
 
-                    ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"thread %d notifies orderly exit",i);
+                    ap_log_error(APLOG_MARK,APLOG_INFO,APR_EGENERAL,s,"thread %d notifies orderly exit",i);
 
                     /* terminated thread restart */
 
-                    rv = create_worker_thread (&module_globals.workers[i]);
+                    rv = create_worker_thread (&module_globals->workers[i]);
                     if (rv != APR_SUCCESS) {
-                        char    errorbuf[512];
+                        char errorbuf[512];
 
                         apr_strerror(rv,errorbuf,200);
-                        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals.server, 
+                        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                             "Error starting request_processor thread (%d) rv=%d:%s",i,rv,errorbuf);
                         exit(1);
 
@@ -202,9 +362,32 @@ static void* APR_THREAD_FUNC supervisor_thread(apr_thread_t *thd, void *data)
                 }
             }       
         }   
-        apr_thread_mutex_unlock(module_globals.job_mutex);
-    }
+        apr_thread_mutex_unlock(module_globals->job_mutex);
+    }  while (!module_globals->server_shutdown);
+    
+    {
+        handler_private* job;
+        int count;
+        int i;
 
+        apr_thread_mutex_lock(module_globals->pool_mutex);
+        job = (handler_private *) apr_palloc(module_globals->pool,sizeof(handler_private));
+        apr_thread_mutex_unlock(module_globals->pool_mutex);
+        job->job_type = orderly_exit;
+
+        i = 5;
+        count = (int) apr_atomic_read32(module_globals->threads_count);
+        do 
+        {
+            
+            for (i = 0; i < count; i++) { apr_queue_push(module_globals->queue,job); }
+            apr_sleep(1000000);
+            count = (int) apr_atomic_read32(module_globals->threads_count);
+
+        } while ((count > 0) && (i-- > 0));
+
+    }
+    apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
 
@@ -212,33 +395,33 @@ void Rivet_MPM_Init (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t rv;
 
-    apr_thread_mutex_create(&module_globals.job_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
-    apr_thread_cond_create(&module_globals.job_cond, pool);
-    module_globals.exiting = apr_array_make(pool,100,sizeof(apr_thread_t*));
-
-    apr_thread_mutex_create(&module_globals.pool_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
+    apr_thread_mutex_create(&module_globals->job_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
+    apr_thread_cond_create(&module_globals->job_cond, pool);
+    apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
     apr_threadkey_private_create (&rivet_thread_key, processor_cleanup, pool);
     apr_threadkey_private_create (&handler_thread_key, NULL, pool);
-    module_globals.server = server;
 
-    apr_thread_mutex_lock(module_globals.pool_mutex);
-    if (apr_pool_create(&module_globals.pool, NULL) != APR_SUCCESS) 
+    module_globals->exiting = apr_array_make(pool,100,sizeof(apr_thread_t*));
+    module_globals->server = server;
+
+    apr_thread_mutex_lock(module_globals->pool_mutex);
+    if (apr_pool_create(&module_globals->pool, NULL) != APR_SUCCESS) 
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": could not initialize mod_rivet private pool");
         exit(1);
     }
-    apr_thread_mutex_unlock(module_globals.pool_mutex);
+    apr_thread_mutex_unlock(module_globals->pool_mutex);
 
-    if (apr_queue_create(&module_globals.queue, MOD_RIVET_QUEUE_SIZE, module_globals.pool) != APR_SUCCESS)
+    if (apr_queue_create(&module_globals->queue, MOD_RIVET_QUEUE_SIZE, module_globals->pool) != APR_SUCCESS)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": could not initialize mod_rivet request queue");
         exit(1);
     }
 
-    rv = apr_thread_create( &module_globals.supervisor, NULL, 
-                            supervisor_thread, server, module_globals.pool);
+    rv = apr_thread_create( &module_globals->supervisor, NULL, 
+                            supervisor_thread, server, module_globals->pool);
 
     if (rv != APR_SUCCESS) {
         char    errorbuf[512];
@@ -248,7 +431,6 @@ void Rivet_MPM_Init (apr_pool_t* pool, server_rec* server)
                      MODNAME "Error starting supervisor thread rv=%d:%s\n",rv,errorbuf);
         exit(1);
     }
-
 }
 
 int Rivet_MPM_Request (request_rec* r)
@@ -266,12 +448,12 @@ int Rivet_MPM_Request (request_rec* r)
 
         if (private == NULL)
         {
-            apr_thread_mutex_lock(module_globals.pool_mutex);
-            private         = apr_palloc(module_globals.pool,sizeof(handler_private));
-            private->req    = TclWeb_NewRequestObject (module_globals.pool);
-            apr_thread_cond_create(&(private->cond), module_globals.pool);
-            apr_thread_mutex_create(&(private->mutex), APR_THREAD_MUTEX_UNNESTED, module_globals.pool);
-            apr_thread_mutex_unlock(module_globals.pool_mutex);
+            apr_thread_mutex_lock(module_globals->pool_mutex);
+            private         = apr_palloc(module_globals->pool,sizeof(handler_private));
+            private->req    = TclWeb_NewRequestObject (module_globals->pool);
+            apr_thread_cond_create(&(private->cond), module_globals->pool);
+            apr_thread_mutex_create(&(private->mutex), APR_THREAD_MUTEX_UNNESTED, module_globals->pool);
+            apr_thread_mutex_unlock(module_globals->pool_mutex);
             private->job_type = request;
         }
 
@@ -285,7 +467,7 @@ int Rivet_MPM_Request (request_rec* r)
     do
     {
 
-        rv = apr_queue_push(module_globals.queue,private);
+        rv = apr_queue_push(module_globals->queue,private);
         if (rv != APR_SUCCESS)
         {
             apr_sleep(100000);
@@ -303,7 +485,25 @@ int Rivet_MPM_Request (request_rec* r)
     return private->code;
 }
 
-void Rivet_MPM_Finalize (void)
+apr_status_t Rivet_MPM_Finalize (void* data)
 {
+    apr_status_t  rv;
+    apr_status_t  thread_status;
+    server_rec* s = (server_rec*) data;
+    
+    module_globals->server_shutdown = 1;
+    apr_thread_mutex_lock(module_globals->job_mutex);
+    apr_thread_cond_signal(module_globals->job_cond);
+    apr_thread_mutex_unlock(module_globals->job_mutex);
 
+    rv = apr_thread_join (&thread_status,module_globals->supervisor);
+    if (rv != APR_SUCCESS)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                     MODNAME ": Error joining supervisor thread");
+    }
+
+    apr_threadkey_private_delete (rivet_thread_key);
+    apr_threadkey_private_delete (handler_thread_key);
+    return OK;
 }

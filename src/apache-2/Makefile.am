@@ -33,4 +33,4 @@ mod_rivet_la_SOURCES =  mod_rivet.c                                         \
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
-mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -I@RIVET_BASE_INCLUDE@/common -I@RIVET_BASE_INCLUDE@/parser -I@apache_request@ @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I../@rivet_channel@ -I@RIVET_BASE_INCLUDE@/common -I@RIVET_BASE_INCLUDE@/parser -I../@apache_request@ @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'

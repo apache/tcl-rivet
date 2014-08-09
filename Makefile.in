@@ -90,7 +90,8 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in $(top_srcdir)/${rivet_core}/Makefile.in \
+	$(srcdir)/config.h.in \
+	$(top_srcdir)/src/${rivet_core}/Makefile.in \
 	$(top_srcdir)/rivet/init.tcl.in ChangeLog tclconfig/ChangeLog \
 	INSTALL README TODO tclconfig/compile tclconfig/config.guess \
 	tclconfig/config.sub tclconfig/depcomp tclconfig/install-sh \
@@ -114,7 +115,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = ${rivet_core}/Makefile rivet/init.tcl
+CONFIG_CLEAN_FILES = src/${rivet_core}/Makefile rivet/init.tcl
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -469,7 +470,7 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-${rivet_core}/Makefile: $(top_builddir)/config.status $(top_srcdir)/${rivet_core}/Makefile.in
+src/${rivet_core}/Makefile: $(top_builddir)/config.status $(top_srcdir)/src/${rivet_core}/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 rivet/init.tcl: $(top_builddir)/config.status $(top_srcdir)/rivet/init.tcl.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -913,7 +914,7 @@ install-binaries:
 	cp -v rivet/init.tcl $(RIVETLIB_DESTDIR)/
 	cp -rv rivet/rivet-tcl $(RIVETLIB_DESTDIR)/
 	-(  cd $(RIVETLIB_DESTDIR); rm -f *.la; \
-        echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH)*[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+        echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH) *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-local:
 	rm -f  $(RIVETLIB_DESTDIR)/init.tcl
@@ -931,7 +932,7 @@ install-packages:
 	cp -rv rivet/packages/* $(RIVET_PACKAGES)
 	-(  cd  $(RIVETLIB_DESTDIR); \
 	    echo 'eval file delete [glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl' | @TCLSH_PROG@ ; \
-	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH)*[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH) *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-packages:
 	rm -fr $(RIVET_PACKAGES)
@@ -940,7 +941,7 @@ uninstall-packages:
 		@rmdir $(RIVETLIB_DESTDIR); \
 	fi
 	-(  cd  $(RIVETLIB_DESTDIR); \
-	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH)*[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH) *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 # 
 distclean-local:

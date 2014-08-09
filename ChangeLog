@@ -1,4 +1,22 @@
-2014-08-05: Massimo Manghi <mxmanghi@apache.org>
+2014-08-09 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: Various functions moved to src/common/mod_rivet_common.c
+    * configure.ac: --with-rivet-core switch simplified
+    * Makefile.am: preparing for installation of MPM bridges which have not to be scanned for Tcl packages
+    * NOTICE: now Apache policy compliant
+    * src/apache-2/Makefile.am: reenabled and reworked to make paths relative
+    * src/apache-2/mod_rivet.h: reworked to reflect the new code organization. Also some definitions
+    moved here from mod_rivet.c
+    * src/common/mod_rivet_common.c: this is now the place where mod_rivet implementation independent
+    function must go
+    * src/experimental/Makefile.am: adding build for rivet_prefork_mpm.so
+    * src/experimental/mod_rivet.[c|h]: placing here only the hopefully necessary code. The module
+    resolves the bridge module symbols and actually calls those function to initialize, respond to 
+    requests and exit child processes
+    * src/experimental/rivet_prefork_mpm.c: first sccessful implementation of the prefork bridge
+    * src/experimental/rivet_worker_mpm.c: stuffing code into this module. It doesn't build now
+    * src/common/mod_rivet_common.h: definitions for functions stored here. 
+
+2014-08-05 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/Makefile.am: build of mod_rivet moved again into the directory containing the code
     * configure.ac: new symbol RIVET_SOURCE_BASE pointing to <rivet-root>/src/, various fixes, 
     generation of Makefile.in in both src/apache-2 and src/experimental
@@ -12,7 +30,7 @@
     rivet_worker_mpm.so
     * tclconfig/: new version of scripts
 
-2014-08-04: Massimo Manghi <mxmanghi@apache.org>
+2014-08-04 Massimo Manghi <mxmanghi@apache.org>
     * src/common: renaming src/config to a more specific name
 
 2014-07-31: Massimo Manghi <mxmanghi@apache.org>

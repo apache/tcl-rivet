@@ -1,18 +1,22 @@
 /* mod_rivet.c -- The apache module itself, for Apache 2.x. */
 
-/* Copyright 2000-2005 The Apache Software Foundation
+/*
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /* $Id$ */
@@ -43,8 +47,6 @@
 #include <apr_strings.h>
 #include <apr_tables.h>
 
-#include <ap_mpm.h>
-
 /* Tcl includes */
 #include <tcl.h>
 /* There is code ifdef'ed out below which uses internal
@@ -53,19 +55,13 @@
 
 /* Rivet Includes */
 #include "mod_rivet.h"
+#include "mod_rivet_common.h"
 #include "rivet.h"
 #include "rivetParser.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
 
-#define MODNAME "mod_rivet"
-
 //module AP_MODULE_DECLARE_DATA rivet_module;
-
-/* This is used *only* in the PanicProc.  Otherwise, don't touch it! */
-static request_rec  *rivet_panic_request_rec = NULL;
-static apr_pool_t   *rivet_panic_pool        = NULL;
-static server_rec   *rivet_panic_server_rec  = NULL;
 
 /* Need some arbitrary non-NULL pointer which can't also be a request_rec */
 #define NESTED_INCLUDE_MAGIC    (&rivet_module)
@@ -77,189 +73,360 @@ static server_rec   *rivet_panic_server_rec  = NULL;
  
 TCL_DECLARE_MUTEX(sendMutex);
 
-#define RIVET_TEMPLATE_CTYPE    "application/x-httpd-rivet"
-#define RIVET_TCLFILE_CTYPE     "application/x-rivet-tcl"
-
-/* 
- * for some reason the max buffer size definition is not exported by Tcl 
- * we steal and reproduce it here prepending the name with TCL
- */
-
-#define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
-
-static Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
-static void Rivet_CreateCache (server_rec *s, apr_pool_t *p);
+static Tcl_Interp*  Rivet_CreateTclInterp (server_rec* s);
 static apr_status_t Rivet_ChildExit(void *data);
 
 mod_rivet_globals* rivet_module_globals = NULL;
 
-/*
- * -- Rivet_InitServerVariables
+/* -- Rivet_ExecuteAndCheck
+ * 
+ * Tcl script execution central procedure. The script stored
+ * outbuf is evaluated and in case an error occurs in the execution
+ * an error handler is executed. In case the error code returned
+ * is RIVET then the error was caused by the invocation of a 
+ * abort_page command and the script stored in conf->abort_script
+ * is run istead. The default error script prints the error buffer
  *
- * Setup an array in each interpreter to tell us things about Apache.
- * This saves us from having to do any real call to load an entire
- * environment.  This routine only gets called once, when the child process
- * is created.
+ *   Arguments:
+ * 
+ *      - Tcl_Interp* interp:      the Tcl interpreter 
+ *      - Tcl_Obj* tcl_script_obj: a pointer to the Tcl_Obj holding the script
+ *      - request_rec* req:        the current request_rec object pointer
  *
- *  Arguments:
+ *   Returned value:
  *
- *      Tcl_Interp* interp: pointer to the Tcl interpreter
- *      apr_pool_t* pool: pool used for calling Apache framework functions
+ *      - invariably TCL_OK
  *
- * Returned value:
- *      none
+ *   Side effects:
  *
- * Side effects:
- *
- *      within the global scope of the interpreter passed as first
- *      argument a 'server' array is created and the variable associated
- *      to the following keys are defined
- *
- *          SERVER_ROOT - Apache's root location
- *          SERVER_CONF - Apache's configuration file
- *          RIVET_DIR   - Rivet's Tcl source directory
- *          RIVET_INIT  - Rivet's init.tcl file
- *          RIVET_VERSION - Rivet version (only when RIVET_DISPLAY_VERSION is 1)
- *          MPM_THREADED - It should contain the string 'unsupported' for a prefork MPM
- *          MPM_FORKED - String describing the forking model of the MPM 
+ *      The Tcl interpreter internal status is changed by the execution
+ *      of the script
  *
  */
 
-static void
-Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
+static int
+Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *req)
 {
-    int     ap_mpm_result;
-    Tcl_Obj *obj;
+    rivet_server_conf *conf = Rivet_GetConf(req);
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    obj = Tcl_NewStringObj(ap_server_root, -1);
-    Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "SERVER_ROOT",
-            obj,
-            TCL_GLOBAL_ONLY);
-    Tcl_DecrRefCount(obj);
+    Tcl_Preserve (interp);
+    if ( Tcl_EvalObjEx(interp, tcl_script_obj, 0) == TCL_ERROR ) {
+        Tcl_Obj *errscript;
+        Tcl_Obj *errorCodeListObj;
+        Tcl_Obj *errorCodeElementObj;
+        char *errorCodeSubString;
 
-    obj = Tcl_NewStringObj(ap_server_root_relative(pool,SERVER_CONFIG_FILE), -1);
-    Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "SERVER_CONF",
-            obj,
-            TCL_GLOBAL_ONLY);
-    Tcl_DecrRefCount(obj);
+        /* There was an error, see if it's from Rivet and it was caused
+         * by abort_page.
+         */
 
-    obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_DIR), -1);
-    Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_DIR",
-            obj,
-            TCL_GLOBAL_ONLY);
-    Tcl_DecrRefCount(obj);
+        errorCodeListObj = Tcl_GetVar2Ex (interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
 
-    obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_INIT), -1);
-    Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_INIT",
-            obj,
-            TCL_GLOBAL_ONLY);
-    Tcl_DecrRefCount(obj);
+        /* errorCode is guaranteed to be set to NONE, but let's make sure
+         * anyway rather than causing a SIGSEGV
+         */
+        ap_assert (errorCodeListObj != (Tcl_Obj *)NULL);
 
-#if RIVET_DISPLAY_VERSION
-    obj = Tcl_NewStringObj(RIVET_VERSION, -1);
-    Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_VERSION",
-            obj,
-            TCL_GLOBAL_ONLY);
-    Tcl_DecrRefCount(obj);
-#endif
+        /* dig the first element out of the errorCode list and see if it
+         * says Rivet -- this shouldn't fail either, but let's assert
+         * success so we don't get a SIGSEGV afterwards */
+        ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 0, &errorCodeElementObj) == TCL_OK);
 
-    if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
-    {
-        switch (ap_mpm_result) 
-        {
-            case AP_MPMQ_STATIC:
-                obj = Tcl_NewStringObj("static", -1);
-                break;
-            case AP_MPMQ_NOT_SUPPORTED:
-                obj = Tcl_NewStringObj("unsupported", -1);
-                break;
-            default: 
-                obj = Tcl_NewStringObj("undefined", -1);
-                break;
+        /* if the error was thrown by Rivet, see if it's abort_page and,
+         * if so, don't treat it as an error, i.e. don't execute the
+         * installed error handler or the default one, just check if
+         * a rivet_abort_script is defined, otherwise the page emits 
+         * as normal
+         */
+        if (strcmp (Tcl_GetString (errorCodeElementObj), "RIVET") == 0) {
+
+            /* dig the second element out of the errorCode list, make sure
+             * it succeeds -- it should always
+             */
+            ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
+
+            errorCodeSubString = Tcl_GetString (errorCodeElementObj);
+            if (strcmp (errorCodeSubString, ABORTPAGE_CODE) == 0) 
+            {
+                if (conf->rivet_abort_script) 
+                {
+                    if (Tcl_EvalObjEx(interp,conf->rivet_abort_script,0) == TCL_ERROR)
+                    {
+                        CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+                        TclWeb_PrintError("<b>Rivet AbortScript failed!</b>",1,globals->req);
+                        TclWeb_PrintError( errorinfo, 0, globals->req );
+                    }
+                }
+                goto good;
+            }
         }
-        Tcl_IncrRefCount(obj);
-        Tcl_SetVar2Ex(interp,"server","MPM_THREADED",obj,TCL_GLOBAL_ONLY);
-        Tcl_DecrRefCount(obj);
+
+        Tcl_SetVar( interp, "errorOutbuf",Tcl_GetStringFromObj( tcl_script_obj, NULL ),TCL_GLOBAL_ONLY );
+
+        /* If we don't have an error script, use the default error handler. */
+        if (conf->rivet_error_script ) {
+            errscript = conf->rivet_error_script;
+        } else {
+            errscript = conf->rivet_default_error_script;
+        }
+
+        Tcl_IncrRefCount(errscript);
+        if (Tcl_EvalObjEx(interp, errscript, 0) == TCL_ERROR) {
+            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+            TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
+            TclWeb_PrintError( errorinfo, 0, globals->req );
+        }
+
+        /* This shouldn't make the default_error_script go away,
+         * because it gets a Tcl_IncrRefCount when it is created. */
+        Tcl_DecrRefCount(errscript);
     }
 
-    if (ap_mpm_query(AP_MPMQ_IS_FORKED,&ap_mpm_result) == APR_SUCCESS)
-    {
-        switch (ap_mpm_result) 
+    /* Make sure to flush the output if buffer_add was the only output */
+good:
+    
+    if (conf->after_every_script) {
+        if (Tcl_EvalObjEx(interp,conf->after_every_script,0) == TCL_ERROR)
         {
-            case AP_MPMQ_STATIC:
-                obj = Tcl_NewStringObj("static", -1);
-                break;
-            case AP_MPMQ_DYNAMIC:
-                obj = Tcl_NewStringObj("dynamic", -1);
-                break;
-            default: 
-                obj = Tcl_NewStringObj("undefined", -1);
-                break;
+            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
+            TclWeb_PrintError( errorinfo, 0, globals->req );
         }
-        Tcl_IncrRefCount(obj);
-        Tcl_SetVar2Ex(interp,"server","MPM_FORKED",obj,TCL_GLOBAL_ONLY);
-        Tcl_DecrRefCount(obj);
+    }
+
+    if (!globals->req->headers_set && (globals->req->charset != NULL)) {
+        TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
+    }
+    TclWeb_PrintHeaders(globals->req);
+    Tcl_Flush(*(conf->outchannel));
+    Tcl_Release(interp);
+
+    return TCL_OK;
+}
+
+/*
+ * -- Rivet_ParseExecFile
+ *
+ * given a filename if the file exists it's either parsed (when a rivet
+ * template) and then executed as a Tcl_Obj instance or directly executed
+ * if a Tcl script.
+ *
+ * This is a separate function so that it may be called from command 'parse'
+ *
+ * Arguments:
+ *
+ *   - TclWebRequest: pointer to the structure collecting Tcl and Apache data
+ *   - filename:      pointer to a string storing the path to the template or
+ *                    Tcl script
+ *   - toplevel:      integer to be interpreted as a boolean meaning the
+ *                    file is pointed by the request. When 0 that's a subtemplate
+ *                    to be parsed and executed from another template
+ */
+
+int
+Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
+{
+    char *hashKey = NULL;
+    int isNew = 0;
+    int result = 0;
+
+    Tcl_Obj *outbuf = NULL;
+    Tcl_HashEntry *entry = NULL;
+
+    time_t ctime;
+    time_t mtime;
+
+    rivet_server_conf *rsc;
+    Tcl_Interp *interp = req->interp;
+
+    rsc = Rivet_GetConf( req->req );
+
+    /* If the user configuration has indeed been updated, I guess that
+       pretty much invalidates anything that might have been
+       cached. */
+
+    /* This is all horrendously slow, and means we should *also* be
+       doing caching on the modification time of the .htaccess files
+       that concern us. FIXME */
+
+    if (rsc->user_scripts_updated && *(rsc->cache_size) != 0) {
+        int ct;
+        Tcl_HashEntry *delEntry;
+        /* Clean out the list. */
+        ct = *(rsc->cache_free);
+        while (ct < *(rsc->cache_size)) {
+            /* Free the corresponding hash entry. */
+            delEntry = Tcl_FindHashEntry(
+                    rsc->objCache,
+                    rsc->objCacheList[ct]);
+            if (delEntry != NULL) {
+                Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+            }
+            Tcl_DeleteHashEntry(delEntry);
+
+            free(rsc->objCacheList[ct]);
+            rsc->objCacheList[ct] = NULL;
+            ct ++;
+        }
+        *(rsc->cache_free) = *(rsc->cache_size);
+    }
+
+    /* If toplevel is 0, we are being called from Parse, which means
+       we need to get the information about the file ourselves. */
+    if (toplevel == 0)
+    {
+        Tcl_Obj *fnobj;
+        Tcl_StatBuf buf;
+
+        fnobj = Tcl_NewStringObj(filename, -1);
+        Tcl_IncrRefCount(fnobj);
+        if( Tcl_FSStat(fnobj, &buf) < 0 )
+            return TCL_ERROR;
+        Tcl_DecrRefCount(fnobj);
+        ctime = buf.st_ctime;
+        mtime = buf.st_mtime;
+    } else {
+        ctime = req->req->finfo.ctime;
+        mtime = req->req->finfo.mtime;
+    }
+
+    /* Look for the script's compiled version.  If it's not found,
+     * create it.
+     */
+    if (*(rsc->cache_size))
+    {
+        hashKey = (char*) apr_psprintf(req->req->pool, "%s%lx%lx%d", filename,
+                mtime, ctime, toplevel);
+        entry = Tcl_CreateHashEntry(rsc->objCache, hashKey, &isNew);
+    }
+
+    /* We don't have a compiled version.  Let's create one. */
+    if (isNew || *(rsc->cache_size) == 0)
+    {
+        outbuf = Tcl_NewObj();
+        Tcl_IncrRefCount(outbuf);
+
+        if (toplevel) {
+            if (rsc->rivet_before_script) {
+                Tcl_AppendObjToObj(outbuf,rsc->rivet_before_script);
+            }
+        }
+
+/*
+ * We check whether we are dealing with a pure Tcl script or a Rivet template.
+ * Actually this check is done only if we are processing a toplevel file, every nested 
+ * file (files included through the 'parse' command) is treated as a template.
+ */
+
+        if (!toplevel || (Rivet_CheckType(req->req) == RIVET_TEMPLATE))
+        {
+            /* toplevel == 0 means we are being called from the parse
+             * command, which only works on Rivet .rvt files. */
+
+            result = Rivet_GetRivetFile(filename, toplevel, outbuf, interp);
+
+        } else {
+            /* It's a plain Tcl file */
+            result = Rivet_GetTclFile(filename, outbuf, interp);
+        }
+
+        if (result != TCL_OK)
+        {
+            Tcl_DecrRefCount(outbuf);
+            return result;
+        }
+
+        if (toplevel && rsc->rivet_after_script) {
+            Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
+        }
+
+        if (*(rsc->cache_size)) {
+            /* We need to incr the reference count of outbuf because we want
+             * it to outlive this function.  This allows it to stay alive
+             * as long as it's in the object cache.
+             */
+            Tcl_IncrRefCount( outbuf );
+            Tcl_SetHashValue(entry, (ClientData)outbuf);
+        }
+
+        if (*(rsc->cache_free)) {
+
+            //hkCopy = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
+            //strcpy(rsc->objCacheList[-- *(rsc->cache_free)], hashKey);
+            rsc->objCacheList[--*(rsc->cache_free)] = 
+                (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
+            strcpy(rsc->objCacheList[*(rsc->cache_free)], hashKey);
+            //rsc->objCacheList[-- *(rsc->cache_free) ] = strdup(hashKey);
+        } else if (*(rsc->cache_size)) { /* If it's zero, we just skip this. */
+            Tcl_HashEntry *delEntry;
+            delEntry = Tcl_FindHashEntry(
+                    rsc->objCache,
+                    rsc->objCacheList[*(rsc->cache_size) - 1]);
+            Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+            Tcl_DeleteHashEntry(delEntry);
+            free(rsc->objCacheList[*(rsc->cache_size) - 1]);
+            memmove((rsc->objCacheList) + 1, rsc->objCacheList,
+                    sizeof(char *) * (*(rsc->cache_size) - 1));
+
+            //hkCopy = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
+            //strcpy (rsc->objCacheList[0], hashKey);
+            rsc->objCacheList[0] = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
+            strcpy (rsc->objCacheList[0], hashKey);
+            
+            //rsc->objCacheList[0] = (char*) strdup(hashKey);
+        }
+    } else {
+        /* We found a compiled version of this page. */
+        outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
+        Tcl_IncrRefCount(outbuf);
+    }
+
+    rsc->user_scripts_updated = 0;
+    {
+        int res = 0;
+        res = Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+        Tcl_DecrRefCount(outbuf);
+        return res;
     }
 }
 
-static void
-Rivet_CleanupRequest( request_rec *r )
+/*
+ * -- Rivet_ParseExecString
+ *
+ * This function accepts a Tcl_Obj carrying a string to be interpreted as
+ * a Rivet template. This function is the core for command 'parsestr'
+ * 
+ * Arguments:
+ *
+ *   - TclWebRequest* req: pointer to the structure collecting Tcl and
+ *   Apache data
+ *   - Tcl_Obj* inbuf: Tcl object storing the template to be parsed.
+ */
+
+int
+Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf)
 {
-#if 0
-    apr_table_t *t;
-    apr_array_header_t *arr;
-    apr_table_entry_t  *elts;
-    int i, nelts;
-    Tcl_Obj *arrayName;
-    Tcl_Interp *interp;
+    int res = 0;
+    Tcl_Obj* outbuf = Tcl_NewObj();
+    Tcl_Interp *interp = req->interp;
 
-    rivet_server_conf *rsc = RIVET_SERVER_CONF( r->per_dir_config );
+    Tcl_IncrRefCount(outbuf);
+    Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
 
-    t = rsc->rivet_user_vars;
-    arr   = (apr_array_header_t*) apr_table_elts( t );
-    elts  = (apr_table_entry_t *) arr->elts;
-    nelts = arr->nelts;
-    arrayName = Tcl_NewStringObj( "RivetUserConf", -1 );
-    interp = rsc->server_interp;
-
-    for( i = 0; i < nelts; ++i )
+    /* If we are not inside a <? ?> section, add the closing ". */
+    if (Rivet_Parser(outbuf, inbuf) == 0)
     {
-        Tcl_UnsetVar2(interp,
-                "RivetUserConf",
-                elts[i].key,
-                TCL_GLOBAL_ONLY);
-    }
-    Tcl_DecrRefCount(arrayName);
+        Tcl_AppendToObj(outbuf, "\"\n", 2);
+    } 
 
-    rivet_server_conf *rdc = RIVET_SERVER_CONF( r->per_dir_config );
+    Tcl_AppendToObj(outbuf, "\n", -1);
 
-    if( rdc->rivet_before_script ) {
-        Tcl_DecrRefCount( rdc->rivet_before_script );
-    }
-    if( rdc->rivet_after_script ) {
-        Tcl_DecrRefCount( rdc->rivet_after_script );
-    }
-    if( rdc->rivet_error_script ) {
-        Tcl_DecrRefCount( rdc->rivet_error_script );
-    }
-#endif
+    res = Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+    Tcl_DecrRefCount(outbuf);
+
+    return res;
 }
-
 
 /*
  *-----------------------------------------------------------------------------
@@ -277,7 +444,7 @@ Rivet_CleanupRequest( request_rec *r )
  *
  *-----------------------------------------------------------------------------
  */
-static void
+static void 
 Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
 {
     Tcl_Interp *interp = rsc->server_interp;
@@ -380,15 +547,17 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     Tcl_Release(interp);
 }
 
+
 static int
 Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
-    rivet_panic_pool       = pPool;
-    rivet_panic_server_rec = s;
 
     rivet_module_globals = apr_palloc(pPool,sizeof(mod_rivet_globals));
     rivet_module_globals->rsc_p = rsc;
+    rivet_module_globals->rivet_panic_pool       = pPool;
+    rivet_module_globals->rivet_panic_server_rec = s;
+
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
 #else
@@ -446,48 +615,6 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     return OK;
 }
 
-
-
-/*
- *-----------------------------------------------------------------------------
- *
- * Rivet_PanicProc --
- *
- *  Called when Tcl panics, usually because of memory problems.
- *  We log the request, in order to be able to determine what went
- *  wrong later.
- *
- * Results:
- *  None.
- *
- * Side Effects:
- *  Calls abort(), which does not return - the child exits.
- *
- *-----------------------------------------------------------------------------
- */
-static void
-Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
-{
-    va_list argList;
-    char *buf;
-    char *format;
-
-    format = (char *) TCL_VARARGS_START(char *,arg1,argList);
-    buf    = (char *) apr_pvsprintf(rivet_panic_pool, format, argList);
-
-    if (rivet_panic_request_rec != NULL) {
-        ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
-                     rivet_panic_server_rec,
-                     MODNAME ": Critical error in request: %s", 
-                     rivet_panic_request_rec->unparsed_uri);
-    }
-
-    ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
-                 rivet_panic_server_rec, "%s", buf);
-
-    abort();
-}
-
 /*
  *-----------------------------------------------------------------------------
  * Rivet_CreateTclInterp --
@@ -502,7 +629,7 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
  *
  *-----------------------------------------------------------------------------
  */
-static Tcl_Interp*
+static Tcl_Interp* 
 Rivet_CreateTclInterp (server_rec* s)
 {
     Tcl_Interp* interp;
@@ -532,56 +659,6 @@ Rivet_CreateTclInterp (server_rec* s)
 
 /*
  *-----------------------------------------------------------------------------
- * Rivet_CreateCache --
- *
- * Arguments:
- *     rsc: pointer to a server_rec structure
- *
- * Results:
- *     None
- *
- * Side Effects:
- *
- *-----------------------------------------------------------------------------
- */
-
-static void
-Rivet_CreateCache (server_rec *s, apr_pool_t *p)
-{
-    extern int ap_max_requests_per_child;
-    rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
-
-    /* If the user didn't set a cache size in their configuration, we
-     * will assume an arbitrary size for them.
-     *
-     * If the cache size is 0, the user has requested not to cache
-     * documents.
-     */
-
-    if(*(rsc->cache_size) < 0) {
-        if (ap_max_requests_per_child != 0) {
-            *(rsc->cache_size) = ap_max_requests_per_child / 5;
-        } else {
-            *(rsc->cache_size) = 50;    // Arbitrary number
-        }
-    }
-
-    if (*(rsc->cache_size) != 0) {
-        *(rsc->cache_free) = *(rsc->cache_size);
-    }
-
-    // Initialize cache structures
-
-    if (*(rsc->cache_size)) {
-        rsc->objCacheList = apr_pcalloc(
-                p, (signed)(*(rsc->cache_size) * sizeof(char *)));
-        rsc->objCache = apr_pcalloc(p, sizeof(Tcl_HashTable));
-        Tcl_InitHashTable(rsc->objCache, TCL_STRING_KEYS);
-    }
-}
-
-/*
- *-----------------------------------------------------------------------------
  *
  * Rivet_InitTclStuff --
  *
@@ -597,15 +674,15 @@ Rivet_CreateCache (server_rec *s, apr_pool_t *p)
  *-----------------------------------------------------------------------------
  */
 
-static void
+static void 
 Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
     Tcl_Interp *interp = rsc->server_interp;
     rivet_server_conf *myrsc;
     server_rec *sr;
-    extern int ap_max_requests_per_child;
     int interpCount = 0;
+    //extern int ap_max_requests_per_child;
 
 /* This code is run once per child process. In a threaded Tcl builds the forking 
  * of a child process most likely has not preserved the thread where the Tcl 
@@ -652,7 +729,8 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
         /* This sets up slave interpreters for other virtual hosts. */
         if (sr != s) /* not the first one  */
         {
-            if (rsc->separate_virtual_interps != 0) {
+            if (rsc->separate_virtual_interps != 0) 
+            {
                 char *slavename = (char*) apr_psprintf (p, "%s_%d_%d", 
                         sr->server_hostname, 
                         sr->port,
@@ -660,7 +738,8 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
 
                 ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
                             MODNAME 
-": Rivet_InitTclStuff: creating slave interpreter '%s', hostname '%s', port '%d', separate interpreters %d",
+                            ": Rivet_InitTclStuff: creating slave interpreter '%s', "\
+                            "hostname '%s', port '%d', separate interpreters %d",
                             slavename, sr->server_hostname, sr->port, 
                             rsc->separate_virtual_interps);
 
@@ -704,7 +783,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
  *
  *-----------------------------------------------------------------------------
  */
-static void
+static void 
 Rivet_ChildHandlers(server_rec *s, int init)
 {
     server_rec *sr;
@@ -871,7 +950,7 @@ Rivet_SendContent(request_rec *r)
 
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
-    rivet_panic_request_rec = r;
+    rivet_module_globals->rivet_panic_request_rec = r;
 
     rsc = Rivet_GetConf(r);
     rivet_module_globals->rsc_p = rsc;

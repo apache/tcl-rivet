@@ -28,7 +28,7 @@ install-binaries:
 	cp -v rivet/init.tcl $(RIVETLIB_DESTDIR)/
 	cp -rv rivet/rivet-tcl $(RIVETLIB_DESTDIR)/
 	-(  cd $(RIVETLIB_DESTDIR); rm -f *.la; \
-        echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH)*[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+        echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH) *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-local:
 	rm -f  $(RIVETLIB_DESTDIR)/init.tcl
@@ -46,7 +46,7 @@ install-packages:
 	cp -rv rivet/packages/* $(RIVET_PACKAGES)
 	-(  cd  $(RIVETLIB_DESTDIR); \
 	    echo 'eval file delete [glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl' | @TCLSH_PROG@ ; \
-	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH)*[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH) *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 uninstall-packages:
 	rm -fr $(RIVET_PACKAGES)
@@ -55,7 +55,7 @@ uninstall-packages:
 		@rmdir $(RIVETLIB_DESTDIR); \
 	fi
 	-(  cd  $(RIVETLIB_DESTDIR); \
-	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH)*[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
+	    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH) *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
 
 # 
 distclean-local:
