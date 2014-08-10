@@ -68,6 +68,231 @@ apr_threadkey_t*        handler_thread_key;
 
 #define ERRORBUF_SZ     256
 
+/* -----------------------------------------------------------------------------
+ * -- Rivet_SendContent
+ *
+ *   Set things up to execute a file, then execute 
+ *-----------------------------------------------------------------------------
+ */
+
+#define USE_APACHE_RSC
+
+int
+Rivet_SendContent(rivet_thread_private *private)
+{
+    int errstatus;
+    int retval;
+    int ctype;
+    Tcl_Interp      *interp;
+    static Tcl_Obj  *request_init = NULL;
+    static Tcl_Obj  *request_cleanup = NULL;
+    rivet_interp_globals *globals = NULL;
+    request_rec* r = private->r;
+#ifdef USE_APACHE_RSC
+    rivet_server_conf    *rsc = NULL;
+#else
+    rivet_server_conf    *rdc;
+#endif
+
+    ctype = Rivet_CheckType(r);  
+    if (ctype == CTYPE_NOT_HANDLED) {
+        return DECLINED;
+    }
+
+    //Tcl_MutexLock(&sendMutex);
+
+    /* Set the global request req to know what we are dealing with in
+     * case we have to call the PanicProc. */
+    module_globals->rivet_panic_request_rec = r;
+
+    rsc = Rivet_GetConf(r);
+
+    interp  = rsc->server_interp;
+    globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    /* The current TclWebRequest record is assigned here to the thread private data
+       for the channel to read it when actual output will flushed */
+    
+    private->req = globals->req;
+
+    /* Setting this pointer in globals is crucial as by assigning it
+     * we signal to Rivet commands we are processing an HTTP request.
+     * This pointer gets set to NULL just before we leave this function
+     * making possible to invalidate command execution that could depend
+     * on a valid request_rec
+     */
+
+    globals->r = r;
+    globals->srec = r->server;
+
+#ifndef USE_APACHE_RSC
+    if (r->per_dir_config != NULL)
+        rdc = RIVET_SERVER_CONF( r->per_dir_config );
+    else
+        rdc = rsc;
+#endif
+
+    r->allowed |= (1 << M_GET);
+    r->allowed |= (1 << M_POST);
+    r->allowed |= (1 << M_PUT);
+    r->allowed |= (1 << M_DELETE);
+    if (r->method_number != M_GET && 
+        r->method_number != M_POST && 
+        r->method_number != M_PUT && 
+        r->method_number != M_DELETE) {
+
+        retval = DECLINED;
+        goto sendcleanup;
+
+    }
+
+    if (r->finfo.filetype == 0)
+    {
+        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, 
+                     r->server,
+                     MODNAME ": File does not exist: %s",
+                     (r->path_info ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL) : r->filename));
+        retval = HTTP_NOT_FOUND;
+        goto sendcleanup;
+    }
+
+    if ((errstatus = ap_meets_conditions(r)) != OK) {
+        retval = errstatus;
+        goto sendcleanup;
+    }
+
+    /* 
+     * This one is the big catch when it comes to moving towards
+     * Apache 2.0, or one of them, at least.
+     */
+
+    if (Rivet_chdir_file(r->filename) < 0)
+    {
+        /* something went wrong doing chdir into r->filename, we are not specific
+         * at this. We simply emit an internal server error and print a log message
+         */
+        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
+                     MODNAME ": Error accessing %s, could not chdir into directory", 
+                     r->filename);
+
+        retval = HTTP_INTERNAL_SERVER_ERROR;
+        goto sendcleanup;
+    }
+
+    /* Initialize this the first time through and keep it around. */
+    if (request_init == NULL) {
+        request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+        Tcl_IncrRefCount(request_init);
+    }
+
+    if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
+                            MODNAME ": Could not create request namespace (%s)\n" ,
+                            Tcl_GetStringResult(interp));
+        retval = HTTP_INTERNAL_SERVER_ERROR;
+        goto sendcleanup;
+    }
+
+    /* Apache Request stuff */
+
+    TclWeb_InitRequest(globals->req, interp, r);
+    ApacheRequest_set_post_max(globals->req->apachereq, rsc->upload_max);
+    ApacheRequest_set_temp_dir(globals->req->apachereq, rsc->upload_dir);
+
+    /* Let's copy the request data into the thread private record */
+
+    errstatus = ApacheRequest_parse(globals->req->apachereq);
+
+    if (errstatus != OK) {
+        retval = errstatus;
+        goto sendcleanup;
+    }
+
+    if (r->header_only && !rsc->honor_header_only_reqs)
+    {
+        TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
+        TclWeb_PrintHeaders(globals->req);
+        retval = OK;
+        goto sendcleanup;
+    }
+
+/* 
+ * if we are handling the request we also want to check if a charset 
+ * parameter was set with the content type, e.g. rivet's configuration 
+ * or .htaccess had lines like 
+ *
+ * AddType 'application/x-httpd-rivet; charset=utf-8;' rvt 
+ */
+ 
+/*
+ * if strlen(req->content_type) > strlen([RIVET|TCL]_FILE_CTYPE)
+ * a charset parameters might be there 
+ */
+
+    {
+        int content_type_len = strlen(r->content_type);
+
+        if (((ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
+             ((ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
+            
+            char* charset;
+
+            /* we parse the content type: we are after a 'charset' parameter definition */
+            
+            charset = strstr(r->content_type,"charset");
+            if (charset != NULL) {
+                charset = apr_pstrdup(r->pool,charset);
+
+                /* ther's some freedom about spaces in the AddType lines: let's strip them off */
+
+                apr_collapse_spaces(charset,charset);
+                globals->req->charset = charset;
+            }
+        }
+    }
+
+    if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
+                     MODNAME ": Error parsing exec file '%s': %s",
+                     r->filename,
+                     Tcl_GetVar(interp, "errorInfo", 0));
+    }
+
+    if (request_cleanup == NULL) {
+        request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+        Tcl_IncrRefCount(request_cleanup);
+    }
+
+    if (Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
+                     MODNAME ": Error evaluating cleanup request: %s",
+                     Tcl_GetVar(interp, "errorInfo", 0));
+    }
+
+    /* Reset globals */
+    Rivet_CleanupRequest( r );
+
+    retval = OK;
+sendcleanup:
+    globals->req->content_sent = 0;
+
+    globals->page_aborting = 0;
+    if (globals->abort_code != NULL)
+    {
+        Tcl_DecrRefCount(globals->abort_code);
+        globals->abort_code = NULL;
+    }
+
+    /* We reset this pointer to signal we have terminated the request processing */
+
+    globals->r = NULL;
+
+    //Tcl_MutexUnlock(&sendMutex);
+    return retval;
+}
+
 /* -- Rivet_ExecuteAndCheck
  * 
  * Tcl script execution central procedure. The script stored
@@ -437,7 +662,7 @@ Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf)
  *-----------------------------------------------------------------------------
  */
 
-static Tcl_Interp* 
+Tcl_Interp* 
 Rivet_CreateTclInterp (server_rec* s)
 {
     Tcl_Interp* interp;
@@ -489,9 +714,9 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
 
+    /* This is mpm bridge dependent */
     /* We register the Tcl channel to the interpreter */
-
-    Tcl_RegisterChannel(interp, *(module_globals->outchannel));
+    // Tcl_RegisterChannel(interp, *(module_globals->outchannel));
 
     /* Set up interpreter associated data */
 
@@ -585,78 +810,6 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
  *
  */
 
-static int Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
-{
-    rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
-
-    apr_threadkey_private_create (&rivet_thread_key,NULL, pPool);
-
-    module_globals->rivet_panic_pool       = pPool;
-    module_globals->rivet_panic_server_rec = s;
-    module_globals->server                 = s;
-
-#if RIVET_DISPLAY_VERSION
-    ap_add_version_component(pPool, "Rivet/Experimental/"__DATE__"/"__TIME__"/");
-    //ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
-#else
-    ap_add_version_component(pPool, RIVET_PACKAGE_NAME);
-#endif
-
-    FILEDEBUGINFO;
-
-    /* we create and initialize a master (server) interpreter */
-
-    rsc->server_interp = Rivet_CreateTclInterp(s) ; /* root interpreter */
-
-    /* Create TCL channel and store a pointer in the rivet_server_conf object */
-
-    module_globals->outchannel    = apr_pcalloc (pPool, sizeof(Tcl_Channel));
-    *(module_globals->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
-
-    /* The channel we have just created replaces Tcl's stdout */
-
-    Tcl_SetStdChannel (*(module_globals->outchannel), TCL_STDOUT);
-
-    /* Set the output buffer size to the largest allowed value, so that we 
-     * won't send any result packets to the browser unless the Rivet
-     * programmer does a "flush stdout" or the page is completed.
-     */
-
-    Tcl_SetChannelBufferSize (*(module_globals->outchannel), TCL_MAX_CHANNEL_BUFFER_SIZE);
-
-    /* We register the Tcl channel to the interpreter */
-
-    Tcl_RegisterChannel(rsc->server_interp, *(module_globals->outchannel));
-
-    Rivet_PerInterpInit(rsc->server_interp,s,pPool);
-
-    /* we don't create the cache here: it would make sense for prefork MPM
-     * but threaded MPM bridges have their pool of threads. Each of them
-     * will by now have their own cache
-     */
-
-    // Rivet_CreateCache(s,pPool);
-
-    if (rsc->rivet_server_init_script != NULL) {
-        Tcl_Interp* interp = rsc->server_interp;
-
-        if (Tcl_EvalObjEx(interp, rsc->rivet_server_init_script, 0) != TCL_OK)
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                         MODNAME ": Error running ServerInitScript '%s': %s",
-                         Tcl_GetString(rsc->rivet_server_init_script),
-                         Tcl_GetVar(interp, "errorInfo", 0));
-        } else {
-            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-                         MODNAME ": ServerInitScript '%s' successful", 
-                         Tcl_GetString(rsc->rivet_server_init_script));
-        }
-    }
-    Tcl_SetPanicProc(Rivet_Panic);
-    
-    return OK;
-}
-
 static int
 Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
@@ -664,6 +817,13 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     char errorbuf[ERRORBUF_SZ];
     char* mpm_model_handler = "rivet_prefork_mpm.so";
     char* mpm_model_path;
+
+#if RIVET_DISPLAY_VERSION
+    ap_add_version_component(pPool, "Rivet/Experimental/"__DATE__"/"__TIME__"/");
+    //ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
+#else
+    ap_add_version_component(pPool, RIVET_PACKAGE_NAME);
+#endif
 
     /* Everything revolves around this structure */
 
@@ -684,10 +844,25 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         apr_status_t                rv;
         apr_dso_handle_sym_t        func = NULL;
 
-        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_Init");
+        ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"MPM bridge loaded: %s",mpm_model_path);
+
+        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_ServerInit");
         if (rv == APR_SUCCESS)
         {
-            module_globals->mpm_init = (int (*)(apr_pool_t*,server_rec*)) func;
+            module_globals->mpm_server_init = (int (*)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*))func;
+        }
+        else
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                         MODNAME ": Error loading symbol Rivet_MPM_ServerInit: %s", 
+                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+            exit(1);   
+        }
+
+        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_ChildInit");
+        if (rv == APR_SUCCESS)
+        {
+            module_globals->mpm_child_init = (int (*)(apr_pool_t*,server_rec*)) func;
         }
         else
         {
@@ -731,7 +906,14 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         module_globals->server_shutdown = 0;
 
-        Rivet_InitHandler (pPool,pLog,pTemp,s);
+        apr_threadkey_private_create (&rivet_thread_key,NULL, pPool);
+
+        module_globals->rivet_panic_pool        = pPool;
+        module_globals->rivet_panic_server_rec  = s;
+        module_globals->server                  = s;
+        module_globals->rivet_panic_request_rec = NULL;
+
+        (*module_globals->mpm_server_init)(pPool,pLog,pTemp,s);
     }
     else
     {
@@ -747,84 +929,9 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     return OK;
 }
 
-int RivetContent (rivet_thread_private* private)    
-{
-    Tcl_Interp*             interp = private->interp;
-    request_rec*            r = private->r;    
-    Tcl_Obj*                script;
-    char                    script_buf[HUGE_STRING_LEN];
-    apr_size_t              bytes_read;
-    apr_finfo_t*            fileinfo = (apr_finfo_t*) apr_palloc(r->pool,sizeof(apr_finfo_t));
-    apr_file_t*             filedesc;
-
-    if (strcmp(r->handler, RIVET_TCLFILE_CTYPE)) {
-        return DECLINED;
-    }
-
-    if (r->method_number != M_GET) { return DECLINED; }
-
-    if (Rivet_chdir_file(r->filename) < 0)
-    {
-        /* something went wrong doing chdir into r->filename, we are not specific
-         * at this. We simply emit an internal server error and print a log message
-         */
-        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
-                     MODNAME ": Error accessing %s, could not chdir into directory", 
-                     r->filename);
-
-        return HTTP_INTERNAL_SERVER_ERROR;
-    }
-
-    if (apr_stat(fileinfo, r->filename, APR_FINFO_SIZE | APR_FINFO_CSIZE ,r->pool) != APR_SUCCESS)
-    {
-        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
-                     MODNAME ": couldn't get info on %s", r->filename);
-
-        return HTTP_INTERNAL_SERVER_ERROR;
-    }
-
-    if (apr_file_open(&filedesc,r->filename,APR_FOPEN_READ,APR_FPROT_UREAD,r->pool) != APR_SUCCESS)
-    {
-        ap_log_error(APLOG_MARK, APLOG_NOERRNO | APLOG_ERR, APR_EGENERAL, r->server, 
-                     MODNAME ": couldn't open %s", r->filename);
-
-        return HTTP_INTERNAL_SERVER_ERROR;
-    }
-    apr_file_read_full(filedesc,script_buf,fileinfo->size,&bytes_read);
-    apr_file_close(filedesc);
-
-    r->content_type = "text/html";
-    if (r->header_only) return OK;
-    //if (r->args == 0) return OK;
-
-    /* 
-     *  I take this call from the current mod_rivet code, but I'm not sure if it's
-     *  necessary in this context
-     */
-
-    Tcl_Preserve(interp);
-
-    script = Tcl_NewStringObj(script_buf,bytes_read);
-    Tcl_IncrRefCount(script);
-
-    //apr_thread_mutex_lock(module_globals.tcl86_mutex);
-    if (Tcl_EvalObjEx(interp, script, 0) == TCL_ERROR)
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
-                     "Error evaluating script: %s", Tcl_GetVar(interp, "errorInfo", 0));
-    }
-    //apr_thread_mutex_unlock(module_globals.tcl86_mutex);
-
-    TclWeb_PrintHeaders(private->req);
-    Tcl_Flush(*(private->channel));
-    Tcl_Release(interp);
-    Tcl_DecrRefCount(script);
-    return OK;
-}
-
 static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *s)
 {
-    (*module_globals->mpm_init)(pChild,s);
+    (*module_globals->mpm_child_init)(pChild,s);
     apr_pool_cleanup_register (pChild, s, module_globals->mpm_finalize, module_globals->mpm_finalize);
 }
 

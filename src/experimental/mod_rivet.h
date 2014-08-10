@@ -126,7 +126,7 @@ typedef struct _rivet_interp_globals {
     server_rec*     srec;               /* pointer to the current server rec obj */
 } rivet_interp_globals;
 
-#define TCL_INTERPS 4
+#define TCL_INTERPS 1
 typedef int rivet_thr_status;
 enum
 {
@@ -155,8 +155,9 @@ typedef struct _mod_rivet_globals {
     server_rec*         server;             /* default host server_rec obj */
     Tcl_Channel*        outchannel;         /* this is the Rivet channel for prefork MPM */
 
-    int                 (*mpm_init)(apr_pool_t* pPool,server_rec* s);
+    int                 (*mpm_child_init)(apr_pool_t* pPool,server_rec* s);
     int                 (*mpm_request)(request_rec*);
+    int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
@@ -172,9 +173,9 @@ typedef struct _thread_worker_private {
                                          * channel                              */
     request_rec*        r;			    
     TclWebRequest*      req;
-    int                 req_cnt;        /* requests served by thread */
-    int                 keep_going;     /* thread loop controlling variable */
-    apr_pool_t*         pool;           /* threads private memory pool */
+    int                 req_cnt;        /* requests served by thread            */
+    int                 keep_going;     /* thread loop controlling variable     */
+    apr_pool_t*         pool;           /* threads private memory pool          */
     
 } rivet_thread_private;
 
@@ -232,10 +233,13 @@ Tcl_Obj* Rivet_CurrentServerRec ( Tcl_Interp* interp, server_rec* s );
 #define RIVET_TEMPLATE      1
 #define RIVET_TCLFILE       2
 
-/* these two must go in their own file */
+/* these three must go in their own file */
 
 EXTERN int Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel);
 EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
+EXTERN int Rivet_SendContent(rivet_thread_private *private);
+EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
+
 
 /* temporary content generation handler */
 

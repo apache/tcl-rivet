@@ -1,3 +1,9 @@
+2014-08-10 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/rivet_prefork_mpm.c: handling also server initialization
+    * src/experimental/rivet_worker_mpm.c: doing server initialization from the threaded MPM perspective
+    * src/experimental/mod_rivet.c: server initialization loads symbols from the bridge module and
+    then defers the initialization task to the specific bridge.
+
 2014-08-09 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: Various functions moved to src/common/mod_rivet_common.c
     * configure.ac: --with-rivet-core switch simplified
