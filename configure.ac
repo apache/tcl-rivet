@@ -502,15 +502,15 @@ AC_DEFUN([APACHE_REQUEST],[
 
 AC_DEFUN([RIVET_CORE_CMDS],[
     AC_ARG_WITH(
-        rivet_core_cmds,
-        [  --with-rivet-core-cmds[=dir] path to Rivet core commands code],,
-        [with_rivet_core_cmds="rivetcmds"]
+        rivet_commands,
+        [  --with-rivet-commands[=dir] path to Rivet core commands code],,
+        [with_rivet_commands="rivetcmds"]
     )
 
     AC_MSG_CHECKING(for Rivet core commands code)
-    rivet_core_cmds=${with_rivet_core_cmds}
-    AC_SUBST(rivet_core_cmds)
-    AC_MSG_RESULT([$rivet_core_cmds])
+    rivet_commands=${with_rivet_commands}
+    AC_SUBST(rivet_commands)
+    AC_MSG_RESULT([$rivet_commands])
 
 ])
 

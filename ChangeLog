@@ -1,3 +1,9 @@
+2014-08-11 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/rivet_worker_mpm.c: redesigning virtual hosts resource management for threads
+    * src/experimental/mod_rivet[c|h]: implementing thread private interpreters management
+    * src/experimental/rivetCore.c,rivetInspect.c: I had to move here these files as some API has changed
+    and perhaps it's better if we stick into the interp globals a reference to the thread private data
+
 2014-08-10 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/rivet_prefork_mpm.c: handling also server initialization
     * src/experimental/rivet_worker_mpm.c: doing server initialization from the threaded MPM perspective

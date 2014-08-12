@@ -107,13 +107,17 @@ Rivet_SendContent(rivet_thread_private *private)
 
     rsc = Rivet_GetConf(r);
 
-    interp  = rsc->server_interp;
+    interp  = private->interps[rsc->idx]->interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
+
+    /* everything should merge into a single struct sooner or later */
+
+    globals->private = private;
 
     /* The current TclWebRequest record is assigned here to the thread private data
        for the channel to read it when actual output will flushed */
     
-    private->req = globals->req;
+    globals->req = private->req;
 
     /* Setting this pointer in globals is crucial as by assigning it
      * we signal to Rivet commands we are processing an HTTP request.
@@ -252,7 +256,7 @@ Rivet_SendContent(rivet_thread_private *private)
         }
     }
 
-    if (Rivet_ParseExecFile(globals->req, r->filename, 1) != TCL_OK)
+    if (Rivet_ParseExecFile(private, r->filename, 1) != TCL_OK)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                      MODNAME ": Error parsing exec file '%s': %s",
@@ -435,7 +439,8 @@ good:
  *
  * Arguments:
  *
- *   - TclWebRequest: pointer to the structure collecting Tcl and Apache data
+ *   - rivet_thread_private : pointer to the structure collecting thread private data
+                      for Tcl and current request
  *   - filename:      pointer to a string storing the path to the template or
  *                    Tcl script
  *   - toplevel:      integer to be interpreted as a boolean meaning the
@@ -444,22 +449,28 @@ good:
  */
 
 int
-Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
+Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 {
-    char *hashKey = NULL;
-    int isNew = 0;
-    int result = 0;
-
+    char *hashKey   = NULL;
+    int isNew       = 0;
+    int result      = 0;
+    //TclWebRequest*  req;
+    vhost_interp*   rivet_interp;
     Tcl_Obj *outbuf = NULL;
     Tcl_HashEntry *entry = NULL;
+    Tcl_Interp*     interp;
 
     time_t ctime;
     time_t mtime;
 
     rivet_server_conf *rsc;
-    Tcl_Interp *interp = req->interp;
 
-    rsc = Rivet_GetConf( req->req );
+    rsc = Rivet_GetConf( private->r );
+
+    /* We have to fetch the interpreter data from the thread private environment */
+
+    rivet_interp = private->interps[rsc->idx];
+    interp = rivet_interp->interp;
 
     /* If the user configuration has indeed been updated, I guess that
        pretty much invalidates anything that might have been
@@ -469,30 +480,32 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
        doing caching on the modification time of the .htaccess files
        that concern us. FIXME */
 
-    if (rsc->user_scripts_updated && *(rsc->cache_size) != 0) {
+    if (rsc->user_scripts_updated && (rivet_interp->cache_size != 0)) 
+    {
         int ct;
         Tcl_HashEntry *delEntry;
         /* Clean out the list. */
-        ct = *(rsc->cache_free);
-        while (ct < *(rsc->cache_size)) {
+        ct = rivet_interp->cache_free;
+        while (ct < rivet_interp->cache_size) {
             /* Free the corresponding hash entry. */
             delEntry = Tcl_FindHashEntry(
-                    rsc->objCache,
-                    rsc->objCacheList[ct]);
+                    rivet_interp->objCache,
+                    rivet_interp->objCacheList[ct]);
             if (delEntry != NULL) {
                 Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
             }
             Tcl_DeleteHashEntry(delEntry);
 
-            free(rsc->objCacheList[ct]);
-            rsc->objCacheList[ct] = NULL;
-            ct ++;
+            free(rivet_interp->objCacheList[ct]);
+            rivet_interp->objCacheList[ct] = NULL;
+            ct++;
         }
-        *(rsc->cache_free) = *(rsc->cache_size);
+        rivet_interp->cache_free = rivet_interp->cache_size;
     }
 
     /* If toplevel is 0, we are being called from Parse, which means
        we need to get the information about the file ourselves. */
+
     if (toplevel == 0)
     {
         Tcl_Obj *fnobj;
@@ -506,22 +519,22 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
         ctime = buf.st_ctime;
         mtime = buf.st_mtime;
     } else {
-        ctime = req->req->finfo.ctime;
-        mtime = req->req->finfo.mtime;
+        ctime = private->r->finfo.ctime;
+        mtime = private->r->finfo.mtime;
     }
 
     /* Look for the script's compiled version.  If it's not found,
      * create it.
      */
-    if (*(rsc->cache_size))
+    if (rivet_interp->cache_size)
     {
-        hashKey = (char*) apr_psprintf(req->req->pool, "%s%lx%lx%d", filename,
+        hashKey = (char*) apr_psprintf(private->r->pool, "%s%lx%lx%d", filename,
                 mtime, ctime, toplevel);
-        entry = Tcl_CreateHashEntry(rsc->objCache, hashKey, &isNew);
+        entry = Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, &isNew);
     }
 
     /* We don't have a compiled version.  Let's create one. */
-    if (isNew || *(rsc->cache_size) == 0)
+    if (isNew || (rivet_interp->cache_size == 0))
     {
         outbuf = Tcl_NewObj();
         Tcl_IncrRefCount(outbuf);
@@ -538,7 +551,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
  * file (files included through the 'parse' command) is treated as a template.
  */
 
-        if (!toplevel || (Rivet_CheckType(req->req) == RIVET_TEMPLATE))
+        if (!toplevel || (Rivet_CheckType(private->r) == RIVET_TEMPLATE))
         {
             /* toplevel == 0 means we are being called from the parse
              * command, which only works on Rivet .rvt files. */
@@ -560,40 +573,38 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
             Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
         }
 
-        if (*(rsc->cache_size)) {
+        if (rivet_interp->cache_size) {
+
             /* We need to incr the reference count of outbuf because we want
              * it to outlive this function.  This allows it to stay alive
              * as long as it's in the object cache.
              */
+
             Tcl_IncrRefCount( outbuf );
             Tcl_SetHashValue(entry, (ClientData)outbuf);
         }
 
-        if (*(rsc->cache_free)) {
+        if (rivet_interp->cache_free) {
 
-            //hkCopy = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
-            //strcpy(rsc->objCacheList[-- *(rsc->cache_free)], hashKey);
-            rsc->objCacheList[--*(rsc->cache_free)] = 
+            rivet_interp->objCacheList[--rivet_interp->cache_free] = 
                 (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
-            strcpy(rsc->objCacheList[*(rsc->cache_free)], hashKey);
-            //rsc->objCacheList[-- *(rsc->cache_free) ] = strdup(hashKey);
-        } else if (*(rsc->cache_size)) { /* If it's zero, we just skip this. */
+            strcpy(rivet_interp->objCacheList[rivet_interp->cache_free], hashKey);
+
+        } else if (rivet_interp->cache_size) { /* If it's zero, we just skip this. */
+
             Tcl_HashEntry *delEntry;
             delEntry = Tcl_FindHashEntry(
-                    rsc->objCache,
-                    rsc->objCacheList[*(rsc->cache_size) - 1]);
+                            rivet_interp->objCache,
+                            rivet_interp->objCacheList[rivet_interp->cache_size - 1]);
             Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
             Tcl_DeleteHashEntry(delEntry);
-            free(rsc->objCacheList[*(rsc->cache_size) - 1]);
-            memmove((rsc->objCacheList) + 1, rsc->objCacheList,
-                    sizeof(char *) * (*(rsc->cache_size) - 1));
+            free(rivet_interp->objCacheList[rivet_interp->cache_size - 1]);
+            memmove((rivet_interp->objCacheList) + 1, rivet_interp->objCacheList,
+                    sizeof(char *) * (rivet_interp->cache_size - 1));
 
-            //hkCopy = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
-            //strcpy (rsc->objCacheList[0], hashKey);
-            rsc->objCacheList[0] = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
-            strcpy (rsc->objCacheList[0], hashKey);
+            rivet_interp->objCacheList[0] = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
+            strcpy (rivet_interp->objCacheList[0], hashKey);
             
-            //rsc->objCacheList[0] = (char*) strdup(hashKey);
         }
     } else {
         /* We found a compiled version of this page. */
@@ -604,7 +615,7 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
     rsc->user_scripts_updated = 0;
     {
         int res = 0;
-        res = Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+        res = Rivet_ExecuteAndCheck(interp, outbuf, private->r);
         Tcl_DecrRefCount(outbuf);
         return res;
     }
@@ -713,10 +724,6 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
 
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
-
-    /* This is mpm bridge dependent */
-    /* We register the Tcl channel to the interpreter */
-    // Tcl_RegisterChannel(interp, *(module_globals->outchannel));
 
     /* Set up interpreter associated data */
 
@@ -910,9 +917,9 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         module_globals->rivet_panic_pool        = pPool;
         module_globals->rivet_panic_server_rec  = s;
-        module_globals->server                  = s;
+        //module_globals->server                  = s;
         module_globals->rivet_panic_request_rec = NULL;
-
+        module_globals->vhosts_count            = 0;
         (*module_globals->mpm_server_init)(pPool,pLog,pTemp,s);
     }
     else

@@ -345,7 +345,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
             private->keep_going = 1;
             private->r          = NULL;
             private->req        = NULL;
-            private->interp     = NULL;
+            private->interps    = NULL;
 
             apr_threadkey_private_set (private,rivet_thread_key);
         }

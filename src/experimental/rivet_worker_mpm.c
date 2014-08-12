@@ -38,7 +38,7 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 static void processor_cleanup (void *data)
 {
     rivet_thread_private*   private = (rivet_thread_private *) data;
-    //rivet_server_conf*      rsc;
+    //rivet_server_conf*    rsc;
 
     //Tcl_UnregisterChannel(private->interp,*private->channel);
     //rsc  = RIVET_SERVER_CONF( module_globals->server->module_config );
@@ -51,110 +51,115 @@ static void processor_cleanup (void *data)
     apr_pool_destroy(private->pool);
 }
 
-/*
- * I think we are correctly allocating from a thread private pool as
- * configuration record must be freed upon thread exit
- *
- */
-
-static void Rivet_InitVirtualHosts (server_rec *server, apr_pool_t *p)
+static vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
 {
-    rivet_server_conf*  rsc = RIVET_SERVER_CONF(server->module_config);
+    extern int ap_max_requests_per_child;
+    vhost_interp*       interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
+    rivet_server_conf*  rsc;
+
+    rsc = RIVET_SERVER_CONF( module_globals->server->module_config );
+
+    /* This calls needs the root server_rec just for logging purposes*/
+
+    interp_obj->interp = Rivet_CreateTclInterp(module_globals->server);
+
+    /* we now read from the pointers to the cache_size and cache_free conf parameters
+       for compatibility with mod_rivet current version, but these values must become
+       integers not pointers */
+
+    if(*(rsc->cache_size) < 0) {
+        if (ap_max_requests_per_child != 0) {
+            interp_obj->cache_size = ap_max_requests_per_child / 5;
+        } else {
+            interp_obj->cache_size = 50;    // Arbitrary number
+        }
+    }
+
+    if (interp_obj->cache_size != 0) {
+        interp_obj->cache_free = interp_obj->cache_size;
+    }
+
+    // Initialize cache structures
+
+    if (interp_obj->cache_size) {
+        interp_obj->objCacheList = apr_pcalloc(pool, (signed)(interp_obj->cache_size*sizeof(char *)));
+        interp_obj->objCache = apr_pcalloc(pool, sizeof(Tcl_HashTable));
+        Tcl_InitHashTable(interp_obj->objCache, TCL_STRING_KEYS);
+    }
+
+    return interp_obj;
+}
+
+static void Rivet_VirtualHostsInterps (rivet_thread_private* private)
+{
+    server_rec*         s;
+    server_rec*         root_server = module_globals->server;
+    rivet_server_conf*  root_server_conf;
     rivet_server_conf*  myrsc; 
-    server_rec*         sr;
-    server_rec*         s = server;
-    int                 interpCount = 0;
-    Tcl_Interp*         interp = rsc->server_interp;
+    vhost_interp*       root_interp;
     void*               parentfunction;     /* this is topmost initialization script */
     void*               function;
-    char*               errmsg = MODNAME ": Error in Child init script: %s";
 
-    parentfunction = rsc->rivet_child_init_script;
-    for (sr = s; sr; sr = sr->next)
+    root_server_conf = RIVET_SERVER_CONF( root_server->module_config );
+    parentfunction = root_server_conf->rivet_child_init_script;
+    root_interp = Rivet_NewVHostInterp(private->pool);
+
+    for (s = root_server; s != NULL; s = s->next)
     {
-        myrsc = RIVET_SERVER_CONF(sr->module_config);
+        vhost_interp*   rivet_interp;
 
-        /* We only have a different rivet_server_conf if MergeConfig
-         * was called. We really need a separate one for each server,
-         * so we go ahead and create one here, if necessary. */
+        myrsc = RIVET_SERVER_CONF(s->module_config);
+        rivet_interp = root_interp;
 
-        if (sr != s && myrsc == rsc) {
-            myrsc = RIVET_NEW_CONF(p);
-            ap_set_module_config(sr->module_config, &rivet_module, myrsc);
-            Rivet_CopyConfig( rsc, myrsc );
-        }
-
-        // myrsc->outchannel = rsc->outchannel;
-
-        /* This sets up slave interpreters for other virtual hosts. */
-        if (sr == s) 
+        if ((s != root_server) && (root_server_conf->separate_virtual_interps != 0))
         {
-            Rivet_PerInterpInit(myrsc->server_interp, s, p);
+            rivet_interp = Rivet_NewVHostInterp(private->pool);
+            Tcl_RegisterChannel(rivet_interp->interp,*private->channel);
         }
-        else/* not the first one  */ 
-        {
-            if (rsc->separate_virtual_interps != 0) 
-            {
-                char *slavename = (char*) apr_psprintf (p, "%s_%d_%d", 
-                        sr->server_hostname, 
-                        sr->port,
-                        interpCount++);
-
-                ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-                            MODNAME ": Rivet_InitVirtualHosts: creating slave interpreter '%s', "\
-                            "hostname '%s', port '%d', separate interpreters %d",
-                            slavename, sr->server_hostname, sr->port, 
-                            rsc->separate_virtual_interps);
-
-                /* Separate virtual interps. */
-                myrsc->server_interp = Tcl_CreateSlave(interp, slavename, 0);
-                if (myrsc->server_interp == NULL) {
-                    ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                                 MODNAME ": slave interp create failed: %s",
-                                 Tcl_GetStringResult(interp) );
-                    exit(1);
-                }
-                Rivet_PerInterpInit(myrsc->server_interp, s, p);
-            } else {
-                myrsc->server_interp = rsc->server_interp;
-            }
-
-            /* Since these things are global, we copy them into the
-             * rivet_server_conf struct.
-             */
-            myrsc->cache_size = rsc->cache_size;
-            myrsc->cache_free = rsc->cache_free;
-            myrsc->objCache = rsc->objCache;
-            myrsc->objCacheList = rsc->objCacheList;
-        }
-        myrsc->server_name = (char*)apr_pstrdup(p, sr->server_hostname);
-
-        /* we now perform the inizialization task that used to be in Rivet_ChildHandler */
         
-        function = rsc->rivet_child_init_script;
-        if  (function && ( sr == s || rsc->separate_virtual_interps || function != parentfunction ))
+        private->interps[myrsc->idx] = rivet_interp;
+        Rivet_PerInterpInit(rivet_interp->interp, root_server, private->pool);
+
+        /*  Check if it's absolutely necessary to lock the pool_mutex in order
+            to allocate from the module global pool 
+
+            this stuff must be allocated from the module global pool which
+            ha the same child process lifespan
+         */
+
+        apr_thread_mutex_lock(module_globals->pool_mutex);
+        myrsc->server_name = (char*)apr_pstrdup(module_globals->pool, s->server_hostname);
+        apr_thread_mutex_unlock(module_globals->pool_mutex);
+
+        function = myrsc->rivet_child_init_script;
+        if (function && 
+            (s == root_server || root_server_conf->separate_virtual_interps || function != parentfunction))
         {
-            rivet_interp_globals* globals = Tcl_GetAssocData( rsc->server_interp, "rivet", NULL );
-            Tcl_Preserve (rsc->server_interp);
+            char*       errmsg = MODNAME ": Error in Child init script: %s";
+            Tcl_Interp* interp = rivet_interp->interp;
+
+            rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
+            Tcl_Preserve (interp);
 
             /* There a lot of passing around pointers to record object
              * and we keep it just for compatibility with existing components
              */
 
-            globals->srec = sr;
-            if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+            globals->srec = s;
+            if (Tcl_EvalObjEx(interp,function, 0) != TCL_OK) {
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              errmsg, Tcl_GetString(function));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
                              "errorCode: %s",
-                        Tcl_GetVar(rsc->server_interp, "errorCode", 0));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                                Tcl_GetVar(interp, "errorCode", 0));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
                              "errorInfo: %s",
-                        Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
+                        Tcl_GetVar(interp, "errorInfo", 0));
             }
-            Tcl_Release (rsc->server_interp);
+            Tcl_Release (interp);
         }
     }
+
 }
 
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
@@ -164,6 +169,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     //apr_threadkey_t*       thread_key = (apr_threadkey_t *) data;  
     rivet_server_conf       *rsc;
     server_rec*             server;
+    int                     i;
 
     apr_thread_mutex_lock(module_globals->job_mutex);
     server = module_globals->server;
@@ -187,7 +193,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             private->keep_going = 2;
             private->r          = NULL;
             private->req        = NULL;
-            private->interp     = NULL;
 
             if (apr_pool_create(&private->pool, NULL) != APR_SUCCESS) 
             {
@@ -197,6 +202,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
                 return NULL;
                 exit(1);
             }
+
+            /* We allocate the array for the interpreters database.
+             * Data referenced in this database must be freed by the thread before exit
+             */
+
+            private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
             apr_threadkey_private_set (private,rivet_thread_key);
 
         }
@@ -209,14 +220,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
      * private data.
      */
 
-    private->interp = Rivet_CreateTclInterp(module_globals->server);
+    // private->interp = Rivet_CreateTclInterp(module_globals->server);
 
     /* We will allocate structures (Tcl_HashTable) from this cache but they cannot
      * survive a thread termination, thus we need to implement a method for releasing
      * them in processor_cleanup
      */
 
-    Rivet_CreateCache(server,private->pool);
+    // Rivet_CreateCache(server,private->pool);
 
     outchannel  = private->channel;
     *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
@@ -240,13 +251,16 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
          * configuration and to the rivet global script
          */
 
+    Rivet_VirtualHostsInterps (private);
+
     if (rsc->rivet_global_init_script != NULL) {
-        if (Tcl_EvalObjEx(private->interp, rsc->rivet_global_init_script, 0) != TCL_OK)
+        Tcl_Interp* interp = private->interps[0]->interp; 
+        if (Tcl_EvalObjEx(interp, rsc->rivet_global_init_script, 0) != TCL_OK)
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error running GlobalInitScript '%s': %s",
                          Tcl_GetString(rsc->rivet_global_init_script),
-                         Tcl_GetVar(private->interp, "errorInfo", 0));
+                         Tcl_GetVar(interp, "errorInfo", 0));
         } else {
             ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, server, 
                          MODNAME ": GlobalInitScript '%s' successful",
@@ -254,9 +268,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         }
     }
 
-    rsc->server_interp = private->interp;
+    // rsc->server_interp = private->interp;
 
-    Rivet_InitVirtualHosts (server, private->pool);
     apr_thread_mutex_unlock(module_globals->job_mutex);       /* unlock job initialization stage */
 
         /* eventually we increment the number of active threads */
@@ -269,6 +282,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         void*               v;
         apr_queue_t*        q = module_globals->queue;
         handler_private*    request_obj;
+        rivet_server_conf*  server_conf;
 
         do {
 
@@ -298,7 +312,11 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             continue;
         }
 
-        TclWeb_InitRequest(request_obj->req, private->interp, request_obj->r);
+        /* we proceed with the request processing */
+
+        server_conf = RIVET_SERVER_CONF(request_obj->r->server->module_config);
+
+        TclWeb_InitRequest(request_obj->req, private->interps[server_conf->idx]->interp, request_obj->r);
         
         /* these assignements are crucial for both calling Rivet_SendContent and
          * for telling the channel where stuff must be sent to */
@@ -320,6 +338,19 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     } while (private->keep_going-- > 0);
             
     ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals->server, "processor thread orlderly exit");
+
+    /* thread private stuff clean up*/
+
+    for (i = 0; i < module_globals->vhosts_count; i++)
+    {
+        Tcl_UnregisterChannel(private->interps[i]->interp,*private->channel);
+        Tcl_DeleteHashTable(private->interps[i]->objCache);
+        Tcl_DeleteInterp(private->interps[i]->interp);
+
+        /* must free the cache here */
+        
+    }
+
 
     apr_thread_mutex_lock(module_globals->job_mutex);
     *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
@@ -466,7 +497,10 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
-    apr_status_t rv;
+    apr_status_t        rv;
+    int                 idx;
+    server_rec*         s;
+    rivet_server_conf*  root_server_conf;
 
     apr_thread_mutex_create(&module_globals->job_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
     apr_thread_cond_create(&module_globals->job_cond, pool);
@@ -491,6 +525,34 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         exit(1);
     }
     apr_thread_mutex_unlock(module_globals->pool_mutex);
+
+    /* Once we have established a pool with the same lifetime of the child process we
+     * process all the server records in configuration assigning an integer as unique key 
+     * to each of them 
+     */
+
+    idx = 0;
+    root_server_conf = RIVET_SERVER_CONF( server->module_config );
+    for (s = server; s != NULL; s = s->next)
+    {
+        rivet_server_conf*  myrsc;
+
+        myrsc = RIVET_SERVER_CONF( s->module_config );
+
+        /* We only have a different rivet_server_conf if MergeConfig
+         * was called. We really need a separate one for each server,
+         * so we go ahead and create one here, if necessary. */
+
+        if (s != server && myrsc == root_server_conf) {
+            myrsc = RIVET_NEW_CONF(pool);
+            ap_set_module_config(s->module_config, &rivet_module, myrsc);
+            Rivet_CopyConfig( root_server_conf, myrsc );
+        }
+
+        myrsc->idx = idx++;
+    }
+
+    module_globals->vhosts_count = idx;
 
     if (apr_queue_create(&module_globals->queue, MOD_RIVET_QUEUE_SIZE, module_globals->pool) != APR_SUCCESS)
     {
