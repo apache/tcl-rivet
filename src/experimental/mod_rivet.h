@@ -161,13 +161,18 @@ typedef struct _mod_rivet_globals {
     server_rec*         rivet_panic_server_rec;
 } mod_rivet_globals;
 
+/* thread private interpreter error flags */
+
+#define RIVET_CACHE_FULL    1
 
 typedef struct _vhost_interp {
     Tcl_Interp*         interp;
     int                 cache_size;
     int                 cache_free;
-    char**              objCacheList;		/* Array of cached objects (for priority handling)  */
     Tcl_HashTable*      objCache;		    /* Objects cache - the key is the script name       */
+    char**              objCacheList;		/* Array of cached objects (for priority handling)  */
+    apr_pool_t*         pool;               /* interpreters cache private memory pool           */
+    unsigned int        flags;
 } vhost_interp;
 
 

@@ -140,9 +140,9 @@ Rivet_SendContent(rivet_thread_private *private)
     r->allowed |= (1 << M_POST);
     r->allowed |= (1 << M_PUT);
     r->allowed |= (1 << M_DELETE);
-    if (r->method_number != M_GET && 
-        r->method_number != M_POST && 
-        r->method_number != M_PUT && 
+    if (r->method_number != M_GET   && 
+        r->method_number != M_POST  && 
+        r->method_number != M_PUT   && 
         r->method_number != M_DELETE) {
 
         retval = DECLINED;
@@ -194,6 +194,7 @@ Rivet_SendContent(rivet_thread_private *private)
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
                             MODNAME ": Could not create request namespace (%s)\n" ,
                             Tcl_GetStringResult(interp));
+
         retval = HTTP_INTERNAL_SERVER_ERROR;
         goto sendcleanup;
     }
@@ -587,10 +588,14 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         if (rivet_interp->cache_free) {
 
             rivet_interp->objCacheList[--rivet_interp->cache_free] = 
-                (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
+                (char*) apr_pcalloc (rivet_interp->pool,(strlen(hashKey)+1)*sizeof(char));
             strcpy(rivet_interp->objCacheList[rivet_interp->cache_free], hashKey);
 
         } else if (rivet_interp->cache_size) { /* If it's zero, we just skip this. */
+
+/*
+        instead of removing the last entry in the cache (for what purpose after all??)
+        we signal the cache full condition
 
             Tcl_HashEntry *delEntry;
             delEntry = Tcl_FindHashEntry(
@@ -604,7 +609,14 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 
             rivet_interp->objCacheList[0] = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
             strcpy (rivet_interp->objCacheList[0], hashKey);
+*/
             
+            if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
+            {
+                ap_log_error(APLOG_MARK, APLOG_NOTICE, APR_EGENERAL, private->r->server, 
+                             MODNAME ": Cache full");
+                rivet_interp->flags |= RIVET_CACHE_FULL;
+            }
         }
     } else {
         /* We found a compiled version of this page. */
@@ -911,21 +923,20 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         module_globals->threads_count = (apr_uint32_t *) apr_palloc(pPool,sizeof(apr_uint32_t));
         apr_atomic_set32(module_globals->threads_count,0);
 
-        module_globals->server_shutdown = 0;
-
-        apr_threadkey_private_create (&rivet_thread_key,NULL, pPool);
-
         module_globals->rivet_panic_pool        = pPool;
         module_globals->rivet_panic_server_rec  = s;
-        //module_globals->server                  = s;
         module_globals->rivet_panic_request_rec = NULL;
         module_globals->vhosts_count            = 0;
+        module_globals->server_shutdown         = 0;
+        module_globals->exiting                 = NULL;
+        //module_globals->server                = s;
+
         (*module_globals->mpm_server_init)(pPool,pLog,pTemp,s);
     }
     else
     {
 
-        /* If we don't find the mpm handler module we give up */
+        /* If we don't find the mpm handler module we give up and exit */
 
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                      MODNAME " Error loading MPM manager: %s", 
@@ -936,10 +947,63 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     return OK;
 }
 
-static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *s)
+static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 {
-    (*module_globals->mpm_child_init)(pChild,s);
-    apr_pool_cleanup_register (pChild, s, module_globals->mpm_finalize, module_globals->mpm_finalize);
+    int                 idx;
+    rivet_server_conf*  root_server_conf;
+    server_rec*         s;
+
+    apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
+
+    /* Creating the module global pool */
+
+    apr_thread_mutex_lock(module_globals->pool_mutex);
+    if (apr_pool_create(&module_globals->pool, NULL) != APR_SUCCESS) 
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                     MODNAME ": could not initialize mod_rivet private pool");
+        exit(1);
+    }
+    apr_thread_mutex_unlock(module_globals->pool_mutex);
+
+    /* Once we have established a pool with the same lifetime of the child process we
+     * process all the configured server records assigning an integer as unique key 
+     * to each of them 
+     */
+
+    root_server_conf = RIVET_SERVER_CONF( server->module_config );
+    idx = 0;
+    for (s = server; s != NULL; s = s->next)
+    {
+        rivet_server_conf*  myrsc;
+
+        myrsc = RIVET_SERVER_CONF( s->module_config );
+
+        /* We only have a different rivet_server_conf if MergeConfig
+         * was called. We really need a separate one for each server,
+         * so we go ahead and create one here, if necessary. */
+
+        if (s != server && myrsc == root_server_conf) {
+            myrsc = RIVET_NEW_CONF(pChild);
+            ap_set_module_config(s->module_config, &rivet_module, myrsc);
+            Rivet_CopyConfig( root_server_conf, myrsc );
+        }
+
+        myrsc->idx = idx++;
+    }
+    module_globals->vhosts_count = idx;
+
+    /* Another crucial point: we are storing here in the globals a reference to the
+     * root server_rec object from which threads are supposed to derive 
+     * all the other chain of virtual hosts server records
+     */
+
+    module_globals->server = server;
+
+    /* Calling the brigde child process initialization */
+
+    (*module_globals->mpm_child_init)(pChild,server);
+    apr_pool_cleanup_register (pChild, server, module_globals->mpm_finalize, module_globals->mpm_finalize);
 }
 
 static int Rivet_Handler (request_rec *r)    

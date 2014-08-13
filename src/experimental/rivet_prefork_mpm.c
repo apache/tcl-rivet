@@ -315,17 +315,8 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
 
-    apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
-    //apr_threadkey_private_create (&rivet_thread_key,NULL, pool);
-
-    apr_thread_mutex_lock(module_globals->pool_mutex);
-    if (apr_pool_create(&module_globals->pool, pool) != APR_SUCCESS) 
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                     MODNAME ": could not initialize mod_rivet private pool");
-        exit(1);
-    }
-    apr_thread_mutex_unlock(module_globals->pool_mutex);
+    // TODO TODO TODO TODO
+    // apr_threadkey_private_create (&rivet_thread_key, processor_cleanup, pool);
 
     if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
     {

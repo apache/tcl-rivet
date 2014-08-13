@@ -19,8 +19,9 @@
     under the License.
  */
 
-/* Id: */
+/* $Id: */
 
+#include <tcl.h>
 #include <apr_strings.h>
 
 #include "mod_rivet.h"
@@ -38,15 +39,29 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 static void processor_cleanup (void *data)
 {
     rivet_thread_private*   private = (rivet_thread_private *) data;
-    //rivet_server_conf*    rsc;
+    Tcl_HashSearch*         searchCtx; 
+    Tcl_HashEntry*          entry;
+    int                     i;
 
-    //Tcl_UnregisterChannel(private->interp,*private->channel);
-    //rsc  = RIVET_SERVER_CONF( module_globals->server->module_config );
-    //Tcl_DeleteHashTable(rsc->objCache);
-    //Tcl_DeleteInterp(private->interp);
-    
     ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals->server, 
             "Thread exiting after %d requests served", private->req_cnt);
+
+    
+    for (i = 0; i < module_globals->vhosts_count; i++)
+    {
+        searchCtx = apr_pcalloc(private->pool,sizeof(Tcl_HashSearch));
+        entry = Tcl_FirstHashEntry(private->interps[i]->objCache,searchCtx);    
+        while (entry)
+        {
+            Tcl_DecrRefCount(Tcl_GetHashValue(entry));
+            Tcl_DeleteHashEntry(entry);
+
+            entry = Tcl_NextHashEntry(searchCtx);
+        }
+        
+        Tcl_UnregisterChannel(private->interps[i]->interp,*private->channel);
+        Tcl_DeleteInterp(private->interps[i]->interp);
+    }
 
     apr_pool_destroy(private->pool);
 }
@@ -75,22 +90,33 @@ static vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
         }
     }
 
-    if (interp_obj->cache_size != 0) {
+    if (interp_obj->cache_size > 0) {
         interp_obj->cache_free = interp_obj->cache_size;
+    }
+
+    // we now create memory from the cache pool as subpool of the thread private pool
+ 
+    if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": could not initialize thread private pool");
+        return NULL;
     }
 
     // Initialize cache structures
 
     if (interp_obj->cache_size) {
-        interp_obj->objCacheList = apr_pcalloc(pool, (signed)(interp_obj->cache_size*sizeof(char *)));
-        interp_obj->objCache = apr_pcalloc(pool, sizeof(Tcl_HashTable));
+        interp_obj->objCacheList = apr_pcalloc(interp_obj->pool, (signed)(interp_obj->cache_size*sizeof(char *)));
+        interp_obj->objCache = apr_pcalloc(interp_obj->pool, sizeof(Tcl_HashTable));
         Tcl_InitHashTable(interp_obj->objCache, TCL_STRING_KEYS);
     }
+
+    interp_obj->flags = 0;
 
     return interp_obj;
 }
 
-static void Rivet_VirtualHostsInterps (rivet_thread_private* private)
+static rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 {
     server_rec*         s;
     server_rec*         root_server = module_globals->server;
@@ -103,6 +129,10 @@ static void Rivet_VirtualHostsInterps (rivet_thread_private* private)
     root_server_conf = RIVET_SERVER_CONF( root_server->module_config );
     parentfunction = root_server_conf->rivet_child_init_script;
     root_interp = Rivet_NewVHostInterp(private->pool);
+    if (root_interp == NULL)
+    {
+        return NULL;
+    }
 
     for (s = root_server; s != NULL; s = s->next)
     {
@@ -159,7 +189,7 @@ static void Rivet_VirtualHostsInterps (rivet_thread_private* private)
             Tcl_Release (interp);
         }
     }
-
+    return private;
 }
 
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
@@ -169,7 +199,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     //apr_threadkey_t*       thread_key = (apr_threadkey_t *) data;  
     rivet_server_conf       *rsc;
     server_rec*             server;
-    int                     i;
 
     apr_thread_mutex_lock(module_globals->job_mutex);
     server = module_globals->server;
@@ -186,7 +215,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         {
             apr_thread_mutex_lock(module_globals->pool_mutex);
             private             = apr_palloc (module_globals->pool,sizeof(*private));
-            private->channel    = apr_pcalloc (module_globals->pool,sizeof(Tcl_Channel));
             apr_thread_mutex_unlock(module_globals->pool_mutex);
 
             private->req_cnt    = 0;
@@ -207,6 +235,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
              * Data referenced in this database must be freed by the thread before exit
              */
 
+            private->channel    = apr_pcalloc (private->pool,sizeof(Tcl_Channel));
             private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
             apr_threadkey_private_set (private,rivet_thread_key);
 
@@ -251,7 +280,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
          * configuration and to the rivet global script
          */
 
-    Rivet_VirtualHostsInterps (private);
+    if (Rivet_VirtualHostsInterps (private) == NULL)
+    {
+        apr_thread_mutex_lock(module_globals->job_mutex);
+        *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
+        apr_thread_cond_signal(module_globals->job_cond);
+        apr_thread_mutex_unlock(module_globals->job_mutex);
+        apr_thread_exit(thd,APR_SUCCESS);
+        return NULL;
+    }
 
     if (rsc->rivet_global_init_script != NULL) {
         Tcl_Interp* interp = private->interps[0]->interp; 
@@ -339,18 +376,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             
     ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals->server, "processor thread orlderly exit");
 
-    /* thread private stuff clean up*/
-
-    for (i = 0; i < module_globals->vhosts_count; i++)
-    {
-        Tcl_UnregisterChannel(private->interps[i]->interp,*private->channel);
-        Tcl_DeleteHashTable(private->interps[i]->objCache);
-        Tcl_DeleteInterp(private->interps[i]->interp);
-
-        /* must free the cache here */
-        
-    }
-
 
     apr_thread_mutex_lock(module_globals->job_mutex);
     *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
@@ -360,6 +385,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     /* the counter of active threads has to be decremented */
 
     apr_atomic_dec32(module_globals->threads_count);
+
+    /* this call triggers thread private stuff clean up by calling processor_cleanup */
 
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
@@ -498,61 +525,14 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t        rv;
-    int                 idx;
-    server_rec*         s;
-    rivet_server_conf*  root_server_conf;
 
+    apr_threadkey_private_create (&rivet_thread_key, processor_cleanup, pool);
     apr_thread_mutex_create(&module_globals->job_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
     apr_thread_cond_create(&module_globals->job_cond, pool);
-    apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
-    apr_threadkey_private_create (&rivet_thread_key, processor_cleanup, pool);
+
     apr_threadkey_private_create (&handler_thread_key, NULL, pool);
 
     module_globals->exiting = apr_array_make(pool,100,sizeof(apr_thread_t*));
-
-    /* Another crucial point: we are storing here in the globals a reference to the
-     * root server_rec object from which threads are supposed to derive 
-     * all the other chain of virtual hosts server records
-     */
-
-    module_globals->server = server;
-
-    apr_thread_mutex_lock(module_globals->pool_mutex);
-    if (apr_pool_create(&module_globals->pool, NULL) != APR_SUCCESS) 
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                     MODNAME ": could not initialize mod_rivet private pool");
-        exit(1);
-    }
-    apr_thread_mutex_unlock(module_globals->pool_mutex);
-
-    /* Once we have established a pool with the same lifetime of the child process we
-     * process all the server records in configuration assigning an integer as unique key 
-     * to each of them 
-     */
-
-    idx = 0;
-    root_server_conf = RIVET_SERVER_CONF( server->module_config );
-    for (s = server; s != NULL; s = s->next)
-    {
-        rivet_server_conf*  myrsc;
-
-        myrsc = RIVET_SERVER_CONF( s->module_config );
-
-        /* We only have a different rivet_server_conf if MergeConfig
-         * was called. We really need a separate one for each server,
-         * so we go ahead and create one here, if necessary. */
-
-        if (s != server && myrsc == root_server_conf) {
-            myrsc = RIVET_NEW_CONF(pool);
-            ap_set_module_config(s->module_config, &rivet_module, myrsc);
-            Rivet_CopyConfig( root_server_conf, myrsc );
-        }
-
-        myrsc->idx = idx++;
-    }
-
-    module_globals->vhosts_count = idx;
 
     if (apr_queue_create(&module_globals->queue, MOD_RIVET_QUEUE_SIZE, module_globals->pool) != APR_SUCCESS)
     {
