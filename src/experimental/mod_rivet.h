@@ -82,7 +82,7 @@ module AP_MODULE_DECLARE_DATA rivet_module;
 
 typedef struct _rivet_server_conf {
     /* we must keep this for compatibility with the module in apache-2 and stuff in common */
-    Tcl_Interp *server_interp;          /* per server Tcl interpreter 	   */
+    //Tcl_Interp *server_interp;          /* per server Tcl interpreter 	   */
 
     Tcl_Obj *rivet_server_init_script;  /* run before children are forked  */
     Tcl_Obj *rivet_global_init_script;	/* run once when apache is started */
@@ -99,8 +99,9 @@ typedef struct _rivet_server_conf {
     int user_scripts_updated;
 
     Tcl_Obj*        rivet_default_error_script;    /* for errors */
-    int*            cache_size;
-    int*            cache_free;
+    int             default_cache_size;
+    //int*            cache_size;
+    //int*            cache_free;
     int             upload_max;
     int             upload_files_to_var;
     int             separate_virtual_interps;
@@ -110,17 +111,17 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_server_vars;
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
-    char**          objCacheList;		/* Array of cached objects (for priority handling)  */
-    Tcl_HashTable*  objCache;		    /* Objects cache - the key is the script name       */
+    //char**          objCacheList;		/* Array of cached objects (for priority handling)  */
+    //Tcl_HashTable*  objCache;		    /* Objects cache - the key is the script name       */
     /* this one must go, we keep just to avoid to duplicate the config handling function just
        to avoid to poke stuff into this field */
-    Tcl_Channel*    outchannel;		    /* stuff for buffering output                       */
+    //Tcl_Channel*    outchannel;		    /* stuff for buffering output                       */
 
     int             idx;                /* server record index (to be used for the interps db */
 
 } rivet_server_conf;
 
-#define TCL_INTERPS 1
+#define TCL_INTERPS 4
 typedef int rivet_thr_status;
 enum
 {
@@ -130,6 +131,21 @@ enum
     done
 };
 
+/* thread private interpreter error flags */
+
+#define RIVET_CACHE_FULL            1
+#define RIVET_INTERP_INITIALIZED    2
+
+typedef struct _vhost_interp {
+    Tcl_Interp*         interp;
+    int                 cache_size;
+    int                 cache_free;
+    Tcl_HashTable*      objCache;		    /* Objects cache - the key is the script name       */
+    char**              objCacheList;		/* Array of cached objects (for priority handling)  */
+    apr_pool_t*         pool;               /* interpreters cache private memory pool           */
+    unsigned int        flags;
+} vhost_interp;
+
 /* we need also a place where to store module wide globals */
 
 typedef struct _mod_rivet_globals {
@@ -137,6 +153,7 @@ typedef struct _mod_rivet_globals {
     apr_thread_t*       supervisor;
     int                 server_shutdown;
     int                 vhosts_count;
+    vhost_interp*       server_interp;      /* server init and prefork MPM master interpreter */
 
     apr_thread_cond_t*  job_cond;
     apr_thread_mutex_t* job_mutex;
@@ -149,31 +166,18 @@ typedef struct _mod_rivet_globals {
     apr_thread_t*       workers[TCL_INTERPS]; /* thread pool ids          */
 
     server_rec*         server;             /* default host server_rec obj */
-    Tcl_Channel*        outchannel;         /* this is the Rivet channel for prefork MPM */
+    //Tcl_Channel*      outchannel;         /* this is the Rivet channel for prefork MPM */
 
     int                 (*mpm_child_init)(apr_pool_t* pPool,server_rec* s);
     int                 (*mpm_request)(request_rec*);
     int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
     apr_status_t        (*mpm_finalize)(void*);
+    vhost_interp*       (*mpm_master_interp)(apr_pool_t *);
 
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
 } mod_rivet_globals;
-
-/* thread private interpreter error flags */
-
-#define RIVET_CACHE_FULL    1
-
-typedef struct _vhost_interp {
-    Tcl_Interp*         interp;
-    int                 cache_size;
-    int                 cache_free;
-    Tcl_HashTable*      objCache;		    /* Objects cache - the key is the script name       */
-    char**              objCacheList;		/* Array of cached objects (for priority handling)  */
-    apr_pool_t*         pool;               /* interpreters cache private memory pool           */
-    unsigned int        flags;
-} vhost_interp;
 
 
 typedef struct _thread_worker_private {

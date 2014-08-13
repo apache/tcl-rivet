@@ -10,13 +10,13 @@ apxs_libexec_LTLIBRARIES = mod_rivet.la
 mod_rivet_la_SOURCES =  mod_rivet.c                                         \
                         ../@apache_request@/apache_multipart_buffer.c 	    \
                         ../@apache_request@/apache_request.c                \
-                        ../@rivet_commands@/rivetCore.c                    \
-                        ../@rivet_commands@/rivetInspect.c                 \
+                        ../@rivet_commands@/rivetCore.c                     \
+                        ../@rivet_commands@/rivetInspect.c                  \
                         ../@rivet_channel@/rivetChannel.c                   \
-                        ../common/TclWebapache.c                            \
-                        ../common/apache_config.c                           \
-                        ../common/mod_rivet_common.c                        \
-                        ../parser/rivetParser.c
+                        ../parser/rivetParser.c                             \
+                        TclWebapache.c                                      \
+                        apache_config.c                                     \
+                        mod_rivet_common.c
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 

@@ -1,3 +1,14 @@
+2014-08-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/rivet_[prefork|worker]_mpm.c: bridges integrated. Removed substantial code
+    from rivet_prefork_mpm.c and merged with the current approach handling hosts interpreters using
+    vhost_interp objects and storing everything in a child process/thread private data
+    * src/experimental/apache_config.[c|h]: eventually these files had to be copied here from common
+    and modified to reflect the new model for handling server records
+    * src/experimental/mod_rivet_common.c: same for this file
+    * src/experimental/mod_rivet.c: further generalization of the code to provide consistent
+    support for the bridges. Adding a new hook for mpm_master_interp, a function implemented by
+    a bridge responsible for returning the child process/thread master interpreter.
+
 2014-08-11 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/rivet_worker_mpm.c: redesigning virtual hosts resource management for threads
     * src/experimental/mod_rivet[c|h]: implementing thread private interpreters management
