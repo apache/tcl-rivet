@@ -21,6 +21,7 @@
 
 /* $Id: */
 
+#include <httpd.h>
 #include <math.h>
 #include <tcl.h>
 #include <ap_mpm.h>
@@ -193,9 +194,9 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         private->r   = request_obj->r;
         private->req = request_obj->req;
 
-        //request_obj->code = RivetContent (private);
-
+        //apr_thread_mutex_lock(module_globals->req_mutex);
         request_obj->code = Rivet_SendContent(private);
+        //apr_thread_mutex_unlock(module_globals->req_mutex);
 
         apr_thread_mutex_lock(request_obj->mutex);
         request_obj->status = done;
@@ -486,23 +487,22 @@ int Rivet_MPM_Request (request_rec* r)
     request_private->status = init;
     apr_threadkey_private_set (request_private,handler_thread_key);
 
-    do
+    rv = apr_queue_push(module_globals->queue,request_private);
+    if (rv == APR_SUCCESS)
     {
-
-        rv = apr_queue_push(module_globals->queue,request_private);
-        if (rv != APR_SUCCESS)
+        apr_thread_mutex_lock(request_private->mutex);
+        while (request_private->status != done)
         {
-            apr_sleep(100000);
+            apr_thread_cond_wait(request_private->cond,request_private->mutex);
         }
+        apr_thread_mutex_unlock(request_private->mutex);
 
-    } while (rv != APR_SUCCESS);
-
-    apr_thread_mutex_lock(request_private->mutex);
-    while (request_private->status != done)
-    {
-        apr_thread_cond_wait(request_private->cond,request_private->mutex);
     }
-    apr_thread_mutex_unlock(request_private->mutex);
+    else
+    {
+        request_private->code = HTTP_INTERNAL_SERVER_ERROR;
+        // apr_sleep(100000);
+    }
 
     return request_private->code;
 }

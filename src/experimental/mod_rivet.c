@@ -71,6 +71,8 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 
 #define ERRORBUF_SZ     256
 
+TCL_DECLARE_MUTEX(sendMutex);
+
 vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
 {
     extern int ap_max_requests_per_child;
@@ -423,6 +425,8 @@ Rivet_SendContent(rivet_thread_private *private)
         Tcl_IncrRefCount(request_init);
     }
 
+
+    apr_thread_mutex_lock(module_globals->req_mutex);
     if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
@@ -430,8 +434,10 @@ Rivet_SendContent(rivet_thread_private *private)
                             Tcl_GetStringResult(interp));
 
         retval = HTTP_INTERNAL_SERVER_ERROR;
+        apr_thread_mutex_unlock(module_globals->req_mutex);
         goto sendcleanup;
     }
+    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     /* Apache Request stuff */
 
@@ -491,6 +497,7 @@ Rivet_SendContent(rivet_thread_private *private)
         }
     }
 
+    apr_thread_mutex_lock(module_globals->req_mutex);
     if (Rivet_ParseExecFile(private, r->filename, 1) != TCL_OK)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
@@ -509,6 +516,7 @@ Rivet_SendContent(rivet_thread_private *private)
                      MODNAME ": Error evaluating cleanup request: %s",
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
+    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     /* Reset globals */
     Rivet_CleanupRequest( r );
@@ -1237,6 +1245,8 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     int                 idx;
     rivet_server_conf*  root_server_conf;
     server_rec*         s;
+
+    apr_thread_mutex_create(&module_globals->req_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
 
 /* This code is run once per child process. In a threaded Tcl builds the forking 
  * of a child process most likely has not preserved the thread where the Tcl 

@@ -158,7 +158,7 @@ typedef struct _mod_rivet_globals {
     apr_thread_t*       supervisor;
     int                 server_shutdown;
     int                 vhosts_count;
-    vhost_interp*       server_interp;      /* server init and prefork MPM master interpreter */
+    vhost_interp*       server_interp;          /* server and prefork MPM interpreter */
 
     apr_thread_cond_t*  job_cond;
     apr_thread_mutex_t* job_mutex;
@@ -192,6 +192,7 @@ typedef struct _mod_rivet_globals {
     double              average_working_threads; 
     */
 
+    apr_thread_mutex_t* req_mutex;
 } mod_rivet_globals;
 
 #define BRIDGE_SUPERVISOR_WAIT  1000000
