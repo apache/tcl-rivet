@@ -147,6 +147,12 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     
     root_interp = (*module_globals->mpm_master_interp)(private->pool);
 
+    /* we must assume the module was able to create the root interprter */ 
+
+    ap_assert (root_interp != NULL);
+
+    /* Using the root interpreter we evaluate the global initialization script, if any */
+
     if (root_server_conf->rivet_global_init_script != NULL) {
         if (Tcl_EvalObjEx(root_interp->interp, root_server_conf->rivet_global_init_script, 0) != TCL_OK)
         {
@@ -161,17 +167,24 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         }
     }
 
+    /* then we proceed assigning/creating the interpreters for the
+     * virtual hosts known to the server
+     */
+
     parentfunction = root_server_conf->rivet_child_init_script;
-    if (root_interp == NULL)
-    {
-        return NULL;
-    }
 
     for (s = root_server; s != NULL; s = s->next)
     {
         vhost_interp*   rivet_interp;
 
         myrsc = RIVET_SERVER_CONF(s->module_config);
+
+        /* by default we assign the root_interpreter as
+         * interpreter of the virtual host. In case of separate
+         * virtual interpreters we create new ones for each
+         * virtual host 
+         */
+
         rivet_interp = root_interp;
 
         if (s == root_server)
@@ -197,16 +210,18 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             rivet_interp->flags |= RIVET_INTERP_INITIALIZED;
         }
 
-        /*  Check if it's absolutely necessary to lock the pool_mutex in order
-            to allocate from the module global pool 
+        /*  TODO: check if it's absolutely necessary to lock the pool_mutex in order
+            to allocate from the module global pool */
 
-            this stuff must be allocated from the module global pool which
-            ha the same child process lifespan
+        /*  this stuff must be allocated from the module global pool which
+         *  has the child process lifespan
          */
 
         apr_thread_mutex_lock(module_globals->pool_mutex);
         myrsc->server_name = (char*)apr_pstrdup(module_globals->pool, s->server_hostname);
         apr_thread_mutex_unlock(module_globals->pool_mutex);
+
+        /* if configured child init script gets evaluated */
 
         function = myrsc->rivet_child_init_script;
         if (function && 
@@ -218,8 +233,11 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
             Tcl_Preserve (interp);
 
-            /* There a lot of passing around pointers to record object
-             * and we keep it just for compatibility with existing components
+            /* There is a lot of passing around of pointers to various record 
+             * objects. We should understand if this is all that necessary.
+             * Here we assign the server_rec pointer to the interpreter which
+             * is wrong, because without separate interpreters it doens't make
+             * any sense. TODO
              */
 
             globals->srec = s;
@@ -272,6 +290,10 @@ void Rivet_ProcessorCleanup (void *data)
 
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
                  "Thread exiting after %d requests served", private->req_cnt);
+
+    /* there must be always a root interpreter in the slot 0 of private->interps,
+       so there is always need to run at least one cycle here */
+
     i = 0;
     do
     {
