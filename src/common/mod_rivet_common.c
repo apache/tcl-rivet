@@ -77,54 +77,6 @@ void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
 }
 
 /*
- *-----------------------------------------------------------------------------
- * Rivet_CreateCache --
- *
- * Arguments:
- *     rsc: pointer to a server_rec structure
- *
- * Results:
- *     None
- *
- * Side Effects:
- *
- *-----------------------------------------------------------------------------
- */
-
-void Rivet_CreateCache (server_rec *s, apr_pool_t *p)
-{
-    extern int ap_max_requests_per_child;
-    rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
-
-    /* If the user didn't set a cache size in their configuration, we
-     * will assume an arbitrary size for them.
-     *
-     * If the cache size is 0, the user has requested not to cache
-     * documents.
-     */
-
-    if(*(rsc->cache_size) < 0) {
-        if (ap_max_requests_per_child != 0) {
-            *(rsc->cache_size) = ap_max_requests_per_child / 5;
-        } else {
-            *(rsc->cache_size) = 50;    // Arbitrary number
-        }
-    }
-
-    if (*(rsc->cache_size) != 0) {
-        *(rsc->cache_free) = *(rsc->cache_size);
-    }
-
-    // Initialize cache structures
-
-    if (*(rsc->cache_size)) {
-        rsc->objCacheList = apr_pcalloc(p, (signed)(*(rsc->cache_size)*sizeof(char *)));
-        rsc->objCache = apr_pcalloc(p, sizeof(Tcl_HashTable));
-        Tcl_InitHashTable(rsc->objCache, TCL_STRING_KEYS);
-    }
-}
-
-/*
  * -- Rivet_CleanupRequest
  *
  * This function contained some come that cleaned up

@@ -443,6 +443,13 @@ AC_DEFUN([MOD_RIVET_CORE],[
     #fi
     
     rivet_core=${with_rivet_core}
+    default_rivet_commands="rivetcmds"
+    default_rivet_channel="channel"
+    
+    if test "$rivet_core" = "experimental"; then
+        default_rivet_commands="experimental"
+        default_rivet_channel="experimental"    
+    fi
 
     AC_CONFIG_FILES([src/${rivet_core}/Makefile])
     AC_SUBST(rivet_core)
@@ -500,11 +507,13 @@ AC_DEFUN([APACHE_REQUEST],[
 # selecting non default directory for Rivet code commands core
 #
 
+default_rivet_commands="rivetcmdsfake"
+
 AC_DEFUN([RIVET_CORE_CMDS],[
     AC_ARG_WITH(
         rivet_commands,
         [  --with-rivet-commands[=dir] path to Rivet core commands code],,
-        [with_rivet_commands="rivetcmds"]
+        [with_rivet_commands=$default_rivet_commands]
     )
 
     AC_MSG_CHECKING(for Rivet core commands code)
@@ -522,7 +531,7 @@ AC_DEFUN([RIVET_CHANNEL],[
     AC_ARG_WITH(
         rivet_channel,
         [  --with-rivet-channel=DIR Rivet channel code path ],,
-        [with_rivet_channel="channel"]
+        [with_rivet_channel=$default_rivet_channel]
     )
 
     AC_MSG_CHECKING(for Rivet channel code path)

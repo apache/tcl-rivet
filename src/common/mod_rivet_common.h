@@ -1,3 +1,4 @@
+/* mod_rivet_common.h -- Definition for code in mod_rivet_common.h */
 
 /*
     Licensed to the Apache Software Foundation (ASF) under one
@@ -18,6 +19,8 @@
     under the License.
 */
 
+/* $Id: */
+
 #ifndef _MOD_RIVET_COMMON_
 #define _MOD_RIVET_COMMON_
 
@@ -25,7 +28,6 @@ EXTERN int Rivet_chdir_file (const char *file);
 EXTERN int Rivet_CheckType (request_rec* r);
 EXTERN void Rivet_CleanupRequest(request_rec *r);
 EXTERN void Rivet_InitServerVariables(Tcl_Interp *interp, apr_pool_t *pool);
-EXTERN void Rivet_CreateCache (server_rec *s, apr_pool_t *p);
 EXTERN void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1);
 
 #endif

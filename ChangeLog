@@ -1,3 +1,8 @@
+2014-08-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: implemented automatic bridge load mechanism.
+    * src/experimental/rivet_worker_mpm.c: starting maximal number of threads (as per mpm_worker configuration)
+    * configure.ac: automated parameters when build experimental module.
+
 2014-08-12 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/rivet_[prefork|worker]_mpm.c: bridges integrated. Removed substantial code
     from rivet_prefork_mpm.c and merged with the current approach handling hosts interpreters using

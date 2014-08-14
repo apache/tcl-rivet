@@ -1,18 +1,22 @@
 /* mod_rivet.h -- The apache module itself, for Apache 2.4. */
 
-/* Copyright 2000-2005 The Apache Software Foundation
+/*
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   	http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /* $Id: mod_rivet.h 1609472 2014-07-10 15:08:52Z mxmanghi $ */
@@ -72,7 +76,6 @@
 #define DEFAULT_ERROR_MSG "[an error occurred while processing this directive]"
 #define DEFAULT_TIME_FORMAT "%A, %d-%b-%Y %H:%M:%S %Z"
 #define MULTIPART_FORM_DATA 1
-/* #define RIVET_VERSION "X.X.X" */
 
 /* IMPORTANT: If you make any changes to the rivet_server_conf struct,
  * you need to make the appropriate modifications to Rivet_CopyConfig,
@@ -81,18 +84,16 @@
 module AP_MODULE_DECLARE_DATA rivet_module;
 
 typedef struct _rivet_server_conf {
-    /* we must keep this for compatibility with the module in apache-2 and stuff in common */
-    //Tcl_Interp *server_interp;          /* per server Tcl interpreter 	   */
 
     Tcl_Obj *rivet_server_init_script;  /* run before children are forked  */
-    Tcl_Obj *rivet_global_init_script;	/* run once when apache is started */
+    Tcl_Obj *rivet_global_init_script;  /* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
-    Tcl_Obj *rivet_before_script;	    /* script run before each page	*/
-    Tcl_Obj *rivet_after_script;	    /*            after                 */
-    Tcl_Obj *rivet_error_script;	    /*            for errors            */
-    Tcl_Obj *rivet_abort_script;	    /* script run upon abort_page call  */
-    Tcl_Obj *after_every_script;	    /* script to be run always	        */
+    Tcl_Obj *rivet_before_script;       /* script run before each page  */
+    Tcl_Obj *rivet_after_script;        /*            after                 */
+    Tcl_Obj *rivet_error_script;        /*            for errors            */
+    Tcl_Obj *rivet_abort_script;        /* script run upon abort_page call  */
+    Tcl_Obj *after_every_script;        /* script to be run always          */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
@@ -100,8 +101,6 @@ typedef struct _rivet_server_conf {
 
     Tcl_Obj*        rivet_default_error_script;    /* for errors */
     int             default_cache_size;
-    //int*            cache_size;
-    //int*            cache_free;
     int             upload_max;
     int             upload_files_to_var;
     int             separate_virtual_interps;
@@ -111,17 +110,23 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_server_vars;
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
-    //char**          objCacheList;		/* Array of cached objects (for priority handling)  */
-    //Tcl_HashTable*  objCache;		    /* Objects cache - the key is the script name       */
+    int             idx;                        /* server record index (to be used for the interps db) */
+
+    //Tcl_Interp *server_interp;          /* per server Tcl interpreter        */
+    //int*          cache_size;
+    //int*          cache_free;
+    //char**          objCacheList;     /* Array of cached objects (for priority handling)    */
+    //Tcl_HashTable*  objCache;             /* Objects cache - the key is the script name         */
+
     /* this one must go, we keep just to avoid to duplicate the config handling function just
        to avoid to poke stuff into this field */
-    //Tcl_Channel*    outchannel;		    /* stuff for buffering output                       */
+    //Tcl_Channel*    outchannel;           /* stuff for buffering output                         */
 
-    int             idx;                /* server record index (to be used for the interps db */
 
 } rivet_server_conf;
 
-#define TCL_INTERPS 4
+#define TCL_INTERPS 1
+
 typedef int rivet_thr_status;
 enum
 {
@@ -140,10 +145,10 @@ typedef struct _vhost_interp {
     Tcl_Interp*         interp;
     int                 cache_size;
     int                 cache_free;
-    Tcl_HashTable*      objCache;		    /* Objects cache - the key is the script name       */
-    char**              objCacheList;		/* Array of cached objects (for priority handling)  */
+    Tcl_HashTable*      objCache;       /* Objects cache - the key is the script name       */
+    char**              objCacheList;       /* Array of cached objects (for priority handling)  */
     apr_pool_t*         pool;               /* interpreters cache private memory pool           */
-    unsigned int        flags;
+    unsigned int        flags;              /* signals of various interp specific conditions    */
 } vhost_interp;
 
 /* we need also a place where to store module wide globals */
@@ -157,16 +162,16 @@ typedef struct _mod_rivet_globals {
 
     apr_thread_cond_t*  job_cond;
     apr_thread_mutex_t* job_mutex;
-    apr_array_header_t* exiting;            /* */
+    apr_array_header_t* exiting;                /* */
     apr_uint32_t*       threads_count;
+    apr_uint32_t*       running_threads_count;
 
-    apr_thread_mutex_t* pool_mutex;         /* threads commmon pool mutex */
-    apr_pool_t*         pool;               /* threads common memory pool */
-    apr_queue_t*        queue;              /* jobs queue                 */
-    apr_thread_t*       workers[TCL_INTERPS]; /* thread pool ids          */
+    apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex   */
+    apr_pool_t*         pool;                   /* threads common memory pool   */
+    apr_queue_t*        queue;                  /* jobs queue                   */
+    apr_thread_t**      workers;                /* thread pool ids              */
 
-    server_rec*         server;             /* default host server_rec obj */
-    //Tcl_Channel*      outchannel;         /* this is the Rivet channel for prefork MPM */
+    server_rec*         server;                 /* default host server_rec obj  */
 
     int                 (*mpm_child_init)(apr_pool_t* pPool,server_rec* s);
     int                 (*mpm_request)(request_rec*);
@@ -177,32 +182,41 @@ typedef struct _mod_rivet_globals {
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
+
+    int                 mpm_max_threads;
+    int                 mpm_min_spare_threads;
+    int                 mpm_max_spare_threads;
+
+    /*
+    int                 num_load_samples;
+    double              average_working_threads; 
+    */
+
 } mod_rivet_globals;
 
+#define BRIDGE_SUPERVISOR_WAIT  1000000
 
 typedef struct _thread_worker_private {
-    vhost_interp**      interps;        /* database of virtual host interps     */
-    Tcl_Channel*        channel;        /* the Tcl thread private channel       */
-    
-                                        /* the request_rec and TclWebRequest    *
-                                         * are copied here to be passed to a    *
-                                         * channel                              */
-    request_rec*        r;			    /* current request_rec                  */
+    apr_pool_t*         pool;               /* threads private memory pool          */
+    vhost_interp**      interps;            /* database of virtual host interps     */
+    Tcl_Channel*        channel;            /* the Tcl thread private channel       */
+    int                 req_cnt;            /* requests served by thread            */
+    int                 keep_going;         /* thread loop controlling variable     */
+                                            /* the request_rec and TclWebRequest    *
+                                             * are copied here to be passed to a    *
+                                             * channel                              */
+    request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
-    int                 req_cnt;        /* requests served by thread            */
-    int                 keep_going;     /* thread loop controlling variable     */
-    apr_pool_t*         pool;           /* threads private memory pool          */
-    
 } rivet_thread_private;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
-    request_rec*            r;			        /* request rec              */
-    TclWebRequest*          req;	            /* TclWeb API request       */
-    Tcl_Namespace*          rivet_ns;           /* Rivet commands namespace */
-    int                     page_aborting;	    /* set by abort_page.       */
-    Tcl_Obj*                abort_code;			/* To be reset by Rivet_SendContent      */
+    request_rec*            r;                  /* request rec                          */
+    TclWebRequest*          req;                /* TclWeb API request                   */
+    Tcl_Namespace*          rivet_ns;           /* Rivet commands namespace             */
+    int                     page_aborting;      /* set by abort_page.                   */
+    Tcl_Obj*                abort_code;         /* To be reset by Rivet_SendContent      */
     server_rec*             srec;               /* pointer to the current server rec obj */
     rivet_thread_private*   private;      
 } rivet_interp_globals;
@@ -222,7 +236,7 @@ typedef struct _handler_private
     rivet_job_t         job_type;
     apr_thread_cond_t*  cond;
     apr_thread_mutex_t* mutex;
-    request_rec*        r;			    /* request rec                 */
+    request_rec*        r;              /* request rec                 */
     TclWebRequest*      req;
     int                 code;
     int                 status;

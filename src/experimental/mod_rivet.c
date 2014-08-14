@@ -34,6 +34,7 @@
 #include <http_log.h>
 #include <http_main.h>
 #include <ap_config.h>
+#include <ap_mpm.h>
 #include <apr_queue.h>
 #include <apr_strings.h>
 #include <apr_general.h>
@@ -107,7 +108,7 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
     if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
-                     MODNAME ": could not initialize thread private pool");
+                     MODNAME ": could not initialize cache private pool");
         return NULL;
     }
 
@@ -124,6 +125,12 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
     return interp_obj;
 }
 
+/*
+ * -- Rivet_VirtualHostsInterps 
+ *
+ *
+ */
+
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 {
     server_rec*         s;
@@ -135,10 +142,24 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     void*               function;
 
     root_server_conf = RIVET_SERVER_CONF( root_server->module_config );
-    parentfunction = root_server_conf->rivet_child_init_script;
     
     root_interp = (*module_globals->mpm_master_interp)(private->pool);
 
+    if (root_server_conf->rivet_global_init_script != NULL) {
+        if (Tcl_EvalObjEx(root_interp->interp, root_server_conf->rivet_global_init_script, 0) != TCL_OK)
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                         MODNAME ": Error running GlobalInitScript '%s': %s",
+                         Tcl_GetString(root_server_conf->rivet_global_init_script),
+                         Tcl_GetVar(root_interp->interp, "errorInfo", 0));
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
+                         MODNAME ": GlobalInitScript '%s' successful",
+                         Tcl_GetString(root_server_conf->rivet_global_init_script));
+        }
+    }
+
+    parentfunction = root_server_conf->rivet_child_init_script;
     if (root_interp == NULL)
     {
         return NULL;
@@ -217,12 +238,26 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 }
 
 
-/*----------------------------------------------------------------------------
+/*
  * -- Rivet_ProcessorCleanup
  *
- * 
+ * Thread private data cleanup. This function is called by MPM bridges to 
+ * release data owned by private and pointed in the array of vhost_interp
+ * objects. It has to be called just before an agent, either thread or
+ * process, exits.
  *
- *----------------------------------------------------------------------------
+ *  Arguments:
+ *
+ *      data:   pointer to a rivet_thread_private data structure. 
+ *
+ *  Returned value:
+ *
+ *      none
+ *
+ *  Side effects:
+ *
+ *      resources stored in the array of vhost_interp objects are released
+ *      and interpreters are deleted.
  */
 
 void Rivet_ProcessorCleanup (void *data)
@@ -233,10 +268,10 @@ void Rivet_ProcessorCleanup (void *data)
     int                     i;
     rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
-    ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals->server, 
-            "Thread exiting after %d requests served", private->req_cnt);
-
-    for (i = 0; i < module_globals->vhosts_count; i++)
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
+                 "Thread exiting after %d requests served", private->req_cnt);
+    i = 0;
+    do
     {
 
         /* cleaning the cache contents and deleting it */
@@ -251,15 +286,17 @@ void Rivet_ProcessorCleanup (void *data)
             entry = Tcl_NextHashEntry(searchCtx);
         }
         
-        Tcl_UnregisterChannel(private->interps[i]->interp,*private->channel);
         Tcl_DeleteInterp(private->interps[i]->interp);
 
-        /* if we are running the same interpreter instance for each vhost 
-           we can jump out of this loop after the first cycle */
+        i++;
 
-        if (!rsc->separate_virtual_interps) break;
+        /* if separate_virtual_interps == 0 we are running the same interpreter
+         * instance for each vhost, thus we can jump out of this loop after 
+         * the first cycle as the only real intepreter object we have is stored
+         * in private->interps[0]
+         */
 
-    }
+    } while ((i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
 
     apr_pool_destroy(private->pool);
 }
@@ -792,8 +829,10 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 
 /*
         instead of removing the last entry in the cache (for what purpose after all??)
-        we signal the cache full condition
+        we signal a 'cache full' condition
+ */
 
+ /*
             Tcl_HashEntry *delEntry;
             delEntry = Tcl_FindHashEntry(
                             rivet_interp->objCache,
@@ -806,7 +845,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 
             rivet_interp->objCacheList[0] = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
             strcpy (rivet_interp->objCacheList[0], hashKey);
-*/
+ */
             
             if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
             {
@@ -1031,8 +1070,11 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 {
     apr_status_t aprrv;
     char errorbuf[ERRORBUF_SZ];
-    char* mpm_model_handler = "rivet_prefork_mpm.so";
+    char* mpm_prefork_bridge = "rivet_prefork_mpm.so";
+    char* mpm_worker_bridge  = "rivet_worker_mpm.so";
+    char* mpm_model_handler;
     char* mpm_model_path;
+    int   ap_mpm_result;
 
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, "Rivet/Experimental/"__DATE__"/"__TIME__"/");
@@ -1056,7 +1098,18 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
     /* Let's load the Rivet-MPM bridge */
 
-    /* TODO: This kludge to load off-path MPM bridges has to be removed because is a security hole */
+    mpm_model_handler = mpm_worker_bridge;
+    if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
+    {
+        /* we are forced to load the prefork MPM bridge */
+
+        if (ap_mpm_result == AP_MPMQ_NOT_SUPPORTED)
+        {
+            mpm_model_handler = mpm_prefork_bridge;
+        }
+    }
+
+    /* We have the chance to tell mod_rivet through an env variable where the bridge has to be loaded from */
 
     if (apr_env_get (&mpm_model_path,"RIVET_MPM_BRIDGE",pTemp) != APR_SUCCESS)
     {
@@ -1140,14 +1193,21 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         
         apr_atomic_init(pPool);
         module_globals->threads_count = (apr_uint32_t *) apr_palloc(pPool,sizeof(apr_uint32_t));
+        module_globals->running_threads_count = (apr_uint32_t *) apr_palloc(pPool,sizeof(apr_uint32_t));
         apr_atomic_set32(module_globals->threads_count,0);
+        apr_atomic_set32(module_globals->running_threads_count,0);
 
+        module_globals->workers                 = NULL;
         module_globals->rivet_panic_pool        = pPool;
         module_globals->rivet_panic_server_rec  = server;
         module_globals->rivet_panic_request_rec = NULL;
         module_globals->vhosts_count            = 0;
         module_globals->server_shutdown         = 0;
         module_globals->exiting                 = NULL;
+        module_globals->mpm_max_threads         = 0;
+        module_globals->mpm_min_spare_threads   = 0;
+        module_globals->mpm_max_spare_threads   = 0;
+        //module_globals->num_load_samples        = 0;
 
     /* Another crucial point: we are storing here in the globals a reference to the
      * root server_rec object from which threads are supposed to derive 
