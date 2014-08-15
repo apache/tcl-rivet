@@ -519,7 +519,6 @@ Rivet_SendContent(rivet_thread_private *private)
         }
     }
 
-    apr_thread_mutex_lock(module_globals->req_mutex);
     if (Rivet_ParseExecFile(private, r->filename, 1) != TCL_OK)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
@@ -538,7 +537,6 @@ Rivet_SendContent(rivet_thread_private *private)
                      MODNAME ": Error evaluating cleanup request: %s",
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
-    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     /* Reset globals */
     Rivet_CleanupRequest( r );
@@ -598,6 +596,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
     rivet_server_conf *conf = Rivet_GetConf(req);
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
+    apr_thread_mutex_lock(module_globals->req_mutex);
     Tcl_Preserve (interp);
     if ( Tcl_EvalObjEx(interp, tcl_script_obj, 0) == TCL_ERROR ) {
         Tcl_Obj *errscript;
@@ -682,6 +681,7 @@ good:
             TclWeb_PrintError( errorinfo, 0, globals->req );
         }
     }
+    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
         TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
@@ -884,6 +884,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
                 rivet_interp->flags |= RIVET_CACHE_FULL;
             }
         }
+
     } else {
         /* We found a compiled version of this page. */
         outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);

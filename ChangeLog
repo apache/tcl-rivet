@@ -1,3 +1,9 @@
+2014-08-15 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: Tcl protecting mutex localized in order to restrict as much as possible
+    the protected code and reduce the size of the bottleneck. Still, this is not OK and the current implementation
+    is going to be kept to provide functionality of mod_rivet with the worker MPM. We have to explore
+    the possibility of calling directly Tcl threading functions.
+
 2014-08-14 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: implemented automatic bridge load mechanism.
     * src/experimental/rivet_worker_mpm.c: starting maximal number of threads (as per mpm_worker configuration)
