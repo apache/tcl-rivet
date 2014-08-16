@@ -507,8 +507,6 @@ AC_DEFUN([APACHE_REQUEST],[
 # selecting non default directory for Rivet code commands core
 #
 
-default_rivet_commands="rivetcmdsfake"
-
 AC_DEFUN([RIVET_CORE_CMDS],[
     AC_ARG_WITH(
         rivet_commands,

@@ -23,8 +23,8 @@ apxs_libexec_LTLIBRARIES = mod_rivet.la
 mod_rivet_la_SOURCES =  mod_rivet.c                                         \
                         ../@apache_request@/apache_multipart_buffer.c 	    \
                         ../@apache_request@/apache_request.c                \
-                        ../@rivet_core_cmds@/rivetCore.c                    \
-                        ../@rivet_core_cmds@/rivetInspect.c                 \
+                        ../@rivet_commands@/rivetCore.c                     \
+                        ../@rivet_commands@/rivetInspect.c                  \
                         ../@rivet_channel@/rivetChannel.c                   \
                         ../common/TclWebapache.c                            \
                         ../common/apache_config.c                           \
