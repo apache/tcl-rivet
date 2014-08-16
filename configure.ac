@@ -631,6 +631,25 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
     fi
 ])
 
+AC_DEFUN([SINGLE_TCL_THREAD],[
+    AC_ARG_ENABLE(
+    single_thread,
+    [  --enable-single-thread Forces single Tcl thread in worker bridge ],
+    [ single_thread=$enable_single_thread ],
+    [ single_thread="no"]
+    )
+
+    AC_MSG_CHECKING(whether MPM bridge has to run a single thread)
+    if test "$single_thread" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(MPM_SINGLE_THREAD,1,[yes, MPM worker single thread])
+    else
+        AC_MSG_RESULT([no, maximal number of Tcl threads])
+        #AC_DEFINE(HEAD_REQUESTS,0,[Honor HEAD requests])
+    fi
+])
+
+
 # RIVET_COMMANDS_EXPORT (--enable-rivet-commands-export).
 # Enable export of commands in Rivet's namespace. Definining this symbols
 # sets the boolean configuration variable rivet_commands_export 
@@ -764,6 +783,7 @@ IMPORT_RIVET_COMMANDS
 APACHE_REQUEST
 RIVET_CORE_CMDS
 RIVET_CHANNEL
+SINGLE_TCL_THREAD
 
 # Let's separate the point version from the major and minor version
 # to build a Rivet version to be substituted as basic version for 

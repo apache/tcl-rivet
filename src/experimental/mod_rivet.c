@@ -358,6 +358,7 @@ Rivet_SendContent(rivet_thread_private *private)
     }
 
     //Tcl_MutexLock(&sendMutex);
+    apr_thread_mutex_lock(module_globals->req_mutex);
 
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
@@ -447,8 +448,6 @@ Rivet_SendContent(rivet_thread_private *private)
         Tcl_IncrRefCount(request_init);
     }
 
-
-    apr_thread_mutex_lock(module_globals->req_mutex);
     if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
@@ -456,10 +455,8 @@ Rivet_SendContent(rivet_thread_private *private)
                             Tcl_GetStringResult(interp));
 
         retval = HTTP_INTERNAL_SERVER_ERROR;
-        apr_thread_mutex_unlock(module_globals->req_mutex);
         goto sendcleanup;
     }
-    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     /* Apache Request stuff */
 
@@ -555,6 +552,7 @@ sendcleanup:
     /* We reset this pointer to signal we have terminated the request processing */
 
     globals->r = NULL;
+    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     //Tcl_MutexUnlock(&sendMutex);
     return retval;
@@ -562,7 +560,7 @@ sendcleanup:
 
 /* -- Rivet_ExecuteAndCheck
  * 
- * Tcl script execution central procedure. The script stored
+ * Tcl script execution central procedure. The script stored in
  * outbuf is evaluated and in case an error occurs in the execution
  * an error handler is executed. In case the error code returned
  * is RIVET then the error was caused by the invocation of a 
@@ -596,7 +594,6 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
     rivet_server_conf *conf = Rivet_GetConf(req);
     rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
-    apr_thread_mutex_lock(module_globals->req_mutex);
     Tcl_Preserve (interp);
     if ( Tcl_EvalObjEx(interp, tcl_script_obj, 0) == TCL_ERROR ) {
         Tcl_Obj *errscript;
@@ -681,7 +678,6 @@ good:
             TclWeb_PrintError( errorinfo, 0, globals->req );
         }
     }
-    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
         TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);

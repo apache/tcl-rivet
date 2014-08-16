@@ -194,9 +194,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         private->r   = request_obj->r;
         private->req = request_obj->req;
 
-        //apr_thread_mutex_lock(module_globals->req_mutex);
         request_obj->code = Rivet_SendContent(private);
-        //apr_thread_mutex_unlock(module_globals->req_mutex);
 
         apr_thread_mutex_lock(request_obj->mutex);
         request_obj->status = done;
@@ -208,7 +206,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     } while (private->keep_going > 0);
             
-    ap_log_error(APLOG_MARK, APLOG_INFO, 0, module_globals->server, "processor thread orlderly exit");
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
     Rivet_ProcessorCleanup(private);
 
@@ -282,16 +280,21 @@ static void supervisor_housekeeping (void)
 
 
 /* -- threaded_bridge_supervisor
- *
  * 
  */
 
 static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void *data)
 {
     server_rec* s = (server_rec *)data;
+#ifdef RIVET_MPM_SINGLE_THREAD
+    int thread_to_start = 1;
+#else
+    int thread_to_start = (int)round(module_globals->mpm_max_threads);
+#endif
 
-    ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"starting %d Tcl threads",(int)round(module_globals->mpm_max_threads));
-    start_thread_pool(module_globals->mpm_max_threads);
+    ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"starting %d Tcl threads",thread_to_start);
+    start_thread_pool(thread_to_start);
+
     do
     {
         apr_thread_t*   p;

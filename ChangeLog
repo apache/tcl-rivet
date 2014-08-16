@@ -1,3 +1,8 @@
+2014-08-16 Massimo Manghi <mxmangho@apache.org>
+    * src/experimental/mod_rivet.c: reinstated big mutex aroud Rivet_SendContent (where originally 
+    Tcl_Mutex lock/unlock were called. The module is usable but way too slow wrt prefork because
+    of the locking
+
 2014-08-15 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: Tcl protecting mutex localized in order to restrict as much as possible
     the protected code and reduce the size of the bottleneck. Still, this is not OK and the current implementation
