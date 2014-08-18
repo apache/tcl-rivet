@@ -76,7 +76,7 @@ TCL_DECLARE_MUTEX(sendMutex);
 static Tcl_Interp*  Rivet_CreateTclInterp (server_rec* s);
 static apr_status_t Rivet_ChildExit(void *data);
 
-mod_rivet_globals* rivet_module_globals = NULL;
+mod_rivet_globals* module_globals = NULL;
 
 /*
  *-----------------------------------------------------------------------------
@@ -600,10 +600,10 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
 
-    rivet_module_globals = apr_palloc(pPool,sizeof(mod_rivet_globals));
-    rivet_module_globals->rsc_p = rsc;
-    rivet_module_globals->rivet_panic_pool       = pPool;
-    rivet_module_globals->rivet_panic_server_rec = s;
+    module_globals = apr_palloc(pPool,sizeof(mod_rivet_globals));
+    module_globals->rsc_p = rsc;
+    module_globals->rivet_panic_pool       = pPool;
+    module_globals->rivet_panic_server_rec = s;
 
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
@@ -620,7 +620,7 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     /* Create TCL channel and store a pointer in the rivet_server_conf object */
 
     rsc->outchannel    = apr_pcalloc (pPool, sizeof(Tcl_Channel));
-    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_module_globals, TCL_WRITABLE);
+    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", module_globals, TCL_WRITABLE);
 
     /* The channel we have just created replaces Tcl's stdout */
 
@@ -997,10 +997,10 @@ Rivet_SendContent(request_rec *r)
 
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
-    rivet_module_globals->rivet_panic_request_rec = r;
+    module_globals->rivet_panic_request_rec = r;
 
     rsc = Rivet_GetConf(r);
-    rivet_module_globals->rsc_p = rsc;
+    module_globals->rsc_p = rsc;
     interp = rsc->server_interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
 

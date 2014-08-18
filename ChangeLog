@@ -1,3 +1,5 @@
+2014-08-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: fixed old symbols now renamed as 'module_globals'
 
 2014-08-16 Massimo Manghi <mxmangho@apache.org>
     * src/experimental/mod_rivet.c: reinstated big mutex aroud Rivet_SendContent (where originally 
