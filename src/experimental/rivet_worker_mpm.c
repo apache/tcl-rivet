@@ -194,7 +194,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         private->r   = request_obj->r;
         private->req = request_obj->req;
 
-        request_obj->code = Rivet_SendContent(private);
+        HTTP_REQUESTS_PROC(request_obj->code = Rivet_SendContent(private))
 
         apr_thread_mutex_lock(request_obj->mutex);
         request_obj->status = done;

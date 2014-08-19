@@ -200,7 +200,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         private->interps[myrsc->idx] = rivet_interp;
 
         /* Basic Rivet packages and libraries are loaded here. Also the interpreter globals
-         * are setup here. We have to explore if could be sensed to moved them to the
+         * are setup here. We have to explore if it could be sensible to move them to the
          * thread private data.
          */
 
@@ -221,7 +221,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         myrsc->server_name = (char*)apr_pstrdup(module_globals->pool, s->server_hostname);
         apr_thread_mutex_unlock(module_globals->pool_mutex);
 
-        /* if configured child init script gets evaluated */
+        /* when configured a child init script gets evaluated */
 
         function = myrsc->rivet_child_init_script;
         if (function && 
@@ -358,7 +358,6 @@ Rivet_SendContent(rivet_thread_private *private)
     }
 
     //Tcl_MutexLock(&sendMutex);
-    apr_thread_mutex_lock(module_globals->req_mutex);
 
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
@@ -552,7 +551,6 @@ sendcleanup:
     /* We reset this pointer to signal we have terminated the request processing */
 
     globals->r = NULL;
-    apr_thread_mutex_unlock(module_globals->req_mutex);
 
     //Tcl_MutexUnlock(&sendMutex);
     return retval;
@@ -1265,7 +1263,9 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     rivet_server_conf*  root_server_conf;
     server_rec*         s;
 
+#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_create(&module_globals->req_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
+#endif
 
 /* This code is run once per child process. In a threaded Tcl builds the forking 
  * of a child process most likely has not preserved the thread where the Tcl 
@@ -1308,7 +1308,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     }
     module_globals->vhosts_count = idx;
 
-    apr_threadkey_private_create (&rivet_thread_key, NULL, pChild);
+    apr_threadkey_private_create (&rivet_thread_key, Rivet_ProcessorCleanup, pChild);
 
     /* Calling the brigde child process initialization */
 

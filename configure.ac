@@ -629,7 +629,7 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
     fi
 ])
 
-AC_DEFUN([SINGLE_TCL_THREAD],[
+AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
     AC_ARG_ENABLE(
     single_thread,
     [  --enable-single-thread Forces single Tcl thread in worker bridge ],
@@ -640,13 +640,35 @@ AC_DEFUN([SINGLE_TCL_THREAD],[
     AC_MSG_CHECKING(whether MPM bridge has to run a single thread)
     if test "$single_thread" = "yes"; then
         AC_MSG_RESULT([yes])
-        AC_DEFINE(MPM_SINGLE_THREAD,1,[yes, MPM worker single thread])
+        AC_DEFINE(MPM_SINGLE_TCL_THREAD,1,[yes, MPM worker single thread])
     else
         AC_MSG_RESULT([no, maximal number of Tcl threads])
-        #AC_DEFINE(HEAD_REQUESTS,0,[Honor HEAD requests])
     fi
 ])
 
+# -- SERIALIZE_HTTP_REQUEST
+#
+# this macro is introduced to make debugging easier when
+# we want threads to serialize accessing the request handling central
+# method Rivet_SendContent. The macro defines the symbol SERIALIZE_HTTP_REQUESTS
+# and cooperates with macro SERIALIZED_REQUESTS
+
+AC_DEFUN([HTTP_REQUESTS_MUTEX],[
+    AC_ARG_ENABLE(
+        requests_serialization,
+        [  --enable-serialize-requests Forces HTTP requests serialization ],
+        [ requests_serialization=$enable_requests_serialization ],
+        [ requests_serialization="no" ]
+    )
+
+    AC_MSG_CHECKING([whether we want to serialize HTTP requests among threads])
+    if test "$requests_serialization" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(SERIALIZE_HTTP_REQUESTS,1,[requests will be serialized])
+    else
+        AC_MSG_RESULT([no, HTTP requests will not be serialized])
+    fi
+])
 
 # RIVET_COMMANDS_EXPORT (--enable-rivet-commands-export).
 # Enable export of commands in Rivet's namespace. Definining this symbols
@@ -781,7 +803,8 @@ IMPORT_RIVET_COMMANDS
 APACHE_REQUEST
 RIVET_CORE_CMDS
 RIVET_CHANNEL
-SINGLE_TCL_THREAD
+SINGLE_WORKER_TCL_THREAD
+HTTP_REQUESTS_MUTEX
 
 # Let's separate the point version from the major and minor version
 # to build a Rivet version to be substituted as basic version for 

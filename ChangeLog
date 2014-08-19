@@ -1,3 +1,12 @@
+2014-08-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: mutex serializing request processing now controlled by 
+    RIVET_SERIALIZE_HTTP_REQUEST. 
+    * src/experimental/mod_rivet.h: mutex req_mutex conditional to definition of RIVET_SERIALIZE_HTTP_REQUESTS.
+    Also defined macro HTTP_REQUESTS_PROC macro to protect execution of code by module_globals->req_mutex
+    * src/experimental/rivet_aprthread_mpm.c: new simplified bridge rivet_aprthread_mpm.c which creates
+    Tcl interpreters within thread private data.
+    * configure.ac: introducing HTTP_REQUESTS_MUTEX for handling of request serialization
+
 2014-08-18 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: fixed old symbols now renamed as 'module_globals'
 

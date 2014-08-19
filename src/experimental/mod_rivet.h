@@ -191,8 +191,9 @@ typedef struct _mod_rivet_globals {
     int                 num_load_samples;
     double              average_working_threads; 
     */
-
+#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
+#endif
 } mod_rivet_globals;
 
 #define BRIDGE_SUPERVISOR_WAIT  1000000
@@ -297,5 +298,14 @@ EXTERN int RivetContent (rivet_thread_private* private);
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
 
 #define MODNAME                     "mod_rivet"
+
+#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
+    #define HTTP_REQUESTS_PROC(request_proc_call) \
+        apr_thread_mutex_lock(module_globals->req_mutex);\
+        request_proc_call;\
+        apr_thread_mutex_unlock(module_globals->req_mutex);
+#else
+    #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
+#endif
 
 #endif /* MOD_RIVET_H */
