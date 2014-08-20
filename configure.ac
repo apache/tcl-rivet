@@ -651,12 +651,12 @@ AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
 # this macro is introduced to make debugging easier when
 # we want threads to serialize accessing the request handling central
 # method Rivet_SendContent. The macro defines the symbol SERIALIZE_HTTP_REQUESTS
-# and cooperates with macro SERIALIZED_REQUESTS
+# and cooperates with macro HTTP_REQUESTS_PROC
 
 AC_DEFUN([HTTP_REQUESTS_MUTEX],[
     AC_ARG_ENABLE(
         requests_serialization,
-        [  --enable-serialize-requests Forces HTTP requests serialization ],
+        [  --enable-requests-serialization Forces HTTP requests serialization among threads],
         [ requests_serialization=$enable_requests_serialization ],
         [ requests_serialization="no" ]
     )
