@@ -102,10 +102,10 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
-
+/*
     apr_thread_mutex_create(&module_globals->job_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
     apr_thread_cond_create(&module_globals->job_cond, pool);
-
+*/
 }
 
 int Rivet_MPM_Request (request_rec* r)
@@ -177,6 +177,7 @@ int Rivet_MPM_Request (request_rec* r)
     }
 
     private->r   = r;
+    private->req_cnt++;
     server_conf = RIVET_SERVER_CONF(private->r->server->module_config);
     TclWeb_InitRequest(private->req, private->interps[server_conf->idx]->interp, private->r);
 
@@ -187,10 +188,11 @@ int Rivet_MPM_Request (request_rec* r)
 
 apr_status_t Rivet_MPM_Finalize (void* data)
 {
+/*    
     apr_status_t  rv;
     apr_status_t  thread_status;
     server_rec* s = (server_rec*) data;
-    
+
     apr_thread_mutex_lock(module_globals->job_mutex);
     module_globals->server_shutdown = 1;
     apr_thread_cond_signal(module_globals->job_cond);
@@ -202,6 +204,7 @@ apr_status_t Rivet_MPM_Finalize (void* data)
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                      MODNAME ": Error joining supervisor thread");
     }
+*/
 
     apr_threadkey_private_delete (rivet_thread_key);
     return OK;
