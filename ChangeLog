@@ -1,3 +1,8 @@
+2014-08-27 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.h: request_init and request_cleanup moved from static into rivet_thread_private
+    * src/experimental/rivet_aprthread_mpm.c,rivet_worker_mpm.c: request_init and request_cleanup are initialized
+    during thread private data set up
+
 2014-08-19 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: mutex serializing request processing now controlled by 
     RIVET_SERIALIZE_HTTP_REQUEST. 

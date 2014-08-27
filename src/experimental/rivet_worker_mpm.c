@@ -68,6 +68,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             private->keep_going = 1;
             private->r          = NULL;
             private->req        = NULL;
+            private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+            private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
 
             if (apr_pool_create(&private->pool, NULL) != APR_SUCCESS) 
             {
@@ -194,7 +196,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         private->r   = request_obj->r;
         private->req = request_obj->req;
 
-        HTTP_REQUESTS_PROC(request_obj->code = Rivet_SendContent(private))
+        HTTP_REQUESTS_PROC(request_obj->code = Rivet_SendContent(private));
 
         apr_thread_mutex_lock(request_obj->mutex);
         request_obj->status = done;
@@ -236,9 +238,11 @@ static void start_thread_pool (int nthreads)
 
     for (i = 0; i < nthreads; i++)
     {
-        apr_status_t rv;
-
-        rv = create_worker_thread( &module_globals->workers[i]);
+        apr_status_t    rv;
+        apr_thread_t*   slot;
+ 
+        rv = create_worker_thread(&slot);
+        module_globals->workers[i] = (void *) slot;
 
         if (rv != APR_SUCCESS) {
             char    errorbuf[512];
@@ -321,7 +325,7 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void 
                     module_globals->workers[i] = NULL;
 
                     /* terminated thread restart */
-                    rv = create_worker_thread (&module_globals->workers[i]);
+                    rv = create_worker_thread (&((apr_thread_t **)module_globals->workers)[i]);
                     if (rv != APR_SUCCESS) {
                         char errorbuf[512];
 
@@ -444,7 +448,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     /* We allocate the array of Tcl threads id. We require it to have AP_MPMQ_MAX_THREADS slots */
 
-    module_globals->workers = (apr_thread_t **) apr_pcalloc(pool,module_globals->mpm_max_threads * sizeof(apr_thread_t *));
+    module_globals->workers = apr_pcalloc(pool,module_globals->mpm_max_threads * sizeof(void *));
 
     rv = apr_thread_create( &module_globals->supervisor, NULL, 
                             threaded_bridge_supervisor, server, module_globals->pool);

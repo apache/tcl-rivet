@@ -341,11 +341,9 @@ Rivet_SendContent(rivet_thread_private *private)
     int errstatus;
     int retval;
     int ctype;
-    Tcl_Interp      *interp;
-    static Tcl_Obj  *request_init = NULL;
-    static Tcl_Obj  *request_cleanup = NULL;
-    rivet_interp_globals *globals = NULL;
-    request_rec* r = private->r;
+    Tcl_Interp*             interp;
+    rivet_interp_globals*   globals = NULL;
+    request_rec*            r = private->r;
 #ifdef USE_APACHE_RSC
     rivet_server_conf    *rsc = NULL;
 #else
@@ -441,13 +439,7 @@ Rivet_SendContent(rivet_thread_private *private)
         goto sendcleanup;
     }
 
-    /* Initialize this the first time through and keep it around. */
-    if (request_init == NULL) {
-        request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
-        Tcl_IncrRefCount(request_init);
-    }
-
-    if (Tcl_EvalObjEx(interp, request_init, 0) == TCL_ERROR)
+    if (Tcl_EvalObjEx(interp, private->request_init, 0) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
                             MODNAME ": Could not create request namespace (%s)\n" ,
@@ -523,12 +515,7 @@ Rivet_SendContent(rivet_thread_private *private)
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
 
-    if (request_cleanup == NULL) {
-        request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
-        Tcl_IncrRefCount(request_cleanup);
-    }
-
-    if (Tcl_EvalObjEx(interp, request_cleanup, 0) == TCL_ERROR) {
+    if (Tcl_EvalObjEx(interp, private->request_cleanup, 0) == TCL_ERROR) {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                      MODNAME ": Error evaluating cleanup request: %s",
                      Tcl_GetVar(interp, "errorInfo", 0));

@@ -140,6 +140,11 @@ int Rivet_MPM_Request (request_rec* r)
                 return HTTP_INTERNAL_SERVER_ERROR;
             }
 
+            private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+            private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+            Tcl_IncrRefCount(private->request_init);
+            Tcl_IncrRefCount(private->request_cleanup);
+
             /* We allocate the array for the interpreters database.
              * Data referenced in this database must be freed by the thread before exit
              */

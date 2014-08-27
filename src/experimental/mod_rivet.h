@@ -145,7 +145,7 @@ typedef struct _vhost_interp {
     Tcl_Interp*         interp;
     int                 cache_size;
     int                 cache_free;
-    Tcl_HashTable*      objCache;       /* Objects cache - the key is the script name       */
+    Tcl_HashTable*      objCache;           /* Objects cache - the key is the script name       */
     char**              objCacheList;       /* Array of cached objects (for priority handling)  */
     apr_pool_t*         pool;               /* interpreters cache private memory pool           */
     unsigned int        flags;              /* signals of various interp specific conditions    */
@@ -169,7 +169,7 @@ typedef struct _mod_rivet_globals {
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex   */
     apr_pool_t*         pool;                   /* threads common memory pool   */
     apr_queue_t*        queue;                  /* jobs queue                   */
-    apr_thread_t**      workers;                /* thread pool ids              */
+    void**              workers;                /* thread pool ids              */
 
     server_rec*         server;                 /* default host server_rec obj  */
 
@@ -209,6 +209,8 @@ typedef struct _thread_worker_private {
                                              * channel                              */
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
+    Tcl_Obj*            request_init;
+    Tcl_Obj*            request_cleanup;
 } rivet_thread_private;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
