@@ -309,7 +309,8 @@ void Rivet_ProcessorCleanup (void *data)
 
             entry = Tcl_NextHashEntry(searchCtx);
         }
-        
+ 
+        Tcl_UnregisterChannel(private->interps[i]->interp,*private->channel);       
         Tcl_DeleteInterp(private->interps[i]->interp);
 
         i++;
@@ -1016,12 +1017,19 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
     rivet_tcl = Tcl_NewStringObj(RIVET_DIR,-1);
     Tcl_IncrRefCount(rivet_tcl);
 
+    if (Tcl_IsShared(auto_path)) {
+        auto_path = Tcl_DuplicateObj(auto_path);
+    }
+
     if (Tcl_ListObjReplace(interp,auto_path,0,0,1,&rivet_tcl) == TCL_ERROR)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                      MODNAME ": error setting auto_path: %s",
                      Tcl_GetStringFromObj(auto_path,NULL));
-    } 
+    } else {
+        Tcl_SetVar2Ex(interp,"auto_path",NULL,auto_path,TCL_GLOBAL_ONLY);
+    }
+
     Tcl_DecrRefCount(rivet_tcl);
 
     /* Initialize the interpreter with Rivet's Tcl commands. */
@@ -1295,7 +1303,8 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     }
     module_globals->vhosts_count = idx;
 
-    apr_threadkey_private_create (&rivet_thread_key, Rivet_ProcessorCleanup, pChild);
+    //apr_threadkey_private_create (&rivet_thread_key, Rivet_ProcessorCleanup, pChild);
+    apr_threadkey_private_create (&rivet_thread_key, NULL, pChild);
 
     /* Calling the brigde child process initialization */
 

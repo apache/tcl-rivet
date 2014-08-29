@@ -38,12 +38,9 @@ extern apr_threadkey_t*  rivet_thread_key;
 extern apr_threadkey_t*  handler_thread_key;
 
 void                  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
-void                  Rivet_ProcessorCleanup (void *data);
+//void                Rivet_ProcessorCleanup (void *data);
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
 vhost_interp*         Rivet_NewVHostInterp(apr_pool_t* pool);
-
-
-
 
 /* -- supervisor_chores
  *
@@ -211,7 +208,7 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     }
 */
 
-    apr_threadkey_private_delete (rivet_thread_key);
+    //apr_threadkey_private_delete (rivet_thread_key);
     return OK;
 }
 

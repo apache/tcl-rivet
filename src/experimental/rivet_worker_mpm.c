@@ -33,6 +33,8 @@
 #include "rivetChannel.h"
 #include "apache_config.h"
 
+#define BRIDGE_SUPERVISOR_WAIT  1000000
+
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*  rivet_thread_key;
 extern apr_threadkey_t*  handler_thread_key;

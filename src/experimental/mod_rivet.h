@@ -196,8 +196,6 @@ typedef struct _mod_rivet_globals {
 #endif
 } mod_rivet_globals;
 
-#define BRIDGE_SUPERVISOR_WAIT  1000000
-
 typedef struct _thread_worker_private {
     apr_pool_t*         pool;               /* threads private memory pool          */
     vhost_interp**      interps;            /* database of virtual host interps     */
@@ -287,7 +285,6 @@ EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
 EXTERN int Rivet_SendContent(rivet_thread_private *private);
 EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 
-
 /* temporary content generation handler */
 
 EXTERN int RivetContent (rivet_thread_private* private);
@@ -298,7 +295,6 @@ EXTERN int RivetContent (rivet_thread_private* private);
 
 #define MOD_RIVET_QUEUE_SIZE        100
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
-
 #define MODNAME                     "mod_rivet"
 
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
