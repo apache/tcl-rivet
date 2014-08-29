@@ -72,6 +72,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             private->req        = NULL;
             private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
             private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+            Tcl_IncrRefCount(private->request_init);
+            Tcl_IncrRefCount(private->request_cleanup);
 
             if (apr_pool_create(&private->pool, NULL) != APR_SUCCESS) 
             {
