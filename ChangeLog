@@ -1,3 +1,8 @@
+2014-08-31 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/rivet_prefork_mpm.c: removing commented code
+    * src/experimental/mod_rivet.c: removing unnecessary Tcl mutex declaration
+    * src/experimental/mod_rivet.h: adding new aggregate structure for conf scripts
+
 2014-08-29 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: added control on Tcl object stored in the variable auto_path and duplicate
     it in case it's shared. Removed callback to Rivet_ProcessorCleanup: this call back is called by APR

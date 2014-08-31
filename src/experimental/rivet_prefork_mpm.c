@@ -19,7 +19,7 @@
     under the License.
  */
 
-/* $Id: */
+/* $Id$ */
 
 #include <apr_strings.h>
 
@@ -63,25 +63,8 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 
     module_globals->server_interp = Rivet_NewVHostInterp(pPool); /* root interpreter */
 
-    /* Create TCL channel and store a pointer in the rivet_server_conf object */
-
-    // outchannel   = apr_pcalloc (pPool, sizeof(Tcl_Channel));
-    //*(outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
-
-    /* The channel we have just created replaces Tcl's stdout */
-
-    //Tcl_SetStdChannel (*(outchannel), TCL_STDOUT);
-
-    /* Set the output buffer size to the largest allowed value, so that we 
-     * won't send any result packets to the browser unless the Rivet
-     * programmer does a "flush stdout" or the page is completed.
-     */
-
-    //Tcl_SetChannelBufferSize (*(outchannel), TCL_MAX_CHANNEL_BUFFER_SIZE);
-
-    /* We register the Tcl channel to the interpreter */
-
-    //Tcl_RegisterChannel(module_globals->server_interp->interp, *(outchannel));
+    /* we initialize the interpreter and we won't register a channel with it because
+     * we couldn't send data to the stdout anyway */
 
     Rivet_PerInterpInit(module_globals->server_interp->interp,s,pPool);
 

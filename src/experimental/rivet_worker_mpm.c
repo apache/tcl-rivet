@@ -19,7 +19,7 @@
     under the License.
  */
 
-/* $Id: */
+/* $Id$*/
 
 #include <httpd.h>
 #include <math.h>

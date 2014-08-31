@@ -83,23 +83,38 @@
 
 module AP_MODULE_DECLARE_DATA rivet_module;
 
+typedef struct _rivet_conf_scripts {
+
+    void* rivet_server_init_script;    /* run before children are forked  */
+    void* rivet_global_init_script;    /* run once when apache is started */
+    void* rivet_child_init_script;
+    void* rivet_child_exit_script;
+    void* rivet_before_script;         /* script run before each page      */
+    void* rivet_after_script;          /*            after                 */
+    void* rivet_error_script;          /*            for errors            */
+    void* rivet_abort_script;          /* script run upon abort_page call  */
+    void* after_every_script;          /* script to be run always          */
+    void* rivet_default_error_script;  /* for errors */
+
+} rivet_conf_scripts;
+
 typedef struct _rivet_server_conf {
 
     Tcl_Obj *rivet_server_init_script;  /* run before children are forked  */
     Tcl_Obj *rivet_global_init_script;  /* run once when apache is started */
     Tcl_Obj *rivet_child_init_script;
     Tcl_Obj *rivet_child_exit_script;
-    Tcl_Obj *rivet_before_script;       /* script run before each page  */
+    Tcl_Obj *rivet_before_script;       /* script run before each page      */
     Tcl_Obj *rivet_after_script;        /*            after                 */
     Tcl_Obj *rivet_error_script;        /*            for errors            */
     Tcl_Obj *rivet_abort_script;        /* script run upon abort_page call  */
     Tcl_Obj *after_every_script;        /* script to be run always          */
+    Tcl_Obj *rivet_default_error_script; /* for errors */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
     int user_scripts_updated;
 
-    Tcl_Obj*        rivet_default_error_script;    /* for errors */
     int             default_cache_size;
     int             upload_max;
     int             upload_files_to_var;
@@ -110,7 +125,7 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_server_vars;
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
-    int             idx;                        /* server record index (to be used for the interps db) */
+    int             idx;                /* server record index (to be used for the interps db) */
 
     //Tcl_Interp *server_interp;          /* per server Tcl interpreter        */
     //int*          cache_size;

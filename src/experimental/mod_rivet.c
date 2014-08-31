@@ -60,7 +60,7 @@
 #include "apache_config.h"
 
 mod_rivet_globals*      module_globals;
-rivet_server_conf       rsc;
+//rivet_server_conf       rsc;
 rivet_interp_globals    interp_globals;
 
 extern Tcl_ChannelType RivetChan;
@@ -71,7 +71,7 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 
 #define ERRORBUF_SZ     256
 
-TCL_DECLARE_MUTEX(sendMutex);
+//TCL_DECLARE_MUTEX(sendMutex);
 
 vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
 {
