@@ -107,8 +107,9 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
                           rivet_server_conf* rsc,
                           Tcl_Obj*           par_name)
 {
-    int parameter_i;
-    Tcl_Obj* par_value = NULL;
+    int         parameter_i;
+    Tcl_Obj*    int_value       = NULL;    
+    char*       string_value    = NULL;
 
     if (Tcl_GetIndexFromObj(interp, par_name, confDirectives,
             "<one of mod_rivet configuration directives>", 0, &parameter_i) == TCL_ERROR) {
@@ -117,88 +118,46 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
 
     switch (parameter_i)
     {
-        case server_init_script:
-        {
-            par_value = rsc->rivet_server_init_script;
-            break;
-        }
-        case global_init_script:
-        {
-            par_value = rsc->rivet_global_init_script;
-            break;
-        }
-        case child_init_script:
-        {
-            par_value = rsc->rivet_child_init_script;
-            break;
-        }
-        case child_exit_script:
-        {
-            par_value = rsc->rivet_child_exit_script;
-            break;
-        }
-        case before_script:
-        {
-            par_value = rsc->rivet_before_script;
-            break;
-        }
-        case after_script:
-        {
-            par_value = rsc->rivet_after_script;
-            break;
-        }
-        case after_every_script:
-        {
-            par_value = rsc->after_every_script;
-            break;
-        }
-        case abort_script:
-        {
-            par_value = rsc->rivet_abort_script;
-            break;
-        }
-        case error_script:
-        {
-            par_value = rsc->rivet_error_script;
-            break;
-        }
-        case upload_max:
-        {
-            par_value = Tcl_NewIntObj(rsc->upload_max);
-            break;
-        }
-        case upload_directory:
-        {
-            par_value = Tcl_NewStringObj(rsc->upload_dir,-1);
-            break;
-        }
-        case upload_files_to_var:
-        {
-            par_value = Tcl_NewIntObj(rsc->upload_files_to_var);
-            break;
-        }
-        case separate_virtual_interps:
-        {
-            par_value = Tcl_NewIntObj(rsc->separate_virtual_interps);
-            break;
-        }
-        case honor_header_only_requests:
-        {
-            par_value = Tcl_NewIntObj(rsc->honor_header_only_reqs);
-            break;
-        }
-        default:
-        {
-            return NULL;
-        }
+        case server_init_script:        string_value = rsc->rivet_server_init_script; break;
+        case global_init_script:        string_value = rsc->rivet_global_init_script; break;
+        case child_init_script:         string_value = rsc->rivet_child_init_script; break;
+        case child_exit_script:         string_value = rsc->rivet_child_exit_script; break;
+        case before_script:             string_value = rsc->rivet_before_script; break;
+        case after_script:              string_value = rsc->rivet_after_script; break;
+        case after_every_script:        string_value = rsc->after_every_script; break;
+        case abort_script:              string_value = rsc->rivet_abort_script; break;
+        case error_script:              string_value = rsc->rivet_error_script; break;
+        case upload_directory:          string_value = (char *)rsc->upload_dir; break;
+        case upload_max:                int_value = Tcl_NewIntObj(rsc->upload_max); break;
+        case upload_files_to_var:       int_value = Tcl_NewIntObj(rsc->upload_files_to_var); break;
+        case separate_virtual_interps:  int_value = Tcl_NewIntObj(rsc->separate_virtual_interps); break;
+        case honor_header_only_requests: int_value = Tcl_NewIntObj(rsc->honor_header_only_reqs); break;
+        default: return NULL;
     }
 
-    if (par_value == NULL) 
+    /* if int_value == NULL and string_value == NULL
+     * we have to return one of the string valued options 
+     * which is underfined, thus we gave it the conventional
+     * value "<undefined>"
+     */
+
+    if ((string_value == NULL) && (int_value == NULL))
     {
-        par_value = Tcl_NewStringObj("undefined",-1);
+        return Tcl_NewStringObj("undefined",-1);
+    }
+    else if (string_value != NULL)
+    {
+        /* otherwise if string_value is defined we return it as Tcl_Obj*/
+
+        return Tcl_NewStringObj(string_value,-1);
+    } 
+    else
+    {
+        /* there is no other possible case: int_value must be returned */
+
+        return int_value;
     }
 
-    return par_value;
 }
 
 /* 

@@ -32,6 +32,7 @@
 #include "httpd.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
+#include "rivet_config.h"
 
 #define BRIDGE_SUPERVISOR_WAIT  1000000
 
@@ -134,7 +135,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     if (Rivet_VirtualHostsInterps (private) == NULL)
     {
-        apr_thread_mutex_lock(module_globals->job_mutex);
         *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
         apr_thread_cond_signal(module_globals->job_cond);
         apr_thread_mutex_unlock(module_globals->job_mutex);
@@ -294,7 +294,7 @@ static void supervisor_housekeeping (void)
 static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void *data)
 {
     server_rec* s = (server_rec *)data;
-#ifdef RIVET_MPM_SINGLE_THREAD
+#ifdef RIVET_MPM_SINGLE_TCL_THREAD
     int thread_to_start = 1;
 #else
     int thread_to_start = (int)round(module_globals->mpm_max_threads);
@@ -381,24 +381,32 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void 
 int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
     Tcl_Interp*         interp;
+    Tcl_Obj*            server_init;
     rivet_server_conf*  rsc = RIVET_SERVER_CONF( s->module_config );
 
     interp = Rivet_CreateTclInterp(s) ; /* Tcl server init interpreter */
     Rivet_PerInterpInit(interp,s,pPool);
 
-    if (rsc->rivet_server_init_script != NULL) {
 
-        if (Tcl_EvalObjEx(interp, rsc->rivet_server_init_script, 0) != TCL_OK)
+    if (rsc->rivet_server_init_script != NULL) {
+        server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
+        Tcl_IncrRefCount(server_init);
+        if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
         {
+
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                          MODNAME ": Error running ServerInitScript '%s': %s",
-                         Tcl_GetString(rsc->rivet_server_init_script),
+                         rsc->rivet_server_init_script,
                          Tcl_GetVar(interp, "errorInfo", 0));
+
         } else {
-            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+
+            ap_log_error(APLOG_MARK, APLOG_INFO, 0, s, 
                          MODNAME ": ServerInitScript '%s' successful", 
-                         Tcl_GetString(rsc->rivet_server_init_script));
+                         rsc->rivet_server_init_script);
+
         }
+        Tcl_DecrRefCount(server_init);
     }
 
     Tcl_DeleteInterp(interp);
@@ -483,8 +491,8 @@ int Rivet_MPM_Request (request_rec* r)
         if (request_private == NULL)
         {
             apr_thread_mutex_lock(module_globals->pool_mutex);
-            request_private         = apr_palloc(module_globals->pool,sizeof(handler_private));
-            request_private->req    = TclWeb_NewRequestObject (module_globals->pool);
+            request_private      = apr_palloc(module_globals->pool,sizeof(handler_private));
+            request_private->req = TclWeb_NewRequestObject (module_globals->pool);
             apr_thread_cond_create(&(request_private->cond), module_globals->pool);
             apr_thread_mutex_create(&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, module_globals->pool);
             apr_thread_mutex_unlock(module_globals->pool_mutex);
@@ -512,7 +520,6 @@ int Rivet_MPM_Request (request_rec* r)
     else
     {
         request_private->code = HTTP_INTERNAL_SERVER_ERROR;
-        // apr_sleep(100000);
     }
 
     return request_private->code;

@@ -83,33 +83,18 @@
 
 module AP_MODULE_DECLARE_DATA rivet_module;
 
-typedef struct _rivet_conf_scripts {
-
-    void* rivet_server_init_script;    /* run before children are forked  */
-    void* rivet_global_init_script;    /* run once when apache is started */
-    void* rivet_child_init_script;
-    void* rivet_child_exit_script;
-    void* rivet_before_script;         /* script run before each page      */
-    void* rivet_after_script;          /*            after                 */
-    void* rivet_error_script;          /*            for errors            */
-    void* rivet_abort_script;          /* script run upon abort_page call  */
-    void* after_every_script;          /* script to be run always          */
-    void* rivet_default_error_script;  /* for errors */
-
-} rivet_conf_scripts;
-
 typedef struct _rivet_server_conf {
 
-    Tcl_Obj *rivet_server_init_script;  /* run before children are forked  */
-    Tcl_Obj *rivet_global_init_script;  /* run once when apache is started */
-    Tcl_Obj *rivet_child_init_script;
-    Tcl_Obj *rivet_child_exit_script;
-    Tcl_Obj *rivet_before_script;       /* script run before each page      */
-    Tcl_Obj *rivet_after_script;        /*            after                 */
-    Tcl_Obj *rivet_error_script;        /*            for errors            */
-    Tcl_Obj *rivet_abort_script;        /* script run upon abort_page call  */
-    Tcl_Obj *after_every_script;        /* script to be run always          */
-    Tcl_Obj *rivet_default_error_script; /* for errors */
+    char*       rivet_server_init_script;   /* run before children are forked  */
+    char*       rivet_global_init_script;   /* run once when apache is started */
+    char*       rivet_child_init_script;
+    char*       rivet_child_exit_script;
+    char*       rivet_before_script;        /* script run before each page      */
+    char*       rivet_after_script;         /*            after                 */
+    char*       rivet_error_script;         /*            for errors            */
+    char*       rivet_abort_script;         /* script run upon abort_page call  */
+    char*       after_every_script;         /* script to be always run          */
+    char*       rivet_default_error_script; /* for errors */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
@@ -127,15 +112,15 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_user_vars;
     int             idx;                /* server record index (to be used for the interps db) */
 
-    //Tcl_Interp *server_interp;          /* per server Tcl interpreter        */
+    //Tcl_Interp *server_interp;        /* per server Tcl interpreter                         */
     //int*          cache_size;
     //int*          cache_free;
     //char**          objCacheList;     /* Array of cached objects (for priority handling)    */
-    //Tcl_HashTable*  objCache;             /* Objects cache - the key is the script name         */
+    //Tcl_HashTable*  objCache;         /* Objects cache - the key is the script name         */
 
     /* this one must go, we keep just to avoid to duplicate the config handling function just
        to avoid to poke stuff into this field */
-    //Tcl_Channel*    outchannel;           /* stuff for buffering output                         */
+    //Tcl_Channel*    outchannel;       /* stuff for buffering output                         */
 
 
 } rivet_server_conf;
@@ -156,6 +141,16 @@ enum
 #define RIVET_CACHE_FULL            1
 #define RIVET_INTERP_INITIALIZED    2
 
+typedef struct _interp_running_scripts {
+
+    Tcl_Obj*    rivet_before_script; /* script run before each page                      */
+    Tcl_Obj*    rivet_after_script;  /*            after                                 */
+    Tcl_Obj*    rivet_error_script;
+    Tcl_Obj*    rivet_abort_script;
+    Tcl_Obj*    after_every_script;
+
+} running_scripts;
+
 typedef struct _vhost_interp {
     Tcl_Interp*         interp;
     int                 cache_size;
@@ -163,6 +158,8 @@ typedef struct _vhost_interp {
     Tcl_HashTable*      objCache;           /* Objects cache - the key is the script name       */
     char**              objCacheList;       /* Array of cached objects (for priority handling)  */
     apr_pool_t*         pool;               /* interpreters cache private memory pool           */
+    running_scripts*    scripts;            /* base server conf scripts                         */
+    apr_hash_t*         per_dir_scripts;    /* per dir running scripts                          */
     unsigned int        flags;              /* signals of various interp specific conditions    */
 } vhost_interp;
 
@@ -224,6 +221,10 @@ typedef struct _thread_worker_private {
     TclWebRequest*      req;
     Tcl_Obj*            request_init;
     Tcl_Obj*            request_cleanup;
+                                            
+    rivet_server_conf*  running_conf;       /* running configuration                */
+    running_scripts*    running;            /* (per request) running conf scripts   */
+
 } rivet_thread_private;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
@@ -295,9 +296,9 @@ Tcl_Obj* Rivet_CurrentServerRec ( Tcl_Interp* interp, server_rec* s );
 
 /* these three must go in their own file */
 
-EXTERN int Rivet_ParseExecFile(rivet_thread_private* req, char* filename, int toplevel);
+EXTERN int Rivet_ParseExecFile (rivet_thread_private* req, char* filename, int toplevel);
 EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
-EXTERN int Rivet_SendContent(rivet_thread_private *private);
+EXTERN int Rivet_SendContent (rivet_thread_private *private);
 EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 
 /* temporary content generation handler */
@@ -320,5 +321,28 @@ EXTERN int RivetContent (rivet_thread_private* private);
 #else
     #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
 #endif
+
+/* avoids unnecessary verbosity of repetitive code in functions 
+ * overlaying and merging configuration records
+ */
+
+#define RIVET_CONF_SELECT(selected,base,overlay,field) \
+    selected->field = overlay->field ? overlay->field : base->field;
+
+#define RIVET_SCRIPT_INIT(running_script,rivet_conf_rec,objscript) \
+    if (rivet_conf_rec->objscript == NULL) {\
+        running_script->objscript = Tcl_NewStringObj("",-1);\
+    } else {\
+        running_script->objscript = Tcl_NewStringObj(rivet_conf_rec->objscript,-1);\
+    }\
+    Tcl_IncrRefCount(running_script->objscript);
+ 
+#define RIVET_NULL_SCRIPT_INIT(running_script,rivet_conf_rec,objscript) \
+    if (rivet_conf_rec->objscript == NULL) {\
+        running_script->objscript = NULL;\
+    } else {\
+        running_script->objscript = Tcl_NewStringObj(rivet_conf_rec->objscript,-1);\
+        Tcl_IncrRefCount(running_script->objscript);\
+    }\
 
 #endif /* MOD_RIVET_H */

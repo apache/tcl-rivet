@@ -1,3 +1,18 @@
+2014-09-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/apache_config.h: removed handling of lines unneeded by this version of mod_rivet
+    * src/experimental/rivet_worker_mpm.c:
+    * src/experimental/rivet_aprthread_mpm.c: 
+    * src/experimental/rivet_prefork_mpm.c: moving reference to configurations
+    scripts into their new location on rivet_thread_private
+    * src/experimental/mod_rivet.h: running_scripts object defined to store running configurations 
+    script wrapped in Tcl_Obj instances and allow construction of database of Tcl scripts bound
+    to per-directory configuration. Adding variables for storing running configuration in rivet_thread_private.
+    Configuration records now store references to pristine char* buffers for scripts
+    * src/experimental/mod_rivet.c: changed referenced to configured scripts to their new location,
+    removed redundant calls to Rivet_GetConf. Configuration is now built and stored in thread private data
+    * src/experimental/rivetInspect.c: code in Rivet_ReadConfParameter adapted to reflect changes
+    in configuration record definitions
+
 2014-08-31 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/rivet_prefork_mpm.c: removing commented code
     * src/experimental/mod_rivet.c: removing unnecessary Tcl mutex declaration

@@ -37,6 +37,8 @@
 #include "apache_config.h"
 #include "rivet.h"
 
+extern mod_rivet_globals* module_globals;
+
 /*
  * -- Rivet_AssignStringtoConf --
  *
@@ -73,6 +75,21 @@ Rivet_AssignStringToConf (Tcl_Obj** objPnt, const char* string_value)
     return objarg;
 }
 
+static char*
+Rivet_AppendStringToConf (char* p,const char* string,apr_pool_t *pool)
+{
+
+    if (p == NULL)
+    {
+        return apr_pstrdup(pool,string);
+    }
+    else
+    {
+        return apr_pstrcat(pool,p,string,"\n",NULL);
+    }
+
+}
+
 /*
  * -- Rivet_SetScript --
  *
@@ -95,24 +112,24 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
 {
     Tcl_Obj *objarg = NULL;
 
-    if( STREQU( script, "GlobalInitScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_global_init_script),string);
-    } else if( STREQU( script, "ChildInitScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_child_init_script),string);
-    } else if( STREQU( script, "ChildExitScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_child_exit_script),string);
-    } else if( STREQU( script, "BeforeScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_before_script),string);
-    } else if( STREQU( script, "AfterScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_after_script),string);
-    } else if( STREQU( script, "ErrorScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_error_script),string);
-    } else if( STREQU( script, "ServerInitScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_server_init_script),string);
-    } else if( STREQU( script, "AbortScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->rivet_abort_script),string);
-    } else if( STREQU( script, "AfterEveryScript" ) ) {
-        objarg = Rivet_AssignStringToConf(&(rsc->after_every_script),string);
+    if ( STREQU( script, "GlobalInitScript" ) ) {
+        rsc->rivet_global_init_script = Rivet_AppendStringToConf(rsc->rivet_global_init_script,string,pool);
+    } else if ( STREQU( script, "ChildInitScript" ) ) {
+        rsc->rivet_child_init_script = Rivet_AppendStringToConf(rsc->rivet_child_init_script,string,pool);
+    } else if ( STREQU( script, "ChildExitScript" ) ) {
+        rsc->rivet_child_exit_script = Rivet_AppendStringToConf(rsc->rivet_child_exit_script,string,pool);
+    } else if ( STREQU( script, "BeforeScript" ) ) {
+        rsc->rivet_before_script = Rivet_AppendStringToConf(rsc->rivet_before_script,string,pool);
+    } else if ( STREQU( script, "AfterScript" ) ) {
+        rsc->rivet_after_script = Rivet_AppendStringToConf(rsc->rivet_after_script,string,pool);
+    } else if ( STREQU( script, "ErrorScript" ) ) {
+        rsc->rivet_error_script = Rivet_AppendStringToConf(rsc->rivet_error_script,string,pool);
+    } else if ( STREQU( script, "AbortScript" ) ) {
+        rsc->rivet_abort_script = Rivet_AppendStringToConf(rsc->rivet_abort_script,string,pool);
+    } else if ( STREQU( script, "AfterEveryScript" ) ) {
+        rsc->after_every_script = Rivet_AppendStringToConf(rsc->after_every_script,string,pool);
+    } else if ( STREQU( script, "ServerInitScript" ) ) {
+        rsc->rivet_server_init_script = Rivet_AppendStringToConf(rsc->rivet_server_init_script,string,pool);
     }
 
     if( !objarg ) return string;
@@ -148,16 +165,22 @@ Rivet_GetConf( request_rec *r )
     void *dconf = r->per_dir_config;
     rivet_server_conf *newconfig = NULL;
     rivet_server_conf *rdc;
-    
+     
     FILEDEBUGINFO;
 
     /* If there is no per dir config, just return the server config */
     if (dconf == NULL) {
         return rsc;
     }
-    rdc = RIVET_SERVER_CONF( dconf ); 
-    
-    newconfig = RIVET_NEW_CONF( r->pool );
+
+    /* things might become tedious when there are scripts set 
+       in a <Directory ...>...</Directory> stanza. Especially
+       since we are calling this function at every single request.
+       We compute the new configuration merging the per-dir conf 
+       with the server configuration and then we return it. */
+
+    rdc       = RIVET_SERVER_CONF ( dconf ); 
+    newconfig = RIVET_NEW_CONF ( r->pool );
 
     Rivet_CopyConfig( rsc, newconfig );
     Rivet_MergeDirConfigVars( r->pool, newconfig, rsc, rdc );
@@ -182,22 +205,16 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 {
     FILEDEBUGINFO;
 
-    //newrsc->server_interp = oldrsc->server_interp;
+    newrsc->rivet_server_init_script = oldrsc->rivet_server_init_script;
     newrsc->rivet_global_init_script = oldrsc->rivet_global_init_script;
     newrsc->rivet_before_script = oldrsc->rivet_before_script;
     newrsc->rivet_after_script = oldrsc->rivet_after_script;
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
     newrsc->rivet_abort_script = oldrsc->rivet_abort_script;
     newrsc->after_every_script = oldrsc->after_every_script;
-
     newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
-
     newrsc->rivet_default_error_script = oldrsc->rivet_default_error_script;
-
-    /* These are pointers so that they can be passed around... */
     newrsc->default_cache_size = oldrsc->default_cache_size;
-    //newrsc->cache_size = oldrsc->cache_size;
-    //newrsc->cache_free = oldrsc->cache_free;
     newrsc->upload_max = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
     newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
@@ -208,9 +225,6 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_dir_vars = oldrsc->rivet_dir_vars;
     newrsc->rivet_user_vars = oldrsc->rivet_user_vars;
     newrsc->idx = oldrsc->idx;
-    //newrsc->objCacheList = oldrsc->objCacheList;
-    //newrsc->objCache = oldrsc->objCache;
-    //newrsc->outchannel = oldrsc->outchannel;
 }
 
 /*
@@ -243,6 +257,10 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
               rivet_server_conf *base, rivet_server_conf *add )
 {
     FILEDEBUGINFO;
+
+    /* TODO: conf assignement should be converted into a macro (already in mod_rivet.h) */
+    // RIVET_CONF_SELECT(new,base,add,rivet_child_init_script)
+
     new->rivet_child_init_script = add->rivet_child_init_script ?
         add->rivet_child_init_script : base->rivet_child_init_script;
     new->rivet_child_exit_script = add->rivet_child_exit_script ?
@@ -262,8 +280,7 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
     new->user_scripts_updated = add->user_scripts_updated ?
         add->user_scripts_updated : base->user_scripts_updated;
 
-    new->upload_dir = add->upload_dir ?
-        add->upload_dir : base->upload_dir;
+    new->upload_dir = add->upload_dir ? add->upload_dir : base->upload_dir;
 
     /* Merge the tables of dir and user variables. */
     if (base->rivet_dir_vars && add->rivet_dir_vars) {
@@ -400,9 +417,6 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     rsc->after_every_script = overrides->after_every_script ?
         overrides->after_every_script : base->after_every_script;
 
-    /* cache_size is global, and set up later. */
-    /* cache_free is not set up at this point. */
-
     rsc->upload_max = overrides->upload_max ?
         overrides->upload_max : base->upload_max;
 
@@ -422,10 +436,6 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
 
     rsc->rivet_user_vars = overrides->rivet_user_vars ?
         overrides->rivet_user_vars : base->rivet_user_vars;
-
-    /* objCacheList is set up later. */
-    /* objCache is set up later. */
-    /* outchannel is set up later. */
 
     return rsc;
 }
@@ -460,14 +470,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
 
     rsc->user_scripts_updated = 0;
 
-    rsc->rivet_default_error_script = Tcl_NewStringObj("::Rivet::handle_error", -1);
-    Tcl_IncrRefCount(rsc->rivet_default_error_script);
-
-    /* these are pointers so that they can be passed around...  */
-    //rsc->cache_size                 = apr_pcalloc(p, sizeof(int));
-    //rsc->cache_free                 = apr_pcalloc(p, sizeof(int));
-    //*(rsc->cache_size)              = -1;
-    //*(rsc->cache_free)              = 0;
+    rsc->rivet_default_error_script = "::Rivet::handle_error";
 
     rsc->default_cache_size         = -1;
     rsc->upload_max                 = RIVET_MAX_POST;
@@ -476,9 +479,6 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->honor_header_only_reqs     = RIVET_HEAD_REQUESTS;
     rsc->upload_dir                 = RIVET_UPLOAD_DIR;
     rsc->server_name                = NULL;
-    //rsc->objCacheList               = NULL;
-    //rsc->objCache                   = NULL;
-    //rsc->outchannel                 = NULL;
 
     rsc->rivet_server_vars          = (apr_table_t *) apr_table_make ( p, 4 );
     rsc->rivet_dir_vars             = (apr_table_t *) apr_table_make ( p, 4 );

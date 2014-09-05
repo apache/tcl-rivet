@@ -55,7 +55,6 @@ apr_status_t Rivet_MPM_Finalize (void* data)
 int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
     rivet_server_conf*  rsc = RIVET_SERVER_CONF( s->module_config );
-    //Tcl_Channel*        outchannel;
 
     FILEDEBUGINFO;
 
@@ -77,18 +76,23 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 
     if (rsc->rivet_server_init_script != NULL) {
         Tcl_Interp* interp = module_globals->server_interp->interp;
+        Tcl_Obj*    server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
 
-        if (Tcl_EvalObjEx(interp, rsc->rivet_server_init_script, 0) != TCL_OK)
+        Tcl_IncrRefCount(server_init);
+
+        if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                          MODNAME ": Error running ServerInitScript '%s': %s",
-                         Tcl_GetString(rsc->rivet_server_init_script),
+                         rsc->rivet_server_init_script,
                          Tcl_GetVar(interp, "errorInfo", 0));
         } else {
             ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
                          MODNAME ": ServerInitScript '%s' successful", 
-                         Tcl_GetString(rsc->rivet_server_init_script));
+                         rsc->rivet_server_init_script);
         }
+
+        Tcl_DecrRefCount(server_init);
     }
 
     Tcl_SetPanicProc(Rivet_Panic);

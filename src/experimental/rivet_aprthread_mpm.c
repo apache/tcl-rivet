@@ -71,24 +71,32 @@ static void supervisor_housekeeping (void)
 int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
     Tcl_Interp*         interp;
+    Tcl_Obj*            server_init;
     rivet_server_conf*  rsc = RIVET_SERVER_CONF( s->module_config );
 
     interp = Rivet_CreateTclInterp(s) ; /* Tcl server init interpreter */
     Rivet_PerInterpInit(interp,s,pPool);
 
     if (rsc->rivet_server_init_script != NULL) {
+        server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
+        Tcl_IncrRefCount(server_init);
 
-        if (Tcl_EvalObjEx(interp, rsc->rivet_server_init_script, 0) != TCL_OK)
+        if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
         {
+
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                          MODNAME ": Error running ServerInitScript '%s': %s",
-                         Tcl_GetString(rsc->rivet_server_init_script),
+                         rsc->rivet_server_init_script,
                          Tcl_GetVar(interp, "errorInfo", 0));
+
         } else {
+
             ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
                          MODNAME ": ServerInitScript '%s' successful", 
-                         Tcl_GetString(rsc->rivet_server_init_script));
+                         rsc->rivet_server_init_script);
+
         }
+        Tcl_DecrRefCount(server_init);
     }
 
     Tcl_DeleteInterp(interp);

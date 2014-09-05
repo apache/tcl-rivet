@@ -71,7 +71,9 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 
 #define ERRORBUF_SZ     256
 
-//TCL_DECLARE_MUTEX(sendMutex);
+ /* XXX: the pool passed to Rivet_NewVHostInterp must be the private pool of
+  * a rivet_thread_private object 
+  */
 
 vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
 {
@@ -117,12 +119,16 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
     // Initialize cache structures
 
     if (interp_obj->cache_size) {
-        interp_obj->objCacheList = apr_pcalloc(interp_obj->pool, (signed)(interp_obj->cache_size*sizeof(char *)));
+        interp_obj->objCacheList = apr_pcalloc (interp_obj->pool, 
+                                                (signed)(interp_obj->cache_size*sizeof(char *)));
         interp_obj->objCache = apr_pcalloc(interp_obj->pool, sizeof(Tcl_HashTable));
         Tcl_InitHashTable(interp_obj->objCache, TCL_STRING_KEYS);
     }
 
     interp_obj->flags = 0;
+
+    interp_obj->scripts         = (running_scripts *) apr_pcalloc(interp_obj->pool,sizeof(running_scripts));
+    interp_obj->per_dir_scripts = apr_hash_make(interp_obj->pool); 
 
     return interp_obj;
 }
@@ -154,17 +160,22 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     /* Using the root interpreter we evaluate the global initialization script, if any */
 
     if (root_server_conf->rivet_global_init_script != NULL) {
-        if (Tcl_EvalObjEx(root_interp->interp, root_server_conf->rivet_global_init_script, 0) != TCL_OK)
+        Tcl_Obj* global_tcl_script;
+
+        global_tcl_script = Tcl_NewStringObj(root_server_conf->rivet_global_init_script,-1);
+        Tcl_IncrRefCount(global_tcl_script);
+        if (Tcl_EvalObjEx(root_interp->interp, global_tcl_script, 0) != TCL_OK)
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
                          MODNAME ": Error running GlobalInitScript '%s': %s",
-                         Tcl_GetString(root_server_conf->rivet_global_init_script),
+                         root_server_conf->rivet_global_init_script,
                          Tcl_GetVar(root_interp->interp, "errorInfo", 0));
         } else {
             ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
                          MODNAME ": GlobalInitScript '%s' successful",
-                         Tcl_GetString(root_server_conf->rivet_global_init_script));
+                         root_server_conf->rivet_global_init_script);
         }
+        Tcl_DecrRefCount(global_tcl_script);
     }
 
     /* then we proceed assigning/creating the interpreters for the
@@ -196,6 +207,14 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             rivet_interp = Rivet_NewVHostInterp(private->pool);
             Tcl_RegisterChannel(rivet_interp->interp,*private->channel);
         }
+
+        /* these 5 lines initialize the interpreter base running scripts */
+
+        RIVET_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_before_script);
+        RIVET_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_after_script);
+        RIVET_NULL_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_error_script);
+        RIVET_NULL_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_abort_script);
+        RIVET_NULL_SCRIPT_INIT (rivet_interp->scripts,myrsc,after_every_script);
 
         private->interps[myrsc->idx] = rivet_interp;
 
@@ -229,11 +248,13 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
             Tcl_Interp* interp = rivet_interp->interp;
+            Tcl_Obj*    tcl_child_init = Tcl_NewStringObj(function,-1);
 
+            Tcl_IncrRefCount(tcl_child_init);
             rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
             Tcl_Preserve (interp);
 
-            /* There is a lot of passing around of pointers to various record 
+            /* There is a lot of passing around of pointers among various record 
              * objects. We should understand if this is all that necessary.
              * Here we assign the server_rec pointer to the interpreter which
              * is wrong, because without separate interpreters it doens't make
@@ -241,7 +262,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
              */
 
             globals->srec = s;
-            if (Tcl_EvalObjEx(interp,function, 0) != TCL_OK) {
+            if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              errmsg, Tcl_GetString(function));
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
@@ -252,6 +273,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
                         Tcl_GetVar(interp, "errorInfo", 0));
             }
             Tcl_Release (interp);
+            Tcl_DecrRefCount(tcl_child_init);
         }
     }
     return private;
@@ -278,6 +300,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
  *
  *      resources stored in the array of vhost_interp objects are released
  *      and interpreters are deleted.
+ *
  */
 
 void Rivet_ProcessorCleanup (void *data)
@@ -346,27 +369,78 @@ Rivet_SendContent(rivet_thread_private *private)
     int ctype;
     Tcl_Interp*             interp;
     rivet_interp_globals*   globals = NULL;
-    request_rec*            r = private->r;
+    request_rec*            r     = private->r;
+    void*                   dconf = r->per_dir_config;
+    vhost_interp*           interp_obj;
 #ifdef USE_APACHE_RSC
-    rivet_server_conf    *rsc = NULL;
+    //rivet_server_conf    *rsc = NULL;
 #else
-    rivet_server_conf    *rdc;
+    //rivet_server_conf    *rdc;
 #endif
 
-    ctype = Rivet_CheckType(r);  
+    ctype = Rivet_CheckType(private->r);  
     if (ctype == CTYPE_NOT_HANDLED) {
         return DECLINED;
     }
 
-    //Tcl_MutexLock(&sendMutex);
-
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
-    module_globals->rivet_panic_request_rec = r;
 
-    rsc = Rivet_GetConf(r);
+    module_globals->rivet_panic_request_rec = private->r;
 
-    interp  = private->interps[rsc->idx]->interp;
+    // rsc = Rivet_GetConf(r);
+
+    private->running_conf = RIVET_SERVER_CONF (private->r->server->module_config);
+
+    /* the interp index in the private data can not be changed by a config merge */
+
+    interp_obj = private->interps[private->running_conf->idx];
+    if (dconf)
+    {
+        const char* canonical = apr_pstrdup(r->pool,r->filename);
+        const char* rootpath; 
+
+        /* Let's check if a scripts object is already stored in the per-dir hash table */
+
+        ap_assert(apr_filepath_root( &rootpath, &canonical, 0, interp_obj->pool) == APR_SUCCESS);
+        
+        private->running = 
+            (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rootpath,strlen(rootpath));
+
+        if (private->running == NULL)
+        {
+            rivet_server_conf*  rdc         = NULL;
+            rivet_server_conf*  newconfig   = NULL;
+            running_scripts*    scripts     = 
+                        (running_scripts *) apr_pcalloc (interp_obj->pool,sizeof(running_scripts));
+
+            rdc       = RIVET_SERVER_CONF(dconf); 
+            newconfig = RIVET_NEW_CONF(r->pool);
+
+            Rivet_CopyConfig( private->running_conf, newconfig );
+            Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
+            private->running_conf = newconfig;
+
+            RIVET_SCRIPT_INIT (scripts,newconfig,rivet_before_script);
+            RIVET_SCRIPT_INIT (scripts,newconfig,rivet_after_script);
+            RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_error_script);
+            RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_abort_script);
+            RIVET_NULL_SCRIPT_INIT (scripts,newconfig,after_every_script);
+ 
+            apr_hash_set (interp_obj->per_dir_scripts,rootpath,strlen(rootpath),scripts);
+           
+            private->running = scripts;
+
+        }
+    }
+    else
+    {
+        /* if no <Directory ...> rules applies we use the server configuration */
+
+        private->running = interp_obj->scripts;
+    }
+
+    interp  = interp_obj->interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
 
     /* everything should merge into a single struct sooner or later */
@@ -455,8 +529,8 @@ Rivet_SendContent(rivet_thread_private *private)
     /* Apache Request stuff */
 
     TclWeb_InitRequest(globals->req, interp, r);
-    ApacheRequest_set_post_max(globals->req->apachereq, rsc->upload_max);
-    ApacheRequest_set_temp_dir(globals->req->apachereq, rsc->upload_dir);
+    ApacheRequest_set_post_max(globals->req->apachereq, private->running_conf->upload_max);
+    ApacheRequest_set_temp_dir(globals->req->apachereq, private->running_conf->upload_dir);
 
     /* Let's copy the request data into the thread private record */
 
@@ -467,7 +541,7 @@ Rivet_SendContent(rivet_thread_private *private)
         goto sendcleanup;
     }
 
-    if (r->header_only && !rsc->honor_header_only_reqs)
+    if (r->header_only && !private->running_conf->honor_header_only_reqs)
     {
         TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
         TclWeb_PrintHeaders(globals->req);
@@ -573,17 +647,18 @@ sendcleanup:
  */
 
 static int
-Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *req)
+Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
 {
-    rivet_thread_private*   private;
+    vhost_interp* interp_obj;
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    //ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    //rivet_server_conf *conf = private->running_conf;
 
-    rivet_server_conf *conf = Rivet_GetConf(req);
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    interp_obj = private->interps[private->running_conf->idx];
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp_obj->interp, "rivet", NULL);
 
-    Tcl_Preserve (interp);
-    if ( Tcl_EvalObjEx(interp, tcl_script_obj, 0) == TCL_ERROR ) {
+    Tcl_Preserve (interp_obj->interp);
+    if ( Tcl_EvalObjEx(interp_obj->interp, tcl_script_obj, 0) == TCL_ERROR ) {
         Tcl_Obj *errscript;
         Tcl_Obj *errorCodeListObj;
         Tcl_Obj *errorCodeElementObj;
@@ -593,7 +668,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
          * by abort_page.
          */
 
-        errorCodeListObj = Tcl_GetVar2Ex (interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
+        errorCodeListObj = Tcl_GetVar2Ex (interp_obj->interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
 
         /* errorCode is guaranteed to be set to NONE, but let's make sure
          * anyway rather than causing a SIGSEGV
@@ -603,7 +678,7 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
         /* dig the first element out of the errorCode list and see if it
          * says Rivet -- this shouldn't fail either, but let's assert
          * success so we don't get a SIGSEGV afterwards */
-        ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 0, &errorCodeElementObj) == TCL_OK);
+        ap_assert (Tcl_ListObjIndex (interp_obj->interp, errorCodeListObj, 0, &errorCodeElementObj) == TCL_OK);
 
         /* if the error was thrown by Rivet, see if it's abort_page and,
          * if so, don't treat it as an error, i.e. don't execute the
@@ -616,16 +691,16 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
             /* dig the second element out of the errorCode list, make sure
              * it succeeds -- it should always
              */
-            ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
+            ap_assert (Tcl_ListObjIndex (interp_obj->interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
 
             errorCodeSubString = Tcl_GetString (errorCodeElementObj);
             if (strcmp (errorCodeSubString, ABORTPAGE_CODE) == 0) 
             {
-                if (conf->rivet_abort_script) 
+                if (private->running->rivet_abort_script) 
                 {
-                    if (Tcl_EvalObjEx(interp,conf->rivet_abort_script,0) == TCL_ERROR)
+                    if (Tcl_EvalObjEx(interp_obj->interp,private->running->rivet_abort_script,0) == TCL_ERROR)
                     {
-                        CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+                        CONST84 char *errorinfo = Tcl_GetVar( interp_obj->interp, "errorInfo", 0 );
                         TclWeb_PrintError("<b>Rivet AbortScript failed!</b>",1,globals->req);
                         TclWeb_PrintError( errorinfo, 0, globals->req );
                     }
@@ -634,45 +709,47 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
             }
         }
 
-        Tcl_SetVar( interp, "errorOutbuf",Tcl_GetStringFromObj( tcl_script_obj, NULL ),TCL_GLOBAL_ONLY );
+        Tcl_SetVar (interp_obj->interp,"errorOutbuf",Tcl_GetStringFromObj(tcl_script_obj, NULL),TCL_GLOBAL_ONLY );
 
         /* If we don't have an error script, use the default error handler. */
-        if (conf->rivet_error_script ) {
-            errscript = conf->rivet_error_script;
+        if (private->running->rivet_error_script ) {
+            errscript = private->running->rivet_error_script;
         } else {
-            errscript = conf->rivet_default_error_script;
+            errscript = Tcl_NewStringObj(private->running_conf->rivet_default_error_script,-1);
         }
 
         Tcl_IncrRefCount(errscript);
-        if (Tcl_EvalObjEx(interp, errscript, 0) == TCL_ERROR) {
-            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+        if (Tcl_EvalObjEx(interp_obj->interp, errscript, 0) == TCL_ERROR) {
+            CONST84 char *errorinfo = Tcl_GetVar( interp_obj->interp, "errorInfo", 0 );
             TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
             TclWeb_PrintError( errorinfo, 0, globals->req );
         }
 
         /* This shouldn't make the default_error_script go away,
-         * because it gets a Tcl_IncrRefCount when it is created. */
+         * because it gets a Tcl_IncrRefCount when it is created. 
+         */
         Tcl_DecrRefCount(errscript);
     }
 
     /* Make sure to flush the output if buffer_add was the only output */
 good:
     
-    if (conf->after_every_script) {
-        if (Tcl_EvalObjEx(interp,conf->after_every_script,0) == TCL_ERROR)
+    if (private->running->after_every_script) {
+        if (Tcl_EvalObjEx(interp_obj->interp,private->running->after_every_script,0) == TCL_ERROR)
         {
-            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+            CONST84 char *errorinfo = Tcl_GetVar(interp_obj->interp,"errorInfo",0);
             TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
             TclWeb_PrintError( errorinfo, 0, globals->req );
         }
     }
 
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
-        TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
+        TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",
+                              globals->req->charset,NULL),globals->req);
     }
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(private->channel));
-    Tcl_Release(interp);
+    Tcl_Release(interp_obj->interp);
 
     return TCL_OK;
 }
@@ -688,51 +765,48 @@ good:
  *
  * Arguments:
  *
- *   - rivet_thread_private : pointer to the structure collecting thread private data
-                      for Tcl and current request
- *   - filename:      pointer to a string storing the path to the template or
- *                    Tcl script
- *   - toplevel:      integer to be interpreted as a boolean meaning the
- *                    file is pointed by the request. When 0 that's a subtemplate
- *                    to be parsed and executed from another template
+ *   - rivet_thread_private:  pointer to the structure collecting thread private data
+ *                            for Tcl and current request
+ *   - filename:              pointer to a string storing the path to the template or
+ *                            Tcl script
+ *   - toplevel:              boolean value set when the argument 'filename' is the request 
+ *                            toplevel script. The value is 0 when the function is called
+ *                            by command ::rivet::parse
  */
 
 int
 Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 {
-    char *hashKey   = NULL;
-    int isNew       = 0;
-    int result      = 0;
-    //TclWebRequest*  req;
+    char*           hashKey = NULL;
+    int             isNew   = 0;
+    int             result  = 0;
     vhost_interp*   rivet_interp;
-    Tcl_Obj *outbuf = NULL;
-    Tcl_HashEntry *entry = NULL;
+    Tcl_Obj*        outbuf  = NULL;
+    Tcl_HashEntry*  entry   = NULL;
     Tcl_Interp*     interp;
-
     time_t ctime;
     time_t mtime;
+    //rivet_server_conf *rsc;
 
-    rivet_server_conf *rsc;
-
-    rsc = Rivet_GetConf( private->r );
+    //rsc = Rivet_GetConf( private->r );
 
     /* We have to fetch the interpreter data from the thread private environment */
 
-    rivet_interp = private->interps[rsc->idx];
+    rivet_interp = private->interps[private->running_conf->idx];
     interp = rivet_interp->interp;
 
     /* If the user configuration has indeed been updated, I guess that
-       pretty much invalidates anything that might have been
-       cached. */
+       pretty much invalidates anything that might have been cached. */
 
     /* This is all horrendously slow, and means we should *also* be
        doing caching on the modification time of the .htaccess files
        that concern us. FIXME */
 
-    if (rsc->user_scripts_updated && (rivet_interp->cache_size != 0)) 
+    if (private->running_conf->user_scripts_updated && (rivet_interp->cache_size != 0)) 
     {
         int ct;
         Tcl_HashEntry *delEntry;
+
         /* Clean out the list. */
         ct = rivet_interp->cache_free;
         while (ct < rivet_interp->cache_size) {
@@ -789,8 +863,8 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         Tcl_IncrRefCount(outbuf);
 
         if (toplevel) {
-            if (rsc->rivet_before_script) {
-                Tcl_AppendObjToObj(outbuf,rsc->rivet_before_script);
+            if (private->running->rivet_before_script) {
+                Tcl_AppendObjToObj(outbuf,private->running->rivet_before_script);
             }
         }
 
@@ -818,8 +892,8 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
             return result;
         }
 
-        if (toplevel && rsc->rivet_after_script) {
-            Tcl_AppendObjToObj(outbuf,rsc->rivet_after_script);
+        if (toplevel && private->running->rivet_after_script) {
+            Tcl_AppendObjToObj(outbuf,private->running->rivet_after_script);
         }
 
         if (rivet_interp->cache_size) {
@@ -875,10 +949,11 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         Tcl_IncrRefCount(outbuf);
     }
 
-    rsc->user_scripts_updated = 0;
+    private->running_conf->user_scripts_updated = 0;
     {
         int res = 0;
-        res = Rivet_ExecuteAndCheck(interp, outbuf, private->r);
+
+        res = Rivet_ExecuteAndCheck(private, outbuf);
         Tcl_DecrRefCount(outbuf);
         return res;
     }
@@ -902,8 +977,9 @@ Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf)
 {
     int res = 0;
     Tcl_Obj* outbuf = Tcl_NewObj();
-    Tcl_Interp *interp = req->interp;
+    rivet_thread_private* private;
 
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
     Tcl_IncrRefCount(outbuf);
     Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
 
@@ -915,7 +991,7 @@ Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf)
 
     Tcl_AppendToObj(outbuf, "\n", -1);
 
-    res = Rivet_ExecuteAndCheck(interp, outbuf, req->req);
+    res = Rivet_ExecuteAndCheck(private, outbuf);
     Tcl_DecrRefCount(outbuf);
 
     return res;
@@ -1229,7 +1305,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         module_globals->mpm_max_threads         = 0;
         module_globals->mpm_min_spare_threads   = 0;
         module_globals->mpm_max_spare_threads   = 0;
-        //module_globals->num_load_samples        = 0;
+        //module_globals->num_load_samples      = 0;
 
     /* Another crucial point: we are storing here in the globals a reference to the
      * root server_rec object from which threads are supposed to derive 
