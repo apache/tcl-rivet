@@ -585,7 +585,7 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
         else
         {
             return apr_pstrcat(cmd->pool, "Rivet configuration error: '",var, 
-                                          "' not valid for RivetDirConf", NULL);
+                                          "' not valid in <Directory> sections", NULL);
         }
     }
 
