@@ -397,24 +397,21 @@ Rivet_SendContent(rivet_thread_private *private)
     interp_obj = private->interps[private->running_conf->idx];
     if (dconf)
     {
-        const char* canonical = apr_pstrdup(r->pool,r->filename);
-        const char* rootpath; 
+        rivet_server_conf*  rdc         = NULL;
+
+        rdc = RIVET_SERVER_CONF(dconf); 
 
         /* Let's check if a scripts object is already stored in the per-dir hash table */
 
-        ap_assert(apr_filepath_root( &rootpath, &canonical, 0, interp_obj->pool) == APR_SUCCESS);
-        
         private->running = 
-            (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rootpath,strlen(rootpath));
+            (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path));
 
         if (private->running == NULL)
         {
-            rivet_server_conf*  rdc         = NULL;
             rivet_server_conf*  newconfig   = NULL;
             running_scripts*    scripts     = 
                         (running_scripts *) apr_pcalloc (interp_obj->pool,sizeof(running_scripts));
 
-            rdc       = RIVET_SERVER_CONF(dconf); 
             newconfig = RIVET_NEW_CONF(r->pool);
 
             Rivet_CopyConfig( private->running_conf, newconfig );
@@ -427,7 +424,7 @@ Rivet_SendContent(rivet_thread_private *private)
             RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_abort_script);
             RIVET_NULL_SCRIPT_INIT (scripts,newconfig,after_every_script);
  
-            apr_hash_set (interp_obj->per_dir_scripts,rootpath,strlen(rootpath),scripts);
+            apr_hash_set (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path),scripts);
            
             private->running = scripts;
 

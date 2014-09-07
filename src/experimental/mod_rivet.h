@@ -98,7 +98,7 @@ typedef struct _rivet_server_conf {
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
-    int user_scripts_updated;
+    int         user_scripts_updated;
 
     int             default_cache_size;
     int             upload_max;
@@ -111,6 +111,9 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
     int             idx;                /* server record index (to be used for the interps db) */
+    char*           path;               /* copy of the path field of a cmd_parms structure:
+                                           should enable us to tell if a conf record comes from a
+                                           Directory section */
 
     //Tcl_Interp *server_interp;        /* per server Tcl interpreter                         */
     //int*          cache_size;

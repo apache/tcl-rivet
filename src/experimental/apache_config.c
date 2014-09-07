@@ -57,6 +57,7 @@ extern mod_rivet_globals* module_globals;
  *
  */
 
+#if 0
 static Tcl_Obj* 
 Rivet_AssignStringToConf (Tcl_Obj** objPnt, const char* string_value)
 {
@@ -74,6 +75,7 @@ Rivet_AssignStringToConf (Tcl_Obj** objPnt, const char* string_value)
     Tcl_AppendToObj( objarg, "\n", 1 );
     return objarg;
 }
+#endif
 
 static char*
 Rivet_AppendStringToConf (char* p,const char* string,apr_pool_t *pool)
@@ -81,7 +83,7 @@ Rivet_AppendStringToConf (char* p,const char* string,apr_pool_t *pool)
 
     if (p == NULL)
     {
-        return apr_pstrdup(pool,string);
+        return apr_pstrcat(pool,apr_pstrdup(pool,string),"\n",NULL);
     }
     else
     {
@@ -225,6 +227,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_dir_vars = oldrsc->rivet_dir_vars;
     newrsc->rivet_user_vars = oldrsc->rivet_user_vars;
     newrsc->idx = oldrsc->idx;
+    newrsc->path = oldrsc->path;
 }
 
 /*
@@ -295,6 +298,8 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
     } else {
         new->rivet_user_vars = base->rivet_user_vars;
     }
+
+    RIVET_CONF_SELECT(new,base,add,path)
 }
 
 /*
@@ -314,7 +319,6 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
  * - void* pointer to a brand new rivet configuration record
  *
  */
-
 
 void *
 Rivet_CreateDirConfig(apr_pool_t *p, char *dir)
@@ -437,6 +441,8 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     rsc->rivet_user_vars = overrides->rivet_user_vars ?
         overrides->rivet_user_vars : base->rivet_user_vars;
 
+    RIVET_CONF_SELECT(rsc,base,overrides,path)
+
     return rsc;
 }
 
@@ -483,6 +489,8 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->rivet_server_vars          = (apr_table_t *) apr_table_make ( p, 4 );
     rsc->rivet_dir_vars             = (apr_table_t *) apr_table_make ( p, 4 );
     rsc->rivet_user_vars            = (apr_table_t *) apr_table_make ( p, 4 );
+    rsc->idx                        = 0;
+    rsc->path                       = NULL;
 
     return rsc;
 }
@@ -590,6 +598,11 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
     }
 
     if (string != NULL) apr_table_set( rdc->rivet_dir_vars, var, string );
+
+    /* TODO: explain this! */
+
+    rdc->path = cmd->path;
+
     return NULL;
 }
 
@@ -649,4 +662,3 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy,
 }
 
 /* apache_config.c */
-

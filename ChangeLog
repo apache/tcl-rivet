@@ -1,3 +1,13 @@
+2014-09-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.h: add field path to rivet_server_conf. This field carries
+    a copy of the 'path' field in cmd_parms. This field is NULL for global and <VirtualHost>
+    sections whereas for <Directory> sections points to the argument (the pattern matching
+    a certain directory)
+    * src/experimental/mod_rivet.c: handling of rdc->path to store configuration scripts
+    * src/experimental/rivet_prefork_mpm.c: defining request_init and request_cleanup in the
+    thread private data
+    * src/experimental/apache_config.h: handling of the path field in rivet_server_conf
+
 2014-09-05 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/apache_config.h: removed handling of lines unneeded by this version of mod_rivet
     * src/experimental/rivet_worker_mpm.c:

@@ -402,6 +402,7 @@
 			      <arg>AfterScript</arg>
 			      <arg>ErrorScript</arg>
 			      <arg>UploadDirectory</arg>
+                  <arg>AfterEveryScript</arg>
 			    </group>
 			  </cmdsynopsis>
 			</term>
@@ -424,6 +425,7 @@
 			      <arg>AfterScript</arg>
 			      <arg>ErrorScript</arg>
 			      <arg>UploadDirectory</arg>
+                  <arg>AfterEveryScript</arg>
 			    </group>
 			  </cmdsynopsis>
 			</term>

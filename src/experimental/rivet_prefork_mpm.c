@@ -133,6 +133,11 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
             private->keep_going = 1;
             private->r          = NULL;
             private->req        = NULL;
+            private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+            private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+            Tcl_IncrRefCount(private->request_init);
+            Tcl_IncrRefCount(private->request_cleanup);
+
             private->channel    = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
             private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
 
