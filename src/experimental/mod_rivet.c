@@ -1172,7 +1172,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     int   ap_mpm_result;
 
 #if RIVET_DISPLAY_VERSION
-    ap_add_version_component(pPool, "Rivet/Experimental/"__DATE__"/"__TIME__"/");
+    ap_add_version_component(pPool, "Rivet/Experimental");
     //ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
 #else
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME);
