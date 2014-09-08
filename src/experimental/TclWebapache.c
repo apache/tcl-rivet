@@ -44,6 +44,7 @@
 #include "TclWeb.h"
 
 extern module rivet_module;
+extern apr_threadkey_t* rivet_thread_key;
 #define TCLWEBPOOL req->req->pool
 
 #define BUFSZ 4096
@@ -398,7 +399,7 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
 static void
 TclWeb_InitEnvVars( TclWebRequest *req )
 {
-    //rivet_server_conf *rsc;
+    rivet_server_conf *rsc;
     apr_table_t *table = req->req->subprocess_env;
     char *timefmt = DEFAULT_TIME_FORMAT;
     char *t;
@@ -406,10 +407,11 @@ TclWeb_InitEnvVars( TclWebRequest *req )
 #ifndef WIN32
     struct passwd *pw;
 #endif /* ndef WIN32 */
+    rivet_thread_private* private;
 
     if( req->environment_set ) return;
 
-    //rsc = RIVET_SERVER_CONF( req->req->server->module_config );
+    rsc = RIVET_SERVER_CONF( req->req->server->module_config );
 
     /* Retrieve cgi variables. */
     ap_add_cgi_vars( req->req );
@@ -453,13 +455,11 @@ TclWeb_InitEnvVars( TclWebRequest *req )
 
     /* Here we create some variables with Rivet internal information. */
 
-    /* TODO: this information has to be fetched from the thread private data */
-    /*
-    apr_table_set( table, "RIVET_CACHE_FREE",
-            (char*)apr_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_free) ) );
-    apr_table_set( table, "RIVET_CACHE_SIZE",
-            (char*)apr_psprintf( TCLWEBPOOL, "%d", *(rsc->cache_size) ) );
-    */
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    apr_table_set (table, "RIVET_CACHE_FREE",
+            (char*) apr_psprintf (TCLWEBPOOL, "%d",private->interps[rsc->idx]->cache_free));
+    apr_table_set (table, "RIVET_CACHE_SIZE",
+            (char*) apr_psprintf (TCLWEBPOOL, "%d",private->interps[rsc->idx]->cache_size));
 
     req->environment_set = 1;
 }

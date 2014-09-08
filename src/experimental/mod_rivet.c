@@ -410,33 +410,42 @@ Rivet_SendContent(rivet_thread_private *private)
         }
         else
         {
+
+            if (rdc->path == NULL)
+            {
+                private->running = interp_obj->scripts;
+            }
+            else
+            {
+
             /* Let's check if a scripts object is already stored in the per-dir hash table */
 
-            private->running = 
-                (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path));
+                private->running = 
+                    (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path));
 
-            if (private->running == NULL)
-            {
-                rivet_server_conf*  newconfig   = NULL;
-                running_scripts*    scripts     = 
-                            (running_scripts *) apr_pcalloc (interp_obj->pool,sizeof(running_scripts));
+                if (private->running == NULL)
+                {
+                    rivet_server_conf*  newconfig   = NULL;
+                    running_scripts*    scripts     = 
+                                (running_scripts *) apr_pcalloc (interp_obj->pool,sizeof(running_scripts));
 
-                newconfig = RIVET_NEW_CONF(r->pool);
+                    newconfig = RIVET_NEW_CONF(r->pool);
 
-                Rivet_CopyConfig( private->running_conf, newconfig );
-                Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
-                private->running_conf = newconfig;
+                    Rivet_CopyConfig( private->running_conf, newconfig );
+                    Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
+                    private->running_conf = newconfig;
 
-                RIVET_SCRIPT_INIT (scripts,newconfig,rivet_before_script);
-                RIVET_SCRIPT_INIT (scripts,newconfig,rivet_after_script);
-                RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_error_script);
-                RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_abort_script);
-                RIVET_NULL_SCRIPT_INIT (scripts,newconfig,after_every_script);
-     
-                apr_hash_set (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path),scripts);
-               
-                private->running = scripts;
+                    RIVET_SCRIPT_INIT (scripts,newconfig,rivet_before_script);
+                    RIVET_SCRIPT_INIT (scripts,newconfig,rivet_after_script);
+                    RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_error_script);
+                    RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_abort_script);
+                    RIVET_NULL_SCRIPT_INIT (scripts,newconfig,after_every_script);
+         
+                    apr_hash_set (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path),scripts);
+                   
+                    private->running = scripts;
 
+                }
             }
         }
     }
