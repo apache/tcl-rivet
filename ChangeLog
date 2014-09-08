@@ -1,3 +1,7 @@
+2014-09-08 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: handling per dir configurations that have no Rivet directives
+    in them, thus leaving the patch field NULL.
+
 2014-09-07 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.h: add field path to rivet_server_conf. This field carries
     a copy of the 'path' field in cmd_parms. This field is NULL for global and <VirtualHost>
