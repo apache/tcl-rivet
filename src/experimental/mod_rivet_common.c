@@ -20,7 +20,7 @@
     under the License.
 */
 
-/* $Id: mod_rivet.c 1609472 2014-07-10 15:08:52Z mxmanghi $ */
+/* $Id$ */
 
 #include <httpd.h>
 #include <apr_strings.h>

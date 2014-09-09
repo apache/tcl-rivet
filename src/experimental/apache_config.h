@@ -19,7 +19,7 @@
     under the License.
  */
 
-/* $Id: apache_config.h 1547463 2013-12-03 16:35:08Z mxmanghi $ */
+/* $Id$ */
 
 
 #ifndef __apache_config_h__

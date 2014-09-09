@@ -17,7 +17,7 @@
    limitations under the License.
 */
 
-/* $Id: rivetCore.c 1599307 2014-06-02 18:57:20Z mxmanghi $ */
+/* $Id$ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H

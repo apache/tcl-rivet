@@ -24,7 +24,7 @@
    limitations under the License.
 */
 
-/* $Id: TclWebapache.c,v 1.49 2005/08/12 22:37:57 davidw Exp $ */
+/* $Id$ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
