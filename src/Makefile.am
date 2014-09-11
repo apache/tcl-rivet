@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SUBDIRS = @rivet_core@
+#SUBDIRS = @rivet_core@
 
 lib_libexecdir = @RIVET_TCL_TARGET@
 lib_libexec_LTLIBRARIES = librivetparser.la librivetlib.la 
@@ -34,6 +34,42 @@ librivetlib_la_SOURCES = librivet/rivetList.c librivet/rivetCrypt.c librivet/riv
 librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 librivetlib_la_LIBADD  = @APXS_LIBS@
 librivetlib_la_CPPFLAGS = -I@rivet_core@ -I@apache_request@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
+
+apxs_libexecdir = @APXS_LIBEXECDIR@
+apxs_libexec_LTLIBRARIES = mod_rivet.la
+
+mod_rivet_la_SOURCES =  @rivet_core@/mod_rivet.c                            \
+                        @apache_request@/apache_multipart_buffer.c 	        \
+                        @apache_request@/apache_request.c                   \
+                        @rivet_commands@/rivetCore.c                        \
+                        @rivet_commands@/rivetInspect.c                     \
+                        @rivet_channel@/rivetChannel.c                      \
+                        parser/rivetParser.c                                \
+                        @rivet_core@/TclWebapache.c                         \
+                        @rivet_core@/apache_config.c                        \
+                        @rivet_core@/mod_rivet_common.c
+
+mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
+mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
+mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -I@RIVET_BASE_INCLUDE@/parser -I@apache_request@ @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+
+lib_libmpmdir = @RIVET_TCL_TARGET@/mpm
+lib_libmpm_LTLIBRARIES = rivet_worker_mpm.la rivet_prefork_mpm.la rivet_aprthread_mpm.la
+
+rivet_worker_mpm_la_SOURCES = experimental/rivet_worker_mpm.c
+rivet_worker_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
+rivet_worker_mpm_la_LIBADD  = @APXS_LIBS@
+rivet_worker_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
+
+rivet_prefork_mpm_la_SOURCES = experimental/rivet_prefork_mpm.c
+rivet_prefork_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
+rivet_prefork_mpm_la_LIBADD  = @APXS_LIBS@
+rivet_prefork_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
+
+rivet_aprthread_mpm_la_SOURCES = experimental/rivet_aprthread_mpm.c
+rivet_aprthread_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
+rivet_aprthread_mpm_la_LIBADD  = @APXS_LIBS@
+rivet_aprthread_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
 
 # Removing libtool .la files from installation
 

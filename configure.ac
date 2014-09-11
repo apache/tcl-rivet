@@ -448,7 +448,10 @@ AC_DEFUN([MOD_RIVET_CORE],[
     
     if test "$rivet_core" = "experimental"; then
         default_rivet_commands="experimental"
-        default_rivet_channel="experimental"    
+        default_rivet_channel="experimental"
+    else
+        default_rivet_commands="apache-2"
+        default_rivet_channel="apache-2"   
     fi
 
     AC_CONFIG_FILES([src/${rivet_core}/Makefile])
