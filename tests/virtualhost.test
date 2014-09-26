@@ -161,7 +161,7 @@ set vhostconf {
 
 # Format: directive, file, 2 regexps to match
 set configs {
-    ChildInitScript childinit.tcl "vhost2 hello world<br>\n::childinit2 exists<br>\n::childinit1 exists<br>\n" \
+    ChildInitScript childinit.tcl "vhost2 hello world<br>\n::childinit2 exists<br>\n::childinit1 exists<br>" \
                                   "vhost1 hello world<br>\n::childinit1 exists<br>\n::childinit2 exists<br>"
     BeforeScript beforescript.tcl "^beforescript2\nVirtual Host2 Test" "^beforescript1\nVirtual Host1 Test"
     AfterScript afterscript.tcl "afterscript2" "afterscript1"
@@ -187,17 +187,18 @@ ServerName vhost2
 " {
 	set page1 [::http::geturl "${urlbase}vhost2.rvt" -headers [list Host vhost2]]
 	set page2 [::http::geturl "${urlbase}vhost1.rvt" -headers [list Host vhost1]]
-	set data1 [::http::data $page1]
-	set data2 [::http::data $page2]
+	set data1 [string trim [::http::data $page1]]
+	set data2 [string trim [::http::data $page2]]
 	::http::cleanup $page1
 	::http::cleanup $page2
 }
-#puts "--$re1--\n--$data1--"
-#puts "--$re2--\n--$data2--"
+#puts "|$re1|\n#$data1#"
+#puts "|$re2|\n#$data2#"
 
-list [regexp $re1 $data1 match] [regexp $re1 $data1 match]
+list [regexp $re1 $data1 match] [regexp $re2 $data2 match]
 #list $data1 $data2
     } {1 1}
+    incr i
 }
 
 set configs {

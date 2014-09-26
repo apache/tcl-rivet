@@ -77,8 +77,16 @@
 #define DEFAULT_TIME_FORMAT "%A, %d-%b-%Y %H:%M:%S %Z"
 #define MULTIPART_FORM_DATA 1
 
+#define USER_SCRIPTS_UPDATED 1
+#define USER_SCRIPTS_CONF    1<<1
+#define USER_SCRIPTS_MERGED  1<<2
+
+#define IS_USER_CONF(mc)        ((mc->user_scripts_status & USER_SCRIPTS_CONF) != 0)
+#define USER_CONF_UPDATED(mc)   ((mc->user_scripts_status & USER_SCRIPTS_UPDATED) != 0)
+#define USER_CONF_MERGED(mc)    ((mc->user_scripts_status & USER_SCRIPTS_MERGED) != 0)
+
 /* IMPORTANT: If you make any changes to the rivet_server_conf struct,
- * you need to make the appropriate modifications to Rivet_CopyConfig,
+ * you need to make the appropriate modinficationus to Rivet_CopyConfig,
  * Rivet_CreateConfig, Rivet_MergeConfig and so on. */
 
 module AP_MODULE_DECLARE_DATA rivet_module;
@@ -98,7 +106,9 @@ typedef struct _rivet_server_conf {
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
-    int         user_scripts_updated;
+    unsigned int    user_scripts_status;
+
+    //int         user_scripts_updated;
 
     int             default_cache_size;
     int             upload_max;
@@ -114,6 +124,7 @@ typedef struct _rivet_server_conf {
     char*           path;               /* copy of the path field of a cmd_parms structure:
                                            should enable us to tell if a conf record comes from a
                                            Directory section */
+    //int             user_conf;
 
     //Tcl_Interp *server_interp;        /* per server Tcl interpreter                         */
     //int*          cache_size;
@@ -305,8 +316,7 @@ EXTERN int Rivet_SendContent (rivet_thread_private *private);
 EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 
 /* temporary content generation handler */
-
-EXTERN int RivetContent (rivet_thread_private* private);
+//EXTERN int RivetContent (rivet_thread_private* private);
 
 /* error code set by command 'abort_page' */
 
@@ -332,20 +342,22 @@ EXTERN int RivetContent (rivet_thread_private* private);
 #define RIVET_CONF_SELECT(selected,base,overlay,field) \
     selected->field = overlay->field ? overlay->field : base->field;
 
-#define RIVET_SCRIPT_INIT(running_script,rivet_conf_rec,objscript) \
+#define RIVET_CR_TERM(pool,string)  apr_pstrcat(pool,string,"\n",NULL)
+
+#define RIVET_SCRIPT_INIT(p,running_script,rivet_conf_rec,objscript) \
     if (rivet_conf_rec->objscript == NULL) {\
         running_script->objscript = Tcl_NewStringObj("",-1);\
     } else {\
-        running_script->objscript = Tcl_NewStringObj(rivet_conf_rec->objscript,-1);\
+        running_script->objscript = Tcl_NewStringObj(RIVET_CR_TERM(p,rivet_conf_rec->objscript),-1);\
     }\
     Tcl_IncrRefCount(running_script->objscript);
  
-#define RIVET_NULL_SCRIPT_INIT(running_script,rivet_conf_rec,objscript) \
+#define RIVET_NULL_SCRIPT_INIT(p,running_script,rivet_conf_rec,objscript) \
     if (rivet_conf_rec->objscript == NULL) {\
         running_script->objscript = NULL;\
     } else {\
-        running_script->objscript = Tcl_NewStringObj(rivet_conf_rec->objscript,-1);\
+        running_script->objscript = Tcl_NewStringObj(RIVET_CR_TERM(p,rivet_conf_rec->objscript),-1);\
         Tcl_IncrRefCount(running_script->objscript);\
-    }\
+    }
 
 #endif /* MOD_RIVET_H */

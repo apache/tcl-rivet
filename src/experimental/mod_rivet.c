@@ -71,6 +71,56 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 
 #define ERRORBUF_SZ     256
 
+/*
+ *-----------------------------------------------------------------------------
+ * Rivet_CreateCache --
+ *
+ * Arguments:
+ *     rsc: pointer to a server_rec structure
+ *
+ * Results:
+ *     None
+ *
+ * Side Effects:
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static void Rivet_CreateCache (apr_pool_t *p, vhost_interp* interp_obj)
+{
+    interp_obj->objCacheList = apr_pcalloc(p, (signed)((interp_obj->cache_size)*sizeof(char *)));
+    interp_obj->objCache = apr_pcalloc(p, sizeof(Tcl_HashTable));
+    Tcl_InitHashTable(interp_obj->objCache, TCL_STRING_KEYS);
+}
+
+/*
+ * Rivet_DuplicateVhostInterp
+ *
+ *
+ */
+
+static vhost_interp* 
+Rivet_DuplicateVHostInterp(apr_pool_t* pool, vhost_interp* source_obj)
+{
+    vhost_interp* interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
+
+    interp_obj->interp      = source_obj->interp;
+    interp_obj->cache_free  = source_obj->cache_free;
+    interp_obj->cache_size  = source_obj->cache_size;
+
+    /* TODO: decouple cache by creating a cache object and store only a pointer to it */
+
+    if (interp_obj->cache_size) {
+        Rivet_CreateCache(pool,interp_obj); 
+    }
+
+    interp_obj->pool            = source_obj->pool;
+    interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
+    interp_obj->per_dir_scripts = apr_hash_make(pool); 
+    interp_obj->flags           = source_obj->flags;
+    return interp_obj;
+}
+
  /* XXX: the pool passed to Rivet_NewVHostInterp must be the private pool of
   * a rivet_thread_private object 
   */
@@ -119,16 +169,13 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
     // Initialize cache structures
 
     if (interp_obj->cache_size) {
-        interp_obj->objCacheList = apr_pcalloc (interp_obj->pool, 
-                                                (signed)(interp_obj->cache_size*sizeof(char *)));
-        interp_obj->objCache = apr_pcalloc(interp_obj->pool, sizeof(Tcl_HashTable));
-        Tcl_InitHashTable(interp_obj->objCache, TCL_STRING_KEYS);
+        Rivet_CreateCache(pool,interp_obj); 
     }
 
     interp_obj->flags = 0;
 
-    interp_obj->scripts         = (running_scripts *) apr_pcalloc(interp_obj->pool,sizeof(running_scripts));
-    interp_obj->per_dir_scripts = apr_hash_make(interp_obj->pool); 
+    interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
+    interp_obj->per_dir_scripts = apr_hash_make(pool); 
 
     return interp_obj;
 }
@@ -206,15 +253,19 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             rivet_interp = Rivet_NewVHostInterp(private->pool);
             Tcl_RegisterChannel(rivet_interp->interp,*private->channel);
+        } 
+        else
+        {
+            rivet_interp = Rivet_DuplicateVHostInterp(private->pool,root_interp);           
         }
 
         /* these 5 lines initialize the interpreter base running scripts */
 
-        RIVET_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_before_script);
-        RIVET_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_after_script);
-        RIVET_NULL_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_error_script);
-        RIVET_NULL_SCRIPT_INIT (rivet_interp->scripts,myrsc,rivet_abort_script);
-        RIVET_NULL_SCRIPT_INIT (rivet_interp->scripts,myrsc,after_every_script);
+        RIVET_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_before_script);
+        RIVET_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_after_script);
+        RIVET_NULL_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_error_script);
+        RIVET_NULL_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_abort_script);
+        RIVET_NULL_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,after_every_script);
 
         private->interps[myrsc->idx] = rivet_interp;
 
@@ -369,9 +420,8 @@ Rivet_SendContent(rivet_thread_private *private)
     int ctype;
     Tcl_Interp*             interp;
     rivet_interp_globals*   globals = NULL;
-    request_rec*            r     = private->r;
-    void*                   dconf = r->per_dir_config;
     vhost_interp*           interp_obj;
+    request_rec*            r = private->r;
 #ifdef USE_APACHE_RSC
     //rivet_server_conf    *rsc = NULL;
 #else
@@ -395,58 +445,62 @@ Rivet_SendContent(rivet_thread_private *private)
     /* the interp index in the private data can not be changed by a config merge */
 
     interp_obj = private->interps[private->running_conf->idx];
-    if (dconf)
+    private->running = interp_obj->scripts;
+
+    if (r->per_dir_config)
     {
-        rivet_server_conf*  rdc         = NULL;
+        rivet_server_conf* rdc = NULL;
 
-        rdc = RIVET_SERVER_CONF(dconf); 
+        rdc = RIVET_SERVER_CONF(r->per_dir_config); 
 
-        if (rdc == NULL)
+        if ((rdc != NULL) && (rdc->path))
         {
-            /* a Directory sections exists but there were no Rivet configuration directives in it */
-
-            private->running = interp_obj->scripts;
-
-        }
-        else
-        {
-
-            if (rdc->path == NULL)
-            {
-                private->running = interp_obj->scripts;
-            }
-            else
-            {
-
             /* Let's check if a scripts object is already stored in the per-dir hash table */
 
-                private->running = 
-                    (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path));
+            private->running = 
+                (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path));
 
-                if (private->running == NULL)
-                {
-                    rivet_server_conf*  newconfig   = NULL;
-                    running_scripts*    scripts     = 
-                                (running_scripts *) apr_pcalloc (interp_obj->pool,sizeof(running_scripts));
+            if (private->running == NULL)
+            {
+                rivet_server_conf*  newconfig   = NULL;
+                running_scripts*    scripts     = 
+                            (running_scripts *) apr_pcalloc (private->pool,sizeof(running_scripts));
 
-                    newconfig = RIVET_NEW_CONF(r->pool);
+                newconfig = RIVET_NEW_CONF(r->pool);
 
-                    Rivet_CopyConfig( private->running_conf, newconfig );
-                    Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
-                    private->running_conf = newconfig;
+                Rivet_CopyConfig( private->running_conf, newconfig );
+                Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
+                private->running_conf = newconfig;
 
-                    RIVET_SCRIPT_INIT (scripts,newconfig,rivet_before_script);
-                    RIVET_SCRIPT_INIT (scripts,newconfig,rivet_after_script);
-                    RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_error_script);
-                    RIVET_NULL_SCRIPT_INIT (scripts,newconfig,rivet_abort_script);
-                    RIVET_NULL_SCRIPT_INIT (scripts,newconfig,after_every_script);
-         
-                    apr_hash_set (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path),scripts);
-                   
-                    private->running = scripts;
-
-                }
+                RIVET_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_before_script);
+                RIVET_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_after_script);
+                RIVET_NULL_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_error_script);
+                RIVET_NULL_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_abort_script);
+                RIVET_NULL_SCRIPT_INIT (private->pool,scripts,newconfig,after_every_script);
+     
+                apr_hash_set (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path),scripts);
+               
+                private->running = scripts;
             }
+        }
+
+        if (USER_CONF_UPDATED(rdc))
+        {
+            rivet_server_conf*  newconfig   = NULL;
+            private->running = (running_scripts *) apr_pcalloc (private->pool,sizeof(running_scripts));
+
+            newconfig = RIVET_NEW_CONF(r->pool);
+
+            Rivet_CopyConfig( private->running_conf, newconfig );
+            Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
+            private->running_conf = newconfig;
+
+            RIVET_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_before_script);
+            RIVET_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_after_script);
+            RIVET_NULL_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_error_script);
+            RIVET_NULL_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_abort_script);
+            RIVET_NULL_SCRIPT_INIT (r->pool,private->running,newconfig,after_every_script);
+
         }
     }
     else
@@ -615,7 +669,7 @@ Rivet_SendContent(rivet_thread_private *private)
     }
 
     /* Reset globals */
-    Rivet_CleanupRequest( r );
+    Rivet_CleanupRequest(r);
 
     retval = OK;
 sendcleanup:
@@ -800,8 +854,8 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
     Tcl_Obj*        outbuf  = NULL;
     Tcl_HashEntry*  entry   = NULL;
     Tcl_Interp*     interp;
-    time_t ctime;
-    time_t mtime;
+    time_t          ctime;
+    time_t          mtime;
     //rivet_server_conf *rsc;
 
     //rsc = Rivet_GetConf( private->r );
@@ -818,7 +872,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
        doing caching on the modification time of the .htaccess files
        that concern us. FIXME */
 
-    if (private->running_conf->user_scripts_updated && (rivet_interp->cache_size != 0)) 
+    if (USER_CONF_UPDATED(private->running_conf) && (rivet_interp->cache_size != 0)) 
     {
         int ct;
         Tcl_HashEntry *delEntry;
@@ -830,15 +884,21 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
             delEntry = Tcl_FindHashEntry(
                     rivet_interp->objCache,
                     rivet_interp->objCacheList[ct]);
+
             if (delEntry != NULL) {
                 Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+                Tcl_DeleteHashEntry(delEntry);
+                rivet_interp->objCacheList[ct] = NULL;
             }
-            Tcl_DeleteHashEntry(delEntry);
 
-            free(rivet_interp->objCacheList[ct]);
-            rivet_interp->objCacheList[ct] = NULL;
             ct++;
         }
+        apr_pool_destroy(rivet_interp->pool);
+        
+        /* let's recreate the cache list */
+
+        rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
+                                                (signed)(rivet_interp->cache_size*sizeof(char *)));
         rivet_interp->cache_free = rivet_interp->cache_size;
     }
 
@@ -865,10 +925,13 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
     /* Look for the script's compiled version.  If it's not found,
      * create it.
      */
+
     if (rivet_interp->cache_size)
     {
-        hashKey = (char*) apr_psprintf(private->r->pool, "%s%lx%lx%d", filename,
-                mtime, ctime, toplevel);
+        unsigned int user_conf = IS_USER_CONF(private->running_conf);
+
+        hashKey = (char*) apr_psprintf(private->r->pool, "%s%lx%lx%d-%d", filename,
+                mtime, ctime, toplevel,user_conf);
         entry = Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, &isNew);
     }
 
@@ -935,21 +998,6 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         instead of removing the last entry in the cache (for what purpose after all??)
         we signal a 'cache full' condition
  */
-
- /*
-            Tcl_HashEntry *delEntry;
-            delEntry = Tcl_FindHashEntry(
-                            rivet_interp->objCache,
-                            rivet_interp->objCacheList[rivet_interp->cache_size - 1]);
-            Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
-            Tcl_DeleteHashEntry(delEntry);
-            free(rivet_interp->objCacheList[rivet_interp->cache_size - 1]);
-            memmove((rivet_interp->objCacheList) + 1, rivet_interp->objCacheList,
-                    sizeof(char *) * (rivet_interp->cache_size - 1));
-
-            rivet_interp->objCacheList[0] = (char*) malloc ((strlen(hashKey)+1) * sizeof(char));
-            strcpy (rivet_interp->objCacheList[0], hashKey);
- */
             
             if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
             {
@@ -965,7 +1013,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         Tcl_IncrRefCount(outbuf);
     }
 
-    private->running_conf->user_scripts_updated = 0;
+    //private->running_conf->user_scripts_status &= ~(unsigned int)USER_SCRIPTS_UPDATED;
     {
         int res = 0;
 

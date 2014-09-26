@@ -59,15 +59,17 @@ if { $testgroup2 } {
 # These tests start the server on their own, or don't need the server
 # at all.
 
-if { $testgroup3 } {
-    foreach Test {
+set group3 {
         failtest.test
         broken.test
         config.test
         parsepackage.test
         virtualhost.test
         inspect.test 
-    } {
+    }
+
+if { $testgroup3 } {
+    foreach Test $group3 {
         puts "Running $Test"
         source $Test
     }

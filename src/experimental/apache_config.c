@@ -81,15 +81,13 @@ static char*
 Rivet_AppendStringToConf (char* p,const char* string,apr_pool_t *pool)
 {
 
-    if (p == NULL)
-    {
-        return apr_pstrcat(pool,apr_pstrdup(pool,string),"\n",NULL);
-    }
-    else
-    {
-        return apr_pstrcat(pool,p,string,"\n",NULL);
+    if (p == NULL) { 
+        p = apr_pstrdup(pool,string);
+    } else {
+        p = apr_pstrcat(pool,p,"\n",string,NULL);
     }
 
+    return p;
 }
 
 /*
@@ -112,31 +110,34 @@ Rivet_AppendStringToConf (char* p,const char* string,apr_pool_t *pool)
 static const char *
 Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, const char *string)
 {
-    Tcl_Obj *objarg = NULL;
+    char** c = NULL;
 
     if ( STREQU( script, "GlobalInitScript" ) ) {
-        rsc->rivet_global_init_script = Rivet_AppendStringToConf(rsc->rivet_global_init_script,string,pool);
+        c = &rsc->rivet_global_init_script;
     } else if ( STREQU( script, "ChildInitScript" ) ) {
-        rsc->rivet_child_init_script = Rivet_AppendStringToConf(rsc->rivet_child_init_script,string,pool);
+        c = &rsc->rivet_child_init_script;
     } else if ( STREQU( script, "ChildExitScript" ) ) {
-        rsc->rivet_child_exit_script = Rivet_AppendStringToConf(rsc->rivet_child_exit_script,string,pool);
+        c = &rsc->rivet_child_exit_script;
     } else if ( STREQU( script, "BeforeScript" ) ) {
-        rsc->rivet_before_script = Rivet_AppendStringToConf(rsc->rivet_before_script,string,pool);
+        c = &rsc->rivet_before_script;
     } else if ( STREQU( script, "AfterScript" ) ) {
-        rsc->rivet_after_script = Rivet_AppendStringToConf(rsc->rivet_after_script,string,pool);
+        c = &rsc->rivet_after_script;
     } else if ( STREQU( script, "ErrorScript" ) ) {
-        rsc->rivet_error_script = Rivet_AppendStringToConf(rsc->rivet_error_script,string,pool);
+        c = &rsc->rivet_error_script;
     } else if ( STREQU( script, "AbortScript" ) ) {
-        rsc->rivet_abort_script = Rivet_AppendStringToConf(rsc->rivet_abort_script,string,pool);
+        c = &rsc->rivet_abort_script;
     } else if ( STREQU( script, "AfterEveryScript" ) ) {
-        rsc->after_every_script = Rivet_AppendStringToConf(rsc->after_every_script,string,pool);
+        c = &rsc->after_every_script;
     } else if ( STREQU( script, "ServerInitScript" ) ) {
-        rsc->rivet_server_init_script = Rivet_AppendStringToConf(rsc->rivet_server_init_script,string,pool);
+        c = &rsc->rivet_server_init_script;
+    } else {
+        return NULL;
     }
+   
+    *c = Rivet_AppendStringToConf(*c,string,pool);
 
-    if( !objarg ) return string;
+    return *c;
 
-    return Tcl_GetStringFromObj( objarg, NULL );
 }
 
 /* 
@@ -214,7 +215,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
     newrsc->rivet_abort_script = oldrsc->rivet_abort_script;
     newrsc->after_every_script = oldrsc->after_every_script;
-    newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
+    //newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
     newrsc->rivet_default_error_script = oldrsc->rivet_default_error_script;
     newrsc->default_cache_size = oldrsc->default_cache_size;
     newrsc->upload_max = oldrsc->upload_max;
@@ -228,6 +229,8 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_user_vars = oldrsc->rivet_user_vars;
     newrsc->idx = oldrsc->idx;
     newrsc->path = oldrsc->path;
+    //newrsc->user_conf = oldrsc->user_conf;
+    newrsc->user_scripts_status = oldrsc->user_scripts_status;
 }
 
 /*
@@ -280,8 +283,8 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
     new->after_every_script = add->after_every_script ?
         add->after_every_script : base->after_every_script;
 
-    new->user_scripts_updated = add->user_scripts_updated ?
-        add->user_scripts_updated : base->user_scripts_updated;
+    //new->user_scripts_updated = add->user_scripts_updated ?
+    //    add->user_scripts_updated : base->user_scripts_updated;
 
     new->upload_dir = add->upload_dir ? add->upload_dir : base->upload_dir;
 
@@ -300,6 +303,8 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
     }
 
     RIVET_CONF_SELECT(new,base,add,path)
+    new->user_scripts_status = add->user_scripts_status;
+    //new->user_conf = add->user_conf;
 }
 
 /*
@@ -474,7 +479,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->rivet_abort_script         = NULL;
     rsc->after_every_script         = NULL;
 
-    rsc->user_scripts_updated = 0;
+    rsc->user_scripts_status        = 0;
 
     rsc->rivet_default_error_script = "::Rivet::handle_error";
 
@@ -491,7 +496,6 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->rivet_user_vars            = (apr_table_t *) apr_table_make ( p, 4 );
     rsc->idx                        = 0;
     rsc->path                       = NULL;
-
     return rsc;
 }
 
@@ -520,17 +524,20 @@ Rivet_UserConf( cmd_parms *cmd,
         return "Rivet Error: RivetUserConf requires two arguments";
     }
 
-    /* We have modified these scripts. */
+    /* We have modified these scripts.  */
     /* This is less than ideal though, because it will get set to 1
-     * every time - FIXME. */
+     * every time - FIXME.              */
 
-    rdc->user_scripts_updated = 1;
+    //rdc->user_scripts_updated = 1;
+    //rdc->user_conf            = 1;
+
+    rdc->user_scripts_status |= (USER_SCRIPTS_UPDATED | USER_SCRIPTS_CONF);
 
     if (STREQU(var,"BeforeScript")      || 
         STREQU(var,"AfterScript")       || 
         STREQU(var,"AbortScript")       ||
         STREQU(var,"AfterEveryScript")  ||
-        STREQU(var,"UploadDirectory")  ||
+        STREQU(var,"UploadDirectory")   ||
         STREQU(var,"ErrorScript"))
     {
         apr_table_set( rdc->rivet_user_vars, var, 
@@ -567,8 +574,7 @@ Rivet_UserConf( cmd_parms *cmd,
  */
 
 const char *
-Rivet_DirConf( cmd_parms *cmd, void *vrdc, 
-               const char *var, const char *val )
+Rivet_DirConf(cmd_parms *cmd,void *vrdc,const char *var,const char *val)
 {
     const char *string = val;
     rivet_server_conf *rdc = (rivet_server_conf *)vrdc;
@@ -579,9 +585,12 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
         return "Rivet Error: RivetDirConf requires two arguments";
     }
 
-    if( STREQU( var, "UploadDirectory" ) ) {
+    if(STREQU(var, "UploadDirectory")) 
+    {
         rdc->upload_dir = val;
-    } else {
+    } 
+    else 
+    {
         if (STREQU(var,"BeforeScript")      || 
             STREQU(var,"AfterScript")       || 
             STREQU(var,"AbortScript")       ||
@@ -628,8 +637,7 @@ Rivet_DirConf( cmd_parms *cmd, void *vrdc,
  */
 
 const char *
-Rivet_ServerConf( cmd_parms *cmd, void *dummy, 
-                  const char *var, const char *val )
+Rivet_ServerConf(cmd_parms *cmd,void *dummy,const char *var,const char *val)
 {
     server_rec *s = cmd->server;
     rivet_server_conf *rsc = RIVET_SERVER_CONF(s->module_config);
@@ -658,7 +666,7 @@ Rivet_ServerConf( cmd_parms *cmd, void *dummy,
     }
 
     if (string != NULL) apr_table_set( rsc->rivet_server_vars, var, string );
-    return( NULL );
+    return(NULL);
 }
 
 /* apache_config.c */

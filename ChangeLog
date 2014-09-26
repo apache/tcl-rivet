@@ -1,3 +1,13 @@
+2014-09-26 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: Add user scripts handling. Fixed bug in per dir and per user
+    scripts when virtual interpreters are off.
+    * src/experimental/mod_rivet.h: add macros for user configuration flags handling
+    * src/experimental/apache_config.h: add user configuration handling
+    * tests/inspect.test: trimming tests in order to make them independent for the final CR. 
+    Carriage returns should now be appended when needed
+    * tests/virtualhost.test: adding returned string space class character trimming
+    * tests/rivet.test: changing localhost into 127.0.0.1 as it breaks in certain cases
+    
 2014-09-08 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: handling per dir configurations that have no Rivet directives
     in them, thus leaving the 'path' field NULL.
