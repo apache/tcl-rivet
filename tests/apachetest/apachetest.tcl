@@ -138,13 +138,15 @@ proc apachetest::start { options conftext code } {
 
     # Kill and wait are the only reasons we need TclX.
     # apache2 binary started with -X reacts to SIGQUIT and ignores TERM
-    kill QUIT $serverpid 
-    catch {
-        set waitres [wait $serverpid]
-        if { $debug > 0 } {
-            puts $waitres
-        }
-    } 
+    #kill QUIT $serverpid 
+
+    eval exec $binname -k stop -f [file join [pwd] server.conf]
+    #catch {
+    #    set waitres [wait $serverpid]
+    #    if { $debug > 0 } {
+    #        puts $waitres
+    ##    }
+    #} 
 }
 
 # startserver - start the server with 'options'.
