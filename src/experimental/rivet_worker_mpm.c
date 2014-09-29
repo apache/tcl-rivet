@@ -509,6 +509,7 @@ int Rivet_MPM_Request (request_rec* r)
     rv = apr_queue_push(module_globals->queue,request_private);
     if (rv == APR_SUCCESS)
     {
+
         apr_thread_mutex_lock(request_private->mutex);
         while (request_private->status != done)
         {
@@ -553,3 +554,29 @@ vhost_interp* Rivet_MPM_MasterInterp(apr_pool_t* pool)
     return Rivet_NewVHostInterp(pool);
 }
 
+int Rivet_MPM_ExitHandler(int code)
+{
+    rivet_thread_private*   private;
+
+    if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, 0,
+                     MODNAME ": cannot get private data for processor thread");
+        exit(1);
+
+    } 
+    else 
+    {
+        Tcl_Interp* interp = private->interps[private->running_conf->idx]->interp;
+        static char *errorMessage = "Page generation terminated by thread_exit command";
+
+        ap_assert(private != NULL);
+
+        private->keep_going = 0;
+
+        Tcl_AddErrorInfo (interp, errorMessage);
+        Tcl_SetErrorCode (interp, "RIVET", THREAD_EXIT_CODE, errorMessage, (char *)NULL);
+
+        return TCL_ERROR;
+    }
+}

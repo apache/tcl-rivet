@@ -204,6 +204,7 @@ typedef struct _mod_rivet_globals {
     int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
     apr_status_t        (*mpm_finalize)(void*);
     vhost_interp*       (*mpm_master_interp)(apr_pool_t *);
+    int                 (*mpm_exit_handler)(int);
 
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
@@ -321,6 +322,7 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 /* error code set by command 'abort_page' */
 
 #define ABORTPAGE_CODE              "ABORTPAGE"
+#define THREAD_EXIT_CODE            "THREAD_EXIT"
 
 #define MOD_RIVET_QUEUE_SIZE        100
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
@@ -346,18 +348,11 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 
 #define RIVET_SCRIPT_INIT(p,running_script,rivet_conf_rec,objscript) \
     if (rivet_conf_rec->objscript == NULL) {\
-        running_script->objscript = Tcl_NewStringObj("",-1);\
-    } else {\
-        running_script->objscript = Tcl_NewStringObj(RIVET_CR_TERM(p,rivet_conf_rec->objscript),-1);\
-    }\
-    Tcl_IncrRefCount(running_script->objscript);
- 
-#define RIVET_NULL_SCRIPT_INIT(p,running_script,rivet_conf_rec,objscript) \
-    if (rivet_conf_rec->objscript == NULL) {\
         running_script->objscript = NULL;\
     } else {\
         running_script->objscript = Tcl_NewStringObj(RIVET_CR_TERM(p,rivet_conf_rec->objscript),-1);\
         Tcl_IncrRefCount(running_script->objscript);\
     }
+
 
 #endif /* MOD_RIVET_H */

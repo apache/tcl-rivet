@@ -53,6 +53,8 @@
 
 extern module rivet_module;
 extern char* TclWeb_GetRawPost (TclWebRequest *req);
+extern mod_rivet_globals* module_globals;
+extern apr_threadkey_t*  rivet_thread_key;
 
 #define POOL (globals->r->pool)
 
@@ -1266,6 +1268,57 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
 /*
  *-----------------------------------------------------------------------------
  *
+ * Rivet_ExitCmd --
+ *
+ *      Calls the MPM specific exit procedure. For a threaded MPM (such
+ *      as 'worker') the procedure should cause a thread to exit, not the
+ *      whole process with all its threads. In this case the procedure
+ *      returns an TCL_ERROR code that has to be handled in mod_rivet so that
+ *      the error is ignored and the request procedure interrupted. 
+ *      For a non threaded MPM (such as 'prefork') the single child process 
+ *      exits thus reproducing an ordinary 'exit' command. 
+ *
+ * Result:
+ *
+ *      TCL_ERROR when running a threaded MPM, it should never return
+ *      if a non threaded MPM is run, because Tcl_Exit will be called
+ *      by the MPM specific function of the corresponding bridge
+ * 
+ * Side Effects:
+ *
+ *      - non threaded MPMs: the child process exits for good
+ *      - threaded MPMs: the logical variable controlling a bridge thread
+ *      is set to zero and the request processing is interrupted
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_ExitCmd )
+{
+    rivet_interp_globals *globals = Tcl_GetAssocData(interp,"rivet",NULL);
+    int                   value;
+
+    CHECK_REQUEST_REC(globals->r,"::rivet::thread_exit");
+    if ((objc != 1) && (objc != 2)) {
+        Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
+        return TCL_ERROR;
+    }
+
+    if (objc == 1) {
+        value = 0;
+    } else if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK) {
+        return TCL_ERROR;
+    }
+
+    /* this call actually could never return for a non-threaded MPM bridge
+     * as it eventually will call Tcl_Exit
+     */
+
+    return (*module_globals->mpm_exit_handler)(value);
+}
+/*
+ *-----------------------------------------------------------------------------
+ *
  * Rivet_VirtualFilenameCmd --
  *
  *      Gets file according to its relationship with the request's
@@ -1617,6 +1670,7 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd);
     RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd);
+    RIVET_OBJ_CMD ("exit_thread",Rivet_ExitCmd);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd);

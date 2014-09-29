@@ -191,3 +191,18 @@ vhost_interp* Rivet_MPM_MasterInterp(void)
 {
     return module_globals->server_interp;
 }
+
+/*
+ * Rivet_MPM_ExitHandler --
+ *
+ *
+ *
+ */
+
+int Rivet_MPM_ExitHandler(int code)
+{
+    Tcl_Exit(code);
+    /*NOTREACHED*/
+    return TCL_OK;		/* Better not ever reach this! */
+}
+

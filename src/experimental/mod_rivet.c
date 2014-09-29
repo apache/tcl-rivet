@@ -71,6 +71,48 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 
 #define ERRORBUF_SZ     256
 
+/*----------------------------------------------------------------------------
+ * -- Rivet_RunningScripts
+ *
+ *
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static running_scripts*
+Rivet_RunningScripts (  apr_pool_t*         pool, 
+                        running_scripts*    scripts, 
+                        rivet_server_conf*  rivet_conf)
+{
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_before_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_after_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_error_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_abort_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,after_every_script);
+
+    return scripts;
+}
+
+/*-----------------------------------------------------------------------------
+ * -- Rivet_ReleaseScript
+ *
+ *
+ * 
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static void
+Rivet_ReleaseScripts (running_scripts* scripts)
+{
+    if (scripts->rivet_before_script) Tcl_DecrRefCount(scripts->rivet_before_script);
+    if (scripts->rivet_after_script) Tcl_DecrRefCount(scripts->rivet_after_script);
+    if (scripts->rivet_error_script) Tcl_DecrRefCount(scripts->rivet_error_script);
+    if (scripts->rivet_abort_script) Tcl_DecrRefCount(scripts->rivet_abort_script);
+    if (scripts->after_every_script) Tcl_DecrRefCount(scripts->after_every_script);
+
+}
+
 /*
  *-----------------------------------------------------------------------------
  * Rivet_CreateCache --
@@ -261,11 +303,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         /* these 5 lines initialize the interpreter base running scripts */
 
-        RIVET_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_before_script);
-        RIVET_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_after_script);
-        RIVET_NULL_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_error_script);
-        RIVET_NULL_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,rivet_abort_script);
-        RIVET_NULL_SCRIPT_INIT (private->pool,rivet_interp->scripts,myrsc,after_every_script);
+        rivet_interp->scripts = Rivet_RunningScripts(private->pool,rivet_interp->scripts,myrsc);
 
         private->interps[myrsc->idx] = rivet_interp;
 
@@ -402,7 +440,6 @@ void Rivet_ProcessorCleanup (void *data)
     apr_pool_destroy(private->pool);
 }
 
-
 /* ----------------------------------------------------------------------------
  * -- Rivet_SendContent
  *
@@ -472,12 +509,8 @@ Rivet_SendContent(rivet_thread_private *private)
                 Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
                 private->running_conf = newconfig;
 
-                RIVET_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_before_script);
-                RIVET_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_after_script);
-                RIVET_NULL_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_error_script);
-                RIVET_NULL_SCRIPT_INIT (private->pool,scripts,newconfig,rivet_abort_script);
-                RIVET_NULL_SCRIPT_INIT (private->pool,scripts,newconfig,after_every_script);
-     
+                scripts = Rivet_RunningScripts (private->pool,scripts,newconfig);
+
                 apr_hash_set (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path),scripts);
                
                 private->running = scripts;
@@ -495,11 +528,7 @@ Rivet_SendContent(rivet_thread_private *private)
             Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
             private->running_conf = newconfig;
 
-            RIVET_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_before_script);
-            RIVET_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_after_script);
-            RIVET_NULL_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_error_script);
-            RIVET_NULL_SCRIPT_INIT (r->pool,private->running,newconfig,rivet_abort_script);
-            RIVET_NULL_SCRIPT_INIT (r->pool,private->running,newconfig,after_every_script);
+            private->running = Rivet_RunningScripts(r->pool,private->running,newconfig);
 
         }
     }
@@ -777,6 +806,12 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
                 }
                 goto good;
             }
+            else if (strcmp(errorCodeSubString, THREAD_EXIT_CODE) == 0)
+            {
+                /* we simply finish up with this request and let the thread exit */
+
+                goto good;
+            }
         }
 
         Tcl_SetVar (interp_obj->interp,"errorOutbuf",Tcl_GetStringFromObj(tcl_script_obj, NULL),TCL_GLOBAL_ONLY );
@@ -856,6 +891,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
     Tcl_Interp*     interp;
     time_t          ctime;
     time_t          mtime;
+    int             res = 0;
     //rivet_server_conf *rsc;
 
     //rsc = Rivet_GetConf( private->r );
@@ -872,7 +908,8 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
        doing caching on the modification time of the .htaccess files
        that concern us. FIXME */
 
-    if (USER_CONF_UPDATED(private->running_conf) && (rivet_interp->cache_size != 0)) 
+    if (USER_CONF_UPDATED(private->running_conf) && (rivet_interp->cache_size != 0) && 
+                                                    (rivet_interp->cache_free < rivet_interp->cache_size)) 
     {
         int ct;
         Tcl_HashEntry *delEntry;
@@ -897,9 +934,18 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         
         /* let's recreate the cache list */
 
-        rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
-                                                (signed)(rivet_interp->cache_size*sizeof(char *)));
-        rivet_interp->cache_free = rivet_interp->cache_size;
+        if (apr_pool_create(&rivet_interp->pool, private->pool) != APR_SUCCESS)
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                         MODNAME ": could not recreate cache private pool. Cache disabled");
+            rivet_interp->cache_free = rivet_interp->cache_size = 0;
+        }
+        else
+        {
+            rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
+                                                    (signed)(rivet_interp->cache_size*sizeof(char *)));
+            rivet_interp->cache_free = rivet_interp->cache_size;
+        }
     }
 
     /* If toplevel is 0, we are being called from Parse, which means
@@ -1008,19 +1054,25 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         }
 
     } else {
+
         /* We found a compiled version of this page. */
         outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
         Tcl_IncrRefCount(outbuf);
+
     }
 
-    //private->running_conf->user_scripts_status &= ~(unsigned int)USER_SCRIPTS_UPDATED;
+    res = Rivet_ExecuteAndCheck(private, outbuf);
+    Tcl_DecrRefCount(outbuf);
+
+    /* We don't keep user script until we find a way to cache them consistently */
+
+    if (IS_USER_CONF(private->running_conf))
     {
-        int res = 0;
-
-        res = Rivet_ExecuteAndCheck(private, outbuf);
-        Tcl_DecrRefCount(outbuf);
-        return res;
+        Rivet_ReleaseScripts(private->running);
+        private->running_conf->user_scripts_status &= ~(unsigned int)USER_SCRIPTS_UPDATED;
     }
+
+    return res;
 }
 
 /*
@@ -1350,6 +1402,21 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
                          apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
+
+        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_ExitHandler");
+        if (rv == APR_SUCCESS)
+        {
+            module_globals->mpm_exit_handler = (int (*)(int)) func;
+        }
+        else
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                         MODNAME ": Error loading symbol Rivet_MPM_ExitHandler: %s", 
+                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+            exit(1);   
+
+        }
+
 
         /* active threads count */
         

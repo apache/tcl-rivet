@@ -1,3 +1,11 @@
+2014-09-29 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: adding mpm_exit_handler function pointer handling. Completed 
+    draft solution for RivetUserConf directives. Scripts cannot be cached though and the whole
+    mechanism has to be redesigned
+    * src/experimental/rivetCore.c: Add new command ::rivet::exit_thread
+    * src/experimental/rivet_prefork_mpm.c,rivet_worker_mpm.c: add function for mpm_exit_handler
+    hook definition
+
 2014-09-26 Massimo Manghi <mxmanghi@apache.org>
     * tests/apachetest/apachetest.tcl: phasing out TclX calls as the web server seems not to respond
     to QUIT signals sent by Tclx's kill. Likewise in apachetcl the httpd binary is used to control
