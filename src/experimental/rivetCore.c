@@ -1439,6 +1439,15 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             Tcl_DecrRefCount(dictObj);
 
         }
+        else if (STRNEQU(cmd_arg,"exit"))
+        {
+            /* thread exit status flag */
+            Tcl_Obj* exit_flag = Tcl_NewIntObj(globals->private->thread_exit);
+
+            Tcl_IncrRefCount(exit_flag);
+            Tcl_SetObjResult(interp,exit_flag);
+            Tcl_DecrRefCount(exit_flag);
+        }
         else
         {
             Tcl_Obj* par_value = NULL;

@@ -757,6 +757,13 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
     rivet_interp_globals *globals = Tcl_GetAssocData(interp_obj->interp, "rivet", NULL);
 
     Tcl_Preserve (interp_obj->interp);
+
+    /* before execution we reset the thread_exit flag. It will in case set if
+     * ::rivet::thread_exit gets called
+     */
+
+    private->thread_exit = 0;
+
     if ( Tcl_EvalObjEx(interp_obj->interp, tcl_script_obj, 0) == TCL_ERROR ) {
         Tcl_Obj *errscript;
         Tcl_Obj *errorCodeListObj;
@@ -808,9 +815,13 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
             }
             else if (strcmp(errorCodeSubString, THREAD_EXIT_CODE) == 0)
             {
-                /* we simply finish up with this request and let the thread exit */
 
+                /* we simply set the thread_exit flag and finish with this 
+                 * request and proceed to check a after_every_script is defined */
+
+                private->thread_exit = 1;
                 goto good;
+
             }
         }
 
@@ -987,10 +998,9 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
         outbuf = Tcl_NewObj();
         Tcl_IncrRefCount(outbuf);
 
-        if (toplevel) {
-            if (private->running->rivet_before_script) {
-                Tcl_AppendObjToObj(outbuf,private->running->rivet_before_script);
-            }
+        if (toplevel && private->running->rivet_before_script) 
+        {
+            Tcl_AppendObjToObj(outbuf,private->running->rivet_before_script);
         }
 
 /*

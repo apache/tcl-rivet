@@ -239,6 +239,7 @@ typedef struct _thread_worker_private {
                                             
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */
+    int                 thread_exit;        /* Flag signalling thread_exit call     */
 
 } rivet_thread_private;
 
