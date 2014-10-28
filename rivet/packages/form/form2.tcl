@@ -413,7 +413,7 @@ package provide form 2.0
     # file -- emit an HTML 5 "file" form field
     #
     method file {name args} {
-        field email $name {*}$args
+        field file $name {*}$args
     }
 
     #
