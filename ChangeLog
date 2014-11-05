@@ -1,3 +1,7 @@
+2014-11-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: fixed wrong call to Tcl_GetString passing a void argument
+    that actually wasn't a Tcl_Obj pointer
+
 2014-10-28 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form2.tcl: how comes the method 'file' emits the same output of method
     email and nobody noticed it?

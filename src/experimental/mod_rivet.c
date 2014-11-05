@@ -353,7 +353,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             globals->srec = s;
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
-                             errmsg, Tcl_GetString(function));
+                             errmsg, function);
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
                              "errorCode: %s",
                                 Tcl_GetVar(interp, "errorCode", 0));
