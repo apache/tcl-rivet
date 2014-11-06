@@ -79,11 +79,15 @@ void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
 /*
  * -- Rivet_CleanupRequest
  *
- * This function contained some come that cleaned up
- * the user configuration before finishing a request
- * processing. That code had been disabled and it's now
- * removed, but we leave the function as a placeholder
- * in case we want to stick into it something to do.
+ * This function is meant to release memory and resorces
+ * owned by a thread.
+ * The handler in general is not guaranteed to be called 
+ * within the same thread that created the resources to 
+ + release. As such it's useless to release any Tcl 
+ * related resorces (e.g. a Tcl_Interp* object) as
+ * any threaded build of Tcl uses its own thread private
+ * data. We leave the function as a placeholder
+ * in case we want to stuff into it something else to do.
  *
  *  Arguments:
  *
