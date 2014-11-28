@@ -1,3 +1,9 @@
+2014-11-28 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: Rivet channel is set as stdout and as such is released
+    when its refCount drops below 2. Therefore we cannot unregister it for each interpreter
+    unless we remove it as stdout when terminating the thread just before unregistering
+    the channel and deleting the intepreters
+
 2014-11-05 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: fixed wrong call to Tcl_GetString passing a void argument
     that actually wasn't a Tcl_Obj pointer

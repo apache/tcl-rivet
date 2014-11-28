@@ -403,6 +403,17 @@ void Rivet_ProcessorCleanup (void *data)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
                  "Thread exiting after %d requests served", private->req_cnt);
 
+    /* We are deleting the interpreters and release the thread channel. 
+     * Rivet channel is set a stdout channel of Tcl and as such is treated
+     * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
+     * the channel is released immediatly by forcing the refCount to 0
+     * (see Tcl source code: generic/TclIO.c). Unregistering for each interpreter
+     * causes the process to segfault at least for certain Tcl versions.
+     * We unset the stdout channel to avoid this
+     */
+
+    Tcl_SetStdChannel(NULL,TCL_STDOUT);
+
     /* there must be always a root interpreter in the slot 0 of private->interps,
        so there is always need to run at least one cycle here */
 
