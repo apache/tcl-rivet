@@ -828,7 +828,9 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
             {
 
                 /* we simply set the thread_exit flag and finish with this 
-                 * request and proceed to check a after_every_script is defined */
+                 * request and proceed checking whether an after_every_script 
+                 * is defined 
+                 */
 
                 private->thread_exit = 1;
                 goto good;
@@ -1285,7 +1287,7 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
      * across patchlevel releases
      */
 
-    if (Tcl_PkgRequire(interp, "Rivet", RIVET_TCL_PACKAGE_VERSION, 1) == NULL)
+    if (Tcl_PkgRequire(interp, "Rivet", RIVET_INIT_VERSION, 1) == NULL)
     {
         ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                       MODNAME ": init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",

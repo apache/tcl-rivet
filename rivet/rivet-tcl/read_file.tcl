@@ -10,11 +10,14 @@
 
 namespace eval ::rivet {
 
-    proc read_file {file} {
+    proc read_file {file args} {
+
         set fp [open $file]
+        if {[llength $args]} { eval fconfigure $fp $args }
         set x [read $fp]
         close $fp
         return $x
+
     }
 
 }

@@ -583,7 +583,7 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
      * across patchlevel releases
      */
 
-    if (Tcl_PkgRequire(interp, "Rivet", RIVET_TCL_PACKAGE_VERSION, 1) == NULL)
+    if (Tcl_PkgRequire(interp, "Rivet", RIVET_INIT_VERSION, 1) == NULL)
     {
         ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                       MODNAME ": init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",

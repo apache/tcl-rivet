@@ -632,10 +632,18 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
     fi
 ])
 
+# SINGLE_WORKER_TCL_THREAD 
+#
+# This options applies to the worker MPM bridge and it's useful only when debugging it.
+# When enabled rivet_worker_bridge will create a single Tcl interp running thread instead 
+# of the whole pool
+# Defautl: no
+
+
 AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
     AC_ARG_ENABLE(
     single_thread,
-    [  --enable-single-thread Forces single Tcl thread in worker bridge ],
+    [  --enable-single-thread forces the worker brigde to create a single thread (debug)],
     [ single_thread=$enable_single_thread ],
     [ single_thread="no"]
     )
@@ -652,14 +660,15 @@ AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
 # -- SERIALIZE_HTTP_REQUEST
 #
 # this macro is introduced to make debugging easier when
-# we want threads to serialize accessing the request handling central
-# method Rivet_SendContent. The macro defines the symbol SERIALIZE_HTTP_REQUESTS
-# and cooperates with macro HTTP_REQUESTS_PROC
+# we want threads to serialize the access to the request handling 
+# central method Rivet_SendContent. The macro defines the symbol
+# SERIALIZE_HTTP_REQUESTS and cooperates with macro HTTP_REQUESTS_PROC
+# Default: no
 
 AC_DEFUN([HTTP_REQUESTS_MUTEX],[
     AC_ARG_ENABLE(
         requests_serialization,
-        [  --enable-requests-serialization Forces HTTP requests serialization among threads],
+        [  --enable-requests-serialization Forces HTTP requests serialization among threads(debug)],
         [ requests_serialization=$enable_requests_serialization ],
         [ requests_serialization="no" ]
     )
@@ -815,8 +824,9 @@ HTTP_REQUESTS_MUTEX
 
 VERSION=${PACKAGE_VERSION}
 AX_SPLIT_VERSION
-AC_DEFINE_UNQUOTED(TCL_PACKAGE_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}",[Rivet Tcl package version])
+AC_DEFINE_UNQUOTED(INIT_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}",[Rivet Tcl package version])
 AC_MSG_NOTICE([Rivet package version is ${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}])
+AC_SUBST(INIT_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}")
 
 if test $import_rivet_commands = "yes"; then
     AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
@@ -839,6 +849,7 @@ AC_DEFINE_UNQUOTED(MAX_POST,[$MAX_POST],[Max size of data in POST operations])
 #TCL_PACKAGE_PATH variable, so we have to handle this
 HANDLE_TCL_PACKAGE_PATH
 AC_SUBST(TCL_PACKAGE_PATH)
+
 
 # Finally, substitute all of the various values into the Makefile.
 # You may alternatively have a special pkgIndex.tcl.in or other files
