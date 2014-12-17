@@ -119,7 +119,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         if (private == NULL)
         {
             apr_thread_mutex_lock(module_globals->pool_mutex);
-            private             = apr_palloc (module_globals->pool,sizeof(rivet_thread_private));
+            private = apr_palloc (module_globals->pool,sizeof(rivet_thread_private));
             apr_thread_mutex_unlock(module_globals->pool_mutex);
 
             if (apr_pool_create(&private->pool, NULL) != APR_SUCCESS) 
@@ -138,8 +138,8 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
             Tcl_IncrRefCount(private->request_init);
             Tcl_IncrRefCount(private->request_cleanup);
 
-            private->channel    = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
-            private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
+            private->channel = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
+            private->interps = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
 
             apr_threadkey_private_set (private,rivet_thread_key);
         }

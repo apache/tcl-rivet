@@ -322,7 +322,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             to allocate from the module global pool */
 
         /*  this stuff must be allocated from the module global pool which
-         *  has the child process lifespan
+         *  has the child process' same lifespan
          */
 
         apr_thread_mutex_lock(module_globals->pool_mutex);
@@ -401,7 +401,8 @@ void Rivet_ProcessorCleanup (void *data)
     rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
-                 "Thread exiting after %d requests served", private->req_cnt);
+                 "Thread exiting after %d requests served (%d vhosts)", 
+                                        private->req_cnt,module_globals->vhosts_count);
 
     /* We are deleting the interpreters and release the thread channel. 
      * Rivet channel is set a stdout channel of Tcl and as such is treated
@@ -436,19 +437,18 @@ void Rivet_ProcessorCleanup (void *data)
         Tcl_UnregisterChannel(private->interps[i]->interp,*private->channel);       
         Tcl_DeleteInterp(private->interps[i]->interp);
 
-        i++;
-
         /* if separate_virtual_interps == 0 we are running the same interpreter
          * instance for each vhost, thus we can jump out of this loop after 
          * the first cycle as the only real intepreter object we have is stored
          * in private->interps[0]
          */
 
-    } while ((i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
+    } while ((++i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
+
     Tcl_DecrRefCount(private->request_init);
     Tcl_DecrRefCount(private->request_cleanup);
-
     apr_pool_destroy(private->pool);
+    
 }
 
 /* ----------------------------------------------------------------------------
@@ -654,7 +654,7 @@ Rivet_SendContent(rivet_thread_private *private)
     if (r->header_only && !private->running_conf->honor_header_only_reqs)
     {
         TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
-        TclWeb_PrintHeaders(globals->req);
+        //TclWeb_PrintHeaders(globals->req);
         retval = OK;
         goto sendcleanup;
     }
@@ -713,6 +713,10 @@ Rivet_SendContent(rivet_thread_private *private)
 
     retval = OK;
 sendcleanup:
+
+    TclWeb_PrintHeaders(globals->req);
+    Tcl_Flush(*(private->channel));
+
     globals->req->content_sent = 0;
 
     globals->page_aborting = 0;
@@ -725,7 +729,6 @@ sendcleanup:
     /* We reset this pointer to signal we have terminated the request processing */
 
     globals->r = NULL;
-
     //Tcl_MutexUnlock(&sendMutex);
     return retval;
 }
@@ -876,8 +879,8 @@ good:
         TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",
                               globals->req->charset,NULL),globals->req);
     }
-    TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(*(private->channel));
+    //TclWeb_PrintHeaders(globals->req);
+    //Tcl_Flush(*(private->channel));
     Tcl_Release(interp_obj->interp);
 
     return TCL_OK;

@@ -1,10 +1,18 @@
+2014-12-16 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: bumping version number to 2.3.0
+    * rivet/init.tcl: recreated by automake
+    * rivet/rivet-tcl/redirect.tcl: add new command ::rivet::redirect
+    * src/experimental/mod_rivet.c: Tcl_Flush call moved from Rivet_ExecuteAndCheck to 
+    the very end of Rivet_SendContent, also TclWeb_PrintHeader is now unique just before
+    the I/O buffer is flushed
+
 2014-12-06 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c,src/apache-2/mod_rivet.c: Rivet init package bound to
     be $(RIVET_MAJOR_VERSION).$(RIVET_MINOR_VERSION) and defined in autotool variable
     INIT_VERSION (to be transformed into RIVET_INIT_VERSION for C code includes)
     * rivet/rivet-tcl/read_file.c: argument lists admit a variable number of extra arguments
     to be evaluated as argument of 'fconfigure' call
-    * configure.ac: Macro symbol TCL_PACKAGE_VERSION changed into INIT_VERSION
+    * configure.ac: Macro symbol TCL_PACKAGE_VERSION renamed as INIT_VERSION
 
 2014-11-28 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: Rivet channel is set as stdout and as such is released
