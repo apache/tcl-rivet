@@ -15,11 +15,19 @@ namespace eval ::rivet {
 
     proc ::rivet::redirect {url {permanent 0}} {
 
+        if {[::rivet::headers sent]} {
+
+            return  -code error \
+                    -errorcode headers_already_sent \
+                    -errorinfo "Impossible to redirect: headers already sent"
+        }
+
         ::rivet::no_body ; ## don’t output anything on a redirect
         ::rivet::headers set Location $url
         ::rivet::headers numeric [expr {$permanent ? "301" : "302"}]
         ::rivet::abort_page ; ## stop any further processing
 
+        return -error ok 
     }
 
 }

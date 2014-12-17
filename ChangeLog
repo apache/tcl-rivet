@@ -1,3 +1,11 @@
+2014-12-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/rivetCore.c: new 'headers sent' introspection command to
+    understand whether headers have been sent already
+    * rivet/rivet-tcl/redirect.tcl: command didn't fail with a meaningful message
+    if headers had been sent already because of ::rivet::no_body that blocks output
+    to the socket. The procedure now returns an error if ::rivet::headers sent 
+    returns 1
+
 2014-12-16 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: bumping version number to 2.3.0
     * rivet/init.tcl: recreated by automake
