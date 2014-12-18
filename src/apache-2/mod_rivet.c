@@ -1477,7 +1477,7 @@ sendcleanup:
     /* Everything is done and we flush the rivet channel before resetting the status */
 
     TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(*(conf->outchannel));
+    Tcl_Flush(*(rsc->outchannel));
 
     globals->req->content_sent = 0;
     globals->page_aborting = 0;
