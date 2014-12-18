@@ -419,8 +419,9 @@ good:
     if (!globals->req->headers_set && (globals->req->charset != NULL)) {
         TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",globals->req->charset,NULL),globals->req);
     }
-    TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(*(conf->outchannel));
+
+    /* Tcl_Flush moved to the end of Rivet_SendContent */
+
     Tcl_Release(interp);
 
     return TCL_OK;
@@ -1472,8 +1473,13 @@ Rivet_SendContent(request_rec *r)
 
     retval = OK;
 sendcleanup:
-    globals->req->content_sent = 0;
 
+    /* Everything is done and we flush the rivet channel before resetting the status */
+
+    TclWeb_PrintHeaders(globals->req);
+    Tcl_Flush(*(conf->outchannel));
+
+    globals->req->content_sent = 0;
     globals->page_aborting = 0;
     if (globals->abort_code != NULL)
     {

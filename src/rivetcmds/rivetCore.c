@@ -359,13 +359,23 @@ TCL_CMD_HEADER( Rivet_Headers )
         Tcl_WrongNumArgs(interp, 1, objv, "option arg ?arg ...?");
         return TCL_ERROR;
     }
+
+    opt = Tcl_GetStringFromObj(objv[1], NULL);
+
+    /* Basic introspection returning the value of the headers_printed flag */
+
+    if (!strcmp("sent",opt))
+    {
+        Tcl_SetObjResult(interp, Tcl_NewIntObj(globals->req->headers_printed));
+        return TCL_OK;
+    }
+
     if (globals->req->headers_printed != 0)
     {
         Tcl_AddObjErrorInfo(interp,
                             "Cannot manipulate headers - already sent", -1);
         return TCL_ERROR;
     }
-    opt = Tcl_GetStringFromObj(objv[1], NULL);
 
     if (!strcmp("redirect", opt)) /* ### redirect ### */
     {

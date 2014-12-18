@@ -1,3 +1,13 @@
+2014-12-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/redirect.tcl: adding Damon's redirect command based on direct manipulation
+    of the headers
+    * src/rivetcmds/rivetCore.c: adding command [::rivet::headers sent] providing basic introspection
+    for the I/O buffer internal status
+    * src/apache-2/mod_rivet.c: moving Tcl_Flush from Rivet_ExecuteAndCheck to the very end of 
+    Rivet_SendContent, avoiding multiple calls in case ::rivet::parse is called.
+    * src/experimental: removing it from this branch. Threaded code will be developed in trunk for
+    rivet 2.3
+
 2014-08-04 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: adding support for --with-rivet-channel switch for alternate implementations
     of a Rivet Tcl channel
