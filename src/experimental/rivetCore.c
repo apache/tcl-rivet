@@ -364,7 +364,7 @@ TCL_CMD_HEADER( Rivet_Headers )
 
     opt = Tcl_GetStringFromObj(objv[1], NULL);
 
-    /* Basic introspection returning the values of the headers_printed flag */
+    /* Basic introspection returning the value of the headers_printed flag */
 
     if (!strcmp("sent",opt))
     {
@@ -378,7 +378,6 @@ TCL_CMD_HEADER( Rivet_Headers )
                             "Cannot manipulate headers - already sent", -1);
         return TCL_ERROR;
     }
-    opt = Tcl_GetStringFromObj(objv[1], NULL);
 
     if (!strcmp("redirect", opt)) /* ### redirect ### */
     {
