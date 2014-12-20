@@ -431,7 +431,7 @@ AC_DEFUN([MOD_RIVET_CORE],[
     AC_ARG_WITH(
        rivet_core,
        [  --with-rivet-core[=path] mod_rivet core directory],,
-       [with_rivet_core="mod_rivet"]
+       [with_rivet_core="experimental"]
     )
 
     AC_MSG_CHECKING(mod_rivet core)
@@ -443,12 +443,12 @@ AC_DEFUN([MOD_RIVET_CORE],[
     #fi
     
     rivet_core=${with_rivet_core}
-    default_rivet_commands="mod_rivet"
-    default_rivet_channel="mod_rivet"
+    default_rivet_commands="experimental"
+    default_rivet_channel="experimental"
     
-    if test "$rivet_core" = "mod_rivet"; then
-        default_rivet_commands="mod_rivet"
-        default_rivet_channel="mod_rivet"
+    if test "$rivet_core" = "experimental"; then
+        default_rivet_commands="experimental"
+        default_rivet_channel="experimental"
     else
         default_rivet_commands="apache-2"
         default_rivet_channel="apache-2"   
