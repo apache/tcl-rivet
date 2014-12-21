@@ -338,7 +338,10 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
     #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
 #endif
 
-/* avoids unnecessary verbosity of repetitive code in functions 
+/* 
+ * RIVET_CONF_SELECT: 
+ *
+ * This macro avoids unnecessary verbosity of repetitive code in functions 
  * overlaying and merging configuration records
  */
 
