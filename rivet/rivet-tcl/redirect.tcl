@@ -13,7 +13,7 @@
 
 namespace eval ::rivet {
 
-    proc ::rivet::redirect {url {permanent 0}} {
+    proc redirect {url {permanent 0}} {
 
         if {[::rivet::headers sent]} {
 
