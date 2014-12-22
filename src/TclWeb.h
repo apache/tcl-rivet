@@ -82,6 +82,8 @@ int TclWeb_PrintError(CONST84 char *errstr, int htmlflag, TclWebRequest *req);
  */
 
 int TclWeb_HeaderSet(char *header, char *val, TclWebRequest *req);
+void        TclWeb_OutputHeaderSet(char *header, char *val, TclWebRequest *req);
+const char* TclWeb_OutputHeaderGet(char *header, TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------

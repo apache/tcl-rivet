@@ -389,6 +389,15 @@ TCL_CMD_HEADER( Rivet_Headers )
         TclWeb_SetStatus(301, globals->req);
         return TCL_OK;
     }
+    else if (!strcmp("get", opt)) /* ### get ### */
+    {
+        if (objc != 3)
+        {
+            Tcl_WrongNumArgs(interp, 2, objv, "headername");
+            return TCL_ERROR;
+        }
+        Tcl_SetObjResult(interp,Tcl_NewStringObj(TclWeb_OutputHeaderGet(Tcl_GetString(objv[2]), globals->req),-1));
+    }
     else if (!strcmp("set", opt)) /* ### set ### */
     {
         if (objc != 4)

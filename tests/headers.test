@@ -1,6 +1,7 @@
 # $Id$
 
 set testfilename1 headers.rvt
+set testfilename2 headers_set.rvt
 
 # We do this in order to always match the version present.
 set httpversion [package require http]
@@ -15,3 +16,11 @@ hdrs(User-Agent) = Tcl http client package $httpversion"
     ::http::cleanup $page
     set match
 } $result
+
+::tcltest::test headers-1.2 {headers set test} {
+    set page [::http::geturl "${urlbase}$testfilename2"]
+    regexp -all -lineanchor "(hdr hdrvalue)" [::http::data $page] match
+    set match [string trim $match]
+    ::http::cleanup $page
+    set match
+} {hdr hdrvalue}

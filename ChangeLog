@@ -1,3 +1,10 @@
+2014-12-22 Massimo Manghi <mxmanghi@apache.org>
+    * tests/headers.test: add test for command 'headers get'
+    * src/Tclweb.h: new definition for functions TclWeb_OutputHeaders[Set|Get]
+    * src/config/Tclwebapache.h: New functions TclWeb_OutputHeaders[Set|Get]
+    * src/rivetcmds/rivetCore.c: new subcommand '::rivet::headers get'
+    * tclconfig/libtool.m4: new script for libtool
+
 2014-12-18 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/redirect.tcl: adding Damon's redirect command based on direct manipulation
     of the headers

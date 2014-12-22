@@ -198,6 +198,33 @@ TclWeb_HeaderSet(char *header, char *val, TclWebRequest *req)
     return TCL_OK;
 }
 
+/*  * accessing output headers *
+ *
+ *  -- TclWeb_OutputHeaderSet: replicates the role of TclWeb_HeaderSet
+ *
+ *  - the name stresses the fact it's an accessor to the output
+ *    headers
+ *  - it returns nothing since it's a wrapper around an APR call
+ *    that doesn't return anything
+ * 
+ *  -- TclWeb_OutputHeaderGet: reads from the output headers and 
+ *  returns the value associated to a key. If the key is not
+ *  existing it returns NULL
+ *  
+ */
+
+INLINE void
+TclWeb_OutputHeaderSet(char *header, char *val, TclWebRequest *req)
+{
+    apr_table_set(req->req->headers_out, header, val);
+}
+
+INLINE const char*
+TclWeb_OutputHeaderGet(char *header, TclWebRequest *req)
+{
+    return apr_table_get(req->req->headers_out, header);
+}
+
 INLINE int
 TclWeb_HeaderAdd(char *header, char *val, TclWebRequest *req)
 {
