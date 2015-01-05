@@ -31,9 +31,9 @@ librivetparser_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APX
 # Rivet Library
 #
 librivetlib_la_SOURCES = librivet/rivetList.c librivet/rivetCrypt.c librivet/rivetWWW.c librivet/rivetPkgInit.c
-librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
+librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ @APU_LDFLAGS@ -module -avoid-version
 librivetlib_la_LIBADD  = @APXS_LIBS@
-librivetlib_la_CPPFLAGS = -I@rivet_core@ -I@apache_request@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
+librivetlib_la_CPPFLAGS = -I@rivet_core@ -I@apache_request@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APU_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
 
 #
 # mod_rivet
@@ -41,9 +41,9 @@ librivetlib_la_CPPFLAGS = -I@rivet_core@ -I@apache_request@ @TCL_INCLUDES@ @APXS
 apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
+mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ @APU_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
-mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -Iconfig -Iparser -I@apache_request@  @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -Iconfig -Iparser -I@apache_request@  @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 mod_rivet_la_SOURCES =  @apache_request@/apache_multipart_buffer.c 	    \
                         @apache_request@/apache_request.c               \

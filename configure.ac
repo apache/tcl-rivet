@@ -333,9 +333,9 @@ AC_DEFUN([APR_HANDLING],[
   AC_ARG_WITH(
    apr_config,
     [  --with-apr-config=FILE     apr portable apr-1-config path],
-     [if test -x "${with_apr_config}"; then
-         apr_found="${with_apr_config}"
-     fi]
+    [if "${with_apr_config}" --version; then
+        apr_found="${with_apr_config}"
+    fi]
          ,
     [if test -x "${apache_base}/bin/apr-1-config" ; then
          apr_found="${apache_base}/bin/apr-1-config" 
@@ -347,7 +347,7 @@ AC_DEFUN([APR_HANDLING],[
             apr_found="${with_apr_config}"
         fi
     else 
-        AC_MSG_ERROR( Specify the apr-1-config path using --with-apr-config, 1)
+        AC_MSG_ERROR( Specify the apr-1-config path or program name using --with-apr-config, 1)
     fi]
 )
     if test "${apr_found+set}" = set ; then
@@ -363,6 +363,44 @@ AC_DEFUN([APR_HANDLING],[
         AC_SUBST(APR_LDFLAGS)
     else
         AC_MSG_ERROR([Could not find apr-1-config. apr-1-config must be in your PATH or you must specify the location of the apr script using --with-apr-config])
+    fi
+])
+
+AC_DEFUN([APU_HANDLING],[
+  AC_MSG_CHECKING(for Apache apu)
+  AC_ARG_WITH(
+   apu_config,
+    [  --with-apu-config=FILE     apu portable apu-1-config path],
+     [if "${with_apu_config}" --version; then
+         apu_found="${with_apu_config}"
+     fi]
+         ,
+         [if test apu-1-config --version; then
+         apu_found=apu-1-config
+    elif test -x "${apache_base}/bin/apu-1-config" ; then
+         apu_found="${apache_base}/bin/apu-1-config" 
+    elif test -x "${apache_base}/sbin/apu-1-config" ; then
+         apu_found="${apache_base}/sbin/apu-1-config" 
+    elif test "${apache_base+set}" = set; then 
+        AC_PATH_PROGS(with_apu_config, apu-1-config)
+        if test "${with_apu_config+set}" = set ; then
+            apu_found="${with_apu_config}"
+        fi
+    else 
+        AC_MSG_ERROR( Specify the apu-1-config path or program name using --with-apu-config, 1)
+    fi]
+)
+    if test "${apu_found+set}" = set ; then
+        AC_MSG_RESULT([$apu_found])
+        dnl At this point we already have apu sorted out
+        dnl It actually calls another script, so the PATH needs to be set.
+        export PATH=$PATH:`dirname ${apu_found}`
+        APU_INCLUDES=`${apu_found} --includes`
+        AC_SUBST(APU_INCLUDES)
+        APU_LDLFAGS=`${apu_found} --link-libtool --libs`
+        AC_SUBST(APU_LDFLAGS)
+    else
+        AC_MSG_ERROR([Could not find apu-1-config. apu-1-config must be in your PATH or you must specify the location of the apu script using --with-apu-config])
     fi
 ])
 
@@ -727,6 +765,7 @@ APACHE
 CHECK_APXS
 APACHE_INCLUDES
 APR_HANDLING
+APU_HANDLING
 RIVET_TCL_LIB
 DISPLAY_RIVET_VERSION
 UPLOAD_DIRECTORY

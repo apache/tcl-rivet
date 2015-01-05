@@ -1,3 +1,8 @@
+2015-01-05 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: adding macro APU_HANDLING for OS where apr-utils have a different installation
+    directory
+    * src/Makefile.am: new macro symbols APU_INCLUDES and APU_CFLAGS
+
 2014-12-22 Massimo Manghi <mxmanghi@apache.org>
     * tests/headers.test: add test for command 'headers get'
     * src/Tclweb.h: new definition for functions TclWeb_OutputHeaders[Set|Get]
