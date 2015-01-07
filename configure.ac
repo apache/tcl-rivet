@@ -30,7 +30,6 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-
 # AX_PREFIX_CONFIG_H is a macro taken from the autotools macro archive.
 # The typical configure generated 'config.h' can be renamed and 
 # preprocessor symbols in it can be prefixed in order to avoid clashes 
@@ -366,6 +365,49 @@ AC_DEFUN([APR_HANDLING],[
     fi
 ])
 
+# -- APU_HANDLING
+#
+# calling apu-1-config to determine where apr-utils includes
+# and library are
+#
+
+AC_DEFUN([APU_HANDLING],[
+  AC_MSG_CHECKING(for Apache apu)
+  AC_ARG_WITH(
+   apu_config,
+    [  --with-apu-config=FILE     apu portable apu-1-config path],
+     [if "${with_apu_config}" --version; then
+         apu_found="${with_apu_config}"
+     fi]
+         ,
+         [if test apu-1-config --version; then
+         apu_found=apu-1-config
+    elif test -x "${apache_base}/bin/apu-1-config" ; then
+         apu_found="${apache_base}/bin/apu-1-config" 
+    elif test -x "${apache_base}/sbin/apu-1-config" ; then
+         apu_found="${apache_base}/sbin/apu-1-config" 
+    elif test "${apache_base+set}" = set; then 
+        AC_PATH_PROGS(with_apu_config, apu-1-config)
+        if test "${with_apu_config+set}" = set ; then
+            apu_found="${with_apu_config}"
+        fi
+    else 
+        AC_MSG_ERROR( Specify the apu-1-config path or program name using --with-apu-config, 1)
+    fi]
+)
+    if test "${apu_found+set}" = set ; then
+        AC_MSG_RESULT([$apu_found_])
+        dnl At this point we already have apu sorted out
+        dnl It actually calls another script, so the PATH needs to be set.
+        export PATH=$PATH:`dirname ${apu_found}`
+        APU_INCLUDES=`${apu_found} --includes`
+        AC_SUBST(APU_INCLUDES)
+        APU_LDLFAGS=`${apu_found} --link-libtool --libs`
+        AC_SUBST(APU_LDFLAGS)
+    else
+        AC_MSG_ERROR([Could not find apu-1-config. apu-1-config must be in your PATH or you must specify the location of the apu script using --with-apu-config])
+    fi
+])
 
 #--------------------------------------------------------------------
 # 6-Dec-2011: Introducing new ::rivet namespace. Some components 
@@ -804,6 +846,7 @@ APACHE
 CHECK_APXS
 APACHE_INCLUDES
 APR_HANDLING
+APU_HANDLING
 RIVET_TCL_LIB
 DISPLAY_RIVET_VERSION
 UPLOAD_DIRECTORY
@@ -843,6 +886,7 @@ AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
 AC_DEFINE_UNQUOTED(UPLOAD_DIR,"${RIVET_UPLOAD_DIR}",[Path to the disk directory where uploads are saved])
 AC_DEFINE_UNQUOTED(MAX_POST,[$MAX_POST],[Max size of data in POST operations])
+AC_DEFINE_UNQUOTED(SEPARATE_CHANNELS,0,[Separate Channels for virtual hosts])
 
 # We need to use the package path for the installation procedure.  On
 #Debian linux TCL_PACKAGE_PATH may have more than one path in the

@@ -222,6 +222,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
     newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
     newrsc->honor_header_only_reqs = oldrsc->honor_header_only_reqs;
+    newrsc->separate_channels = oldrsc->separate_channels;
     newrsc->server_name = oldrsc->server_name;
     newrsc->upload_dir = oldrsc->upload_dir;
     newrsc->rivet_server_vars = oldrsc->rivet_server_vars;
@@ -431,6 +432,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
 
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
+    rsc->separate_channels = base->separate_channels;
 
     /* server_name is set up later. */
 
@@ -488,6 +490,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->upload_files_to_var        = RIVET_UPLOAD_FILES_TO_VAR;
     rsc->separate_virtual_interps   = RIVET_SEPARATE_VIRTUAL_INTERPS;
     rsc->honor_header_only_reqs     = RIVET_HEAD_REQUESTS;
+    rsc->separate_channels          = RIVET_SEPARATE_CHANNELS;
     rsc->upload_dir                 = RIVET_UPLOAD_DIR;
     rsc->server_name                = NULL;
 
@@ -661,6 +664,8 @@ Rivet_ServerConf(cmd_parms *cmd,void *dummy,const char *var,const char *val)
         Tcl_GetBoolean (NULL, val, &rsc->separate_virtual_interps);
     } else if( STREQU( var, "HonorHeaderOnlyRequests" ) ) {
         Tcl_GetBoolean (NULL, val, &rsc->honor_header_only_reqs);
+    } else if( STREQU( var, "SeparateChannels" ) ) {
+        Tcl_GetBoolean (NULL, val, &rsc->separate_channels);
     } else {
         string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }

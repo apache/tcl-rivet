@@ -103,7 +103,7 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
-    Tcl_Channel*            outchannel;
+    //Tcl_Channel*            outchannel;
 
     /* This is the only execution thread in this process so we create
      * the Tcl thread private data here
@@ -138,7 +138,8 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
             Tcl_IncrRefCount(private->request_init);
             Tcl_IncrRefCount(private->request_cleanup);
 
-            private->channel = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
+            //private->channel = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
+            private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
             private->interps = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
 
             apr_threadkey_private_set (private,rivet_thread_key);
@@ -146,19 +147,19 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     }
 
-    outchannel  = private->channel;
-    *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
+    //outchannel  = private->channel;
+    //*outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
 
         /* The channel we have just created replaces Tcl's stdout */
 
-    Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
+    //Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
 
         /* Set the output buffer size to the largest allowed value, so that we 
          * won't send any result packets to the browser unless the Rivet
          * programmer does a "flush stdout" or the page is completed.
          */
 
-    Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
+    //Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
 
         /*
          * We proceed creating the vhost interpreters database

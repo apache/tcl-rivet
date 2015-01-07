@@ -48,7 +48,7 @@ vhost_interp*         Rivet_NewVHostInterp(apr_pool_t* pool);
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
     rivet_thread_private*   private;
-    Tcl_Channel*            outchannel;		    /* stuff for buffering output */
+    //Tcl_Channel*            outchannel;		    /* stuff for buffering output */
     server_rec*             server;
 
     apr_thread_mutex_lock(module_globals->job_mutex);
@@ -88,7 +88,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
              * Data referenced in this database must be freed by the thread before exit
              */
 
-            private->channel    = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
+            //private->channel    = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
+            private->channel    = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
             private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
             apr_threadkey_private_set (private,rivet_thread_key);
 
@@ -111,19 +112,19 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     // Rivet_CreateCache(server,private->pool);
 
-    outchannel  = private->channel;
-    *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
+    //outchannel  = private->channel;
+    //*outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
 
         /* The channel we have just created replaces Tcl's stdout */
 
-    Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
+    //Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
 
         /* Set the output buffer size to the largest allowed value, so that we 
          * won't send any result packets to the browser unless the Rivet
          * programmer does a "flush stdout" or the page is completed.
          */
 
-    Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
+    //Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
 
         /* So far nothing differs much with what we did for the prefork bridge */
     

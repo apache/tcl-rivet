@@ -29,6 +29,7 @@
 #include <unistd.h>
 
 #include "mod_rivet.h"
+#include "rivetChannel.h"
 #include "mod_rivet_common.h"
 #include "TclWeb.h"
 #include "rivetParser.h"
@@ -36,6 +37,50 @@
 #include "apache_config.h"
 
 extern mod_rivet_globals* module_globals;
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * -- Rivet_CreateRivetChannel
+ *
+ * Creates a channel and registers with to the interpreter
+ *
+ *  Arguments:
+ *
+ *     - apr_pool_t*        pPool: a pointer to an APR memory pool
+ *
+ *  Returned value:
+ *
+ *     the pointer to the Tcl_Channel object
+ *
+ *  Side Effects:
+ *
+ *     a Tcl channel is created allocating memory from the pool
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+Tcl_Channel*
+Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key)
+{
+    Tcl_Channel* outchannel;
+
+    outchannel = apr_pcalloc (pPool, sizeof(Tcl_Channel));
+    *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
+
+    /* The channel we have just created replaces Tcl's stdout */
+
+    Tcl_SetStdChannel (*(outchannel), TCL_STDOUT);
+
+    /* Set the output buffer size to the largest allowed value, so that we 
+     * won't send any result packets to the browser unless the Rivet
+     * programmer does a "flush stdout" or the page is completed.
+     */
+
+    Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
+
+    return outchannel;
+}
 
 /*
  *-----------------------------------------------------------------------------

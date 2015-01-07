@@ -26,5 +26,5 @@ EXTERN int Rivet_CheckType (request_rec* r);
 EXTERN void Rivet_CleanupRequest(request_rec *r);
 EXTERN void Rivet_InitServerVariables(Tcl_Interp *interp, apr_pool_t *pool);
 EXTERN void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1);
-
+EXTERN Tcl_Channel* Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key);
 #endif

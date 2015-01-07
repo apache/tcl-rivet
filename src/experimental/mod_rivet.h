@@ -107,7 +107,6 @@ typedef struct _rivet_server_conf {
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
     unsigned int    user_scripts_status;
-
     //int         user_scripts_updated;
 
     int             default_cache_size;
@@ -115,6 +114,7 @@ typedef struct _rivet_server_conf {
     int             upload_files_to_var;
     int             separate_virtual_interps;
     int             honor_header_only_reqs;
+    int             separate_channels;      /* when true a vhosts get their private channel */
     char*           server_name;
     const char*     upload_dir;
     apr_table_t*    rivet_server_vars;
@@ -156,17 +156,16 @@ enum
 #define RIVET_INTERP_INITIALIZED    2
 
 typedef struct _interp_running_scripts {
-
-    Tcl_Obj*    rivet_before_script; /* script run before each page                      */
-    Tcl_Obj*    rivet_after_script;  /*            after                                 */
+    Tcl_Obj*    rivet_before_script;        /* script run before each page                      */
+    Tcl_Obj*    rivet_after_script;         /*            after                                 */
     Tcl_Obj*    rivet_error_script;
     Tcl_Obj*    rivet_abort_script;
     Tcl_Obj*    after_every_script;
-
 } running_scripts;
 
 typedef struct _vhost_interp {
     Tcl_Interp*         interp;
+    Tcl_Channel*        channel;            /* the Tcl interp private channel                   */
     int                 cache_size;
     int                 cache_free;
     Tcl_HashTable*      objCache;           /* Objects cache - the key is the script name       */

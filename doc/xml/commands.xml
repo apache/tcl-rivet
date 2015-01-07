@@ -1378,7 +1378,22 @@ bab</programlisting>
 		</para>
 	    </refsect1>
 	</refentry>	
-
+   <refentry id="redirect">
+       <refnamediv>
+          <refname>redirect</refname>
+          <refpurpose>Interrupt processing and divert to a new URL</refpurpose>
+       </refnamediv>
+       <refsynopsisdiv>
+           <cmdsynopsis>
+               <command>::rivet::redirect</command>
+               <arg>URL</arg>
+               <arg>permanent</arg>
+           </cmdsynopsis>
+       </refsynopsisdiv>
+       <refsect1>
+       
+       </refsect1>
+   </refentry>
 	<refentry id="unescape_string">
 	    <refnamediv>
 		<refname>unescape_string</refname>

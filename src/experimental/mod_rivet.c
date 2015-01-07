@@ -63,7 +63,7 @@ mod_rivet_globals*      module_globals;
 //rivet_server_conf       rsc;
 rivet_interp_globals    interp_globals;
 
-extern Tcl_ChannelType RivetChan;
+extern Tcl_ChannelType  RivetChan;
 apr_threadkey_t*        rivet_thread_key;
 apr_threadkey_t*        handler_thread_key;
 
@@ -147,10 +147,11 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, vhost_interp* source_obj)
     vhost_interp* interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
 
     interp_obj->interp      = source_obj->interp;
+    interp_obj->channel     = source_obj->channel;
     interp_obj->cache_free  = source_obj->cache_free;
     interp_obj->cache_size  = source_obj->cache_size;
 
-    /* TODO: decouple cache by creating a cache object and store only a pointer to it */
+    /* TODO: decouple cache by creating a new cache object */
 
     if (interp_obj->cache_size) {
         Rivet_CreateCache(pool,interp_obj); 
@@ -167,9 +168,10 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, vhost_interp* source_obj)
   * a rivet_thread_private object 
   */
 
-vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
+vhost_interp* Rivet_NewVHostInterp(rivet_thread_private* private)
 {
-    extern int ap_max_requests_per_child;
+    apr_pool_t*         pool = private->pool;
+    extern int          ap_max_requests_per_child;
     vhost_interp*       interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
     rivet_server_conf*  rsc;
 
@@ -218,6 +220,10 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool)
 
     interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
     interp_obj->per_dir_scripts = apr_hash_make(pool); 
+
+    /* By default the interpreter gets the thread private Tcl channel */
+
+    interp_obj->channel         = private->channel;
 
     return interp_obj;
 }
@@ -291,14 +297,21 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             Tcl_RegisterChannel(rivet_interp->interp,*private->channel);
         }
-        else if (root_server_conf->separate_virtual_interps)
+        else 
         {
-            rivet_interp = Rivet_NewVHostInterp(private->pool);
-            Tcl_RegisterChannel(rivet_interp->interp,*private->channel);
-        } 
-        else
-        {
-            rivet_interp = Rivet_DuplicateVHostInterp(private->pool,root_interp);           
+            if (root_server_conf->separate_virtual_interps)
+            {
+                rivet_interp = Rivet_NewVHostInterp(private);
+                if (myrsc->separate_channels)
+                {
+                    rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+                } 
+                Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
+            } 
+            else
+            {
+                rivet_interp = Rivet_DuplicateVHostInterp(private->pool,root_interp);           
+            }
         }
 
         /* these 5 lines initialize the interpreter base running scripts */
@@ -470,6 +483,7 @@ Rivet_SendContent(rivet_thread_private *private)
     rivet_interp_globals*   globals = NULL;
     vhost_interp*           interp_obj;
     request_rec*            r = private->r;
+    Tcl_Channel*            running_channel;
 #ifdef USE_APACHE_RSC
     //rivet_server_conf    *rsc = NULL;
 #else
@@ -494,6 +508,7 @@ Rivet_SendContent(rivet_thread_private *private)
 
     interp_obj = private->interps[private->running_conf->idx];
     private->running = interp_obj->scripts;
+    running_channel = interp_obj->channel;
 
     if (r->per_dir_config)
     {
@@ -715,7 +730,7 @@ Rivet_SendContent(rivet_thread_private *private)
 sendcleanup:
 
     TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(*(private->channel));
+    Tcl_Flush(*(running_channel));
 
     globals->req->content_sent = 0;
 

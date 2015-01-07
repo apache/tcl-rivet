@@ -1,3 +1,13 @@
+2015-01-06 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: handling separate_channels flag for virtual host
+    private Rivet Channels
+    * src/experimental/mod_rivet_common.c: new function Rivet_CreateRivetChannel
+    * src/experimental/apache_config.c: Conf directive SeparateChannels
+    * src/experimental/rivet_worker_mpm.c,rivet_prefork_mpm.c: Channel creation code
+    moved to mod_rivet_common.c
+    * configure.ac: apache utils configuration split from APR configuration
+    * Makefile.am: new symbols APU_INCLUDES and APU_LDFLAGS
+
 2014-12-21 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/redirect.tcl: passing a meaningful dictionary as error descriptor
     * src/experimental/rivetCore.c: supporting also method 'get'
