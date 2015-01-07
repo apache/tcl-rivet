@@ -375,7 +375,7 @@ AC_DEFUN([APU_HANDLING],[
          apu_found="${with_apu_config}"
      fi]
          ,
-         [if test apu-1-config --version; then
+         [if apu-1-config --version; then
          apu_found=apu-1-config
     elif test -x "${apache_base}/bin/apu-1-config" ; then
          apu_found="${apache_base}/bin/apu-1-config" 
