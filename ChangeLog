@@ -1,3 +1,8 @@
+2015-01-06 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: handling separate_channel flag to create virtual host specific
+    Rivet channels
+    * src/config/apache_config.c: handling SeparateChannels configuration directive
+
 2015-01-05 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: adding macro APU_HANDLING for OS where apr-utils have a different installation
     directory

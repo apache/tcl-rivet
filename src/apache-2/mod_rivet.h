@@ -91,6 +91,7 @@ typedef struct _rivet_server_conf {
     int upload_files_to_var;
     int separate_virtual_interps;
     int honor_header_only_reqs;
+    int separate_channels;
     char *server_name;
     const char *upload_dir;
     apr_table_t *rivet_server_vars;

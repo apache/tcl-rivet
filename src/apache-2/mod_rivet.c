@@ -693,6 +693,50 @@ Rivet_CleanupRequest( request_rec *r )
 #endif
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * -- Rivet_CreateRivetChannel
+ *
+ * Creates a channel and registers with to the interpreter
+ *
+ *  Arguments:
+ *
+ *     - Tcl_Interp*        interp: a Tcl interpreter object pointer
+ *     - rivet_server_conf* rsc: the rivet_server_conf data structure
+ *     - apr_pool_t*        pPool: a pointer to an APR memory pool
+ *
+ *  Returned value:
+ *
+ *     none
+ *
+ *  Side Effects:
+ *
+ *     a Tcl channel is created allocating memory from the pool and
+ *     a reference to it is stored in the rivet_server_conf record
+ *-----------------------------------------------------------------------------
+ */
+static void
+Rivet_CreateRivetChannel(Tcl_Interp* interp,rivet_server_conf* rsc, apr_pool_t* pPool)
+{
+    rsc->outchannel    = apr_pcalloc (pPool, sizeof(Tcl_Channel));
+    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_module_globals, TCL_WRITABLE);
+
+    /* The channel we have just created replaces Tcl's stdout */
+
+    Tcl_SetStdChannel (*(rsc->outchannel), TCL_STDOUT);
+
+    /* Set the output buffer size to the largest allowed value, so that we 
+     * won't send any result packets to the browser unless the Rivet
+     * programmer does a "flush stdout" or the page is completed.
+     */
+
+    Tcl_SetChannelBufferSize (*(rsc->outchannel), TCL_MAX_CHANNEL_BUFFER_SIZE);
+
+    /* We register the Tcl channel to the interpreter */
+
+    Tcl_RegisterChannel(rsc->server_interp, *(rsc->outchannel));
+}
 
 /*
  *-----------------------------------------------------------------------------
@@ -711,7 +755,7 @@ Rivet_CleanupRequest( request_rec *r )
  *-----------------------------------------------------------------------------
  */
 static void
-Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
+Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p, int new_channel)
 {
     Tcl_Interp *interp = rsc->server_interp;
     rivet_interp_globals *globals = NULL;
@@ -721,9 +765,22 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p)
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
 
-    /* We register the Tcl channel to the interpreter */
+    /* We don't generally need more than one channel as the child process
+     * can serve a request at a time, but in case Rivet will ever be deployed
+     * in large systems with many unrelated applications and separate developers
+     * a private channel per interpreter can be created using SeparateChannels
+     * in the conf. 
+     */
 
-    Tcl_RegisterChannel(interp, *(rsc->outchannel));
+    if (new_channel) 
+    {
+        Rivet_CreateRivetChannel(interp,rsc,p);
+    }
+    else
+    {
+        /* We register the Tcl channel to the interpreter */
+        Tcl_RegisterChannel(interp, *(rsc->outchannel));
+    }
 
     /* Set up interpreter associated data */
 
@@ -834,27 +891,7 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
     rsc->server_interp = Rivet_CreateTclInterp(s) ; /* root interpreter */
 
-    /* Create TCL channel and store a pointer in the rivet_server_conf object */
-
-    rsc->outchannel    = apr_pcalloc (pPool, sizeof(Tcl_Channel));
-    *(rsc->outchannel) = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_module_globals, TCL_WRITABLE);
-
-    /* The channel we have just created replaces Tcl's stdout */
-
-    Tcl_SetStdChannel (*(rsc->outchannel), TCL_STDOUT);
-
-    /* Set the output buffer size to the largest allowed value, so that we 
-     * won't send any result packets to the browser unless the Rivet
-     * programmer does a "flush stdout" or the page is completed.
-     */
-
-    Tcl_SetChannelBufferSize (*(rsc->outchannel), TCL_MAX_CHANNEL_BUFFER_SIZE);
-
-    /* We register the Tcl channel to the interpreter */
-
-    Tcl_RegisterChannel(rsc->server_interp, *(rsc->outchannel));
-
-    Rivet_PerInterpInit(s, rsc, pPool);
+    Rivet_PerInterpInit(s,rsc,pPool,1);
 
     /* we create also the cache */
 
@@ -1105,7 +1142,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
                                  Tcl_GetStringResult(interp) );
                     exit(1);
                 }
-                Rivet_PerInterpInit(s, myrsc, p);
+                Rivet_PerInterpInit(s, myrsc, p, rsc->separate_channels);
             } else {
                 myrsc->server_interp = rsc->server_interp;
             }
