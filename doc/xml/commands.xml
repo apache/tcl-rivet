@@ -572,113 +572,147 @@
 	
 	<refentry id="headers">
 	    <refnamediv>
-		<refname>headers</refname>
-		<refpurpose>set and parse HTTP headers.</refpurpose>
+			<refname>headers</refname>
+			<refpurpose>set and parse HTTP headers.</refpurpose>
 	    </refnamediv>
 
 	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>::rivet::headers</command>
-		    <group choice="req">
-			<arg>set</arg>
-			<arg>redirect</arg>
-			<arg>add</arg>
-			<arg>type</arg>
-			<arg>numeric</arg>
-		    </group>
-		</cmdsynopsis>
+			<cmdsynopsis>
+			    <command>::rivet::headers</command>
+			    <group choice="req">
+					<arg>get</arg>
+					<arg>set</arg>
+					<arg>sent</arg>
+					<arg>redirect</arg>
+					<arg>add</arg>
+					<arg>type</arg>
+					<arg>numeric</arg>
+			    </group>
+			</cmdsynopsis>
 	    </refsynopsisdiv>
 
 	    <refsect1>
-		<title>Description</title>
-		<para>
-		  The <command>headers</command> command is for setting and
-		  parsing HTTP headers.
-		</para>
+			<title>Description</title>
+			<para>
+			  The <command>headers</command> command is for setting and
+			  parsing HTTP headers.
+			</para>
 		
-		<variablelist>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::headers</command>
-				<arg choice="plain">set</arg>
-				<arg><replaceable>headername</replaceable></arg>
-				<arg><replaceable>value</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Set arbitrary header names and values.
-			    </para>
-			</listitem>
-		    </varlistentry>
+			<variablelist>
 
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::headers</command>
-				<arg choice="plain">redirect</arg>
-				<arg><replaceable>uri</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Redirect from the current page to a new
-				URI. <emphasis>Must</emphasis> be done in the first block
-				of TCL code.
-			    </para>
-			</listitem>
-		    </varlistentry>
+		    	<varlistentry>
+					<term>
+					    <cmdsynopsis>
+							<command>::rivet::headers</command>
+							<arg choice="plain">get</arg>
+							<arg><replaceable>headername</replaceable></arg>
+							<arg><replaceable>value</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+					    <para>
+							Read arbitrary header names and values from output HTTP headers
+					    </para>
+					</listitem>
+		    	</varlistentry>
 
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::headers</command>
-				<arg choice="plain">add</arg>
-				<arg><replaceable>headername</replaceable></arg>
-				<arg><replaceable>value</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>Add text to header
-				<varname>headername</varname>.
-			    </para>
-			</listitem>
-		    </varlistentry>
+		    	<varlistentry>
+					<term>
+					    <cmdsynopsis>
+							<command>::rivet::headers</command>
+							<arg choice="plain">set</arg>
+							<arg><replaceable>headername</replaceable></arg>
+							<arg><replaceable>value</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+					    <para>
+							Set arbitrary header names and values into output HTTP headers
+					    </para>
+					</listitem>
+		    	</varlistentry>
 
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::headers</command>
-				<arg choice="plain">type</arg>
-				<arg><replaceable>content-type</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				This command sets the <constant>Content-type</constant>
-				header returned by the script, which is useful if you wish
-				to send content other than HTML with Rivet - PNG or jpeg
-				images, for example.
-			    </para>
-			</listitem>
-		    </varlistentry>
+		    	<varlistentry>
+					<term>
+					    <cmdsynopsis>
+							<command>::rivet::headers</command>
+							<arg choice="plain">sent</arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+					   <para>
+							Test internal status of the module and returns 1
+							if the HTTP headers have been already sent  
+					   </para>
+					</listitem>
+		    	</varlistentry>
 
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::headers</command>
-				<arg choice="plain">numeric</arg>
-				<arg><replaceable>response code</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Set a numeric response code, such as 200, 404 or 500.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		</variablelist>
+		    	<varlistentry>
+					<term>
+					    <cmdsynopsis>
+							<command>::rivet::headers</command>
+							<arg choice="plain">redirect</arg>
+							<arg><replaceable>uri</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+					    <para>
+							Redirect from the current page to a 
+							new URI. <emphasis>Must</emphasis> be 
+							done in the first block of TCL code.
+					    </para>
+					</listitem>
+		    	</varlistentry>
+		    	
+		    	<varlistentry>
+					<term>
+					    <cmdsynopsis>
+							<command>::rivet::headers</command>
+							<arg choice="plain">add</arg>
+							<arg><replaceable>headername</replaceable></arg>
+							<arg><replaceable>value</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+					    <para>Add text to header
+							<varname>headername</varname>.
+					    </para>
+					</listitem>
+		    	</varlistentry>
+
+		    	<varlistentry>
+					<term>
+					    <cmdsynopsis>
+						<command>::rivet::headers</command>
+						<arg choice="plain">type</arg>
+						<arg><replaceable>content-type</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+					    <para>
+							This command sets the <constant>Content-type</constant>
+							header returned by the script, which is useful if you wish
+							to send content other than HTML with Rivet - PNG or jpeg
+							images, for example.
+					    </para>
+					</listitem>
+		    	</varlistentry>
+
+		    	<varlistentry>
+					<term>
+				    	<cmdsynopsis>
+							<command>::rivet::headers</command>
+							<arg choice="plain">numeric</arg>
+							<arg><replaceable>response code</replaceable></arg>
+				    	</cmdsynopsis>
+					</term>
+					<listitem>
+				    	<para>
+							Set a numeric response code, such as 200, 404 or 500.
+				    	</para>
+					</listitem>
+		    	</varlistentry>
+			</variablelist>
 	    </refsect1>
 	</refentry>
 

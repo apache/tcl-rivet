@@ -376,11 +376,11 @@ AC_DEFUN([APU_HANDLING],[
   AC_ARG_WITH(
    apu_config,
     [  --with-apu-config=FILE     apu portable apu-1-config path],
-     [if "${with_apu_config}" --version; then
+    [if "${with_apu_config}" --version; then
          apu_found="${with_apu_config}"
-     fi]
-         ,
-         [if test apu-1-config --version; then
+    fi]
+     ,
+    [if apu-1-config --version; then
          apu_found=apu-1-config
     elif test -x "${apache_base}/bin/apu-1-config" ; then
          apu_found="${apache_base}/bin/apu-1-config" 

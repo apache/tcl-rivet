@@ -179,12 +179,12 @@ TclWeb_PrintError(CONST84 char *errstr, int htmlflag, TclWebRequest *req)
 
     if (errstr != NULL)
     {
-	if (htmlflag != 1)
-	{
-	    ap_rputs(ap_escape_html(TCLWEBPOOL, errstr), req->req);
-	} else {
-	    ap_rputs(errstr, req->req);
-	}
+        if (htmlflag != 1)
+        {
+            ap_rputs(ap_escape_html(TCLWEBPOOL, errstr), req->req);
+        } else {
+            ap_rputs(errstr, req->req);
+        }
     }
     if (htmlflag != 1)
 	ap_rputs(ER2, req->req);
@@ -220,13 +220,11 @@ TclWeb_OutputHeaderSet(char *header, char *val, TclWebRequest *req)
     apr_table_set(req->req->headers_out, header, val);
 }
 
-
 INLINE const char*
 TclWeb_OutputHeaderGet(char *header, TclWebRequest *req)
 {
     return apr_table_get(req->req->headers_out, header);
 }
-
 
 INLINE int
 TclWeb_HeaderAdd(char *header, char *val, TclWebRequest *req)
@@ -245,8 +243,8 @@ TclWeb_SetStatus(int status, TclWebRequest *req)
 INLINE int
 TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 {
-    Tcl_SetStringObj(result, ap_construct_url(TCLWEBPOOL,
-					      filename, req->req), -1);
+    Tcl_SetStringObj(result,
+                ap_construct_url(TCLWEBPOOL,filename,req->req),-1);
     return TCL_OK;
 }
 
