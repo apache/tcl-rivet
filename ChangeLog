@@ -1,3 +1,8 @@
+2015-01-08 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/rivetInspect.c: add SeparateChannels directive introspection
+    * doc/xml/command.xml,directives.xml: add explanation of new command
+    ::rivet::redirect and new directive SeparateChannel
+
 2015-01-06 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c: handling separate_channels flag for virtual host
     private Rivet Channels

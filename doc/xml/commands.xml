@@ -1377,7 +1377,8 @@ bab</programlisting>
 		    a file and returns it as a result.
 		</para>
 	    </refsect1>
-	</refentry>	
+	</refentry>
+
    <refentry id="redirect">
        <refnamediv>
           <refname>redirect</refname>
@@ -1387,13 +1388,42 @@ bab</programlisting>
            <cmdsynopsis>
                <command>::rivet::redirect</command>
                <arg>URL</arg>
-               <arg>permanent</arg>
+               <arg>permanent (default: 0)</arg>
            </cmdsynopsis>
        </refsynopsisdiv>
        <refsect1>
-       
+       	<title>Description</title>
+       	<para>
+       		<command>::rivet::redirect</command> diverts the browser to a new URL and marks
+       		the redirection as either permanent in the browser local cache or
+       		non permanent (default).
+       		Calling <command>::rivet::redirect</command> causes the script execution to interrupt
+       		and control passes to <command>AbortScript</command>, if such script is 
+       		set, by calling <command>::rivet::abort_page</command> and passing as abort
+       		code a dictionary with 2 keys: 
+       		<itemizedlist>
+       			<listitem><command>error_code</command>: string literal 'redirect'</listitem>
+       			<listitem><command>location</command>: the URL the browser will be redirected to</listitem>
+       		</itemizedlist>
+       	</para>
+       	<para>
+       		<command>::rivet::redirect</command> drives the redirection by setting the
+       		301 (permanent redirect) or 302 (non permanent redirect) HTTP status codes and 
+       		attempts to discard the output the script might have already placed in the
+       		stdout channel buffer. Therefore the command can fail if
+       		<itemizedlist>
+       			<listitem>A <command>flush stdout</command> was called before <command>::rivet::redirect</command>
+       			thus causing the HTTP headers to be sent and preventing any possibility to 
+       			manipulate them</listitem>
+       			<listitem>The channel buffer was filled causing Tcl to
+       			flush the channel</listitem>
+       		</itemizedlist>
+				The <command>stdout</command> channel, like any Tcl channels, can be manipulated
+				and if needed its internal buffer streched.    
+       	</para>
        </refsect1>
    </refentry>
+		
 	<refentry id="unescape_string">
 	    <refnamediv>
 		<refname>unescape_string</refname>
