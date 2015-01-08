@@ -371,7 +371,7 @@
 	      </listitem>
 	    </varlistentry>
 
-	    <varlistentry>
+		<varlistentry>
 	      <term>
 		     <cmdsynopsis>
 		       <arg choice="plain">SeparateChannels</arg>
@@ -385,9 +385,9 @@
       		<para>
       			Internally mod_rivet creates a new Tcl channel (Rivet channel) which is configured
       			as <command>stdout</command> and registered to each existing interpreter.
-      			There is no need for multiple channels in a single thread as each thread can 
+      			There is no need of multiple channels in a single thread as each thread can 
       			serve only one request at a time. But if you are deploying mod_rivet in a
-      			complex environment running many unrelated application, developed by 
+      			complex environment running unrelated applications developed by 
       			different teams, it could be the case to have <command>SeparateVirtualInterps</command>
       			set. If you want to enhance the environment separation you may also
       			set <command>SeparateChannels</command> to force mod_rivet to create
@@ -395,38 +395,37 @@
       			code to change the Rivet channel parameters without affecting other
       			applications (even though changing the Tcl channel parameters is a rare 
       			necessity). Setting this options increases the system overheads as each
-      			Rivet channel needs to allocate their private control structures and internal
-      			buffers
+      			Rivet channel needs to allocate its own control structures and internal
+      			buffers.
       		</para>
       		<note>
-      			Notice that this is not needed if you have control over your application
-      		</note>
-   		   <note>
-   		      This option is, by nature, only available at the
-   		      global level has effect only if <command>SeparateVirtualInterps</command>
-   		      is set
+      			This option is implemented in order to have fine grain control over mod_rivet. In
+      			nearly all practical cases you won't need to change Rivet Channel (stdout) settings
+      			for different applications by calling <command>fconfigure stdout ....</command>. 
+      			This option is, by nature, only available at the global level and has effect only if 
+   		      also <command>SeparateVirtualInterps</command> is set
    		   </note>
 	      </listitem>
 	    </varlistentry>
 	    
 	    <varlistentry>
 	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">HonorHeaderOnlyRequests</arg>
-		  <group choice="req">
-		    <arg>yes</arg>
-		    <arg>no</arg>
-		  </group>
-		</cmdsynopsis>
+				<cmdsynopsis>
+				  <arg choice="plain">HonorHeaderOnlyRequests</arg>
+				  <group choice="req">
+				    <arg>yes</arg>
+				    <arg>no</arg>
+				  </group>
+				</cmdsynopsis>
 	      </term>
 	      <listitem>
-		<para>
-		  If a HEAD requests is issued by the client Rivet detects
-		  this case and sends back to the client a standard header 
-		  response. If the real header has to be examined (e.g. 
-		  for debugging) you can turn this options on. 
-		</para>
-		<para>This option is, by nature, only available at the global level</para>
+				<para>
+				  If a HEAD requests is issued by the client Rivet detects
+				  this case and sends back to the client a standard header 
+				  response. If the real header has to be examined (e.g. 
+				  for debugging) you can turn this options on. 
+				</para>
+				<para>This option is, by nature, only available at the global level</para>
 	      </listitem>
 	    </varlistentry>
 	  </variablelist>

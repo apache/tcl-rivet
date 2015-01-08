@@ -1379,7 +1379,7 @@ bab</programlisting>
        		code a dictionary with 2 keys: 
        		<itemizedlist>
        			<listitem><command>error_code</command>: string literal 'redirect'</listitem>
-       			<listitem><command>location</command>: the URL the browser is about to be redirected</listitem>
+       			<listitem><command>location</command>: the URL the browser will be redirected to</listitem>
        		</itemizedlist>
        	</para>
        	<para>
@@ -1388,18 +1388,18 @@ bab</programlisting>
        		attempts to discard the output the script might have already placed in the
        		stdout channel buffer. Therefore the command can fail if
        		<itemizedlist>
-       			<listitem>Somewhere a <command>flush stdout</command> was called
-       			causing the HTTP headers to be sent, thus preventing any possibility to 
+       			<listitem>A <command>flush stdout</command> was called before <command>::rivet::redirect</command>
+       			thus causing the HTTP headers to be sent and preventing any possibility to 
        			manipulate them</listitem>
-       			<listitem>The channel buffer had been filled already, causing Tcl to
+       			<listitem>The channel buffer was filled causing Tcl to
        			flush the channel</listitem>
        		</itemizedlist>
 				The <command>stdout</command> channel, like any Tcl channels, can be manipulated
-				and its internal buffer streched if needed.    
+				and if needed its internal buffer streched.    
        	</para>
-    
        </refsect1>
    </refentry>
+   
 	<refentry id="read_file">
 	    <refnamediv>
 		<refname>read_file</refname>

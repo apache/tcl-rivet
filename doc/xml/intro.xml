@@ -17,7 +17,6 @@
       giving you ideas on how to best take advantage of Rivet's
       architecture to create different styles of web site.
     </para>
-
     <para>
         This documentation is focused on the current version of Rivet, but
         still a work in progress, and, like everything
@@ -30,11 +29,14 @@
     <simplesect>
         <title>Acknowledgements</title>
         <para>
-        		Rivet's development took advantage from contributions from 
+        		Rivet 2.2 development took advantage from contributions from 
         		several users who provided whole new componenents, bug fixes and 
-        		enhancements. 
+        		enhancements.
         </para>
         <itemizedlist>
+    			<listitem><emphasis>Damon Courtney</emphasis> (Apache Tcl Team member,
+    			he originally wrote mod_rivet) contributed with the new
+    			<command>::rivet::redirect</command> command.</listitem>
          	<listitem>
          		<emphasis>Harald Oehlmann</emphasis> (now member of the Apache Tcl Team) 
          		who wrote package RivetEntitites, command ::rivet::http_accept and filed
@@ -43,6 +45,6 @@
          	<listitem><emphasis>Cyril Shtumf</emphasis> filed several important bugfixes</listitem>
          	<listitem><emphasis>Jeff Lawson</emphasis> who patched Rivet parser to add the 
          	shorthand syntax for string output and filed several bug reports</listitem>
-			</itemizedlist>
-   </simplesect>
+		 </itemizedlist>
+    </simplesect>
 </section>
