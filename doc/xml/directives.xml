@@ -46,6 +46,7 @@
 				      <arg>UploadMaxSize</arg>
 				      <arg>UploadFilesToVar</arg>
 				      <arg>SeparateVirtualInterps</arg>
+				      <arg>SeparateChannels</arg>
 				      <arg>HonorHeaderOnlyRequests</arg>
 	    			</group>
 			  </cmdsynopsis>
@@ -370,6 +371,44 @@
 	      </listitem>
 	    </varlistentry>
 
+	    <varlistentry>
+	      <term>
+		     <cmdsynopsis>
+		       <arg choice="plain">SeparateChannels</arg>
+		       <group choice="req">
+		          <arg>yes</arg>
+		          <arg>no</arg>
+		       </group>
+		     </cmdsynopsis>
+		  </term>
+	      <listitem>
+      		<para>
+      			Internally mod_rivet creates a new Tcl channel (Rivet channel) which is configured
+      			as <command>stdout</command> and registered to each existing interpreter.
+      			There is no need for multiple channels in a single thread as each thread can 
+      			serve only one request at a time. But if you are deploying mod_rivet in a
+      			complex environment running many unrelated application, developed by 
+      			different teams, it could be the case to have <command>SeparateVirtualInterps</command>
+      			set. If you want to enhance the environment separation you may also
+      			set <command>SeparateChannels</command> to force mod_rivet to create
+      			a channel per each Tcl interpreter thus enabling single application
+      			code to change the Rivet channel parameters without affecting other
+      			applications (even though changing the Tcl channel parameters is a rare 
+      			necessity). Setting this options increases the system overheads as each
+      			Rivet channel needs to allocate their private control structures and internal
+      			buffers
+      		</para>
+      		<note>
+      			Notice that this is not needed if you have control over your application
+      		</note>
+   		   <note>
+   		      This option is, by nature, only available at the
+   		      global level has effect only if <command>SeparateVirtualInterps</command>
+   		      is set
+   		   </note>
+	      </listitem>
+	    </varlistentry>
+	    
 	    <varlistentry>
 	      <term>
 		<cmdsynopsis>

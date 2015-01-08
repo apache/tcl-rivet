@@ -56,6 +56,7 @@ static const char* confDirectives[] =
                     "UploadDirectory",
                     "UploadFilesToVar",
                     "SeparateVirtualInterps",
+                    "SeparateChannels",
                     "HonorHeaderOnlyRequests",
                     NULL 
 };
@@ -74,6 +75,7 @@ enum confIndices {
                     upload_directory,
                     upload_files_to_var,
                     separate_virtual_interps,
+                    separate_channels,
                     honor_header_only_requests,
                     conf_index_terminator 
 };
@@ -180,6 +182,11 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case separate_virtual_interps:
         {
             par_value = Tcl_NewIntObj(rsc->separate_virtual_interps);
+            break;
+        }
+        case separate_channels:
+        {
+            par_value = Tcl_NewIntObj(rsc->separate_channels);
             break;
         }
         case honor_header_only_requests:
