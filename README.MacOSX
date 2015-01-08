@@ -1,4 +1,9 @@
 
+This document is probably obsolete. Anyone who will undertake the task of
+porting Rivet on Macintosh is welcome to join us in the effort of supporting
+Rivet for new plattforms. (mxmanghi: 2015-01-09)
+
+
 $Id$
 
 Building Rivet isn't 100% turnkey under Mac OS X, but it's getting better

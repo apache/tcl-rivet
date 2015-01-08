@@ -14,22 +14,8 @@ $Id$
 			    KNOWN PROBLEMS
 			    ==============
 
-
- - Rivet is reported to conflict with cgi scripts on some Linux machines.
-Symptom of the problem is when cgi scripts hang forever and don't send contents
-to the client
+ - Rivet used to conflict with cgi scripts on some Linux machines. This
+problem seems to have disappeared at least on Debian and Ubuntu now
 
  
-			    RIVET NAMESPACE
-			    ===============
-
- - With the intruduction of the Rivet namespace the command set has been
-moved into '::rivet' and should now be fully qualified. Commands are exported
-though and can be imported in the global namespace, but whenever possible this
-is deprecated.  Putting the following code in the Server Conf should guarantee
-compatibility with existing scripts
-
-RivetServerConf	    ServerInitScript	"package require rivet"
-RivetServerConf	    ServerInitScript	"package require rivetlib"
-RivetServerConf	    ServerInitScript	"namespace import --force ::rivet::*"
-
+ 

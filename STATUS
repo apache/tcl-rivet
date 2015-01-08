@@ -5,31 +5,11 @@ Committers:
 ==========
 David Welton
 Damon Courtney
-Andy Doerr
 Karl Lehenbauer
+Harald Oehlmann
+Brice Hamon
+George Petasis
+Massimo Manghi
 
-Work in progress:
-================
-
-*) Apache 2.0:
-
-   * Waiting on apreq 2.0.
-
-   * Need a good thread strategy.
-
-*) Tcl code
-
-*) Documentation
-
-   Italian and Russian translations need updating.
-
-*) Installation
-
-Platform                  Tcl Version  Ok?
---------                  -----------  ---
-Debian testing/unstable   Tcl 8.4      Yes
-Redhat 7.3		  Tcl 8.4      Yes
-FreeBSD 4.8-STABLE	  Tcl 8.4      Yes
-FreeBSD 5.3               Tcl 8.4      Yes
-
-*) auto* tools work in progress.
+Rivet 2.2 builds for most Unix-like systems and runs with
+Apache 2.2 and 2.4 and the prefork MPM 
