@@ -580,6 +580,7 @@
 		<cmdsynopsis>
 		    <command>::rivet::headers</command>
 		    <group choice="req">
+		   <arg>get</arg>
 			<arg>set</arg>
 			<arg>redirect</arg>
 			<arg>add</arg>
@@ -597,40 +598,72 @@
 		</para>
 		
 		<variablelist>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::headers</command>
-				<arg choice="plain">set</arg>
-				<arg><replaceable>headername</replaceable></arg>
-				<arg><replaceable>value</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Set arbitrary header names and values.
-			    </para>
-			</listitem>
-		    </varlistentry>
+		  
+		  <varlistentry>
+					<term>
+					    <cmdsynopsis>
+							<command>::rivet::headers</command>
+							<arg choice="plain">get</arg>
+							<arg><replaceable>headername</replaceable></arg>
+							<arg><replaceable>value</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+					    <para>
+							Read arbitrary header names and values from output HTTP headers
+					    </para>
+					</listitem>
+		  </varlistentry>
 
-		    <varlistentry>
-			<term>
+		  <varlistentry>
+			  <term>
 			    <cmdsynopsis>
-				<command>::rivet::headers</command>
-				<arg choice="plain">redirect</arg>
-				<arg><replaceable>uri</replaceable></arg>
+					<command>::rivet::headers</command>
+					<arg choice="plain">set</arg>
+					<arg><replaceable>headername</replaceable></arg>
+					<arg><replaceable>value</replaceable></arg>
 			    </cmdsynopsis>
-			</term>
+			  </term>
 			<listitem>
-			    <para>
-				Redirect from the current page to a new
-				URI. <emphasis>Must</emphasis> be done in the first block
-				of TCL code.
-			    </para>
+				<para>
+					Set arbitrary header names and values into output HTTP headers
+				</para>
 			</listitem>
-		    </varlistentry>
+		  </varlistentry>
+		  
+		  <varlistentry>
+				<term>
+				    <cmdsynopsis>
+						<command>::rivet::headers</command>
+						<arg choice="plain">sent</arg>
+					 </cmdsynopsis>
+				</term>
+				<listitem>
+					<para>
+						Test internal status of the module and returns 1
+						if the HTTP headers have been already sent  
+					</para>
+				</listitem>
+		  </varlistentry>
+		  
+		  <varlistentry>
+			  <term>
+			    	<cmdsynopsis>
+						<command>::rivet::headers</command>
+						<arg choice="plain">redirect</arg>
+						<arg><replaceable>uri</replaceable></arg>
+			   	</cmdsynopsis>
+			  </term>
+			  <listitem>
+			    	<para>
+						Redirect from the current page to a new
+						URI. <emphasis>Must</emphasis> be done in the first block
+						of TCL code.
+			    </para>
+		     </listitem>
+		  </varlistentry>
 
-		    <varlistentry>
+		  <varlistentry>
 			<term>
 			    <cmdsynopsis>
 				<command>::rivet::headers</command>
@@ -641,12 +674,12 @@
 			</term>
 			<listitem>
 			    <para>Add text to header
-				<varname>headername</varname>.
+					<varname>headername</varname>.
 			    </para>
 			</listitem>
-		    </varlistentry>
+		  </varlistentry>
 
-		    <varlistentry>
+		  <varlistentry>
 			<term>
 			    <cmdsynopsis>
 				<command>::rivet::headers</command>

@@ -391,12 +391,16 @@ TCL_CMD_HEADER( Rivet_Headers )
     }
     else if (!strcmp("get", opt)) /* ### get ### */
     {
+        const char* header_value;
+
         if (objc != 3)
         {
             Tcl_WrongNumArgs(interp, 2, objv, "headername");
             return TCL_ERROR;
         }
-        Tcl_SetObjResult(interp,Tcl_NewStringObj(TclWeb_OutputHeaderGet(Tcl_GetString(objv[2]), globals->req),-1));
+        header_value = TclWeb_OutputHeaderGet(Tcl_GetString(objv[2]),globals->req); 
+
+        Tcl_SetObjResult(interp,Tcl_NewStringObj(header_value ? header_value : "",-1));
     }
     else if (!strcmp("set", opt)) /* ### set ### */
     {
