@@ -14,7 +14,7 @@ syn keyword rivetCommand        abort_code abort_page apache_log_error apache_ta
 syn keyword rivetCommand        cookie debug env escape_sgml_chars escape_string escape_shell_command
 syn keyword rivetCommand        headers html http_accept import_keyvalue_pairs include inspect
 syn keyword rivetCommand        lempty lmatch load_cookies load_env load_headers load_response makeurl
-syn keyword rivetCommand        no_body parray parse raw_post read_file unescape_string upload
+syn keyword rivetCommand        no_body parray parse raw_post read_file unescape_string redirect upload
 syn keyword rivetCommand        var_qs var_post var wrap wrapline
 syn match   rivetNamespace      "::rivet::"
 

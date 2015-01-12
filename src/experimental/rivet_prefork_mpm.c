@@ -33,7 +33,7 @@ extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
 extern apr_threadkey_t*   handler_thread_key;
 
-void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
+void Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
 vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool);
 void Rivet_ProcessorCleanup (void *data);
@@ -58,6 +58,7 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 
     FILEDEBUGINFO;
 
+
     /* we create and initialize a master (server) interpreter */
 
     module_globals->server_interp = Rivet_NewVHostInterp(pPool); /* root interpreter */
@@ -66,6 +67,10 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
      * we couldn't send data to the stdout anyway */
 
     Rivet_PerInterpInit(module_globals->server_interp->interp,s,pPool);
+
+    /*
+     * The server_interp flag is set as initialized
+     */
 
     module_globals->server_interp->flags |= RIVET_INTERP_INITIALIZED;
 
@@ -139,8 +144,14 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
             Tcl_IncrRefCount(private->request_cleanup);
 
             //private->channel = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
-            private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+            //private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
             private->interps = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
+
+            /*
+             * We also create thread/child global output channel. 
+             */
+
+            private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
             apr_threadkey_private_set (private,rivet_thread_key);
         }
@@ -160,6 +171,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
          */
 
     //Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
+    
 
         /*
          * We proceed creating the vhost interpreters database
@@ -190,6 +202,11 @@ int Rivet_MPM_Request (request_rec* r)
 
 vhost_interp* Rivet_MPM_MasterInterp(void)
 {
+    rivet_thread_private*   private;
+
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+
+    module_globals->server_interp->channel = private->channel;
     return module_globals->server_interp;
 }
 

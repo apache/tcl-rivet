@@ -168,9 +168,8 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, vhost_interp* source_obj)
   * a rivet_thread_private object 
   */
 
-vhost_interp* Rivet_NewVHostInterp(rivet_thread_private* private)
+vhost_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
 {
-    apr_pool_t*         pool = private->pool;
     extern int          ap_max_requests_per_child;
     vhost_interp*       interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
     rivet_server_conf*  rsc;
@@ -221,10 +220,6 @@ vhost_interp* Rivet_NewVHostInterp(rivet_thread_private* private)
     interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
     interp_obj->per_dir_scripts = apr_hash_make(pool); 
 
-    /* By default the interpreter gets the thread private Tcl channel */
-
-    interp_obj->channel         = private->channel;
-
     return interp_obj;
 }
 
@@ -246,7 +241,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
     root_server_conf = RIVET_SERVER_CONF( root_server->module_config );
     
-    root_interp = (*module_globals->mpm_master_interp)(private->pool);
+    root_interp = (*module_globals->mpm_master_interp)();
 
     /* we must assume the module was able to create the root interprter */ 
 
@@ -301,13 +296,17 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             if (root_server_conf->separate_virtual_interps)
             {
-                rivet_interp = Rivet_NewVHostInterp(private);
+                rivet_interp = Rivet_NewVHostInterp(private->pool);
                 if (myrsc->separate_channels)
                 {
                     rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-                } 
+                }
+                else
+                {
+                    rivet_interp->channel = private->channel;
+                }
                 Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
-            } 
+            }
             else
             {
                 rivet_interp = Rivet_DuplicateVHostInterp(private->pool,root_interp);           
@@ -1434,7 +1433,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_MasterInterp");
         if (rv == APR_SUCCESS)
         {
-            module_globals->mpm_master_interp = (vhost_interp* (*)(apr_pool_t *)) func;
+            module_globals->mpm_master_interp = (vhost_interp* (*)(void)) func;
         }
         else
         {

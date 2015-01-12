@@ -88,13 +88,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
              * Data referenced in this database must be freed by the thread before exit
              */
 
-            //private->channel    = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
+            //private->channel  = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
             private->channel    = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
             private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
             apr_threadkey_private_set (private,rivet_thread_key);
 
         }
-
     }
     
     /*
@@ -388,7 +387,6 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
     interp = Rivet_CreateTclInterp(s) ; /* Tcl server init interpreter */
     Rivet_PerInterpInit(interp,s,pPool);
 
-
     if (rsc->rivet_server_init_script != NULL) {
         server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
         Tcl_IncrRefCount(server_init);
@@ -550,9 +548,25 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     return OK;
 }
 
-vhost_interp* Rivet_MPM_MasterInterp(apr_pool_t* pool)
+/*
+ * Rivet_MPM_MasterInterp --
+ *
+ *  Arguments:
+ *
+ *      apr_pool_t* pool: must be the thread/child private pool
+ */
+
+vhost_interp* Rivet_MPM_MasterInterp(void)
 {
-    return Rivet_NewVHostInterp(pool);
+    rivet_thread_private*   private;
+    vhost_interp*           interp_obj; 
+
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+
+    interp_obj = Rivet_NewVHostInterp(private->pool);
+    interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+
+    return interp_obj;
 }
 
 int Rivet_MPM_ExitHandler(int code)

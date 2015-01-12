@@ -106,7 +106,7 @@ typedef struct _rivet_server_conf {
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
-    unsigned int    user_scripts_status;
+    unsigned int user_scripts_status;
     //int         user_scripts_updated;
 
     int             default_cache_size;
@@ -202,7 +202,7 @@ typedef struct _mod_rivet_globals {
     int                 (*mpm_request)(request_rec*);
     int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
     apr_status_t        (*mpm_finalize)(void*);
-    vhost_interp*       (*mpm_master_interp)(apr_pool_t *);
+    vhost_interp*       (*mpm_master_interp)(void);
     int                 (*mpm_exit_handler)(int);
 
     request_rec*        rivet_panic_request_rec;
