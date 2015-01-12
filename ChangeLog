@@ -1,3 +1,6 @@
+2015-01-11 Massimo Manghi <mxmanghi@apache.org>
+    * tests/redirect.test,redirect.rvt: adding test for command ::rivet::redirect
+
 2015-01-08 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/rivetInspect.c: add SeparateChannels directive introspection
     * doc/xml/command.xml,directives.xml: add explanation of new command

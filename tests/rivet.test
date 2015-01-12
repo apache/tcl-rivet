@@ -66,6 +66,7 @@ set group3 {
         parsepackage.test
         virtualhost.test
         inspect.test 
+        redirect.test
     }
 
 if { $testgroup3 } {

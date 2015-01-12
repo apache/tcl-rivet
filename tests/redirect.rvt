@@ -1,0 +1,8 @@
+<?
+    ::rivet::apache_log_error info "running redirect.rvt"
+    if {[::rivet::var_qs exists base]} {
+        
+        ::rivet::apache_log_error info "diverting browser to [::rivet::var_qs get base]"
+        ::rivet::redirect [::rivet::var_qs get base]
+    }
+?>
