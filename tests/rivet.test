@@ -67,6 +67,8 @@ if { $testgroup3 } {
         parsepackage.test
         virtualhost.test
         inspect.test 
+        redirect.test
+        channel.test
     } {
         puts "Running $Test"
         source $Test

@@ -1,0 +1,28 @@
+# checking the channel management
+
+foreach {sep_channel offset_value} {On 0 Off 1} {
+
+::tcltest::test channel-1.1 [list checking SeparateChannel] {
+	apachetest::start {} "
+RivetServerConf SeparateVirtualInterps  On
+RivetServerConf SeparateChannels        $sep_channel
+NameVirtualHost 127.0.0.1
+<VirtualHost 127.0.0.1>
+    ServerName vhost1
+    RivetServerConf ChildInitScript \"fconfigure stdout -buffersize 8192\"
+</VirtualHost>
+
+<VirtualHost 127.0.0.1>
+    ServerName vhost2
+    RivetServerConf ChildInitScript \"fconfigure stdout -buffersize 16384\"
+</VirtualHost>
+" {
+    set page1 [::http::geturl "${urlbase}channel.tcl" -headers [list Host vhost1]]
+    set page2 [::http::geturl "${urlbase}channel.tcl" -headers [list Host vhost2]]
+
+    puts "[::http::data $page1] [::http::data $page2]"
+    set diff [expr ([::http::data $page2]-[::http::data $page1] != 0) + $offset_value]
+}
+set diff
+} {1}
+}

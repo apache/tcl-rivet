@@ -1,3 +1,6 @@
+2015-01-12 Massimo Manghi <mxmanghi@apache.org>
+    * tests/redirect.test,channel.test: adding tests for new features of Rivet 2.2.1
+
 2015-01-08 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: documenting the ::rivet::redirect command
     * doc/xml/directives.xml: add SeparateChannels directive documentation
