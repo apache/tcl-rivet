@@ -133,7 +133,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
          * configuration and to the rivet global script
          */
 
-    if (Rivet_VirtualHostsInterps (private) == NULL)
+    if (Rivet_VirtualHostsInterps(private) == NULL)
     {
         *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
         apr_thread_cond_signal(module_globals->job_cond);
@@ -554,6 +554,9 @@ apr_status_t Rivet_MPM_Finalize (void* data)
  *  Arguments:
  *
  *      apr_pool_t* pool: must be the thread/child private pool
+ *
+ *  Results:
+ *
  */
 
 vhost_interp* Rivet_MPM_MasterInterp(void)
@@ -564,7 +567,7 @@ vhost_interp* Rivet_MPM_MasterInterp(void)
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
     interp_obj = Rivet_NewVHostInterp(private->pool);
-    interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+    //interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
     return interp_obj;
 }

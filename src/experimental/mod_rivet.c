@@ -174,7 +174,7 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
     vhost_interp*       interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
     rivet_server_conf*  rsc;
 
-    /* the cache size is global so we take it from here */
+    /* The cache size is global so we take it from here */
     
     rsc = RIVET_SERVER_CONF( module_globals->server->module_config );
 
@@ -182,9 +182,10 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
 
     interp_obj->interp = Rivet_CreateTclInterp(module_globals->server); 
 
-    /* we now read from the pointers to the cache_size and cache_free conf parameters
-       for compatibility with mod_rivet current version, but these values must become
-       integers not pointers */
+    /* We now read from the pointers to the cache_size and cache_free conf parameters
+     * for compatibility with mod_rivet current version, but these values must become
+     * integers not pointers
+     */
     
     if (rsc->default_cache_size < 0) {
         if (ap_max_requests_per_child != 0) {
@@ -226,6 +227,9 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
 /*
  * -- Rivet_VirtualHostsInterps 
  *
+ *  Arguments:
+ *
+ *      rivet_thread_private* private;
  *
  */
 
@@ -313,7 +317,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             }
         }
 
-        /* these 5 lines initialize the interpreter base running scripts */
+        /* interpreter base running scripts definition and initialization */
 
         rivet_interp->scripts = Rivet_RunningScripts(private->pool,rivet_interp->scripts,myrsc);
 
@@ -331,7 +335,8 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         }
 
         /*  TODO: check if it's absolutely necessary to lock the pool_mutex in order
-            to allocate from the module global pool */
+         *  to allocate from the module global pool
+         */
 
         /*  this stuff must be allocated from the module global pool which
          *  has the child process' same lifespan
