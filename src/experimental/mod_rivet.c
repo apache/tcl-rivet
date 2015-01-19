@@ -304,12 +304,12 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
                 if (myrsc->separate_channels)
                 {
                     rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+                    Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
                 }
                 else
                 {
                     rivet_interp->channel = private->channel;
                 }
-                Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
             }
             else
             {

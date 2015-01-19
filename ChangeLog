@@ -1,3 +1,6 @@
+2015-01-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/mod_rivet.c: Channel ref count fixed
+
 2015-01-13 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/mod_rivet.c,mod_rivet_common.c: improved some comments
     * rivet_worker_bridge.c: fixed channel wrong handling 
