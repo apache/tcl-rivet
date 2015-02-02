@@ -1,3 +1,15 @@
+2015-02-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetCore.c: in Rivet_Parse returned value of 
+    Rivet_ParseExecFile is propagated up to the caller. Probably unnecessary
+    now, but just in case we want to have special handling of TCL_CONTINUE or
+    TCL_BREAK
+    * src/apache-2/mod_rivet.c: moving call to after_every_script out
+    of Rivet_ParseExecFile and into Rivet_SendContent. Any call to 
+    ::rivet::abort_page is now trapped by abort_script
+    * src/config/TclWebapache.c: if charset is set in the configuration
+    then it's set in the headers just before HTTP headers are sent (moved
+    from mod_rivet.c
+
 2015-01-12 Massimo Manghi <mxmanghi@apache.org>
     * tests/redirect.test,channel.test: adding tests for new features of Rivet 2.2.1
 
