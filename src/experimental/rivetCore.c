@@ -243,11 +243,7 @@ TCL_CMD_HEADER( Rivet_Parse )
         return TCL_ERROR;
     }
 
-    if (Rivet_ParseExecFile(globals->private, filename, 0) == TCL_OK) {
-        return TCL_OK;
-    } else {
-        return TCL_ERROR;
-    }
+    return Rivet_ParseExecFile(globals->private, filename, 0);
 }
 
 /*

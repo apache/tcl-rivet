@@ -67,7 +67,8 @@ extern Tcl_ChannelType  RivetChan;
 apr_threadkey_t*        rivet_thread_key;
 apr_threadkey_t*        handler_thread_key;
 
-void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
+void        Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
+static int  Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj);
 
 #define ERRORBUF_SZ     256
 
@@ -110,7 +111,6 @@ Rivet_ReleaseScripts (running_scripts* scripts)
     if (scripts->rivet_error_script) Tcl_DecrRefCount(scripts->rivet_error_script);
     if (scripts->rivet_abort_script) Tcl_DecrRefCount(scripts->rivet_abort_script);
     if (scripts->after_every_script) Tcl_DecrRefCount(scripts->after_every_script);
-
 }
 
 /*
@@ -224,13 +224,22 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
     return interp_obj;
 }
 
-/*
- * -- Rivet_VirtualHostsInterps 
+/* -- Rivet_VirtualHostsInterps 
+ *
+ * The server_rec chain is walked through and server configurations is read to
+ * set up the thread private configuration and interpreters database
  *
  *  Arguments:
  *
  *      rivet_thread_private* private;
  *
+ *  Returned value:
+ *
+ *     a new rivet_thread_private object
+ * 
+ *  Side effects:
+ *
+ *     
  */
 
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
@@ -502,6 +511,10 @@ Rivet_SendContent(rivet_thread_private *private)
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
 
+    /* TODO: we can't place a pointer to the request rec here, if Tcl_Panic 
+       gets called in general it won't have this pointer which has to be 
+       thread private */
+
     module_globals->rivet_panic_request_rec = private->r;
 
     // rsc = Rivet_GetConf(r);
@@ -581,7 +594,7 @@ Rivet_SendContent(rivet_thread_private *private)
     
     private->req = globals->req;
 
-    /* Setting this pointer in globals is crucial as by assigning it
+    /* Setting this pointer in globals is crucial: by assigning it
      * we signal to Rivet commands we are processing an HTTP request.
      * This pointer gets set to NULL just before we leave this function
      * making possible to invalidate command execution that could depend
@@ -721,6 +734,21 @@ Rivet_SendContent(rivet_thread_private *private)
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
 
+    /* We execute also the AfterEveryScript if one was set */
+
+    if (private->running->after_every_script) 
+    {
+        //if (Tcl_EvalObjEx(interp_obj->interp,private->running->after_every_script,0) == TCL_ERROR)
+        if (Rivet_ExecuteAndCheck(private,private->running->after_every_script) == TCL_ERROR)
+        {
+            CONST84 char *errorinfo = Tcl_GetVar(interp_obj->interp,"errorInfo",0);
+            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
+            TclWeb_PrintError( errorinfo, 0, globals->req );
+        }
+    }
+
+    /* and finally we run the request_cleanup procedure (always set) */
+
     if (Tcl_EvalObjEx(interp, private->request_cleanup, 0) == TCL_ERROR) {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                      MODNAME ": Error evaluating cleanup request: %s",
@@ -732,6 +760,13 @@ Rivet_SendContent(rivet_thread_private *private)
 
     retval = OK;
 sendcleanup:
+
+    /* Let's set the charset in the headers if one was set in the configuration  */
+
+    //if (!globals->req->headers_set && (globals->req->charset != NULL)) {
+    //    TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",
+    //                          globals->req->charset,NULL),globals->req);
+    //}
 
     TclWeb_PrintHeaders(globals->req);
     Tcl_Flush(*(running_channel));
@@ -748,7 +783,6 @@ sendcleanup:
     /* We reset this pointer to signal we have terminated the request processing */
 
     globals->r = NULL;
-    //Tcl_MutexUnlock(&sendMutex);
     return retval;
 }
 
@@ -781,6 +815,7 @@ sendcleanup:
 static int
 Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
 {
+    int           tcl_result;
     vhost_interp* interp_obj;
 
     //ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
@@ -796,12 +831,12 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
      */
 
     private->thread_exit = 0;
-
-    if ( Tcl_EvalObjEx(interp_obj->interp, tcl_script_obj, 0) == TCL_ERROR ) {
-        Tcl_Obj *errscript;
-        Tcl_Obj *errorCodeListObj;
-        Tcl_Obj *errorCodeElementObj;
-        char *errorCodeSubString;
+    tcl_result = Tcl_EvalObjEx(interp_obj->interp, tcl_script_obj, 0);
+    if (tcl_result == TCL_ERROR) {
+        Tcl_Obj*    errscript;
+        Tcl_Obj*    errorCodeListObj;
+        Tcl_Obj*    errorCodeElementObj;
+        char*       errorCodeSubString;
 
         /* There was an error, see if it's from Rivet and it was caused
          * by abort_page.
@@ -844,7 +879,6 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
                         TclWeb_PrintError( errorinfo, 0, globals->req );
                     }
                 }
-                goto good;
             }
             else if (strcmp(errorCodeSubString, THREAD_EXIT_CODE) == 0)
             {
@@ -855,51 +889,40 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
                  */
 
                 private->thread_exit = 1;
-                goto good;
-
             }
         }
-
-        Tcl_SetVar (interp_obj->interp,"errorOutbuf",Tcl_GetStringFromObj(tcl_script_obj, NULL),TCL_GLOBAL_ONLY );
-
-        /* If we don't have an error script, use the default error handler. */
-        if (private->running->rivet_error_script ) {
-            errscript = private->running->rivet_error_script;
-        } else {
-            errscript = Tcl_NewStringObj(private->running_conf->rivet_default_error_script,-1);
-        }
-
-        Tcl_IncrRefCount(errscript);
-        if (Tcl_EvalObjEx(interp_obj->interp, errscript, 0) == TCL_ERROR) {
-            CONST84 char *errorinfo = Tcl_GetVar( interp_obj->interp, "errorInfo", 0 );
-            TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
-            TclWeb_PrintError( errorinfo, 0, globals->req );
-        }
-
-        /* This shouldn't make the default_error_script go away,
-         * because it gets a Tcl_IncrRefCount when it is created. 
-         */
-        Tcl_DecrRefCount(errscript);
-    }
-
-    /* Make sure to flush the output if buffer_add was the only output */
-good:
-    
-    if (private->running->after_every_script) {
-        if (Tcl_EvalObjEx(interp_obj->interp,private->running->after_every_script,0) == TCL_ERROR)
+        else
         {
-            CONST84 char *errorinfo = Tcl_GetVar(interp_obj->interp,"errorInfo",0);
-            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
-            TclWeb_PrintError( errorinfo, 0, globals->req );
+
+            /* The script returned a generic error not handled by mod_rivet. We check for a
+             * rivet_error_script and in case we run it
+             */
+
+            Tcl_SetVar (interp_obj->interp,"errorOutbuf",Tcl_GetStringFromObj(tcl_script_obj,NULL),TCL_GLOBAL_ONLY );
+
+            /* If we don't have an error script, use the default error handler. */
+
+            if (private->running->rivet_error_script) {
+                errscript = private->running->rivet_error_script;
+            } else {
+                errscript = Tcl_NewStringObj(private->running_conf->rivet_default_error_script,-1);
+            }
+
+            Tcl_IncrRefCount(errscript);
+            if (Tcl_EvalObjEx(interp_obj->interp, errscript, 0) == TCL_ERROR) {
+                CONST84 char *errorinfo = Tcl_GetVar( interp_obj->interp, "errorInfo", 0 );
+                TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
+                TclWeb_PrintError( errorinfo, 0, globals->req );
+            }
+
+            /* This shouldn't make the default_error_script go away,
+             * because it gets a Tcl_IncrRefCount when it is created. 
+             */
+
+            Tcl_DecrRefCount(errscript);
         }
     }
-
-    if (!globals->req->headers_set && (globals->req->charset != NULL)) {
-        TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",
-                              globals->req->charset,NULL),globals->req);
-    }
-    //TclWeb_PrintHeaders(globals->req);
-    //Tcl_Flush(*(private->channel));
+    
     Tcl_Release(interp_obj->interp);
 
     return TCL_OK;
@@ -923,6 +946,11 @@ good:
  *   - toplevel:              boolean value set when the argument 'filename' is the request 
  *                            toplevel script. The value is 0 when the function is called
  *                            by command ::rivet::parse
+ *
+ * Returned value:
+ *
+ *  this function must return a Tcl valid status code (TCL_OK, TCL_ERROR ....)
+ *
  */
 
 int

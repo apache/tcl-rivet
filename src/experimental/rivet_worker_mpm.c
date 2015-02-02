@@ -45,10 +45,65 @@ void                  Rivet_ProcessorCleanup (void *data);
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
 vhost_interp*         Rivet_NewVHostInterp(apr_pool_t* pool);
 
+/* Rivet_MPM_Shutdown --
+ *
+ *  Child process shutdown. The thread count is read and 
+ * on the job queue are places as many orderly exit commands
+ * as the number of existing thread.
+ *
+ * The procedure exits as soon as the thread count drops to zero
+ * or after a 5 seconds wait. If the thread count is not zero when
+ * the max wait time elapses an error message is printed in the log
+ *
+ *  Arguments:
+ *
+ *      none
+ *
+ *  Returned value:
+ *    
+ *      none
+ *
+ *  Side effects:
+ *
+ * - The whole pool of worker threads is shutdown and either they
+ * must be restared or (most likely) the child process can exit.
+ *
+ */
+
+void Rivet_MPM_Shutdown (void)
+{
+    handler_private* job;
+    int count;
+    int i,waits;
+
+    apr_thread_mutex_lock(module_globals->pool_mutex);
+    job = (handler_private *) apr_palloc(module_globals->pool,sizeof(handler_private));
+    apr_thread_mutex_unlock(module_globals->pool_mutex);
+    job->job_type = orderly_exit;
+
+    waits = 5;
+    count = (int) apr_atomic_read32(module_globals->threads_count);
+    for (i = 0; i < count; i++) { apr_queue_push(module_globals->queue,job); }
+    apr_sleep(500000);
+    do 
+    {
+        count = (int) apr_atomic_read32(module_globals->threads_count);
+        if (count == 0) break;
+        apr_sleep(1000000);
+    } while (waits-- > 0);
+
+    if (count > 0) {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+            "Unexpected %d threads still running after 5 seconds. Child process exits anyway",count);
+    }
+
+}
+
+
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
     rivet_thread_private*   private;
-    //Tcl_Channel*            outchannel;		    /* stuff for buffering output */
+    //Tcl_Channel*          outchannel;		    /* stuff for buffering output */
     server_rec*             server;
 
     apr_thread_mutex_lock(module_globals->job_mutex);
@@ -96,35 +151,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         }
     }
     
-    /*
-     * From here on stuff differs substantially wrt rivet_mpm_prefork
-     * We cannot draw on Rivet_InitTclStuff that knows nothing about threads
-     * private data.
-     */
-
-    // private->interp = Rivet_CreateTclInterp(module_globals->server);
-
-    /* We will allocate structures (Tcl_HashTable) from this cache but they cannot
-     * survive a thread termination, thus we need to implement a method for releasing
-     * them in processor_cleanup
-     */
-
-    // Rivet_CreateCache(server,private->pool);
-
-    //outchannel  = private->channel;
-    //*outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
-
-        /* The channel we have just created replaces Tcl's stdout */
-
-    //Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
-
-        /* Set the output buffer size to the largest allowed value, so that we 
-         * won't send any result packets to the browser unless the Rivet
-         * programmer does a "flush stdout" or the page is completed.
-         */
-
-    //Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
-
         /* So far nothing differs much with what we did for the prefork bridge */
     
         /* At this stage we have to set up the private interpreters of configured 
@@ -351,29 +377,9 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void 
         }   
         apr_thread_mutex_unlock(module_globals->job_mutex);
     }  while (!module_globals->server_shutdown);
+
+    Rivet_MPM_Shutdown();
     
-    {
-        handler_private* job;
-        int count;
-        int i;
-
-        apr_thread_mutex_lock(module_globals->pool_mutex);
-        job = (handler_private *) apr_palloc(module_globals->pool,sizeof(handler_private));
-        apr_thread_mutex_unlock(module_globals->pool_mutex);
-        job->job_type = orderly_exit;
-
-        i = 5;
-        count = (int) apr_atomic_read32(module_globals->threads_count);
-        do 
-        {
-            
-            for (i = 0; i < count; i++) { apr_queue_push(module_globals->queue,job); }
-            apr_sleep(1000000);
-            count = (int) apr_atomic_read32(module_globals->threads_count);
-
-        } while ((count > 0) && (i-- > 0));
-
-    }
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
