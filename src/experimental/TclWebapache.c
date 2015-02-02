@@ -152,10 +152,8 @@ TclWeb_PrintHeaders(TclWebRequest *req)
 
     /* Let's set the charset in the headers if one was set in the configuration  */
 
-    if (!globals->req->headers_set && (globals->req->charset != NULL)) 
-    {
-        TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",
-                              globals->req->charset,NULL),globals->req);
+    if (!req->headers_set && (req->charset != NULL)) {
+        TclWeb_SetHeaderType(apr_pstrcat(req->req->pool,"text/html;",req->charset,NULL),req);
     }
 
     if (req->headers_set == 0)
