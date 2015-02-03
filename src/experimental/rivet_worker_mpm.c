@@ -574,7 +574,7 @@ vhost_interp* Rivet_MPM_MasterInterp(void)
 
     interp_obj = Rivet_NewVHostInterp(private->pool);
     //interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-
+    interp_obj->channel = private->channel;
     return interp_obj;
 }
 

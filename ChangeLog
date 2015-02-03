@@ -1,3 +1,7 @@
+2015-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/experimental/rivet_worker_mpm.c: assigning to base server interpreter
+    the channel referenced in private->channel (was dangling and caused segfaults)
+
 2015-02-02 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/rivet_worker_mpm.c: removing commented code and adding
     new function Rivet_MPM_Shutdown aimed at forcing ancillary thread to exit
@@ -8,7 +12,7 @@
     * src/experimental/mod_rivet.c: moving call to after_every_script out
     of Rivet_ParseExecFile and into Rivet_SendContent. Any call to 
     ::rivet::abort_page is now trapped by abort_script
-    * src/apache-2/TclWebapache.c: if charset is set in the configuration
+    * src/experimental/TclWebapache.c: if charset is set in the configuration
     then it's set in the headers just before HTTP headers are sent (moved
     from mod_rivet.c
 
