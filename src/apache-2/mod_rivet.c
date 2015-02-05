@@ -1482,6 +1482,18 @@ Rivet_SendContent(request_rec *r)
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
 
+    /* We execute also the AfterEveryScript if one was set */
+
+    if (rsc->after_every_script)
+    {
+        if (Rivet_ExecuteAndCheck(interp, rsc->after_every_script,r) == TCL_ERROR)
+        {
+            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
+            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
+            TclWeb_PrintError( errorinfo, 0, globals->req );
+        }
+    }
+
     if (request_cleanup == NULL) {
         request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
         Tcl_IncrRefCount(request_cleanup);
@@ -1491,17 +1503,6 @@ Rivet_SendContent(request_rec *r)
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                      MODNAME ": Error evaluating cleanup request: %s",
                      Tcl_GetVar(interp, "errorInfo", 0));
-    }
-
-    /* We execute also the AfterEveryScript if one was set */
-
-    if (rsc->after_every_script) {
-        if (Tcl_EvalObjEx(interp,rsc->after_every_script,0) == TCL_ERROR)
-        {
-            CONST84 char *errorinfo = Tcl_GetVar( interp, "errorInfo", 0 );
-            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
-            TclWeb_PrintError( errorinfo, 0, globals->req );
-        }
     }
 
     /* Reset globals */
