@@ -473,7 +473,7 @@ AC_DEFUN([MOD_RIVET_CORE],[
     AC_ARG_WITH(
        rivet_core,
        [  --with-rivet-core[=path] mod_rivet core directory],,
-       [with_rivet_core="experimental"]
+       [with_rivet_core="mod_rivet"]
     )
 
     AC_MSG_CHECKING(mod_rivet core)
@@ -485,18 +485,15 @@ AC_DEFUN([MOD_RIVET_CORE],[
     #fi
     
     rivet_core=${with_rivet_core}
-    default_rivet_commands="experimental"
-    default_rivet_channel="experimental"
-    
-    if test "$rivet_core" = "experimental"; then
-        default_rivet_commands="experimental"
-        default_rivet_channel="experimental"
-    else
-        default_rivet_commands="apache-2"
-        default_rivet_channel="apache-2"   
-    fi
+   
+    # by default we search the channel and core commands
+    # implementation in the same directory. This can
+    # be superseded by other macros
 
-    AC_CONFIG_FILES([src/${rivet_core}/Makefile])
+    default_rivet_commands=${rivet_core}
+    default_rivet_channel=${rivet_core}
+
+    #AC_CONFIG_FILES([src/${rivet_core}/Makefile])
     AC_SUBST(rivet_core)
     AC_MSG_RESULT([$rivet_core])
 ])
@@ -899,7 +896,7 @@ AC_SUBST(TCL_PACKAGE_PATH)
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting the AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile src/apache-2/Makefile src/experimental/Makefile src/Makefile rivet/init.tcl src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
+AC_CONFIG_FILES([Makefile src/Makefile rivet/init.tcl src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
 
 #case $apache_version_dir in
 #    apache-1) AC_CONFIG_FILES([Makefile src/Makefile src/apache-1/Makefile doc/Makefile]) ;;

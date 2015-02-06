@@ -56,17 +56,17 @@ mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -I@RIVET_BASE_INCLUDE@/
 lib_libmpmdir = @RIVET_TCL_TARGET@/mpm
 lib_libmpm_LTLIBRARIES = rivet_worker_mpm.la rivet_prefork_mpm.la rivet_aprthread_mpm.la
 
-rivet_worker_mpm_la_SOURCES = experimental/rivet_worker_mpm.c
+rivet_worker_mpm_la_SOURCES = @rivet_core@/rivet_worker_mpm.c
 rivet_worker_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_worker_mpm_la_LIBADD  = @APXS_LIBS@
 rivet_worker_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
 
-rivet_prefork_mpm_la_SOURCES = experimental/rivet_prefork_mpm.c
+rivet_prefork_mpm_la_SOURCES = @rivet_core@/rivet_prefork_mpm.c
 rivet_prefork_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_prefork_mpm_la_LIBADD  = @APXS_LIBS@
 rivet_prefork_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
 
-rivet_aprthread_mpm_la_SOURCES = experimental/rivet_aprthread_mpm.c
+rivet_aprthread_mpm_la_SOURCES = @rivet_core@/rivet_aprthread_mpm.c
 rivet_aprthread_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_aprthread_mpm_la_LIBADD  = @APXS_LIBS@
 rivet_aprthread_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@

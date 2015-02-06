@@ -1,3 +1,8 @@
+2015-02-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/: removed, now maintained only in branches/2.2
+    * src/mod_rivet: new directory with code for MPM aware mod_rivet
+    * src/experimental: removed
+
 2015-02-03 Massimo Manghi <mxmanghi@apache.org>
     * src/experimental/rivet_worker_mpm.c: assigning to base server interpreter
     the channel referenced in private->channel (was dangling and caused segfaults)
