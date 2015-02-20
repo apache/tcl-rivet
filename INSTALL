@@ -1,9 +1,9 @@
-              Rivet 2.1 Installation
+              Rivet 2.2 Installation
               ======================
 
 For more detailed instructions, see the docs/html/ directory.
 
-Rivet is now based on the autotools - autoconf, automake and libtool,
+Rivet build system is based on autotools - autoconf, automake and libtool,
 and so compilation is simple.  
 
 1) run 'configure' with the appropiate options for your installation. (if you
@@ -16,7 +16,7 @@ Example:
             --with-apxs=/usr/bin/apxs                   \
             --with-tclsh=/usr/bin/tclsh8.5              \
             --with-apache-version=2                     \
-            --with-rivet-target-dir=/usr/lib/rivet2.1   \
+            --with-rivet-target-dir=/usr/lib/rivet2.2   \
             --enable-version-display
 
 2) if 'configure' was successful Rivet is ready for compilation
@@ -54,7 +54,7 @@ handles other specific options.
                             metainformation program
 --with-rivet-target-dir=DIR Rivet library installation directory.
 --enable-version-display    Apache signature shows Rivet 
-                            version number in the form Rivet/2.0.x. 
+                            version number in the form Rivet/2.2.2 
                             Default=no
 
 These are the basic Apache configuration directives that are needed:

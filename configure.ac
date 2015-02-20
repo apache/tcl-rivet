@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.2.1])
+AC_INIT([Rivet],[2.2.2])
 TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)

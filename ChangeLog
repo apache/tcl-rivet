@@ -1,3 +1,8 @@
+2015-02-20 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: installation instructions update 
+    * VERSION: new version 2.2.2
+    * configure.ac: new version 2.2.2
+
 2015-02-06 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: moving execution of after_every_script before request
     cleanup (still a null procedure, but just in case we give it something to do)
