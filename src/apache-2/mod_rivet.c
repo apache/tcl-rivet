@@ -1505,6 +1505,12 @@ Rivet_SendContent(request_rec *r)
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
 
+    /* We finalize the request processing by printing the headers and flushing
+       the rivet channel internal buffer */
+
+    TclWeb_PrintHeaders(globals->req);
+    Tcl_Flush(*(rsc->outchannel));
+
     /* Reset globals */
     Rivet_CleanupRequest(r);
 
@@ -1512,9 +1518,6 @@ Rivet_SendContent(request_rec *r)
 sendcleanup:
 
     /* Everything is done and we flush the rivet channel before resetting the status */
-
-    TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(*(rsc->outchannel));
 
     globals->req->content_sent = 0;
     globals->page_aborting = 0;

@@ -1,3 +1,8 @@
+2015-03-11 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/internals.xml: Improved paragraph on how to extend mod_rivet
+    * src/apache-2/mod_rivet.c: Improper handling of 'HTTP_NOT_FOUND' and
+    HTTP_INTERNAL_SERVER_ERROR caused an access to non existing memory (Bug #57686)
+
 2015-02-20 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: installation instructions update 
     * VERSION: new version 2.2.2
@@ -14,7 +19,7 @@
     TCL_BREAK (bug #57501) 
     * src/apache-2/mod_rivet.c: moving call to after_every_script out
     of Rivet_ParseExecFile and into Rivet_SendContent. Any call to 
-    ::rivet::abort_page is now trapped by abort_script (bug #57501)
+    ::rivet::abort_page is now trapped by AbortScript (bug #57501)
     * src/config/TclWebapache.c: if charset is set in the configuration
     then it's set in the headers just before HTTP headers are sent (moved
     from mod_rivet.c)
@@ -25,7 +30,7 @@
 2015-01-08 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: documenting the ::rivet::redirect command
     * doc/xml/directives.xml: add SeparateChannels directive documentation
-    * src/rivetcmds/rivetInspect.c: add handling of SeparateChannels/separate_channels configuratio
+    * src/rivetcmds/rivetInspect.c: add handling of SeparateChannels/separate_channels configuration
     flag
 
 2015-01-06 Massimo Manghi <mxmanghi@apache.org>

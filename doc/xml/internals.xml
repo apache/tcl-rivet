@@ -94,20 +94,30 @@
         <title>Extending Rivet by developing C procedures implementing new commands</title>
         <para>
             Rivet endows the Tcl interpreter with new commands
-            to provide an interface from the application layer to the
-            Apache web server internal data. Many of these commands
-            are meaningful only when HTTP request are being processed
-            and a fundamental data structure has been allocated and
-            intialized by the Apache framework: the request_rec object. 
-            In case commands have to be written that have to gain access 
-            to a valid request_rec object pointer they must check if such 
+            serving as interface between the application layer and the
+            Apache web server. Many of these commands
+            are meaningful only when a HTTP request is under way and 
+            therefore a request_rec object allocated by the framework 
+            is existing and was passed to mod_rivet as argument of a callback. 
+            In case commands have to gain access to a valid request_rec
+            object the C procedure must check if such 
             a pointer exists and it's initialized
-            with valid data. 
+            with valid data. For this purpose the procedure handling requests 
+            (Rivet_SendContent) makes a copy of such pointer and keeps it
+            in an internal structure. The copy is set to NULL just before
+            returning to the framework, right after mod_rivet's has
+            carried out its request processing. When the pointer copy is NULL 
+            the module is outside any request processing and this
+            condition invalidates the execution of
+            many of the Rivet commands. In case they are called  
+            (for example in a ChildInitScript, GlobalInitScript, 
+            ServerInitScript or ChildExitScript) they fail with a Tcl error 
+            you can handle with a <command>catch</command> command.
         </para>
         <para>            
             For this purpose in <option>src/rivet.h</option> the macro
-            CHECK_REQUEST_REC was defined accepting to arguments: the pointer
-            to the request_rec object (stored in the 
+            CHECK_REQUEST_REC was defined accepting two arguments: the copy
+            to the request_rec pointer (stored in the 
             <structname>rivet_interp_globals</structname>
             structure) and the command name. If the pointer is NULL
             the macro calls Tcl_NoRequestRec and returns TCL_ERROR
