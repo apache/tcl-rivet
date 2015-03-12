@@ -590,13 +590,13 @@ Rivet_SendContent(rivet_thread_private *private)
     globals->private = private;
 
     /* The current TclWebRequest record is assigned here to the thread private data
-       for the channel to read it when actual output will flushed */
+       for the channel to read it when the internal buffer will be flushed */
     
     private->req = globals->req;
 
     /* Setting this pointer in globals is crucial: by assigning it
-     * we signal to Rivet commands we are processing an HTTP request.
-     * This pointer gets set to NULL just before we leave this function
+     * we signal we are processing an HTTP request.
+     * This pointer is set to NULL just before we leave this function
      * making possible to invalidate command execution that could depend
      * on a valid request_rec
      */
@@ -686,7 +686,7 @@ Rivet_SendContent(rivet_thread_private *private)
     if (r->header_only && !private->running_conf->honor_header_only_reqs)
     {
         TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
-        //TclWeb_PrintHeaders(globals->req);
+        TclWeb_PrintHeaders(globals->req);
         retval = OK;
         goto sendcleanup;
     }
@@ -755,6 +755,12 @@ Rivet_SendContent(rivet_thread_private *private)
                      Tcl_GetVar(interp, "errorInfo", 0));
     }
 
+    /* We finalize the request processing by printing the headers and flushing
+       the rivet channel internal buffer */
+
+    TclWeb_PrintHeaders(globals->req);
+    Tcl_Flush(*(running_channel));
+
     /* Reset globals */
     Rivet_CleanupRequest(r);
 
@@ -768,11 +774,7 @@ sendcleanup:
     //                          globals->req->charset,NULL),globals->req);
     //}
 
-    TclWeb_PrintHeaders(globals->req);
-    Tcl_Flush(*(running_channel));
-
     globals->req->content_sent = 0;
-
     globals->page_aborting = 0;
     if (globals->abort_code != NULL)
     {
