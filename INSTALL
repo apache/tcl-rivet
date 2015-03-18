@@ -13,9 +13,9 @@ the source tree running 'aclocal; autoreconf' beforehand)
 Example:
 
 ./configure --with-tcl=/usr/lib/tcl8.5/                 \
-            --with-apxs=/usr/bin/apxs                   \
+            --with-apache=/usr/local/apache2            \
+            --with-apxs=/usr/local/apache2/bin/apxs     \
             --with-tclsh=/usr/bin/tclsh8.5              \
-            --with-apache-version=2                     \
             --with-rivet-target-dir=/usr/lib/rivet2.2   \
             --enable-version-display
 
@@ -70,12 +70,11 @@ AddType application/x-rivet-tcl    tcl
 
 AddType "application/x-httpd-rivet; charset=utf-8" rvt
 
-If Apache1.x and Apache2.x coexist on the same system you must
-tell configure where the right apxs (apache extension tool) script is
-located. E.g.: on a Debian system apxs for Apache2.x is named apxs2
+ Examples:
+
+On a Debian system apxs for Apache2.x is named apxs2
 
 ./configure --with-apache-include=/usr/include/apr-1.0          \
-            --with-apache-version=2                             \
             --with-apxs=/usr/bin/apxs2                          \
             --with-tcl=/usr/lib/tcl8.6                          \
             --with-apache=/usr
