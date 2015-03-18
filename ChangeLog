@@ -1,3 +1,6 @@
+2015-03-28 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: update installation and configuration examples
+
 2015-03-11 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/internals.xml: Improved paragraph on how to extend mod_rivet
     * src/apache-2/mod_rivet.c: Improper handling of 'HTTP_NOT_FOUND' and

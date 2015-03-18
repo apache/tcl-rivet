@@ -68,12 +68,11 @@ AddType application/x-rivet-tcl    tcl
 
 AddType "application/x-httpd-rivet; charset=utf-8" rvt
 
-If Apache1.x and Apache2.x coexist on the same system you must
-tell configure where the right apxs (apache extension tool) script is
-located. E.g.: on a Debian system apxs for Apache2.x is named apxs2
+ Examples:
+
+On a Debian system apxs for Apache2.x is named apxs2
 
 ./configure --with-apache-include=/usr/include/apr-1.0          \
-            --with-apache-version=2                             \
             --with-apxs=/usr/bin/apxs2                          \
             --with-tcl=/usr/lib/tcl8.6                          \
             --with-apache=/usr
@@ -83,7 +82,7 @@ Rivet on Slackware 12.1
 
 aclocal
 autoreconf
-./configure --with-apache-version=2 --with-tcl=/usr/lib --with-apxs=/usr/bin/apxs 
+./configure --with-tcl=/usr/lib --with-apxs=/usr/bin/apxs 
 make
 
 Rivet is packaged for various Linux flavours. A list is available at http://tcl.apache.org/download.html
