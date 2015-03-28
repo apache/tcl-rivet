@@ -37,6 +37,7 @@
 #include "apache_config.h"
 
 extern mod_rivet_globals* module_globals;
+extern apr_threadkey_t*   rivet_thread_key;
 
 /*
  *-----------------------------------------------------------------------------
@@ -82,6 +83,88 @@ Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key)
     return outchannel;
 }
 
+/*-----------------------------------------------------------------------------
+ *
+ *  -- Rivet_CreatePrivateData 
+ *
+ * Creates a thread private data object
+ *
+ *  Arguments:
+ * 
+ *    - apr_threadkey_t*  rivet_thread_key
+ *
+ *  Returned value:
+ * 
+ *    - rivet_thread_private*   private data object
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+rivet_thread_private* Rivet_CreatePrivateData (void)
+{
+    rivet_thread_private*   private;
+
+    if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
+    {
+        return NULL;
+    }
+
+    apr_thread_mutex_lock(module_globals->pool_mutex);
+    private = apr_palloc (module_globals->pool,sizeof(*private));
+    apr_thread_mutex_unlock(module_globals->pool_mutex);
+
+    private->req_cnt    = 0;
+    private->keep_going = 1;
+    private->r          = NULL;
+    private->req        = NULL;
+    private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+    private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+    Tcl_IncrRefCount(private->request_init);
+    Tcl_IncrRefCount(private->request_cleanup);
+
+    if (apr_pool_create (&private->pool, NULL) != APR_SUCCESS) 
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": could not create thread private pool");
+        return NULL;
+    }
+
+    /* We allocate the array for the interpreters database.
+     * Data referenced in this database must be freed by the thread before exit
+     */
+
+    private->channel    = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+    private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
+    apr_threadkey_private_set (private,rivet_thread_key);
+
+    return private;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_SetupTclPanicProc --
+ *
+ * 
+ *-----------------------------------------------------------------------------
+ */
+
+rivet_thread_private* 
+Rivet_SetupTclPanicProc (void)
+{
+    rivet_thread_private*   private;
+
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+
+    private->rivet_panic_pool        = private->pool;
+    private->rivet_panic_server_rec  = module_globals->server;
+    private->rivet_panic_request_rec = NULL;
+
+    return private;
+}
+
+
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -101,22 +184,25 @@ Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key)
  */
 void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
 {
-    va_list argList;
-    char *buf;
-    char *format;
+    va_list                 argList;
+    char*                   buf;
+    char*                   format;
+    rivet_thread_private*   private;
+
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
     format = (char *) TCL_VARARGS_START(char *,arg1,argList);
-    buf    = (char *) apr_pvsprintf(module_globals->rivet_panic_pool, format, argList);
+    buf    = (char *) apr_pvsprintf(private->rivet_panic_pool, format, argList);
 
-    if (module_globals->rivet_panic_request_rec != NULL) {
+    if (private->rivet_panic_request_rec != NULL) {
         ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
-                     module_globals->rivet_panic_server_rec,
+                     private->rivet_panic_server_rec,
                      MODNAME ": Critical error in request: %s", 
-                     module_globals->rivet_panic_request_rec->unparsed_uri);
+                     private->rivet_panic_request_rec->unparsed_uri);
     }
 
     ap_log_error(APLOG_MARK, APLOG_CRIT, APR_EGENERAL, 
-                 module_globals->rivet_panic_server_rec, "%s", buf);
+                 private->rivet_panic_server_rec, "%s", buf);
 
     abort();
 }

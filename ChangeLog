@@ -1,4 +1,16 @@
 2015-03-28 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.[c|h]: moved Tcl panic procedure data from
+    mod_rivet_globals to rivet_thread_private
+    * src/mod_rivet/mod_rivet_common.[c|h]: new procedure Rivet_SetupTclPanicProc
+    and Rivet_PanicProc fixed to handle thread private data to get valid
+    and thread safe information about the module status. New procedure
+    Rivet_CreatePrivateData should provide a common method for all bridges
+    to create thread private data
+    * src/mod_rivet/rivet_[prefork|worker]_mpm.c: exploiting
+    Rivet_CreatePrivateData and Rivet_SetupTclPanicProc makes code
+    more localized, removes redundancy and improves readability
+
+2015-03-18 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: update installation and configuration examples
 
 2015-03-11 Massimo Manghi <mxmanghi@apache.org>

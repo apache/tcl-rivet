@@ -104,51 +104,23 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
     rivet_thread_private*   private;
     //Tcl_Channel*          outchannel;		    /* stuff for buffering output */
-    server_rec*             server;
+    //server_rec*           server;
 
     apr_thread_mutex_lock(module_globals->job_mutex);
-    server = module_globals->server;
+    //server = module_globals->server;
 
-    if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    if (private == NULL)
     {
-        return NULL;
-    } 
-    else 
-    {
+        private = Rivet_CreatePrivateData();
 
-        if (private == NULL)
+        if (private == NULL) 
         {
-            apr_thread_mutex_lock(module_globals->pool_mutex);
-            private = apr_palloc (module_globals->pool,sizeof(*private));
-            apr_thread_mutex_unlock(module_globals->pool_mutex);
-
-            private->req_cnt    = 0;
-            private->keep_going = 1;
-            private->r          = NULL;
-            private->req        = NULL;
-            private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
-            private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
-            Tcl_IncrRefCount(private->request_init);
-            Tcl_IncrRefCount(private->request_cleanup);
-
-            if (apr_pool_create(&private->pool, NULL) != APR_SUCCESS) 
-            {
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                             MODNAME ": could not create thread private pool");
-                apr_thread_exit(thd,APR_SUCCESS);
-                return NULL;
-            }
-
-            /* We allocate the array for the interpreters database.
-             * Data referenced in this database must be freed by the thread before exit
-             */
-
-            //private->channel  = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
-            private->channel    = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-            private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
-            apr_threadkey_private_set (private,rivet_thread_key);
-
+            /* TODO: we have to log something here */
+            apr_thread_exit(thd,APR_SUCCESS);
         }
+        Rivet_SetupTclPanicProc ();
+
     }
     
         /* So far nothing differs much with what we did for the prefork bridge */

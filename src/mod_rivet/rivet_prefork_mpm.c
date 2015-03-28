@@ -108,74 +108,29 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
-    //Tcl_Channel*            outchannel;
 
-    /* This is the only execution thread in this process so we create
+    /* 
+     * This is the only execution thread in this process so we create
      * the Tcl thread private data here
      */
 
-    if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
-    {
-        exit(1);
-    } 
-    else 
-    {
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
+    if (private == NULL)
+    {
+        private = Rivet_CreatePrivateData();
         if (private == NULL)
         {
-            apr_thread_mutex_lock(module_globals->pool_mutex);
-            private = apr_palloc (module_globals->pool,sizeof(rivet_thread_private));
-            apr_thread_mutex_unlock(module_globals->pool_mutex);
+            /* TODO: we have to log something here */
 
-            if (apr_pool_create(&private->pool, NULL) != APR_SUCCESS) 
-            {
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                             MODNAME ": could not create child thread private pool");
-                exit(1);
-            }
-
-            private->req_cnt    = 0;
-            private->keep_going = 1;
-            private->r          = NULL;
-            private->req        = NULL;
-            private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
-            private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
-            Tcl_IncrRefCount(private->request_init);
-            Tcl_IncrRefCount(private->request_cleanup);
-
-            //private->channel = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
-            //private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-            private->interps = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
-
-            /*
-             * We also create thread/child global output channel. 
-             */
-
-            private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-
-            apr_threadkey_private_set (private,rivet_thread_key);
+            exit(1);
         }
-
+        Rivet_SetupTclPanicProc ();
     }
 
-    //outchannel  = private->channel;
-    //*outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
-
-        /* The channel we have just created replaces Tcl's stdout */
-
-    //Tcl_SetStdChannel (*outchannel, TCL_STDOUT);
-
-        /* Set the output buffer size to the largest allowed value, so that we 
-         * won't send any result packets to the browser unless the Rivet
-         * programmer does a "flush stdout" or the page is completed.
-         */
-
-    //Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
-    
-
-        /*
-         * We proceed creating the vhost interpreters database
-         */
+    /*
+     * We proceed creating the vhost interpreters database
+     */
 
     if (Rivet_VirtualHostsInterps (private) == NULL)
     {

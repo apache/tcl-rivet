@@ -60,7 +60,6 @@
 #include "apache_config.h"
 
 mod_rivet_globals*      module_globals;
-//rivet_server_conf       rsc;
 rivet_interp_globals    interp_globals;
 
 extern Tcl_ChannelType  RivetChan;
@@ -515,7 +514,7 @@ Rivet_SendContent(rivet_thread_private *private)
        gets called in general it won't have this pointer which has to be 
        thread private */
 
-    module_globals->rivet_panic_request_rec = private->r;
+    private->rivet_panic_request_rec = private->r;
 
     // rsc = Rivet_GetConf(r);
 
@@ -1501,16 +1500,12 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         apr_atomic_set32(module_globals->running_threads_count,0);
 
         module_globals->workers                 = NULL;
-        module_globals->rivet_panic_pool        = pPool;
-        module_globals->rivet_panic_server_rec  = server;
-        module_globals->rivet_panic_request_rec = NULL;
         module_globals->vhosts_count            = 0;
         module_globals->server_shutdown         = 0;
         module_globals->exiting                 = NULL;
         module_globals->mpm_max_threads         = 0;
         module_globals->mpm_min_spare_threads   = 0;
         module_globals->mpm_max_spare_threads   = 0;
-        //module_globals->num_load_samples      = 0;
 
     /* Another crucial point: we are storing here in the globals a reference to the
      * root server_rec object from which threads are supposed to derive 

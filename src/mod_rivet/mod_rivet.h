@@ -106,8 +106,7 @@ typedef struct _rivet_server_conf {
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
-    unsigned int user_scripts_status;
-    //int         user_scripts_updated;
+    unsigned int    user_scripts_status;
 
     int             default_cache_size;
     int             upload_max;
@@ -124,16 +123,17 @@ typedef struct _rivet_server_conf {
     char*           path;               /* copy of the path field of a cmd_parms structure:
                                            should enable us to tell if a conf record comes from a
                                            Directory section */
-    //int             user_conf;
+    //int           user_conf;
 
-    //Tcl_Interp *server_interp;        /* per server Tcl interpreter                         */
-    //int*          cache_size;
-    //int*          cache_free;
-    //char**          objCacheList;     /* Array of cached objects (for priority handling)    */
-    //Tcl_HashTable*  objCache;         /* Objects cache - the key is the script name         */
+    //Tcl_Interp    *server_interp;     /* per server Tcl interpreter                         */
+    //int*           cache_size;
+    //int*           cache_free;
+    //char**         objCacheList;      /* Array of cached objects (for priority handling)    */
+    //Tcl_HashTable* objCache;          /* Objects cache - the key is the script name         */
 
     /* this one must go, we keep just to avoid to duplicate the config handling function just
        to avoid to poke stuff into this field */
+
     //Tcl_Channel*    outchannel;       /* stuff for buffering output                         */
 
 
@@ -205,10 +205,6 @@ typedef struct _mod_rivet_globals {
     vhost_interp*       (*mpm_master_interp)(void);
     int                 (*mpm_exit_handler)(int);
 
-    request_rec*        rivet_panic_request_rec;
-    apr_pool_t*         rivet_panic_pool;
-    server_rec*         rivet_panic_server_rec;
-
     int                 mpm_max_threads;
     int                 mpm_min_spare_threads;
     int                 mpm_max_spare_threads;
@@ -239,6 +235,10 @@ typedef struct _thread_worker_private {
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */
     int                 thread_exit;        /* Flag signalling thread_exit call     */
+
+    request_rec*        rivet_panic_request_rec;
+    apr_pool_t*         rivet_panic_pool;
+    server_rec*         rivet_panic_server_rec;
 
 } rivet_thread_private;
 
