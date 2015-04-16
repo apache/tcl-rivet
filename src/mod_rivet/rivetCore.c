@@ -1318,7 +1318,7 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
     rivet_interp_globals *globals = Tcl_GetAssocData(interp,"rivet",NULL);
     int                   value;
 
-    CHECK_REQUEST_REC(globals->r,"::rivet::thread_exit");
+    //CHECK_REQUEST_REC(globals->r,"::rivet::exit_thread");
     if ((objc != 1) && (objc != 2)) {
         Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
         return TCL_ERROR;

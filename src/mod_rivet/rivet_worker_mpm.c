@@ -543,6 +543,7 @@ vhost_interp* Rivet_MPM_MasterInterp(void)
     vhost_interp*           interp_obj; 
 
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    ap_assert (private != NULL);
 
     interp_obj = Rivet_NewVHostInterp(private->pool);
     //interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
@@ -553,26 +554,17 @@ vhost_interp* Rivet_MPM_MasterInterp(void)
 int Rivet_MPM_ExitHandler(int code)
 {
     rivet_thread_private*   private;
+    Tcl_Interp*             interp;
+    static char *errorMessage = "Page generation terminated by thread_exit command";
 
-    if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, 0,
-                     MODNAME ": cannot get private data for processor thread");
-        exit(1);
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    ap_assert (private != NULL);
 
-    } 
-    else 
-    {
-        Tcl_Interp* interp = private->interps[private->running_conf->idx]->interp;
-        static char *errorMessage = "Page generation terminated by thread_exit command";
+    interp = private->interps[private->running_conf->idx]->interp;
+    private->keep_going = 0;
 
-        ap_assert(private != NULL);
+    Tcl_AddErrorInfo (interp, errorMessage);
+    Tcl_SetErrorCode (interp, "RIVET", THREAD_EXIT_CODE, errorMessage, (char *)NULL);
 
-        private->keep_going = 0;
-
-        Tcl_AddErrorInfo (interp, errorMessage);
-        Tcl_SetErrorCode (interp, "RIVET", THREAD_EXIT_CODE, errorMessage, (char *)NULL);
-
-        return TCL_ERROR;
-    }
+    return TCL_ERROR;
 }

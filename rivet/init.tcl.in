@@ -164,6 +164,14 @@ namespace eval ::Rivet {
         lappend auto_path .
     }
 
+
+    ## eventually we have to divert Tcl ::exit to ::rivet::exit_thread
+
+    rename ::exit ::Rivet::exit
+    proc exit {code} {
+        eval ::rivet::exit_thread $code
+    }
+
 } ;## namespace eval ::Rivet
 
 
@@ -174,6 +182,12 @@ namespace eval ::Rivet {
 ## we alias this command only in the global namespace
 
 interp alias {} ::incr0 {} incr
+
+## eventually we have to divert Tcl ::exit to ::rivet::exit_thread
+
+rename ::exit ::rivet::exit_thread
+
+
 
 ## Initialize Rivet.
 ::Rivet::init

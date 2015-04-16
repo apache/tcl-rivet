@@ -1,3 +1,12 @@
+2015-04-16 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: now we assume thread private data
+    exist already
+    * rivet/init.tcl.in,rivet/init.tcl: new method Rivet::exit now
+    replaces Tcl ::exit and calls ::rivet::exit_thread which has 
+    an implementation in the MPM bridges 
+    * docs/xml/install.xml: removed documentation for obsolete
+    configure switch --with-apache-version
+
 2015-03-28 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.[c|h]: moved Tcl panic procedure data from
     mod_rivet_globals to rivet_thread_private

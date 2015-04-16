@@ -143,8 +143,17 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
 /*
  *-----------------------------------------------------------------------------
  *
- * Rivet_SetupTclPanicProc --
+ * -- Rivet_SetupTclPanicProc
  *
+ * initialize Tcl panic procedure data in a rivet_thread_private object
+ *
+ *  Arguments:
+ *
+ *    - none
+ *
+ *  Returned value:
+ *
+ *    - initialized rivet_thread_private* data record 
  * 
  *-----------------------------------------------------------------------------
  */
@@ -162,8 +171,6 @@ Rivet_SetupTclPanicProc (void)
 
     return private;
 }
-
-
 
 /*
  *-----------------------------------------------------------------------------

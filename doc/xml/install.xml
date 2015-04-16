@@ -107,15 +107,6 @@ tar -xvf rivet-X.X.X.tar.gz</programlisting>
 		  </listitem>
 		</varlistentry>
 		<varlistentry>
-		  <term>--with-apache-version=[1|2]</term>
-		  <listitem>
-		    <para>
-			This option tells the build scripts whether you want to build Rivet for the
-			Apache 1.x or Apache 2.x server. (Obsolete: Apache 1.x is no longer supported)
-		    </para>
-		  </listitem>
-		</varlistentry>
-		<varlistentry>
 		  <term>--with-apache-include[=DIR]</term>
 		  <listitem>
 		    <para>
