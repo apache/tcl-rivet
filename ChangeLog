@@ -1,3 +1,7 @@
+2015-04-16 Massimo Manghi <mxmanghi@apache.org>
+    * docs/xml/install.xml: removed documentation for obsolete
+    configure switch --with-apache-version
+
 2015-03-28 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: update installation and configuration examples
 
