@@ -1,3 +1,8 @@
+2015-04-22 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/internals.xml: replaced reference to the old configure.tcl script
+    and replaced with up-to-date directions on how to build with the debugger
+    using the current autotools based scripts
+
 2015-04-16 Massimo Manghi <mxmanghi@apache.org>
     * docs/xml/install.xml: removed documentation for obsolete
     configure switch --with-apache-version
