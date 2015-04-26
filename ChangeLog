@@ -1,3 +1,7 @@
+2015-04-26 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION,configure.ac: changing version to 2.2.3 looking ahead for a
+    future release
+
 2015-04-22 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/internals.xml: replaced reference to the old configure.tcl script
     and replaced with up-to-date directions on how to build with the debugger
