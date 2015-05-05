@@ -1,3 +1,13 @@
+2015-05-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: New procedures Rivet_PrintErrorMessage and
+    Rivet_ExecuteErrorHandler. Error handling generalized and Tcl
+    status returned by Tcl_EvalObjEx is propagated by Rivet_ExecuteAndCheck
+    to interrupt execution even when an error occurs or abort_page is
+    called from a nested template. Flag globals->page_aborting is
+    used to prevent error loggin because ::rivet::abort_page is called.
+    Therefore globals->page_aborting is reset when a real error occurs
+    (fixed bug #57501)
+
 2015-04-26 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: changing version to 2.2.3 looking ahead for a
     future release
