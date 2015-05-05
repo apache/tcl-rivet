@@ -555,7 +555,7 @@ int Rivet_MPM_ExitHandler(int code)
 {
     rivet_thread_private*   private;
     Tcl_Interp*             interp;
-    static char *errorMessage = "Page generation terminated by thread_exit command";
+    static char*            errorMessage = "Page generation terminated by thread_exit command";
 
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
     ap_assert (private != NULL);

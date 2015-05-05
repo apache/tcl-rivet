@@ -1,3 +1,13 @@
+2015-05-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.c: porting error and 
+    abort_page handling implemented in branches/2.2 (fixes bug #57501). 
+    * src/mod_rivet/mod_rivet.h: abort_page related fields
+    moved to rivet_thread_private from interpreter globals
+    * src/mod_rivet/mod_rivet_common.c,src/mod_rivet/rivetCore.c:
+    changes needed after we moved to rivet_thread_private fields
+    driven by C code implementing ::rivet::abort_page.
+    Adding bridge name to server array variables.
+    
 2015-04-16 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: now we assume thread private data
     exist already

@@ -183,8 +183,6 @@ namespace eval ::Rivet {
 
 interp alias {} ::incr0 {} incr
 
-
-
 ## Initialize Rivet.
 ::Rivet::init
 

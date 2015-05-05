@@ -113,10 +113,12 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     private = apr_palloc (module_globals->pool,sizeof(*private));
     apr_thread_mutex_unlock(module_globals->pool_mutex);
 
-    private->req_cnt    = 0;
-    private->keep_going = 1;
-    private->r          = NULL;
-    private->req        = NULL;
+    private->req_cnt        = 0;
+    private->keep_going     = 1;
+    private->r              = NULL;
+    private->req            = NULL;
+    private->page_aborting  = 0;
+    private->abort_code     = NULL;
     private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
     private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
     Tcl_IncrRefCount(private->request_init);
@@ -361,6 +363,16 @@ void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
         Tcl_SetVar2Ex(interp,"server","MPM_FORKED",obj,TCL_GLOBAL_ONLY);
         Tcl_DecrRefCount(obj);
     }
+
+    obj = Tcl_NewStringObj(module_globals->rivet_mpm_bridge, -1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+            "server",
+            "RIVET_MPM_BRIDGE",
+            obj,
+            TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
+    
 }
 
 /*

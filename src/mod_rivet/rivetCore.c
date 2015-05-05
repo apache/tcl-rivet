@@ -1175,7 +1175,7 @@ TCL_CMD_HEADER( Rivet_NoBody )
 
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
-    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    rivet_thread_private*   private;
     static char *errorMessage = "Page generation terminated by abort_page directive";
 
     if (objc > 2)
@@ -1184,13 +1184,15 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
         return TCL_ERROR;
     }
 
+    RIVET_PRIVATE_DATA_NOT_NULL(private,rivet_thread_key)
+
     if (objc == 2)
     {
         char* cmd_arg = Tcl_GetStringFromObj(objv[1],NULL);
         
         if (strcmp(cmd_arg,"-aborting") == 0)
         {
-            Tcl_SetObjResult (interp,Tcl_NewBooleanObj(globals->page_aborting));
+            Tcl_SetObjResult (interp,Tcl_NewBooleanObj(private->page_aborting));
             return TCL_OK;
         }
  
@@ -1199,10 +1201,10 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
      * processing the same request 
      */
        
-        if (globals->abort_code == NULL)
+        if (private->abort_code == NULL)
         {
-            globals->abort_code = objv[1];
-            Tcl_IncrRefCount(globals->abort_code);
+            private->abort_code = objv[1];
+            Tcl_IncrRefCount(private->abort_code);
         }
     }
 
@@ -1212,14 +1214,14 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
      * completion code
      */
 
-    if (globals->page_aborting)
+    if (private->page_aborting)
     {
         return TCL_OK;
     }
 
     /* this is the first (and supposedly unique) abort_page call during this request */
 
-    globals->page_aborting = 1;
+    private->page_aborting = 1;
 
     Tcl_AddErrorInfo (interp, errorMessage);
     Tcl_SetErrorCode (interp, "RIVET", ABORTPAGE_CODE, errorMessage, (char *)NULL);
@@ -1238,11 +1240,12 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
  */
 TCL_CMD_HEADER( Rivet_AbortCodeCmd )
 {
-    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    rivet_thread_private*   private;
     
-    if (globals->abort_code != NULL)
+    RIVET_PRIVATE_DATA_NOT_NULL(private,rivet_thread_key)
+    if (private->abort_code != NULL)
     {
-        Tcl_SetObjResult(interp,globals->abort_code);
+        Tcl_SetObjResult(interp,private->abort_code);
     }
 
     return TCL_OK;
@@ -1315,8 +1318,8 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
 
 TCL_CMD_HEADER( Rivet_ExitCmd )
 {
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp,"rivet",NULL);
-    int                   value;
+    //rivet_interp_globals *globals = Tcl_GetAssocData(interp,"rivet",NULL);
+    int value;
 
     //CHECK_REQUEST_REC(globals->r,"::rivet::exit_thread");
     if ((objc != 1) && (objc != 2)) {

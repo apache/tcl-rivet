@@ -119,24 +119,10 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_server_vars;
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
-    int             idx;                /* server record index (to be used for the interps db) */
-    char*           path;               /* copy of the path field of a cmd_parms structure:
-                                           should enable us to tell if a conf record comes from a
-                                           Directory section */
-    //int           user_conf;
-
-    //Tcl_Interp    *server_interp;     /* per server Tcl interpreter                         */
-    //int*           cache_size;
-    //int*           cache_free;
-    //char**         objCacheList;      /* Array of cached objects (for priority handling)    */
-    //Tcl_HashTable* objCache;          /* Objects cache - the key is the script name         */
-
-    /* this one must go, we keep just to avoid to duplicate the config handling function just
-       to avoid to poke stuff into this field */
-
-    //Tcl_Channel*    outchannel;       /* stuff for buffering output                         */
-
-
+    int             idx;                /* server record index (to be used for the interps db)      */
+    char*           path;               /* copy of the path field of a cmd_parms structure:         
+                                         * should enable us to tell if a conf record comes from a
+                                         * Directory section */
 } rivet_server_conf;
 
 #define TCL_INTERPS 1
@@ -198,6 +184,8 @@ typedef struct _mod_rivet_globals {
 
     server_rec*         server;                 /* default host server_rec obj  */
 
+    char*               rivet_mpm_bridge;       /* name of the MPM bridge       */
+
     int                 (*mpm_child_init)(apr_pool_t* pPool,server_rec* s);
     int                 (*mpm_request)(request_rec*);
     int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
@@ -236,6 +224,11 @@ typedef struct _thread_worker_private {
     running_scripts*    running;            /* (per request) running conf scripts   */
     int                 thread_exit;        /* Flag signalling thread_exit call     */
 
+
+    int                 page_aborting;      /* abort_page flag                      */
+    Tcl_Obj*            abort_code;         /* To be reset by before request        *
+                                             * processing completes                 */
+
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
@@ -248,8 +241,6 @@ typedef struct _rivet_interp_globals {
     request_rec*            r;                  /* request rec                          */
     TclWebRequest*          req;                /* TclWeb API request                   */
     Tcl_Namespace*          rivet_ns;           /* Rivet commands namespace             */
-    int                     page_aborting;      /* set by abort_page.                   */
-    Tcl_Obj*                abort_code;         /* To be reset by Rivet_SendContent      */
     server_rec*             srec;               /* pointer to the current server rec obj */
     rivet_thread_private*   private;      
 } rivet_interp_globals;
@@ -357,5 +348,11 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
         Tcl_IncrRefCount(running_script->objscript);\
     }
 
+#define RIVET_PRIVATE_DATA(private_p,thread_key) \
+    ap_assert (apr_threadkey_private_get ((void **)&private_p,thread_key) == APR_SUCCESS);
+    
+#define RIVET_PRIVATE_DATA_NOT_NULL(private_p,thread_key) \
+    RIVET_PRIVATE_DATA(private_p,thread_key) \
+    ap_assert (private_p != NULL);
 
 #endif /* MOD_RIVET_H */

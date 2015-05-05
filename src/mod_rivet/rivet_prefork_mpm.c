@@ -138,10 +138,6 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
                      MODNAME ": Tcl Interpreters creation fails");
         exit(1);
     }
-
-    // Rivet_InitTclStuff(server, pool);
-    // Rivet_ChildHandlers(server, 1);
-
 }
 
 int Rivet_MPM_Request (request_rec* r)
@@ -166,9 +162,9 @@ vhost_interp* Rivet_MPM_MasterInterp(void)
 }
 
 /*
- * Rivet_MPM_ExitHandler --
+ * -- Rivet_MPM_ExitHandler
  *
- *
+ * This handler basically falls back to the Tcl exit handler
  *
  */
 

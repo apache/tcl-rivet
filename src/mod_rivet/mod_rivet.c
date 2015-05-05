@@ -71,6 +71,33 @@ static int  Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_sc
 
 #define ERRORBUF_SZ     256
 
+/* -- Rivet_PrintErrorMessage
+ *
+ * Utility function to print the error message stored in errorInfo
+ * with a custom header. This procedure is called to print standard
+ * errors when one of Tcl scripts fails
+ * 
+ * Arguments:
+ *
+ *   - Tcl_Interp* interp: the Tcl interpreter that was running the script
+ *                         (and therefore the built-in variable errorInfo
+ *                          keeps the message)
+ *   - const char* error: Custom error header
+ */
+
+static void 
+Rivet_PrintErrorMessage (Tcl_Interp* interp,const char* error_header)
+{
+    Tcl_Obj* errormsg  = Tcl_NewObj();
+
+    Tcl_IncrRefCount(errormsg);
+    Tcl_AppendStringsToObj(errormsg,"puts \"",error_header,"<br />\"\n",NULL);
+    Tcl_AppendStringsToObj(errormsg,"puts \"<pre>$errorInfo</pre>\"\n",NULL);
+    Tcl_EvalObjEx(interp,errormsg,0);
+    Tcl_DecrRefCount(errormsg);
+}
+
+
 /*----------------------------------------------------------------------------
  * -- Rivet_RunningScripts
  *
@@ -727,10 +754,16 @@ Rivet_SendContent(rivet_thread_private *private)
 
     if (Rivet_ParseExecFile(private, r->filename, 1) != TCL_OK)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
-                     MODNAME ": Error parsing exec file '%s': %s",
-                     r->filename,
-                     Tcl_GetVar(interp, "errorInfo", 0));
+
+        /* we don't report errors coming from abort_page execution */
+
+        if (!private->page_aborting) 
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
+                         MODNAME ": Error parsing exec file '%s': %s",
+                         r->filename,
+                         Tcl_GetVar(interp, "errorInfo", 0));
+        }
     }
 
     /* We execute also the AfterEveryScript if one was set */
@@ -740,9 +773,8 @@ Rivet_SendContent(rivet_thread_private *private)
         //if (Tcl_EvalObjEx(interp_obj->interp,private->running->after_every_script,0) == TCL_ERROR)
         if (Rivet_ExecuteAndCheck(private,private->running->after_every_script) == TCL_ERROR)
         {
-            CONST84 char *errorinfo = Tcl_GetVar(interp_obj->interp,"errorInfo",0);
-            TclWeb_PrintError("<b>Rivet AfterEveryScript failed!</b>",1,globals->req);
-            TclWeb_PrintError( errorinfo, 0, globals->req );
+            Rivet_PrintErrorMessage(private->interps[private->running_conf->idx]->interp,
+                                    "<b>Rivet AfterEveryScript failed</b>");
         }
     }
 
@@ -773,12 +805,14 @@ sendcleanup:
     //                          globals->req->charset,NULL),globals->req);
     //}
 
-    globals->req->content_sent = 0;
-    globals->page_aborting = 0;
-    if (globals->abort_code != NULL)
+    globals->req->content_sent  = 0;
+    private->page_aborting      = 0;
+    private->abort_code         = NULL;
+    private->page_aborting      = 0;
+    if (private->abort_code != NULL)
     {
-        Tcl_DecrRefCount(globals->abort_code);
-        globals->abort_code = NULL;
+        Tcl_DecrRefCount(private->abort_code);
+        private->abort_code = NULL;
     }
 
     /* We reset this pointer to signal we have terminated the request processing */
@@ -786,6 +820,66 @@ sendcleanup:
     globals->r = NULL;
     return retval;
 }
+
+/* -- Rivet_ExecuteErrorHandler
+ *
+ * Invoking either the default error handler or the ErrorScript.
+ * In case the error handler fails a standard error message is printed
+ * (you're better off if you make your error handlers fail save)
+ *
+ * Arguments:
+ *
+ *  - Tcl_Interp* interp: the Tcl interpreter
+ *  - Tcl_Obj*    tcl_script_obj: the script that failed (to retrieve error
+ *                info from it
+ *  - request_rec* req: current request obj pointer
+ * 
+ * Returned value:
+ *
+ *  - A Tcl status
+ */
+
+static int 
+Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thread_private *private)
+{
+    int                 result;
+    Tcl_Obj*            errscript;
+    rivet_server_conf*  conf = private->running_conf;
+
+    /* We extract information from the errorOutbuf variable. Notice that tcl_script_obj
+     * can either be the request processing script or conf->rivet_abort_script
+     */
+
+    Tcl_SetVar( interp, "errorOutbuf",Tcl_GetStringFromObj( tcl_script_obj, NULL ),TCL_GLOBAL_ONLY );
+
+    /* If we don't have an error script, use the default error handler. */
+    if (conf->rivet_error_script) {
+        errscript = Tcl_NewStringObj(conf->rivet_error_script,-1);
+    } else {
+        errscript = Tcl_NewStringObj(conf->rivet_default_error_script,-1);
+    }
+
+    Tcl_IncrRefCount(errscript);
+    result = Tcl_EvalObjEx(interp, errscript, 0);
+    if (result == TCL_ERROR) {
+        Rivet_PrintErrorMessage(interp,"<b>Rivet ErrorScript failed</b>");
+    }
+
+    /* This shouldn't make the default_error_script go away,
+     * because it gets a Tcl_IncrRefCount when it is created.
+     */
+    Tcl_DecrRefCount(errscript);
+
+    /* In case we are handling an error occurring after an abort_page call (for
+     * example because the AbortString itself failed) we must reset this
+     * flag or the logging will be inihibited
+     */
+
+    private->page_aborting = 0;
+
+    return result;
+}
+
 
 /* -- Rivet_ExecuteAndCheck
  * 
@@ -804,7 +898,8 @@ sendcleanup:
  *
  *   Returned value:
  *
- *      - invariably TCL_OK
+ *      - One of the Tcl defined returned value of Tcl_EvelObjExe (TCL_OK, 
+ *        TCL_ERROR, TCL_BREAK etc.)
  *
  *   Side effects:
  *
@@ -819,11 +914,8 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
     int           tcl_result;
     vhost_interp* interp_obj;
 
-    //ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
-    //rivet_server_conf *conf = private->running_conf;
-
     interp_obj = private->interps[private->running_conf->idx];
-    rivet_interp_globals *globals = Tcl_GetAssocData(interp_obj->interp, "rivet", NULL);
+    //rivet_interp_globals *globals = Tcl_GetAssocData(interp_obj->interp, "rivet", NULL);
 
     Tcl_Preserve (interp_obj->interp);
 
@@ -834,7 +926,6 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
     private->thread_exit = 0;
     tcl_result = Tcl_EvalObjEx(interp_obj->interp, tcl_script_obj, 0);
     if (tcl_result == TCL_ERROR) {
-        Tcl_Obj*    errscript;
         Tcl_Obj*    errorCodeListObj;
         Tcl_Obj*    errorCodeElementObj;
         char*       errorCodeSubString;
@@ -873,11 +964,27 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
             {
                 if (private->running->rivet_abort_script) 
                 {
-                    if (Tcl_EvalObjEx(interp_obj->interp,private->running->rivet_abort_script,0) == TCL_ERROR)
+                    Tcl_Interp* interp = interp_obj->interp;
+
+                    /* Ideally an AbortScript should be fail safe, but in case
+                     * it fails we give a chance to the subsequent ErrorScript
+                     * to catch this error.
+                     */
+
+                    tcl_result = Tcl_EvalObjEx(interp,private->running->rivet_abort_script,0);
+                    if (tcl_result == TCL_ERROR)
                     {
-                        CONST84 char *errorinfo = Tcl_GetVar( interp_obj->interp, "errorInfo", 0 );
-                        TclWeb_PrintError("<b>Rivet AbortScript failed!</b>",1,globals->req);
-                        TclWeb_PrintError( errorinfo, 0, globals->req );
+                        /* This is not elegant, but we want to avoid to print
+                         * this error message if an ErrorScript will handle this error.
+                         * Thus we print the usual error message only if we are running the
+                         * default error handler
+                         */
+
+                        if (private->running->rivet_error_script == NULL) {
+
+                            Rivet_PrintErrorMessage(interp,"<b>Rivet AbortScript failed</b>");
+                        }
+                        Rivet_ExecuteErrorHandler(interp,private->running->rivet_abort_script,private);
                     }
                 }
             }
@@ -890,43 +997,18 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
                  */
 
                 private->thread_exit = 1;
-            }
+            } 
+ 
         }
-        else
+        else if (!private->page_aborting)
         {
-
-            /* The script returned a generic error not handled by mod_rivet. We check for a
-             * rivet_error_script and in case we run it
-             */
-
-            Tcl_SetVar (interp_obj->interp,"errorOutbuf",Tcl_GetStringFromObj(tcl_script_obj,NULL),TCL_GLOBAL_ONLY );
-
-            /* If we don't have an error script, use the default error handler. */
-
-            if (private->running->rivet_error_script) {
-                errscript = private->running->rivet_error_script;
-            } else {
-                errscript = Tcl_NewStringObj(private->running_conf->rivet_default_error_script,-1);
-            }
-
-            Tcl_IncrRefCount(errscript);
-            if (Tcl_EvalObjEx(interp_obj->interp, errscript, 0) == TCL_ERROR) {
-                CONST84 char *errorinfo = Tcl_GetVar( interp_obj->interp, "errorInfo", 0 );
-                TclWeb_PrintError("<b>Rivet ErrorScript failed!</b>",1,globals->req);
-                TclWeb_PrintError( errorinfo, 0, globals->req );
-            }
-
-            /* This shouldn't make the default_error_script go away,
-             * because it gets a Tcl_IncrRefCount when it is created. 
-             */
-
-            Tcl_DecrRefCount(errscript);
+            Rivet_ExecuteErrorHandler (interp_obj->interp,tcl_script_obj,private);
         }
     }
     
     Tcl_Release(interp_obj->interp);
 
-    return TCL_OK;
+    return tcl_result;
 }
 
 /*
@@ -1268,8 +1350,6 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
     /* Rivet commands namespace is created */
     globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                             (Tcl_NamespaceDeleteProc *)NULL);
-    globals->page_aborting  = 0;
-    globals->abort_code     = NULL;
     globals->req            = TclWeb_NewRequestObject (p); 
     globals->srec           = s;
     globals->r              = NULL;
@@ -1360,7 +1440,6 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     char errorbuf[ERRORBUF_SZ];
     char* mpm_prefork_bridge = "rivet_prefork_mpm.so";
     char* mpm_worker_bridge  = "rivet_worker_mpm.so";
-    char* mpm_model_handler;
     char* mpm_model_path;
     int   ap_mpm_result;
 
@@ -1385,22 +1464,37 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
     /* Let's load the Rivet-MPM bridge */
 
-    mpm_model_handler = mpm_worker_bridge;
+    module_globals->rivet_mpm_bridge = mpm_worker_bridge;
     if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
     {
-        /* we are forced to load the prefork MPM bridge */
 
         if (ap_mpm_result == AP_MPMQ_NOT_SUPPORTED)
         {
-            mpm_model_handler = mpm_prefork_bridge;
+            /* we are forced to load the prefork MPM bridge */
+
+            module_globals->rivet_mpm_bridge = apr_pstrdup(pPool,mpm_prefork_bridge);
         }
+        else
+        {
+            module_globals->rivet_mpm_bridge = apr_pstrdup(pPool,mpm_worker_bridge);
+        }
+    }
+    else
+    {
+
+        /* Execution shouldn't get here as a failure querying about MPM is supposed
+         * to be return APR_SUCCESS in every normal operative conditions. We
+         * give a default to the MPM bridge anyway
+         */
+
+        module_globals->rivet_mpm_bridge = apr_pstrdup(pPool,mpm_worker_bridge);
     }
 
     /* We have the chance to tell mod_rivet through an env variable where the bridge has to be loaded from */
 
     if (apr_env_get (&mpm_model_path,"RIVET_MPM_BRIDGE",pTemp) != APR_SUCCESS)
     {
-        mpm_model_path = apr_pstrcat(pTemp,RIVET_DIR,"/mpm/",mpm_model_handler,NULL);
+        mpm_model_path = apr_pstrcat(pTemp,RIVET_DIR,"/mpm/",module_globals->rivet_mpm_bridge,NULL);
     } 
 
     aprrv = apr_dso_load(&module_globals->dso_handle,mpm_model_path,pPool);
