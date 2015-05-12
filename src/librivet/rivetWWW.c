@@ -354,9 +354,9 @@ TCL_CMD_HEADER( Rivet_EscapeShellCommandCmd )
 int 
 Rivet_InitWWW( Tcl_Interp *interp)
 {
-    RIVET_OBJ_CMD ("unescape_string",Rivet_UnescapeStringCmd);
-    RIVET_OBJ_CMD ("escape_string",Rivet_EscapeStringCmd);
-    RIVET_OBJ_CMD ("escape_sgml_chars",Rivet_EscapeSgmlCharsCmd);
-    RIVET_OBJ_CMD ("escape_shell_command",Rivet_EscapeShellCommandCmd);
+    RIVET_OBJ_CMD ("unescape_string",Rivet_UnescapeStringCmd,NULL);
+    RIVET_OBJ_CMD ("escape_string",Rivet_EscapeStringCmd,NULL);
+    RIVET_OBJ_CMD ("escape_sgml_chars",Rivet_EscapeSgmlCharsCmd,NULL);
+    RIVET_OBJ_CMD ("escape_shell_command",Rivet_EscapeShellCommandCmd,NULL);
     return TCL_OK;
 }

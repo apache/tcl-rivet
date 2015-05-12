@@ -540,10 +540,10 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
 int 
 Rivet_InitList( Tcl_Interp *interp)
 {
-    RIVET_OBJ_CMD("lremove",Rivet_LremoveObjCmd);
-    RIVET_OBJ_CMD("comma_split",Rivet_CommaSplitObjCmd);
-    RIVET_OBJ_CMD("comma_join",Rivet_CommaJoinObjCmd);
-    RIVET_OBJ_CMD("lassign_array",Rivet_LassignArrayObjCmd);
+    RIVET_OBJ_CMD("lremove",Rivet_LremoveObjCmd,NULL);
+    RIVET_OBJ_CMD("comma_split",Rivet_CommaSplitObjCmd,NULL);
+    RIVET_OBJ_CMD("comma_join",Rivet_CommaJoinObjCmd,NULL);
+    RIVET_OBJ_CMD("lassign_array",Rivet_LassignArrayObjCmd,NULL);
 
     return TCL_OK;
 }

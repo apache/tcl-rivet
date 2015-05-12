@@ -1,20 +1,22 @@
+/* rivetCore.c -- Core commands which are compiled into mod_rivet itself */
+
 /*
- * rivetCore.c - Core commands which are compiled into mod_rivet itself.
- */
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-/* Copyright 2002-2004 The Apache Software Foundation
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /* $Id$ */
@@ -107,12 +109,13 @@ Rivet_NoRequestRec (Tcl_Interp* interp, Tcl_Obj* command)
 
 TCL_CMD_HEADER( Rivet_MakeURL )
 {
+    rivet_thread_private*   private;
     Tcl_Obj*                result  = NULL;
-    rivet_interp_globals*   globals = Tcl_GetAssocData(interp,"rivet",NULL);
     char*                   url_target_name;
     int                     target_length;
 
-    CHECK_REQUEST_REC(globals->r,"::rivet::makeurl");
+    THREAD_PRIVATE_DATA(private)
+    CHECK_REQUEST_REC(private->r,"::rivet::makeurl")
 
     if (objc > 2)
     {
@@ -122,7 +125,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
 
     if (objc == 1)
     {
-        url_target_name = TclWeb_GetEnvVar (globals->req,"SCRIPT_NAME");
+        url_target_name = TclWeb_GetEnvVar (private->req,"SCRIPT_NAME");
     }
     else
     {
@@ -135,7 +138,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
         if (url_target_name[0] != '/')
         {
             /* relative path */
-            char* script_name = TclWeb_GetEnvVar (globals->req,"SCRIPT_NAME");
+            char* script_name = TclWeb_GetEnvVar (private->req,"SCRIPT_NAME");
             int   script_name_l = strlen(script_name);
 
             // regardless the reason for a SCRIPT_NAME being undefined we
@@ -149,22 +152,22 @@ TCL_CMD_HEADER( Rivet_MakeURL )
                 
                 if (script_name[script_name_l-1] == '/')
                 {
-                    url_target_name = apr_pstrcat(globals->req->req->pool,script_name,url_target_name,NULL);
+                    url_target_name = apr_pstrcat(private->req->req->pool,script_name,url_target_name,NULL);
                 }
                 else
                 {
-                    url_target_name = apr_pstrcat(globals->req->req->pool,script_name,"/",url_target_name,NULL);
+                    url_target_name = apr_pstrcat(private->req->req->pool,script_name,"/",url_target_name,NULL);
                 }
             }
             else
             {
-                url_target_name = apr_pstrcat(globals->req->req->pool,"/",url_target_name,NULL);
+                url_target_name = apr_pstrcat(private->req->req->pool,"/",url_target_name,NULL);
             }
         }
     }
 
     result = Tcl_NewObj();   
-    TclWeb_MakeURL(result, url_target_name, globals->req);
+    TclWeb_MakeURL(result, url_target_name, private->req);
     Tcl_SetObjResult(interp, result);
 
     return TCL_OK;
@@ -1175,7 +1178,7 @@ TCL_CMD_HEADER( Rivet_NoBody )
 
 TCL_CMD_HEADER( Rivet_AbortPageCmd )
 {
-    rivet_thread_private*   private;
+    rivet_thread_private* private;
     static char *errorMessage = "Page generation terminated by abort_page directive";
 
     if (objc > 2)
@@ -1184,7 +1187,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
         return TCL_ERROR;
     }
 
-    RIVET_PRIVATE_DATA_NOT_NULL(private,rivet_thread_key)
+    THREAD_PRIVATE_DATA(private)
 
     if (objc == 2)
     {
@@ -1242,7 +1245,8 @@ TCL_CMD_HEADER( Rivet_AbortCodeCmd )
 {
     rivet_thread_private*   private;
     
-    RIVET_PRIVATE_DATA_NOT_NULL(private,rivet_thread_key)
+    THREAD_PRIVATE_DATA(private)
+
     if (private->abort_code != NULL)
     {
         Tcl_SetObjResult(interp,private->abort_code);
@@ -1675,6 +1679,8 @@ TestpanicCmd(dummy, interp, argc, argv)
 int
 Rivet_InitCore( Tcl_Interp *interp )
 {
+    rivet_thread_private*   private;
+
 #if RIVET_NAMESPACE_EXPORT == 1
     rivet_interp_globals *globals = NULL;
     Tcl_Namespace *rivet_ns;
@@ -1683,29 +1689,34 @@ Rivet_InitCore( Tcl_Interp *interp )
     rivet_ns = globals->rivet_ns;
 #endif
 
-    RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL);
-    RIVET_OBJ_CMD ("headers",Rivet_Headers);
-    RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv);
-    RIVET_OBJ_CMD ("load_headers",Rivet_LoadHeaders);
-    RIVET_OBJ_CMD ("var",Rivet_Var);
-    RIVET_OBJ_CMD ("abort_page",Rivet_AbortPageCmd);
-    RIVET_OBJ_CMD ("abort_code", Rivet_AbortCodeCmd);
-    RIVET_OBJ_CMD ("virtual_filename",Rivet_VirtualFilenameCmd);
-    RIVET_OBJ_CMD ("apache_table",Rivet_ApacheTable);
-    RIVET_OBJ_CMD ("var_qs",Rivet_Var);
-    RIVET_OBJ_CMD ("var_post",Rivet_Var);
-    RIVET_OBJ_CMD ("raw_post",Rivet_RawPost);
-    RIVET_OBJ_CMD ("upload",Rivet_Upload);
-    RIVET_OBJ_CMD ("include",Rivet_Include);
-    RIVET_OBJ_CMD ("parse",Rivet_Parse);
-    RIVET_OBJ_CMD ("no_body",Rivet_NoBody);
-    RIVET_OBJ_CMD ("env",Rivet_EnvCmd);
-    RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd);
-    RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd);
-    RIVET_OBJ_CMD ("exit_thread",Rivet_ExitCmd);
+    /* By calling this macro we fetch the thread private data
+     * and we also ap_assert the pointer is not NULL */
+
+    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
+
+    RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,NULL);
+    RIVET_OBJ_CMD ("headers",Rivet_Headers,NULL);
+    RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv,NULL);
+    RIVET_OBJ_CMD ("load_headers",Rivet_LoadHeaders,NULL);
+    RIVET_OBJ_CMD ("var",Rivet_Var,NULL);
+    RIVET_OBJ_CMD ("abort_page",Rivet_AbortPageCmd,private);
+    RIVET_OBJ_CMD ("abort_code", Rivet_AbortCodeCmd,private);
+    RIVET_OBJ_CMD ("virtual_filename",Rivet_VirtualFilenameCmd,NULL);
+    RIVET_OBJ_CMD ("apache_table",Rivet_ApacheTable,NULL);
+    RIVET_OBJ_CMD ("var_qs",Rivet_Var,NULL);
+    RIVET_OBJ_CMD ("var_post",Rivet_Var,NULL);
+    RIVET_OBJ_CMD ("raw_post",Rivet_RawPost,NULL);
+    RIVET_OBJ_CMD ("upload",Rivet_Upload,NULL);
+    RIVET_OBJ_CMD ("include",Rivet_Include,NULL);
+    RIVET_OBJ_CMD ("parse",Rivet_Parse,NULL);
+    RIVET_OBJ_CMD ("no_body",Rivet_NoBody,NULL);
+    RIVET_OBJ_CMD ("env",Rivet_EnvCmd,NULL);
+    RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd,NULL);
+    RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,NULL);
+    RIVET_OBJ_CMD ("exit_thread",Rivet_ExitCmd,NULL);
 
 #ifdef TESTPANIC
-    RIVET_OBJ_CMD ("testpanic",TestpanicCmd);
+    RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
 #endif
 
 #if RIVET_NAMESPACE_EXPORT == 1

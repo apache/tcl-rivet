@@ -85,6 +85,36 @@ Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key)
 
 /*-----------------------------------------------------------------------------
  *
+ * -- Rivet_ReleaseRivetChannel
+ *
+ * Tcl_UnregisterChannel wrapper with the purpose of introducing a control
+ * variables that might help debugging
+ *
+ * Arguments:
+ *
+ *     - Tcl_Interp*    interp
+ *     - Tcl_Channel*   channel
+ *
+ * Returned value
+ *
+ *     none
+ *
+ * Side Effects:
+ *
+ *     channel debug counter decremented (TODO) 
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+void 
+Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel)
+{
+    Tcl_UnregisterChannel(interp,*channel);       
+}
+
+
+/*-----------------------------------------------------------------------------
+ *
  *  -- Rivet_CreatePrivateData 
  *
  * Creates a thread private data object
@@ -113,10 +143,16 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     private = apr_palloc (module_globals->pool,sizeof(*private));
     apr_thread_mutex_unlock(module_globals->pool_mutex);
 
+    if (apr_pool_create (&private->pool, NULL) != APR_SUCCESS) 
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": could not create thread private pool");
+        return NULL;
+    }
     private->req_cnt        = 0;
     private->keep_going     = 1;
     private->r              = NULL;
-    private->req            = NULL;
+    private->req            = TclWeb_NewRequestObject (private->pool);
     private->page_aborting  = 0;
     private->abort_code     = NULL;
     private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
@@ -124,18 +160,11 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     Tcl_IncrRefCount(private->request_init);
     Tcl_IncrRefCount(private->request_cleanup);
 
-    if (apr_pool_create (&private->pool, NULL) != APR_SUCCESS) 
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
-                     MODNAME ": could not create thread private pool");
-        return NULL;
-    }
 
     /* We allocate the array for the interpreters database.
      * Data referenced in this database must be freed by the thread before exit
      */
 
-    private->channel    = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
     private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
     apr_threadkey_private_set (private,rivet_thread_key);
 

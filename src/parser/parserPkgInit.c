@@ -126,8 +126,8 @@ Rivetparser_Init( Tcl_Interp *interp )
         return TCL_ERROR;
     }
 
-    RIVET_OBJ_CMD("parserivet",Parse_Rivet);
-    RIVET_OBJ_CMD("parserivetdata",Parse_RivetData);
+    RIVET_OBJ_CMD("parserivet",Parse_Rivet,NULL);
+    RIVET_OBJ_CMD("parserivetdata",Parse_RivetData,NULL);
     return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }
 
@@ -162,6 +162,6 @@ Rivetparser_SafeInit( Tcl_Interp *interp )
                          (Tcl_CmdDeleteProc *)NULL);
 */
 
-    RIVET_OBJ_CMD("parserivetdata",Parse_RivetData);
+    RIVET_OBJ_CMD("parserivetdata",Parse_RivetData,NULL);
     return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }

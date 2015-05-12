@@ -24,11 +24,22 @@
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_rivet */
 
-#define STREQU(s1, s2)  (s1[0] == s2[0] && strcmp(s1, s2) == 0)
-#define STRNEQU(s1, s2) (s1[0] == s2[0] && strncmp(s1, s2, strlen(s2)) == 0)
+#define STREQU(s1,s2)  (s1[0] == s2[0] && strcmp(s1, s2) == 0)
+#define STRNEQU(s1,s2) (s1[0] == s2[0] && strncmp(s1, s2, strlen(s2)) == 0)
 #define RIVET_NS                "::rivet"
 #define RIVET_TCL_PACKAGE       "rivet"
 #define RIVETLIB_TCL_PACKAGE    "rivetlib"
+
+/* Macros to access and check thread private data */
+
+#define RIVET_PRIVATE_DATA(thread_key,private_p) \
+        ap_assert (apr_threadkey_private_get ((void **)&private_p,thread_key) == APR_SUCCESS);
+    
+#define RIVET_PRIVATE_DATA_NOT_NULL(thread_key,private_p) \
+        RIVET_PRIVATE_DATA(thread_key,private_p) \
+        ap_assert (private_p != NULL);
+
+/* macros defining Tcl commands */
 
 #define TCL_CMD_HEADER(cmd)	\
 static int cmd(\
@@ -37,6 +48,12 @@ static int cmd(\
     int objc,\
     Tcl_Obj *CONST objv[])
 
+ /* we also define a convenience macro to cast the ClientData
+  * into the thread private data pointer */
+
+#define THREAD_PRIVATE_DATA(p)  p = (rivet_thread_private *) clientData;
+
+
 #define TCL_OBJ_CMD( name, func ) \
 Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      name,   /* Function name in Tcl */\
@@ -44,18 +61,23 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      NULL,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
 
-/* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace. Commands
- * are exported from the RIVET_NS (::rivet) namespace in the init.tcl 
- * script accordingly to configuration switches passed to ./configure
- * (see configure.ac)
- */
+ /* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace. Commands
+  * are exported from the RIVET_NS (::rivet) namespace in the init.tcl 
+  * script accordingly to configuration switches passed to ./configure
+  * (see configure.ac)
+  */
 
-#define RIVET_OBJ_CMD(name,func) \
+ /* We now pass the thread private data to the 
+  * Tcl command's ClientData
+  */
+
+#define RIVET_OBJ_CMD( name, func, private_p) \
 Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      RIVET_NS "::" name,   /* Function name in Tcl */\
 		      func,   /* C function name */\
-		      NULL,   /* Client Data */\
+		      private_p,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); 
+
 
 /* 
  * Pointer in r is checked and in case Rivet_NoRequestRec is

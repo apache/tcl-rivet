@@ -119,6 +119,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             /* TODO: we have to log something here */
             apr_thread_exit(thd,APR_SUCCESS);
         }
+        private->channel    = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
         Rivet_SetupTclPanicProc ();
 
     }

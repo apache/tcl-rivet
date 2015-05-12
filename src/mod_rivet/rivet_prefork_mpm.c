@@ -58,7 +58,6 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
 
     FILEDEBUGINFO;
 
-
     /* we create and initialize a master (server) interpreter */
 
     module_globals->server_interp = Rivet_NewVHostInterp(pPool); /* root interpreter */
@@ -111,7 +110,8 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     /* 
      * This is the only execution thread in this process so we create
-     * the Tcl thread private data here
+     * the Tcl thread private data here. In a fork capable OS
+     * private data should have been created by the httpd parent process
      */
 
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
@@ -125,6 +125,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
             exit(1);
         }
+        private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
         Rivet_SetupTclPanicProc ();
     }
 

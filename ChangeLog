@@ -1,12 +1,33 @@
+2015-05-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.[c|h]: moving some request processing status
+    objects (request_rec, TclWebapache etc) from the interpreter
+    globals (mod_rivet_globals) to the thread private data (rivet_thread_private)
+    * src/mod_rivet/rivet_[prefork|worker]_mpm.c: Rivet channel creation
+    is now removed from Rivet_CreatePrivateData, Private data
+    must be allocated indipendtly from the RivetChannel
+    * src/mod_rivet/rivetCore.c: setting up status variables storage 
+    transition from mod_rivet_globals to rivet_thread_private
+    * src/rivet.h: Rivet command macro changed to accept a new
+    argument to be passed to a command implementation as ClientData.
+    Currently the value passed must be the pointer to the thread private
+    data
+    * src/mod_rivet/mod_rivet_common.c: New function Rivet_ReleaseChannel
+    and initialization of status variables moved to thread private data
+    * src/mod_rivet/rivetCore.c:
+    changes needed after we moved to rivet_thread_private fields
+    driven by C code implementing ::rivet::abort_page.
+    Adding bridge name to server array variables.
+    * src/librivet/rivetCrypt.c:
+    * src/librivet/rivetWWW.c:
+    * src/librivet/rivetList.c:
+    * src/parser/parserPkgInit.c: Changing command creation macro
+    to follow new 3 arguments form
+
 2015-05-05 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.c: porting error and 
     abort_page handling implemented in branches/2.2 (fixes bug #57501). 
     * src/mod_rivet/mod_rivet.h: abort_page related fields
     moved to rivet_thread_private from interpreter globals
-    * src/mod_rivet/mod_rivet_common.c,src/mod_rivet/rivetCore.c:
-    changes needed after we moved to rivet_thread_private fields
-    driven by C code implementing ::rivet::abort_page.
-    Adding bridge name to server array variables.
     
 2015-04-16 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: now we assume thread private data
@@ -35,7 +56,8 @@
 2015-03-11 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/internals.xml: Improved paragraph on how to extend mod_rivet
     * src/apache-2/mod_rivet.c: Improper handling of 'HTTP_NOT_FOUND' and
-    HTTP_INTERNAL_SERVER_ERROR caused an access to non existing memory (Bug #57686)
+    HTTP_INTERNAL_SERVER_ERROR caused mod_rivet to access a non existing 
+    memory location (Bug #57686)
 
 2015-02-20 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: updating examples and version

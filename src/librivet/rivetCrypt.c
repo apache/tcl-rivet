@@ -163,8 +163,8 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
 int
 Rivet_InitCrypt( Tcl_Interp *interp)
 {
-    RIVET_OBJ_CMD("encrypt", Rivet_EncryptCmd);
-    RIVET_OBJ_CMD("decrypt", Rivet_DecryptCmd);
-    RIVET_OBJ_CMD("crypt", Rivet_CryptCmd);
+    RIVET_OBJ_CMD("encrypt", Rivet_EncryptCmd,NULL);
+    RIVET_OBJ_CMD("decrypt", Rivet_DecryptCmd,NULL);
+    RIVET_OBJ_CMD("crypt", Rivet_CryptCmd,NULL);
     return TCL_OK;
 }

@@ -1,3 +1,4 @@
+/* -- mod_rivet_common.h Declariations for common utility functions */ 
 
 /*
     Licensed to the Apache Software Foundation (ASF) under one
@@ -29,4 +30,5 @@ EXTERN void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1);
 EXTERN Tcl_Channel* Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key);
 EXTERN rivet_thread_private* Rivet_CreatePrivateData (void);
 EXTERN rivet_thread_private* Rivet_SetupTclPanicProc (void);
+EXTERN void Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel);
 #endif

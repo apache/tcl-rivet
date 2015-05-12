@@ -348,11 +348,5 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
         Tcl_IncrRefCount(running_script->objscript);\
     }
 
-#define RIVET_PRIVATE_DATA(private_p,thread_key) \
-    ap_assert (apr_threadkey_private_get ((void **)&private_p,thread_key) == APR_SUCCESS);
-    
-#define RIVET_PRIVATE_DATA_NOT_NULL(private_p,thread_key) \
-    RIVET_PRIVATE_DATA(private_p,thread_key) \
-    ap_assert (private_p != NULL);
 
 #endif /* MOD_RIVET_H */
