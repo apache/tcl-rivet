@@ -519,9 +519,9 @@ void Rivet_ProcessorCleanup (void *data)
 int
 Rivet_SendContent(rivet_thread_private *private)
 {
-    int errstatus;
-    int retval;
-    int ctype;
+    int                     errstatus;
+    int                     retval;
+    int                     ctype;
     Tcl_Interp*             interp;
     rivet_interp_globals*   globals = NULL;
     vhost_interp*           interp_obj;

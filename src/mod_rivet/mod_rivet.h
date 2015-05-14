@@ -257,14 +257,14 @@ enum {
 
 typedef struct _handler_private 
 {
-    rivet_job_t         job_type;
-    apr_thread_cond_t*  cond;
-    apr_thread_mutex_t* mutex;
-    request_rec*        r;              /* request rec                 */
-    TclWebRequest*      req;
-    int                 code;
-    int                 status;
+    rivet_job_t             job_type;
+    apr_thread_cond_t*      cond;
+    apr_thread_mutex_t*     mutex;
+    request_rec*            r;              /* request rec                 */
+    int                     code;
+    int                     status;
 
+    //TclWebRequest*      req;
 } handler_private;
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);

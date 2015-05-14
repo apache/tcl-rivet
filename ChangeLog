@@ -1,4 +1,10 @@
 2015-05-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.h: removing redundant variable from handler_private
+    structure
+    * src/mod_rivet/rivet_worker_mpm.c: removing unnecessary call to
+    TclWeb_InitRequest which is called in Rivet_SendContent.    
+
+2015-05-12 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.[c|h]: moving some request processing status
     objects (request_rec, TclWebapache etc) from the interpreter
     globals (mod_rivet_globals) to the thread private data (rivet_thread_private)

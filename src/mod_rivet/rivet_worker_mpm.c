@@ -155,7 +155,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         void*               v;
         apr_queue_t*        q = module_globals->queue;
         handler_private*    request_obj;
-        rivet_server_conf*  server_conf;
+        //rivet_server_conf*  server_conf;
 
         do {
 
@@ -189,15 +189,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         
         apr_atomic_inc32(module_globals->running_threads_count);
 
-        server_conf = RIVET_SERVER_CONF(request_obj->r->server->module_config);
-
-        TclWeb_InitRequest(request_obj->req, private->interps[server_conf->idx]->interp, request_obj->r);
+        //server_conf = RIVET_SERVER_CONF(request_obj->r->server->module_config);
+        //TclWeb_InitRequest(request_obj->req, private->interps[server_conf->idx]->interp, request_obj->r);
         
         /* these assignements are crucial for both calling Rivet_SendContent and
          * for telling the channel where stuff must be sent to */
 
         private->r   = request_obj->r;
-        private->req = request_obj->req;
+        //private->req = request_obj->req;
 
         HTTP_REQUESTS_PROC(request_obj->code = Rivet_SendContent(private));
 
@@ -470,7 +469,7 @@ int Rivet_MPM_Request (request_rec* r)
         {
             apr_thread_mutex_lock(module_globals->pool_mutex);
             request_private      = apr_palloc(module_globals->pool,sizeof(handler_private));
-            request_private->req = TclWeb_NewRequestObject (module_globals->pool);
+            //request_private->req = TclWeb_NewRequestObject (module_globals->pool);
             apr_thread_cond_create(&(request_private->cond), module_globals->pool);
             apr_thread_mutex_create(&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, module_globals->pool);
             apr_thread_mutex_unlock(module_globals->pool_mutex);
@@ -487,14 +486,12 @@ int Rivet_MPM_Request (request_rec* r)
     rv = apr_queue_push(module_globals->queue,request_private);
     if (rv == APR_SUCCESS)
     {
-
         apr_thread_mutex_lock(request_private->mutex);
         while (request_private->status != done)
         {
             apr_thread_cond_wait(request_private->cond,request_private->mutex);
         }
         apr_thread_mutex_unlock(request_private->mutex);
-
     }
     else
     {
