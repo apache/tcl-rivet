@@ -238,11 +238,8 @@ typedef struct _thread_worker_private {
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
-    request_rec*            r;                  /* request rec                          */
-    TclWebRequest*          req;                /* TclWeb API request                   */
-    Tcl_Namespace*          rivet_ns;           /* Rivet commands namespace             */
     server_rec*             srec;               /* pointer to the current server rec obj */
-    rivet_thread_private*   private;      
+    Tcl_Namespace*          rivet_ns;           /* Rivet commands namespace             */
 } rivet_interp_globals;
 
 /* Job types a worker thread is supposed to respond to */

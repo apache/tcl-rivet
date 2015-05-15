@@ -392,7 +392,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             Tcl_Obj*    tcl_child_init = Tcl_NewStringObj(function,-1);
 
             Tcl_IncrRefCount(tcl_child_init);
-            rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
+            //rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
             Tcl_Preserve (interp);
 
             /* There is a lot of passing around of pointers among various record 
@@ -402,7 +402,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
              * any sense. TODO
              */
 
-            globals->srec = s;
+            //globals->srec = s;
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              errmsg, function);
@@ -525,7 +525,7 @@ Rivet_SendContent(rivet_thread_private *private)
     Tcl_Interp*             interp;
     rivet_interp_globals*   globals = NULL;
     vhost_interp*           interp_obj;
-    request_rec*            r = private->r;
+    //request_rec*            r = private->r;
     Tcl_Channel*            running_channel;
 #ifdef USE_APACHE_RSC
     //rivet_server_conf    *rsc = NULL;
@@ -557,11 +557,11 @@ Rivet_SendContent(rivet_thread_private *private)
     private->running = interp_obj->scripts;
     running_channel = interp_obj->channel;
 
-    if (r->per_dir_config)
+    if (private->r->per_dir_config)
     {
         rivet_server_conf* rdc = NULL;
 
-        rdc = RIVET_SERVER_CONF(r->per_dir_config); 
+        rdc = RIVET_SERVER_CONF(private->r->per_dir_config); 
 
         if ((rdc != NULL) && (rdc->path))
         {
@@ -576,10 +576,10 @@ Rivet_SendContent(rivet_thread_private *private)
                 running_scripts*    scripts     = 
                             (running_scripts *) apr_pcalloc (private->pool,sizeof(running_scripts));
 
-                newconfig = RIVET_NEW_CONF(r->pool);
+                newconfig = RIVET_NEW_CONF(private->r->pool);
 
                 Rivet_CopyConfig( private->running_conf, newconfig );
-                Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
+                Rivet_MergeDirConfigVars( private->r->pool, newconfig, private->running_conf, rdc );
                 private->running_conf = newconfig;
 
                 scripts = Rivet_RunningScripts (private->pool,scripts,newconfig);
@@ -595,13 +595,13 @@ Rivet_SendContent(rivet_thread_private *private)
             rivet_server_conf*  newconfig   = NULL;
             private->running = (running_scripts *) apr_pcalloc (private->pool,sizeof(running_scripts));
 
-            newconfig = RIVET_NEW_CONF(r->pool);
+            newconfig = RIVET_NEW_CONF(private->r->pool);
 
             Rivet_CopyConfig( private->running_conf, newconfig );
-            Rivet_MergeDirConfigVars( r->pool, newconfig, private->running_conf, rdc );
+            Rivet_MergeDirConfigVars( private->r->pool, newconfig, private->running_conf, rdc );
             private->running_conf = newconfig;
 
-            private->running = Rivet_RunningScripts(r->pool,private->running,newconfig);
+            private->running = Rivet_RunningScripts(private->r->pool,private->running,newconfig);
 
         }
     }
@@ -614,58 +614,43 @@ Rivet_SendContent(rivet_thread_private *private)
 
     interp  = interp_obj->interp;
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
-
-    /* everything should merge into a single struct sooner or later */
-
-    globals->private = private;
-
-    /* The current TclWebRequest record is assigned here to the thread private data
-       for the channel to read it when the internal buffer will be flushed */
-    
-    globals->req = private->req;
-
-    /* Setting this pointer in globals is crucial: by assigning it
-     * we signal we are processing an HTTP request.
-     * This pointer is set to NULL just before we leave this function
-     * making possible to invalidate command execution that could depend
-     * on a valid request_rec
-     */
-
-    globals->r = r;
-    globals->srec = r->server;
+    //globals->r = r;
+    globals->srec = private->r->server;
 
 #ifndef USE_APACHE_RSC
-    if (r->per_dir_config != NULL)
-        rdc = RIVET_SERVER_CONF( r->per_dir_config );
+    if (private->r->per_dir_config != NULL)
+        rdc = RIVET_SERVER_CONF( private->r->per_dir_config );
     else
         rdc = rsc;
 #endif
 
-    r->allowed |= (1 << M_GET);
-    r->allowed |= (1 << M_POST);
-    r->allowed |= (1 << M_PUT);
-    r->allowed |= (1 << M_DELETE);
-    if (r->method_number != M_GET   && 
-        r->method_number != M_POST  && 
-        r->method_number != M_PUT   && 
-        r->method_number != M_DELETE) {
+    private->r->allowed |= (1 << M_GET);
+    private->r->allowed |= (1 << M_POST);
+    private->r->allowed |= (1 << M_PUT);
+    private->r->allowed |= (1 << M_DELETE);
+    if (private->r->method_number != M_GET   && 
+        private->r->method_number != M_POST  && 
+        private->r->method_number != M_PUT   && 
+        private->r->method_number != M_DELETE) {
 
         retval = DECLINED;
         goto sendcleanup;
 
     }
 
-    if (r->finfo.filetype == 0)
+    if (private->r->finfo.filetype == 0)
     {
+        request_rec* r = private->r;
+
         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, 
-                     r->server,
+                     private->r->server,
                      MODNAME ": File does not exist: %s",
                      (r->path_info ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL) : r->filename));
         retval = HTTP_NOT_FOUND;
         goto sendcleanup;
     }
 
-    if ((errstatus = ap_meets_conditions(r)) != OK) {
+    if ((errstatus = ap_meets_conditions(private->r)) != OK) {
         retval = errstatus;
         goto sendcleanup;
     }
@@ -675,8 +660,10 @@ Rivet_SendContent(rivet_thread_private *private)
      * Apache 2.0, or one of them, at least.
      */
 
-    if (Rivet_chdir_file(r->filename) < 0)
+    if (Rivet_chdir_file(private->r->filename) < 0)
     {
+        request_rec* r = private->r;
+
         /* something went wrong doing chdir into r->filename, we are not specific
          * at this. We simply emit an internal server error and print a log message
          */
@@ -690,6 +677,8 @@ Rivet_SendContent(rivet_thread_private *private)
 
     if (Tcl_EvalObjEx(interp, private->request_init, 0) == TCL_ERROR)
     {
+        request_rec* r = private->r;
+
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
                             MODNAME ": Could not create request namespace (%s)\n" ,
                             Tcl_GetStringResult(interp));
@@ -700,9 +689,9 @@ Rivet_SendContent(rivet_thread_private *private)
 
     /* Apache Request stuff */
 
-    TclWeb_InitRequest(private->req, interp, r);
-    ApacheRequest_set_post_max(globals->req->apachereq, private->running_conf->upload_max);
-    ApacheRequest_set_temp_dir(globals->req->apachereq, private->running_conf->upload_dir);
+    TclWeb_InitRequest(private->req, interp, ctype, private->r);
+    ApacheRequest_set_post_max(private->req->apachereq, private->running_conf->upload_max);
+    ApacheRequest_set_temp_dir(private->req->apachereq, private->running_conf->upload_dir);
 
     /* Let's copy the request data into the thread private record */
 
@@ -712,10 +701,10 @@ Rivet_SendContent(rivet_thread_private *private)
         goto sendcleanup;
     }
 
-    if (r->header_only && !private->running_conf->honor_header_only_reqs)
+    if (private->r->header_only && !private->running_conf->honor_header_only_reqs)
     {
-        TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, globals->req);
-        TclWeb_PrintHeaders(globals->req);
+        TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, private->req);
+        TclWeb_PrintHeaders(private->req);
         retval = OK;
         goto sendcleanup;
     }
@@ -728,40 +717,16 @@ Rivet_SendContent(rivet_thread_private *private)
  * AddType 'application/x-httpd-rivet; charset=utf-8;' rvt 
  */
  
-/*
- * if strlen(req->content_type) > strlen([RIVET|TCL]_FILE_CTYPE)
- * a charset parameters might be there 
- */
 
-    {
-        int content_type_len = strlen(r->content_type);
-
-        if (((ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
-             ((ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
-            
-            char* charset;
-
-            /* we parse the content type: we are after a 'charset' parameter definition */
-            
-            charset = strstr(r->content_type,"charset");
-            if (charset != NULL) {
-                charset = apr_pstrdup(r->pool,charset);
-
-                /* ther's some freedom about spaces in the AddType lines: let's strip them off */
-
-                apr_collapse_spaces(charset,charset);
-                globals->req->charset = charset;
-            }
-        }
-    }
-
-    if (Rivet_ParseExecFile(private, r->filename, 1) != TCL_OK)
+    if (Rivet_ParseExecFile(private, private->r->filename, 1) != TCL_OK)
     {
 
         /* we don't report errors coming from abort_page execution */
 
         if (!private->page_aborting) 
         {
+            request_rec* r = private->r;
+
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                          MODNAME ": Error parsing exec file '%s': %s",
                          r->filename,
@@ -784,6 +749,8 @@ Rivet_SendContent(rivet_thread_private *private)
     /* and finally we run the request_cleanup procedure (always set) */
 
     if (Tcl_EvalObjEx(interp, private->request_cleanup, 0) == TCL_ERROR) {
+        request_rec* r = private->r;
+
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                      MODNAME ": Error evaluating cleanup request: %s",
                      Tcl_GetVar(interp, "errorInfo", 0));
@@ -796,7 +763,7 @@ Rivet_SendContent(rivet_thread_private *private)
     Tcl_Flush(*(running_channel));
 
     /* Reset globals */
-    Rivet_CleanupRequest(r);
+    Rivet_CleanupRequest(private->r);
 
     retval = OK;
 sendcleanup:
@@ -820,7 +787,7 @@ sendcleanup:
 
     /* We reset this pointer to signal we have terminated the request processing */
 
-    globals->r = NULL;
+    private->r = NULL;
     return retval;
 }
 
@@ -1354,8 +1321,8 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
     globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                             (Tcl_NamespaceDeleteProc *)NULL);
     //globals->req    = TclWeb_NewRequestObject (p); 
+    //globals->r      = NULL;
     globals->srec   = s;
-    globals->r      = NULL;
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 

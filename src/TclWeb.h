@@ -48,7 +48,7 @@ TclWebRequest* TclWeb_NewRequestObject (apr_pool_t *p);
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, void *arg);
+int TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, int ctype, void *arg);
 
 /*
  *-----------------------------------------------------------------------------

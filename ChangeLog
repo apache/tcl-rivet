@@ -1,3 +1,12 @@
+2015-05-15 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.h: further reorganization removes duplication
+    of status variables between rivet_thread_worker and rivet_interp_globals
+    * src/mod_rivet/rivetCore.c: completed transition from interpreter globals
+    to thread private data which now stores per request status 
+    * src/mod_rivet/mod_rivet.c: removed globals variable initialization
+    * src/mod_rivet/TclWebapache.c: charset determination stored now done in
+    TclWeb_InitRequest
+
 2015-05-14 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.h: removing redundant variable from handler_private
     structure

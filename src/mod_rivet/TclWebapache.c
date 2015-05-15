@@ -1,32 +1,28 @@
+/* -- TclWeb.c: Common API layer. */
+
 /*
- * TclWeb.c --
- *
- * 	Common API layer.
- *
- * This file contains the Apache-based versions of the functions in
- * TclWeb.h.  They rely on Apache and apreq to perform the underlying
- * operations.
- *
- */
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-/* Copyright 2002-2014 The Apache Software Foundation
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-   	http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 */
 
 /* $Id$ */
 
 /* Rivet config */
+
 #ifdef HAVE_CONFIG_H
 #include <rivet_config.h>
 #endif
@@ -49,8 +45,8 @@ extern apr_threadkey_t* rivet_thread_key;
 
 #define BUFSZ 4096
 
-/* This is used below to determine what part of the parmsarray to
- * parse. */
+/* This is used below to determine what part of the parmsarray to parse. */
+
 #define PARMSARRAY_COORDINATES i = 0; j = parmsarray->nelts; \
 if (source == VAR_SRC_QUERYSTRING) { j = req->apachereq->nargs; } \
 else if (source == VAR_SRC_POST) { i = req->apachereq->nargs; }
@@ -94,9 +90,10 @@ TclWeb_NewRequestObject (apr_pool_t *p)
  */
 
 int
-TclWeb_InitRequest(TclWebRequest* req, Tcl_Interp *interp, void *arg)
+TclWeb_InitRequest(TclWebRequest* req, Tcl_Interp *interp, int ctype, void *arg)
 {
     request_rec *r = (request_rec *)arg;
+    int content_type_len = strlen(r->content_type);
 
     req->interp             = interp;
     req->req                = r;
@@ -104,9 +101,31 @@ TclWeb_InitRequest(TclWebRequest* req, Tcl_Interp *interp, void *arg)
     req->headers_printed    = 0;
     req->headers_set        = 0;
     req->environment_set    = 0;
+    req->charset            = NULL;
 
+    /*
+     * if strlen(req->content_type) > strlen([RIVET|TCL]_FILE_CTYPE)
+     * a charset parameters might be there 
+     */
 
-    req->charset = NULL;
+    if (((ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
+         ((ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
+        
+        char* charset;
+
+        /* we parse the content type: we are after a 'charset' parameter definition */
+        
+        charset = strstr(r->content_type,"charset");
+        if (charset != NULL) {
+            charset = apr_pstrdup(r->pool,charset);
+
+            /* ther's some freedom about spaces in the AddType lines: let's strip them off */
+
+            apr_collapse_spaces(charset,charset);
+            req->charset = charset;
+        }
+    }
+
     return TCL_OK;
 }
 

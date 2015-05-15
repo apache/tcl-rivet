@@ -117,7 +117,7 @@ int Rivet_MPM_Request (request_rec* r)
 {
     rivet_thread_private*   private;
     Tcl_Channel*            outchannel;		    /* stuff for buffering output */
-    rivet_server_conf*      server_conf;
+    //rivet_server_conf*      server_conf;
     int                     retcode;
 
     if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
@@ -188,8 +188,8 @@ int Rivet_MPM_Request (request_rec* r)
 
     private->r   = r;
     private->req_cnt++;
-    server_conf = RIVET_SERVER_CONF(private->r->server->module_config);
-    TclWeb_InitRequest(private->req, private->interps[server_conf->idx]->interp, private->r);
+    //server_conf = RIVET_SERVER_CONF(private->r->server->module_config);
+    //TclWeb_InitRequest(private->req, private->interps[server_conf->idx]->interp, ctype, private->r);
 
     HTTP_REQUESTS_PROC(retcode = Rivet_SendContent(private));
 
