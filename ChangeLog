@@ -1,3 +1,7 @@
+2015-05-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet_common.c: fixed call to apr_palloc which
+    allocated dirty ram, changed as apr_pcalloc
+
 2015-05-15 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.h: further reorganization removes duplication
     of status variables between rivet_thread_worker and rivet_interp_globals

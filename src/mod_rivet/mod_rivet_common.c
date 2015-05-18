@@ -140,7 +140,7 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     }
 
     apr_thread_mutex_lock(module_globals->pool_mutex);
-    private = apr_palloc (module_globals->pool,sizeof(*private));
+    private = apr_pcalloc (module_globals->pool,sizeof(*private));
     apr_thread_mutex_unlock(module_globals->pool_mutex);
 
     if (apr_pool_create (&private->pool, NULL) != APR_SUCCESS) 
