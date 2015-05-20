@@ -1,3 +1,23 @@
+2015-05-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h: macro THREAD_PRIVATE_DATA now simply casts ClientData
+    pointer to a rivet_thread_private pointer
+    * src/mod_rivet/mod_rivet.h: type vhost_interp renamed as rivet_thread_interp
+    * src/mod_rivet/mod_rivet.c: Server root interpreter not initialized
+    with mod_rivet core as it's pointless to have the rivet commands
+    for a ServerInitScript. Rivet core deferred to child process initialization
+    for the same interpreter when the OS supports the fork system call, thus
+    to rivet_prefork_mpm.c. Changed argument list of Rivet_PerInterpInit in 
+    that the function handles a whole rivet_thread_interp object.
+    New function Rivet_RunServerInit controls and runs ServerInitScript.
+    Thread private key creation devolved to child process initialization
+    * src/mod_rivet/rivet_prefork_mpm.c: Rivet_MPM_ServerInit emptied
+    Rivet core commands initialized in Rivet_MPM_ChildInit 
+    * src/mod_rivet/rivetCore.c: removed dependence from rivet_interp_globals,
+    status devolved to rivet_thread_private as it's thread specific not
+    interpreter specific. Pointer to the rivet_thread_private cast as
+    client data when core commands are create calling Tcl_CreateCommand (see
+    macros THREAD_PRIVATE_DATA and RIVET_OBJ_COMMAND)
+
 2015-05-18 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet_common.c: fixed call to apr_palloc which
     allocated dirty ram, changed as apr_pcalloc

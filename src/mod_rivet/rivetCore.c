@@ -119,7 +119,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
     }
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::makeurl")
+    CHECK_REQUEST_REC(private,"::rivet::makeurl")
     if (objc == 1)
     {
         url_target_name = TclWeb_GetEnvVar (private->req,"SCRIPT_NAME");
@@ -194,7 +194,7 @@ TCL_CMD_HEADER( Rivet_Parse )
     apr_finfo_t             finfo_b;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::parse");
+    CHECK_REQUEST_REC(private,"::rivet::parse");
 
     if( objc < 2 || objc > 3 )
     {
@@ -282,7 +282,7 @@ TCL_CMD_HEADER( Rivet_Include )
     }
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::include");
+    CHECK_REQUEST_REC(private,"::rivet::include");
 
     if( objc == 2 ) {
         filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
@@ -292,7 +292,7 @@ TCL_CMD_HEADER( Rivet_Include )
             return TCL_ERROR;
         }
 
-        CHECK_REQUEST_REC(private->r,"::rivet::include -virtual");
+        CHECK_REQUEST_REC(private,"::rivet::include -virtual");
         filename = TclWeb_GetVirtualFile(private->req,Tcl_GetStringFromObj(objv[2], (int *)NULL) );
     }
 
@@ -354,7 +354,7 @@ TCL_CMD_HEADER( Rivet_Headers )
     rivet_thread_private*   private;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::headers");
+    CHECK_REQUEST_REC(private,"::rivet::headers");
 
     if (objc < 2)
     {
@@ -486,7 +486,7 @@ TCL_CMD_HEADER( Rivet_LoadEnv )
     Tcl_Obj*                ArrayObj;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::load_env");
+    CHECK_REQUEST_REC(private,"::rivet::load_env");
     if( objc > 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
         return TCL_ERROR;
@@ -525,7 +525,7 @@ TCL_CMD_HEADER ( Rivet_LoadHeaders )
     Tcl_Obj*                ArrayObj;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::load_headers");
+    CHECK_REQUEST_REC(private,"::rivet::load_headers");
     if( objc > 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "?arrayName?" );
         return TCL_ERROR;
@@ -576,7 +576,7 @@ TCL_CMD_HEADER ( Rivet_Var )
     int                     source;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::var,var_post,var_qs");
+    CHECK_REQUEST_REC(private,"::rivet::var,var_post,var_qs");
     if (objc < 2 || objc > 4)
     {
         Tcl_WrongNumArgs(interp, 1, objv,
@@ -775,7 +775,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
     rivet_thread_private*   private;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::apache_table");
+    CHECK_REQUEST_REC(private,"::rivet::apache_table");
 
     if ((objc < 3) || (objc > 5)) {
         Tcl_WrongNumArgs(interp, 1, objv, "option tablename ?args?");
@@ -993,7 +993,7 @@ TCL_CMD_HEADER( Rivet_Upload )
     rivet_thread_private*   private;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::upload");
+    CHECK_REQUEST_REC(private,"::rivet::upload");
     if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
                         "channel|save|data|exists|size|type|filename|names|tempname"
                         "|tempname|names",
@@ -1124,7 +1124,7 @@ TCL_CMD_HEADER ( Rivet_RawPost )
     rivet_thread_private*   private;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::raw_post");
+    CHECK_REQUEST_REC(private,"::rivet::raw_post");
     data = TclWeb_GetRawPost(private->req);
 
     if (!data) {
@@ -1157,7 +1157,7 @@ TCL_CMD_HEADER( Rivet_NoBody )
     rivet_thread_private*   private;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::no_body");
+    CHECK_REQUEST_REC(private,"::rivet::no_body");
     if (private->req->content_sent == 1) {
         Tcl_AddErrorInfo(interp, "Content already sent");
         return TCL_ERROR;
@@ -1290,7 +1290,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
     
     THREAD_PRIVATE_DATA(private)
 
-    CHECK_REQUEST_REC(private->r,"::rivet::env");
+    CHECK_REQUEST_REC(private,"::rivet::env");
     if( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "variable" );
         return TCL_ERROR;
@@ -1377,7 +1377,7 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
     char*                   virtual;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private->r,"::rivet::virtual_filename");
+    CHECK_REQUEST_REC(private,"::rivet::virtual_filename");
     if( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "filename" );
         return TCL_ERROR;
@@ -1437,7 +1437,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
     {
         Tcl_Obj* dictObj;
 
-        CHECK_REQUEST_REC(private->r,"::rivet::inspect");
+        CHECK_REQUEST_REC(private,"::rivet::inspect");
         rsc = Rivet_GetConf(private->r); 
         dictObj = Rivet_BuildConfDictionary(interp,rsc);
         if (dictObj != NULL) {
@@ -1459,7 +1459,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         {
             Tcl_Obj* dictObj;
             
-            CHECK_REQUEST_REC(private->r,"::rivet::inspect -all");
+            CHECK_REQUEST_REC(private,"::rivet::inspect -all");
             rsc = Rivet_GetConf(private->r); 
             dictObj = Rivet_CurrentConfDict(interp,rsc);
             Tcl_IncrRefCount(dictObj);
@@ -1469,11 +1469,18 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         }
         else if (STRNEQU(cmd_arg,"server"))
         {
-            /* we read data from the server_rec */
-            Tcl_Obj* dictObj;
-            rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
+            Tcl_Obj*    dictObj;
+            server_rec* srec;
 
-            dictObj = Rivet_CurrentServerRec(interp,globals->srec);
+            if (private->r == NULL) {
+                srec = module_globals->server;
+            } else {
+                srec = private->r->server;
+            }
+
+            /* we read data from the server_rec */
+
+            dictObj = Rivet_CurrentServerRec(interp,srec);
             Tcl_IncrRefCount(dictObj);
             Tcl_SetObjResult(interp,dictObj);            
             Tcl_DecrRefCount(dictObj);
@@ -1492,7 +1499,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         {
             Tcl_Obj* par_value = NULL;
 
-            CHECK_REQUEST_REC(private->r,"::rivet::inspect");
+            CHECK_REQUEST_REC(private,"::rivet::inspect");
             rsc = Rivet_GetConf(private->r); 
             par_value = Rivet_ReadConfParameter(interp,rsc,par_name);
             if (par_value == NULL)
@@ -1691,9 +1698,8 @@ TestpanicCmd(dummy, interp, argc, argv)
  */
 
 int
-Rivet_InitCore(Tcl_Interp *interp)
+Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 {
-    rivet_thread_private*   private;
 
 #if RIVET_NAMESPACE_EXPORT == 1
     rivet_interp_globals *globals = NULL;
@@ -1702,11 +1708,6 @@ Rivet_InitCore(Tcl_Interp *interp)
     globals = Tcl_GetAssocData(interp, "rivet", NULL);
     rivet_ns = globals->rivet_ns;
 #endif
-
-    /* By calling this macro we fetch the thread private data
-     * and we also ap_assert the pointer is not NULL */
-
-    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,private);
     RIVET_OBJ_CMD ("headers",Rivet_Headers,private);

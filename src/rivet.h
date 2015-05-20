@@ -51,8 +51,7 @@ static int cmd(\
  /* we also define a convenience macro to cast the ClientData
   * into the thread private data pointer */
 
-#define THREAD_PRIVATE_DATA(p)  p = (rivet_thread_private *) clientData;
-
+#define THREAD_PRIVATE_DATA(p)  p = (rivet_thread_private *)clientData;
 
 #define TCL_OBJ_CMD( name, func ) \
 Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
@@ -87,8 +86,9 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
  * (when a request processing ends it's set to NULL)
  */
 
-#define CHECK_REQUEST_REC(r,cmd_name) \
-if (r == NULL)\
+#define CHECK_REQUEST_REC(p,cmd_name) \
+if (p == NULL) return TCL_OK;\
+if (p->r == NULL)\
 {\
     Rivet_NoRequestRec(interp,Tcl_NewStringObj(cmd_name,-1));\
     return TCL_ERROR;\
@@ -98,7 +98,6 @@ EXTERN int Rivet_Init(Tcl_Interp *interp);
 EXTERN int Rivet_InitList(Tcl_Interp *interp);
 EXTERN int Rivet_InitCrypt(Tcl_Interp *interp);
 EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
-EXTERN int Rivet_InitCore(Tcl_Interp *interp); 
 
 #endif
 

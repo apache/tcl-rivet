@@ -59,15 +59,16 @@
 #include "rivetChannel.h"
 #include "apache_config.h"
 
-mod_rivet_globals*      module_globals;
 rivet_interp_globals    interp_globals;
 
 extern Tcl_ChannelType  RivetChan;
-apr_threadkey_t*        rivet_thread_key;
-apr_threadkey_t*        handler_thread_key;
+apr_threadkey_t*        rivet_thread_key    = NULL;
+apr_threadkey_t*        handler_thread_key  = NULL;
+mod_rivet_globals*      module_globals      = NULL;
 
-void        Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
-static int  Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj);
+void        Rivet_PerInterpInit     (rivet_thread_interp* interp, rivet_thread_private* private, server_rec *s, apr_pool_t *p);
+static int  Rivet_ExecuteAndCheck   (rivet_thread_private *private, Tcl_Obj *tcl_script_obj);
+int         Rivet_InitCore          (Tcl_Interp *interp,rivet_thread_private* p); 
 
 #define ERRORBUF_SZ     256
 
@@ -154,7 +155,7 @@ Rivet_ReleaseScripts (running_scripts* scripts)
  *-----------------------------------------------------------------------------
  */
 
-static void Rivet_CreateCache (apr_pool_t *p, vhost_interp* interp_obj)
+static void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
 {
     interp_obj->objCacheList = apr_pcalloc(p, (signed)((interp_obj->cache_size)*sizeof(char *)));
     interp_obj->objCache = apr_pcalloc(p, sizeof(Tcl_HashTable));
@@ -167,10 +168,10 @@ static void Rivet_CreateCache (apr_pool_t *p, vhost_interp* interp_obj)
  *
  */
 
-static vhost_interp* 
-Rivet_DuplicateVHostInterp(apr_pool_t* pool, vhost_interp* source_obj)
+static rivet_thread_interp* 
+Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
 {
-    vhost_interp* interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
+    rivet_thread_interp* interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
 
     interp_obj->interp      = source_obj->interp;
     interp_obj->channel     = source_obj->channel;
@@ -194,10 +195,10 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, vhost_interp* source_obj)
   * a rivet_thread_private object 
   */
 
-vhost_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
+rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
 {
     extern int          ap_max_requests_per_child;
-    vhost_interp*       interp_obj = apr_pcalloc(pool,sizeof(vhost_interp));
+    rivet_thread_interp*       interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
     rivet_server_conf*  rsc;
 
     /* The cache size is global so we take it from here */
@@ -265,6 +266,7 @@ vhost_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
  * 
  *  Side effects:
  *
+ *     GlobalInitScript and ChildInitScript are run at this stage
  *     
  */
 
@@ -274,11 +276,11 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     server_rec*         root_server = module_globals->server;
     rivet_server_conf*  root_server_conf;
     rivet_server_conf*  myrsc; 
-    vhost_interp*       root_interp;
+    rivet_thread_interp* root_interp;
     void*               parentfunction;     /* this is topmost initialization script */
     void*               function;
 
-    root_server_conf = RIVET_SERVER_CONF( root_server->module_config );
+    root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
     
     root_interp = (*module_globals->mpm_master_interp)();
 
@@ -315,7 +317,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
     for (s = root_server; s != NULL; s = s->next)
     {
-        vhost_interp*   rivet_interp;
+        rivet_thread_interp*   rivet_interp;
 
         myrsc = RIVET_SERVER_CONF(s->module_config);
 
@@ -329,7 +331,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         if (s == root_server)
         {
-            Tcl_RegisterChannel(rivet_interp->interp,*private->channel);
+            Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
         }
         else 
         {
@@ -354,19 +356,15 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         /* interpreter base running scripts definition and initialization */
 
-        rivet_interp->scripts = Rivet_RunningScripts(private->pool,rivet_interp->scripts,myrsc);
+        rivet_interp->scripts = Rivet_RunningScripts (private->pool,rivet_interp->scripts,myrsc);
 
         private->interps[myrsc->idx] = rivet_interp;
 
-        /* Basic Rivet packages and libraries are loaded here. Also the interpreter globals
-         * are setup here. We have to explore if it could be sensible to move them to the
-         * thread private data.
-         */
+        /* Basic Rivet packages and libraries are loaded here */
 
         if ((rivet_interp->flags & RIVET_INTERP_INITIALIZED) == 0)
         {
-            Rivet_PerInterpInit(rivet_interp->interp, root_server, private->pool);
-            rivet_interp->flags |= RIVET_INTERP_INITIALIZED;
+            Rivet_PerInterpInit(rivet_interp, private, root_server, private->pool);
         }
 
         /*  TODO: check if it's absolutely necessary to lock the pool_mutex in order
@@ -392,7 +390,6 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             Tcl_Obj*    tcl_child_init = Tcl_NewStringObj(function,-1);
 
             Tcl_IncrRefCount(tcl_child_init);
-            //rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
             Tcl_Preserve (interp);
 
             /* There is a lot of passing around of pointers among various record 
@@ -402,7 +399,6 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
              * any sense. TODO
              */
 
-            //globals->srec = s;
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              errmsg, function);
@@ -425,7 +421,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
  * -- Rivet_ProcessorCleanup
  *
  * Thread private data cleanup. This function is called by MPM bridges to 
- * release data owned by private and pointed in the array of vhost_interp
+ * release data owned by private and pointed in the array of rivet_thread_interp
  * objects. It has to be called just before an agent, either thread or
  * process, exits.
  *
@@ -439,7 +435,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
  *
  *  Side effects:
  *
- *      resources stored in the array of vhost_interp objects are released
+ *      resources stored in the array of rivet_thread_interp objects are released
  *      and interpreters are deleted.
  *
  */
@@ -523,9 +519,9 @@ Rivet_SendContent(rivet_thread_private *private)
     int                     retval;
     int                     ctype;
     Tcl_Interp*             interp;
-    rivet_interp_globals*   globals = NULL;
-    vhost_interp*           interp_obj;
-    //request_rec*            r = private->r;
+    //rivet_interp_globals*   globals = NULL;
+    rivet_thread_interp*           interp_obj;
+    //request_rec*          r = private->r;
     Tcl_Channel*            running_channel;
 #ifdef USE_APACHE_RSC
     //rivet_server_conf    *rsc = NULL;
@@ -613,9 +609,9 @@ Rivet_SendContent(rivet_thread_private *private)
     }
 
     interp  = interp_obj->interp;
-    globals = Tcl_GetAssocData(interp, "rivet", NULL);
+    //globals = Tcl_GetAssocData(interp, "rivet", NULL);
     //globals->r = r;
-    globals->srec = private->r->server;
+    //globals->srec = private->r->server;
 
 #ifndef USE_APACHE_RSC
     if (private->r->per_dir_config != NULL)
@@ -718,7 +714,7 @@ Rivet_SendContent(rivet_thread_private *private)
  */
  
 
-    if (Rivet_ParseExecFile(private, private->r->filename, 1) != TCL_OK)
+    if (Rivet_ParseExecFile (private, private->r->filename, 1) != TCL_OK)
     {
 
         /* we don't report errors coming from abort_page execution */
@@ -729,8 +725,7 @@ Rivet_SendContent(rivet_thread_private *private)
 
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
                          MODNAME ": Error parsing exec file '%s': %s",
-                         r->filename,
-                         Tcl_GetVar(interp, "errorInfo", 0));
+                         r->filename, Tcl_GetVar(interp, "errorInfo", 0));
         }
     }
 
@@ -882,7 +877,7 @@ static int
 Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
 {
     int           tcl_result;
-    vhost_interp* interp_obj;
+    rivet_thread_interp* interp_obj;
 
     interp_obj = private->interps[private->running_conf->idx];
     //rivet_interp_globals *globals = Tcl_GetAssocData(interp_obj->interp, "rivet", NULL);
@@ -1011,7 +1006,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
     char*           hashKey = NULL;
     int             isNew   = 0;
     int             result  = 0;
-    vhost_interp*   rivet_interp;
+    rivet_thread_interp*   rivet_interp;
     Tcl_Obj*        outbuf  = NULL;
     Tcl_HashEntry*  entry   = NULL;
     Tcl_Interp*     interp;
@@ -1084,7 +1079,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 
         fnobj = Tcl_NewStringObj(filename, -1);
         Tcl_IncrRefCount(fnobj);
-        if( Tcl_FSStat(fnobj, &buf) < 0 )
+        if (Tcl_FSStat(fnobj, &buf) < 0)
             return TCL_ERROR;
         Tcl_DecrRefCount(fnobj);
         ctime = buf.st_ctime;
@@ -1153,8 +1148,8 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
              * as long as it's in the object cache.
              */
 
-            Tcl_IncrRefCount( outbuf );
-            Tcl_SetHashValue(entry, (ClientData)outbuf);
+            Tcl_IncrRefCount (outbuf);
+            Tcl_SetHashValue (entry,(ClientData)outbuf);
         }
 
         if (rivet_interp->cache_free) {
@@ -1186,7 +1181,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 
     }
 
-    res = Rivet_ExecuteAndCheck(private, outbuf);
+    res = Rivet_ExecuteAndCheck (private, outbuf);
     Tcl_DecrRefCount(outbuf);
 
     /* We don't keep user script until we find a way to cache them consistently */
@@ -1296,11 +1291,12 @@ Rivet_CreateTclInterp (server_rec* s)
  *
  *-----------------------------------------------------------------------------
  */
-void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
+void  Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p)
 {
     rivet_interp_globals*   globals     = NULL;
     Tcl_Obj*                auto_path   = NULL;
     Tcl_Obj*                rivet_tcl   = NULL;
+    Tcl_Interp*             interp      = interp_obj->interp;
 
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
@@ -1322,7 +1318,7 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
                                             (Tcl_NamespaceDeleteProc *)NULL);
     //globals->req    = TclWeb_NewRequestObject (p); 
     //globals->r      = NULL;
-    globals->srec   = s;
+    //globals->srec   = s;
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
@@ -1351,11 +1347,24 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
     Tcl_DecrRefCount(rivet_tcl);
 
     /* Initialize the interpreter with Rivet's Tcl commands. */
-    Rivet_InitCore(interp);
+
+    if (private == NULL)
+    {
+        /* reduced core for the server init interpreter */
+
+        // RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,private);
+        
+    } 
+    else
+    {
+        /* full fledged rivet core */
+
+        Rivet_InitCore(interp,private);
+
+    }
 
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables(interp, p );
-//  Rivet_PropagateServerConfArray( interp, rsc );
 
     /* Loading into the interpreter commands in librivet.so */
     /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
@@ -1397,9 +1406,62 @@ void  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p)
     }
 
     Tcl_Release(interp);
+    interp_obj->flags |= RIVET_INTERP_INITIALIZED;
 }
 
-/*
+/* 
+ * -- Rivet_RunServerInit
+ *
+ */
+
+static int
+Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
+{
+    rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
+
+    FILEDEBUGINFO;
+
+    /* we create and initialize a master (server) interpreter */
+
+    module_globals->server_interp = Rivet_NewVHostInterp(pPool); /* root interpreter */
+
+    /* We initialize the interpreter and we won't register a channel with it because
+     * we couldn't send data to the stdout anyway */
+
+    Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
+
+    /* We don't create the cache here: it would make sense for prefork MPM
+     * but threaded MPM bridges have their pool of threads. Each of them
+     * will by now have their own cache
+     */
+
+    if (rsc->rivet_server_init_script != NULL) {
+        Tcl_Interp* interp = module_globals->server_interp->interp;
+        Tcl_Obj*    server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
+
+        Tcl_IncrRefCount(server_init);
+
+        if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                         MODNAME ": Error running ServerInitScript '%s': %s",
+                         rsc->rivet_server_init_script,
+                         Tcl_GetVar(interp, "errorInfo", 0));
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+                         MODNAME ": ServerInitScript '%s' successful", 
+                         rsc->rivet_server_init_script);
+        }
+
+        Tcl_DecrRefCount(server_init);
+    }
+
+
+    return OK;
+
+}
+
+/* -- Rivet_ServerInit
  *
  */
 
@@ -1412,7 +1474,6 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     char*                   mpm_worker_bridge  = "rivet_worker_mpm.so";
     char*                   mpm_model_path;
     int                     ap_mpm_result;
-    rivet_thread_private*   private;
 
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
@@ -1531,7 +1592,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_MasterInterp");
         if (rv == APR_SUCCESS)
         {
-            module_globals->mpm_master_interp = (vhost_interp* (*)(void)) func;
+            module_globals->mpm_master_interp = (rivet_thread_interp* (*)(void)) func;
         }
         else
         {
@@ -1581,17 +1642,11 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         module_globals->server = server;
 
-    /* And since we are running a server initialization script we also have
-       to create the thread private key and data even though it's unlikely
-       we are calling extensively rivet commands from it */
+        //ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pPool) == APR_SUCCESS);
+        //private = Rivet_CreatePrivateData();
+        //ap_assert (private != NULL);
+        //Rivet_SetupTclPanicProc ();
 
-        apr_threadkey_private_create (&rivet_thread_key, NULL, pPool);
-
-        private = Rivet_CreatePrivateData();
-        ap_assert (private != NULL);
-        Rivet_SetupTclPanicProc ();
-
-        (*module_globals->mpm_server_init)(pPool,pLog,pTemp,server);
     }
     else
     {
@@ -1604,7 +1659,9 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         exit(1);   
     }
 
-    return OK;
+    Rivet_RunServerInit(pPool,pLog,pTemp,server);
+
+    return (*module_globals->mpm_server_init)(pPool,pLog,pTemp,server);
 }
 
 static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
@@ -1657,10 +1714,6 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
         myrsc->idx = idx++;
     }
     module_globals->vhosts_count = idx;
-
-    /* the thread private key is initialized */
-
-    apr_threadkey_private_create (&rivet_thread_key, NULL, pChild);
 
     /* Calling the brigde child process initialization */
 

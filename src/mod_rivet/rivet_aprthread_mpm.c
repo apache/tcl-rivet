@@ -40,7 +40,7 @@ extern apr_threadkey_t*  handler_thread_key;
 void                  Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
 //void                Rivet_ProcessorCleanup (void *data);
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
-vhost_interp*         Rivet_NewVHostInterp(apr_pool_t* pool);
+rivet_thread_interp*         Rivet_NewVHostInterp(apr_pool_t* pool);
 
 /* -- supervisor_chores
  *
@@ -155,7 +155,7 @@ int Rivet_MPM_Request (request_rec* r)
              */
 
             private->channel    = apr_pcalloc(private->pool,sizeof(Tcl_Channel));
-            private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
+            private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
             apr_threadkey_private_set (private,rivet_thread_key);
             outchannel  = private->channel;
             *outchannel = Tcl_CreateChannel(&RivetChan, "apacheout", rivet_thread_key, TCL_WRITABLE);
@@ -220,7 +220,7 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     return OK;
 }
 
-vhost_interp* Rivet_MPM_MasterInterp(apr_pool_t* pool)
+rivet_thread_interp* Rivet_MPM_MasterInterp(apr_pool_t* pool)
 {
     return Rivet_NewVHostInterp(pool);
 }

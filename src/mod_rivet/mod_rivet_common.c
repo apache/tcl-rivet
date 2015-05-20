@@ -36,9 +36,8 @@
 #include "rivet.h"
 #include "apache_config.h"
 
-extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
-
+extern mod_rivet_globals* module_globals;
 /*
  *-----------------------------------------------------------------------------
  *
@@ -165,7 +164,7 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
      * Data referenced in this database must be freed by the thread before exit
      */
 
-    private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(vhost_interp));
+    private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
     apr_threadkey_private_set (private,rivet_thread_key);
 
     return private;

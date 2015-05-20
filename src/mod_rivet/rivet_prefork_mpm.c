@@ -33,10 +33,13 @@ extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
 extern apr_threadkey_t*   handler_thread_key;
 
-void Rivet_PerInterpInit(Tcl_Interp* interp, server_rec *s, apr_pool_t *p);
+void        Rivet_ProcessorCleanup (void *data);
+int         Rivet_InitCore          (Tcl_Interp *interp,rivet_thread_private* p); 
+
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
-vhost_interp* Rivet_NewVHostInterp(apr_pool_t* pool);
-void Rivet_ProcessorCleanup (void *data);
+rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t* pool);
+
+/* */
 
 apr_status_t Rivet_MPM_Finalize (void* data)
 {
@@ -52,61 +55,13 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     return OK;
 }
 
-int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
-{
-    rivet_server_conf*  rsc = RIVET_SERVER_CONF( s->module_config );
-
-    FILEDEBUGINFO;
-
-    /* we create and initialize a master (server) interpreter */
-
-    module_globals->server_interp = Rivet_NewVHostInterp(pPool); /* root interpreter */
-
-    /* we initialize the interpreter and we won't register a channel with it because
-     * we couldn't send data to the stdout anyway */
-
-    Rivet_PerInterpInit(module_globals->server_interp->interp,s,pPool);
-
-    /*
-     * The server_interp flag is set as initialized
-     */
-
-    module_globals->server_interp->flags |= RIVET_INTERP_INITIALIZED;
-
-    /* we don't create the cache here: it would make sense for prefork MPM
-     * but threaded MPM bridges have their pool of threads. Each of them
-     * will by now have their own cache
-     */
-
-    if (rsc->rivet_server_init_script != NULL) {
-        Tcl_Interp* interp = module_globals->server_interp->interp;
-        Tcl_Obj*    server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
-
-        Tcl_IncrRefCount(server_init);
-
-        if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                         MODNAME ": Error running ServerInitScript '%s': %s",
-                         rsc->rivet_server_init_script,
-                         Tcl_GetVar(interp, "errorInfo", 0));
-        } else {
-            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-                         MODNAME ": ServerInitScript '%s' successful", 
-                         rsc->rivet_server_init_script);
-        }
-
-        Tcl_DecrRefCount(server_init);
-    }
-
-    Tcl_SetPanicProc(Rivet_Panic);
-
-    return OK;
-}
+int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
 
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
+
+    ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pool) == APR_SUCCESS);
 
     /* 
      * This is the only execution thread in this process so we create
@@ -114,20 +69,19 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
      * private data should have been created by the httpd parent process
      */
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    private = Rivet_CreatePrivateData();
+    
+    Rivet_SetupTclPanicProc ();
+    ap_assert(private != NULL);
 
-    if (private == NULL)
+    if (private->channel == NULL)
     {
-        private = Rivet_CreatePrivateData();
-        if (private == NULL)
-        {
-            /* TODO: we have to log something here */
-
-            exit(1);
-        }
         private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-        Rivet_SetupTclPanicProc ();
     }
+
+    /* we now establish the full rivet core command set for the root interpreter */
+
+    Rivet_InitCore (module_globals->server_interp->interp,private);
 
     /*
      * We proceed creating the vhost interpreters database
@@ -152,7 +106,7 @@ int Rivet_MPM_Request (request_rec* r)
     return Rivet_SendContent(private);
 }
 
-vhost_interp* Rivet_MPM_MasterInterp(void)
+rivet_thread_interp* Rivet_MPM_MasterInterp(void)
 {
     rivet_thread_private*   private;
 

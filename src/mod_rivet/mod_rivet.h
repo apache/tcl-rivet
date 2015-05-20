@@ -149,7 +149,7 @@ typedef struct _interp_running_scripts {
     Tcl_Obj*    after_every_script;
 } running_scripts;
 
-typedef struct _vhost_interp {
+typedef struct _rivet_thread_interp {
     Tcl_Interp*         interp;
     Tcl_Channel*        channel;            /* the Tcl interp private channel                   */
     int                 cache_size;
@@ -160,7 +160,7 @@ typedef struct _vhost_interp {
     running_scripts*    scripts;            /* base server conf scripts                         */
     apr_hash_t*         per_dir_scripts;    /* per dir running scripts                          */
     unsigned int        flags;              /* signals of various interp specific conditions    */
-} vhost_interp;
+} rivet_thread_interp;
 
 /* we need also a place where to store module wide globals */
 
@@ -169,7 +169,7 @@ typedef struct _mod_rivet_globals {
     apr_thread_t*       supervisor;
     int                 server_shutdown;
     int                 vhosts_count;
-    vhost_interp*       server_interp;          /* server and prefork MPM interpreter */
+    rivet_thread_interp*       server_interp;          /* server and prefork MPM interpreter */
 
     apr_thread_cond_t*  job_cond;
     apr_thread_mutex_t* job_mutex;
@@ -190,7 +190,7 @@ typedef struct _mod_rivet_globals {
     int                 (*mpm_request)(request_rec*);
     int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
     apr_status_t        (*mpm_finalize)(void*);
-    vhost_interp*       (*mpm_master_interp)(void);
+    rivet_thread_interp*       (*mpm_master_interp)(void);
     int                 (*mpm_exit_handler)(int);
 
     int                 mpm_max_threads;
@@ -208,7 +208,7 @@ typedef struct _mod_rivet_globals {
 
 typedef struct _thread_worker_private {
     apr_pool_t*         pool;               /* threads private memory pool          */
-    vhost_interp**      interps;            /* database of virtual host interps     */
+    rivet_thread_interp**      interps;            /* database of virtual host interps     */
     Tcl_Channel*        channel;            /* the Tcl thread private channel       */
     int                 req_cnt;            /* requests served by thread            */
     int                 keep_going;         /* thread loop controlling variable     */
@@ -238,8 +238,7 @@ typedef struct _thread_worker_private {
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
-    server_rec*             srec;               /* pointer to the current server rec obj */
-    Tcl_Namespace*          rivet_ns;           /* Rivet commands namespace             */
+    Tcl_Namespace*          rivet_ns;       /* Rivet commands namespace              */
 } rivet_interp_globals;
 
 /* Job types a worker thread is supposed to respond to */
