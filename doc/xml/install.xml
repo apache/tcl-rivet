@@ -6,7 +6,7 @@
             It is known to build and run on various Linux distributions 
             (Debian &amp; Ubuntu, Redhat, SuSE and CentOS), FreeBSD and OpenBSD. For some
             of these Unix-like operative systems 
-            <ulink url="http://tcl.apache.org/rivet/static/download.html">binary packages</ulink> 
+            <ulink url="http://tcl.apache.org/rivet/html/download.html">binary packages</ulink> 
             are already available for download.
         </para>
         <para>
@@ -18,7 +18,7 @@
             and the
             <ulink url="http://httpd.apache.org/docs/2.2/mod/mpm_winnt.html">winnt</ulink> MPMs.
             Check our
-            <ulink url="http://tcl.apache.org/rivet/static/about.html">development mailing list</ulink>
+            <ulink url="http://tcl.apache.org/rivet/html/about.html">development mailing list</ulink>
             for the latests updates about Rivet development
         </para>
         <para>
@@ -40,7 +40,7 @@
          <step>
             <title>Get Rivet</title>
             <para>
-                Download the sources at <ulink url="http://tcl.apache.org/rivet/static/download.html"/>.  
+                Download the sources at <ulink url="http://tcl.apache.org/rivet/html/download.html"/>.  
             </para>
          </step>
          <step performance="optional">
