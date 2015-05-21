@@ -1,3 +1,8 @@
+2015-05-21 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_prefork_mpm.c: child processes created by fork calls
+    inherit an interpreter that needs to import the ::rivet namespace when
+    configured that way
+
 2015-05-19 Massimo Manghi <mxmanghi@apache.org>
     * src/rivet.h: macro THREAD_PRIVATE_DATA now simply casts ClientData
     pointer to a rivet_thread_private pointer

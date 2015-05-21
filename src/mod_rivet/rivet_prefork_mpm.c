@@ -83,6 +83,14 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     Rivet_InitCore (module_globals->server_interp->interp,private);
 
+#ifdef RIVET_NAMESPACE_IMPORT
+    {
+        char*    import_cmd = "namespace eval :: { namespace eval :: { namespace import -force ::rivet::* }";
+
+        Tcl_Eval (module_globals->server_interp->interp,import_cmd);
+    }
+#endif 
+
     /*
      * We proceed creating the vhost interpreters database
      */
