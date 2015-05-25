@@ -133,10 +133,7 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
 {
     rivet_thread_private*   private;
 
-    if (apr_threadkey_private_get ((void **)&private,rivet_thread_key) != APR_SUCCESS)
-    {
-        return NULL;
-    }
+    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
     apr_thread_mutex_lock(module_globals->pool_mutex);
     private = apr_pcalloc (module_globals->pool,sizeof(*private));
@@ -299,6 +296,7 @@ void Rivet_CleanupRequest( request_rec *r )
  *          RIVET_VERSION - Rivet version (only when RIVET_DISPLAY_VERSION is 1)
  *          MPM_THREADED - It should contain the string 'unsupported' for a prefork MPM
  *          MPM_FORKED - String describing the forking model of the MPM 
+ *          RIVET_MPM_BRIDGE - Filename of the running MPM bridge 
  *
  */
 

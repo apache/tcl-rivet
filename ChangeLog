@@ -1,3 +1,14 @@
+2015-05-25 Massimo Manghi <mxmanghi@apache.org>
+    * src/Makefile.am: disabled build of aprthread experimental bridge 
+    * src/mod_rivet/mod_rivet.h: introduced opaque datatype mpm_bridge_status
+    and removed bridge specific variables from mod_rivet_globals. 
+    * src/mod_rivet/mod_rivet.c: removed handling of bridge specific status
+    * src/mod_rivet/rivet_worker_mpm.c: devolving to this file all the handling
+    of its internal status
+    * src/mod_rivet/rivet_prefork_mpm.c: changes imposed by modification
+    of the APIs and also new responsabilities devolved to Rivet_CreatePrivateData.
+    
+
 2015-05-21 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_prefork_mpm.c: child processes created by fork calls
     inherit an interpreter that needs to import the ::rivet namespace when

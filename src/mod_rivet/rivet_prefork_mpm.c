@@ -28,6 +28,7 @@
 #include "httpd.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
+#include "rivet.h"
 
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
@@ -85,9 +86,9 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
 #ifdef RIVET_NAMESPACE_IMPORT
     {
-        char*    import_cmd = "namespace eval :: { namespace eval :: { namespace import -force ::rivet::* }";
+        char*    tcl_import_cmd = "namespace eval :: { namespace eval :: { namespace import -force ::rivet::* }}\n";
 
-        Tcl_Eval (module_globals->server_interp->interp,import_cmd);
+        Tcl_Eval (module_globals->server_interp->interp,tcl_import_cmd);
     }
 #endif 
 
@@ -103,22 +104,37 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     }
 }
 
+/*
+ * -- Rivet_MPM_Request
+ *
+ *  The prefork implementation of this function is basically a wrapper of
+ *  Rivet_SendContent. The real job is fetching the thread private data
+ *
+ * Arguments:
+ *
+ *   request_rec* rec
+ *
+ * Returned value:
+ *
+ *   HTTP status code (see the Apache HTTP web server documentation)
+ */
+
 int Rivet_MPM_Request (request_rec* r)
 {
     rivet_thread_private*   private;
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    /* fetching the thread private data to be passed to Rivet_SendContent */
 
-    private->r = r;
+    RIVET_PRIVATE_DATA_NOT_NULL (rivet_thread_key, private);
 
-    return Rivet_SendContent(private);
+    return Rivet_SendContent(private,r);
 }
 
 rivet_thread_interp* Rivet_MPM_MasterInterp(void)
 {
     rivet_thread_private*   private;
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    RIVET_PRIVATE_DATA_NOT_NULL (rivet_thread_key, private);
 
     module_globals->server_interp->channel = private->channel;
     return module_globals->server_interp;

@@ -164,38 +164,28 @@ typedef struct _rivet_thread_interp {
 
 /* we need also a place where to store module wide globals */
 
+typedef struct mpm_bridge_status mpm_bridge_status;
+
 typedef struct _mod_rivet_globals {
-    apr_dso_handle_t*   dso_handle;
-    apr_thread_t*       supervisor;
-    int                 server_shutdown;
-    int                 vhosts_count;
-    rivet_thread_interp*       server_interp;          /* server and prefork MPM interpreter */
-
-    apr_thread_cond_t*  job_cond;
-    apr_thread_mutex_t* job_mutex;
-    apr_array_header_t* exiting;                /* */
-    apr_uint32_t*       threads_count;
-    apr_uint32_t*       running_threads_count;
-
-    apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex   */
-    apr_pool_t*         pool;                   /* threads common memory pool   */
-    apr_queue_t*        queue;                  /* jobs queue                   */
-    void**              workers;                /* thread pool ids              */
-
-    server_rec*         server;                 /* default host server_rec obj  */
-
+    apr_pool_t*         pool;               
     char*               rivet_mpm_bridge;       /* name of the MPM bridge       */
+    server_rec*         server;                 /* default host server_rec obj  */
+    int                 vhosts_count;           /* Number of configured virtual host including 
+                                                 * the root server thus it's supposed to be >= 1 */
+    rivet_thread_interp* 
+                        server_interp;          /* server and prefork MPM interpreter */
+    apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex           */
+
+    /* Jump table to bridge specific procedures */
 
     int                 (*mpm_child_init)(apr_pool_t* pPool,server_rec* s);
     int                 (*mpm_request)(request_rec*);
     int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
     apr_status_t        (*mpm_finalize)(void*);
-    rivet_thread_interp*       (*mpm_master_interp)(void);
+    rivet_thread_interp* (*mpm_master_interp)(void);
     int                 (*mpm_exit_handler)(int);
 
-    int                 mpm_max_threads;
-    int                 mpm_min_spare_threads;
-    int                 mpm_max_spare_threads;
+    mpm_bridge_status*  mpm;
 
     /*
     int                 num_load_samples;
@@ -208,7 +198,7 @@ typedef struct _mod_rivet_globals {
 
 typedef struct _thread_worker_private {
     apr_pool_t*         pool;               /* threads private memory pool          */
-    rivet_thread_interp**      interps;            /* database of virtual host interps     */
+    rivet_thread_interp** interps;          /* database of virtual host interps     */
     Tcl_Channel*        channel;            /* the Tcl thread private channel       */
     int                 req_cnt;            /* requests served by thread            */
     int                 keep_going;         /* thread loop controlling variable     */
@@ -300,7 +290,7 @@ Tcl_Obj* Rivet_CurrentServerRec ( Tcl_Interp* interp, server_rec* s );
 
 EXTERN int Rivet_ParseExecFile (rivet_thread_private* req, char* filename, int toplevel);
 EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
-EXTERN int Rivet_SendContent (rivet_thread_private *private);
+EXTERN int Rivet_SendContent (rivet_thread_private *private,request_rec* r);
 EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 
 /* temporary content generation handler */
@@ -314,15 +304,6 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 #define MOD_RIVET_QUEUE_SIZE        100
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
 #define MODNAME                     "mod_rivet"
-
-#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
-    #define HTTP_REQUESTS_PROC(request_proc_call) \
-        apr_thread_mutex_lock(module_globals->req_mutex);\
-        request_proc_call;\
-        apr_thread_mutex_unlock(module_globals->req_mutex);
-#else
-    #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
-#endif
 
 /* 
  * RIVET_CONF_SELECT: 

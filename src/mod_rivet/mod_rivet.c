@@ -66,7 +66,9 @@ apr_threadkey_t*        rivet_thread_key    = NULL;
 apr_threadkey_t*        handler_thread_key  = NULL;
 mod_rivet_globals*      module_globals      = NULL;
 
-void        Rivet_PerInterpInit     (rivet_thread_interp* interp, rivet_thread_private* private, server_rec *s, apr_pool_t *p);
+void        Rivet_PerInterpInit (   rivet_thread_interp* interp, 
+                                    rivet_thread_private* private, 
+                                    server_rec *s, apr_pool_t *p );
 static int  Rivet_ExecuteAndCheck   (rivet_thread_private *private, Tcl_Obj *tcl_script_obj);
 int         Rivet_InitCore          (Tcl_Interp *interp,rivet_thread_private* p); 
 
@@ -197,13 +199,13 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
 
 rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
 {
-    extern int          ap_max_requests_per_child;
-    rivet_thread_interp*       interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
-    rivet_server_conf*  rsc;
+    extern int              ap_max_requests_per_child;
+    rivet_thread_interp*    interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
+    rivet_server_conf*      rsc;
 
     /* The cache size is global so we take it from here */
     
-    rsc = RIVET_SERVER_CONF( module_globals->server->module_config );
+    rsc = RIVET_SERVER_CONF (module_globals->server->module_config);
 
     /* This calls needs the root server_rec just for logging purposes*/
 
@@ -228,7 +230,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
         interp_obj->cache_free = interp_obj->cache_size;
     }
 
-    // we now create memory from the cache pool as subpool of the thread private pool
+    /* we now create memory from the cache pool as subpool of the thread private pool */
  
     if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
     {
@@ -376,7 +378,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
          */
 
         apr_thread_mutex_lock(module_globals->pool_mutex);
-        myrsc->server_name = (char*)apr_pstrdup(module_globals->pool, s->server_hostname);
+        myrsc->server_name = (char*) apr_pstrdup (private->pool, s->server_hostname);
         apr_thread_mutex_unlock(module_globals->pool_mutex);
 
         /* when configured a child init script gets evaluated */
@@ -513,21 +515,22 @@ void Rivet_ProcessorCleanup (void *data)
 #define USE_APACHE_RSC
 
 int
-Rivet_SendContent(rivet_thread_private *private)
+Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 {
     int                     errstatus;
     int                     retval;
     int                     ctype;
     Tcl_Interp*             interp;
-    //rivet_interp_globals*   globals = NULL;
-    rivet_thread_interp*           interp_obj;
-    //request_rec*          r = private->r;
+    rivet_thread_interp*    interp_obj;
     Tcl_Channel*            running_channel;
+
 #ifdef USE_APACHE_RSC
     //rivet_server_conf    *rsc = NULL;
 #else
     //rivet_server_conf    *rdc;
 #endif
+
+    private->r = r;
 
     ctype = Rivet_CheckType(private->r);  
     if (ctype == CTYPE_NOT_HANDLED) {
@@ -1468,12 +1471,13 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 static int
 Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *server)
 {
-    apr_status_t            aprrv;
-    char                    errorbuf[ERRORBUF_SZ];
-    char*                   mpm_prefork_bridge = "rivet_prefork_mpm.so";
-    char*                   mpm_worker_bridge  = "rivet_worker_mpm.so";
-    char*                   mpm_model_path;
-    int                     ap_mpm_result;
+    apr_status_t        aprrv;
+    char                errorbuf[ERRORBUF_SZ];
+    char*               mpm_prefork_bridge = "rivet_prefork_mpm.so";
+    char*               mpm_worker_bridge  = "rivet_worker_mpm.so";
+    char*               mpm_model_path;
+    int                 ap_mpm_result;
+    apr_dso_handle_t*   dso_handle;
 
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
@@ -1529,7 +1533,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         mpm_model_path = apr_pstrcat(pTemp,RIVET_DIR,"/mpm/",module_globals->rivet_mpm_bridge,NULL);
     } 
 
-    aprrv = apr_dso_load(&module_globals->dso_handle,mpm_model_path,pPool);
+    aprrv = apr_dso_load(&dso_handle,mpm_model_path,pPool);
     if (aprrv == APR_SUCCESS)
     {
         apr_status_t                rv;
@@ -1537,7 +1541,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         ap_log_error(APLOG_MARK,APLOG_INFO,0,server,"MPM bridge loaded: %s",mpm_model_path);
 
-        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_ServerInit");
+        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_ServerInit");
         if (rv == APR_SUCCESS)
         {
             module_globals->mpm_server_init = (int (*)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*))func;
@@ -1546,11 +1550,11 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error loading symbol Rivet_MPM_ServerInit: %s", 
-                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
 
-        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_ChildInit");
+        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_ChildInit");
         if (rv == APR_SUCCESS)
         {
             module_globals->mpm_child_init = (int (*)(apr_pool_t*,server_rec*)) func;
@@ -1559,11 +1563,11 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error loading symbol Rivet_MPM_Init: %s", 
-                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
 
-        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_Request");
+        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_Request");
         if (rv == APR_SUCCESS)
         {
             module_globals->mpm_request = (int (*)(request_rec*)) func;
@@ -1572,11 +1576,11 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error loading symbol Rivet_MPM_Request: %s", 
-                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
 
-        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_Finalize");
+        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_Finalize");
         if (rv == APR_SUCCESS)
         {
             module_globals->mpm_finalize = (apr_status_t (*)(void *)) func;
@@ -1585,11 +1589,11 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error loading symbol Rivet_MPM_Finalize: %s", 
-                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
 
-        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_MasterInterp");
+        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_MasterInterp");
         if (rv == APR_SUCCESS)
         {
             module_globals->mpm_master_interp = (rivet_thread_interp* (*)(void)) func;
@@ -1598,11 +1602,11 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error loading symbol Rivet_MPM_MasterInterp: %s", 
-                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
 
-        rv = apr_dso_sym(&func,module_globals->dso_handle,"Rivet_MPM_ExitHandler");
+        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_ExitHandler");
         if (rv == APR_SUCCESS)
         {
             module_globals->mpm_exit_handler = (int (*)(int)) func;
@@ -1611,7 +1615,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error loading symbol Rivet_MPM_ExitHandler: %s", 
-                         apr_dso_error(module_globals->dso_handle,errorbuf,ERRORBUF_SZ));
+                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
 
         }
@@ -1620,19 +1624,6 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         /* active threads count */
         
         apr_atomic_init(pPool);
-        module_globals->threads_count = (apr_uint32_t *) apr_palloc(pPool,sizeof(apr_uint32_t));
-        module_globals->running_threads_count = (apr_uint32_t *) apr_palloc(pPool,sizeof(apr_uint32_t));
-        apr_atomic_set32(module_globals->threads_count,0);
-        apr_atomic_set32(module_globals->running_threads_count,0);
-
-        module_globals->workers                 = NULL;
-        module_globals->vhosts_count            = 0;
-        module_globals->server_shutdown         = 0;
-        module_globals->exiting                 = NULL;
-        module_globals->mpm_max_threads         = 0;
-        module_globals->mpm_min_spare_threads   = 0;
-        module_globals->mpm_max_spare_threads   = 0;
-
         apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pPool);
 
     /* Another crucial point: we are storing in the globals a reference to the
@@ -1655,7 +1646,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME " Error loading MPM manager: %s", 
-                     apr_dso_error(module_globals->dso_handle,errorbuf,1024));
+                     apr_dso_error(dso_handle,errorbuf,1024));
         exit(1);   
     }
 
@@ -1670,9 +1661,9 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     rivet_server_conf*  root_server_conf;
     server_rec*         s;
 
-#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
-    apr_thread_mutex_create(&module_globals->req_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
-#endif
+    /* the thread key used to access to Tcl threads private data */
+
+    ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pChild) == APR_SUCCESS);
 
 /* This code is run once per child process. In a threaded Tcl builds the forking 
  * of a child process most likely has not preserved the thread where the Tcl 

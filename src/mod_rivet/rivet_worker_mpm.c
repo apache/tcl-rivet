@@ -36,13 +36,42 @@
 
 #define BRIDGE_SUPERVISOR_WAIT  1000000
 
+#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
+    #define HTTP_REQUESTS_PROC(request_proc_call) \
+        apr_thread_mutex_lock(module_globals->mpm->req_mutex);\
+        request_proc_call;\
+        apr_thread_mutex_unlock(module_globals->mpm->req_mutex);
+#else
+    #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
+#endif
+
+
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*  rivet_thread_key;
 extern apr_threadkey_t*  handler_thread_key;
 
 void                  Rivet_ProcessorCleanup (void *data);
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
-rivet_thread_interp*         Rivet_NewVHostInterp(apr_pool_t* pool);
+rivet_thread_interp*  Rivet_NewVHostInterp(apr_pool_t* pool);
+
+typedef struct mpm_bridge_status {
+    apr_thread_t*       supervisor;
+    int                 server_shutdown;
+    apr_thread_cond_t*  job_cond;
+    apr_thread_mutex_t* job_mutex;
+    apr_array_header_t* exiting;                /* */
+    apr_uint32_t*       threads_count;
+    apr_uint32_t*       running_threads_count;
+    apr_queue_t*        queue;                  /* jobs queue                   */
+    void**              workers;                /* thread pool ids              */
+
+    int                 max_threads;
+    int                 min_spare_threads;
+    int                 max_spare_threads;
+#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
+    apr_thread_mutex_t* req_mutex;
+#endif
+} mpm_bridge_status;
 
 /* Rivet_MPM_Shutdown --
  *
@@ -81,12 +110,12 @@ void Rivet_MPM_Shutdown (void)
     job->job_type = orderly_exit;
 
     waits = 5;
-    count = (int) apr_atomic_read32(module_globals->threads_count);
-    for (i = 0; i < count; i++) { apr_queue_push(module_globals->queue,job); }
+    count = (int) apr_atomic_read32(module_globals->mpm->threads_count);
+    for (i = 0; i < count; i++) { apr_queue_push(module_globals->mpm->queue,job); }
     apr_sleep(500000);
     do 
     {
-        count = (int) apr_atomic_read32(module_globals->threads_count);
+        count = (int) apr_atomic_read32(module_globals->mpm->threads_count);
         if (count == 0) break;
         apr_sleep(1000000);
     } while (waits-- > 0);
@@ -105,56 +134,49 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     //Tcl_Channel*          outchannel;		    /* stuff for buffering output */
     //server_rec*           server;
 
-    apr_thread_mutex_lock(module_globals->job_mutex);
+    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
     //server = module_globals->server;
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
-    if (private == NULL)
+    private = Rivet_CreatePrivateData();
+    if (private == NULL) 
     {
-        private = Rivet_CreatePrivateData();
-
-        if (private == NULL) 
-        {
-            /* TODO: we have to log something here */
-            apr_thread_exit(thd,APR_SUCCESS);
-        }
-        private->channel    = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-        Rivet_SetupTclPanicProc ();
-
+        /* TODO: we have to log something here */
+        apr_thread_exit(thd,APR_SUCCESS);
     }
+    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+    Rivet_SetupTclPanicProc ();
     
-        /* So far nothing differs much with what we did for the prefork bridge */
-    
-        /* At this stage we have to set up the private interpreters of configured 
-         * virtual hosts (if any). We assume the server_rec stored in the module
-         * globals can be used to retrieve the reference to the root interpreter
-         * configuration and to the rivet global script
-         */
+    /* So far nothing differs much with what we did for the prefork bridge */
+
+    /* At this stage we have to set up the private interpreters of configured 
+     * virtual hosts (if any). We assume the server_rec stored in the module
+     * globals can be used to retrieve the reference to the root interpreter
+     * configuration and to the rivet global script
+     */
 
     if (Rivet_VirtualHostsInterps(private) == NULL)
     {
-        *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
-        apr_thread_cond_signal(module_globals->job_cond);
-        apr_thread_mutex_unlock(module_globals->job_mutex);
+        *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
+        apr_thread_cond_signal(module_globals->mpm->job_cond);
+        apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
         apr_thread_exit(thd,APR_SUCCESS);
         return NULL;
     }
 
     // rsc->server_interp = private->interp;
 
-    apr_thread_mutex_unlock(module_globals->job_mutex);       /* unlock job initialization stage */
+    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);       /* unlock job initialization stage */
 
         /* eventually we increment the number of active threads */
 
-    apr_atomic_inc32(module_globals->threads_count);
+    apr_atomic_inc32(module_globals->mpm->threads_count);
 
     do
     {
         apr_status_t        rv;
         void*               v;
-        apr_queue_t*        q = module_globals->queue;
+        apr_queue_t*        q = module_globals->mpm->queue;
         handler_private*    request_obj;
-        //rivet_server_conf*  server_conf;
 
         do {
 
@@ -186,7 +208,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         /* we proceed with the request processing */
         
-        apr_atomic_inc32(module_globals->running_threads_count);
+        apr_atomic_inc32(module_globals->mpm->running_threads_count);
 
         //server_conf = RIVET_SERVER_CONF(request_obj->r->server->module_config);
         //TclWeb_InitRequest(request_obj->req, private->interps[server_conf->idx]->interp, request_obj->r);
@@ -194,10 +216,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         /* these assignements are crucial for both calling Rivet_SendContent and
          * for telling the channel where stuff must be sent to */
 
-        private->r   = request_obj->r;
-        //private->req = request_obj->req;
-
-        HTTP_REQUESTS_PROC(request_obj->code = Rivet_SendContent(private));
+        HTTP_REQUESTS_PROC(request_obj->code = Rivet_SendContent(private,request_obj->r));
 
         apr_thread_mutex_lock(request_obj->mutex);
         request_obj->status = done;
@@ -205,7 +224,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         apr_thread_mutex_unlock(request_obj->mutex);
     
         private->req_cnt++;
-        apr_atomic_dec32(module_globals->running_threads_count);
+        apr_atomic_dec32(module_globals->mpm->running_threads_count);
 
     } while (private->keep_going > 0);
             
@@ -213,14 +232,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     Rivet_ProcessorCleanup(private);
 
-    apr_thread_mutex_lock(module_globals->job_mutex);
-    *(apr_thread_t **) apr_array_push(module_globals->exiting) = thd;
-    apr_thread_cond_signal(module_globals->job_cond);
-    apr_thread_mutex_unlock(module_globals->job_mutex);
+    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
+    *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
+    apr_thread_cond_signal(module_globals->mpm->job_cond);
+    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
 
     /* the counter of active threads has to be decremented */
 
-    apr_atomic_dec32(module_globals->threads_count);
+    apr_atomic_dec32(module_globals->mpm->threads_count);
 
     /* this call triggers thread private stuff clean up by calling processor_cleanup */
 
@@ -243,7 +262,7 @@ static void start_thread_pool (int nthreads)
         apr_thread_t*   slot;
  
         rv = create_worker_thread(&slot);
-        module_globals->workers[i] = (void *) slot;
+        module_globals->mpm->workers[i] = (void *) slot;
 
         if (rv != APR_SUCCESS) {
             char    errorbuf[512];
@@ -288,13 +307,13 @@ static void supervisor_housekeeping (void)
  * 
  */
 
-static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void *data)
+static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void *data)
 {
     server_rec* s = (server_rec *)data;
 #ifdef RIVET_MPM_SINGLE_TCL_THREAD
     int thread_to_start = 1;
 #else
-    int thread_to_start = (int)round(module_globals->mpm_max_threads);
+    int thread_to_start = (int)round(module_globals->mpm->max_threads);
 #endif
 
     ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"starting %d Tcl threads",thread_to_start);
@@ -304,29 +323,29 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void 
     {
         apr_thread_t*   p;
       
-        apr_thread_mutex_lock(module_globals->job_mutex);
-        while (apr_is_empty_array(module_globals->exiting) && !module_globals->server_shutdown)
+        apr_thread_mutex_lock(module_globals->mpm->job_mutex);
+        while (apr_is_empty_array(module_globals->mpm->exiting) && !module_globals->mpm->server_shutdown)
         {
-            apr_thread_cond_wait ( module_globals->job_cond, module_globals->job_mutex );
+            apr_thread_cond_wait ( module_globals->mpm->job_cond, module_globals->mpm->job_mutex );
         }
 
-        while (!apr_is_empty_array(module_globals->exiting) && !module_globals->server_shutdown)
+        while (!apr_is_empty_array(module_globals->mpm->exiting) && !module_globals->mpm->server_shutdown)
         {
             int i;
-            p = *(apr_thread_t **)apr_array_pop(module_globals->exiting);
+            p = *(apr_thread_t **)apr_array_pop(module_globals->mpm->exiting);
             
-            for (i = 0; (i < TCL_INTERPS) && !module_globals->server_shutdown; i++)
+            for (i = 0; (i < TCL_INTERPS) && !module_globals->mpm->server_shutdown; i++)
             {
-                if (p == module_globals->workers[i])
+                if (p == module_globals->mpm->workers[i])
                 {
                     apr_status_t rv;
 
                     ap_log_error(APLOG_MARK,APLOG_DEBUG,0,s,"thread %d notifies orderly exit",i);
 
-                    module_globals->workers[i] = NULL;
+                    module_globals->mpm->workers[i] = NULL;
 
                     /* terminated thread restart */
-                    rv = create_worker_thread (&((apr_thread_t **)module_globals->workers)[i]);
+                    rv = create_worker_thread (&((apr_thread_t **)module_globals->mpm->workers)[i]);
                     if (rv != APR_SUCCESS) {
                         char errorbuf[512];
 
@@ -346,8 +365,8 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor(apr_thread_t *thd, void 
                 }
             }       
         }   
-        apr_thread_mutex_unlock(module_globals->job_mutex);
-    }  while (!module_globals->server_shutdown);
+        apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
+    }  while (!module_globals->mpm->server_shutdown);
 
     Rivet_MPM_Shutdown();
     
@@ -364,23 +383,43 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t        rv;
 
-    apr_thread_mutex_create(&module_globals->job_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
-    apr_thread_cond_create(&module_globals->job_cond, pool);
+#ifdef RIVET_SERIALIZE_HTTP_REQUESTS
+    apr_thread_mutex_create(&module_globals->req_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
+#endif
+
+    /* First of all we allocate and initialize the mpm status */
+
+    module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
+
+    module_globals->mpm->exiting            = NULL;
+    module_globals->mpm->max_threads        = 0;
+    module_globals->mpm->min_spare_threads  = 0;
+    module_globals->mpm->max_spare_threads  = 0;
+    module_globals->mpm->workers            = NULL;
+    module_globals->mpm->server_shutdown    = 0;
+
+    module_globals->mpm->threads_count = (apr_uint32_t *) apr_palloc(pool,sizeof(apr_uint32_t));
+    module_globals->mpm->running_threads_count = (apr_uint32_t *) apr_palloc(pool,sizeof(apr_uint32_t));
+    apr_atomic_set32(module_globals->mpm->threads_count,0);
+    apr_atomic_set32(module_globals->mpm->running_threads_count,0);
+
+    ap_assert(apr_thread_mutex_create(&module_globals->mpm->job_mutex, APR_THREAD_MUTEX_UNNESTED, pool) == APR_SUCCESS);
+    ap_assert(apr_thread_cond_create(&module_globals->mpm->job_cond, pool) == APR_SUCCESS);
 
     /* This is the thread key for the framework thread calling the content generation callback */
 
-    apr_threadkey_private_create (&handler_thread_key, NULL, pool);
+    ap_assert (apr_threadkey_private_create (&handler_thread_key, NULL, pool) == APR_SUCCESS);
 
     /* This bridge keeps an array of the ids of threads about to exit. This array is protected by
      * the mutex module_globals->job_mutex and signals through module_globals->job_cond
      */
 
-    module_globals->exiting = apr_array_make(pool,100,sizeof(apr_thread_t*));
+    module_globals->mpm->exiting = apr_array_make(pool,100,sizeof(apr_thread_t*));
 
     /* This APR-Util queue object is the central communication channel from the Apache
      * framework to the Tcl threads through the request handler */
 
-    if (apr_queue_create(&module_globals->queue, MOD_RIVET_QUEUE_SIZE, module_globals->pool) != APR_SUCCESS)
+    if (apr_queue_create(&module_globals->mpm->queue, MOD_RIVET_QUEUE_SIZE, module_globals->pool) != APR_SUCCESS)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": could not initialize mod_rivet request queue");
@@ -390,24 +429,24 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     /* In order to prepare load balancing let's query apache for some configuration 
      * parameters of the worker MPM */
 
-    if (ap_mpm_query(AP_MPMQ_MAX_THREADS,&module_globals->mpm_max_threads) != APR_SUCCESS)
+    if (ap_mpm_query(AP_MPMQ_MAX_THREADS,&module_globals->mpm->max_threads) != APR_SUCCESS)
     {
-        module_globals->mpm_max_threads = TCL_INTERPS;
+        module_globals->mpm->max_threads = TCL_INTERPS;
     }
-    if (ap_mpm_query(AP_MPMQ_MIN_SPARE_THREADS,&module_globals->mpm_min_spare_threads) != APR_SUCCESS)
+    if (ap_mpm_query(AP_MPMQ_MIN_SPARE_THREADS,&module_globals->mpm->min_spare_threads) != APR_SUCCESS)
     {
-        module_globals->mpm_min_spare_threads = TCL_INTERPS;
+        module_globals->mpm->min_spare_threads = TCL_INTERPS;
     }
-    if (ap_mpm_query(AP_MPMQ_MAX_SPARE_THREADS,&module_globals->mpm_max_spare_threads) != APR_SUCCESS)
+    if (ap_mpm_query(AP_MPMQ_MAX_SPARE_THREADS,&module_globals->mpm->max_spare_threads) != APR_SUCCESS)
     {
-        module_globals->mpm_max_spare_threads = TCL_INTERPS;
+        module_globals->mpm->max_spare_threads = TCL_INTERPS;
     }
 
     /* We allocate the array of Tcl threads id. We require it to have AP_MPMQ_MAX_THREADS slots */
 
-    module_globals->workers = apr_pcalloc(pool,module_globals->mpm_max_threads * sizeof(void *));
+    module_globals->mpm->workers = apr_pcalloc(pool,module_globals->mpm->max_threads * sizeof(void *));
 
-    rv = apr_thread_create( &module_globals->supervisor, NULL, 
+    rv = apr_thread_create( &module_globals->mpm->supervisor, NULL, 
                             threaded_bridge_supervisor, server, module_globals->pool);
 
     if (rv != APR_SUCCESS) {
@@ -420,40 +459,74 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     }
 }
 
+/*
+ * -- Rivet_MPM_Request
+ *
+ * Content generation callback. Actually on the bridge this function is not
+ * generating directly the requested content but instead builds a handler_private 
+ * structure, which is a descriptor of the request to be placed on a global thread safe
+ * queue (module_globals->mpm->queue). In this structure are also a
+ * condition variable and associated mutex. Through this condition variable a
+ * worker thread running a Tcl interpreter will tell the framework thread the request
+ * has been served letting it go and return to the HTTP server framework
+ *
+ * Arguments:
+ *
+ *   request_rec* rec
+ *
+ * Returned value:
+ *
+ *   HTTP status code (see the Apache HTTP web server documentation)
+ */
+
 int Rivet_MPM_Request (request_rec* r)
 {
     handler_private*    request_private;
     apr_status_t        rv;
 
+    /* We are running within a thread controlled by the framework. On the first request
+       served by this thread we allocate a structure instance of type handler_private 
+       associated to the thread through the 'request_private' thread key */ 
+
     if (apr_threadkey_private_get ((void **)&request_private,handler_thread_key) != APR_SUCCESS)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
                      MODNAME ": cannot get private data for processor thread");
-        exit(1);
+
+        return HTTP_INTERNAL_SERVER_ERROR;
 
     } else {
+
+        /* Checking if we are at the first request server by this thread */
 
         if (request_private == NULL)
         {
             apr_thread_mutex_lock(module_globals->pool_mutex);
             request_private      = apr_palloc(module_globals->pool,sizeof(handler_private));
-            //request_private->req = TclWeb_NewRequestObject (module_globals->pool);
+ 
             apr_thread_cond_create(&(request_private->cond), module_globals->pool);
             apr_thread_mutex_create(&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, module_globals->pool);
             apr_thread_mutex_unlock(module_globals->pool_mutex);
-            request_private->job_type = request;
+
+            apr_threadkey_private_set (request_private,handler_thread_key);
         }
 
     }
 
+    /* We prepare the request descriptor object to be placed on the Tcl working threads queue */
+
     request_private->r      = r;
     request_private->code   = OK;
     request_private->status = init;
-    apr_threadkey_private_set (request_private,handler_thread_key);
+    request_private->job_type = request;
 
-    rv = apr_queue_push(module_globals->queue,request_private);
+    rv = apr_queue_push(module_globals->mpm->queue,request_private);
     if (rv == APR_SUCCESS)
     {
+
+        /* After the request has been posted on the thread safe queue we
+         * wait on the condition variable associated to the request_private structure */
+
         apr_thread_mutex_lock(request_private->mutex);
         while (request_private->status != done)
         {
@@ -475,12 +548,12 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     apr_status_t  thread_status;
     server_rec* s = (server_rec*) data;
     
-    apr_thread_mutex_lock(module_globals->job_mutex);
-    module_globals->server_shutdown = 1;
-    apr_thread_cond_signal(module_globals->job_cond);
-    apr_thread_mutex_unlock(module_globals->job_mutex);
+    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
+    module_globals->mpm->server_shutdown = 1;
+    apr_thread_cond_signal(module_globals->mpm->job_cond);
+    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
 
-    rv = apr_thread_join (&thread_status,module_globals->supervisor);
+    rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
     if (rv != APR_SUCCESS)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
