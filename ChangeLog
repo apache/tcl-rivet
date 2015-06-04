@@ -1,3 +1,8 @@
+2015-06-03 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.css: changing selector for namespace table as DocBook
+    seems not to honor the id attribute anymore
+    * doc/xml/request.css: changing the id "namespaces" as class
+
 2015-05-25 Massimo Manghi <mxmanghi@apache.org>
     * src/Makefile.am: disabled build of aprthread experimental bridge 
     * src/mod_rivet/mod_rivet.h: introduced opaque datatype mpm_bridge_status
@@ -7,7 +12,6 @@
     of its internal status
     * src/mod_rivet/rivet_prefork_mpm.c: changes imposed by modification
     of the APIs and also new responsabilities devolved to Rivet_CreatePrivateData.
-    
 
 2015-05-21 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_prefork_mpm.c: child processes created by fork calls

@@ -202,7 +202,7 @@
 			will take care of cleaning the namespace up and everything created inside the namespace
 			will be destroyed.
 		</para>
-		<table id="namespaces">
+		<table align="center" title="Apache Rivet Scripts" class="namespaces">
 			<thead>
 				<td>Stage</td><td>Script</td><td>Namespace</td>
 			</thead>
@@ -216,8 +216,9 @@
 				<tr class="processing"><td>AfterScript</td><td>::</td></tr>
 				<tr class="processing"><td>AbortScript</td><td>::</td></tr>
 				<tr class="processing"><td>AfterEveryScript</td><td>::</td></tr>
-				<tr class="processing"><td>Error Handling</td><td>ErrorScript</td><td>::</td></tr>
 				<tr class="childexit"><td>Child Termination</td><td>ChildExitScript</td><td>::</td></tr>
+				<tr class="processing"><td>Error Handling</td><td>ErrorScript</td><td>::</td></tr>
+
 			</tbody>
 		</table>
 	</simplesect>
