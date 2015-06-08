@@ -501,12 +501,15 @@ int Rivet_MPM_Request (request_rec* r)
 
         if (request_private == NULL)
         {
-            apr_thread_mutex_lock(module_globals->pool_mutex);
-            request_private      = apr_palloc(module_globals->pool,sizeof(handler_private));
+            apr_pool_t *tpool = apr_thread_pool_get(r->connection->current_thread);
+
+
+            //apr_thread_mutex_lock(module_globals->pool_mutex);
+            request_private      = apr_palloc(tpool,sizeof(handler_private));
  
-            apr_thread_cond_create(&(request_private->cond), module_globals->pool);
-            apr_thread_mutex_create(&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, module_globals->pool);
-            apr_thread_mutex_unlock(module_globals->pool_mutex);
+            apr_thread_cond_create(&(request_private->cond), tpool);
+            apr_thread_mutex_create(&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, tpool);
+            //apr_thread_mutex_unlock(module_globals->pool_mutex);
 
             apr_threadkey_private_set (request_private,handler_thread_key);
         }

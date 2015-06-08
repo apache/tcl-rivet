@@ -344,7 +344,7 @@ Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
 {
     Tcl_Obj* dictObj = Tcl_NewObj();
     Tcl_Obj* par_name; 
-    static const char** p;
+    const char** p;
 
     for (p = confDirectives; (*p) != NULL; p++)
     {
