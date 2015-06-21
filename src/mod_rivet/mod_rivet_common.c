@@ -399,6 +399,15 @@ void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
     
+    obj = Tcl_NewStringObj(RIVET_CONFIGURE_CMD,-1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+            "server",
+            "RIVET_CONFIGURE_CMD",
+            obj,
+            TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
+
 }
 
 /*
