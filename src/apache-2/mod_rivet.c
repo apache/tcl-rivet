@@ -275,6 +275,15 @@ Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
             TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
+    obj = Tcl_NewStringObj(RIVET_CONFIGURE_CMD,-1);
+    Tcl_IncrRefCount(obj);
+    Tcl_SetVar2Ex(interp,
+            "server",
+            "RIVET_CONFIGURE_CMD",
+            obj,
+            TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(obj);
+
 #if RIVET_DISPLAY_VERSION
     obj = Tcl_NewStringObj(RIVET_VERSION, -1);
     Tcl_IncrRefCount(obj);
@@ -1284,16 +1293,13 @@ Rivet_ChildHandlers(server_rec *s, int init)
         parentfunction = top->rivet_child_exit_script;
         errmsg = MODNAME ": Error in Child exit script: %s";
         //errmsg = (char *) apr_pstrdup(p, "Error in child exit script: %s");
+        Tcl_Preserve(top->server_interp);
     }
 
     for (sr = s; sr; sr = sr->next)
     {
         rsc = RIVET_SERVER_CONF(sr->module_config);
         function = init ? rsc->rivet_child_init_script : rsc->rivet_child_exit_script;
-
-        if (!init && sr == s) {
-            Tcl_Preserve(rsc->server_interp);
-        }
 
         /* Execute it if it exists and it's the top level, separate
          * virtual interps are turned on, or it's different than the
@@ -1320,10 +1326,16 @@ Rivet_ChildHandlers(server_rec *s, int init)
             Tcl_Release (rsc->server_interp);
         }
 
+        /*
+            it's probably pedantic to unregister the channel just before
+            the child exits and the interpreter is deleted 
+
         if (!init && ((sr == s) || rsc->separate_channels)) 
         {
             Tcl_UnregisterChannel(rsc->server_interp,*(rsc->outchannel));
         }
+
+        */
 
     }
 
@@ -1336,11 +1348,10 @@ Rivet_ChildHandlers(server_rec *s, int init)
      * as deleting the master implicitly deletes its slave interpreters.
      */
 
-        rsc = RIVET_SERVER_CONF(s->module_config);
-        if (!Tcl_InterpDeleted (rsc->server_interp)) {
-            Tcl_DeleteInterp(rsc->server_interp);
+        if (!Tcl_InterpDeleted (top->server_interp)) {
+            Tcl_DeleteInterp(top->server_interp);
         }
-        Tcl_Release (rsc->server_interp);
+        Tcl_Release (top->server_interp);
     }
 }
 

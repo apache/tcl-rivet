@@ -22,8 +22,13 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.2.3])
+AC_INIT([Rivet],[2.2.4])
 TEA_INIT([3.9])
+
+# we are storing here the configure command line, as recursive
+# invocations change the value of the shell variables $0 $*
+
+CONFIGURE_CMD="$0 $*"
 
 AC_CONFIG_AUX_DIR(tclconfig)
 AM_INIT_AUTOMAKE
@@ -802,7 +807,7 @@ AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet
 AC_DEFINE_UNQUOTED(NAMEOFEXECUTABLE,"${TCLSH_PROG}",[The path to a working tclsh executable])
 AC_DEFINE_UNQUOTED(UPLOAD_DIR,"${RIVET_UPLOAD_DIR}",[Path to the disk directory where uploads are saved])
 AC_DEFINE_UNQUOTED(MAX_POST,[$MAX_POST],[Max size of data in POST operations])
-
+AC_DEFINE_UNQUOTED(CONFIGURE_CMD,"${CONFIGURE_CMD}",[configure command string])
 # We need to use the package path for the installation procedure.  On
 #Debian linux TCL_PACKAGE_PATH may have more than one path in the
 #TCL_PACKAGE_PATH variable, so we have to handle this
