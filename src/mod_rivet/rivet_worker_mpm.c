@@ -27,6 +27,7 @@
 #include <ap_mpm.h>
 #include <apr_strings.h>
 
+#include "rivet.h"
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
 #include "httpd.h"
@@ -379,6 +380,19 @@ int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp
     return OK;
 }
 
+/*
+ * -- Rivet_MPM_ChildInit
+ *
+ * Child initialization function called by the web server framework.
+ * For this bridge tasks are 
+ *
+ *   + mpm_bridge_status object allocation and initialization
+ *   + content generation callback private key creation
+ *   + supervisor thread creation
+ * 
+ *
+ */
+
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t        rv;
@@ -453,11 +467,37 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         char    errorbuf[512];
 
         apr_strerror(rv, errorbuf,200);
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+        ap_log_error(APLOG_MARK, APLOG_ERR, rv, server, 
                      MODNAME "Error starting supervisor thread rv=%d:%s\n",rv,errorbuf);
         exit(1);
     }
 }
+
+/*
+ * -- Worker_PrivateCleanup
+ *
+ *  Pool cleanup function registered with the MPM controlled thread. Purpose
+ * of this function is to properly get rid of data allocated on the
+ * handler_private object
+ *
+ * Arguments:
+ *
+ *  void* client_data: a generic pointer cast to a handler_private object pointer
+ *
+ */ 
+
+apr_status_t Worker_RequestPrivateCleanup (void *client_data)
+{
+    handler_private* req_private = (handler_private*)client_data;
+
+    apr_thread_cond_destroy(req_private->cond);
+    apr_thread_mutex_destroy(req_private->mutex);
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, module_globals->server,
+                 MODNAME ": request thread private data released");
+
+    return APR_SUCCESS;
+}
+
 
 /*
  * -- Rivet_MPM_Request
@@ -490,38 +530,38 @@ int Rivet_MPM_Request (request_rec* r)
 
     if (apr_threadkey_private_get ((void **)&request_private,handler_thread_key) != APR_SUCCESS)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
-                     MODNAME ": cannot get private data for processor thread");
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r, MODNAME ": cannot get private data for processor thread");
 
         return HTTP_INTERNAL_SERVER_ERROR;
 
     } else {
 
-        /* Checking if we are at the first request server by this thread */
+        /* if the thread is serving its first request we allocate its private data from the thread pool */
 
         if (request_private == NULL)
         {
             apr_pool_t *tpool = apr_thread_pool_get(r->connection->current_thread);
 
-
-            //apr_thread_mutex_lock(module_globals->pool_mutex);
-            request_private      = apr_palloc(tpool,sizeof(handler_private));
+            request_private = apr_palloc(tpool,sizeof(handler_private));
  
-            apr_thread_cond_create(&(request_private->cond), tpool);
-            apr_thread_mutex_create(&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, tpool);
-            //apr_thread_mutex_unlock(module_globals->pool_mutex);
-
+            apr_thread_cond_create (&(request_private->cond), tpool);
+            apr_thread_mutex_create (&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, tpool);
             apr_threadkey_private_set (request_private,handler_thread_key);
+
+            apr_pool_cleanup_register(tpool,(void *)request_private,Worker_RequestPrivateCleanup,apr_pool_cleanup_null);
+
+            ap_log_rerror(APLOG_MARK, APLOG_INFO, APR_SUCCESS, r,  MODNAME ": request thread private data allocated");
+
         }
 
     }
 
     /* We prepare the request descriptor object to be placed on the Tcl working threads queue */
 
-    request_private->r      = r;
-    request_private->code   = OK;
-    request_private->status = init;
-    request_private->job_type = request;
+    request_private->r          = r;
+    request_private->code       = OK;
+    request_private->status     = init;
+    request_private->job_type   = request;
 
     rv = apr_queue_push(module_globals->mpm->queue,request_private);
     if (rv == APR_SUCCESS)
@@ -584,8 +624,9 @@ rivet_thread_interp* Rivet_MPM_MasterInterp(void)
     rivet_thread_private*   private;
     rivet_thread_interp*           interp_obj; 
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
-    ap_assert (private != NULL);
+    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
+    //ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    //ap_assert (private != NULL);
 
     interp_obj = Rivet_NewVHostInterp(private->pool);
     //interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);

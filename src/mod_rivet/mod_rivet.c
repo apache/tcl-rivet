@@ -455,12 +455,12 @@ void Rivet_ProcessorCleanup (void *data)
                                         private->req_cnt,module_globals->vhosts_count);
 
     /* We are deleting the interpreters and release the thread channel. 
-     * Rivet channel is set a stdout channel of Tcl and as such is treated
+     * Rivet channel is set as stdout channel of Tcl and as such is treated
      * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
-     * the channel is released immediatly by forcing the refCount to 0
+     * the channel is released immediately by forcing the refCount to 0
      * (see Tcl source code: generic/TclIO.c). Unregistering for each interpreter
      * causes the process to segfault at least for certain Tcl versions.
-     * We unset the stdout channel to avoid this
+     * We unset the channel as stdout to avoid this
      */
 
     Tcl_SetStdChannel(NULL,TCL_STDOUT);
@@ -486,8 +486,6 @@ void Rivet_ProcessorCleanup (void *data)
  
         if ((i > 0) && rsc->separate_channels) 
             Rivet_ReleaseRivetChannel(private->interps[i]->interp,private->channel);
-
-        //Tcl_UnregisterChannel(private->interps[i]->interp,*private->channel);       
 
         Tcl_DeleteInterp(private->interps[i]->interp);
 

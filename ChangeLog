@@ -1,3 +1,9 @@
+2015-06-28 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.c: fixed errors in comments
+    * src/mod_rivet/rivet_worker_mpm.c: Binding release of mutex and
+    condition variable to MPM thread pool cleanup, hopefully fixing
+    this potential memory leak
+
 2015-06-21 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: add creation of config variable RIVET_CONFIGURE_CMD
     * src/mod_rivet/mod_rivet_common.c: add RIVET_CONFIGURE_CMD handling

@@ -168,12 +168,12 @@ typedef struct mpm_bridge_status mpm_bridge_status;
 
 typedef struct _mod_rivet_globals {
     apr_pool_t*         pool;               
-    char*               rivet_mpm_bridge;       /* name of the MPM bridge       */
-    server_rec*         server;                 /* default host server_rec obj  */
+    char*               rivet_mpm_bridge;       /* name of the MPM bridge               */
+    server_rec*         server;                 /* default host server_rec obj          */
     int                 vhosts_count;           /* Number of configured virtual host including 
                                                  * the root server thus it's supposed to be >= 1 */
     rivet_thread_interp* 
-                        server_interp;          /* server and prefork MPM interpreter */
+                        server_interp;          /* server and prefork MPM interpreter   */
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex           */
 
     /* Jump table to bridge specific procedures */
