@@ -1,3 +1,7 @@
+2015-06-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: thread id determination 
+    method changed to support Apache 2.2
+
 2015-06-28 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.c: fixed errors in comments
     * src/mod_rivet/rivet_worker_mpm.c: Binding release of mutex and

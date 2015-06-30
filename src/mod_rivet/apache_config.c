@@ -403,51 +403,24 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     /* server_interp isn't set at this point. */
     /* rivet_global_init_script is global, not per server. */
 
-    rsc->rivet_child_init_script = overrides->rivet_child_init_script ?
-        overrides->rivet_child_init_script : base->rivet_child_init_script;
-
-    rsc->rivet_child_exit_script = overrides->rivet_child_exit_script ?
-        overrides->rivet_child_exit_script : base->rivet_child_exit_script;
-
-    rsc->rivet_before_script = overrides->rivet_before_script ?
-        overrides->rivet_before_script : base->rivet_before_script;
-
-    rsc->rivet_after_script = overrides->rivet_after_script ?
-        overrides->rivet_after_script : base->rivet_after_script;
-
-    rsc->rivet_error_script = overrides->rivet_error_script ?
-        overrides->rivet_error_script : base->rivet_error_script;
-
-    rsc->rivet_default_error_script = overrides->rivet_default_error_script ?
-        overrides->rivet_default_error_script : base->rivet_default_error_script;
-
-    rsc->rivet_abort_script = overrides->rivet_abort_script ?
-        overrides->rivet_abort_script : base->rivet_abort_script;
-
-    rsc->after_every_script = overrides->after_every_script ?
-        overrides->after_every_script : base->after_every_script;
-
-    rsc->upload_max = overrides->upload_max ?
-        overrides->upload_max : base->upload_max;
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_child_init_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_child_exit_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_before_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_after_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_error_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_default_error_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_abort_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,after_every_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,upload_max)
 
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
     rsc->separate_channels = base->separate_channels;
 
-    /* server_name is set up later. */
-
-    rsc->upload_dir = overrides->upload_dir ?
-        overrides->upload_dir : base->upload_dir;
-
-    rsc->rivet_server_vars = overrides->rivet_server_vars ?
-        overrides->rivet_server_vars : base->rivet_server_vars;
-
-    rsc->rivet_dir_vars = overrides->rivet_dir_vars ?
-        overrides->rivet_dir_vars : base->rivet_dir_vars;
-
-    rsc->rivet_user_vars = overrides->rivet_user_vars ?
-        overrides->rivet_user_vars : base->rivet_user_vars;
-
+    RIVET_CONF_SELECT(rsc,base,overrides,upload_dir)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_server_vars)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_dir_vars)
+    RIVET_CONF_SELECT(rsc,base,overrides,rivet_user_vars)
     RIVET_CONF_SELECT(rsc,base,overrides,path)
 
     return rsc;

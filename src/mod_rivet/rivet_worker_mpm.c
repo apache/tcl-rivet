@@ -106,7 +106,7 @@ void Rivet_MPM_Shutdown (void)
     int i,waits;
 
     apr_thread_mutex_lock(module_globals->pool_mutex);
-    job = (handler_private *) apr_palloc(module_globals->pool,sizeof(handler_private));
+    job = (handler_private *) apr_pcalloc(module_globals->pool,sizeof(handler_private));
     apr_thread_mutex_unlock(module_globals->pool_mutex);
     job->job_type = orderly_exit;
 
@@ -412,8 +412,8 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->workers            = NULL;
     module_globals->mpm->server_shutdown    = 0;
 
-    module_globals->mpm->threads_count = (apr_uint32_t *) apr_palloc(pool,sizeof(apr_uint32_t));
-    module_globals->mpm->running_threads_count = (apr_uint32_t *) apr_palloc(pool,sizeof(apr_uint32_t));
+    module_globals->mpm->threads_count = (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
+    module_globals->mpm->running_threads_count = (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
     apr_atomic_set32(module_globals->mpm->threads_count,0);
     apr_atomic_set32(module_globals->mpm->running_threads_count,0);
 
@@ -540,9 +540,18 @@ int Rivet_MPM_Request (request_rec* r)
 
         if (request_private == NULL)
         {
-            apr_pool_t *tpool = apr_thread_pool_get(r->connection->current_thread);
+            apr_pool_t*     tpool;
+            apr_thread_t*   thread_id;
 
-            request_private = apr_palloc(tpool,sizeof(handler_private));
+#if HTTP_VERSION(AP_SERVER_MAJORVERSION_NUMBER,AP_SERVER_MINORVERSION_NUMBER) == 2004
+            thread_id = r->connection->current_thread;
+#else
+            apr_os_thread_t  os_thread_id = apr_os_thread_current();
+            apr_os_thread_put(&thread_id,&os_thread_id,r->pool);
+#endif
+
+            tpool = apr_thread_pool_get(thread_id);
+            request_private = apr_pcalloc(tpool,sizeof(handler_private));
  
             apr_thread_cond_create (&(request_private->cond), tpool);
             apr_thread_mutex_create (&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, tpool);
