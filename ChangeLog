@@ -1,3 +1,7 @@
+2015-07-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: hopefully a method to 
+    determine the thread id portable across Apache versions
+
 2015-06-30 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: thread id determination 
     method changed to support Apache 2.2

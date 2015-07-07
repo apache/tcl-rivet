@@ -542,13 +542,9 @@ int Rivet_MPM_Request (request_rec* r)
         {
             apr_pool_t*     tpool;
             apr_thread_t*   thread_id;
+            apr_os_thread_t os_thread_id = apr_os_thread_current();
 
-#if HTTP_VERSION(AP_SERVER_MAJORVERSION_NUMBER,AP_SERVER_MINORVERSION_NUMBER) == 2004
-            thread_id = r->connection->current_thread;
-#else
-            apr_os_thread_t  os_thread_id = apr_os_thread_current();
             apr_os_thread_put(&thread_id,&os_thread_id,r->pool);
-#endif
 
             tpool = apr_thread_pool_get(thread_id);
             request_private = apr_pcalloc(tpool,sizeof(handler_private));
