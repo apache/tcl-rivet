@@ -1,3 +1,11 @@
+2015-07-15 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: when thread private data
+    are released the correponding pointer is set to NULL in APR 
+    threadkey database. It turned out a thread pool is very often
+    deleted and data allcoated from it invalidated
+    * src/mod_rivet/mod_rivet.c: handler private data key is
+    now local to rivet_worker_mpm.c
+
 2015-07-07 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: hopefully a method to 
     determine the thread id portable across Apache versions

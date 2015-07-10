@@ -63,7 +63,6 @@ rivet_interp_globals    interp_globals;
 
 extern Tcl_ChannelType  RivetChan;
 apr_threadkey_t*        rivet_thread_key    = NULL;
-apr_threadkey_t*        handler_thread_key  = NULL;
 mod_rivet_globals*      module_globals      = NULL;
 
 void        Rivet_PerInterpInit (   rivet_thread_interp* interp, 

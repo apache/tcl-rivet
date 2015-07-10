@@ -46,14 +46,14 @@
     #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
 #endif
 
-
 extern mod_rivet_globals* module_globals;
-extern apr_threadkey_t*  rivet_thread_key;
-extern apr_threadkey_t*  handler_thread_key;
+extern apr_threadkey_t*   rivet_thread_key;
 
-void                  Rivet_ProcessorCleanup (void *data);
-rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
-rivet_thread_interp*  Rivet_NewVHostInterp(apr_pool_t* pool);
+apr_threadkey_t*        handler_thread_key;
+
+void                    Rivet_ProcessorCleanup (void *data);
+rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
+rivet_thread_interp*    Rivet_NewVHostInterp(apr_pool_t* pool);
 
 typedef struct mpm_bridge_status {
     apr_thread_t*       supervisor;
@@ -495,6 +495,9 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, module_globals->server,
                  MODNAME ": request thread private data released");
 
+    /* we have to invalidate the data pointer */
+
+    apr_threadkey_private_set (NULL,handler_thread_key);
     return APR_SUCCESS;
 }
 
@@ -548,14 +551,14 @@ int Rivet_MPM_Request (request_rec* r)
 
             tpool = apr_thread_pool_get(thread_id);
             request_private = apr_pcalloc(tpool,sizeof(handler_private));
- 
-            apr_thread_cond_create (&(request_private->cond), tpool);
-            apr_thread_mutex_create (&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, tpool);
+
+            ap_assert(apr_thread_cond_create (&(request_private->cond), tpool) == APR_SUCCESS);
+            ap_assert(apr_thread_mutex_create (&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, tpool) == APR_SUCCESS);
             apr_threadkey_private_set (request_private,handler_thread_key);
 
             apr_pool_cleanup_register(tpool,(void *)request_private,Worker_RequestPrivateCleanup,apr_pool_cleanup_null);
 
-            ap_log_rerror(APLOG_MARK, APLOG_INFO, APR_SUCCESS, r,  MODNAME ": request thread private data allocated");
+            ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, r,  MODNAME ": request thread private data allocated");
 
         }
 

@@ -32,7 +32,6 @@
 
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
-extern apr_threadkey_t*   handler_thread_key;
 
 void        Rivet_ProcessorCleanup (void *data);
 int         Rivet_InitCore          (Tcl_Interp *interp,rivet_thread_private* p); 
