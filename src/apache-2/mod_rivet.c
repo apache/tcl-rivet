@@ -395,12 +395,12 @@ Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_int
 
 /* -- Rivet_ExecuteAndCheck
  * 
- * Tcl script execution central procedure. The script stored
- * outbuf is evaluated and in case an error occurs in the execution
- * an error handler is executed. In case the error code returned
- * is RIVET then the error was caused by the invocation of a 
- * abort_page command and the script stored in conf->abort_script
- * is run istead. The default error script prints the error buffer
+ * Tcl script execution central procedure. The script stored in
+ * outbuf is evaluated and in case of errors an error handler is 
+ * executed. In case the error code is "RIVET" then the error was 
+ * caused by the invocation of ::rivet::abort_page and the script
+ * stored in conf->abort_script is run istead. 
+ * The default error handler prints the error buffer
  *
  *   Arguments:
  * 
@@ -513,10 +513,8 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
 /*
  * -- Rivet_ParseExecFile
  *
- * given a filename if the file exists it's either parsed (when a rivet
- * template) and then executed as a Tcl_Obj instance or directly executed
- * if a Tcl script.
- *
+ * Given a filename the corresponding file is checked to exist.  
+ * If the file is a Rivet template its content gets parsed and then executed.
  * This is a separate function so that it may be called from command 'parse'
  * 
  * Returned value:
@@ -717,7 +715,8 @@ Rivet_ParseExecFile(TclWebRequest *req, char *filename, int toplevel)
  * -- Rivet_ParseExecString
  *
  * This function accepts a Tcl_Obj carrying a string to be interpreted as
- * a Rivet template. This function is the core for command 'parsestr'
+ * a Rivet template. This function is the core for the form  
+ * '::rivet::parsestr -string $tclscript'
  * 
  * Arguments:
  *
@@ -816,6 +815,7 @@ Rivet_CleanupRequest( request_rec *r )
  *     a reference to it is stored in the rivet_server_conf record
  *-----------------------------------------------------------------------------
  */
+
 static void
 Rivet_CreateRivetChannel(Tcl_Interp* interp,rivet_server_conf* rsc, apr_pool_t* pPool)
 {
@@ -854,6 +854,7 @@ Rivet_CreateRivetChannel(Tcl_Interp* interp,rivet_server_conf* rsc, apr_pool_t* 
  *
  *-----------------------------------------------------------------------------
  */
+
 static void
 Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p, int new_channel)
 {
@@ -970,6 +971,19 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p, int ne
     Tcl_Release(interp);
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * -- Rivet_InitHandler: basic callback for mod_rivet initialization
+ *
+ * Arguments:
+ * 
+ *  The list of arguments is dictated by the Apache framework specifications
+ *
+ *-----------------------------------------------------------------------------
+ *
+ */
+
 static int
 Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
@@ -1072,6 +1086,7 @@ Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
  *
  *-----------------------------------------------------------------------------
  */
+
 static Tcl_Interp*
 Rivet_CreateTclInterp (server_rec* s)
 {
@@ -1177,7 +1192,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
     extern int ap_max_requests_per_child;
     int interpCount = 0;
 
-/* This code is run once per child process. In a threaded Tcl builds the forking 
+/* This code is run once per child process. In a threaded Tcl build the forking 
  * of a child process most likely has not preserved the thread where the Tcl 
  * notifier runs. The Notifier should have been restarted by one the 
  * pthread_atfork callbacks (setup in Tcl >= 8.5.14 and Tcl >= 8.6.1). In
@@ -1280,6 +1295,7 @@ Rivet_ChildHandlers(server_rec *s, int init)
     server_rec *sr;
     rivet_server_conf *rsc;
     rivet_server_conf *top;
+
     void *function;
     void *parentfunction;
     char *errmsg;
@@ -1288,11 +1304,13 @@ Rivet_ChildHandlers(server_rec *s, int init)
     if (init == 1) {
         parentfunction = top->rivet_child_init_script;
         errmsg = MODNAME ": Error in Child init script: %s";
-        //errmsg = (char *) apr_pstrdup(p, "Error in child init script: %s");
     } else {
         parentfunction = top->rivet_child_exit_script;
         errmsg = MODNAME ": Error in Child exit script: %s";
-        //errmsg = (char *) apr_pstrdup(p, "Error in child exit script: %s");
+        Tcl_Preserve(top->server_interp);
+    }
+
+    if (!init) {
         Tcl_Preserve(top->server_interp);
     }
 
@@ -1314,20 +1332,15 @@ Rivet_ChildHandlers(server_rec *s, int init)
 
             globals->srec = sr;
             if (Tcl_EvalObjEx(rsc->server_interp,function, 0) != TCL_OK) {
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                             errmsg, Tcl_GetString(function));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                             "errorCode: %s",
-                        Tcl_GetVar(rsc->server_interp, "errorCode", 0));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                             "errorInfo: %s",
-                        Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, errmsg, Tcl_GetString(function));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, "errorCode: %s", Tcl_GetVar(rsc->server_interp, "errorCode", 0));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, "errorInfo: %s", Tcl_GetVar(rsc->server_interp, "errorInfo", 0));
             }
             Tcl_Release (rsc->server_interp);
         }
 
         /*
-            it's probably pedantic to unregister the channel just before
+            it's probably pedantic to unregister the channel(s) just before
             the child exits and the interpreter is deleted 
 
         if (!init && ((sr == s) || rsc->separate_channels)) 
@@ -1653,10 +1666,6 @@ sendcleanup:
 static void
 rivet_register_hooks (apr_pool_t *p)
 {
-    //static const char * const aszPre[] = {
-    //    "http_core.c", "mod_mime.c", NULL };
-    //static const char * const aszPreTranslate[] = {"mod_alias.c", NULL};
-
     ap_hook_post_config (Rivet_InitHandler, NULL, NULL, APR_HOOK_LAST);
     ap_hook_handler (Rivet_SendContent, NULL, NULL, APR_HOOK_LAST);
     ap_hook_child_init (Rivet_ChildInit, NULL, NULL, APR_HOOK_LAST);

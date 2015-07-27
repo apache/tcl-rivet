@@ -1,3 +1,7 @@
+2015-07-27 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: add more comments, improved code 
+    readability in Rivet_CreateTclInterp
+
 2015-06-21 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: changing version to 2.2.4, definition of config.h
     variable RIVET_CONFIGURE_CMD carring the configure full command that
