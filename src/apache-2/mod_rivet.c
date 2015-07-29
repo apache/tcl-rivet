@@ -1667,7 +1667,7 @@ static void
 rivet_register_hooks (apr_pool_t *p)
 {
     ap_hook_post_config (Rivet_InitHandler, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_handler (Rivet_SendContent, NULL, NULL, APR_HOOK_LAST);
+    ap_hook_handler (Rivet_SendContent, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_child_init (Rivet_ChildInit, NULL, NULL, APR_HOOK_LAST);
 }
 

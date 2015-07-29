@@ -1,3 +1,8 @@
+2015-07-29 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: someone noticed the handler was registered
+    as APR_HOOK_LAST instead APR_HOOK_MIDDLE as recommended by the 
+    specifications
+
 2015-07-27 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: add more comments, improved code 
     readability in Rivet_CreateTclInterp
