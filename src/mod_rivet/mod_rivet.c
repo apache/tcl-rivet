@@ -61,9 +61,9 @@
 
 rivet_interp_globals    interp_globals;
 
-extern Tcl_ChannelType  RivetChan;
-apr_threadkey_t*        rivet_thread_key    = NULL;
-mod_rivet_globals*      module_globals      = NULL;
+extern Tcl_ChannelType   RivetChan;
+apr_threadkey_t*         rivet_thread_key    = NULL;
+mod_rivet_globals*       module_globals      = NULL;
 
 void        Rivet_PerInterpInit (   rivet_thread_interp* interp, 
                                     rivet_thread_private* private, 
@@ -72,6 +72,17 @@ static int  Rivet_ExecuteAndCheck   (rivet_thread_private *private, Tcl_Obj *tcl
 int         Rivet_InitCore          (Tcl_Interp *interp,rivet_thread_private* p); 
 
 #define ERRORBUF_SZ     256
+
+/*
+ *
+ */
+
+int Rivet_Exit_Handler(int code)
+{
+    Tcl_Exit(code);
+    /*NOTREACHED*/
+    return TCL_OK;		/* Better not ever reach this! */
+}
 
 /* -- Rivet_PrintErrorMessage
  *
@@ -283,7 +294,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
     
-    root_interp = (*module_globals->mpm_master_interp)();
+    root_interp = (*RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp))();
 
     /* we must assume the module was able to create the root interprter */ 
 
@@ -1456,7 +1467,6 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
         Tcl_DecrRefCount(server_init);
     }
 
-
     return OK;
 
 }
@@ -1536,90 +1546,30 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         apr_status_t                rv;
         apr_dso_handle_sym_t        func = NULL;
 
-        ap_log_error(APLOG_MARK,APLOG_INFO,0,server,"MPM bridge loaded: %s",mpm_model_path);
+        ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server,"MPM bridge loaded: %s",mpm_model_path);
 
-        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_ServerInit");
+        rv = apr_dso_sym(&func,dso_handle,"bridge_jump_table");
         if (rv == APR_SUCCESS)
         {
-            module_globals->mpm_server_init = (int (*)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*))func;
+            module_globals->bridge_jump_table = (rivet_bridge_table*) func;
         }
         else
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                         MODNAME ": Error loading symbol Rivet_MPM_ServerInit: %s", 
+                         MODNAME ": Error loading symbol bridge_jump_table: %s", 
                          apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
 
-        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_ChildInit");
-        if (rv == APR_SUCCESS)
-        {
-            module_globals->mpm_child_init = (int (*)(apr_pool_t*,server_rec*)) func;
-        }
-        else
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                         MODNAME ": Error loading symbol Rivet_MPM_Init: %s", 
-                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-            exit(1);   
+        /* we require only mpm_request and mpm_master_interp to be defined */
+
+        ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_request) != NULL);
+        ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp) != NULL);
+
+        if (RIVET_MPM_BRIDGE_FUNCTION(mpm_exit_handler) == NULL) {
+            RIVET_MPM_BRIDGE_FUNCTION(mpm_exit_handler) = Rivet_Exit_Handler;
         }
 
-        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_Request");
-        if (rv == APR_SUCCESS)
-        {
-            module_globals->mpm_request = (int (*)(request_rec*)) func;
-        }
-        else
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                         MODNAME ": Error loading symbol Rivet_MPM_Request: %s", 
-                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-            exit(1);   
-        }
-
-        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_Finalize");
-        if (rv == APR_SUCCESS)
-        {
-            module_globals->mpm_finalize = (apr_status_t (*)(void *)) func;
-        }
-        else
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                         MODNAME ": Error loading symbol Rivet_MPM_Finalize: %s", 
-                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-            exit(1);   
-        }
-
-        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_MasterInterp");
-        if (rv == APR_SUCCESS)
-        {
-            module_globals->mpm_master_interp = (rivet_thread_interp* (*)(void)) func;
-        }
-        else
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                         MODNAME ": Error loading symbol Rivet_MPM_MasterInterp: %s", 
-                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-            exit(1);   
-        }
-
-        rv = apr_dso_sym(&func,dso_handle,"Rivet_MPM_ExitHandler");
-        if (rv == APR_SUCCESS)
-        {
-            module_globals->mpm_exit_handler = (int (*)(int)) func;
-        }
-        else
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                         MODNAME ": Error loading symbol Rivet_MPM_ExitHandler: %s", 
-                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-            exit(1);   
-
-        }
-
-
-        /* active threads count */
-        
         apr_atomic_init(pPool);
         apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pPool);
 
@@ -1649,7 +1599,9 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
     Rivet_RunServerInit(pPool,pLog,pTemp,server);
 
-    return (*module_globals->mpm_server_init)(pPool,pLog,pTemp,server);
+    RIVET_MPM_BRIDGE_CALL(mpm_server_init,pPool,pLog,pTemp,server);
+
+    return OK;
 }
 
 static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
@@ -1705,13 +1657,25 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     /* Calling the brigde child process initialization */
 
-    (*module_globals->mpm_child_init)(pChild,server);
-    apr_pool_cleanup_register (pChild, server, module_globals->mpm_finalize, module_globals->mpm_finalize);
+    RIVET_MPM_BRIDGE_CALL(mpm_child_init,pChild,server);
+
+    if (RIVET_MPM_BRIDGE_FUNCTION(mpm_finalize) == NULL)
+    {
+        apr_pool_cleanup_register (pChild, server,
+                                    apr_pool_cleanup_null,
+                                    apr_pool_cleanup_null);
+    }
+    else
+    {
+        apr_pool_cleanup_register (pChild, server,
+                                    RIVET_MPM_BRIDGE_FUNCTION(mpm_finalize),
+                                    RIVET_MPM_BRIDGE_FUNCTION(mpm_finalize));
+    }
 }
 
 static int Rivet_Handler (request_rec *r)    
 {
-    return (*module_globals->mpm_request)(r);
+    return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_request))(r);
 }
 
 /*

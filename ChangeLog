@@ -1,3 +1,19 @@
+2015-08-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.[c|h]: now calling MPM through
+    a bridge_jump_table structure with all the functions exported
+    by a bridge implementation. Created default exit handler
+    so that only if a special exit handler is needed it has
+    to be defined
+    * src/mod_rivet/rivet_worker_mpm.c: exporting through
+    the bridge_jump_table the names of bridge functions
+    * src/mod_rivet/rivet_prefork_mpm.c: export of the
+    bridge function through the jump table. Removed the
+    empty server init function (it's field in the jump
+    table set to NULL). Removed exit handler (we rely on
+    the default exit handler)
+    * src/mod_rivet/rivetCore.c: using the jump table
+    to call the exit handler
+
 2015-07-15 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: when thread private data
     are released the correponding pointer is set to NULL in APR 

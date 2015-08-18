@@ -1351,7 +1351,7 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
      * as it eventually will call Tcl_Exit
      */
 
-    return (*module_globals->mpm_exit_handler)(value);
+    return (*module_globals->bridge_jump_table->mpm_exit_handler)(value);
 }
 /*
  *-----------------------------------------------------------------------------

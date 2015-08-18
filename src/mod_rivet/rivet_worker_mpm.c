@@ -375,10 +375,7 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
     return NULL;
 }
 
-int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
-{
-    return OK;
-}
+// int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
 
 /*
  * -- Rivet_MPM_ChildInit
@@ -659,3 +656,12 @@ int Rivet_MPM_ExitHandler(int code)
 
     return TCL_ERROR;
 }
+
+rivet_bridge_table bridge_jump_table = {
+    NULL,
+    Rivet_MPM_ChildInit,
+    Rivet_MPM_Request,
+    Rivet_MPM_Finalize,
+    Rivet_MPM_MasterInterp,
+    Rivet_MPM_ExitHandler
+};

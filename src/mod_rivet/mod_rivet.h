@@ -162,35 +162,41 @@ typedef struct _rivet_thread_interp {
     unsigned int        flags;              /* signals of various interp specific conditions    */
 } rivet_thread_interp;
 
+typedef int  (RivetBridge_ServerInit)   (apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
+typedef void (RivetBridge_ChildInit)    (apr_pool_t* pPool,server_rec* s);
+typedef int  (RivetBridge_Request)      (request_rec*);
+typedef apr_status_t 
+             (RivetBridge_Finalize)(void*);
+typedef rivet_thread_interp*
+             (RivetBridge_Master_Interp) (void);
+typedef int  (RivetBridge_Exit_Handler) (int);
+
+typedef struct _mpm_bridge_table {
+    RivetBridge_ServerInit    *mpm_server_init;
+    RivetBridge_ChildInit     *mpm_child_init;
+    RivetBridge_Request       *mpm_request;
+    RivetBridge_Finalize      *mpm_finalize;
+    RivetBridge_Master_Interp *mpm_master_interp;
+    RivetBridge_Exit_Handler  *mpm_exit_handler;
+} rivet_bridge_table;
+
 /* we need also a place where to store module wide globals */
 
 typedef struct mpm_bridge_status mpm_bridge_status;
 
 typedef struct _mod_rivet_globals {
     apr_pool_t*         pool;               
-    char*               rivet_mpm_bridge;       /* name of the MPM bridge               */
-    server_rec*         server;                 /* default host server_rec obj          */
+    char*               rivet_mpm_bridge;       /* name of the MPM bridge                   */
+    server_rec*         server;                 /* default host server_rec obj              */
     int                 vhosts_count;           /* Number of configured virtual host including 
                                                  * the root server thus it's supposed to be >= 1 */
     rivet_thread_interp* 
-                        server_interp;          /* server and prefork MPM interpreter   */
-    apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex           */
+                        server_interp;          /* server and prefork MPM interpreter       */
+    apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
 
-    /* Jump table to bridge specific procedures */
-
-    int                 (*mpm_child_init)(apr_pool_t* pPool,server_rec* s);
-    int                 (*mpm_request)(request_rec*);
-    int                 (*mpm_server_init)(apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
-    apr_status_t        (*mpm_finalize)(void*);
-    rivet_thread_interp* (*mpm_master_interp)(void);
-    int                 (*mpm_exit_handler)(int);
-
-    mpm_bridge_status*  mpm;
-
-    /*
-    int                 num_load_samples;
-    double              average_working_threads; 
-    */
+    rivet_bridge_table* bridge_jump_table;     /* Jump table to bridge specific procedures  */
+    mpm_bridge_status*  mpm;                   /* bridge private control structure          */
+    
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
 #endif
@@ -325,5 +331,11 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
         Tcl_IncrRefCount(running_script->objscript);\
     }
 
+#define RIVET_MPM_BRIDGE_TABLE         bridge_jump_table
+#define RIVET_MPM_BRIDGE_FUNCTION(fun) module_globals->bridge_jump_table->fun
+
+#define RIVET_MPM_BRIDGE_CALL(fun,...) if ((*module_globals->bridge_jump_table->fun) != NULL) {\
+    (*module_globals->bridge_jump_table->fun)(__VA_ARGS__);\
+}
 
 #endif /* MOD_RIVET_H */

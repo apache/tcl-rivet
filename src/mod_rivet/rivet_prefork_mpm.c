@@ -46,7 +46,7 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     rivet_thread_private*   private;
     server_rec* s = (server_rec*) data;
 
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running prefork bridge Finalize method");
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running prefork bridge finalize method");
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
     Rivet_ProcessorCleanup(private);
@@ -55,7 +55,7 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     return OK;
 }
 
-int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
+//int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
 
 void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
@@ -146,10 +146,19 @@ rivet_thread_interp* Rivet_MPM_MasterInterp(void)
  *
  */
 
-int Rivet_MPM_ExitHandler(int code)
-{
-    Tcl_Exit(code);
-    /*NOTREACHED*/
-    return TCL_OK;		/* Better not ever reach this! */
-}
+//int Rivet_MPM_ExitHandler(int code)
+//{
+//    Tcl_Exit(code);
+//    /*NOTREACHED*/
+//    return TCL_OK;		/* Better not ever reach this! */
+//}
+
+rivet_bridge_table bridge_jump_table = {
+    NULL,
+    Rivet_MPM_ChildInit,
+    Rivet_MPM_Request,
+    Rivet_MPM_Finalize,
+    Rivet_MPM_MasterInterp,
+    NULL
+};
 
