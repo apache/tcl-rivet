@@ -73,6 +73,27 @@ typedef struct mpm_bridge_status {
     apr_thread_mutex_t* req_mutex;
 #endif
 } mpm_bridge_status;
+/* data private to the Apache callback handling the request */
+
+typedef struct _handler_private 
+{
+    rivet_job_t             job_type;
+    apr_thread_cond_t*      cond;
+    apr_thread_mutex_t*     mutex;
+    request_rec*            r;              /* request rec                 */
+    int                     code;
+    int                     status;
+    rivet_req_ctype         ctype;          /*                             */
+} handler_private;
+
+typedef int rivet_thr_status;
+enum
+{
+    init,
+    idle,
+    request_processing,
+    done
+};
 
 /* Rivet_MPM_Shutdown --
  *
@@ -132,11 +153,8 @@ void Rivet_MPM_Shutdown (void)
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
     rivet_thread_private*   private;
-    //Tcl_Channel*          outchannel;		    /* stuff for buffering output */
-    //server_rec*           server;
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
-    //server = module_globals->server;
 
     private = Rivet_CreatePrivateData();
     if (private == NULL) 
@@ -163,8 +181,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         apr_thread_exit(thd,APR_SUCCESS);
         return NULL;
     }
-
-    // rsc->server_interp = private->interp;
 
     apr_thread_mutex_unlock(module_globals->mpm->job_mutex);       /* unlock job initialization stage */
 
@@ -216,6 +232,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         
         /* these assignements are crucial for both calling Rivet_SendContent and
          * for telling the channel where stuff must be sent to */
+
+        private->ctype  = request_obj->ctype;
 
         HTTP_REQUESTS_PROC(request_obj->code = Rivet_SendContent(private,request_obj->r));
 
@@ -519,7 +537,7 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
  *   HTTP status code (see the Apache HTTP web server documentation)
  */
 
-int Rivet_MPM_Request (request_rec* r)
+int Rivet_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
     handler_private*    request_private;
     apr_status_t        rv;
@@ -567,6 +585,7 @@ int Rivet_MPM_Request (request_rec* r)
     request_private->code       = OK;
     request_private->status     = init;
     request_private->job_type   = request;
+    request_private->ctype      = ctype;
 
     rv = apr_queue_push(module_globals->mpm->queue,request_private);
     if (rv == APR_SUCCESS)

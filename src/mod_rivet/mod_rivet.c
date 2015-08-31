@@ -51,13 +51,14 @@
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
 #include <unistd.h>
 
-#include "TclWeb.h"
-#include "rivet.h"
+#include "rivet_types.h"
 #include "mod_rivet.h"
-#include "mod_rivet_common.h"
-#include "rivetParser.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
+#include "TclWeb.h"
+#include "rivet.h"
+#include "mod_rivet_common.h"
+#include "rivetParser.h"
 
 rivet_interp_globals    interp_globals;
 
@@ -527,7 +528,6 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 {
     int                     errstatus;
     int                     retval;
-    int                     ctype;
     Tcl_Interp*             interp;
     rivet_thread_interp*    interp_obj;
     Tcl_Channel*            running_channel;
@@ -539,11 +539,6 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 #endif
 
     private->r = r;
-
-    ctype = Rivet_CheckType(private->r);  
-    if (ctype == CTYPE_NOT_HANDLED) {
-        return DECLINED;
-    }
 
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
@@ -620,9 +615,6 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     }
 
     interp  = interp_obj->interp;
-    //globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    //globals->r = r;
-    //globals->srec = private->r->server;
 
 #ifndef USE_APACHE_RSC
     if (private->r->per_dir_config != NULL)
@@ -696,7 +688,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 
     /* Apache Request stuff */
 
-    TclWeb_InitRequest(private->req, interp, ctype, private->r);
+    TclWeb_InitRequest(private, interp);
     ApacheRequest_set_post_max(private->req->apachereq, private->running_conf->upload_max);
     ApacheRequest_set_temp_dir(private->req->apachereq, private->running_conf->upload_dir);
 
@@ -816,7 +808,7 @@ sendcleanup:
  */
 
 static int 
-Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thread_private *private)
+Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thread_private* private)
 {
     int                 result;
     Tcl_Obj*            errscript;
@@ -1675,7 +1667,11 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
 static int Rivet_Handler (request_rec *r)    
 {
-    return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_request))(r);
+    rivet_req_ctype ctype = Rivet_CheckType(r);  
+    if (ctype == CTYPE_NOT_HANDLED) {
+        return DECLINED;
+    }
+    return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_request))(r,ctype);
 }
 
 /*

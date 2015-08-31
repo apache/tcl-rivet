@@ -30,8 +30,8 @@
 #include <apr_thread_cond.h>
 #include <apr_atomic.h>
 #include <tcl.h>
+#include "rivet.h"
 #include "apache_request.h"
-#include "TclWeb.h"
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
@@ -127,15 +127,6 @@ typedef struct _rivet_server_conf {
 
 #define TCL_INTERPS 1
 
-typedef int rivet_thr_status;
-enum
-{
-    init,
-    idle,
-    request_processing,
-    done
-};
-
 /* thread private interpreter error flags */
 
 #define RIVET_CACHE_FULL            1
@@ -164,7 +155,7 @@ typedef struct _rivet_thread_interp {
 
 typedef int  (RivetBridge_ServerInit)   (apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
 typedef void (RivetBridge_ChildInit)    (apr_pool_t* pPool,server_rec* s);
-typedef int  (RivetBridge_Request)      (request_rec*);
+typedef int  (RivetBridge_Request)      (request_rec*,rivet_req_ctype);
 typedef apr_status_t 
              (RivetBridge_Finalize)(void*);
 typedef rivet_thread_interp*
@@ -211,6 +202,7 @@ typedef struct _thread_worker_private {
                                             /* the request_rec and TclWebRequest    *
                                              * are copied here to be passed to a    *
                                              * channel                              */
+    rivet_req_ctype     ctype;              /*                                      */
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
     Tcl_Obj*            request_init;
@@ -245,19 +237,6 @@ enum {
     orderly_exit
 };
 
-/* data private to the Apache callback handling the request */
-
-typedef struct _handler_private 
-{
-    rivet_job_t             job_type;
-    apr_thread_cond_t*      cond;
-    apr_thread_mutex_t*     mutex;
-    request_rec*            r;              /* request rec                 */
-    int                     code;
-    int                     status;
-
-    //TclWebRequest*      req;
-} handler_private;
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 

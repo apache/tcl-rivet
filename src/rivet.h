@@ -1,22 +1,33 @@
-/* Copyright 2002-2004 The Apache Software Foundation
+/* rivet.h: */
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+/*
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-   	http://www.apache.org/licenses/LICENSE-2.0
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+ */
 
 /* $Id$ */
 
 #ifndef _RIVET_H_
 #define _RIVET_H_
+
+#include <tcl.h>
+#include "rivet_types.h"
+
+typedef int rivet_req_ctype;
 
 /* This is for windows. */
 #ifdef BUILD_rivet
@@ -54,10 +65,10 @@ static int cmd(\
 #define THREAD_PRIVATE_DATA(p)  p = (rivet_thread_private *)clientData;
 
 #define TCL_OBJ_CMD( name, func ) \
-Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
-		      name,   /* Function name in Tcl */\
-		      func,   /* C function name */\
-		      NULL,   /* Client Data */\
+Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
+		      name,                     /* Function name in Tcl */\
+		      func,                     /* C function name */\
+		      NULL,                     /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
 
  /* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace. Commands
@@ -71,12 +82,11 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
   */
 
 #define RIVET_OBJ_CMD( name, func, private_p) \
-Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
-		      RIVET_NS "::" name,   /* Function name in Tcl */\
-		      func,   /* C function name */\
-		      private_p,   /* Client Data */\
+Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
+		      RIVET_NS "::" name,       /* Function name in Tcl */\
+		      func,                     /* C function name */\
+		      private_p,                /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); 
-
 
 /* 
  * Pointer in r is checked and in case Rivet_NoRequestRec is

@@ -90,9 +90,10 @@ TclWeb_NewRequestObject (apr_pool_t *p)
  */
 
 int
-TclWeb_InitRequest(TclWebRequest* req, Tcl_Interp *interp, int ctype, void *arg)
+TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp)
 {
-    request_rec *r = (request_rec *)arg;
+    request_rec*        r   = private->r;
+    TclWebRequest*      req = private->req;
     int content_type_len = strlen(r->content_type);
 
     req->interp             = interp;
@@ -108,8 +109,8 @@ TclWeb_InitRequest(TclWebRequest* req, Tcl_Interp *interp, int ctype, void *arg)
      * a charset parameters might be there 
      */
 
-    if (((ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
-         ((ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
+    if (((private->ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
+         ((private->ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
         
         char* charset;
 

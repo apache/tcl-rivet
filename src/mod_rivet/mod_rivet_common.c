@@ -466,10 +466,10 @@ int Rivet_chdir_file (const char *file)
  *
  */
 
-int
+rivet_req_ctype
 Rivet_CheckType (request_rec *req)
 {
-    int ctype = CTYPE_NOT_HANDLED;
+    rivet_req_ctype ctype = CTYPE_NOT_HANDLED;
 
     if ( req->content_type != NULL ) {
         if( STRNEQU( req->content_type, RIVET_TEMPLATE_CTYPE) ) {

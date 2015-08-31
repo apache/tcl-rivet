@@ -118,13 +118,15 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
  *   HTTP status code (see the Apache HTTP web server documentation)
  */
 
-int Rivet_MPM_Request (request_rec* r)
+int Rivet_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
     rivet_thread_private*   private;
 
     /* fetching the thread private data to be passed to Rivet_SendContent */
 
     RIVET_PRIVATE_DATA_NOT_NULL (rivet_thread_key, private);
+
+    private->ctype = ctype;
 
     return Rivet_SendContent(private,r);
 }
@@ -138,20 +140,6 @@ rivet_thread_interp* Rivet_MPM_MasterInterp(void)
     module_globals->server_interp->channel = private->channel;
     return module_globals->server_interp;
 }
-
-/*
- * -- Rivet_MPM_ExitHandler
- *
- * This handler basically falls back to the Tcl exit handler
- *
- */
-
-//int Rivet_MPM_ExitHandler(int code)
-//{
-//    Tcl_Exit(code);
-//    /*NOTREACHED*/
-//    return TCL_OK;		/* Better not ever reach this! */
-//}
 
 rivet_bridge_table bridge_jump_table = {
     NULL,

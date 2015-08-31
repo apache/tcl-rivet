@@ -8,6 +8,7 @@
 #include "http_main.h"
 #include "http_protocol.h"
 #include "util_script.h"
+#include "mod_rivet.h"
 
 #ifdef  SFIO
 #include "sfio.h"
@@ -30,36 +31,6 @@ extern Sfio_t*  _stdopen _ARG_((int, const char*)); /*1999*/
 #undef  ap_pfclose
 #define ap_pfclose(p,q)		sfclose(q)
 #endif /*SFIO*/
-
-typedef struct ApacheUpload ApacheUpload;
-
-typedef struct _ApacheRequest {
-    //table *parms;
-    apr_table_t *parms;
-    ApacheUpload *upload;
-    int status;
-    int parsed;
-    int post_max;
-    int disable_uploads;
-    int (*upload_hook)(void *ptr, char *buf, int len, ApacheUpload *upload);
-    void *hook_data;
-    const char* temp_dir;
-    char* raw_post; /* Raw post data. */
-    request_rec *r;
-    int nargs;
-} ApacheRequest;
-
-struct ApacheUpload {
-    ApacheUpload *next;
-    char *filename;
-    char *name;
-    char *tempname;
-    //table *info;
-    apr_table_t *info;
-    apr_file_t *fp;
-    long size;
-    ApacheRequest *req;
-};
 
 #ifndef strEQ
 #define strEQ(s1,s2) (!strcmp((s1),(s2)))

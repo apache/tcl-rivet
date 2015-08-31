@@ -23,18 +23,6 @@
 #define DEFAULT_HEADER_TYPE "text/html"
 #define DEFAULT_TIME_FORMAT "%A, %d-%b-%Y %H:%M:%S %Z"
 
-typedef struct TclWebRequest {
-    Tcl_Interp*     interp;
-    request_rec*    req;
-    ApacheRequest*  apachereq;
-    ApacheUpload*   upload;
-    int             headers_printed;	/* has the header been printed yet? */
-    int             headers_set;		/* has the header been set yet? */
-    int             content_sent;
-    int             environment_set;	/* have we setup the environment variables? */
-    char*           charset;
-} TclWebRequest;
-
 /* Creates a TclWebRequest object */
 
 TclWebRequest* TclWeb_NewRequestObject (apr_pool_t *p);
@@ -48,7 +36,7 @@ TclWebRequest* TclWeb_NewRequestObject (apr_pool_t *p);
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_InitRequest(TclWebRequest *req, Tcl_Interp *interp, int ctype, void *arg);
+int TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp);
 
 /*
  *-----------------------------------------------------------------------------

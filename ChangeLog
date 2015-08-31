@@ -1,3 +1,29 @@
+2015-08-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.c: bringing the request type check
+    back to Rivet_Handler shook quite a bit the build process as
+    it required to create a new file rivet_types.h to store
+    various definitions 
+    * src/mod_rivet/TclWebapache.c: changed definition of
+    TclWeb_InitRequest. The thread private data must have
+    stored the whole request processing status
+    * src/mod_rivet/rivet_prefork_mpm.c: Request type check moved
+    to mod_rivet.c (Rivet_Handler)
+    * src/mod_rivet/rivet_worker_mpm.c: Request type stored
+    now in the request private data
+    * src/parser/parsePkgInit.c: was still including config.h
+    instead rivet_config.h. Add mandatory Apache standard 
+    copyright statement
+    * src/mod_rivet/mod_rivet_common.c: Rivet_CheckType 
+    definition changed to return a rivet_req_ctype value
+    * src/mod_rivet/rivet_types.h: add new file with
+    definition used by various files that don't need mod_rivet.h
+    * src/mod_rivet/apache_request.h: removed definition that
+    went into rivet_types.h
+    * src/Makefile.am: libparser needed to have also LDFLAGS
+    to build correctly
+    * src/rivet.h: ASF copyright statement, including also
+    rivet_types.h
+    
 2015-08-18 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.[c|h]: now calling MPM through
     a bridge_jump_table structure with all the functions exported
