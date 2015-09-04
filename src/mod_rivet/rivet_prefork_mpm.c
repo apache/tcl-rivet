@@ -46,8 +46,8 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     rivet_thread_private*   private;
     server_rec* s = (server_rec*) data;
 
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s, MODNAME ": Running prefork bridge finalize method");
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, s, "Running prefork bridge finalize method");
 
     Rivet_ProcessorCleanup(private);
 

@@ -623,7 +623,7 @@ apr_status_t Rivet_MPM_Finalize (void* data)
     rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
     if (rv != APR_SUCCESS)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+        ap_log_error(APLOG_MARK, APLOG_ERR, rv, s,
                      MODNAME ": Error joining supervisor thread");
     }
 

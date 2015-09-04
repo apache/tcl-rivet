@@ -1,3 +1,9 @@
+2015-09-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_prefork_mpm.c: fix message severity
+    in finalize method
+    * src/mod_rivet/rivet_worker_mpm.c: passing actual error
+    code to log message if thread join fails
+
 2015-08-30 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.c: bringing the request type check
     back to Rivet_Handler shook quite a bit the build process as
