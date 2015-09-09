@@ -1361,9 +1361,14 @@ Rivet_ChildHandlers(server_rec *s, int init)
      * as deleting the master implicitly deletes its slave interpreters.
      */
 
-        if (!Tcl_InterpDeleted (top->server_interp)) {
-            Tcl_DeleteInterp(top->server_interp);
-        }
+    /*
+     *  The Tcl exit reform now recommends we don't call Tcl_DeleteInterp
+     * anymore when a child process is about to exit
+     */
+
+        //if (!Tcl_InterpDeleted (top->server_interp)) {
+        //    Tcl_DeleteInterp(top->server_interp);
+        //}
         Tcl_Release (top->server_interp);
     }
 }

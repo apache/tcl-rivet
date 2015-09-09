@@ -1,3 +1,7 @@
+2015-09-09 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: We don't delete the Tcl interpreter anymore,
+    we just let the process exit do the cleanup.
+
 2015-07-29 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: someone noticed the handler was registered
     as APR_HOOK_LAST instead APR_HOOK_MIDDLE as recommended by the 
@@ -8,6 +12,7 @@
     readability in Rivet_CreateTclInterp
 
 2015-06-21 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: new version 2.2.4
     * configure.ac: changing version to 2.2.4, definition of config.h
     variable RIVET_CONFIGURE_CMD carring the configure full command that
     prepared the build of the module
