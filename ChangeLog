@@ -1,3 +1,20 @@
+2015-10-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet.c: moving Rivet_ProcessorCleanup in 
+    mod_rivet_common.c
+    * src/mod_rivet/mod_rivet.h: add exit status code to
+    thread private data
+    * src/mod_rivet/mod_rivet_common.c: Rivet_ProcessorCleanup now
+    in this file
+    * src/mod_rivet/rivet_worker_mpm.c: thread exit handling
+    now calling the finalize handling function. Functions naming
+    scheme reformed. Since the exit_thread command forces
+    the whole child process to exit the check on the thread
+    counter in the supervisor thread was changed as the thread
+    executing thread_exit brings about can't exit before
+    the supervisor itself terminates
+    * src/mod_rivet/rivet_prefork_mpm.c: function naming scheme
+    changed.
+
 2015-09-04 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_prefork_mpm.c: fix message severity
     in finalize method

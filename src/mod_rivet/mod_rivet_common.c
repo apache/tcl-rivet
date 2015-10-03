@@ -38,6 +38,7 @@
 
 extern apr_threadkey_t*   rivet_thread_key;
 extern mod_rivet_globals* module_globals;
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -150,6 +151,8 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     private->r              = NULL;
     private->req            = TclWeb_NewRequestObject (private->pool);
     private->page_aborting  = 0;
+    private->thread_exit    = 0;
+    private->exit_status    = 0;
     private->abort_code     = NULL;
     private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
     private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
@@ -481,4 +484,87 @@ Rivet_CheckType (request_rec *req)
     return ctype; 
 }
 
+/*
+ * -- Rivet_ProcessorCleanup
+ *
+ * Thread private data cleanup. This function is called by MPM bridges to 
+ * release data owned by private and pointed in the array of rivet_thread_interp
+ * objects. It has to be called just before an agent, either thread or
+ * process, exits.
+ *
+ *  Arguments:
+ *
+ *      data:   pointer to a rivet_thread_private data structure. 
+ *
+ *  Returned value:
+ *
+ *      none
+ *
+ *  Side effects:
+ *
+ *      resources stored in the array of rivet_thread_interp objects are released
+ *      and interpreters are deleted.
+ *
+ */
+
+void Rivet_ProcessorCleanup (void *data)
+{
+    rivet_thread_private*   private = (rivet_thread_private *) data;
+    Tcl_HashSearch*         searchCtx; 
+    Tcl_HashEntry*          entry;
+    int                     i;
+    rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
+                 "Thread exiting after %d requests served (%d vhosts)", 
+                                        private->req_cnt,module_globals->vhosts_count);
+
+    /* We are deleting the interpreters and release the thread channel. 
+     * Rivet channel is set as stdout channel of Tcl and as such is treated
+     * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
+     * the channel is released immediately by forcing the refCount to 0
+     * (see Tcl source code: generic/TclIO.c). Unregistering for each interpreter
+     * causes the process to segfault at least for certain Tcl versions.
+     * We unset the channel as stdout to avoid this
+     */
+
+    Tcl_SetStdChannel(NULL,TCL_STDOUT);
+
+    /* there must be always a root interpreter in the slot 0 of private->interps,
+       so there is always need to run at least one cycle here */
+
+    i = 0;
+    do
+    {
+
+        /* cleaning the cache contents and deleting it */
+
+        searchCtx = apr_pcalloc(private->pool,sizeof(Tcl_HashSearch));
+        entry = Tcl_FirstHashEntry(private->interps[i]->objCache,searchCtx);    
+        while (entry)
+        {
+            Tcl_DecrRefCount(Tcl_GetHashValue(entry)); /* Let Tcl clear the mem allocated */
+            Tcl_DeleteHashEntry(entry);
+
+            entry = Tcl_NextHashEntry(searchCtx);
+        }
+ 
+        if ((i > 0) && rsc->separate_channels) 
+            Rivet_ReleaseRivetChannel(private->interps[i]->interp,private->channel);
+
+        Tcl_DeleteInterp(private->interps[i]->interp);
+
+        /* if separate_virtual_interps == 0 we are running the same interpreter
+         * instance for each vhost, thus we can jump out of this loop after 
+         * the first cycle as the only real intepreter object we have is stored
+         * in private->interps[0]
+         */
+
+    } while ((++i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
+
+    Tcl_DecrRefCount(private->request_init);
+    Tcl_DecrRefCount(private->request_cleanup);
+    apr_pool_destroy(private->pool);
+    
+}
 

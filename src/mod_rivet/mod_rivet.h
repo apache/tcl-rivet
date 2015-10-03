@@ -28,7 +28,6 @@
 #include <apr_tables.h>
 #include <apr_thread_proc.h>
 #include <apr_thread_cond.h>
-#include <apr_atomic.h>
 #include <tcl.h>
 #include "rivet.h"
 #include "apache_request.h"
@@ -210,8 +209,8 @@ typedef struct _thread_worker_private {
                                             
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */
-    int                 thread_exit;        /* Flag signalling thread_exit call     */
-
+    int                 thread_exit;        /* Thread exit code                     */
+    int                 exit_status;        /* status code to be passed to exit()   */
 
     int                 page_aborting;      /* abort_page flag                      */
     Tcl_Obj*            abort_code;         /* To be reset by before request        *
@@ -286,7 +285,6 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 #define ABORTPAGE_CODE              "ABORTPAGE"
 #define THREAD_EXIT_CODE            "THREAD_EXIT"
 
-#define MOD_RIVET_QUEUE_SIZE        100
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
 #define MODNAME                     "mod_rivet"
 

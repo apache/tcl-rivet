@@ -22,6 +22,7 @@
 #ifndef _MOD_RIVET_COMMON_
 #define _MOD_RIVET_COMMON_
 
+EXTERN void Rivet_ProcessorCleanup (void *data);
 EXTERN int Rivet_chdir_file (const char *file);
 EXTERN int Rivet_CheckType (request_rec* r);
 EXTERN void Rivet_CleanupRequest(request_rec *r);
@@ -31,4 +32,5 @@ EXTERN Tcl_Channel* Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t*
 EXTERN rivet_thread_private* Rivet_CreatePrivateData (void);
 EXTERN rivet_thread_private* Rivet_SetupTclPanicProc (void);
 EXTERN void Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel);
+
 #endif

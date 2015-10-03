@@ -66,21 +66,24 @@ extern Tcl_ChannelType   RivetChan;
 apr_threadkey_t*         rivet_thread_key    = NULL;
 mod_rivet_globals*       module_globals      = NULL;
 
-void        Rivet_PerInterpInit (   rivet_thread_interp* interp, 
-                                    rivet_thread_private* private, 
-                                    server_rec *s, apr_pool_t *p );
-static int  Rivet_ExecuteAndCheck   (rivet_thread_private *private, Tcl_Obj *tcl_script_obj);
-int         Rivet_InitCore          (Tcl_Interp *interp,rivet_thread_private* p); 
+void        Rivet_PerInterpInit (rivet_thread_interp* interp, 
+                                 rivet_thread_private* private, 
+                                 server_rec *s, apr_pool_t *p );
+static int  Rivet_ExecuteAndCheck (rivet_thread_private *private, Tcl_Obj *tcl_script_obj);
+int         Rivet_InitCore (Tcl_Interp *interp,rivet_thread_private* p); 
 
 #define ERRORBUF_SZ     256
 
 /*
+ * -- Rivet_Exit_Handler
+ *
+ * 
  *
  */
 
 int Rivet_Exit_Handler(int code)
 {
-    Tcl_Exit(code);
+    //Tcl_Exit(code);
     /*NOTREACHED*/
     return TCL_OK;		/* Better not ever reach this! */
 }
@@ -430,90 +433,6 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 }
 
 
-/*
- * -- Rivet_ProcessorCleanup
- *
- * Thread private data cleanup. This function is called by MPM bridges to 
- * release data owned by private and pointed in the array of rivet_thread_interp
- * objects. It has to be called just before an agent, either thread or
- * process, exits.
- *
- *  Arguments:
- *
- *      data:   pointer to a rivet_thread_private data structure. 
- *
- *  Returned value:
- *
- *      none
- *
- *  Side effects:
- *
- *      resources stored in the array of rivet_thread_interp objects are released
- *      and interpreters are deleted.
- *
- */
-
-void Rivet_ProcessorCleanup (void *data)
-{
-    rivet_thread_private*   private = (rivet_thread_private *) data;
-    Tcl_HashSearch*         searchCtx; 
-    Tcl_HashEntry*          entry;
-    int                     i;
-    rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
-
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
-                 "Thread exiting after %d requests served (%d vhosts)", 
-                                        private->req_cnt,module_globals->vhosts_count);
-
-    /* We are deleting the interpreters and release the thread channel. 
-     * Rivet channel is set as stdout channel of Tcl and as such is treated
-     * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
-     * the channel is released immediately by forcing the refCount to 0
-     * (see Tcl source code: generic/TclIO.c). Unregistering for each interpreter
-     * causes the process to segfault at least for certain Tcl versions.
-     * We unset the channel as stdout to avoid this
-     */
-
-    Tcl_SetStdChannel(NULL,TCL_STDOUT);
-
-    /* there must be always a root interpreter in the slot 0 of private->interps,
-       so there is always need to run at least one cycle here */
-
-    i = 0;
-    do
-    {
-
-        /* cleaning the cache contents and deleting it */
-
-        searchCtx = apr_pcalloc(private->pool,sizeof(Tcl_HashSearch));
-        entry = Tcl_FirstHashEntry(private->interps[i]->objCache,searchCtx);    
-        while (entry)
-        {
-            Tcl_DecrRefCount(Tcl_GetHashValue(entry)); /* Let Tcl clear the mem allocated */
-            Tcl_DeleteHashEntry(entry);
-
-            entry = Tcl_NextHashEntry(searchCtx);
-        }
- 
-        if ((i > 0) && rsc->separate_channels) 
-            Rivet_ReleaseRivetChannel(private->interps[i]->interp,private->channel);
-
-        Tcl_DeleteInterp(private->interps[i]->interp);
-
-        /* if separate_virtual_interps == 0 we are running the same interpreter
-         * instance for each vhost, thus we can jump out of this loop after 
-         * the first cycle as the only real intepreter object we have is stored
-         * in private->interps[0]
-         */
-
-    } while ((++i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
-
-    Tcl_DecrRefCount(private->request_init);
-    Tcl_DecrRefCount(private->request_cleanup);
-    apr_pool_destroy(private->pool);
-    
-}
-
 /* ----------------------------------------------------------------------------
  * -- Rivet_SendContent
  *
@@ -766,22 +685,29 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     retval = OK;
 sendcleanup:
 
-    /* Let's set the charset in the headers if one was set in the configuration  */
+    /* Request processing final stage */
 
-    //if (!globals->req->headers_set && (globals->req->charset != NULL)) {
-    //    TclWeb_SetHeaderType (apr_pstrcat(globals->req->req->pool,"text/html;",
-    //                          globals->req->charset,NULL),globals->req);
-    //}
+    /* A new big catch is the handling of exit commands that are treated
+     * as ::rivet::abort_page. After the AbortScript has been evaluated
+     * the exit condition is checked and in case the exit handler
+     * of the bridge module is called before terminating the whole process
+     */
+    
+    if (private->thread_exit)
+    {
+        RIVET_MPM_BRIDGE_CALL(mpm_exit_handler,private->exit_status);
+        Tcl_Exit(private->exit_status);
+    }
 
-    private->req->content_sent  = 0;
-    private->page_aborting      = 0;
-    private->abort_code         = NULL;
-    private->page_aborting      = 0;
+    /* We now reset the status to prepare the child process for another request */
+
+    private->req->content_sent = 0;
     if (private->abort_code != NULL)
     {
         Tcl_DecrRefCount(private->abort_code);
         private->abort_code = NULL;
     }
+    private->page_aborting = 0;
 
     /* We reset this pointer to signal we have terminated the request processing */
 
@@ -836,6 +762,7 @@ Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thr
     /* This shouldn't make the default_error_script go away,
      * because it gets a Tcl_IncrRefCount when it is created.
      */
+
     Tcl_DecrRefCount(errscript);
 
     /* In case we are handling an error occurring after an abort_page call (for
@@ -846,6 +773,48 @@ Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thr
     private->page_aborting = 0;
 
     return result;
+}
+
+/*
+ * -- Rivet_RunAbortScript
+ *
+ * 
+ */
+
+static int
+Rivet_RunAbortScript (rivet_thread_private *private)
+{
+    int retcode = TCL_OK;
+    Tcl_Interp* interp = private->interps[private->running_conf->idx]->interp;
+
+    if (private->running->rivet_abort_script) 
+    {
+
+        /* Ideally an AbortScript should be fail safe, but in case
+         * it fails we give a chance to the subsequent ErrorScript
+         * to catch this error.
+         */
+
+        retcode = Tcl_EvalObjEx(interp,private->running->rivet_abort_script,0);
+
+        if (retcode == TCL_ERROR)
+        {
+            /* This is not elegant, but we want to avoid to print
+             * this error message if an ErrorScript will handle this error.
+             * Thus we print the usual error message only if we are running the
+             * default error handler
+             */
+
+            if (private->running->rivet_error_script == NULL) {
+
+                Rivet_PrintErrorMessage(interp,"<b>Rivet AbortScript failed</b>");
+
+            }
+            Rivet_ExecuteErrorHandler(interp,private->running->rivet_abort_script,private);
+        }
+
+    }
+    return retcode;
 }
 
 
@@ -887,16 +856,10 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
 
     Tcl_Preserve (interp_obj->interp);
 
-    /* before execution we reset the thread_exit flag. It will in case set if
-     * ::rivet::thread_exit gets called
-     */
-
-    private->thread_exit = 0;
     tcl_result = Tcl_EvalObjEx(interp_obj->interp, tcl_script_obj, 0);
     if (tcl_result == TCL_ERROR) {
         Tcl_Obj*    errorCodeListObj;
         Tcl_Obj*    errorCodeElementObj;
-        char*       errorCodeSubString;
 
         /* There was an error, see if it's from Rivet and it was caused
          * by abort_page.
@@ -920,54 +883,27 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
          * a rivet_abort_script is defined, otherwise the page emits 
          * as normal
          */
-        if (strcmp (Tcl_GetString (errorCodeElementObj), "RIVET") == 0) {
+
+        // if (strcmp (Tcl_GetString (errorCodeElementObj), "RIVET") == 0) 
+        if (private->page_aborting)
+        {
+            //char*       errorCodeSubString;
 
             /* dig the second element out of the errorCode list, make sure
              * it succeeds -- it should always
              */
-            ap_assert (Tcl_ListObjIndex (interp_obj->interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
+            //ap_assert (Tcl_ListObjIndex (interp_obj->interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
 
-            errorCodeSubString = Tcl_GetString (errorCodeElementObj);
-            if (strcmp (errorCodeSubString, ABORTPAGE_CODE) == 0) 
-            {
-                if (private->running->rivet_abort_script) 
-                {
-                    Tcl_Interp* interp = interp_obj->interp;
-
-                    /* Ideally an AbortScript should be fail safe, but in case
-                     * it fails we give a chance to the subsequent ErrorScript
-                     * to catch this error.
-                     */
-
-                    if (Tcl_EvalObjEx(interp,private->running->rivet_abort_script,0) == TCL_ERROR)
-                    {
-                        /* This is not elegant, but we want to avoid to print
-                         * this error message if an ErrorScript will handle this error.
-                         * Thus we print the usual error message only if we are running the
-                         * default error handler
-                         */
-
-                        if (private->running->rivet_error_script == NULL) {
-
-                            Rivet_PrintErrorMessage(interp,"<b>Rivet AbortScript failed</b>");
-                        }
-                        Rivet_ExecuteErrorHandler(interp,private->running->rivet_abort_script,private);
-                    }
-                }
-            }
-            else if (strcmp(errorCodeSubString, THREAD_EXIT_CODE) == 0)
-            {
-
-                /* we simply set the thread_exit flag and finish with this 
-                 * request and proceed checking whether an after_every_script 
-                 * is defined 
-                 */
-
-                private->thread_exit = 1;
-            } 
+            //errorCodeSubString = Tcl_GetString (errorCodeElementObj);
+            //if ((strcmp(errorCodeSubString, ABORTPAGE_CODE) == 0) || 
+            //    (strcmp(errorCodeSubString, THREAD_EXIT_CODE) == 0))
+            //
+            //{
+                Rivet_RunAbortScript(private);
+            //}
  
         }
-        else if (!private->page_aborting)
+        else 
         {
             Rivet_ExecuteErrorHandler (interp_obj->interp,tcl_script_obj,private);
         }
@@ -1016,9 +952,6 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
     time_t          ctime;
     time_t          mtime;
     int             res = 0;
-    //rivet_server_conf *rsc;
-
-    //rsc = Rivet_GetConf( private->r );
 
     /* We have to fetch the interpreter data from the thread private environment */
 
@@ -1470,8 +1403,6 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 static int
 Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *server)
 {
-    apr_status_t        aprrv;
-    char                errorbuf[ERRORBUF_SZ];
     char*               mpm_prefork_bridge = "rivet_prefork_mpm.so";
     char*               mpm_worker_bridge  = "rivet_worker_mpm.so";
     char*               mpm_model_path;
@@ -1479,9 +1410,9 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     apr_dso_handle_t*   dso_handle;
 
 #if RIVET_DISPLAY_VERSION
-    ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
+    ap_add_version_component(pPool,RIVET_PACKAGE_NAME"/"RIVET_VERSION);
 #else
-    ap_add_version_component(pPool, RIVET_PACKAGE_NAME);
+    ap_add_version_component(pPool,RIVET_PACKAGE_NAME);
 #endif
 
     /* Everything revolves around this structure */
@@ -1532,8 +1463,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         mpm_model_path = apr_pstrcat(pTemp,RIVET_DIR,"/mpm/",module_globals->rivet_mpm_bridge,NULL);
     } 
 
-    aprrv = apr_dso_load(&dso_handle,mpm_model_path,pPool);
-    if (aprrv == APR_SUCCESS)
+    if (apr_dso_load(&dso_handle,mpm_model_path,pPool) == APR_SUCCESS)
     {
         apr_status_t                rv;
         apr_dso_handle_sym_t        func = NULL;
@@ -1547,6 +1477,8 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         }
         else
         {
+            char errorbuf[ERRORBUF_SZ];
+
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": Error loading symbol bridge_jump_table: %s", 
                          apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
@@ -1558,11 +1490,6 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_request) != NULL);
         ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp) != NULL);
 
-        if (RIVET_MPM_BRIDGE_FUNCTION(mpm_exit_handler) == NULL) {
-            RIVET_MPM_BRIDGE_FUNCTION(mpm_exit_handler) = Rivet_Exit_Handler;
-        }
-
-        apr_atomic_init(pPool);
         apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pPool);
 
     /* Another crucial point: we are storing in the globals a reference to the
@@ -1580,12 +1507,13 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     }
     else
     {
+        char errorbuf[ERRORBUF_SZ];
 
         /* If we don't find the mpm handler module we give up and exit */
 
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME " Error loading MPM manager: %s", 
-                     apr_dso_error(dso_handle,errorbuf,1024));
+                     apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
         exit(1);   
     }
 
@@ -1671,6 +1599,7 @@ static int Rivet_Handler (request_rec *r)
     if (ctype == CTYPE_NOT_HANDLED) {
         return DECLINED;
     }
+
     return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_request))(r,ctype);
 }
 

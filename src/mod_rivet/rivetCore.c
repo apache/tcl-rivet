@@ -1234,6 +1234,11 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
 
     /* this is the first (and supposedly unique) abort_page call during this request */
 
+    /* we eleveta the page_aborting flag to the actual flag controlling the page abort execution. 
+     * We still return the RIVET and ABORTPAGE_CODE, but internally
+     * its page_aborting that will drive the code execution after abort_page
+     */
+
     private->page_aborting = 1;
 
     Tcl_AddErrorInfo (interp, errorMessage);
@@ -1335,6 +1340,8 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
 TCL_CMD_HEADER( Rivet_ExitCmd )
 {
     int value;
+    rivet_thread_private*   private;
+    char* errorMessage = "page generation interrupted by exit command";
 
     if ((objc != 1) && (objc != 2)) {
         Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
@@ -1347,11 +1354,40 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
         return TCL_ERROR;
     }
 
+    THREAD_PRIVATE_DATA(private)
+
+    private->page_aborting = 1;
+    private->abort_code = Tcl_NewDictObj();
+
+    /* The private->abort_code ref count is decremented before 
+     * request processing terminates*/
+
+    Tcl_IncrRefCount(private->abort_code);
+
+    /*
+     * mod_rivet traps call to exit and offers a chance to handle them 
+     * in the way we handle ::rivet::abort_page calls
+     */
+
+    Tcl_DictObjPut(interp,private->abort_code,
+                   Tcl_NewStringObj("error_code",-1),
+                   Tcl_NewStringObj("exit",-1));
+
+    Tcl_DictObjPut(interp,private->abort_code,
+                   Tcl_NewStringObj("return_code",-1),
+                   Tcl_NewIntObj(value));
+
+    private->thread_exit = 1;
+    private->exit_status = value;
+
     /* this call actually could never return for a non-threaded MPM bridge
      * as it eventually will call Tcl_Exit
      */
+    Tcl_AddErrorInfo (interp, errorMessage);
+    Tcl_SetErrorCode (interp, "RIVET", THREAD_EXIT_CODE, errorMessage, (char *)NULL);
 
-    return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_exit_handler))(value);
+    //return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_exit_handler))(value);
+    return TCL_ERROR;
 }
 /*
  *-----------------------------------------------------------------------------
@@ -1383,8 +1419,8 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
         return TCL_ERROR;
     }
 
-    virtual   = Tcl_GetStringFromObj( objv[1], NULL );
-    filename  = TclWeb_GetVirtualFile( private->req, virtual );
+    virtual  = Tcl_GetStringFromObj( objv[1], NULL );
+    filename = TclWeb_GetVirtualFile( private->req, virtual );
 
     Tcl_SetObjResult(interp, Tcl_NewStringObj( filename, -1 ) );
     return TCL_OK;
@@ -1728,7 +1764,7 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd,private);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd,private);
     RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,private);
-    RIVET_OBJ_CMD ("exit_thread",Rivet_ExitCmd,NULL);
+    RIVET_OBJ_CMD ("exit_thread",Rivet_ExitCmd,private);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
@@ -1738,6 +1774,5 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     Tcl_Export(interp,rivet_ns,"*",0);
 #endif
 
-//  return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");
     return TCL_OK;
 }

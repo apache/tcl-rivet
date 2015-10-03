@@ -33,31 +33,31 @@
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
 
-void        Rivet_ProcessorCleanup (void *data);
-int         Rivet_InitCore          (Tcl_Interp *interp,rivet_thread_private* p); 
+int Rivet_InitCore (Tcl_Interp *interp,rivet_thread_private* p); 
 
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
 rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t* pool);
 
-/* */
+/* -- Prefork_MPM_Finalize */
 
-apr_status_t Rivet_MPM_Finalize (void* data)
+apr_status_t Prefork_MPM_Finalize (void* data)
 {
     rivet_thread_private*   private;
     server_rec* s = (server_rec*) data;
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, s, "Running prefork bridge finalize method");
 
-    Rivet_ProcessorCleanup(private);
+    // No, we don't clean up anymore as we are just shutting this process down
+    // Rivet_ProcessorCleanup(private);
 
     apr_threadkey_private_delete (rivet_thread_key);
     return OK;
 }
 
-//int Rivet_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
+//int Prefork_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
 
-void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+void Prefork_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
 
@@ -85,7 +85,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
 #ifdef RIVET_NAMESPACE_IMPORT
     {
-        char*    tcl_import_cmd = "namespace eval :: { namespace eval :: { namespace import -force ::rivet::* }}\n";
+        char* tcl_import_cmd = "namespace eval :: { namespace import -force ::rivet::* }\n";
 
         Tcl_Eval (module_globals->server_interp->interp,tcl_import_cmd);
     }
@@ -104,7 +104,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 }
 
 /*
- * -- Rivet_MPM_Request
+ * -- Prefork_MPM_Request
  *
  *  The prefork implementation of this function is basically a wrapper of
  *  Rivet_SendContent. The real job is fetching the thread private data
@@ -118,7 +118,7 @@ void Rivet_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
  *   HTTP status code (see the Apache HTTP web server documentation)
  */
 
-int Rivet_MPM_Request (request_rec* r,rivet_req_ctype ctype)
+int Prefork_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
     rivet_thread_private*   private;
 
@@ -131,7 +131,7 @@ int Rivet_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     return Rivet_SendContent(private,r);
 }
 
-rivet_thread_interp* Rivet_MPM_MasterInterp(void)
+rivet_thread_interp* Prefork_MPM_MasterInterp(void)
 {
     rivet_thread_private*   private;
 
@@ -143,10 +143,10 @@ rivet_thread_interp* Rivet_MPM_MasterInterp(void)
 
 rivet_bridge_table bridge_jump_table = {
     NULL,
-    Rivet_MPM_ChildInit,
-    Rivet_MPM_Request,
-    Rivet_MPM_Finalize,
-    Rivet_MPM_MasterInterp,
+    Prefork_MPM_ChildInit,
+    Prefork_MPM_Request,
+    Prefork_MPM_Finalize,
+    Prefork_MPM_MasterInterp,
     NULL
 };
 
