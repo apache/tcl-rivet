@@ -1,3 +1,7 @@
+2015-10-14 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/hexgliphs/hexgliphs.tcl: new package HexGliphs
+    to print hexadecimal character gliphs as ascii art
+
 2015-10-04 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet.c: moving Rivet_ProcessorCleanup in 
     mod_rivet_common.c
