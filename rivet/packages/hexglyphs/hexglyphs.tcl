@@ -17,19 +17,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-namespace eval ::HexGliphs:: {
+namespace eval ::HexGlyphs:: {
 
-    variable HEXGLIPH
+    variable HEXGLYPH
 
-    array set HEXGLIPH {}
+    array set HEXGLYPH {}
 
 
     proc build_hex {hs} {
-        variable HEXGLIPH
+        variable HEXGLYPH
 
         for {set i 0} {$i < [string length $hs]} {incr i} {
 
-            set lines [split $HEXGLIPH([string toupper [string index $hs $i]]) "\n"]
+            set lines [split $HEXGLYPH([string toupper [string index $hs $i]]) "\n"]
             set lines [lrange $lines 1 end-1]
 
             set l 0
@@ -49,7 +49,7 @@ namespace eval ::HexGliphs:: {
 
     }
 
-    proc toGliphs {hexstring} {
+    proc toGlyphs {hexstring} {
 
         set hexstring_l [split $hexstring " "]
         foreach s $hexstring_l {
@@ -70,14 +70,14 @@ namespace eval ::HexGliphs:: {
                             [join $bigstring(4) "   "] \
                             [join $bigstring(5) "   "]] "\n"]
     }
-    namespace export toGliphs
+    namespace export toGlyphs
 
 
     namespace ensemble create
 
 }
 
-set ::HexGliphs::HEXGLIPH(A) {
+set ::HexGlyphs::HEXGLYPH(A) {
            
     /\     
    /  \    
@@ -86,7 +86,7 @@ set ::HexGliphs::HEXGLIPH(A) {
 /_/    \_\ 
 }
 
-set ::HexGliphs::HEXGLIPH(B) {
+set ::HexGlyphs::HEXGLYPH(B) {
  ____  
 |  _ \ 
 | |_) |
@@ -95,7 +95,7 @@ set ::HexGliphs::HEXGLIPH(B) {
 |____/ 
 }
 
-set ::HexGliphs::HEXGLIPH(C) {
+set ::HexGlyphs::HEXGLYPH(C) {
   _____ 
  / ____|
 | |     
@@ -104,7 +104,7 @@ set ::HexGliphs::HEXGLIPH(C) {
  \_____|
 }
 
-set ::HexGliphs::HEXGLIPH(D) {
+set ::HexGlyphs::HEXGLYPH(D) {
  _____  
 |  __ \ 
 | |  | |
@@ -113,7 +113,7 @@ set ::HexGliphs::HEXGLIPH(D) {
 |_____/ 
 }
 
-set ::HexGliphs::HEXGLIPH(E) {
+set ::HexGlyphs::HEXGLYPH(E) {
  ______ 
 |  ____|
 | |__   
@@ -122,7 +122,7 @@ set ::HexGliphs::HEXGLIPH(E) {
 |______|
 }
 
-set ::HexGliphs::HEXGLIPH(F) {
+set ::HexGlyphs::HEXGLYPH(F) {
  ______ 
 |  ____|
 | |__   
@@ -131,7 +131,7 @@ set ::HexGliphs::HEXGLIPH(F) {
 |_|     
 }
 
-set ::HexGliphs::HEXGLIPH(0) {
+set ::HexGlyphs::HEXGLYPH(0) {
   ___  
  / _ \ 
 | | | |
@@ -140,7 +140,7 @@ set ::HexGliphs::HEXGLIPH(0) {
  \___/ 
 }
 
-set ::HexGliphs::HEXGLIPH(1) {
+set ::HexGlyphs::HEXGLYPH(1) {
  __ 
 /_ |
  | |
@@ -149,7 +149,7 @@ set ::HexGliphs::HEXGLIPH(1) {
  |_|
 }
 
-set ::HexGliphs::HEXGLIPH(2) {
+set ::HexGlyphs::HEXGLYPH(2) {
  ___  
 |__ \ 
    ) |
@@ -158,7 +158,7 @@ set ::HexGliphs::HEXGLIPH(2) {
 |____|
 }
 
-set ::HexGliphs::HEXGLIPH(3) {
+set ::HexGlyphs::HEXGLYPH(3) {
  ____  
 |___ \ 
   __) |
@@ -167,7 +167,7 @@ set ::HexGliphs::HEXGLIPH(3) {
 |____/ 
 }
 
-set ::HexGliphs::HEXGLIPH(4) {
+set ::HexGlyphs::HEXGLYPH(4) {
  _  _   
 | || |  
 | || |_ 
@@ -176,7 +176,7 @@ set ::HexGliphs::HEXGLIPH(4) {
    |_|  
 }
 
-set ::HexGliphs::HEXGLIPH(5) {
+set ::HexGlyphs::HEXGLYPH(5) {
  _____ 
 | ____|
 | |__  
@@ -185,7 +185,7 @@ set ::HexGliphs::HEXGLIPH(5) {
 |____/ 
 }
 
-set ::HexGliphs::HEXGLIPH(6) {
+set ::HexGlyphs::HEXGLYPH(6) {
    __  
   / /  
  / /_  
@@ -194,7 +194,7 @@ set ::HexGliphs::HEXGLIPH(6) {
  \___/ 
 }
 
-set ::HexGliphs::HEXGLIPH(7) {
+set ::HexGlyphs::HEXGLYPH(7) {
  ______ 
 |____  |
     / / 
@@ -202,7 +202,7 @@ set ::HexGliphs::HEXGLIPH(7) {
   / /   
  /_/    
 }
-set ::HexGliphs::HEXGLIPH(8) {
+set ::HexGlyphs::HEXGLYPH(8) {
   ___  
  / _ \ 
 | (_) |
@@ -211,7 +211,7 @@ set ::HexGliphs::HEXGLIPH(8) {
  \___/ 
 }
 
-set ::HexGliphs::HEXGLIPH(9) {
+set ::HexGlyphs::HEXGLYPH(9) {
   ___  
  / _ \ 
 | (_) |
@@ -221,6 +221,6 @@ set ::HexGliphs::HEXGLIPH(9) {
 }
  
 
-package provide HexGliphs
+package provide HexGlyphs 0.1
 
 
