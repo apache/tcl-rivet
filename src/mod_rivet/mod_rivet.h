@@ -315,4 +315,6 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
     (*module_globals->bridge_jump_table->fun)(__VA_ARGS__);\
 }
 
+#define RIVET_MPM_BRIDGE rivet_bridge_table bridge_jump_table =
+
 #endif /* MOD_RIVET_H */

@@ -141,7 +141,7 @@ rivet_thread_interp* Prefork_MPM_MasterInterp(void)
     return module_globals->server_interp;
 }
 
-rivet_bridge_table bridge_jump_table = {
+RIVET_MPM_BRIDGE {
     NULL,
     Prefork_MPM_ChildInit,
     Prefork_MPM_Request,

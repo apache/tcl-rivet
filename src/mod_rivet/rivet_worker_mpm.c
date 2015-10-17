@@ -732,7 +732,7 @@ int Worker_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
-rivet_bridge_table bridge_jump_table = {
+RIVET_MPM_BRIDGE {
     NULL,
     Worker_MPM_ChildInit,
     Worker_MPM_Request,
