@@ -1,3 +1,11 @@
+2015-10-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: returning HTTP_INTERNAL_SERVER_ERROR
+    to requests coming in during a process shutdown. This is required
+    by the exit command handling
+    * src/mod_rivet/mod_rivet.c: changed some log message calls
+    in order to have ap_log_rerror when an error occurs during
+    a request processing 
+
 2015-10-17 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c,rivet_prefork_mpm.c,mod_rivet.c:
     bridge jump table macro definition

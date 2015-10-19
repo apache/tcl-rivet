@@ -666,11 +666,11 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     /* and finally we run the request_cleanup procedure (always set) */
 
     if (Tcl_EvalObjEx(interp, private->request_cleanup, 0) == TCL_ERROR) {
-        request_rec* r = private->r;
 
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, private->r, 
                      MODNAME ": Error evaluating cleanup request: %s",
                      Tcl_GetVar(interp, "errorInfo", 0));
+
     }
 
     /* We finalize the request processing by printing the headers and flushing
@@ -695,6 +695,8 @@ sendcleanup:
     
     if (private->thread_exit)
     {
+        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, private->r, 
+                                  "process terminating with code %d",private->exit_status);
         RIVET_MPM_BRIDGE_CALL(mpm_exit_handler,private->exit_status);
         Tcl_Exit(private->exit_status);
     }
@@ -1449,19 +1451,22 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     {
 
         /* Execution shouldn't get here as a failure querying about MPM is supposed
-         * to be return APR_SUCCESS in every normal operative conditions. We
+         * to return APR_SUCCESS in every normal operative conditions. We
          * give a default to the MPM bridge anyway
          */
 
         module_globals->rivet_mpm_bridge = apr_pstrdup(pPool,mpm_worker_bridge);
     }
 
-    /* We have the chance to tell mod_rivet through an env variable where the bridge has to be loaded from */
+    /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
+       what bridge custom implementation we want to be loaded */
 
     if (apr_env_get (&mpm_model_path,"RIVET_MPM_BRIDGE",pTemp) != APR_SUCCESS)
     {
         mpm_model_path = apr_pstrcat(pTemp,RIVET_DIR,"/mpm/",module_globals->rivet_mpm_bridge,NULL);
     } 
+
+    /* Finally the bridge is loaded and the jump table sought */
 
     if (apr_dso_load(&dso_handle,mpm_model_path,pPool) == APR_SUCCESS)
     {

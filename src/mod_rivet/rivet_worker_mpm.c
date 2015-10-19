@@ -417,6 +417,8 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 
         }
     }
+
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"Worker bridge supervisor shuts down");
     apr_thread_exit(thd,APR_SUCCESS);
 
     return NULL;
@@ -582,6 +584,12 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 
         return HTTP_INTERNAL_SERVER_ERROR;
 
+    } else if (module_globals->mpm->server_shutdown == 1) {
+
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r, MODNAME ": http request aborted during child process shutdown");
+
+        return HTTP_INTERNAL_SERVER_ERROR;
+
     } else {
 
         /* if the thread is serving its first request we allocate its private data from the thread pool */
@@ -603,7 +611,7 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 
             apr_pool_cleanup_register(tpool,(void *)request_private,Worker_RequestPrivateCleanup,apr_pool_cleanup_null);
 
-            ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, r,  MODNAME ": request thread private data allocated");
+            ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, r, MODNAME ": request thread private data allocated");
 
         }
 
