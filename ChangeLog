@@ -1,3 +1,7 @@
+2015-10-21 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/hexglyphs/hexglyphs.tcl: package to create ASCII art 
+    glyphs of hexadecimal characters
+
 2015-09-09 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: We don't delete the Tcl interpreter anymore,
     we just let the process exit do the cleanup.
