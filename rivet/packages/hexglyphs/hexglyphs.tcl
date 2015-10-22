@@ -17,19 +17,49 @@
 # specific language governing permissions and limitations
 # under the License.
 
+#
+# The ASCII glyphs appearance was taken from Fossil 
+# http://fossil-scm.org/ and reproduced by permission 
+# of Richard Hipp
+# 
+
 namespace eval ::HexGlyphs:: {
 
     variable HEXGLYPH
 
     array set HEXGLYPH {}
 
+    proc glyph {g} {
+        variable HEXGLYPH
+
+        return $HEXGLYPH([string toupper $g])
+    }
+    namespace export glyph
+
+    proc glyph_catalog {} {
+        variable HEXGLYPH
+
+        return [array names HEXGLYPH]
+
+    }
+    namespace export glyph_catalog
 
     proc build_hex {hs} {
         variable HEXGLYPH
 
+        set glyphs_avail [array names HEXGLYPH]
+
+        set hs [string toupper $hs]
         for {set i 0} {$i < [string length $hs]} {incr i} {
 
-            set lines [split $HEXGLYPH([string toupper [string index $hs $i]]) "\n"]
+            set c [string index $hs $i]
+
+            #if {![string is xdigit $c]} 
+            if {[lsearch $glyphs_avail $c] < 0} {
+                return -code error -errocode invalid_char "Invalid non hexadecimal or non space character"
+            }
+
+            set lines [split $HEXGLYPH($c) "\n"]
             set lines [lrange $lines 1 end-1]
 
             set l 0
@@ -51,7 +81,7 @@ namespace eval ::HexGlyphs:: {
 
     proc toGlyphs {hexstring} {
 
-        set hexstring_l [split $hexstring " "]
+        set hexstring_l [split $hexstring " \t"]
         foreach s $hexstring_l {
 
             set s [string trim $s]
@@ -63,18 +93,16 @@ namespace eval ::HexGlyphs:: {
 
         }
 
-        return [join [list  [join $bigstring(0) "   "] \
-                            [join $bigstring(1) "   "] \
-                            [join $bigstring(2) "   "] \
-                            [join $bigstring(3) "   "] \
-                            [join $bigstring(4) "   "] \
-                            [join $bigstring(5) "   "]] "\n"]
+        return [join [list  [join $bigstring(0) "  "] \
+                            [join $bigstring(1) "  "] \
+                            [join $bigstring(2) "  "] \
+                            [join $bigstring(3) "  "] \
+                            [join $bigstring(4) "  "] \
+                            [join $bigstring(5) "  "]] "\n"]
     }
     namespace export toGlyphs
 
-
     namespace ensemble create
-
 }
 
 set ::HexGlyphs::HEXGLYPH(A) {
@@ -129,6 +157,15 @@ set ::HexGlyphs::HEXGLYPH(F) {
 |  __|  
 | |     
 |_|     
+}
+
+set ::HexGlyphs::HEXGLYPH(G) {
+  _____  
+ / ____| 
+| |  __  
+| | |_ \ 
+| |___| |
+ \_____/ 
 }
 
 set ::HexGlyphs::HEXGLYPH(0) {
@@ -220,7 +257,24 @@ set ::HexGlyphs::HEXGLYPH(9) {
   /_/  
 }
  
+set ::HexGlyphs::HEXGLYPH(-) {
+        
+        
+ _____  
+|_____| 
+        
+        
+}
 
+set ::HexGlyphs::HEXGLYPH(:) {
+        
+   __   
+  |__|  
+   __   
+  |__|  
+        
+        
+}
 package provide HexGlyphs 0.1
 
 
