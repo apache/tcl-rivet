@@ -1,3 +1,6 @@
+2015-10-27 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl.in: actually was this file that had to be changed
+
 2015-10-22 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl: now renaming the [exit] core command into ::Rivet::tclcore_exit
     and replacing with a Tcl scripts that calls ::rivet::thread_exit
