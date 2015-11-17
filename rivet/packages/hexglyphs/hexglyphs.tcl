@@ -168,6 +168,178 @@ set ::HexGlyphs::HEXGLYPH(G) {
  \_____/ 
 }
 
+set ::HexGlyphs::HEXGLYPH(H) {
+ _   _  
+| | | | 
+| |_| | 
+|  _  | 
+| | | | 
+|_| |_| 
+}
+
+set ::HexGlyphs::HEXGLYPH(I) {
+ ___ 
+|   |
+ | | 
+ | | 
+ | | 
+|___|
+}
+
+set ::HexGlyphs::HEXGLYPH(J) {
+   ___ 
+  |   |
+   | | 
+ _ | | 
+| || | 
+\____/ 
+}
+
+set ::HexGlyphs::HEXGLYPH(K) {
+ _   _  
+| | / | 
+| |/ /  
+|  <    
+| |\ \  
+|_| \_\ 
+}
+
+set ::HexGlyphs::HEXGLYPH(L) {
+ _      
+| |     
+| |     
+| |     
+| |___  
+|_____| 
+}
+
+set ::HexGlyphs::HEXGLYPH(M) {
+ _    _  
+| \  / | 
+|  \/  | 
+| |  | | 
+| |  | | 
+|_|  |_| 
+}
+
+set ::HexGlyphs::HEXGLYPH(N) {
+ _    _  
+| \  | | 
+|  \ | | 
+| \ \| | 
+| |\   | 
+|_| \__| 
+}
+
+set ::HexGlyphs::HEXGLYPH(O) {
+ _____  
+|  _  | 
+| | | | 
+| | | | 
+| |_| | 
+|_____| 
+}
+
+set ::HexGlyphs::HEXGLYPH(P) {
+ ____   
+|  _ \  
+| |_| | 
+|  __/  
+| |     
+|_|     
+}
+
+set ::HexGlyphs::HEXGLYPH(Q) {
+ _____  
+|  _  | 
+| | | | 
+| |_| | 
+|___\\| 
+     \\ 
+}
+
+set ::HexGlyphs::HEXGLYPH(R) {
+ ____   
+|  _ \  
+| |_| | 
+|    /  
+| |\ \  
+|_| \_\ 
+}
+
+set ::HexGlyphs::HEXGLYPH(S) {
+ ____   
+/  __|  
+| |__   
+\__  \  
+ __|  | 
+|____/  
+}
+
+set ::HexGlyphs::HEXGLYPH(T) {
+ _____  
+|_   _| 
+  | |   
+  | |   
+  | |   
+  |_|   
+}
+
+set ::HexGlyphs::HEXGLYPH(U) {
+ _   _  
+| | | | 
+| | | | 
+| | | | 
+| |_| | 
+ \___/  
+}
+
+set ::HexGlyphs::HEXGLYPH(V) {
+ __     __ 
+ \ \   / / 
+  \ \ / /  
+   \ v /   
+    \ /    
+     v     
+}
+
+set ::HexGlyphs::HEXGLYPH(W) {
+ __      __ 
+ \ \    / / 
+  \ \/\/ /  
+   \    /   
+    \__/    
+            
+}
+
+set ::HexGlyphs::HEXGLYPH(X) {
+ __  __  
+ \ \/ /  
+  \  /   
+  /  \   
+ / /\ \  
+/_/  \_\ 
+}
+
+set ::HexGlyphs::HEXGLYPH(Y) {
+ __    __ 
+ \ \  / / 
+  \ \/ /  
+   \  /   
+   / /    
+  /_/     
+}
+
+set ::HexGlyphs::HEXGLYPH(Z) {
+  ______   
+ |____  |  
+     / /   
+    / /    
+   / /___  
+  /______| 
+}
+
+
 set ::HexGlyphs::HEXGLYPH(0) {
   ___  
  / _ \ 
@@ -258,23 +430,50 @@ set ::HexGlyphs::HEXGLYPH(9) {
 }
  
 set ::HexGlyphs::HEXGLYPH(-) {
-        
-        
- _____  
-|_____| 
-        
-        
+       
+       
+ ____  
+|____| 
+       
+       
+}
+
+set ::HexGlyphs::HEXGLYPH(_) {
+         
+         
+         
+         
+ ______  
+|______| 
 }
 
 set ::HexGlyphs::HEXGLYPH(:) {
-        
-   __   
-  |__|  
-   __   
-  |__|  
-        
-        
+     
+  _  
+ |_| 
+  _  
+ |_| 
+     
 }
+
+set ::HexGlyphs::HEXGLYPH(.) {
+     
+     
+     
+  _  
+ |_| 
+     
+}
+
+set ::HexGlyphs::HEXGLYPH(/) {
+      __ 
+     / / 
+    / /  
+   / /   
+  / /    
+ /_/     
+}
+
 package provide HexGlyphs 0.1
 
 

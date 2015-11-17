@@ -67,7 +67,7 @@ if { $testgroup3 } {
         parsepackage.test
         virtualhost.test
         inspect.test 
-        redirect.test
+        bailout.test
         channel.test
     } {
         puts "Running $Test"

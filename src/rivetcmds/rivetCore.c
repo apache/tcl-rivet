@@ -1,20 +1,22 @@
-/*
- * rivetCore.c - Core commands which are compiled into mod_rivet itself.
- */
+/* rivetCore.c - Core commands which are compiled into mod_rivet itself. */
 
-/* Copyright 2002-2004 The Apache Software Foundation
+/* 
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
 
-        http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License. 
 */
 
 /* $Id$ */
@@ -1214,7 +1216,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
         return TCL_OK;
     }
 
-    /* this is the first (and supposedly unique) abort_page call during this request */
+    /* this is the first (and supposedly unique) abort_page call in a request */
 
     globals->page_aborting = 1;
 
@@ -1549,6 +1551,71 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
     return TCL_OK;
 }
 
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_ExitCmd --
+ *
+ *      The exit_process flag is set and the procedure is interrupted
+ *      setting the abort_page flag to let this condition be handled
+ *      by an AbortScript before the child process exits
+ *
+ * Result:
+ *
+ *      TCL_ERROR 
+ * 
+ * Side Effects:
+ *
+ *      - non threaded MPMs: the child process exits for good
+ *      - threaded MPMs: the logical variable controlling a bridge thread
+ *      is set to zero and the request processing is interrupted
+ *
+ *-----------------------------------------------------------------------------
+ */
+TCL_CMD_HEADER( Rivet_ExitCmd )
+{
+    int value;
+    rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
+
+    if ((objc != 1) && (objc != 2)) {
+        Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
+        return TCL_ERROR;
+    }
+
+    if (objc == 1) {
+        value = 0;
+    } else if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK) {
+        return TCL_ERROR;
+    }
+
+    globals->page_aborting = 1;
+    globals->abort_code = Tcl_NewDictObj();
+
+    /* The private->abort_code ref count is decremented before 
+     * request processing terminates*/
+
+    Tcl_IncrRefCount(globals->abort_code);
+
+    /*
+     * mod_rivet traps call to exit and offers a chance to handle them 
+     * in the way we handle ::rivet::abort_page calls
+     */
+
+    Tcl_DictObjPut(interp,globals->abort_code,
+                   Tcl_NewStringObj("error_code",-1),
+                   Tcl_NewStringObj("exit",-1));
+
+    Tcl_DictObjPut(interp,globals->abort_code,
+                   Tcl_NewStringObj("return_code",-1),
+                   Tcl_NewIntObj(value));
+
+    globals->exit_process = 1;
+    globals->exit_status = value;
+
+    return TCL_ERROR;
+}
+
+
 #define TESTPANIC 0
 
 #ifdef TESTPANIC
@@ -1636,6 +1703,7 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd);
     RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd);
+    RIVET_OBJ_CMD ("exit",Rivet_ExitCmd);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd);

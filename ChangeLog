@@ -1,3 +1,14 @@
+2015-11-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/hexglyphs/hexglyphs.tcl: now printing the whole
+    alphabet and some puntuation character
+    * src/rivetcmd/rivetCore.c: Implementing command exit
+    * src/apache-2/mod_rivet.c: New command ::exit required the flag
+    exit_process be checked to see if a child process must exit and
+    also to treat exit like an ::rivet::abort_page invocation that
+    eventually causes the process to go away. Abort page conditions now 
+    checked through flag abort_page
+    * rivet/init.tcl.in: now reimplementing the core command exit
+
 2015-10-21 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/hexglyphs/hexglyphs.tcl: package to create ASCII art 
     glyphs of hexadecimal characters

@@ -166,6 +166,18 @@ namespace eval ::Rivet {
 
 } ;## namespace eval ::Rivet
 
+## eventually we have to divert Tcl ::exit to ::rivet::exit_thread
+
+rename ::exit ::Rivet::tclcore_exit
+proc ::exit {code} {
+
+    if {[string is integer $code]} {
+        eval ::rivet::exit $code
+    } else {
+        eval ::rivet::exit 0
+    }
+
+}
 
 ## Rivet 2.1.x supports Tcl >= 8.5, therefore there's no more need for
 ## the command incr0, as the functionality of creating a not yet
