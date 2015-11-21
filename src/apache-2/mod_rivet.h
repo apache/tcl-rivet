@@ -158,6 +158,7 @@ Tcl_Obj* Rivet_CurrentServerRec (   Tcl_Interp*         interp, server_rec* s );
 /* error code set by command 'abort_page' */
 
 #define ABORTPAGE_CODE "ABORTPAGE"
+#define EXITPAGE_CODE "EXITPAGE"
 
 #endif /* MOD_RIVET_H */
 

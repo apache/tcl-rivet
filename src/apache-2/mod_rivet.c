@@ -991,7 +991,7 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     rivet_panic_pool       = pPool;
     rivet_panic_server_rec = s;
 
-    rivet_module_globals = apr_palloc(pPool,sizeof(mod_rivet_globals));
+    rivet_module_globals = apr_pcalloc(pPool,sizeof(mod_rivet_globals));
     rivet_module_globals->rsc_p = rsc;
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);

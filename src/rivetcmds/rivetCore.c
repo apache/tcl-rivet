@@ -1193,6 +1193,12 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
             return TCL_OK;
         }
  
+        if (strcmp(cmd_arg,"-exiting") == 0)
+        {
+            Tcl_SetObjResult (interp,Tcl_NewBooleanObj(globals->exit_process));
+            return TCL_OK;
+        }
+
     /* 
      * we assume abort_code to be null, as abort_page shouldn't run twice while
      * processing the same request 
@@ -1574,7 +1580,8 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
  */
 TCL_CMD_HEADER( Rivet_ExitCmd )
 {
-    int value;
+    static char *errorMessage = "Page generation terminated by ::rivet::exit";
+    int         value;
     rivet_interp_globals* globals = Tcl_GetAssocData( interp, "rivet", NULL );
 
     if ((objc != 1) && (objc != 2)) {
@@ -1612,6 +1619,8 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
     globals->exit_process = 1;
     globals->exit_status = value;
 
+    Tcl_AddErrorInfo (interp, errorMessage);
+    Tcl_SetErrorCode (interp, "RIVET", EXITPAGE_CODE, errorMessage, (char *)NULL);
     return TCL_ERROR;
 }
 

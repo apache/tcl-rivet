@@ -1,3 +1,7 @@
+2015-11-21 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivetcmds/rivetCore.c: return EXITPAGECODE when ::rivet::exit
+    is called.Add [::rivet::abort_page -exiting] exit condition detection
+
 2015-11-20 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/catch.tcl: new command [::rivet::catch ...] wraps
     the core command but returns an error anyway if raised by
