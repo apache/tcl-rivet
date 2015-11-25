@@ -954,10 +954,6 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p, int ne
 
     /* Watch out! Calling Tcl_PkgRequire with a version number binds this module to
      * the Rivet package revision number in rivet/init.tcl
-     *
-     * RIVET_TCL_PACKAGE_VERSION is defined by configure.ac as the combination
-     * "MAJOR_VERSION.MINOR_VERSION". We don't expect to change rivet/init.tcl
-     * across patchlevel releases
      */
 
     if (Tcl_PkgRequire(interp, "Rivet", RIVET_TCL_PACKAGE_VERSION, 1) == NULL)

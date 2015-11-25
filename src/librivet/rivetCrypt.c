@@ -148,9 +148,9 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
 #endif /* ! crypt */
 }
 
-
 /*-----------------------------------------------------------------------------
  * Rivet_initCrypt --
+ *
  *   Initialize the encrypt, decrypt and crypt commands in an interpreter.
  *
  *   These routines have been examined and are believed to be safe in a safe
@@ -160,11 +160,28 @@ TCL_CMD_HEADER( Rivet_CryptCmd )
  *   o interp - Interpreter to add commands to.
  *-----------------------------------------------------------------------------
  */
+
+#if RIVET_NAMESPACE_EXPORT == 1
+extern Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp);
+#endif
+
 int
 Rivet_InitCrypt( Tcl_Interp *interp)
 {
     RIVET_OBJ_CMD("encrypt", Rivet_EncryptCmd);
     RIVET_OBJ_CMD("decrypt", Rivet_DecryptCmd);
     RIVET_OBJ_CMD("crypt", Rivet_CryptCmd);
+
+#if RIVET_NAMESPACE_EXPORT == 1
+    {
+        Tcl_Namespace* rivet_ns = Rivet_GetNamespace(interp);
+
+        RIVET_EXPORT_CMD(interp,rivet_ns,"encrypt");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"decrypt");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"crypt");
+        
+    }
+#endif
+
     return TCL_OK;
 }

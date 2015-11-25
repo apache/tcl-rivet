@@ -1,3 +1,16 @@
+2015-11-25 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h: add macro RIVET_EXPORT_COMMAND (wraps Tcl_Export)
+    * src/librivet/rivet[WWW|List|Crypt].c: proper way to put these commands
+    on the export list
+    * src/rivetcmds/rivetCore.c: Commands are now put explicitly on the
+    export list (if build with --enable-rivet-commands-export)
+    * rivet/init.tcl: removed -force switch when importing the ::rivet command
+    set. Rationalization of Tcl commands export list
+    * doc/xml/command.xml: add manual page for ::rivet::exit
+    * tests/bailout.test: add test for bailout commands ::rivet::abort_page
+    and ::rivet::exit
+    * configure.ac: add INIT_VERSION symbol substitution
+
 2015-11-21 Massimo Manghi <mxmanghi@apache.org>
     * src/rivetcmds/rivetCore.c: return EXITPAGECODE when ::rivet::exit
     is called.Add [::rivet::abort_page -exiting] exit condition detection

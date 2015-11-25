@@ -58,8 +58,6 @@ extern char* TclWeb_GetRawPost (TclWebRequest *req);
 
 #define POOL (globals->r->pool)
 
-   
-
 /*
  * -- Rivet_NoRequestRec
  *
@@ -1685,14 +1683,6 @@ TestpanicCmd(dummy, interp, argc, argv)
 int
 Rivet_InitCore( Tcl_Interp *interp )
 {
-#if RIVET_NAMESPACE_EXPORT == 1
-    rivet_interp_globals *globals = NULL;
-    Tcl_Namespace *rivet_ns;
-
-    globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_ns = globals->rivet_ns;
-#endif
-
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL);
     RIVET_OBJ_CMD ("headers",Rivet_Headers);
     RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv);
@@ -1719,7 +1709,34 @@ Rivet_InitCore( Tcl_Interp *interp )
 #endif
 
 #if RIVET_NAMESPACE_EXPORT == 1
-    Tcl_Export(interp,rivet_ns,"*",0);
+    {
+        rivet_interp_globals *globals = NULL;
+        Tcl_Namespace* rivet_ns;
+
+        globals = Tcl_GetAssocData(interp, "rivet", NULL);
+        rivet_ns = globals->rivet_ns;
+
+        RIVET_EXPORT_CMD(interp,rivet_ns,"makeurl");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"headers");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"load_env");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"load_headers");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"var");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"abort_page");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"abort_code");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"virtual_filename");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"apache_table");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"var_qs");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"var_post");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"raw_post");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"upload");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"include");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"parse");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"no_body");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"env");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"apache_log_error");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"inspect");
+    }
+    // ::rivet::exit is not exported
 #endif
 
 //  return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");

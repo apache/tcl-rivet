@@ -40,25 +40,19 @@ namespace eval ::Rivet {
             
             set dir $tclpath
             source [file join $tclpath tclIndex]
-        }
-        
-        set command_list [namespace eval ::rivet_temp {array names auto_index}]
 
-        # commands in 'command_list' are prefixed with ::rivet, so we have to
-        # remove it to build an export list 
-        
-        set export_list {}
-        foreach c $command_list {
-            if {[regexp {::rivet::(.*)} $c m cmd]} {
-                lappend export_list $cmd
-#               namespace eval ::rivet [list namespace export $cmd]
-            }
+            # Rivet Tcl commands not meant to go onto the export list must
+            # be unset from auto_index here
+
+            unset auto_index(::rivet::catch)
         }
+
+        set command_list [namespace eval ::rivet_temp {array names auto_index}]
 
         # we won't left anything behind
         namespace delete ::rivet_temp
 
-        return $export_list
+        return $command_list
     }
 
     ###
@@ -125,7 +119,7 @@ namespace eval ::Rivet {
 
         ## we keep in ::rivet::export_list a list of importable commands
 
-        namespace eval ::rivet [list set export_list [tcl_commands_export_list $tclpath]]
+        namespace eval ::rivet [list set cmd_export_list [tcl_commands_export_list $tclpath]]
         namespace eval ::rivet {
 
         ## init.tcl is run by mod_rivet (which creates the ::rivet namespace) but it gets run
@@ -135,9 +129,18 @@ namespace eval ::Rivet {
             if {[info exists module_conf(export_namespace_commands)] && \
                  $module_conf(export_namespace_commands)} {
 
+                # commands in 'command_list' are prefixed with ::rivet, so we have to
+                # remove it to build an export list 
+                
+                set export_list {}
+                foreach c $cmd_export_list {
+                    lappend export_list [namespace tail $c]
+                }
+
+                #puts stderr "exporting $export_list"
                 eval namespace export $export_list
 
-            } 
+            }
         }
         ## Add the packages directory to the auto_path.
         ## If we have a packages$tcl_version directory
@@ -166,7 +169,7 @@ namespace eval ::Rivet {
 
 } ;## namespace eval ::Rivet
 
-## eventually we have to divert Tcl ::exit to ::rivet::exit_thread
+## eventually we have to divert Tcl ::exit to ::rivet::exit
 
 rename ::exit ::Rivet::tclcore_exit
 proc ::exit {code} {
@@ -191,15 +194,15 @@ interp alias {} ::incr0 {} incr
 ::Rivet::init
 
 ## And now we get to the import of the whole ::rivet namespace. 
-## Some commands (namely lassign) replace the native lassign command
-## so we have to  use the -force switch
 
 # Do we actually want to import everything? If Rivet was configured
 # to import the ::rivet namespace for compatibility we do it right away.
 # This option is not guaranteed to be supported in future versions.
 
 if {[info exists module_conf(import_rivet_commands)] && $module_conf(import_rivet_commands)} {
-    namespace eval :: { namespace import -force ::rivet::* }
+
+    namespace eval :: { namespace import ::rivet::* }
+
 }
 
 array unset module_conf

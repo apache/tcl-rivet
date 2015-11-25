@@ -11,7 +11,6 @@
         RivetServerConf AbortScript "set tmpfp \[open redirect_code.txt w+\]"
         RivetServerConf AbortScript "puts \$tmpfp \[::rivet::abort_code\]"
         RivetServerConf AbortScript "close \$tmpfp"
-        #RivetServerConf AbortScript "touch /tmp/aaaaaa"
     } {
         set url "${urlbase}redirect.rvt?base=$urlbase"
         #puts $url
@@ -30,7 +29,8 @@
     apachetest::start {} {
         RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching exit\\\""
         RivetServerConf AbortScript "set abcode \[::rivet::abort_code\]"
-        RivetServerConf AbortScript "puts -nonewline \\\"\[dict get \$abcode error_code\] \[dict get \$abcode return_code\]\\\""
+        RivetServerConf AbortScript "puts -nonewline \[::rivet::abort_page -exiting\]"
+        RivetServerConf AbortScript "puts -nonewline \\\" \[dict get \$abcode error_code\] \[dict get \$abcode return_code\]\\\""
     } {
         puts "test exit command"
         set url "${urlbase}exit.tcl"
@@ -39,5 +39,7 @@
         ::http::cleanup $page
     }
     set r
-} {exit 100}
+} {1 exit 100} 
+
+
 
