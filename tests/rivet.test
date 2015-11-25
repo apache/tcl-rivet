@@ -66,7 +66,7 @@ set group3 {
         parsepackage.test
         virtualhost.test
         inspect.test 
-        redirect.test
+        bailout.test
         channel.test
     }
 

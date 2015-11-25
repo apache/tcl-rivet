@@ -5,7 +5,7 @@
 
 # $Id: $
 
-::tcltest::test redirect-1.1 {redirect command} {
+::tcltest::test bailout-1.1 {redirect command} {
     apachetest::start {} {
         RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching redirect\\\""
         RivetServerConf AbortScript "set tmpfp \[open redirect_code.txt w+\]"
@@ -24,3 +24,22 @@
     } 
     list $r1 $r2
 } {1 1}
+
+::tcltest::test bailout-1.2 {exit command} {
+    apachetest::start {} {
+        RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching exit\\\""
+        RivetServerConf AbortScript "set abcode \[::rivet::abort_code\]"
+        RivetServerConf AbortScript "puts -nonewline \[::rivet::abort_page -exiting\]"
+        RivetServerConf AbortScript "puts -nonewline \\\" \[dict get \$abcode error_code\] \[dict get \$abcode return_code\]\\\""
+    } {
+        puts "test exit command"
+        set url "${urlbase}exit.tcl"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r
+} {1 exit 100} 
+
+
+

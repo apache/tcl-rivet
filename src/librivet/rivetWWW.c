@@ -351,6 +351,10 @@ TCL_CMD_HEADER( Rivet_EscapeShellCommandCmd )
  *-----------------------------------------------------------------------------
  */
 
+#if RIVET_NAMESPACE_EXPORT == 1
+extern Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp);
+#endif
+
 int 
 Rivet_InitWWW( Tcl_Interp *interp)
 {
@@ -358,5 +362,16 @@ Rivet_InitWWW( Tcl_Interp *interp)
     RIVET_OBJ_CMD ("escape_string",Rivet_EscapeStringCmd,NULL);
     RIVET_OBJ_CMD ("escape_sgml_chars",Rivet_EscapeSgmlCharsCmd,NULL);
     RIVET_OBJ_CMD ("escape_shell_command",Rivet_EscapeShellCommandCmd,NULL);
+
+#if RIVET_NAMESPACE_EXPORT == 1
+    {
+        Tcl_Namespace* rivet_ns = Rivet_GetNamespace(interp);
+
+        RIVET_EXPORT_CMD(interp,rivet_ns,"unescape_string");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"escape_string");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"escape_sgml_chars");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"escape_shell_command");
+    }
+#endif
     return TCL_OK;
 }

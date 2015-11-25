@@ -569,6 +569,56 @@
 	    </refsect1>
 	</refentry>
 
+		<refentry id="exit">
+		<refnamediv>
+			<refname>exit</refname>
+			<refpurpose>terminate execution and child process</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+				<command>::rivet::exit</command>
+				<arg>code</arg>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<title>Description</title>
+			<para>
+				Replaces Tcl's <command>exit</command> core command. <command>::rivet::exit</command>
+				interrupts execution of the current script and passes execution to AbortScript if
+				such script is set. After AbortScript has finished and request processing completed
+				the child process is forced to exit by calling Tcl_Exit producing the same final
+				effect of the core command. During an <command>AbortScript</command> execution the
+				exit condition can be detected
+				<programlisting>if {[<command>::rivet::abort_page -exiting</command>]} {
+...handle exit condition
+}</programlisting>
+			</para>
+			<para>
+				<command>::rivet::exit</command> has a single optional argument <arg>code</arg>. This 
+				value must be a positive integer number to be passed to Tcl_Exit. If any other value is
+				given <arg>code</arg> is set to 0. The exit code can be obtained from the dictionary
+				returned by <command>::rivet::abort_code</command>
+			</para>
+			<programlisting>[::rivet::abort_code]
+&lt;== return_code <arg>code</arg> error_code exit</programlisting>
+			<para>
+				We support this command in order to have a gentle way to terminate a request processing
+				before actually exit the child process and avoid an abrupt interruption of a request that
+				might leave an application in a inconsistent state. In some cases <command>::rivet::exit</command>
+				could be the only way to exit a process and force the Apache HTTP web server to start
+				a fresh one. Moreover the core <command>exit</command> could be called from third parties
+				software and you may not be aware of it. We thus decided to trap this command and give it 
+				the most gentle behavior still preserving the its basic purpose.
+			</para>
+			<note>
+				Nonetheless we discourage the programmer to use such command, and suggest to focus on proper
+				application design and avoid such a drastic way to bail out. 
+				If you need to restart the child processes from time to time we recommend to check the 
+				MaxRequests parameter in the 
+				<ulink url="https://httpd.apache.org/docs/2.4/mod/prefork.html">prefork MPM documentation</ulink>
+			</note>
+		</refsect1>
+	</refentry>	
 	
 	<refentry id="headers">
 	    <refnamediv>

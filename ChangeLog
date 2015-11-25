@@ -1,3 +1,14 @@
+2015-11-25 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h: defined RIVET_CMD_EXPORT as wrapper to Tcl_Export
+    * tests/bailout.test: redirect.test renamed as bailout.test. It's meant
+    to gather all the tests concerning exceptions like abort_page and ::rivet::exit
+    * src/librivet/rivet[Crypt|WWW|List].c: command export mechanism changed
+    as we are now explicitly exporting commands
+    * rivet/rivet-tcl/catch.tcl: new (non-exported) command ::rivet::catch
+    * rivet/init.tcl[.in]: command export mechanics changed
+    * src/mod_rivet/rivetCore.c: command export made explicit through RIVET_CMD_EXPORT.
+    Abort page command now handling also [::rivet::abort_page -exiting] test
+
 2015-10-27 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: actually was this file that had to be changed
 

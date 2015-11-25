@@ -500,31 +500,31 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
     varValue = (listIdx < listObjc) ?
         listObjv[listIdx] : Tcl_NewStringObj("", -1);
 
-    if( Tcl_ObjSetVar2( interp, objv[2], objv[idx],
-                varValue, TCL_LEAVE_ERR_MSG ) == NULL ) {
-        return TCL_ERROR;
+    if (Tcl_ObjSetVar2( interp, objv[2], objv[idx],
+                varValue, TCL_LEAVE_ERR_MSG ) == NULL) {
+            return TCL_ERROR;
         }
     }
 
     /* We have some left over items.  Return them in a list. */
     if( listIdx < listObjc ) {
-    Tcl_Obj *list = Tcl_NewListObj( 0, NULL );
-    int i;
+        Tcl_Obj *list = Tcl_NewListObj( 0, NULL );
+        int i;
 
-    for( i = listIdx; i < listObjc; ++i )
-    {
-        if (Tcl_ListObjAppendElement(interp, list, listObjv[i]) != TCL_OK) {
-        return TCL_ERROR;
+        for( i = listIdx; i < listObjc; ++i )
+        {
+            if (Tcl_ListObjAppendElement(interp, list, listObjv[i]) != TCL_OK) {
+            return TCL_ERROR;
+            }
         }
-    }
-    Tcl_SetObjResult( interp, list );
+        Tcl_SetObjResult( interp, list );
     }
     return TCL_OK;
 }
 
-
 /*-----------------------------------------------------------------------------
  * Rivet_initList --
+ *
  *   Initialize the list commands in an interpreter.
  *
  *   These routines have been examined and are believed to be safe in a safe
@@ -537,6 +537,10 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
  *-----------------------------------------------------------------------------
  */
 
+#if RIVET_NAMESPACE_EXPORT == 1
+extern Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp);
+#endif
+
 int 
 Rivet_InitList( Tcl_Interp *interp)
 {
@@ -544,6 +548,16 @@ Rivet_InitList( Tcl_Interp *interp)
     RIVET_OBJ_CMD("comma_split",Rivet_CommaSplitObjCmd,NULL);
     RIVET_OBJ_CMD("comma_join",Rivet_CommaJoinObjCmd,NULL);
     RIVET_OBJ_CMD("lassign_array",Rivet_LassignArrayObjCmd,NULL);
+
+#if RIVET_NAMESPACE_EXPORT == 1
+    {
+        Tcl_Namespace* rivet_ns = Rivet_GetNamespace(interp);
+        RIVET_EXPORT_CMD(interp,rivet_ns,"lremove");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"comma_split");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"comma_join");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"lassign_array");
+    }
+#endif
 
     return TCL_OK;
 }

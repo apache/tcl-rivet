@@ -1208,6 +1208,12 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
             Tcl_SetObjResult (interp,Tcl_NewBooleanObj(private->page_aborting));
             return TCL_OK;
         }
+
+        if (strcmp(cmd_arg,"-exiting") == 0)
+        {
+            Tcl_SetObjResult (interp,Tcl_NewBooleanObj(private->thread_exit));
+            return TCL_OK;
+        }
  
     /* 
      * we assume abort_code to be null, as abort_page shouldn't run twice while
@@ -1324,15 +1330,13 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
  *
  * Result:
  *
- *      TCL_ERROR when running a threaded MPM, it should never return
- *      if a non threaded MPM is run, because Tcl_Exit will be called
- *      by the MPM specific function of the corresponding bridge
+ *      TCL_ERROR 
  * 
  * Side Effects:
  *
  *      - non threaded MPMs: the child process exits for good
- *      - threaded MPMs: the logical variable controlling a bridge thread
- *      is set to zero and the request processing is interrupted
+ *      - threaded MPMs: the child process exits after all Tcl threads
+ *      are told to exit
  *
  *-----------------------------------------------------------------------------
  */
@@ -1386,7 +1390,6 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
     Tcl_AddErrorInfo (interp, errorMessage);
     Tcl_SetErrorCode (interp, "RIVET", THREAD_EXIT_CODE, errorMessage, (char *)NULL);
 
-    //return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_exit_handler))(value);
     return TCL_ERROR;
 }
 /*
@@ -1738,11 +1741,6 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 {
 
 #if RIVET_NAMESPACE_EXPORT == 1
-    rivet_interp_globals *globals = NULL;
-    Tcl_Namespace *rivet_ns;
-
-    globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_ns = globals->rivet_ns;
 #endif
 
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,private);
@@ -1764,14 +1762,42 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd,private);
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd,private);
     RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,private);
-    RIVET_OBJ_CMD ("exit_thread",Rivet_ExitCmd,private);
+    RIVET_OBJ_CMD ("exit",Rivet_ExitCmd,private);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
 #endif
 
 #if RIVET_NAMESPACE_EXPORT == 1
-    Tcl_Export(interp,rivet_ns,"*",0);
+    {
+        rivet_interp_globals *globals = NULL;
+        Tcl_Namespace *rivet_ns;
+
+        globals = Tcl_GetAssocData(interp, "rivet", NULL);
+        rivet_ns = globals->rivet_ns;
+
+        RIVET_EXPORT_CMD(interp,rivet_ns,"makeurl");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"headers");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"load_env");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"load_headers");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"var");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"abort_page");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"abort_code");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"virtual_filename");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"apache_table");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"var_qs");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"var_post");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"raw_post");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"upload");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"include");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"parse");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"no_body");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"env");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"apache_log_error");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"inspect");
+        // ::rivet::exit is not exported
+        //Tcl_Export(interp,rivet_ns,"*",0);
+    }
 #endif
 
     return TCL_OK;
