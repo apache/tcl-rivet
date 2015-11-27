@@ -392,44 +392,6 @@ Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_int
     return result;
 }
 
-/*
- * -- Rivet_RunAbortScript
- *
- * 
- */
-
-static int
-Rivet_RunAbortScript (Tcl_Interp* interp,rivet_server_conf* conf,rivet_interp_globals* globals)
-{
-    int retcode = TCL_OK;
-
-    if (conf->rivet_abort_script) 
-    {
-
-        /* Ideally an AbortScript should be fail safe, but in case
-         * it fails we give a chance to the subsequent ErrorScript
-         * to catch this error.
-         */
-
-        retcode = Tcl_EvalObjEx(interp,conf->rivet_abort_script,0);
-        if (retcode == TCL_ERROR)
-        {
-            /* This is not elegant, but we want to avoid to print
-             * this error message if an ErrorScript will handle this error.
-             * Thus we print the usual error message only if we are running the
-             * default error handler
-             */
-
-            if (conf->rivet_error_script == NULL) 
-            {
-                Rivet_PrintErrorMessage(interp,"<b>Rivet AbortScript failed</b>");
-            }
-            Rivet_ExecuteErrorHandler(interp,conf->rivet_abort_script,globals);
-        }
-
-    }
-    return retcode;
-}
 
 /* -- Rivet_ExecuteAndCheck
  * 
@@ -468,18 +430,21 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
     Tcl_Preserve (interp);
     result = Tcl_EvalObjEx(interp, tcl_script_obj, 0);
 
-    if (result == TCL_ERROR) 
-    {
+    if (result == TCL_ERROR) {
+
         Tcl_Obj*    errorCodeListObj;
         Tcl_Obj*    errorCodeElementObj;
+        char*       errorCodeSubString;
 
         /* There was an error, see if it's from Rivet and it was caused
          * by abort_page.
          */
+
         errorCodeListObj = Tcl_GetVar2Ex (interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
 
         /* errorCode is guaranteed to be set to NONE, but let's make sure
-         * anyway rather than causing a SIGSEGV */
+         * anyway rather than causing a SIGSEGV
+         */
         ap_assert (errorCodeListObj != (Tcl_Obj *)NULL);
 
         /* dig the first element out of the errorCode list and see if it
@@ -491,15 +456,50 @@ Rivet_ExecuteAndCheck(Tcl_Interp *interp, Tcl_Obj *tcl_script_obj, request_rec *
          * if so, don't treat it as an error, i.e. don't execute the
          * installed error handler or the default one, just check if
          * a rivet_abort_script is defined, otherwise the page emits 
-         * as normal */
-        if (globals->page_aborting) 
-        {
-            Rivet_RunAbortScript(interp,conf,globals);
+         * as normal
+         */
+        if (strcmp (Tcl_GetString (errorCodeElementObj), "RIVET") == 0) {
+
+            /* dig the second element out of the errorCode list, make sure
+             * it succeeds -- it should always
+             */
+            ap_assert (Tcl_ListObjIndex (interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
+
+            errorCodeSubString = Tcl_GetString (errorCodeElementObj);
+            if (strcmp (errorCodeSubString, ABORTPAGE_CODE) == 0) 
+            {
+                if (conf->rivet_abort_script) 
+                {
+
+                    /* Ideally an AbortScript should be fail safe, but in case
+                     * it fails we give a chance to the subsequent ErrorScript
+                     * to catch this error.
+                     */
+
+                    if (Tcl_EvalObjEx(interp,conf->rivet_abort_script,0) == TCL_ERROR)
+                    {
+
+                        /* This is not elegant, but we want to avoid to print
+                         * the default AbortScript error message if a custom ErrorScript 
+                         * will handle this error and in case print its own error message.
+                         */
+
+                        if (conf->rivet_error_script == NULL) 
+                        {
+                            Rivet_PrintErrorMessage(interp,"<b>Rivet AbortScript failed</b>");
+                        }
+                        Rivet_ExecuteErrorHandler(interp,conf->rivet_abort_script,globals);
+
+                    }
+                }
+            }
         }
-        else 
+        else if (!globals->page_aborting)
         {
             /* Invoke Rivet error handler */
+
             Rivet_ExecuteErrorHandler(interp,tcl_script_obj,globals);
+
         }
     }
     
@@ -954,6 +954,10 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p, int ne
 
     /* Watch out! Calling Tcl_PkgRequire with a version number binds this module to
      * the Rivet package revision number in rivet/init.tcl
+     *
+     * RIVET_TCL_PACKAGE_VERSION is defined by configure.ac as the combination
+     * "MAJOR_VERSION.MINOR_VERSION". We don't expect to change rivet/init.tcl
+     * across patchlevel releases
      */
 
     if (Tcl_PkgRequire(interp, "Rivet", RIVET_TCL_PACKAGE_VERSION, 1) == NULL)
@@ -987,7 +991,7 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     rivet_panic_pool       = pPool;
     rivet_panic_server_rec = s;
 
-    rivet_module_globals = apr_pcalloc(pPool,sizeof(mod_rivet_globals));
+    rivet_module_globals = apr_palloc(pPool,sizeof(mod_rivet_globals));
     rivet_module_globals->rsc_p = rsc;
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool, RIVET_PACKAGE_NAME"/"RIVET_VERSION);
@@ -1485,14 +1489,9 @@ Rivet_SendContent(request_rec *r)
     r->allowed |= (1 << M_POST);
     r->allowed |= (1 << M_PUT);
     r->allowed |= (1 << M_DELETE);
-    if (r->method_number != M_GET && 
-        r->method_number != M_POST && 
-        r->method_number != M_PUT && 
-        r->method_number != M_DELETE) {
-
+    if (r->method_number != M_GET && r->method_number != M_POST && r->method_number != M_PUT && r->method_number != M_DELETE) {
         retval = DECLINED;
         goto sendcleanup;
-
     }
 
     if (r->finfo.filetype == 0)
@@ -1650,13 +1649,6 @@ Rivet_SendContent(request_rec *r)
 
     retval = OK;
 sendcleanup:
-
-    if (globals->exit_process)
-    {
-        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, r, 
-                                  "process terminating with code %d",globals->exit_status);
-        Tcl_Exit(globals->exit_status);
-    }
 
     /* Everything is done and we flush the rivet channel before resetting the status */
 

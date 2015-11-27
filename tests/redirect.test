@@ -5,12 +5,13 @@
 
 # $Id: $
 
-::tcltest::test bailout-1.1 {redirect command} {
+::tcltest::test redirect-1.1 {redirect command} {
     apachetest::start {} {
         RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching redirect\\\""
         RivetServerConf AbortScript "set tmpfp \[open redirect_code.txt w+\]"
         RivetServerConf AbortScript "puts \$tmpfp \[::rivet::abort_code\]"
         RivetServerConf AbortScript "close \$tmpfp"
+        RivetServerConf AbortScript "touch /tmp/aaaaaa"
     } {
         set url "${urlbase}redirect.rvt?base=$urlbase"
         #puts $url

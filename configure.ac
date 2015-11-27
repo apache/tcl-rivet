@@ -791,7 +791,6 @@ VERSION=${PACKAGE_VERSION}
 AX_SPLIT_VERSION
 AC_DEFINE_UNQUOTED(TCL_PACKAGE_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}",[Rivet Tcl package version])
 AC_MSG_NOTICE([Rivet package version is ${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}])
-AC_SUBST(INIT_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}")
 
 if test $import_rivet_commands = "yes"; then
     AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])
@@ -819,7 +818,7 @@ AC_SUBST(TCL_PACKAGE_PATH)
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting the AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile src/Makefile src/parser/Makefile doc/Makefile doc/convert_examples.tcl rivet/init.tcl])
+AC_CONFIG_FILES([Makefile src/Makefile rivet/init.tcl src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
 
 #case $apache_version_dir in
 #    apache-1) AC_CONFIG_FILES([Makefile src/Makefile src/apache-1/Makefile doc/Makefile]) ;;

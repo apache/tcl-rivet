@@ -28,4 +28,3 @@ set auto_index(::rivet::load_cookies) [list source [file join $dir load_cookies.
 set auto_index(::rivet::http_accept) [list source [file join $dir http_accept.tcl]]
 set auto_index(::rivet::xml) [list source [file join $dir xml.tcl]]
 set auto_index(::rivet::redirect) [list source [file join $dir redirect.tcl]]
-set auto_index(::rivet::catch) [list source [file join $dir catch.tcl]]

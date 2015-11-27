@@ -522,9 +522,9 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
     return TCL_OK;
 }
 
+
 /*-----------------------------------------------------------------------------
  * Rivet_initList --
- *
  *   Initialize the list commands in an interpreter.
  *
  *   These routines have been examined and are believed to be safe in a safe
@@ -537,10 +537,6 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
  *-----------------------------------------------------------------------------
  */
 
-#if RIVET_NAMESPACE_EXPORT == 1
-extern Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp);
-#endif
-
 int 
 Rivet_InitList( Tcl_Interp *interp)
 {
@@ -548,14 +544,6 @@ Rivet_InitList( Tcl_Interp *interp)
     RIVET_OBJ_CMD("comma_split",Rivet_CommaSplitObjCmd);
     RIVET_OBJ_CMD("comma_join",Rivet_CommaJoinObjCmd);
     RIVET_OBJ_CMD("lassign_array",Rivet_LassignArrayObjCmd);
-#if RIVET_NAMESPACE_EXPORT == 1
-    {
-        Tcl_Namespace* rivet_ns = Rivet_GetNamespace(interp);
-        RIVET_EXPORT_CMD(interp,rivet_ns,"lremove");
-        RIVET_EXPORT_CMD(interp,rivet_ns,"comma_split");
-        RIVET_EXPORT_CMD(interp,rivet_ns,"comma_join");
-        RIVET_EXPORT_CMD(interp,rivet_ns,"lassign_array");
-    }
-#endif
+
     return TCL_OK;
 }

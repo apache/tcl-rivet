@@ -54,10 +54,6 @@ Tcl_CreateObjCommand( interp, /* Tcl interpreter */\
 		      NULL,   /* Client Data */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); 
 
-#define RIVET_EXPORT_CMD(interp,ns,cmdname) Tcl_Export(interp,ns,cmdname,0);
-
-//Tcl_ListObjAppendElement(interp,export_l,Tcl_NewStringObj(RIVET_NS "::" cmdname,-1));
-
 /* 
  * Pointer in r is checked and in case Rivet_NoRequestRec is
  * called returning TCL_ERROR. This macro is used (and often

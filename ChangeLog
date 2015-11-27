@@ -1,39 +1,6 @@
-2015-11-25 Massimo Manghi <mxmanghi@apache.org>
-    * src/rivet.h: add macro RIVET_EXPORT_COMMAND (wraps Tcl_Export)
-    * src/librivet/rivet[WWW|List|Crypt].c: proper way to put these commands
-    on the export list
-    * src/rivetcmds/rivetCore.c: Commands are now put explicitly on the
-    export list (if build with --enable-rivet-commands-export)
-    * rivet/init.tcl: removed -force switch when importing the ::rivet command
-    set. Rationalization of Tcl commands export list
-    * doc/xml/command.xml: add manual page for ::rivet::exit
-    * tests/bailout.test: add test for bailout commands ::rivet::abort_page
-    and ::rivet::exit
-    * configure.ac: add INIT_VERSION symbol substitution
-
-2015-11-21 Massimo Manghi <mxmanghi@apache.org>
-    * src/rivetcmds/rivetCore.c: return EXITPAGECODE when ::rivet::exit
-    is called.Add [::rivet::abort_page -exiting] exit condition detection
-
-2015-11-20 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/rivet-tcl/catch.tcl: new command [::rivet::catch ...] wraps
-    the core command but returns an error anyway if raised by
-    either [::rivet::abort_page] or [::rivet::exit]
-
-2015-11-18 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/hexglyphs/hexglyphs.tcl: now printing the whole
-    alphabet and some puntuation character
-    * src/rivetcmd/rivetCore.c: Implementing command exit
-    * src/apache-2/mod_rivet.c: New command ::exit required the flag
-    exit_process be checked to see if a child process must exit and
-    also to treat exit like an ::rivet::abort_page invocation that
-    eventually causes the process to go away. Abort page conditions now 
-    checked through flag abort_page
-    * rivet/init.tcl.in: now reimplementing the core command exit
-
-2015-10-21 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/hexglyphs/hexglyphs.tcl: package to create ASCII art 
-    glyphs of hexadecimal characters
+2015-11-27 Massimo Manghi <mxmanghi@apache.org>
+    * 2.2: bringing this brack back to r1702115. Changes done after Sept 9 2015
+    are now in branches/2.3
 
 2015-09-09 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: We don't delete the Tcl interpreter anymore,
