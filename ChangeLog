@@ -1,3 +1,6 @@
+2015-11-27 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION,configure.ac: version number increased to 2.3.0
+
 2015-11-25 Massimo Manghi <mxmanghi@apache.org>
     * src/rivet.h: add macro RIVET_EXPORT_COMMAND (wraps Tcl_Export)
     * src/librivet/rivet[WWW|List|Crypt].c: proper way to put these commands
