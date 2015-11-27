@@ -1,0 +1,25 @@
+# redirect.test -- test redirect command.
+#
+# redirect must trigger an AbortScript and have
+# predictable data stored in the abort code
+
+# $Id: $
+
+::tcltest::test bailout-1.1 {redirect command} {
+    apachetest::start {} {
+        RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching redirect\\\""
+        RivetServerConf AbortScript "set tmpfp \[open redirect_code.txt w+\]"
+        RivetServerConf AbortScript "puts \$tmpfp \[::rivet::abort_code\]"
+        RivetServerConf AbortScript "close \$tmpfp"
+    } {
+        set url "${urlbase}redirect.rvt?base=$urlbase"
+        #puts $url
+        catch {set page1 [::http::geturl $url]}
+        puts "verifying abort code"
+        set rdfp [open redirect_code.txt r]
+        set redirect_code [dict create {*}[read $rdfp]]
+        set r1 [dict exists $redirect_code location]
+        set r2 [dict exists $redirect_code error_code]
+    } 
+    list $r1 $r2
+} {1 1}
