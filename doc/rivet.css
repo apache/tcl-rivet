@@ -30,14 +30,14 @@ PRE.PROGRAMLISTING
         font-family: monospace;
         white-space: pre;
         width:  95%;
-        background-color: #eeffee;
+        background-color: #ffeeee;
         border: solid;
         color:  #000000;
-        border-color: #009999;
-        border-left: solid #009999 1px;
-        border-right: solid #009999 1px;
-        border-top: solid #009999 1px;
-        border-bottom: solid #009999 1px;
+        border-color: #990099;
+        border-left: solid #990099 1px;
+        border-right: solid #990099 1px;
+        border-top: solid #990099 1px;
+        border-bottom: solid #990099 1px;
         font-size:  normal;
         padding-top:    1em;
         padding-left:   1em;
@@ -81,9 +81,9 @@ H2
 {       
         COLOR: #ffffff ;
         font-style: italic;
-        BACKGROUND-color: #a0d0a0;
-        BORDER: solid 3px #609060;
-        PADDING: 5px
+        BACKGROUND-color: #d0a0a0;
+        BORDER: solid 3px #906060;
+        PADDING: 0.5em;
 }
 
 TABLE.IMPORTANT
@@ -262,11 +262,11 @@ P.C2 {
 
 DIV.NAVFOOTER {
         color: #000000;
-        background-color: #DFFFDF;
+        background-color: #FFDFDF;
         padding: 5px;
         margin-top: 10px;
         width: 100%;
-        border: thin solid #a0a0d0;
+        border: 2px solid #d0a0a0;
 }
 
 DIV.NUKEFOOTER {
@@ -280,11 +280,11 @@ DIV.NUKEFOOTER {
 
 DIV.NAVHEADER {
         color: #000000;
-        background-color: #DFFFDF;
+        background-color: #FFDFDF;
         padding: 5px;
         margin-bottom: 10px;
         width: 100%;
-        border: thin solid #a0a0d0;
+        border: 2px solid #d0a0a0;
 }
 
 DIV.SECT1,DIV.SECT2,DIV.SECT3 {
@@ -296,7 +296,7 @@ DIV.EXAMPLE,DIV.TOC {
         padding-left: 10px;
         padding-right: 10px;
         color: #000000;
-        background-color: #E8FFE8;
+        background-color: #FFE8E8;
 }
 DIV.EXAMPLE {
         border: thin dotted #22AA22;

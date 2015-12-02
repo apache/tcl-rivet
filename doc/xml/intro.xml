@@ -29,22 +29,27 @@
     <simplesect>
         <title>Acknowledgements</title>
         <para>
-        		Rivet 2.2 development took advantage from contributions from 
-        		several users who provided whole new componenents, bug fixes and 
-        		enhancements.
+        		Rivet 2.3 introduces 2 new commands <command>::rivet::exit</command>
+        		and <command>::rivet::catch</command>
         </para>
         <itemizedlist>
-    			<listitem><emphasis>Damon Courtney</emphasis> (Apache Tcl Team member,
-    			he originally wrote mod_rivet) contributed with the new
-    			<command>::rivet::redirect</command> command.</listitem>
+    			<listitem>
+    				<command>::rivet::exit</command> was introduced to help mod_rivet to
+    				give the command <command>exit</command> a more sensible behavior within
+    				the context of the Apache HTTP Web Server. In fact the core command has
+    				become an alias of <command>::rivet::exit</command> which interrupts the 
+    				script execution and hands control to any <command>AbortScript</command>, 
+    				completes the request and just before returning to the web server framework terminates 
+    				the child process by calling <command>Tcl_Exit</command>
+    			</listitem>
          	<listitem>
-         		<emphasis>Harald Oehlmann</emphasis> (now member of the Apache Tcl Team) 
-         		who wrote package RivetEntitites, command ::rivet::http_accept and filed
-         		several bug reports with relative patches
+         		Since <command>::rivet::abort_page</command> and <command>::rivet::exit</command>
+         		interrupt the execution returning a <emphasis>TCL_ERROR</emphasis> code any <command>catch</command>
+         		could trap them and AbortScript could be executed only by throwing the error again. We introduced
+         		the <command>::rivet::catch</command> in order to simplify these operations. If any real error occurs
+         		during a script execution the procedure returns 1 and fills the optional arguments with their
+         		expected values, otherwise interrupts execution and allows for passing control to <command>AbortScript</command>
          	</listitem>
-         	<listitem><emphasis>Cyril Shtumf</emphasis> filed several important bugfixes</listitem>
-         	<listitem><emphasis>Jeff Lawson</emphasis> who patched Rivet parser to add the 
-         	shorthand syntax for string output and filed several bug reports</listitem>
 		 </itemizedlist>
     </simplesect>
 </section>

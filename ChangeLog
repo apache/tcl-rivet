@@ -1,3 +1,10 @@
+2015-12-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/images/*.png, doc/rivet.css: styles and navigation items color
+    changed to mark the difference with Rivet 2.2 and Rivet 2.1
+    * doc/xml/commands.xml,intro.xml: new commands ::rivet::exit and
+    ::rivet::catch documented
+    * rivet/init.tcl: new version 2.3 of package Rivet
+ 
 2015-11-27 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: version number increased to 2.3.0
 

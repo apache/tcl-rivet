@@ -336,6 +336,43 @@
 		</variablelist>
 	    </refsect1>
 	</refentry>
+	<refentry id="catch">
+		<refnamediv>
+			<refname>catch</refname>
+			<refpurpose>wraps core command <command>catch</command> and handles in
+			a special way fake error conditions resulting from calls to <command>exit</command>
+			and <command>abort_page</command></refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+			    <command>::rivet::catch</command>
+			    <arg><replaceable>script</replaceable></arg>
+			    <arg><replaceable>error_code_var_name</replaceable></arg>
+			    <arg><replaceable>options_var_name</replaceable></arg>
+	
+			</cmdsynopsis>
+		</refsynopsisdiv>
+
+	   <refsect1>
+			<title>Description</title>
+			<para>
+		    	<command>::rivet::catch</command> is a utility command wrapping of the core language's same command. 
+		    	Within mod_rivet a script execution can be interrupted by either calling 
+		    	<command>::rivet::exit</command> or <command>::rivet::abort_page</command> that
+		    	return an error code and hand the execution down to any <command>AbortScript</command> and
+		    	eventually to <command>AfterEveryScript</command>.
+		    	Any procedure fired under control of the core <command>::catch</command> would be trapped and
+		    	the error code should be checked and in case the error should be confirmed. <command>::rivet::catch</command>
+		    	checks for these conditions and in case handles the condition in a proper way interrupting the execution 
+		    	and returning control to mod_rivet which in turn calls <link linkend="directives"><command>AbortScript</command></link>
+			</para>
+			
+			<note>
+				This command is not exported from the <command>::rivet</command> namespace and therefore has
+				to be fully qualified.
+			</note>
+	    </refsect1>
+	</refentry>
     <!-- Reference page for command 'clock_to_rfc' -->
 	<refentry id="clock_to_rfc">
 	    <refnamediv>
