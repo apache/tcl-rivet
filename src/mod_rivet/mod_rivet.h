@@ -105,7 +105,7 @@ typedef struct _rivet_server_conf {
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
-    unsigned int    user_scripts_status;
+    unsigned int user_scripts_status;
 
     int             default_cache_size;
     int             upload_max;
@@ -184,8 +184,8 @@ typedef struct _mod_rivet_globals {
                         server_interp;          /* server and prefork MPM interpreter       */
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
 
-    rivet_bridge_table* bridge_jump_table;     /* Jump table to bridge specific procedures  */
-    mpm_bridge_status*  mpm;                   /* bridge private control structure          */
+    rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
+    mpm_bridge_status*  mpm;                    /* bridge private control structure         */
     
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
@@ -225,7 +225,7 @@ typedef struct _thread_worker_private {
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
-    Tcl_Namespace*          rivet_ns;       /* Rivet commands namespace              */
+    Tcl_Namespace*      rivet_ns;           /* Rivet commands namespace             */
 } rivet_interp_globals;
 
 /* Job types a worker thread is supposed to respond to */

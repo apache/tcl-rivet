@@ -17,7 +17,6 @@
       giving you ideas on how to best take advantage of Rivet's
       architecture to create different styles of web site.
     </para>
-
     <para>
         This documentation is focused on the current version of Rivet, but
         still a work in progress, and, like everything
@@ -28,21 +27,19 @@
     </para>
     
     <simplesect>
-        <title>Acknowledgements</title>
+        <title>Introduction</title>
         <para>
-        		Rivet's development took advantage from contributions from 
-        		several users who provided whole new componenents, bug fixes and 
-        		enhancements. 
+	        	Rivet 3.0 ships with a major rewriting of mod_rivet, the Apache HTTP
+	        	Websever module at the core of Rivet. With this version of the module
+	        	we attained full support of different MPM (Multiprocessing Modules) for
+	        	the Apache framework, whereas previous version of mod_rivet only supported
+	        	the prefork MPM.
         </para>
-        <itemizedlist>
+        <!-- itemizedlist>
+    			<listitem>
+    			</listitem>
          	<listitem>
-         		<emphasis>Harald Oehlmann</emphasis> (now member of the Apache Tcl Team) 
-         		who wrote package RivetEntitites, command ::rivet::http_accept and filed
-         		several bug reports with relative patches
          	</listitem>
-         	<listitem><emphasis>Cyril Shtumf</emphasis> filed several important bugfixes</listitem>
-         	<listitem><emphasis>Jeff Lawson</emphasis> who patched Rivet parser to add the 
-         	shorthand syntax for string output and filed several bug reports</listitem>
-			</itemizedlist>
-   </simplesect>
+		 </itemizedlist -->
+    </simplesect>
 </section>

@@ -28,11 +28,11 @@ namespace eval ::rivet {
 
         if {$catch_ret && [::rivet::abort_page -aborting]} {
 
-            return -code error -errorcode ABORTPAGE
+            return -code error -errorcode ABORTPAGE 1
 
         } elseif {$catch_ret && [::rivet::abort_page -exiting]} {
 
-            return -code error -errorcode EXITPAGE 
+            return -code error -errorcode EXITPAGE 1
 
         } else {
 

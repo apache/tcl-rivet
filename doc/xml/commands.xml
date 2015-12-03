@@ -336,6 +336,43 @@
 		</variablelist>
 	    </refsect1>
 	</refentry>
+	<refentry id="catch">
+		<refnamediv>
+			<refname>catch</refname>
+			<refpurpose>wraps core command <command>catch</command> and handles in
+			a special way fake error conditions resulting from calls to <command>exit</command>
+			and <command>abort_page</command></refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+			    <command>::rivet::catch</command>
+			    <arg><replaceable>script</replaceable></arg>
+			    <arg><replaceable>error_code_var_name</replaceable></arg>
+			    <arg><replaceable>options_var_name</replaceable></arg>
+	
+			</cmdsynopsis>
+		</refsynopsisdiv>
+
+	   <refsect1>
+			<title>Description</title>
+			<para>
+		    	<command>::rivet::catch</command> is a utility command wrapping of the core language's same command. 
+		    	Within mod_rivet a script execution can be interrupted by either calling 
+		    	<command>::rivet::exit</command> or <command>::rivet::abort_page</command> that
+		    	return an error code and hand the execution down to any <command>AbortScript</command> and
+		    	eventually to <command>AfterEveryScript</command>.
+		    	Any procedure fired under control of the core <command>::catch</command> would be trapped and
+		    	the error code should be checked and in case the error should be confirmed. <command>::rivet::catch</command>
+		    	checks for these conditions and in case handles the condition in a proper way interrupting the execution 
+		    	and returning control to mod_rivet which in turn calls <link linkend="directives"><command>AbortScript</command></link>
+			</para>
+			
+			<note>
+				This command is not exported from the <command>::rivet</command> namespace and therefore has
+				to be fully qualified.
+			</note>
+	    </refsect1>
+	</refentry>
     <!-- Reference page for command 'clock_to_rfc' -->
 	<refentry id="clock_to_rfc">
 	    <refnamediv>
@@ -569,7 +606,7 @@
 	    </refsect1>
 	</refentry>
 
-		<refentry id="exit">
+	<refentry id="exit">
 		<refnamediv>
 			<refname>exit</refname>
 			<refpurpose>terminate execution and child process</refpurpose>
@@ -618,21 +655,20 @@
 				<ulink url="https://httpd.apache.org/docs/2.4/mod/prefork.html">prefork MPM documentation</ulink>
 			</note>
 		</refsect1>
-	</refentry>	
+	</refentry>
 	
 	<refentry id="headers">
 	    <refnamediv>
-			<refname>headers</refname>
-			<refpurpose>set and parse HTTP headers.</refpurpose>
+		<refname>headers</refname>
+		<refpurpose>set and parse HTTP headers.</refpurpose>
 	    </refnamediv>
 
 	    <refsynopsisdiv>
 			<cmdsynopsis>
 			    <command>::rivet::headers</command>
 			    <group choice="req">
-					<arg>get</arg>
+				   <arg>get</arg>
 					<arg>set</arg>
-					<arg>sent</arg>
 					<arg>redirect</arg>
 					<arg>add</arg>
 					<arg>type</arg>
@@ -642,15 +678,15 @@
 	    </refsynopsisdiv>
 
 	    <refsect1>
-			<title>Description</title>
-			<para>
-			  The <command>headers</command> command is for setting and
-			  parsing HTTP headers.
-			</para>
+		<title>Description</title>
+		<para>
+		  The <command>headers</command> command is for setting and
+		  parsing HTTP headers.
+		</para>
 		
-			<variablelist>
-
-		    	<varlistentry>
+		<variablelist>
+		  
+		  <varlistentry>
 					<term>
 					    <cmdsynopsis>
 							<command>::rivet::headers</command>
@@ -664,105 +700,105 @@
 							Read arbitrary header names and values from output HTTP headers
 					    </para>
 					</listitem>
-		    	</varlistentry>
+		  </varlistentry>
 
-		    	<varlistentry>
-					<term>
-					    <cmdsynopsis>
-							<command>::rivet::headers</command>
-							<arg choice="plain">set</arg>
-							<arg><replaceable>headername</replaceable></arg>
-							<arg><replaceable>value</replaceable></arg>
-					    </cmdsynopsis>
-					</term>
-					<listitem>
-					    <para>
-							Set arbitrary header names and values into output HTTP headers
-					    </para>
-					</listitem>
-		    	</varlistentry>
-
-		    	<varlistentry>
-					<term>
-					    <cmdsynopsis>
-							<command>::rivet::headers</command>
-							<arg choice="plain">sent</arg>
-					    </cmdsynopsis>
-					</term>
-					<listitem>
-					   <para>
-							Test internal status of the module and returns 1
-							if the HTTP headers have been already sent  
-					   </para>
-					</listitem>
-		    	</varlistentry>
-
-		    	<varlistentry>
-					<term>
-					    <cmdsynopsis>
-							<command>::rivet::headers</command>
-							<arg choice="plain">redirect</arg>
-							<arg><replaceable>uri</replaceable></arg>
-					    </cmdsynopsis>
-					</term>
-					<listitem>
-					    <para>
-							Redirect from the current page to a 
-							new URI. <emphasis>Must</emphasis> be 
-							done in the first block of TCL code.
-					    </para>
-					</listitem>
-		    	</varlistentry>
-		    	
-		    	<varlistentry>
-					<term>
-					    <cmdsynopsis>
-							<command>::rivet::headers</command>
-							<arg choice="plain">add</arg>
-							<arg><replaceable>headername</replaceable></arg>
-							<arg><replaceable>value</replaceable></arg>
-					    </cmdsynopsis>
-					</term>
-					<listitem>
-					    <para>Add text to header
-							<varname>headername</varname>.
-					    </para>
-					</listitem>
-		    	</varlistentry>
-
-		    	<varlistentry>
-					<term>
-					    <cmdsynopsis>
+		  <varlistentry>
+			  <term>
+			    <cmdsynopsis>
+					<command>::rivet::headers</command>
+					<arg choice="plain">set</arg>
+					<arg><replaceable>headername</replaceable></arg>
+					<arg><replaceable>value</replaceable></arg>
+			    </cmdsynopsis>
+			  </term>
+			<listitem>
+				<para>
+					Set arbitrary header names and values into output HTTP headers
+				</para>
+			</listitem>
+		  </varlistentry>
+		  
+		  <varlistentry>
+				<term>
+				    <cmdsynopsis>
 						<command>::rivet::headers</command>
-						<arg choice="plain">type</arg>
-						<arg><replaceable>content-type</replaceable></arg>
-					    </cmdsynopsis>
-					</term>
-					<listitem>
-					    <para>
-							This command sets the <constant>Content-type</constant>
-							header returned by the script, which is useful if you wish
-							to send content other than HTML with Rivet - PNG or jpeg
-							images, for example.
-					    </para>
-					</listitem>
-		    	</varlistentry>
+						<arg choice="plain">sent</arg>
+					 </cmdsynopsis>
+				</term>
+				<listitem>
+					<para>
+						Test internal status of the module and returns 1
+						if the HTTP headers have been already sent  
+					</para>
+				</listitem>
+		  </varlistentry>
+		  
+		  <varlistentry>
+			  <term>
+			    	<cmdsynopsis>
+						<command>::rivet::headers</command>
+						<arg choice="plain">redirect</arg>
+						<arg><replaceable>uri</replaceable></arg>
+			   	</cmdsynopsis>
+			  </term>
+			  <listitem>
+			    	<para>
+						Redirect from the current page to a new
+						URI. <emphasis>Must</emphasis> be done in the first block
+						of TCL code.
+			    </para>
+		     </listitem>
+		  </varlistentry>
 
-		    	<varlistentry>
-					<term>
-				    	<cmdsynopsis>
-							<command>::rivet::headers</command>
-							<arg choice="plain">numeric</arg>
-							<arg><replaceable>response code</replaceable></arg>
-				    	</cmdsynopsis>
-					</term>
-					<listitem>
-				    	<para>
-							Set a numeric response code, such as 200, 404 or 500.
-				    	</para>
-					</listitem>
-		    	</varlistentry>
-			</variablelist>
+		  <varlistentry>
+			<term>
+			    <cmdsynopsis>
+				<command>::rivet::headers</command>
+				<arg choice="plain">add</arg>
+				<arg><replaceable>headername</replaceable></arg>
+				<arg><replaceable>value</replaceable></arg>
+			    </cmdsynopsis>
+			</term>
+			<listitem>
+			    <para>Add text to header
+					<varname>headername</varname>.
+			    </para>
+			</listitem>
+		  </varlistentry>
+
+		  <varlistentry>
+			<term>
+			    <cmdsynopsis>
+				<command>::rivet::headers</command>
+				<arg choice="plain">type</arg>
+				<arg><replaceable>content-type</replaceable></arg>
+			    </cmdsynopsis>
+			</term>
+			<listitem>
+			    <para>
+				This command sets the <constant>Content-type</constant>
+				header returned by the script, which is useful if you wish
+				to send content other than HTML with Rivet - PNG or jpeg
+				images, for example.
+			    </para>
+			</listitem>
+		    </varlistentry>
+
+		    <varlistentry>
+			<term>
+			    <cmdsynopsis>
+				<command>::rivet::headers</command>
+				<arg choice="plain">numeric</arg>
+				<arg><replaceable>response code</replaceable></arg>
+			    </cmdsynopsis>
+			</term>
+			<listitem>
+			    <para>
+				Set a numeric response code, such as 200, 404 or 500.
+			    </para>
+			</listitem>
+		    </varlistentry>
+		</variablelist>
 	    </refsect1>
 	</refentry>
 
@@ -1439,30 +1475,6 @@ bab</programlisting>
 		not a POST or there is no data, then "" - an empty string - is returned.
 	    </para>
 	</refentry>
-
-	<refentry id="read_file">
-	    <refnamediv>
-		<refname>read_file</refname>
-		<refpurpose>
-		    Read the entire contents of a file and return it as a string.			
-		</refpurpose>
-	    </refnamediv>
-		
-	    <refsynopsisdiv>
-	    	<cmdsynopsis>
-		    <command>::rivet::read_file</command>
-		    <arg>file name</arg>
-		</cmdsynopsis>
-	    </refsynopsisdiv>	
-	    <refsect1>
-		<title>Description</title>
-		<para>
-		    This is a utility command which loads the entire content of
-		    a file and returns it as a result.
-		</para>
-	    </refsect1>
-	</refentry>
-
    <refentry id="redirect">
        <refnamediv>
           <refname>redirect</refname>
@@ -1507,7 +1519,30 @@ bab</programlisting>
        	</para>
        </refsect1>
    </refentry>
+   
+	<refentry id="read_file">
+	    <refnamediv>
+		<refname>read_file</refname>
+		<refpurpose>
+		    Read the entire contents of a file and return it as a string.			
+		</refpurpose>
+	    </refnamediv>
 		
+	    <refsynopsisdiv>
+	    	<cmdsynopsis>
+		    <command>::rivet::read_file</command>
+		    <arg>file name</arg>
+		</cmdsynopsis>
+	    </refsynopsisdiv>	
+	    <refsect1>
+		<title>Description</title>
+		<para>
+		    This is a utility command which loads the entire content of
+		    a file and returns it as a result.
+		</para>
+	    </refsect1>
+	</refentry>	
+
 	<refentry id="unescape_string">
 	    <refnamediv>
 		<refname>unescape_string</refname>

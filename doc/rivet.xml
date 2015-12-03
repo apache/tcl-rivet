@@ -78,12 +78,6 @@
     </author>
   </articleinfo>
 
-  <!--para>
-    This document is also available in the following languages: 
-    <ulink url="index.it.html">Italian</ulink>, 
-    <ulink url="index.ru.html">Russian</ulink>
-  </para-->
-
   <para>
     Document revision: $Revision$, last modified <?dbtimestamp format="Y-m-d X" ?>$ by $Author$.
   </para>

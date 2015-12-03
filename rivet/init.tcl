@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package provide Rivet 2.3
+package provide Rivet 3.0
 
 namespace eval ::Rivet {
 

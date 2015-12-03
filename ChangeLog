@@ -1,3 +1,12 @@
+2015-12-03 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/internals.xml: explaining the MPM bridge jump table
+    * doc/rivet.css: changing colors adopting 2.3 style temporarily
+    * doc/images: new images with new colors
+    * doc/xml/intro.xml,install.xml: removing reference no longer
+    valid for version 3.0
+    * packages/hexglyphs/hexglyphs.tcl: new glyphs for more punctuation
+    characters
+
 2015-11-27 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: Major version number increased to 3.0.0
 

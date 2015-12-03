@@ -10,7 +10,124 @@
       (<command>svn</command>) can provide you with information about
       what has been happening with the code.
     </para>
-    <section>
+    <sect2>
+    	<title>Rivet approach to Apache Multiprocessing Models</title>
+    	<para>
+    		The Apache HTTP web server has an extremely modular architecture
+    		that made it very popular among web developers. Most of the server
+    		features can be implemented in external modules, including some of
+    		the way the server interfaces to the operative system. The multiprocessing
+    		modules are meant to provide different models for distributing the
+    		server workload but also to cope with different operative systems
+    		having their specific architectures and services.
+    	</para>
+    	<para>
+    		From the very beginning mod_rivet was designed to work with
+    		the  <ulink url="http://httpd.apache.org/docs/2.4/mod/prefork.html">prefork MPM</ulink>
+    		MPM (Multi Processing Module) which assumes the OS to have 'fork' capabilities.
+    		This prerequisite basically restricted mod_rivet to work only with
+    		Unix-like operative systems. Starting with version 3.0 we reorganized
+    		mod_rivet to offer a design that could fit with different MPM and
+    		hopefully pave the way to support different OS that have no 'fork'
+    		call. At the same time we tried to preserve some of the basic
+    		feature the 'fork' call, like the ability of 'cloning' a parent process
+    		memory into its child, thus allowing fast initialization of interpreters
+    		(even though this feature works only with the prefork MPM), having at the same
+    		time a more general design
+    	</para>
+    	<para>
+    		The central design of mod_rivet is relies on <quote>MPM bridges</quote>,
+    		loadable modules that are supposed to adapt the module internal organization to
+    		a given MPM class. This design is open to the development of more
+    		MPM bridges implementing new models and adapting more efficiently to 
+    		specific MPMs. By now we have only 2 bridges 
+    	</para>
+    	<itemizedlist>
+    		<listitem>rivet_prefork_mpm.c: a bridge for the prefork MPM</listitem>
+    		<listitem>rivet_worker_mpm.c: a threaded bridge creating a pool of threads
+    		each running Tcl interpreters and communicating with the worker MPM threads
+    		through a thread safe queue. This bridge is needed by the worker MPM.</listitem>
+    	</itemizedlist>
+    </sect2>
+    <sect2>
+    	<title>mod_rivet MPM Bridge callbacks</title> 
+    	<para>
+    		A bridge is a loadable library implementing different ways to handle
+    		specific features needed to mod_rivet. It was originally meant as a way
+    		to handle the prefork/worker/event MPM specificities that prevented mod_rivet
+    		from supporting each of them. Furthermore some features of fork capable
+    		MPM (prefork) were fundamentally incompatible with threaded MPMs such as worker
+    		and in principle would have needed to stuff the code with conditional 
+    		statements that implied useless complexity, error prone programming and performance costs. 
+    		New bridges could be imagined also to implement different models of workload
+    		distribution and resource management (like the resources demanded by the Tcl interpreters). 
+			We designed mod_rivet in order to call functions defined in the rivet_bridge_table structure    		
+    	</para>
+    	<programlisting>typedef struct _mpm_bridge_table {
+    RivetBridge_ServerInit    *mpm_server_init;
+    RivetBridge_ChildInit     *mpm_child_init;
+    RivetBridge_Request       *mpm_request;
+    RivetBridge_Finalize      *mpm_finalize;
+    RivetBridge_Master_Interp *mpm_master_interp;
+    RivetBridge_Exit_Handler  *mpm_exit_handler;
+} rivet_bridge_table;</programlisting>
+		<para>
+			<itemizedlist>
+				<listitem><emphasis>mpm_server_init</emphasis>: pointer to any
+				specific server inititalization function. This field can be NULL
+				if no bridge specific initialization has to be done. The core of
+				mod_rivet runs the <command>ServerInitScript</command> before
+				calling this function.</listitem>
+				<listitem><emphasis>mpm_child_init</emphasis>: Bridge specific
+				child process initialization. If the pointer is assigned with
+				a non-NULL value the function is called by Rivet_ChildInit. 
+				</listitem>
+				<listitem><emphasis>mpm_request</emphasis>: This pointer must
+				be assigned with a valid function pointer to the content generator
+				implemented by the bridge. If the pointer is not defined the Apache
+				web server will stop during start up. This condition is motivated by
+				the need of avoiding useless testing of the pointer. The fundamental
+				purpose of a content generator module (like mod_rivet) is to respond
+				to requests creating content, thus whatever it is
+				a content generating function must exist (during the early stages of
+				development you can create a simple test function for that)
+				</listitem>
+				<listitem><emphasis>mpm_finalize</emphasis>: pointer to a finalization
+				function called during a child process exit. This function is registered
+				as child process memory pool cleanup function. If the pointer is NULL
+				the pool is given a default cleanup function (apr_pool_cleanup_null) 
+				defined in src/mod_rivet/mod_rivet.c. For instance the finalize function
+				in the <emphasis>worker</emphasis> MPM bridge notifies
+				a supervisor thread demanding the whole pool of threads running Tcl 
+				interpreters to orderly exit. This pointer can be NULL if the bridge 
+				has no special need when a child process must exit.
+				</listitem>
+				<listitem><emphasis>mpm_master_interp</emphasis>: This pointer must
+				be assigned with a valid function returning the child process master
+				interpreter descriptor. The master interpreter should be either the only 
+				interpreter descriptor pointer of the child process (when 
+				<command>SeparateVirtualInterps</command> is off (default)) or one of 
+				the virtual host interpreter pointers. The current implementation of
+				the prefork and worker bridges return the interpreter associated to 
+				the first record in the linked list of <command>server_rec</command>
+				records. When <command>SeparateVirtualInterps</command> is off
+				the <emphasis>prefork</emphasis> MPM bridge returns the interpreter
+				inherited through the fork call from the server parent process
+				</listitem>
+				<listitem><emphasis>mpm_exit_handler</emphasis>: mod_rivet replaces
+				the core <command>exit</command> command with a new one
+				(<command>::rivet::exit</command>) with a special handling of
+				the process exit allowing the current request process to be finished
+				interrupting the script execution and handing execution down to
+				<command>AbortScript</command>. If the bridge needs to be aware of
+				the exit call the is the function when special tasks can be carried out.
+				With the <emphasis>worker</emphasis> MPM bridge the finalize function
+				is called after the current thread itself is set up for termination.
+				</listitem>
+			</itemizedlist>
+		</para>
+    </sect2>
+    <sect2>
       <title>Initialization</title>
       <para>
 			When Apache is started, (or when child Apache processes are
@@ -24,8 +141,8 @@
 			system is also set up, and if there is a
 			<command>GlobalInitScript</command>, it is run.
       </para>
-    </section>
-    <section>
+    </sect2>
+    <sect2>
       <title>RivetChan</title>
       <para>
 			The <structname>RivetChan</structname> system was created in
@@ -36,10 +153,10 @@
 			predetermined times, passes it on to Apache's IO system.
 			Tcl's regular standard output is replaced with an instance of
 			this channel type, so that, by default, output will go to the
-			web page.
+			web page. 
       </para>
-    </section>
-    <section>
+    </sect2>
+    <sect2>
       <title>The <command>global</command> Command</title>
       <para>
 			Rivet aims to run standard Tcl code with as few surprises as
@@ -57,8 +174,8 @@
 			<command>::global</command> or add the :: namespace qualifier
 			to variables you wish to make global.
       </para>
-    </section>
-    <section>
+    </sect2>
+    <sect2>
       <title>Page Parsing, Execution and Caching</title>
       <para>
 			When a Rivet page is requested, it is transformed into an
@@ -89,8 +206,8 @@
 	    	The number of scripts stored in memory is configurable.  This
 	    	feature can significantly improve performance.
       </para>
-    </section>
-    <section>
+    </sect2>
+    <sect2>
         <title>Extending Rivet by developing C procedures implementing new commands</title>
         <para>
             Rivet endows the Tcl interpreter with new commands
@@ -129,8 +246,9 @@
                 Define the command and associated C language procedure
                 in src/rivetcmds/rivetCore.c using the macro
                 <option>RIVET_OBJ_CMD</option>
-                <programlisting>RIVET_OBJ_CMD("mycmd",Rivet_MyCmd)</programlisting>
+                <programlisting>RIVET_OBJ_CMD("mycmd",Rivet_MyCmd,private)</programlisting>
                 This macro ensures the command is defined as <command>::rivet::mycmd</command>
+                and its ClientData pointer is defined with the thread private data
             </listitem>
             <listitem>
                 Add the code of Rivet_MyCmd to src/rivetcmd/rivetCore.c (in case
@@ -143,9 +261,11 @@
                 put add the macro testing for the pointer
                 <programlisting>TCL_CMD_HEADER( Rivet_MyCmd )
 {
-    rivet_interp_globals *globals = Tcl_GetAssocData( interp, "rivet", NULL );
+    /* we have to fetch the thread private data */
+    
+    THREAD_PRIVATE_DATA(private)
     ....
-    CHECK_REQUEST_REC(globals->r,"::rivet::mycmd");
+    CHECK_REQUEST_REC(private,"::rivet::mycmd");
     ...   
 }</programlisting>
             </listitem>
@@ -166,28 +286,30 @@ mycmd->1</programlisting>
                 The value associated to the test must be <option>0</option> in case the
                 command doesn't need to test the <command>globals->r</command> pointer.
             </listitem>
-            
         </itemizedlist>
-    </section>
-    <section>
+    </sect2>
+    <sect2>
       <title>Debugging Rivet and Apache</title>
       <para>
-	If you are interested in hacking on Rivet, you're welcome to
-	contribute!  Invariably, when working with code, things go
-	wrong, and it's necessary to do some debugging.  In a server
-	environment like Apache, it can be a bit more difficult to
-	find the right way to do this.  Here are some techniques to
-	try.
+			If you are interested in hacking on Rivet, you're welcome to
+			contribute!  Invariably, when working with code, things go
+			wrong, and it's necessary to do some debugging.  In a server
+			environment like Apache, it can be a bit more difficult to
+			find the right way to do this.  Here are some techniques to
+			try.
       </para>
       <para>
-	The first thing you should know is that Apache can be launched
-	as a <emphasis>single process</emphasis> with the
-	<option>-X</option> argument:</para>
-      <programlisting>httpd -X</programlisting>.
-      <para>
-	On Linux, one of the first things to try is the system call
-	tracer, <command>strace</command>.  You don't even have to
-	recompile Rivet or Apache for this to work.
+			The first thing you should know is that Apache can be launched
+			as a <emphasis>single process</emphasis> with the
+			<option>-X</option> argument:
+		</para>
+		
+		<programlisting>httpd -X</programlisting>.
+
+		<para>
+			On Linux, one of the first things to try is the system call
+			tracer, <command>strace</command>.  You don't even have to
+			recompile Rivet or Apache for this to work.
       </para>
 
       <programlisting>strace -o /tmp/outputfile -S 1000 httpd -X</programlisting>
@@ -216,6 +338,7 @@ mycmd->1</programlisting>
 			<option>-enable-symbols</option> option and after you have
 			set the CFLAGS and LDFLAGS environment variables
       </para>
+      
       <programlisting>export CFLAGS="-g -O0"
 export LDFLAGS="-g"
 ./configure --enable-symbols ......
@@ -233,8 +356,7 @@ make install</programlisting>
 			Apache in single process mode with -X:
       </para>
 
-      <programlisting>
-@ashland [~] $ gdb /usr/sbin/apache.dbg
+      <programlisting>@ashland [~] $ gdb /usr/sbin/apache.dbg
 GNU gdb 5.3-debian
 Copyright 2002 Free Software Foundation, Inc.
 GDB is free software, covered by the GNU General Public License, and you are
@@ -247,16 +369,12 @@ Starting program: /usr/sbin/apache.dbg -X
 [New Thread 16384 (LWP 13598)]
 .
 .
-.
-      </programlisting>
+.</programlisting>
 
       <para>
-	When your apache session is up and running, you can request a
-	web page with the browser, and see where things go wrong (if
-	you are dealing with a crash, for instance).
+			When your apache session is up and running, you can request a
+			web page with the browser, and see where things go wrong (if
+			you are dealing with a crash, for instance).
       </para>
-
-    </section>
-
+    </sect2>
   </section>
-
