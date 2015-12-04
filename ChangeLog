@@ -1,3 +1,6 @@
+2015-12-04 Massimo Manghi <mxmanghi@apache.org>
+    * 2.2: releasing current version as 2.2.4
+
 2015-11-27 Massimo Manghi <mxmanghi@apache.org>
     * 2.2: bringing this brack back to r1702115. Changes done after Sept 9 2015
     are now in branches/2.3
