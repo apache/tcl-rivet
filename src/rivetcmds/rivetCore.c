@@ -1739,6 +1739,5 @@ Rivet_InitCore( Tcl_Interp *interp )
     // ::rivet::exit is not exported
 #endif
 
-//  return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");
     return TCL_OK;
 }

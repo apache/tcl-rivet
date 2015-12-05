@@ -1,3 +1,10 @@
+2015-12-05 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/try.tcl: new command ::rivet::try wraps core
+    same command to trap ::rivet::abort_code and ::rivet::exit interruptions
+    * rivet/rivet-tcl/catch.tcl: using [uplevel] to control Tcl core [catch] 
+    command (as it's been customary with Tcl ever since)
+    * rivet/init.tcl: modified to remove ::rivet::try from the export list
+
 2015-12-02 Massimo Manghi <mxmanghi@apache.org>
     * doc/images/*.png, doc/rivet.css: styles and navigation items color
     changed to mark the difference with Rivet 2.2 and Rivet 2.1

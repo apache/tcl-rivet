@@ -110,10 +110,10 @@ typedef struct _rivet_server_conf {
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
 typedef struct _rivet_interp_globals {
-    request_rec     *r;			        /* request rec              */
-    TclWebRequest   *req;	            /* TclWeb API request       */
-    Tcl_Namespace   *rivet_ns;          /* Rivet commands namespace */
-    int             page_aborting;	    /* set by abort_page.       */
+    request_rec*    r;			        /* request rec                      */
+    TclWebRequest*  req;	            /* TclWeb API request               */
+    Tcl_Namespace*  rivet_ns;           /* Rivet commands namespace         */
+    int             page_aborting;	    /* set by abort_page.               */
     Tcl_Obj*        abort_code;			/* To be reset by Rivet_SendContent */
     int             exit_process;       /* signals a ::rivet::exit command was called */
     int             exit_status;        /* ::rivet::exit status code */
