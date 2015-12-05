@@ -37,7 +37,9 @@ namespace eval ::Rivet {
             array set auto_index {}
 
             # the auto_index in ${tclpath}/tclIndex is loaded
-            
+            # this array is used to fetch a list of Rivet commands
+            # implemented in Rivet
+
             set dir $tclpath
             source [file join $tclpath tclIndex]
 
@@ -45,6 +47,7 @@ namespace eval ::Rivet {
             # be unset from auto_index here
 
             unset auto_index(::rivet::catch)
+            unset auto_index(::rivet::try)
         }
 
         set command_list [namespace eval ::rivet_temp {array names auto_index}]

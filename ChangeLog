@@ -1,3 +1,11 @@
+2015-12-05 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/try.tcl: new command ::rivet::try wraps core
+    same command to trap ::rivet::abort_code and ::rivet::exit interruptions
+    * src/mod_rivet/rivetCore.c: removed semicolons in macro CHECK_REQUEST_REC
+    calls
+    * rivet/rivet-tcl/catch.tcl: using [uplevel] to control Tcl core [catch] 
+    command (as it's been customary with Tcl ever since)
+
 2015-12-03 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/internals.xml: explaining the MPM bridge jump table
     * doc/rivet.css: changing colors adopting 2.3 style temporarily
