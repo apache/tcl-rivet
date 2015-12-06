@@ -11,7 +11,7 @@ namespace eval ::rivet {
 
         uplevel [list ::try $script trap {RIVET ABORTPAGE} {} {
                 return -errorcode ABORTPAGE -code error
-            } trap {RIVET THREAD_EXIT} {} {
+            } trap {RIVET EXITPAGE} {} {
                 return -errorcode EXITPAGE -code error
             } {*}$args]
 
