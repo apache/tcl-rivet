@@ -23,31 +23,31 @@
 # of Richard Hipp
 # 
 
-namespace eval ::HexGlyphs:: {
+namespace eval ::AsciiGlyphs:: {
 
-    variable HEXGLYPH
+    variable ASCIIGLYPHS
 
-    array set HEXGLYPH {}
+    array set ASCIIGLYPHS {}
 
     proc glyph {g} {
-        variable HEXGLYPH
+        variable ASCIIGLYPHS
 
-        return $HEXGLYPH([string toupper $g])
+        return $ASCIIGLYPHS([string toupper $g])
     }
     namespace export glyph
 
     proc glyph_catalog {} {
-        variable HEXGLYPH
+        variable ASCIIGLYPHS
 
-        return [array names HEXGLYPH]
+        return [array names ASCIIGLYPHS]
 
     }
     namespace export glyph_catalog
 
     proc build_hex {hs} {
-        variable HEXGLYPH
+        variable ASCIIGLYPHS
 
-        set glyphs_avail [array names HEXGLYPH]
+        set glyphs_avail [array names ASCIIGLYPHS]
 
         set hs [string toupper $hs]
         for {set i 0} {$i < [string length $hs]} {incr i} {
@@ -59,7 +59,7 @@ namespace eval ::HexGlyphs:: {
                 return -code error -errocode invalid_char "Invalid non hexadecimal or non space character"
             }
 
-            set lines [split $HEXGLYPH($c) "\n"]
+            set lines [split $ASCIIGLYPHS($c) "\n"]
             set lines [lrange $lines 1 end-1]
 
             set l 0
@@ -105,7 +105,7 @@ namespace eval ::HexGlyphs:: {
     namespace ensemble create
 }
 
-set ::HexGlyphs::HEXGLYPH(A) {
+set ::AsciiGlyphs::ASCIIGLYPHS(A) {
            
     /\     
    /  \    
@@ -114,7 +114,7 @@ set ::HexGlyphs::HEXGLYPH(A) {
 /_/    \_\ 
 }
 
-set ::HexGlyphs::HEXGLYPH(B) {
+set ::AsciiGlyphs::ASCIIGLYPHS(B) {
  ____  
 |  _ \ 
 | |_) |
@@ -123,7 +123,7 @@ set ::HexGlyphs::HEXGLYPH(B) {
 |____/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(C) {
+set ::AsciiGlyphs::ASCIIGLYPHS(C) {
   _____ 
  / ____|
 | |     
@@ -132,7 +132,7 @@ set ::HexGlyphs::HEXGLYPH(C) {
  \_____|
 }
 
-set ::HexGlyphs::HEXGLYPH(D) {
+set ::AsciiGlyphs::ASCIIGLYPHS(D) {
  _____  
 |  __ \ 
 | |  | |
@@ -141,7 +141,7 @@ set ::HexGlyphs::HEXGLYPH(D) {
 |_____/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(E) {
+set ::AsciiGlyphs::ASCIIGLYPHS(E) {
  ______ 
 |  ____|
 | |__   
@@ -150,7 +150,7 @@ set ::HexGlyphs::HEXGLYPH(E) {
 |______|
 }
 
-set ::HexGlyphs::HEXGLYPH(F) {
+set ::AsciiGlyphs::ASCIIGLYPHS(F) {
  ______ 
 |  ____|
 | |__   
@@ -159,7 +159,7 @@ set ::HexGlyphs::HEXGLYPH(F) {
 |_|     
 }
 
-set ::HexGlyphs::HEXGLYPH(G) {
+set ::AsciiGlyphs::ASCIIGLYPHS(G) {
   _____  
  / ____| 
 | |  __  
@@ -168,7 +168,7 @@ set ::HexGlyphs::HEXGLYPH(G) {
  \_____/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(H) {
+set ::AsciiGlyphs::ASCIIGLYPHS(H) {
  _   _  
 | | | | 
 | |_| | 
@@ -177,7 +177,7 @@ set ::HexGlyphs::HEXGLYPH(H) {
 |_| |_| 
 }
 
-set ::HexGlyphs::HEXGLYPH(I) {
+set ::AsciiGlyphs::ASCIIGLYPHS(I) {
  ___ 
 |   |
  | | 
@@ -186,7 +186,7 @@ set ::HexGlyphs::HEXGLYPH(I) {
 |___|
 }
 
-set ::HexGlyphs::HEXGLYPH(J) {
+set ::AsciiGlyphs::ASCIIGLYPHS(J) {
    ___ 
   |   |
    | | 
@@ -195,7 +195,7 @@ set ::HexGlyphs::HEXGLYPH(J) {
 \____/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(K) {
+set ::AsciiGlyphs::ASCIIGLYPHS(K) {
  _   _  
 | | / | 
 | |/ /  
@@ -204,7 +204,7 @@ set ::HexGlyphs::HEXGLYPH(K) {
 |_| \_\ 
 }
 
-set ::HexGlyphs::HEXGLYPH(L) {
+set ::AsciiGlyphs::ASCIIGLYPHS(L) {
  _      
 | |     
 | |     
@@ -213,7 +213,7 @@ set ::HexGlyphs::HEXGLYPH(L) {
 |_____| 
 }
 
-set ::HexGlyphs::HEXGLYPH(M) {
+set ::AsciiGlyphs::ASCIIGLYPHS(M) {
  _    _  
 | \  / | 
 |  \/  | 
@@ -222,7 +222,7 @@ set ::HexGlyphs::HEXGLYPH(M) {
 |_|  |_| 
 }
 
-set ::HexGlyphs::HEXGLYPH(N) {
+set ::AsciiGlyphs::ASCIIGLYPHS(N) {
  _    _  
 | \  | | 
 |  \ | | 
@@ -231,7 +231,7 @@ set ::HexGlyphs::HEXGLYPH(N) {
 |_| \__| 
 }
 
-set ::HexGlyphs::HEXGLYPH(O) {
+set ::AsciiGlyphs::ASCIIGLYPHS(O) {
  _____  
 |  _  | 
 | | | | 
@@ -240,7 +240,7 @@ set ::HexGlyphs::HEXGLYPH(O) {
 |_____| 
 }
 
-set ::HexGlyphs::HEXGLYPH(P) {
+set ::AsciiGlyphs::ASCIIGLYPHS(P) {
  ____   
 |  _ \  
 | |_| | 
@@ -249,7 +249,7 @@ set ::HexGlyphs::HEXGLYPH(P) {
 |_|     
 }
 
-set ::HexGlyphs::HEXGLYPH(Q) {
+set ::AsciiGlyphs::ASCIIGLYPHS(Q) {
  _____  
 |  _  | 
 | | | | 
@@ -258,7 +258,7 @@ set ::HexGlyphs::HEXGLYPH(Q) {
      \\ 
 }
 
-set ::HexGlyphs::HEXGLYPH(R) {
+set ::AsciiGlyphs::ASCIIGLYPHS(R) {
  ____   
 |  _ \  
 | |_| | 
@@ -267,7 +267,7 @@ set ::HexGlyphs::HEXGLYPH(R) {
 |_| \_\ 
 }
 
-set ::HexGlyphs::HEXGLYPH(S) {
+set ::AsciiGlyphs::ASCIIGLYPHS(S) {
  ____   
 /  __|  
 | |__   
@@ -276,7 +276,7 @@ set ::HexGlyphs::HEXGLYPH(S) {
 |____/  
 }
 
-set ::HexGlyphs::HEXGLYPH(T) {
+set ::AsciiGlyphs::ASCIIGLYPHS(T) {
  _____  
 |_   _| 
   | |   
@@ -285,7 +285,7 @@ set ::HexGlyphs::HEXGLYPH(T) {
   |_|   
 }
 
-set ::HexGlyphs::HEXGLYPH(U) {
+set ::AsciiGlyphs::ASCIIGLYPHS(U) {
  _   _  
 | | | | 
 | | | | 
@@ -294,7 +294,7 @@ set ::HexGlyphs::HEXGLYPH(U) {
  \___/  
 }
 
-set ::HexGlyphs::HEXGLYPH(V) {
+set ::AsciiGlyphs::ASCIIGLYPHS(V) {
  __     __ 
  \ \   / / 
   \ \ / /  
@@ -303,7 +303,7 @@ set ::HexGlyphs::HEXGLYPH(V) {
      v     
 }
 
-set ::HexGlyphs::HEXGLYPH(W) {
+set ::AsciiGlyphs::ASCIIGLYPHS(W) {
  __      __ 
  \ \    / / 
   \ \/\/ /  
@@ -312,7 +312,7 @@ set ::HexGlyphs::HEXGLYPH(W) {
             
 }
 
-set ::HexGlyphs::HEXGLYPH(X) {
+set ::AsciiGlyphs::ASCIIGLYPHS(X) {
  __  __  
  \ \/ /  
   \  /   
@@ -321,7 +321,7 @@ set ::HexGlyphs::HEXGLYPH(X) {
 /_/  \_\ 
 }
 
-set ::HexGlyphs::HEXGLYPH(Y) {
+set ::AsciiGlyphs::ASCIIGLYPHS(Y) {
  __    __ 
  \ \  / / 
   \ \/ /  
@@ -330,7 +330,7 @@ set ::HexGlyphs::HEXGLYPH(Y) {
   /_/     
 }
 
-set ::HexGlyphs::HEXGLYPH(Z) {
+set ::AsciiGlyphs::ASCIIGLYPHS(Z) {
   ______   
  |____  |  
      / /   
@@ -340,7 +340,7 @@ set ::HexGlyphs::HEXGLYPH(Z) {
 }
 
 
-set ::HexGlyphs::HEXGLYPH(0) {
+set ::AsciiGlyphs::ASCIIGLYPHS(0) {
   ___  
  / _ \ 
 | | | |
@@ -349,7 +349,7 @@ set ::HexGlyphs::HEXGLYPH(0) {
  \___/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(1) {
+set ::AsciiGlyphs::ASCIIGLYPHS(1) {
  __ 
 /_ |
  | |
@@ -358,7 +358,7 @@ set ::HexGlyphs::HEXGLYPH(1) {
  |_|
 }
 
-set ::HexGlyphs::HEXGLYPH(2) {
+set ::AsciiGlyphs::ASCIIGLYPHS(2) {
  ___  
 |__ \ 
    ) |
@@ -367,7 +367,7 @@ set ::HexGlyphs::HEXGLYPH(2) {
 |____|
 }
 
-set ::HexGlyphs::HEXGLYPH(3) {
+set ::AsciiGlyphs::ASCIIGLYPHS(3) {
  ____  
 |___ \ 
   __) |
@@ -376,7 +376,7 @@ set ::HexGlyphs::HEXGLYPH(3) {
 |____/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(4) {
+set ::AsciiGlyphs::ASCIIGLYPHS(4) {
  _  _   
 | || |  
 | || |_ 
@@ -385,7 +385,7 @@ set ::HexGlyphs::HEXGLYPH(4) {
    |_|  
 }
 
-set ::HexGlyphs::HEXGLYPH(5) {
+set ::AsciiGlyphs::ASCIIGLYPHS(5) {
  _____ 
 | ____|
 | |__  
@@ -394,7 +394,7 @@ set ::HexGlyphs::HEXGLYPH(5) {
 |____/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(6) {
+set ::AsciiGlyphs::ASCIIGLYPHS(6) {
    __  
   / /  
  / /_  
@@ -403,7 +403,7 @@ set ::HexGlyphs::HEXGLYPH(6) {
  \___/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(7) {
+set ::AsciiGlyphs::ASCIIGLYPHS(7) {
  ______ 
 |____  |
     / / 
@@ -411,7 +411,7 @@ set ::HexGlyphs::HEXGLYPH(7) {
   / /   
  /_/    
 }
-set ::HexGlyphs::HEXGLYPH(8) {
+set ::AsciiGlyphs::ASCIIGLYPHS(8) {
   ___  
  / _ \ 
 | (_) |
@@ -420,7 +420,7 @@ set ::HexGlyphs::HEXGLYPH(8) {
  \___/ 
 }
 
-set ::HexGlyphs::HEXGLYPH(9) {
+set ::AsciiGlyphs::ASCIIGLYPHS(9) {
   ___  
  / _ \ 
 | (_) |
@@ -429,7 +429,7 @@ set ::HexGlyphs::HEXGLYPH(9) {
   /_/  
 }
  
-set ::HexGlyphs::HEXGLYPH(-) {
+set ::AsciiGlyphs::ASCIIGLYPHS(-) {
        
        
  ____  
@@ -438,7 +438,7 @@ set ::HexGlyphs::HEXGLYPH(-) {
        
 }
 
-set ::HexGlyphs::HEXGLYPH(_) {
+set ::AsciiGlyphs::ASCIIGLYPHS(_) {
          
          
          
@@ -447,7 +447,7 @@ set ::HexGlyphs::HEXGLYPH(_) {
 |______| 
 }
 
-set ::HexGlyphs::HEXGLYPH(:) {
+set ::AsciiGlyphs::ASCIIGLYPHS(:) {
      
   _  
  |_| 
@@ -456,7 +456,7 @@ set ::HexGlyphs::HEXGLYPH(:) {
      
 }
 
-set ::HexGlyphs::HEXGLYPH(;) {
+set ::AsciiGlyphs::ASCIIGLYPHS(;) {
      
   _  
  |_| 
@@ -465,7 +465,7 @@ set ::HexGlyphs::HEXGLYPH(;) {
  |/   
 }
 
-set ::HexGlyphs::HEXGLYPH(.) {
+set ::AsciiGlyphs::ASCIIGLYPHS(.) {
      
      
      
@@ -474,7 +474,7 @@ set ::HexGlyphs::HEXGLYPH(.) {
      
 }
 
-set ::HexGlyphs::HEXGLYPH(/) {
+set ::AsciiGlyphs::ASCIIGLYPHS(/) {
       __ 
      / / 
     / /  
@@ -483,7 +483,7 @@ set ::HexGlyphs::HEXGLYPH(/) {
  /_/     
 }
 
-set ::HexGlyphs::HEXGLYPH(\) {
+set ::AsciiGlyphs::ASCIIGLYPHS(\) {
  __      
  \ \     
   \ \    
@@ -492,7 +492,6 @@ set ::HexGlyphs::HEXGLYPH(\) {
      \_\ 
 }
 
-
-package provide HexGlyphs 0.1
+package provide AsciiGlyphs 0.1
 
 

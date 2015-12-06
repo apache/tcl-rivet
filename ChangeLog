@@ -1,3 +1,6 @@
+2015-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/asciiglyphs.tcl: Package HexGlyphs renamed as AsciiGlyphs
+
 2015-12-05 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/try.tcl: new command ::rivet::try wraps core
     same command to trap ::rivet::abort_code and ::rivet::exit interruptions
