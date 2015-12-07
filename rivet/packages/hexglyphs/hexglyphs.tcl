@@ -456,6 +456,15 @@ set ::HexGlyphs::HEXGLYPH(:) {
      
 }
 
+set ::HexGlyphs::HEXGLYPH(;) {
+     
+  _  
+ |_| 
+  _  
+ | | 
+ |/   
+}
+
 set ::HexGlyphs::HEXGLYPH(.) {
      
      
@@ -473,6 +482,16 @@ set ::HexGlyphs::HEXGLYPH(/) {
   / /    
  /_/     
 }
+
+set ::HexGlyphs::HEXGLYPH(\) {
+ __      
+ \ \     
+  \ \    
+   \ \   
+    \ \  
+     \_\ 
+}
+
 
 package provide HexGlyphs 0.1
 
