@@ -45,6 +45,7 @@ namespace eval ::Rivet {
             # be unset from auto_index here
 
             unset auto_index(::rivet::catch)
+            unset auto_index(::rivet::try)
         }
 
         set command_list [namespace eval ::rivet_temp {array names auto_index}]

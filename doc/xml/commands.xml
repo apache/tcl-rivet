@@ -1543,6 +1543,84 @@ bab</programlisting>
 	    </refsect1>
 	</refentry>	
 
+	<refentry id="try">
+		<refnamediv>
+			<refname>try</refname>
+			<refpurpose>
+				Catch error and exception conditions
+			</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+				<command>::rivet::try</command>
+				<arg>script</arg>
+				<arg>script</arg>
+		    	<arg><replaceable>handlers</replaceable></arg>
+		    	<arg><replaceable>finally script</replaceable></arg>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<title>Description</title>
+			<para>
+				<command>::rivet::try</command> wraps the core language
+				command and simply traps exceptions that might have raised
+				by <command>::rivet::abort_page</command> and
+				<command>::rivet::exit</command> to throw them again and
+				thus causing <command>AbortScript</command> to be executed.
+			</para>
+			<para>
+				If neither <command>::rivet::abort_page</command> nor
+				<command>::rivet::exit</command> are called from <arg>script</arg> 
+				then any handlers specified in the command are tested for execution.
+				Thus <command>::rivet::try</command> can transparently be used
+				as a replacement for Tcl's own <command>try</command> and it's needed
+				if you want <arg>script</arg> to safely bail out to <command>AbortScript</command>	
+			</para>
+			<para>
+				This script shows how <command>::rivet:try</command>
+				handles different exceptions or errors. You can drive this script
+				within mod_rivet adding the arguments fail or abort or exit to its URL.
+				You can handle the <quote>exit</quote> and <quote>abort</quote> cases with
+				an <command>AbortScript</command>.
+				See <xref linkend="directives"><command>AbortScript</command></xref>
+			</para>
+			<programlisting>&lt;html&gt;&lt;?::rivet::try {
+	if {[::rivet::var_qs exists exit]} {
+	    ::rivet::exit 100
+	} elseif {[::rivet::var_qs exists abort]} {
+	    ::rivet::abort_page 
+	} elseif {[::rivet::var_qs exists fail]} {
+	    # this is just a non existent command
+	    wrong_command
+	} else {
+	    puts "&lt;b&gt;OK&lt;/b&gt;"
+	}
+
+} on error {e o} {
+  puts "catching error -&amp;gt; $e&lt;br/&gt;"
+  dict for {fd fv} $o {
+
+   puts "$fd --&amp;gt;&amp;gt; $fv&lt;br/&gt;"
+
+  }
+ }
+?>&lt;/html></programlisting>
+		<para>
+			Placing this code in a file (try.rvt) on the 
+			web server <emphasis>DocumentRoot</emphasis> 
+			directory and setting for example the browser
+			to <command>http://localhost/try.rvt?fail=1</command>.			
+		</para>
+		<programlisting>catching error -> invalid command name "wrong_command"
+-errorcode -->> TCL LOOKUP COMMAND wrong_command
+-code -->> 1
+-level -->> 0
+-errorstack -->> INNER {invokeStk1 wrong_command} UP 1
+-errorinfo -->> invalid command name "wrong_command" while executing "wrong_command" ("::try" body line 9)
+-errorline -->> 9</programlisting>
+		</refsect1>
+	</refentry>
+
 	<refentry id="unescape_string">
 	    <refnamediv>
 		<refname>unescape_string</refname>
