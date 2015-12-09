@@ -27,6 +27,7 @@
     <!ENTITY upgrade.xml           SYSTEM "xml/upgrade.xml" >
     <!ENTITY request.xml           SYSTEM "xml/request.xml" >
     <!ENTITY entities.xml          SYSTEM "xml/entities.xml" >
+    <!ENTITY asciiglyphs.xml		  SYSTEM "xml/asciiglyphs.xml" >
 ]>
 
 <!--
@@ -120,6 +121,9 @@
 
     <!-- Entities -->
     &entities.xml;
+    
+    <!-- AsciiGlyphs -->
+	 &asciiglyphs.xml; 
 
     <!-- Help -->
     &help.xml;

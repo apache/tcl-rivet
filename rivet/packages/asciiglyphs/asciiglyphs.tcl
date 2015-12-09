@@ -26,6 +26,7 @@
 namespace eval ::AsciiGlyphs:: {
 
     variable ASCIIGLYPHS
+    variable glyphs_avail
 
     array set ASCIIGLYPHS {}
 
@@ -44,31 +45,32 @@ namespace eval ::AsciiGlyphs:: {
     }
     namespace export glyph_catalog
 
-    proc build_hex {hs} {
+    proc build_glyph {c} {
         variable ASCIIGLYPHS
+        variable glyphs_avail
 
-        set glyphs_avail [array names ASCIIGLYPHS]
-
-        set hs [string toupper $hs]
-        for {set i 0} {$i < [string length $hs]} {incr i} {
-
-            set c [string index $hs $i]
-
-            #if {![string is xdigit $c]} 
-            if {[lsearch $glyphs_avail $c] < 0} {
-                return -code error -errocode invalid_char "Invalid non hexadecimal or non space character"
+        #if {![string is xdigit $c]} 
+        puts -nonewline "'$c' -> "
+        if {[lsearch $glyphs_avail $c] < 0} {
+            #return -code error -errocode invalid_char "Invalid non hexadecimal or non space character"
+            if {[string is space $c]} {
+                set c "space"
+            } elseif {$c == "\\"} {
+                set c "backslash"
+            } else {
+                set c "*"
             }
-
-            set lines [split $ASCIIGLYPHS($c) "\n"]
-            set lines [lrange $lines 1 end-1]
-
-            set l 0
-            foreach gliphline $lines {
-                append hexline($l) $gliphline
-                incr l
-            } 
-   
         }
+        puts $c
+
+        set lines [split $ASCIIGLYPHS($c) "\n"]
+        set lines [lrange $lines 1 end-1]
+
+        set l 0
+        foreach gliphline $lines {
+            append hexline($l) $gliphline
+            incr l
+        } 
 
         return [list $hexline(0) \
                      $hexline(1) \
@@ -80,13 +82,17 @@ namespace eval ::AsciiGlyphs:: {
     }
 
     proc toGlyphs {hexstring} {
+        variable ASCIIGLYPHS
+        variable glyphs_avail
 
-        set hexstring_l [split $hexstring " \t"]
+        set glyphs_avail [array names ASCIIGLYPHS]
+
+        set hexstring_l [split [string toupper $hexstring] ""]
         foreach s $hexstring_l {
 
             set s [string trim $s]
 
-            set string_l [[namespace current]::build_hex $s]
+            set string_l [[namespace current]::build_glyph $s]
             for {set i 0} {$i < 6} {incr i} {
                 lappend bigstring($i) [lindex $string_l $i] 
             }
@@ -304,12 +310,12 @@ set ::AsciiGlyphs::ASCIIGLYPHS(V) {
 }
 
 set ::AsciiGlyphs::ASCIIGLYPHS(W) {
- __      __ 
- \ \    / / 
-  \ \/\/ /  
-   \    /   
-    \__/    
-            
+__            __
+\ \          / /
+ \ \  /\/\  / / 
+  \ \/    \/ /  
+   \   /\   /   
+    \_/  \_/    
 }
 
 set ::AsciiGlyphs::ASCIIGLYPHS(X) {
@@ -331,12 +337,12 @@ set ::AsciiGlyphs::ASCIIGLYPHS(Y) {
 }
 
 set ::AsciiGlyphs::ASCIIGLYPHS(Z) {
-  ______   
- |____  |  
-     / /   
-    / /    
-   / /___  
-  /______| 
+  _____   
+ |___  |  
+    / /   
+   / /    
+  / /___  
+ /______| 
 }
 
 
@@ -430,21 +436,21 @@ set ::AsciiGlyphs::ASCIIGLYPHS(9) {
 }
  
 set ::AsciiGlyphs::ASCIIGLYPHS(-) {
-       
-       
- ____  
-|____| 
-       
-       
+      
+      
+ ____ 
+|____|
+      
+      
 }
 
 set ::AsciiGlyphs::ASCIIGLYPHS(_) {
-         
-         
-         
-         
- ______  
-|______| 
+        
+        
+        
+        
+ ______ 
+|______|
 }
 
 set ::AsciiGlyphs::ASCIIGLYPHS(:) {
@@ -456,13 +462,13 @@ set ::AsciiGlyphs::ASCIIGLYPHS(:) {
      
 }
 
-set ::AsciiGlyphs::ASCIIGLYPHS(;) {
+set ::AsciiGlyphs::ASCIIGLYPHS(\;) {
      
   _  
  |_| 
   _  
  | | 
- |/   
+ |/  
 }
 
 set ::AsciiGlyphs::ASCIIGLYPHS(.) {
@@ -483,7 +489,7 @@ set ::AsciiGlyphs::ASCIIGLYPHS(/) {
  /_/     
 }
 
-set ::AsciiGlyphs::ASCIIGLYPHS(\) {
+set ::AsciiGlyphs::ASCIIGLYPHS(backslash) {
  __      
  \ \     
   \ \    
@@ -492,6 +498,31 @@ set ::AsciiGlyphs::ASCIIGLYPHS(\) {
      \_\ 
 }
 
+set ::AsciiGlyphs::ASCIIGLYPHS(~) {
+   ___     
+  / _ \    
+ /_/ \ \__ 
+      \__/ 
+           
+           
+}
+
+set ::AsciiGlyphs::ASCIIGLYPHS(*) {
+        
+ \ | /  
+ _\|/_  
+  /|\   
+ / | \  
+        
+}
+
+set ::AsciiGlyphs::ASCIIGLYPHS(space) {
+ 
+ 
+ 
+ 
+ 
+ 
+}
+
 package provide AsciiGlyphs 0.1
-
-
