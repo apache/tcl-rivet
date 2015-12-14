@@ -1,3 +1,12 @@
+2015-12-13 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: changed in order to have a better handling
+    of ::rivet::exit (the call to exit( ) is now carried out from within the
+    supervising thread
+    * src/mod_rivet/rivet_prefork_mpm.c: Adding exit command handler
+    * src/mod_rivet/mod_rivet.c: new central Rivet_Finalize method that calls
+    any bridge module finalization. The function deletes the thread key to
+    access private data
+
 2015-12-08 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml,asciiglyphs.tcl: adding documentation for ::rivet::try
     and AsciiGlyphs

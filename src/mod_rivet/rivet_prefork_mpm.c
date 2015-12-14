@@ -51,7 +51,6 @@ apr_status_t Prefork_MPM_Finalize (void* data)
     // No, we don't clean up anymore as we are just shutting this process down
     // Rivet_ProcessorCleanup(private);
 
-    apr_threadkey_private_delete (rivet_thread_key);
     return OK;
 }
 
@@ -141,12 +140,33 @@ rivet_thread_interp* Prefork_MPM_MasterInterp(void)
     return module_globals->server_interp;
 }
 
+/*
+ * -- Prefork_MPM_ExitHandler
+ *
+ *  Just calling Tcl_Exit  
+ *
+ *  Arguments:
+ *      int code
+ *
+ * Side Effects:
+ *
+ *  the thread running the Tcl script will exit 
+ */
+
+int Prefork_MPM_ExitHandler(int code)
+{
+    Tcl_Exit(code);
+
+    /* it will never get here */
+    return TCL_OK;
+}
+
 RIVET_MPM_BRIDGE {
     NULL,
     Prefork_MPM_ChildInit,
     Prefork_MPM_Request,
     Prefork_MPM_Finalize,
     Prefork_MPM_MasterInterp,
-    NULL
+    Prefork_MPM_ExitHandler
 };
 

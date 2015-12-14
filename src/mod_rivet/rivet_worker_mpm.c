@@ -66,6 +66,8 @@ typedef struct mpm_bridge_status {
     apr_uint32_t*       running_threads_count;
     apr_queue_t*        queue;                  /* jobs queue               */
     void**              workers;                /* thread pool ids          */
+    int                 exit_command;
+    int                 exit_command_status;
 
     int                 max_threads;
     int                 min_spare_threads;
@@ -138,11 +140,10 @@ void Worker_Bridge_Shutdown (void)
     waits = 5;
     count = (int) apr_atomic_read32(module_globals->mpm->threads_count);
     for (i = 0; i < count; i++) { apr_queue_push(module_globals->mpm->queue,job); }
-    apr_sleep(500000);
+    apr_sleep(1000000);
 
     do 
     {
-
         count = (int) apr_atomic_read32(module_globals->mpm->threads_count);
 
         /* Actually, when Rivet exit command implementation shuts the bridge down
@@ -154,10 +155,18 @@ void Worker_Bridge_Shutdown (void)
 
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_SUCCESS, module_globals->server, 
             "Sending %d more stop signals to threads",count);
-        apr_sleep(1000000);
+        for (i = 0; i < count; i++) { apr_queue_push(module_globals->mpm->queue,job); }
+
+        apr_sleep(500000);
 
     } while (waits-- > 0);
 
+    count = (int) apr_atomic_read32(module_globals->mpm->threads_count);
+    if (count > 0) 
+    {
+        ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,module_globals->server, 
+            "%d threads are still running after 5 attempts. Child process exits anyway",count);
+    }
     return;
 }
 
@@ -407,15 +416,10 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 
     Worker_Bridge_Shutdown();
     
+    if (module_globals->mpm->exit_command)
     {
-        int count = (int) apr_atomic_read32(mpm->threads_count);
-        if (count > 0) 
-        {
-
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
-                "%d threads are still running after 5 attempts. Child process exits anyway",count);
-
-        }
+        ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"Orderly child process exits.");
+        exit(module_globals->mpm->exit_command_status);
     }
 
     ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"Worker bridge supervisor shuts down");
@@ -456,6 +460,7 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->max_spare_threads  = 0;
     module_globals->mpm->workers            = NULL;
     module_globals->mpm->server_shutdown    = 0;
+    module_globals->mpm->exit_command       = 0;
 
     /* We keep some atomic counters that could provide basic data for a workload balancer */
 
@@ -633,10 +638,10 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
          * wait on the condition variable associated to the request_private structure */
 
         apr_thread_mutex_lock(request_private->mutex);
-        while (request_private->status != done)
+        do 
         {
             apr_thread_cond_wait(request_private->cond,request_private->mutex);
-        }
+        } while (request_private->status == init); 
         apr_thread_mutex_unlock(request_private->mutex);
     }
     else
@@ -671,15 +676,17 @@ apr_status_t Worker_MPM_Finalize (void* data)
     apr_thread_cond_signal(module_globals->mpm->job_cond);
     apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
 
-    rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
-    if (rv != APR_SUCCESS)
+    if (!module_globals->mpm->exit_command)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, rv, s,
-                     MODNAME ": Error joining supervisor thread");
+        rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
+        if (rv != APR_SUCCESS)
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, rv, s,
+                         MODNAME ": Error joining supervisor thread");
+        }
     }
 
-    apr_threadkey_private_delete (rivet_thread_key);
-    apr_threadkey_private_delete (handler_thread_key);
+    // apr_threadkey_private_delete (handler_thread_key);
     return OK;
 }
 
@@ -733,6 +740,9 @@ int Worker_MPM_ExitHandler(int code)
     /* This will force the current thread to exit */
 
     private->keep_going = 0;
+
+    module_globals->mpm->exit_command = 1;
+    module_globals->mpm->exit_command_status = code;
 
     /* We now tell the whole process to shutdown */
  

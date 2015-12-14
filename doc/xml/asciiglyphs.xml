@@ -12,8 +12,31 @@
 				The string to be represented has to be made of pure 7-bit ASCII characters.
 				The package also runs standalone outside of mod_rivet
         </para>
-
-			<programlisting>package require AsciiGlyphs
+     </section>
+    <refentry id="toglyphs">
+	        <refnamediv>
+	            <refname>toGlyphs</refname>
+	            <refpurpose>
+	            	print large ASCII glyphs
+	            </refpurpose>
+	        </refnamediv>
+	        <refsynopsisdiv>
+	            <cmdsynopsis>
+	                <command>::AsciiGlyphs toGlyphs</command>
+	                <arg choice="plain">string</arg>
+	            </cmdsynopsis>
+	        </refsynopsisdiv>
+	        <refsect1>
+            <title>Description</title>
+            <para>
+            	prints the ASCII glyphs corresponding to the characters forming
+    		        	the argument <arg choice="plain">string</arg>
+            </para>
+           </refsect1>
+		  </refentry>
+		  <section>
+		  	<title>Example</title>
+		  		<programlisting>package require AsciiGlyphs
 ::AsciiGlyphs toGlyphs "Date: 07-12-2015"
  _____              _____   ______          ___   ______         __  ___          ___    ___   __  _____ 
 |  __ \     /\     |_   _| |  ____|  _     / _ \ |____  |       /_ ||__ \        |__ \  / _ \ /_ || ____|

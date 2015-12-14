@@ -433,11 +433,12 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 }
 
 
-/* ----------------------------------------------------------------------------
+/*
  * -- Rivet_SendContent
  *
- *   Set things up to execute a file, then execute 
- *-----------------------------------------------------------------------------
+ *   Set things up to execute a Tcl script or parse a rvt template, prepare
+ *   the environment then execute it as a pure Tcl script
+ *
  */
 
 #define USE_APACHE_RSC
@@ -698,7 +699,7 @@ sendcleanup:
         ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, private->r, 
                                   "process terminating with code %d",private->exit_status);
         RIVET_MPM_BRIDGE_CALL(mpm_exit_handler,private->exit_status);
-        Tcl_Exit(private->exit_status);
+        //Tcl_Exit(private->exit_status);
     }
 
     /* We now reset the status to prepare the child process for another request */
@@ -1229,7 +1230,7 @@ Rivet_CreateTclInterp (server_rec* s)
  *
  *-----------------------------------------------------------------------------
  */
-void  Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p)
+void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p)
 {
     rivet_interp_globals*   globals     = NULL;
     Tcl_Obj*                auto_path   = NULL;
@@ -1529,6 +1530,20 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     return OK;
 }
 
+/*
+ * -- Rivet_Finalize
+ *
+ */
+
+apr_status_t Rivet_Finalize(void* data)
+{
+
+    RIVET_MPM_BRIDGE_CALL(mpm_finalize,data);
+    apr_threadkey_private_delete (rivet_thread_key);
+
+    return OK;
+}
+
 static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 {
     int                 idx;
@@ -1584,19 +1599,9 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     RIVET_MPM_BRIDGE_CALL(mpm_child_init,pChild,server);
 
-    if (RIVET_MPM_BRIDGE_FUNCTION(mpm_finalize) == NULL)
-    {
-        apr_pool_cleanup_register (pChild, server,
-                                    apr_pool_cleanup_null,
-                                    apr_pool_cleanup_null);
-    }
-    else
-    {
-        apr_pool_cleanup_register (pChild, server,
-                                    RIVET_MPM_BRIDGE_FUNCTION(mpm_finalize),
-                                    RIVET_MPM_BRIDGE_FUNCTION(mpm_finalize));
-    }
+    apr_pool_cleanup_register (pChild,server,Rivet_Finalize,Rivet_Finalize);
 }
+
 
 static int Rivet_Handler (request_rec *r)    
 {
