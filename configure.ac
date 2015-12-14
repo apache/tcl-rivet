@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[2.2.4])
+AC_INIT([Rivet],[2.2.5])
 TEA_INIT([3.9])
 
 # we are storing here the configure command line, as recursive

@@ -1609,14 +1609,6 @@ TestpanicCmd(dummy, interp, argc, argv)
 int
 Rivet_InitCore( Tcl_Interp *interp )
 {
-#if RIVET_NAMESPACE_EXPORT == 1
-    rivet_interp_globals *globals = NULL;
-    Tcl_Namespace *rivet_ns;
-
-    globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    rivet_ns = globals->rivet_ns;
-#endif
-
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL);
     RIVET_OBJ_CMD ("headers",Rivet_Headers);
     RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv);
@@ -1641,10 +1633,5 @@ Rivet_InitCore( Tcl_Interp *interp )
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd);
 #endif
 
-#if RIVET_NAMESPACE_EXPORT == 1
-    Tcl_Export(interp,rivet_ns,"*",0);
-#endif
-
-//  return Tcl_PkgProvide( interp,RIVET_TCL_PACKAGE,"1.2");
     return TCL_OK;
 }

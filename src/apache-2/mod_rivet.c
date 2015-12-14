@@ -942,6 +942,10 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p, int ne
         exit(1);
     }
 
+#if RIVET_NAMESPACE_EXPORT == 1
+    Tcl_Export(interp,globals->rivet_ns,"*",0);
+#endif
+
     /*  If rivet is configured to export the ::rivet namespace commands we set the
      *  array variable ::rivet::module_conf(export_namespace_commands) before calling init.tcl
      *  This array will be unset after commands are exported.

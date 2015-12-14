@@ -1,3 +1,10 @@
+2015-12-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: now exporting the ::rivet namespace during
+    Tcl interpreter set up
+    * src/librivet/rivetPkgInit.c: removed redundant code to export namespace
+    * src/rivetcmds/rivetCore.c: removed redundant code to export namespace
+    * VERSION,configure.ac: bumping version number up to 2.2.5
+
 2015-12-04 Massimo Manghi <mxmanghi@apache.org>
     * 2.2: releasing current version as 2.2.4
 
