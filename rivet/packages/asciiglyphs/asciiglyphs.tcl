@@ -50,7 +50,7 @@ namespace eval ::AsciiGlyphs:: {
         variable glyphs_avail
 
         #if {![string is xdigit $c]} 
-        puts -nonewline "'$c' -> "
+        #puts -nonewline "'$c' -> "
         if {[lsearch $glyphs_avail $c] < 0} {
             #return -code error -errocode invalid_char "Invalid non hexadecimal or non space character"
             if {[string is space $c]} {
@@ -61,7 +61,7 @@ namespace eval ::AsciiGlyphs:: {
                 set c "*"
             }
         }
-        puts $c
+        #puts $c
 
         set lines [split $ASCIIGLYPHS($c) "\n"]
         set lines [lrange $lines 1 end-1]

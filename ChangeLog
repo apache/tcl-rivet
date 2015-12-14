@@ -1,3 +1,6 @@
+2015-12-14 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/asciiglyphs.tcl: removed debugging lines
+    
 2015-12-09 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/asciiglyphs.tcl: character selection mechanism amended
     * doc/xml/commands.xml: documenting ::rivet::try
