@@ -300,7 +300,12 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     
     root_interp = (*RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp))();
 
-    /* we must assume the module was able to create the root interprter */ 
+    /* we must assume the module was able to create the root interprter otherwise
+     * it's just a null module. I try to have also this case to develop experimental
+     * bridges without the Tcl stuff 
+     */ 
+
+    //if (root_interp == NULL) return private;
 
     ap_assert (root_interp != NULL);
 
@@ -419,11 +424,9 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              errmsg, function);
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
-                             "errorCode: %s",
-                                Tcl_GetVar(interp, "errorCode", 0));
+                             "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
-                             "errorInfo: %s",
-                        Tcl_GetVar(interp, "errorInfo", 0));
+                             "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
             }
             Tcl_Release (interp);
             Tcl_DecrRefCount(tcl_child_init);
@@ -500,8 +503,8 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 
                 newconfig = RIVET_NEW_CONF(private->r->pool);
 
-                Rivet_CopyConfig( private->running_conf, newconfig );
-                Rivet_MergeDirConfigVars( private->r->pool, newconfig, private->running_conf, rdc );
+                Rivet_CopyConfig (private->running_conf,newconfig);
+                Rivet_MergeDirConfigVars (private->r->pool,newconfig,private->running_conf,rdc);
                 private->running_conf = newconfig;
 
                 scripts = Rivet_RunningScripts (private->pool,scripts,newconfig);
@@ -1396,20 +1399,97 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
     }
 
     return OK;
-
 }
 
+/*
+ * -- Rivet_SeekMPMBridge 
+ *
+ *
+ */
+
+static char*
+Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
+{
+    char*   mpm_prefork_bridge = "rivet_prefork_mpm.so";
+    char*   mpm_worker_bridge  = "rivet_worker_mpm.so";
+    char*   mpm_model_path;
+    int     ap_mpm_result;
+    rivet_server_conf* rsc = RIVET_SERVER_CONF( server->module_config );
+
+    /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
+       what bridge custom implementation we want to be loaded */
+
+    if (apr_env_get (&mpm_model_path,"RIVET_MPM_BRIDGE",pool) == APR_SUCCESS)
+    {
+        return mpm_model_path;
+    }
+
+    /* we now look into the configuration record */
+
+    if (rsc->mpm_bridge != NULL)
+    {
+        apr_finfo_t finfo;
+
+        mpm_model_path = apr_pstrcat(pool,RIVET_DIR,"/mpm/rivet_",rsc->mpm_bridge,"_mpm.so",NULL);
+        if (apr_stat(&finfo,mpm_model_path,APR_FINFO_MIN,pool) == APR_SUCCESS)
+        {
+            return mpm_model_path;
+        }
+
+        if (apr_stat(&finfo,rsc->mpm_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
+        {
+            return apr_pstrdup(pool,rsc->mpm_bridge);
+        }
+        else
+        {   
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                         MODNAME ": MPM bridge %s not found", rsc->mpm_bridge); 
+            exit(1);   
+        }
+
+    }
+
+    /* Let's load the Rivet-MPM bridge */
+
+    if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
+    {
+        if (ap_mpm_result == AP_MPMQ_NOT_SUPPORTED)
+        {
+            /* we are forced to load the prefork MPM bridge */
+
+            mpm_model_path = apr_pstrdup(pool,mpm_prefork_bridge);
+        }
+        else
+        {
+            mpm_model_path = apr_pstrdup(pool,mpm_worker_bridge);
+        }
+    }
+    else
+    {
+
+        /* Execution shouldn't get here as a failure querying about MPM is supposed
+         * to return APR_SUCCESS in every normal operative conditions. We
+         * give a default to the MPM bridge anyway
+         */
+
+        mpm_model_path = apr_pstrdup(pool,mpm_worker_bridge);
+    }
+
+    mpm_model_path = apr_pstrcat(pool,RIVET_DIR,"/mpm/",mpm_model_path,NULL);
+    return mpm_model_path;
+}
+
+
 /* -- Rivet_ServerInit
+ *
+ * Post config hook. The server initialization loads the MPM bridge
+ * and runs the Tcl server initialization script
  *
  */
 
 static int
 Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *server)
 {
-    char*               mpm_prefork_bridge = "rivet_prefork_mpm.so";
-    char*               mpm_worker_bridge  = "rivet_worker_mpm.so";
-    char*               mpm_model_path;
-    int                 ap_mpm_result;
     apr_dso_handle_t*   dso_handle;
 
 #if RIVET_DISPLAY_VERSION
@@ -1431,50 +1511,17 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         exit(1);
     }
 
-    /* Let's load the Rivet-MPM bridge */
-
-    module_globals->rivet_mpm_bridge = mpm_worker_bridge;
-    if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
-    {
-
-        if (ap_mpm_result == AP_MPMQ_NOT_SUPPORTED)
-        {
-            /* we are forced to load the prefork MPM bridge */
-
-            module_globals->rivet_mpm_bridge = apr_pstrdup(pPool,mpm_prefork_bridge);
-        }
-        else
-        {
-            module_globals->rivet_mpm_bridge = apr_pstrdup(pPool,mpm_worker_bridge);
-        }
-    }
-    else
-    {
-
-        /* Execution shouldn't get here as a failure querying about MPM is supposed
-         * to return APR_SUCCESS in every normal operative conditions. We
-         * give a default to the MPM bridge anyway
-         */
-
-        module_globals->rivet_mpm_bridge = apr_pstrdup(pPool,mpm_worker_bridge);
-    }
-
-    /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
-       what bridge custom implementation we want to be loaded */
-
-    if (apr_env_get (&mpm_model_path,"RIVET_MPM_BRIDGE",pTemp) != APR_SUCCESS)
-    {
-        mpm_model_path = apr_pstrcat(pTemp,RIVET_DIR,"/mpm/",module_globals->rivet_mpm_bridge,NULL);
-    } 
+    module_globals->rivet_mpm_bridge = Rivet_SeekMPMBridge(pTemp,server);
 
     /* Finally the bridge is loaded and the jump table sought */
 
-    if (apr_dso_load(&dso_handle,mpm_model_path,pPool) == APR_SUCCESS)
+    if (apr_dso_load(&dso_handle,module_globals->rivet_mpm_bridge,pPool) == APR_SUCCESS)
     {
         apr_status_t                rv;
         apr_dso_handle_sym_t        func = NULL;
 
-        ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server,"MPM bridge loaded: %s",mpm_model_path);
+        ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server,
+                     "MPM bridge loaded: %s",module_globals->rivet_mpm_bridge);
 
         rv = apr_dso_sym(&func,dso_handle,"bridge_jump_table");
         if (rv == APR_SUCCESS)

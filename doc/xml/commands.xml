@@ -1576,6 +1576,11 @@ bab</programlisting>
 				as a replacement for Tcl's own <command>try</command> and it's needed
 				if you want <arg>script</arg> to safely bail out to <command>AbortScript</command>	
 			</para>
+			<note>
+				This command is not exported from the <command>::rivet</command> namespace and therefore has
+				to be fully qualified.
+			</note>
+
 			<para>
 				This script shows how <command>::rivet:try</command>
 				handles different exceptions or errors. You can drive this script

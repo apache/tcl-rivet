@@ -122,6 +122,10 @@ typedef struct _rivet_server_conf {
     char*           path;               /* copy of the path field of a cmd_parms structure:         
                                          * should enable us to tell if a conf record comes from a
                                          * Directory section */
+    const char*     mpm_bridge;         /* MPM bridge. if not null the module will try to load the      * 
+                                         * file name in this field. The string should be either a full  *
+                                         * path to a file name, or a string from which a file name will *
+                                         * be composed using the pattern 'rivet_(mpm_bridge)_mpm.so     */
 } rivet_server_conf;
 
 #define TCL_INTERPS 1

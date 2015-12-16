@@ -348,6 +348,17 @@ static void supervisor_housekeeping (void)
 
 /* -- threaded_bridge_supervisor
  * 
+ * This function runs within a single thread and to the
+ * start and stop of Tcl worker thread pool. It could be extended also
+ * provide some basic monitoring data. 
+ *
+ * As we don't delete Tcl interpreters anymore because it can lead
+ * to seg faults or delays the supervisor threads doesn't restart
+ * single threads anymore, but it basically stops and starts the whole
+ * pool of Tcl worker threads. Nonetheless it still keeps a list of
+ * the thread pool ids and it should be able to restart a thread when
+ * it's notified (if the child process is not shutting down)
+ *
  */
 
 static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void *data)
@@ -453,6 +464,10 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     /* First of all we allocate and initialize the mpm status */
 
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
+
+    /* apr_calloc is supposed to allocate zerod memory, but we still make esplicit the initialization
+     * of some of its fields
+     */
 
     module_globals->mpm->exiting            = NULL;
     module_globals->mpm->max_threads        = 0;
@@ -643,6 +658,7 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
             apr_thread_cond_wait(request_private->cond,request_private->mutex);
         } while (request_private->status == init); 
         apr_thread_mutex_unlock(request_private->mutex);
+
     }
     else
     {
@@ -675,6 +691,12 @@ apr_status_t Worker_MPM_Finalize (void* data)
 
     apr_thread_cond_signal(module_globals->mpm->job_cond);
     apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
+
+    /* If the Function is called by the memory pool cleanup we wait
+     * to join the supervisor, otherwise we if the function was called
+     * by Worker_MPM_Exit we skip it because this thread itself must exit
+     * to allow the supervisor to exit in the shortest possible time 
+     */
 
     if (!module_globals->mpm->exit_command)
     {
@@ -744,7 +766,8 @@ int Worker_MPM_ExitHandler(int code)
     module_globals->mpm->exit_command = 1;
     module_globals->mpm->exit_command_status = code;
 
-    /* We now tell the whole process to shutdown */
+    /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
+     * and is sequence the whole process to shutdown by calling exit() */
  
     Worker_MPM_Finalize (private->r->server);
     return TCL_OK;

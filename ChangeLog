@@ -1,3 +1,11 @@
+2015-12-15 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_lazy_mpm.c: new lazy MPM bridge with a smoother workload 
+    balancing (should work better for low to middle workloads)
+    * src/mod_rivet/rivet_worker_mpm.c: improved code comments
+    * src/mod_rivet/mod_rivet.c: handling of mpm_bridge configuration parameter.
+    New bridge module search method
+    * src/mod_rivet/rivet_config.c: new MpmBridge configuration directive
+
 2015-12-13 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: changed in order to have a better handling
     of ::rivet::exit (the call to exit( ) is now carried out from within the

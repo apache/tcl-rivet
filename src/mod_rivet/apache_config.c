@@ -230,6 +230,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_user_vars = oldrsc->rivet_user_vars;
     newrsc->idx = oldrsc->idx;
     newrsc->path = oldrsc->path;
+    newrsc->mpm_bridge = oldrsc->mpm_bridge;
     //newrsc->user_conf = oldrsc->user_conf;
     newrsc->user_scripts_status = oldrsc->user_scripts_status;
 }
@@ -416,6 +417,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
     rsc->separate_channels = base->separate_channels;
+    rsc->mpm_bridge = base->mpm_bridge;
 
     RIVET_CONF_SELECT(rsc,base,overrides,upload_dir)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_server_vars)
@@ -466,6 +468,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->separate_channels          = RIVET_SEPARATE_CHANNELS;
     rsc->upload_dir                 = RIVET_UPLOAD_DIR;
     rsc->server_name                = NULL;
+    rsc->mpm_bridge                 = NULL;
 
     rsc->rivet_server_vars          = (apr_table_t *) apr_table_make ( p, 4 );
     rsc->rivet_dir_vars             = (apr_table_t *) apr_table_make ( p, 4 );
@@ -610,6 +613,7 @@ Rivet_DirConf(cmd_parms *cmd,void *vrdc,const char *var,const char *val)
  *  RivetServerConf UploadFilesToVar <yes|no>
  *  RivetServerConf SeparateVirtualInterps <yes|no>
  *  RivetServerConf HonorHeaderOnlyRequests <yes|no> (2008-06-20: mm)
+ *  RivetServerConf MpmBridge <path-to-mpm-bridge>|<bridge-label> (2015-12-14: mm)
  */
 
 const char *
@@ -625,20 +629,22 @@ Rivet_ServerConf(cmd_parms *cmd,void *dummy,const char *var,const char *val)
         return "Rivet Error: RivetServerConf requires two arguments";
     }
 
-    if( STREQU( var, "CacheSize" ) ) {
+    if ( STREQU ( var, "CacheSize" ) ) {
         rsc->default_cache_size = strtol( val, NULL, 10 );
-    } else if( STREQU( var, "UploadDirectory" ) ) {
+    } else if ( STREQU ( var, "UploadDirectory" ) ) {
         rsc->upload_dir = val;
-    } else if( STREQU( var, "UploadMaxSize" ) ) {
+    } else if ( STREQU ( var, "UploadMaxSize" ) ) {
         rsc->upload_max = strtol( val, NULL, 10 );
-    } else if( STREQU( var, "UploadFilesToVar" ) ) {
+    } else if ( STREQU ( var, "UploadFilesToVar" ) ) {
         Tcl_GetBoolean (NULL, val, &rsc->upload_files_to_var);
-    } else if( STREQU( var, "SeparateVirtualInterps" ) ) {
+    } else if ( STREQU ( var, "SeparateVirtualInterps" ) ) {
         Tcl_GetBoolean (NULL, val, &rsc->separate_virtual_interps);
-    } else if( STREQU( var, "HonorHeaderOnlyRequests" ) ) {
+    } else if ( STREQU ( var, "HonorHeaderOnlyRequests" ) ) {
         Tcl_GetBoolean (NULL, val, &rsc->honor_header_only_reqs);
-    } else if( STREQU( var, "SeparateChannels" ) ) {
+    } else if ( STREQU ( var, "SeparateChannels" ) ) {
         Tcl_GetBoolean (NULL, val, &rsc->separate_channels);
+    } else if ( STREQU ( var, "MpmBridge" ) ) {
+        rsc->mpm_bridge = val;
     } else {
         string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }
