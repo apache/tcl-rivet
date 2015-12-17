@@ -30,17 +30,16 @@
     		mod_rivet to offer a design that could fit with different MPM and
     		hopefully pave the way to support different OS that have no 'fork'
     		call. At the same time we tried to preserve some of the basic
-    		feature the 'fork' call, like the ability of 'cloning' a parent process
-    		memory into its child, thus allowing fast initialization of interpreters
-    		(even though this feature works only with the prefork MPM), having at the same
-    		time a more general design
+    		features of mod_rivet when working with the prefork MPM, chiefly the feature of
+    		the Unix fork system call of 'cloning' a parent process
+    		memory into its child, thus allowing fast initialization of interpreters.
     	</para>
     	<para>
-    		The central design of mod_rivet is relies on <quote>MPM bridges</quote>,
-    		loadable modules that are supposed to adapt the module internal organization to
-    		a given MPM class. This design is open to the development of more
-    		MPM bridges implementing new models and adapting more efficiently to 
-    		specific MPMs. By now we have only 2 bridges 
+    		The central design of mod_rivet now relies on the idea of <quote>MPM bridges</quote>,
+    		loadable modules that are responsible to adapt the module procedural design to
+    		a given class of Apache MPMs. This design is open to the development of more
+    		MPM bridges coping with different multi-processing models but also to the development of
+    		different approaches to resource consumption and workload balance. By now we have only 2 bridges: 
     	</para>
     	<itemizedlist>
     		<listitem>rivet_prefork_mpm.c: a bridge for the prefork MPM</listitem>
@@ -48,6 +47,12 @@
     		each running Tcl interpreters and communicating with the worker MPM threads
     		through a thread safe queue. This bridge is needed by the worker MPM.</listitem>
     	</itemizedlist>
+    	<para>
+    		A third bridge for threaded MPMs (rivet_lazy_mpm.c) is under development and it aims at
+    		a more conservative resource consumption that suits well the need of web sites having
+    		low to middle workload and many virtual hosts having a roughly uniform workload distribution.
+    		This bridge should work well also for development web servers.
+    	</para>
     </sect2>
     <sect2>
     	<title>mod_rivet MPM Bridge callbacks</title> 
@@ -120,13 +125,23 @@
 				the process exit allowing the current request process to be finished
 				interrupting the script execution and handing execution down to
 				<command>AbortScript</command>. If the bridge needs to be aware of
-				the exit call the is the function when special tasks can be carried out.
+				the exit call this is the function where special tasks can be carried out.
 				With the <emphasis>worker</emphasis> MPM bridge the finalize function
 				is called after the current thread itself is set up for termination.
+				See function Rivet_ExitCmd in
+				<ulink url="svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivetCore.c">rivetCore.c</ulink>
+				to have details on how and at what stage this callback is invoked.
 				</listitem>
 			</itemizedlist>
 		</para>
     </sect2>
+    <sect2>
+    	<title>MPM bridge internal status</title>
+    	<para>
+    		....
+    	</para>
+    </sect2>
+    
     <sect2>
       <title>Initialization</title>
       <para>
