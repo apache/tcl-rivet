@@ -1,3 +1,7 @@
+2015-12-20 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_lazy_mpm.c: first prototype of a threaded bridge with
+    reduced start up time and thread number optimization
+
 2015-12-15 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_lazy_mpm.c: new lazy MPM bridge with a smoother workload 
     balancing (should work better for low to middle workloads)

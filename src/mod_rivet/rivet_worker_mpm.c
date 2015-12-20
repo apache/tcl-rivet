@@ -68,7 +68,6 @@ typedef struct mpm_bridge_status {
     void**              workers;                /* thread pool ids          */
     int                 exit_command;
     int                 exit_command_status;
-
     int                 max_threads;
     int                 min_spare_threads;
     int                 max_spare_threads;
@@ -87,7 +86,7 @@ typedef struct _handler_private
     request_rec*            r;              /* request rec                 */
     int                     code;
     int                     status;
-    rivet_req_ctype         ctype;          /*                             */
+    rivet_req_ctype         ctype;
 } handler_private;
 
 typedef int rivet_thr_status;
@@ -226,7 +225,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
             if (rv == APR_EOF) {
                 fprintf(stderr, "request_processor: queue terminated APR_EOF\n");
-                rv=APR_SUCCESS;
+                rv = APR_SUCCESS;
             }
             else 
             {
@@ -271,7 +270,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
     // We don't clean up the thread resources anymore, if the thread exits the whole process terminates
-
     // Rivet_ProcessorCleanup(private);
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
@@ -456,9 +454,11 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t        rv;
+    
+    apr_atomic_init(pool);
 
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
-    apr_thread_mutex_create(&module_globals->req_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
+    apr_thread_mutex_create(&module_globals->req_mutex, APR_THREAD_MUTEX_UNNESTED, pool);
 #endif
 
     /* First of all we allocate and initialize the mpm status */
@@ -479,18 +479,17 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     /* We keep some atomic counters that could provide basic data for a workload balancer */
 
-    apr_atomic_init(pool);
     module_globals->mpm->threads_count = (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
     module_globals->mpm->running_threads_count = (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
     apr_atomic_set32(module_globals->mpm->threads_count,0);
     apr_atomic_set32(module_globals->mpm->running_threads_count,0);
 
-    ap_assert(apr_thread_mutex_create(&module_globals->mpm->job_mutex, APR_THREAD_MUTEX_UNNESTED, pool) == APR_SUCCESS);
-    ap_assert(apr_thread_cond_create(&module_globals->mpm->job_cond, pool) == APR_SUCCESS);
+    ap_assert(apr_thread_mutex_create(&module_globals->mpm->job_mutex,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
+    ap_assert(apr_thread_cond_create(&module_globals->mpm->job_cond,pool) == APR_SUCCESS);
 
     /* This is the thread key for the framework thread calling the content generation callback */
 
-    ap_assert (apr_threadkey_private_create (&handler_thread_key, NULL, pool) == APR_SUCCESS);
+    ap_assert (apr_threadkey_private_create(&handler_thread_key,NULL,pool) == APR_SUCCESS);
 
     /* This bridge keeps an array of the ids of threads about to exit. This array is protected by
      * the mutex module_globals->job_mutex and signals through module_globals->job_cond

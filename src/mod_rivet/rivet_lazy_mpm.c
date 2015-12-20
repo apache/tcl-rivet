@@ -28,31 +28,170 @@
 #include <tcl.h>
 #include <ap_mpm.h>
 #include <apr_strings.h>
+#include <apr_atomic.h>
 
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
 
-extern mod_rivet_globals* module_globals;
-extern apr_threadkey_t*  rivet_thread_key;
-extern apr_threadkey_t*  handler_thread_key;
+extern mod_rivet_globals*   module_globals;
+extern apr_threadkey_t*     rivet_thread_key;
+extern apr_threadkey_t*     handler_thread_key;
 
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
 rivet_thread_interp*  Rivet_NewVHostInterp(apr_pool_t* pool);
 
+enum
+{
+    init,
+    idle,
+    processing,
+    thread_exit,
+    done
+};
+
+typedef struct lazy_tcl_worker {
+    apr_thread_mutex_t* mutex;
+    apr_thread_cond_t*  condition;
+    int                 status;
+    apr_thread_t*       thread_id;
+    int                 idx;
+    request_rec*        r;
+    int                 ctype;
+    int                 ap_sts;
+} lazy_tcl_worker;
+
+typedef struct vhost_iface {
+    apr_uint32_t*       idle_threads_cnt;       /* */
+    apr_queue_t*        queue;                  /* available threads  */
+} vhost;
+
+typedef struct mpm_bridge_status {
+    apr_thread_mutex_t* mutex;
+    apr_thread_cond_t*  condition;
+    void**              workers;                /* thread pool ids          */
+    int                 exit_command;
+    int                 exit_command_status;
+    vhost*              vhosts;
+} mpm_bridge_status;
+
 #define DEFAULT_HEADER_TYPE "text/html"
 #define BASIC_PAGE          "<b>Lazy Bridge</b>"
 
+#define MOD_RIVET_QUEUE_SIZE        100
+
+static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
+{
+    lazy_tcl_worker* w = (lazy_tcl_worker*) data; 
+
+    do 
+    {
+        apr_queue_push(module_globals->mpm->vhosts[w->idx].queue,w);
+        apr_atomic_inc32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
+        apr_thread_mutex_lock(w->mutex);
+        do {
+            apr_thread_cond_wait(w->condition,w->mutex);
+        } while (w->status != init);
+
+        apr_atomic_dec32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
+        w->status = processing;
+        apr_thread_mutex_unlock(w->mutex);
+
+        /* Content generation */
+
+        ap_set_content_type(w->r,apr_pstrdup(w->r->pool,DEFAULT_HEADER_TYPE));
+        ap_send_http_header(w->r);
+        ap_rwrite(apr_pstrdup(w->r->pool,BASIC_PAGE),strlen(BASIC_PAGE),w->r);
+        ap_rflush(w->r);
+
+        apr_thread_mutex_lock(w->mutex);
+        w->status = done;
+        w->ap_sts = OK;
+        apr_thread_cond_signal(w->condition);
+        apr_thread_mutex_unlock(w->mutex);
+
+        apr_thread_mutex_lock(w->mutex);
+        do {
+            apr_thread_cond_wait(w->condition,w->mutex);
+        } while (w->status == done);
+
+        w->status = idle;
+        w->r      = NULL;
+        apr_thread_mutex_unlock(w->mutex);
+
+    } while (1);
+
+    return NULL;
+}
+
+static lazy_tcl_worker* create_worker (apr_pool_t* pool,int idx)
+{
+    lazy_tcl_worker*    w;
+
+    w = apr_pcalloc(pool,sizeof(lazy_tcl_worker));
+
+    w->status = idle;
+    w->idx = idx;
+    ap_assert(apr_thread_mutex_create(&w->mutex,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
+    ap_assert(apr_thread_cond_create(&w->condition, pool) == APR_SUCCESS); 
+    apr_thread_create(&w->thread_id, NULL, request_processor, w, module_globals->pool);
+
+    return w;
+}
+
+void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+{
+    apr_status_t    rv;
+    int             vh;
+
+    apr_atomic_init(pool);
+    module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
+
+    rv = apr_thread_mutex_create(&module_globals->mpm->mutex,APR_THREAD_MUTEX_UNNESTED,pool);
+    ap_assert(rv == APR_SUCCESS);
+    rv = apr_thread_cond_create(&module_globals->mpm->condition, pool); 
+    ap_assert(rv == APR_SUCCESS);
+
+    /*
+    apr_atomic_set32(module_globals->mpm->first_available,0);
+    */
+
+    for (vh = 0; vh < module_globals->vhosts_count; vh++)
+    {
+        module_globals->mpm->vhosts[vh].idle_threads_cnt = 
+                (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
+
+        apr_atomic_set32(module_globals->mpm->vhosts[vh].idle_threads_cnt,0);
+        ap_assert (apr_queue_create(&module_globals->mpm->vhosts[vh].queue,
+                    MOD_RIVET_QUEUE_SIZE,module_globals->pool) != APR_SUCCESS);
+        
+        create_worker(pool,vh);
+    }
+}
+
 int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
-    ap_set_content_type(r,apr_pstrdup(r->pool,DEFAULT_HEADER_TYPE));
-    ap_send_http_header(r);
+    lazy_tcl_worker*    w;
+    apr_status_t        rv;
 
-    ap_rwrite(apr_pstrdup(r->pool,BASIC_PAGE),strlen(BASIC_PAGE),r);
-    ap_rflush(r);
+    do {
+        rv = apr_queue_pop(module_globals->mpm->vhosts[w->idx].queue, (void *)&w);
 
-    return OK;
+    } while (rv == APR_EINTR);
+
+    apr_thread_mutex_lock(w->mutex);
+    w->r        = r;
+    w->ctype    = ctype;
+    w->status   = init;
+    apr_thread_cond_signal(w->condition);
+
+    do {
+        apr_thread_cond_wait(w->condition,w->mutex);
+    } while (w->status != done);
+
+    apr_thread_mutex_unlock(w->mutex);
+    return w->ap_sts;
 }
 
 rivet_thread_interp* Lazy_MPM_MasterInterp(void)
@@ -62,7 +201,7 @@ rivet_thread_interp* Lazy_MPM_MasterInterp(void)
 
 RIVET_MPM_BRIDGE {
     NULL,
-    NULL,
+    Lazy_MPM_ChildInit,
     Lazy_MPM_Request,
     NULL,
     Lazy_MPM_MasterInterp,

@@ -10,7 +10,7 @@
       (<command>svn</command>) can provide you with information about
       what has been happening with the code.
     </para>
-    <sect2>
+    <section>
     	<title>Rivet approach to Apache Multiprocessing Models</title>
     	<para>
     		The Apache HTTP web server has an extremely modular architecture
@@ -53,8 +53,8 @@
     		low to middle workload and many virtual hosts having a roughly uniform workload distribution.
     		This bridge should work well also for development web servers.
     	</para>
-    </sect2>
-    <sect2>
+    </section>
+    <section>
     	<title>mod_rivet MPM Bridge callbacks</title> 
     	<para>
     		A bridge is a loadable library implementing different ways to handle
@@ -134,30 +134,15 @@
 				</listitem>
 			</itemizedlist>
 		</para>
-    </sect2>
-    <sect2>
-    	<title>MPM bridge internal status</title>
-    	<para>
-    		....
-    	</para>
-    </sect2>
+    </section>
     
-    <sect2>
-      <title>Initialization</title>
+    <section>
+      <title>Server Initialization and MPM Bridge</title>
       <para>
-			When Apache is started, (or when child Apache processes are
-			started if a threaded Tcl is used),
-			<function>Rivet_InitTclStuff</function> is called, which
-			creates a new interpreter, or one interpreter per virtual
-			host, depending on the configuration. It also initializes
-			various things, like the <structname>RivetChan</structname>
-			channel system, creates the Rivet-specific Tcl commands, and
-			executes Rivet's <filename>init.tcl</filename>.  The caching
-			system is also set up, and if there is a
-			<command>GlobalInitScript</command>, it is run.
+      	The main
       </para>
-    </sect2>
-    <sect2>
+    </section>
+    <section>
       <title>RivetChan</title>
       <para>
 			The <structname>RivetChan</structname> system was created in
@@ -170,8 +155,8 @@
 			this channel type, so that, by default, output will go to the
 			web page. 
       </para>
-    </sect2>
-    <sect2>
+    </section>
+    <section>
       <title>The <command>global</command> Command</title>
       <para>
 			Rivet aims to run standard Tcl code with as few surprises as
@@ -189,8 +174,8 @@
 			<command>::global</command> or add the :: namespace qualifier
 			to variables you wish to make global.
       </para>
-    </sect2>
-    <sect2>
+    </section>
+    <section>
       <title>Page Parsing, Execution and Caching</title>
       <para>
 			When a Rivet page is requested, it is transformed into an
@@ -221,8 +206,8 @@
 	    	The number of scripts stored in memory is configurable.  This
 	    	feature can significantly improve performance.
       </para>
-    </sect2>
-    <sect2>
+    </section>
+    <section>
         <title>Extending Rivet by developing C procedures implementing new commands</title>
         <para>
             Rivet endows the Tcl interpreter with new commands
@@ -302,8 +287,8 @@ mycmd->1</programlisting>
                 command doesn't need to test the <command>globals->r</command> pointer.
             </listitem>
         </itemizedlist>
-    </sect2>
-    <sect2>
+    </section>
+    <section>
       <title>Debugging Rivet and Apache</title>
       <para>
 			If you are interested in hacking on Rivet, you're welcome to
@@ -391,5 +376,5 @@ Starting program: /usr/sbin/apache.dbg -X
 			web page with the browser, and see where things go wrong (if
 			you are dealing with a crash, for instance).
       </para>
-    </sect2>
+    </section>
   </section>
