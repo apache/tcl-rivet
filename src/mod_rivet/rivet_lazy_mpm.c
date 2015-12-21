@@ -1,4 +1,4 @@
-/* rivet_aprthread_mpm.c: dynamically loaded MPM aware functions for threaded MPM */
+/* rivet_lazy_mpm.c: dynamically loaded MPM aware functions for threaded MPM */
 
 /*
     Licensed to the Apache Software Foundation (ASF) under one
@@ -52,8 +52,10 @@ enum
 };
 
 typedef struct lazy_tcl_worker {
-    apr_thread_mutex_t* mutex;
-    apr_thread_cond_t*  condition;
+    apr_thread_mutex_t* mutex1;
+    apr_thread_mutex_t* mutex2;
+    apr_thread_cond_t*  condition1;
+    apr_thread_cond_t*  condition2;
     int                 status;
     apr_thread_t*       thread_id;
     int                 idx;
@@ -89,14 +91,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     {
         apr_queue_push(module_globals->mpm->vhosts[w->idx].queue,w);
         apr_atomic_inc32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
-        apr_thread_mutex_lock(w->mutex);
+        apr_thread_mutex_lock(w->mutex1);
         do {
-            apr_thread_cond_wait(w->condition,w->mutex);
+            apr_thread_cond_wait(w->condition1,w->mutex1);
         } while (w->status != init);
 
         apr_atomic_dec32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
         w->status = processing;
-        apr_thread_mutex_unlock(w->mutex);
+        apr_thread_mutex_unlock(w->mutex1);
 
         /* Content generation */
 
@@ -105,20 +107,18 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         ap_rwrite(apr_pstrdup(w->r->pool,BASIC_PAGE),strlen(BASIC_PAGE),w->r);
         ap_rflush(w->r);
 
-        apr_thread_mutex_lock(w->mutex);
+        apr_thread_mutex_lock(w->mutex2);
         w->status = done;
         w->ap_sts = OK;
-        apr_thread_cond_signal(w->condition);
-        apr_thread_mutex_unlock(w->mutex);
+        apr_thread_cond_signal(w->condition2);
+        apr_thread_mutex_unlock(w->mutex2);
 
-        apr_thread_mutex_lock(w->mutex);
+        apr_thread_mutex_lock(w->mutex1);
         do {
-            apr_thread_cond_wait(w->condition,w->mutex);
+            apr_thread_cond_wait(w->condition1,w->mutex1);
         } while (w->status == done);
 
-        w->status = idle;
-        w->r      = NULL;
-        apr_thread_mutex_unlock(w->mutex);
+        apr_thread_mutex_unlock(w->mutex1);
 
     } while (1);
 
@@ -133,8 +133,10 @@ static lazy_tcl_worker* create_worker (apr_pool_t* pool,int idx)
 
     w->status = idle;
     w->idx = idx;
-    ap_assert(apr_thread_mutex_create(&w->mutex,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
-    ap_assert(apr_thread_cond_create(&w->condition, pool) == APR_SUCCESS); 
+    ap_assert(apr_thread_mutex_create(&w->mutex1,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
+    ap_assert(apr_thread_cond_create(&w->condition1, pool) == APR_SUCCESS); 
+    ap_assert(apr_thread_mutex_create(&w->mutex2,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
+    ap_assert(apr_thread_cond_create(&w->condition2, pool) == APR_SUCCESS); 
     apr_thread_create(&w->thread_id, NULL, request_processor, w, module_globals->pool);
 
     return w;
@@ -157,6 +159,8 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     apr_atomic_set32(module_globals->mpm->first_available,0);
     */
 
+    module_globals->mpm->vhosts = (vhost *) apr_pcalloc(pool,module_globals->vhosts_count * sizeof(vhost));
+
     for (vh = 0; vh < module_globals->vhosts_count; vh++)
     {
         module_globals->mpm->vhosts[vh].idle_threads_cnt = 
@@ -164,7 +168,7 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
         apr_atomic_set32(module_globals->mpm->vhosts[vh].idle_threads_cnt,0);
         ap_assert (apr_queue_create(&module_globals->mpm->vhosts[vh].queue,
-                    MOD_RIVET_QUEUE_SIZE,module_globals->pool) != APR_SUCCESS);
+                    MOD_RIVET_QUEUE_SIZE,module_globals->pool) == APR_SUCCESS);
         
         create_worker(pool,vh);
     }
@@ -174,24 +178,35 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
     lazy_tcl_worker*    w;
     apr_status_t        rv;
+    int                 ap_sts;
+    rivet_server_conf*  conf = RIVET_SERVER_CONF(r->server->module_config);
 
     do {
-        rv = apr_queue_pop(module_globals->mpm->vhosts[w->idx].queue, (void *)&w);
-
+        rv = apr_queue_pop(module_globals->mpm->vhosts[conf->idx].queue, (void *)&w);
     } while (rv == APR_EINTR);
 
-    apr_thread_mutex_lock(w->mutex);
+    apr_thread_mutex_lock(w->mutex1);
     w->r        = r;
     w->ctype    = ctype;
     w->status   = init;
-    apr_thread_cond_signal(w->condition);
+    w->idx      = conf->idx;
+    apr_thread_cond_signal(w->condition1);
+    apr_thread_mutex_unlock(w->mutex1);
 
+    apr_thread_mutex_lock(w->mutex2);
     do {
-        apr_thread_cond_wait(w->condition,w->mutex);
+        apr_thread_cond_wait(w->condition2,w->mutex2);
     } while (w->status != done);
 
-    apr_thread_mutex_unlock(w->mutex);
-    return w->ap_sts;
+    ap_sts = w->ap_sts;
+    apr_thread_mutex_unlock(w->mutex2);
+
+    apr_thread_mutex_lock(w->mutex1);
+    w->status = idle;
+    w->r      = NULL;
+    apr_thread_cond_signal(w->condition1);
+    apr_thread_mutex_unlock(w->mutex1);
+    return ap_sts;
 }
 
 rivet_thread_interp* Lazy_MPM_MasterInterp(void)
