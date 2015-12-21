@@ -62,6 +62,7 @@ typedef struct lazy_tcl_worker {
     request_rec*        r;
     int                 ctype;
     int                 ap_sts;
+    int                 nreqs;
 } lazy_tcl_worker;
 
 typedef struct vhost_iface {
@@ -87,11 +88,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
     lazy_tcl_worker* w = (lazy_tcl_worker*) data; 
 
+    w->nreqs = 0;
     do 
     {
+        char* page;
+
+        apr_thread_mutex_lock(w->mutex1);
         apr_queue_push(module_globals->mpm->vhosts[w->idx].queue,w);
         apr_atomic_inc32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
-        apr_thread_mutex_lock(w->mutex1);
         do {
             apr_thread_cond_wait(w->condition1,w->mutex1);
         } while (w->status != init);
@@ -104,7 +108,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         ap_set_content_type(w->r,apr_pstrdup(w->r->pool,DEFAULT_HEADER_TYPE));
         ap_send_http_header(w->r);
-        ap_rwrite(apr_pstrdup(w->r->pool,BASIC_PAGE),strlen(BASIC_PAGE),w->r);
+        //ap_rwrite(apr_pstrdup(w->r->pool,BASIC_PAGE),strlen(BASIC_PAGE),w->r);
+
+        page = apr_psprintf(w->r->pool,"%s: vh %d, idle threads: %d, nreqs: %d",BASIC_PAGE,w->idx,
+                            (int) apr_atomic_read32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt),++(w->nreqs));
+
+        ap_rwrite(page,strlen(page),w->r);
         ap_rflush(w->r);
 
         apr_thread_mutex_lock(w->mutex2);
@@ -117,7 +126,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         do {
             apr_thread_cond_wait(w->condition1,w->mutex1);
         } while (w->status == done);
-
         apr_thread_mutex_unlock(w->mutex1);
 
     } while (1);
@@ -171,6 +179,7 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
                     MOD_RIVET_QUEUE_SIZE,module_globals->pool) == APR_SUCCESS);
         
         create_worker(pool,vh);
+        create_worker(pool,vh);
     }
 }
 
@@ -206,6 +215,7 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     w->r      = NULL;
     apr_thread_cond_signal(w->condition1);
     apr_thread_mutex_unlock(w->mutex1);
+
     return ap_sts;
 }
 
