@@ -67,7 +67,9 @@ typedef struct lazy_tcl_worker {
 
 typedef struct vhost_iface {
     apr_uint32_t*       idle_threads_cnt;       /* */
-    apr_queue_t*        queue;                  /* available threads  */
+    //apr_queue_t*        queue;                  /* available threads  */
+    apr_thread_mutex_t* mutex;
+    apr_array_header_t* array;                   /* available threads  */
 } vhost;
 
 typedef struct mpm_bridge_status {
@@ -94,15 +96,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         char* page;
 
         apr_thread_mutex_lock(w->mutex1);
-        apr_queue_push(module_globals->mpm->vhosts[w->idx].queue,w);
+        //apr_queue_push(module_globals->mpm->vhosts[w->idx].queue,w);
         apr_atomic_inc32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
-        do {
+        while (w->status != init) {
             apr_thread_cond_wait(w->condition1,w->mutex1);
-        } while (w->status != init);
+        } 
 
-        apr_atomic_dec32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
         w->status = processing;
         apr_thread_mutex_unlock(w->mutex1);
+        apr_atomic_dec32(module_globals->mpm->vhosts[w->idx].idle_threads_cnt);
 
         /* Content generation */
 
@@ -123,10 +125,16 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         apr_thread_mutex_unlock(w->mutex2);
 
         apr_thread_mutex_lock(w->mutex1);
-        do {
+        while (w->status == done) {
             apr_thread_cond_wait(w->condition1,w->mutex1);
-        } while (w->status == done);
+        } 
         apr_thread_mutex_unlock(w->mutex1);
+ 
+        // rescheduling itself in the array of idle threads
+       
+        apr_thread_mutex_lock(module_globals->mpm->vhosts[w->idx].mutex);
+        *(lazy_tcl_worker **) apr_array_push(module_globals->mpm->vhosts[w->idx].array) = w;
+        apr_thread_mutex_unlock(module_globals->mpm->vhosts[w->idx].mutex);
 
     } while (1);
 
@@ -155,8 +163,9 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     apr_status_t    rv;
     int             vh;
 
-    apr_atomic_init(pool);
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
+
+    //module_globals->mpm->vhosts = (vhost *) apr_pcalloc(pool,sizeof(vhost) * module_globals->vhosts_count);
 
     rv = apr_thread_mutex_create(&module_globals->mpm->mutex,APR_THREAD_MUTEX_UNNESTED,pool);
     ap_assert(rv == APR_SUCCESS);
@@ -168,32 +177,56 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     */
 
     module_globals->mpm->vhosts = (vhost *) apr_pcalloc(pool,module_globals->vhosts_count * sizeof(vhost));
+    ap_assert(module_globals->mpm->vhosts != NULL);
 
     for (vh = 0; vh < module_globals->vhosts_count; vh++)
     {
-        module_globals->mpm->vhosts[vh].idle_threads_cnt = 
-                (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
+        apr_array_header_t* array;
 
+        ap_assert(apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
+        array = apr_array_make(pool,0,sizeof(void*));
+        ap_assert(array != NULL);
+        module_globals->mpm->vhosts[vh].array = array;
+
+        //ap_assert(apr_queue_create(&module_globals->mpm->vhosts[vh].queue,MOD_RIVET_QUEUE_SIZE,pool) == APR_SUCCESS);
+        module_globals->mpm->vhosts[vh].idle_threads_cnt = (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
         apr_atomic_set32(module_globals->mpm->vhosts[vh].idle_threads_cnt,0);
-        ap_assert (apr_queue_create(&module_globals->mpm->vhosts[vh].queue,
-                    MOD_RIVET_QUEUE_SIZE,module_globals->pool) == APR_SUCCESS);
         
-        create_worker(pool,vh);
-        create_worker(pool,vh);
+        //create_worker(pool,vh);
+        //create_worker(pool,vh);
     }
 }
 
 int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
+    //void*               v;
+    //apr_status_t        rv;
     lazy_tcl_worker*    w;
-    apr_status_t        rv;
     int                 ap_sts;
     rivet_server_conf*  conf = RIVET_SERVER_CONF(r->server->module_config);
+    apr_array_header_t* array;
+    apr_thread_mutex_t* mutex;
 
-    do {
-        rv = apr_queue_pop(module_globals->mpm->vhosts[conf->idx].queue, (void *)&w);
-    } while (rv == APR_EINTR);
+    //do {
+    //     rv = apr_queue_pop(module_globals->mpm->vhosts[conf->idx].queue, &v);
+    //} while (rv == APR_EINTR);
+    //w = (lazy_tcl_worker*) v;
 
+    /* If the array is empty we create a new worker thread */
+
+    mutex = module_globals->mpm->vhosts[conf->idx].mutex;
+    array = module_globals->mpm->vhosts[conf->idx].array;
+    apr_thread_mutex_lock(mutex);
+    if (apr_is_empty_array(array))
+    {
+        w = create_worker(module_globals->pool,conf->idx);
+    }
+    else
+    {
+        w = *(lazy_tcl_worker**) apr_array_pop(array);
+    }
+    apr_thread_mutex_unlock(mutex);
+    
     apr_thread_mutex_lock(w->mutex1);
     w->r        = r;
     w->ctype    = ctype;
@@ -203,10 +236,9 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     apr_thread_mutex_unlock(w->mutex1);
 
     apr_thread_mutex_lock(w->mutex2);
-    do {
+    while (w->status != done) {
         apr_thread_cond_wait(w->condition2,w->mutex2);
-    } while (w->status != done);
-
+    } 
     ap_sts = w->ap_sts;
     apr_thread_mutex_unlock(w->mutex2);
 

@@ -1,3 +1,7 @@
+2015-12-22 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_lazy_mpm.c: taking a snapshot of the current development
+    as this code proved to be quite robust when stressed using 'ab'
+
 2015-12-20 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_lazy_mpm.c: first prototype of a threaded bridge with
     reduced start up time and thread number optimization
