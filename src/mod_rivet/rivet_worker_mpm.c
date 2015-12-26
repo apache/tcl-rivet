@@ -76,6 +76,13 @@ typedef struct mpm_bridge_status {
 #endif
 } mpm_bridge_status;
 
+/* This object is thread specific */
+
+typedef struct mpm_bridge_specific {
+    int                   keep_going;       /* thread loop controlling variable     */
+} mpm_bridge_specific;
+
+
 /* data private to the Apache callback handling the request */
 
 typedef struct _handler_private 
@@ -177,10 +184,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
 
     private = Rivet_CreatePrivateData();
+    private->interps = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
+    private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
+    private->ext->keep_going = 1;
+
     if (private == NULL) 
     {
         /* TODO: we have to log something here */
         apr_thread_exit(thd,APR_SUCCESS);
+        return NULL;
     }
     private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
     Rivet_SetupTclPanicProc ();
@@ -239,7 +251,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         request_obj = (handler_private *) v;
         if (request_obj->job_type == orderly_exit)
         {
-            private->keep_going = 0;
+            private->ext->keep_going = 0;
             continue;
         }
 
@@ -265,7 +277,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         private->req_cnt++;
         apr_atomic_dec32(module_globals->mpm->running_threads_count);
 
-    } while (private->keep_going > 0);
+    } while (private->ext->keep_going > 0);
             
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
@@ -760,7 +772,7 @@ int Worker_MPM_ExitHandler(int code)
 
     /* This will force the current thread to exit */
 
-    private->keep_going = 0;
+    private->ext->keep_going = 0;
 
     module_globals->mpm->exit_command = 1;
     module_globals->mpm->exit_command_status = code;
@@ -772,11 +784,18 @@ int Worker_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
+rivet_thread_interp* Worker_MPM_Interp(rivet_thread_private *private,
+                                       rivet_server_conf *conf)
+{
+    return private->interps[conf->idx];   
+}
+
 RIVET_MPM_BRIDGE {
     NULL,
     Worker_MPM_ChildInit,
     Worker_MPM_Request,
     Worker_MPM_Finalize,
     Worker_MPM_MasterInterp,
-    Worker_MPM_ExitHandler
+    Worker_MPM_ExitHandler,
+    Worker_MPM_Interp
 };

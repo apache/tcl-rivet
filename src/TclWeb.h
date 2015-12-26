@@ -110,9 +110,9 @@ int TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req);
 
 int TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req);
 
-int TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req);
+int TclWeb_GetEnvVars(Tcl_Obj *envvar, rivet_thread_private *p);
 
-int TclWeb_GetHeaderVars(Tcl_Obj *headersvar, TclWebRequest *req);
+int TclWeb_GetHeaderVars(Tcl_Obj *headersvar, rivet_thread_private *p);
 
 /*
  *-----------------------------------------------------------------------------
@@ -255,7 +255,7 @@ char *TclWeb_StringToUtf(char *in, TclWebRequest *req);
 
 Tcl_Obj * TclWeb_StringToUtfToObj(char *in, TclWebRequest *req);
 
-char *TclWeb_GetEnvVar( TclWebRequest *req, char * );
+char *TclWeb_GetEnvVar(rivet_thread_private *,char *);
 
 char *TclWeb_GetVirtualFile( TclWebRequest *req, char *virtualname );
 

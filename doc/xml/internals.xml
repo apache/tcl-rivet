@@ -107,9 +107,10 @@
 				interpreters to orderly exit. This pointer can be NULL if the bridge 
 				has no special need when a child process must exit.
 				</listitem>
-				<listitem><emphasis>mpm_master_interp</emphasis>: This pointer must
-				be assigned with a valid function returning the child process master
-				interpreter descriptor. The master interpreter should be either the only 
+				<listitem><emphasis>mpm_master_interp</emphasis>: This function
+				is mainly existing to allow fork capable bridges to reuturn
+				the child process master interpreter descriptor. 
+				In general the master interpreter should be either the only 
 				interpreter descriptor pointer of the child process (when 
 				<command>SeparateVirtualInterps</command> is off (default)) or one of 
 				the virtual host interpreter pointers. The current implementation of

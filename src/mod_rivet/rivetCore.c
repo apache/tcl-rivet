@@ -60,6 +60,11 @@ extern apr_threadkey_t*  rivet_thread_key;
 
 #define POOL (private->r->pool)
 
+ /* define a convenience macro to cast the ClientData
+  * into the thread private data pointer */
+
+#define THREAD_PRIVATE_DATA(p)  p = (rivet_thread_private *)clientData;
+
 /*
  * -- Rivet_NoRequestRec
  *
@@ -122,7 +127,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
     CHECK_REQUEST_REC(private,"::rivet::makeurl")
     if (objc == 1)
     {
-        url_target_name = TclWeb_GetEnvVar (private->req,"SCRIPT_NAME");
+        url_target_name = TclWeb_GetEnvVar (private,"SCRIPT_NAME");
     }
     else
     {
@@ -135,7 +140,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
         if (url_target_name[0] != '/')
         {
             /* relative path */
-            char* script_name = TclWeb_GetEnvVar (private->req,"SCRIPT_NAME");
+            char* script_name = TclWeb_GetEnvVar (private,"SCRIPT_NAME");
             int   script_name_l = strlen(script_name);
 
             // regardless the reason for a SCRIPT_NAME being undefined we
@@ -498,7 +503,7 @@ TCL_CMD_HEADER( Rivet_LoadEnv )
         ArrayObj = Tcl_NewStringObj( ENV_ARRAY_NAME, -1 );
     }
 
-    return TclWeb_GetEnvVars(ArrayObj,private->req);
+    return TclWeb_GetEnvVars(ArrayObj,private);
 }
 
 /*
@@ -537,7 +542,7 @@ TCL_CMD_HEADER ( Rivet_LoadHeaders )
         ArrayObj = Tcl_NewStringObj( HEADERS_ARRAY_NAME, -1 );
     }
 
-    return TclWeb_GetHeaderVars(ArrayObj,private->req);
+    return TclWeb_GetHeaderVars(ArrayObj,private);
 }
 
 /* Tcl command to return a particular variable.  */
@@ -1309,7 +1314,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
 
     key = Tcl_GetStringFromObj( objv[1], NULL );
 
-    val = TclWeb_GetEnvVar( private->req, key );
+    val = TclWeb_GetEnvVar( private, key );
 
     Tcl_SetObjResult(interp, Tcl_NewStringObj( val, -1 ) );
     return TCL_OK;

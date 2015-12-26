@@ -156,14 +156,15 @@ typedef struct _rivet_thread_interp {
     unsigned int        flags;              /* signals of various interp specific conditions    */
 } rivet_thread_interp;
 
+typedef struct _thread_worker_private rivet_thread_private;
+
 typedef int  (RivetBridge_ServerInit)   (apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
 typedef void (RivetBridge_ChildInit)    (apr_pool_t* pPool,server_rec* s);
 typedef int  (RivetBridge_Request)      (request_rec*,rivet_req_ctype);
-typedef apr_status_t 
-             (RivetBridge_Finalize)(void*);
-typedef rivet_thread_interp*
-             (RivetBridge_Master_Interp) (void);
+typedef apr_status_t                    (RivetBridge_Finalize)(void*);
+typedef rivet_thread_interp*            (RivetBridge_Master_Interp) (void);
 typedef int  (RivetBridge_Exit_Handler) (int);
+typedef rivet_thread_interp* (RivetBridge_Thread_Interp)(rivet_thread_private*,rivet_server_conf *);
 
 typedef struct _mpm_bridge_table {
     RivetBridge_ServerInit    *mpm_server_init;
@@ -172,6 +173,7 @@ typedef struct _mpm_bridge_table {
     RivetBridge_Finalize      *mpm_finalize;
     RivetBridge_Master_Interp *mpm_master_interp;
     RivetBridge_Exit_Handler  *mpm_exit_handler;
+    RivetBridge_Thread_Interp *mpm_thread_interp;
 } rivet_bridge_table;
 
 /* we need also a place where to store module wide globals */
@@ -196,15 +198,13 @@ typedef struct _mod_rivet_globals {
 #endif
 } mod_rivet_globals;
 
+typedef struct mpm_bridge_specific mpm_bridge_specific;
+
 typedef struct _thread_worker_private {
     apr_pool_t*         pool;               /* threads private memory pool          */
     rivet_thread_interp** interps;          /* database of virtual host interps     */
     Tcl_Channel*        channel;            /* the Tcl thread private channel       */
     int                 req_cnt;            /* requests served by thread            */
-    int                 keep_going;         /* thread loop controlling variable     */
-                                            /* the request_rec and TclWebRequest    *
-                                             * are copied here to be passed to a    *
-                                             * channel                              */
     rivet_req_ctype     ctype;              /*                                      */
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
@@ -224,6 +224,7 @@ typedef struct _thread_worker_private {
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
 
+    mpm_bridge_specific* ext;               /* bridge specific extension            */
 } rivet_thread_private;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
@@ -318,6 +319,8 @@ EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 #define RIVET_MPM_BRIDGE_CALL(fun,...) if ((*module_globals->bridge_jump_table->fun) != NULL) {\
     (*module_globals->bridge_jump_table->fun)(__VA_ARGS__);\
 }
+
+#define RIVET_PEEK_INTERP (module_globals->bridge_jump_table->mpm_thread_interp)
 
 #define RIVET_MPM_BRIDGE rivet_bridge_table bridge_jump_table =
 

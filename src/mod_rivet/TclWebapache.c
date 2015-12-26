@@ -40,7 +40,7 @@
 #include "TclWeb.h"
 
 extern module rivet_module;
-extern apr_threadkey_t* rivet_thread_key;
+extern mod_rivet_globals* module_globals;
 #define TCLWEBPOOL req->req->pool
 
 #define BUFSZ 4096
@@ -435,11 +435,11 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
         apr_table_elts(req->apachereq->parms);
 
     if (source == VAR_SRC_QUERYSTRING) {
-	Tcl_SetIntObj(result, req->apachereq->nargs);
+	    Tcl_SetIntObj(result, req->apachereq->nargs);
     } else if (source == VAR_SRC_POST) {
-	Tcl_SetIntObj(result, parmsarray->nelts - req->apachereq->nargs);
+	    Tcl_SetIntObj(result, parmsarray->nelts - req->apachereq->nargs);
     } else {
-	Tcl_SetIntObj(result, parmsarray->nelts);
+	    Tcl_SetIntObj(result, parmsarray->nelts);
     }
 
     return TCL_OK;
@@ -450,21 +450,25 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
  * have already done so, we don't need to do it again.
  */
 static void
-TclWeb_InitEnvVars( TclWebRequest *req )
+TclWeb_InitEnvVars (rivet_thread_private* private)
 {
-    rivet_server_conf *rsc;
-    apr_table_t *table = req->req->subprocess_env;
+    //rivet_server_conf *rsc;
     char *timefmt = DEFAULT_TIME_FORMAT;
     char *t;
-    apr_time_t date = req->req->request_time;
+    apr_time_t date;
 #ifndef WIN32
     struct passwd *pw;
 #endif /* ndef WIN32 */
-    rivet_thread_private* private;
+    TclWebRequest *req;
+    apr_table_t *table;  
+
+    req = private->req;
+    table = req->req->subprocess_env;
+    date = req->req->request_time;
 
     if( req->environment_set ) return;
 
-    rsc = RIVET_SERVER_CONF( req->req->server->module_config );
+    //rsc = RIVET_SERVER_CONF( req->req->server->module_config );
 
     /* Retrieve cgi variables. */
     ap_add_cgi_vars( req->req );
@@ -508,17 +512,16 @@ TclWeb_InitEnvVars( TclWebRequest *req )
 
     /* Here we create some variables with Rivet internal information. */
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
     apr_table_set (table, "RIVET_CACHE_FREE",
-            (char*) apr_psprintf (TCLWEBPOOL, "%d",private->interps[rsc->idx]->cache_free));
+            (char*) apr_psprintf (TCLWEBPOOL, "%d",RIVET_PEEK_INTERP(private,private->running_conf)->cache_free));
     apr_table_set (table, "RIVET_CACHE_SIZE",
-            (char*) apr_psprintf (TCLWEBPOOL, "%d",private->interps[rsc->idx]->cache_size));
+            (char*) apr_psprintf (TCLWEBPOOL, "%d",RIVET_PEEK_INTERP(private,private->running_conf)->cache_size));
 
     req->environment_set = 1;
 }
 
 int
-TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
+TclWeb_GetEnvVars(Tcl_Obj *envvar,rivet_thread_private* private)
 {
     int i;
 
@@ -526,9 +529,12 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
     apr_table_entry_t  *env;
     Tcl_Obj *key;
     Tcl_Obj *val;
+    TclWebRequest *req;
 
-    TclWeb_InitEnvVars( req );
 
+    TclWeb_InitEnvVars(private);
+
+    req = private->req;
     Tcl_IncrRefCount(envvar);
     /* Transfer Apache internal CGI variables to TCL request namespace. */
     env_arr = (apr_array_header_t *) apr_table_elts(req->req->subprocess_env);
@@ -563,16 +569,18 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar, TclWebRequest *req)
 }
 
 int
-TclWeb_GetHeaderVars(Tcl_Obj *headersvar, TclWebRequest *req)
+TclWeb_GetHeaderVars(Tcl_Obj *headersvar,rivet_thread_private* private)
 {
     int i;
-
+    TclWebRequest *req;
     apr_array_header_t *hdrs_arr;
     apr_table_entry_t  *hdrs;
     Tcl_Obj *key;
     Tcl_Obj *val;
 
-    TclWeb_InitEnvVars( req );
+    req = private->req;
+
+    TclWeb_InitEnvVars(private);
 
     Tcl_IncrRefCount(headersvar);
     /* Transfer client request headers to TCL request namespace. */
@@ -580,19 +588,19 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar, TclWebRequest *req)
     hdrs = (apr_table_entry_t *) hdrs_arr->elts;
     for (i = 0; i < hdrs_arr->nelts; ++i)
     {
-	if (!hdrs[i].key)
-	    continue;
+        if (!hdrs[i].key)
+            continue;
 
-	key = TclWeb_StringToUtfToObj(hdrs[i].key, req);
-	val = TclWeb_StringToUtfToObj(hdrs[i].val, req);
-	Tcl_IncrRefCount(key);
-	Tcl_IncrRefCount(val);
+        key = TclWeb_StringToUtfToObj(hdrs[i].key, req);
+        val = TclWeb_StringToUtfToObj(hdrs[i].val, req);
+        Tcl_IncrRefCount(key);
+        Tcl_IncrRefCount(val);
 
-        /* See comment in TclWeb_GetEnvVars concerning Bug 48963*/
+            /* See comment in TclWeb_GetEnvVars concerning Bug 48963*/
 
         Tcl_ObjSetVar2(req->interp, headersvar, key, val, 0);
- 	Tcl_DecrRefCount(key);
-	Tcl_DecrRefCount(val);
+        Tcl_DecrRefCount(key);
+        Tcl_DecrRefCount(val);
     }
 
     /* Transfer Apache internal CGI variables to TCL request namespace. */
@@ -767,11 +775,13 @@ int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req)
 }
 
 char *
-TclWeb_GetEnvVar( TclWebRequest *req, char *key )
+TclWeb_GetEnvVar(rivet_thread_private* private,char *key)
 {
     char *val;
+    TclWebRequest *req;
 
-    TclWeb_InitEnvVars( req );
+    req = private->req;
+    TclWeb_InitEnvVars(private);
 
     /* Check to see if it's a header variable first. */
     val = (char *)apr_table_get( req->req->headers_in, key );

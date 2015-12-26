@@ -1,7 +1,6 @@
-/*
-    mod_rivet_common.c - functions likely to be shared among 
-    different versions of mod_rivet.c 
+/* -- mod_rivet_common.c - functions likely to be shared among different versions of mod_rivet.c */
 
+/*
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
     distributed with this work for additional information
@@ -35,9 +34,253 @@
 #include "rivetParser.h"
 #include "rivet.h"
 #include "apache_config.h"
+#include "rivetCore.h"
 
 extern apr_threadkey_t*   rivet_thread_key;
 extern mod_rivet_globals* module_globals;
+
+/*----------------------------------------------------------------------------
+ * -- Rivet_RunningScripts
+ *
+ *
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf*  rivet_conf)
+{
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_before_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_after_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_error_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_abort_script);
+    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,after_every_script);
+
+    return scripts;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_PerInterpInit --
+ *
+ *  Do the initialization that needs to happen for every
+ *  interpreter.
+ *
+ * Results:
+ *  None.
+ *
+ * Side Effects:
+ *  None.
+ *
+ *-----------------------------------------------------------------------------
+ */
+void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p)
+{
+    rivet_interp_globals*   globals     = NULL;
+    Tcl_Obj*                auto_path   = NULL;
+    Tcl_Obj*                rivet_tcl   = NULL;
+    Tcl_Interp*             interp      = interp_obj->interp;
+
+    ap_assert (interp != (Tcl_Interp *)NULL);
+    Tcl_Preserve (interp);
+
+    /* Set up interpreter associated data */
+
+    globals = apr_pcalloc (p, sizeof(rivet_interp_globals));
+    Tcl_SetAssocData (interp,"rivet",NULL,globals);
+    
+    /* 
+     * abort_page status variables in globals are set here and then 
+     * reset in Rivet_SendContent just before the request processing is 
+     * completed 
+     */
+
+    /* Rivet commands namespace is created */
+
+    globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
+                                            (Tcl_NamespaceDeleteProc *)NULL);
+    //globals->req    = TclWeb_NewRequestObject (p); 
+    //globals->r      = NULL;
+    //globals->srec   = s;
+
+    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
+
+    /* We put in front the auto_path list the path to the directory where
+     * init.tcl is located (provides package Rivet, previously RivetTcl)
+     */
+
+    auto_path = Tcl_GetVar2Ex(interp,"auto_path",NULL,TCL_GLOBAL_ONLY);
+
+    rivet_tcl = Tcl_NewStringObj(RIVET_DIR,-1);
+    Tcl_IncrRefCount(rivet_tcl);
+
+    if (Tcl_IsShared(auto_path)) {
+        auto_path = Tcl_DuplicateObj(auto_path);
+    }
+
+    if (Tcl_ListObjReplace(interp,auto_path,0,0,1,&rivet_tcl) == TCL_ERROR)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                     MODNAME ": error setting auto_path: %s",
+                     Tcl_GetStringFromObj(auto_path,NULL));
+    } else {
+        Tcl_SetVar2Ex(interp,"auto_path",NULL,auto_path,TCL_GLOBAL_ONLY);
+    }
+
+    Tcl_DecrRefCount(rivet_tcl);
+
+    /* Initialize the interpreter with Rivet's Tcl commands. */
+
+    if (private == NULL)
+    {
+        /* reduced core for the server init interpreter */
+
+        // RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,private);
+        
+    } 
+    else
+    {
+        /* full fledged rivet core */
+
+        Rivet_InitCore(interp,private);
+
+    }
+
+    /* Create a global array with information about the server. */
+    Rivet_InitServerVariables(interp, p );
+
+    /* Loading into the interpreter commands in librivet.so */
+    /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
+     * Rivetlib can be mapped at this stage
+     */
+
+    if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION, 1) == NULL)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                     MODNAME ": Error loading rivetlib package: %s",
+                     Tcl_GetStringResult(interp) );
+        exit(1);
+    }
+
+    /*  If rivet is configured to export the ::rivet namespace commands we set the
+     *  array variable ::rivet::module_conf(export_namespace_commands) before calling init.tcl
+     *  This array will be unset after commands are exported.
+     */
+
+    Tcl_SetVar2Ex(interp,"module_conf","export_namespace_commands",Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
+    Tcl_SetVar2Ex(interp,"module_conf","import_rivet_commands",Tcl_NewIntObj(RIVET_NAMESPACE_IMPORT),0);
+
+    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
+
+    /* Watch out! Calling Tcl_PkgRequire with a version number binds this module to
+     * the Rivet package revision number in rivet/init.tcl
+     *
+     * RIVET_TCL_PACKAGE_VERSION is defined by configure.ac as the combination
+     * "MAJOR_VERSION.MINOR_VERSION". We don't expect to change rivet/init.tcl
+     * across patchlevel releases
+     */
+
+    if (Tcl_PkgRequire(interp, "Rivet", RIVET_INIT_VERSION, 1) == NULL)
+    {
+        ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                      MODNAME ": init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
+                      Tcl_GetStringResult(interp), RIVET_DIR );
+        exit(1);
+    }
+
+    Tcl_Release(interp);
+    interp_obj->flags |= RIVET_INTERP_INITIALIZED;
+}
+/*
+ * Rivet_CreateCache --
+ *
+ * Arguments:
+ *     rsc: pointer to a server_rec structure
+ *
+ * Results:
+ *     None
+ *
+ * Side Effects:
+ *
+ */
+
+void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
+{
+    interp_obj->objCacheList = apr_pcalloc(p, (signed)((interp_obj->cache_size)*sizeof(char *)));
+    interp_obj->objCache = apr_pcalloc(p, sizeof(Tcl_HashTable));
+    Tcl_InitHashTable(interp_obj->objCache, TCL_STRING_KEYS);
+}
+
+ /* -- Rivet_NewVHostInterp
+  *
+  * Returns a new rivet_thread_interp object with a new Tcl interpreter
+  * configuration scripts and cache. The pool passed to Rivet_NewVHostInterp 
+  *
+  *     Arguments: 
+  *       apr_pool_t* pool: a memory pool, it must be the private pool of a 
+  *       rivet_thread_private object (thread private)
+  *
+  *   Returned value:
+  *       a rivet_thread_interp* record object
+  *
+  */
+
+rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
+{
+    extern int              ap_max_requests_per_child;
+    rivet_thread_interp*    interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
+    rivet_server_conf*      rsc;
+
+    /* The cache size is global so we take it from here */
+    
+    rsc = RIVET_SERVER_CONF (module_globals->server->module_config);
+
+    /* This calls needs the root server_rec just for logging purposes*/
+
+    interp_obj->interp = Rivet_CreateTclInterp(module_globals->server); 
+
+    /* We now read from the pointers to the cache_size and cache_free conf parameters
+     * for compatibility with mod_rivet current version, but these values must become
+     * integers not pointers
+     */
+    
+    if (rsc->default_cache_size < 0) {
+        if (ap_max_requests_per_child != 0) {
+            interp_obj->cache_size = ap_max_requests_per_child / 5;
+        } else {
+            interp_obj->cache_size = 50;    // Arbitrary number
+        }
+    } else if (rsc->default_cache_size > 0) {
+        interp_obj->cache_size = rsc->default_cache_size;
+    }
+
+    if (interp_obj->cache_size > 0) {
+        interp_obj->cache_free = interp_obj->cache_size;
+    }
+
+    /* we now create memory from the cache pool as subpool of the thread private pool */
+ 
+    if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": could not initialize cache private pool");
+        return NULL;
+    }
+
+    // Initialize cache structures
+
+    if (interp_obj->cache_size) {
+        Rivet_CreateCache(pool,interp_obj); 
+    }
+
+    interp_obj->flags = 0;
+
+    interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
+    interp_obj->per_dir_scripts = apr_hash_make(pool); 
+
+    return interp_obj;
+}
+
 
 /*
  *-----------------------------------------------------------------------------
@@ -147,7 +390,6 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
         return NULL;
     }
     private->req_cnt        = 0;
-    private->keep_going     = 1;
     private->r              = NULL;
     private->req            = TclWeb_NewRequestObject (private->pool);
     private->page_aborting  = 0;
@@ -159,14 +401,7 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     Tcl_IncrRefCount(private->request_init);
     Tcl_IncrRefCount(private->request_cleanup);
 
-
-    /* We allocate the array for the interpreters database.
-     * Data referenced in this database must be freed by the thread before exit
-     */
-
-    private->interps    = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
     apr_threadkey_private_set (private,rivet_thread_key);
-
     return private;
 }
 
@@ -484,87 +719,4 @@ Rivet_CheckType (request_rec *req)
     return ctype; 
 }
 
-/*
- * -- Rivet_ProcessorCleanup
- *
- * Thread private data cleanup. This function is called by MPM bridges to 
- * release data owned by private and pointed in the array of rivet_thread_interp
- * objects. It has to be called just before an agent, either thread or
- * process, exits.
- *
- *  Arguments:
- *
- *      data:   pointer to a rivet_thread_private data structure. 
- *
- *  Returned value:
- *
- *      none
- *
- *  Side effects:
- *
- *      resources stored in the array of rivet_thread_interp objects are released
- *      and interpreters are deleted.
- *
- */
-
-void Rivet_ProcessorCleanup (void *data)
-{
-    rivet_thread_private*   private = (rivet_thread_private *) data;
-    Tcl_HashSearch*         searchCtx; 
-    Tcl_HashEntry*          entry;
-    int                     i;
-    rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
-
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
-                 "Thread exiting after %d requests served (%d vhosts)", 
-                                        private->req_cnt,module_globals->vhosts_count);
-
-    /* We are deleting the interpreters and release the thread channel. 
-     * Rivet channel is set as stdout channel of Tcl and as such is treated
-     * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
-     * the channel is released immediately by forcing the refCount to 0
-     * (see Tcl source code: generic/TclIO.c). Unregistering for each interpreter
-     * causes the process to segfault at least for certain Tcl versions.
-     * We unset the channel as stdout to avoid this
-     */
-
-    Tcl_SetStdChannel(NULL,TCL_STDOUT);
-
-    /* there must be always a root interpreter in the slot 0 of private->interps,
-       so there is always need to run at least one cycle here */
-
-    i = 0;
-    do
-    {
-
-        /* cleaning the cache contents and deleting it */
-
-        searchCtx = apr_pcalloc(private->pool,sizeof(Tcl_HashSearch));
-        entry = Tcl_FirstHashEntry(private->interps[i]->objCache,searchCtx);    
-        while (entry)
-        {
-            Tcl_DecrRefCount(Tcl_GetHashValue(entry)); /* Let Tcl clear the mem allocated */
-            Tcl_DeleteHashEntry(entry);
-
-            entry = Tcl_NextHashEntry(searchCtx);
-        }
- 
-        if ((i > 0) && rsc->separate_channels) 
-            Rivet_ReleaseRivetChannel(private->interps[i]->interp,private->channel);
-
-        Tcl_DeleteInterp(private->interps[i]->interp);
-
-        /* if separate_virtual_interps == 0 we are running the same interpreter
-         * instance for each vhost, thus we can jump out of this loop after 
-         * the first cycle as the only real intepreter object we have is stored
-         * in private->interps[0]
-         */
-
-    } while ((++i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
-
-    Tcl_DecrRefCount(private->request_init);
-    Tcl_DecrRefCount(private->request_cleanup);
-    apr_pool_destroy(private->pool);
-    
-}
 

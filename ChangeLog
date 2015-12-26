@@ -1,3 +1,15 @@
+2015-12-26 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/worker_prefork_common.c: functions common to both the prefork
+    and worker bridges, but not general enough bur rather specific to the worker
+    model adopted by them
+    * src/mod_rivet/rivet_lazy_mpm.c: further development, now capable of serving
+    rivet requests, but needs to be completed.
+    * src/mod_rivet/mod_rivet_common.c: more stuff moved from mod_rivet to this file
+    * src/mod_rivet/mod_rivet.h: new data organization with bridge specific thread
+    private data
+    * src/mod_rivet/Tclwebapache.c: API changed from Tclwebreq pointers to 
+    thread private data that is supposed to store most of the thread environment
+
 2015-12-22 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_lazy_mpm.c: taking a snapshot of the current development
     as this code proved to be quite robust when stressed using 'ab'

@@ -59,11 +59,6 @@ static int cmd(\
     int objc,\
     Tcl_Obj *CONST objv[])
 
- /* we also define a convenience macro to cast the ClientData
-  * into the thread private data pointer */
-
-#define THREAD_PRIVATE_DATA(p)  p = (rivet_thread_private *)clientData;
-
 #define TCL_OBJ_CMD( name, func ) \
 Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
 		      name,                     /* Function name in Tcl */\

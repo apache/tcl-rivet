@@ -29,14 +29,17 @@
 #include "rivetChannel.h"
 #include "apache_config.h"
 #include "rivet.h"
+#include "rivetCore.h"
 
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
 
-int Rivet_InitCore (Tcl_Interp *interp,rivet_thread_private* p); 
+rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
+rivet_thread_interp*    Rivet_NewVHostInterp(apr_pool_t* pool);
 
-rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
-rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t* pool);
+/* typedef struct mpm_bridge_specific {
+    rivet_thread_interp** interps;          
+} mpm_bridge_specific; */
 
 /* -- Prefork_MPM_Finalize */
 
@@ -69,7 +72,9 @@ void Prefork_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
      */
 
     private = Rivet_CreatePrivateData();
-    
+    //private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
+    private->interps = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
+   
     Rivet_SetupTclPanicProc ();
     ap_assert(private != NULL);
 
@@ -161,12 +166,18 @@ int Prefork_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
+rivet_thread_interp* Prefork_MPM_Interp(rivet_thread_private *private,rivet_server_conf* conf)
+{
+    return private->interps[conf->idx];   
+}
+
 RIVET_MPM_BRIDGE {
     NULL,
     Prefork_MPM_ChildInit,
     Prefork_MPM_Request,
     Prefork_MPM_Finalize,
     Prefork_MPM_MasterInterp,
-    Prefork_MPM_ExitHandler
+    Prefork_MPM_ExitHandler,
+    Prefork_MPM_Interp
 };
 

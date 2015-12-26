@@ -21,7 +21,10 @@
 
 #ifndef _MOD_RIVET_COMMON_
 #define _MOD_RIVET_COMMON_
-
+EXTERN running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf* rivet_conf);
+EXTERN void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p);
+EXTERN void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
+EXTERN rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool);
 EXTERN void Rivet_ProcessorCleanup (void *data);
 EXTERN int Rivet_chdir_file (const char *file);
 EXTERN int Rivet_CheckType (request_rec* r);
