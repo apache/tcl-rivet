@@ -75,6 +75,7 @@
     RivetBridge_Finalize      *mpm_finalize;
     RivetBridge_Master_Interp *mpm_master_interp;
     RivetBridge_Exit_Handler  *mpm_exit_handler;
+    RivetBridge_Thread_Interp *mpm_thread_interp;
 } rivet_bridge_table;</programlisting>
 		<para>
 			<itemizedlist>
@@ -108,8 +109,8 @@
 				has no special need when a child process must exit.
 				</listitem>
 				<listitem><emphasis>mpm_master_interp</emphasis>: This function
-				is mainly existing to allow fork capable bridges to reuturn
-				the child process master interpreter descriptor. 
+				is mainly existing to allow fork capable bridges to return
+				the child process root master interpreter descriptor. 
 				In general the master interpreter should be either the only 
 				interpreter descriptor pointer of the child process (when 
 				<command>SeparateVirtualInterps</command> is off (default)) or one of 
@@ -133,6 +134,17 @@
 				<ulink url="svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivetCore.c">rivetCore.c</ulink>
 				to have details on how and at what stage this callback is invoked.
 				</listitem>
+				<listitem>
+					<emphasis>mpm_thread_interp</emphasis> must be a function returning
+					the interpreter object (a pointer to record of type <command>rivet_thread_interp</command>) associated
+					to a given configuration as stored in a <command>rivet_server_conf*</command> object. This element
+					was temporarily introduced in the <command>mpm_bridge_table</command> table and should be accessed
+					through the macro RIVET_PEEK_INTERP.
+					<programlisting>interp_obj = RIVET_PEEK_INTERP(private,private->conf);</programlisting>
+					Every bridge implementation should have its own way to store interpreter data and manage their
+					status. So this macro (and associated function)	should hide from the module core function
+					the specific approach followed in a particular bridge
+				</listitem>
 			</itemizedlist>
 		</para>
     </section>
@@ -140,7 +152,6 @@
     <section>
       <title>Server Initialization and MPM Bridge</title>
       <para>
-      	The main
       </para>
     </section>
     <section>

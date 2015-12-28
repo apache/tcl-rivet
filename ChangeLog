@@ -1,3 +1,7 @@
+2015-12-28 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_lazy_mpm.c: fixed missing interpreter scripts initialization
+    * doc/xml/internals.xml: documenting bridge interpreter accessor function 
+
 2015-12-26 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/worker_prefork_common.c: functions common to both the prefork
     and worker bridges, but not general enough bur rather specific to the worker

@@ -192,7 +192,6 @@ typedef struct _mod_rivet_globals {
 
     rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
     mpm_bridge_status*  mpm;                    /* bridge private control structure         */
-    
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
 #endif
@@ -210,7 +209,6 @@ typedef struct _thread_worker_private {
     TclWebRequest*      req;
     Tcl_Obj*            request_init;
     Tcl_Obj*            request_cleanup;
-                                            
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */
     int                 thread_exit;        /* Thread exit code                     */

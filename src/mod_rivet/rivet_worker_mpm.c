@@ -781,6 +781,7 @@ int Worker_MPM_ExitHandler(int code)
      * and is sequence the whole process to shutdown by calling exit() */
  
     Worker_MPM_Finalize (private->r->server);
+
     return TCL_OK;
 }
 
