@@ -31,10 +31,11 @@
 #include "rivet.h"
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
-#include "httpd.h"
+#include "mod_rivet_generator.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
 #include "rivet_config.h"
+#include "worker_prefork_common.h"
 
 #define BRIDGE_SUPERVISOR_WAIT  1000000
 #define MOD_RIVET_QUEUE_SIZE        100
@@ -76,17 +77,11 @@ typedef struct mpm_bridge_status {
 #endif
 } mpm_bridge_status;
 
-/* This object is thread specific */
-
-typedef struct mpm_bridge_specific {
-    int                   keep_going;       /* thread loop controlling variable     */
-} mpm_bridge_specific;
-
-
 /* data private to the Apache callback handling the request */
 
 typedef struct _handler_private 
 {
+    rivet_thread_interp**   interps;        /* database of virtual host interps     */
     rivet_job_t             job_type;
     apr_thread_cond_t*      cond;
     apr_thread_mutex_t*     mutex;
@@ -184,9 +179,10 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
 
     private = Rivet_CreatePrivateData();
-    private->interps = apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
+    private->ext->interps = 
+        apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
 
     if (private == NULL) 
     {
@@ -724,7 +720,7 @@ apr_status_t Worker_MPM_Finalize (void* data)
 }
 
 /*
- * -- Worker_MPM_MasterInterp
+ * -- MPM_MasterInterp
  *
  *  Arguments:
  *
@@ -734,7 +730,8 @@ apr_status_t Worker_MPM_Finalize (void* data)
  *
  */
 
-rivet_thread_interp* Worker_MPM_MasterInterp(void)
+
+rivet_thread_interp* MPM_MasterInterp(void)
 {
     rivet_thread_private*   private;
     rivet_thread_interp*    interp_obj; 
@@ -788,7 +785,7 @@ int Worker_MPM_ExitHandler(int code)
 rivet_thread_interp* Worker_MPM_Interp(rivet_thread_private *private,
                                        rivet_server_conf *conf)
 {
-    return private->interps[conf->idx];   
+    return private->ext->interps[conf->idx];   
 }
 
 RIVET_MPM_BRIDGE {
@@ -796,7 +793,6 @@ RIVET_MPM_BRIDGE {
     Worker_MPM_ChildInit,
     Worker_MPM_Request,
     Worker_MPM_Finalize,
-    Worker_MPM_MasterInterp,
     Worker_MPM_ExitHandler,
     Worker_MPM_Interp
 };

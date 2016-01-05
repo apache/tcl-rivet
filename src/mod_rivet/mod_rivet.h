@@ -171,7 +171,6 @@ typedef struct _mpm_bridge_table {
     RivetBridge_ChildInit     *mpm_child_init;
     RivetBridge_Request       *mpm_request;
     RivetBridge_Finalize      *mpm_finalize;
-    RivetBridge_Master_Interp *mpm_master_interp;
     RivetBridge_Exit_Handler  *mpm_exit_handler;
     RivetBridge_Thread_Interp *mpm_thread_interp;
 } rivet_bridge_table;
@@ -189,7 +188,6 @@ typedef struct _mod_rivet_globals {
     rivet_thread_interp* 
                         server_interp;          /* server and prefork MPM interpreter       */
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
-
     rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
     mpm_bridge_status*  mpm;                    /* bridge private control structure         */
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
@@ -201,7 +199,6 @@ typedef struct mpm_bridge_specific mpm_bridge_specific;
 
 typedef struct _thread_worker_private {
     apr_pool_t*         pool;               /* threads private memory pool          */
-    rivet_thread_interp** interps;          /* database of virtual host interps     */
     Tcl_Channel*        channel;            /* the Tcl thread private channel       */
     int                 req_cnt;            /* requests served by thread            */
     rivet_req_ctype     ctype;              /*                                      */
@@ -275,10 +272,6 @@ Tcl_Obj* Rivet_CurrentServerRec ( Tcl_Interp* interp, server_rec* s );
 
 /* these three must go in their own file */
 
-EXTERN int Rivet_ParseExecFile (rivet_thread_private* req, char* filename, int toplevel);
-EXTERN int Rivet_ParseExecString (TclWebRequest* req, Tcl_Obj* inbuf);
-EXTERN int Rivet_SendContent (rivet_thread_private *private,request_rec* r);
-EXTERN Tcl_Interp* Rivet_CreateTclInterp (server_rec* s);
 
 /* temporary content generation handler */
 //EXTERN int RivetContent (rivet_thread_private* private);

@@ -32,6 +32,7 @@
 
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
+#include "mod_rivet_generator.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
 
@@ -50,11 +51,11 @@ enum
     done
 };
 
+/* lazy bridge Tcl thread status and communication variables */
+
 typedef struct lazy_tcl_worker {
-    apr_thread_mutex_t* mutex1;
-    apr_thread_mutex_t* mutex2;
-    apr_thread_cond_t*  condition1;
-    apr_thread_cond_t*  condition2;
+    apr_thread_mutex_t* mutex;
+    apr_thread_cond_t*  condition;
     int                 status;
     apr_thread_t*       thread_id;
     server_rec*         server;
@@ -64,23 +65,25 @@ typedef struct lazy_tcl_worker {
     int                 nreqs;
 } lazy_tcl_worker;
 
+/* virtual host descriptor */
+
 typedef struct vhost_iface {
-    apr_uint32_t*       idle_threads_cnt;       /* */
-    //apr_uint32_t*       threads_count;          /* */
+    int                 idle_threads_cnt;   /* */
     int                 threads_count;
-    apr_thread_mutex_t* mutex;
-    apr_array_header_t* array;                  /* available threads  */
+    apr_thread_mutex_t* mutex;              /* mutex protecting 'array' */
+    apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers */
     int                 server_shutdown;
 } vhost;
 
 typedef struct mpm_bridge_status {
     apr_thread_mutex_t* mutex;
-    apr_thread_cond_t*  condition;
-    void**              workers;                /* thread pool ids          */
+    //apr_thread_cond_t*   condition;
     int                 exit_command;
     int                 exit_command_status;
-    vhost*              vhosts;
+    vhost*              vhosts;             /* array of vhost descriptors */
 } mpm_bridge_status;
+
+/* lazy bridge thread private data extension */
 
 typedef struct mpm_bridge_specific {
     rivet_thread_interp*  interp;           /* thread Tcl interpreter object        */
@@ -90,9 +93,6 @@ typedef struct mpm_bridge_specific {
                                              * are copied here to be passed to a    *
                                              * channel                              */
 } mpm_bridge_specific;
-
-#define DEFAULT_HEADER_TYPE "text/html"
-#define BASIC_PAGE          "<b>Lazy Bridge</b>"
 
 #define MOD_RIVET_QUEUE_SIZE 100
 
@@ -120,7 +120,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     w->nreqs = 0;
     Tcl_RegisterChannel(private->ext->interp->interp,*private->channel);
 
-    private->ext->interp->scripts = Rivet_RunningScripts (private->pool,private->ext->interp->scripts,private->ext->conf );
+    private->ext->interp->scripts = 
+            Rivet_RunningScripts (private->pool,private->ext->interp->scripts,private->ext->conf );
 
     Rivet_PerInterpInit(private->ext->interp,private,module_globals->server,private->pool);
     
@@ -141,11 +142,11 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
                          "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, w->server, 
                          "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
-            apr_thread_mutex_lock(w->mutex2);
+            apr_thread_mutex_lock(w->mutex);
             w->status = done;
             w->ap_sts = HTTP_INTERNAL_SERVER_ERROR;
-            apr_thread_cond_signal(w->condition2);
-            apr_thread_mutex_unlock(w->mutex2);
+            apr_thread_cond_signal(w->condition);
+            apr_thread_mutex_unlock(w->mutex);
 
             /* This is broken: there must be a way to tell the array of 
              * available threads this thread is about to exit, otherwise
@@ -160,15 +161,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     }
 
     idx = private->ext->conf->idx;
+    apr_thread_mutex_lock(w->mutex);
     do 
     {
-        //char* page;
         int   http_code;
 
-        apr_thread_mutex_lock(w->mutex1);
-        apr_atomic_inc32(module_globals->mpm->vhosts[idx].idle_threads_cnt);
+        module_globals->mpm->vhosts[idx].idle_threads_cnt++;
         while ((w->status != init) && (w->status != thread_exit)) {
-            apr_thread_cond_wait(w->condition1,w->mutex1);
+            apr_thread_cond_wait(w->condition,w->mutex);
         } 
         if (w->status == thread_exit) {
             private->ext->keep_going = 0;
@@ -177,8 +177,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         w->status = processing;
         w->nreqs++;
-        apr_thread_mutex_unlock(w->mutex1);
-        apr_atomic_dec32(module_globals->mpm->vhosts[idx].idle_threads_cnt);
+        module_globals->mpm->vhosts[idx].idle_threads_cnt--;
 
         /* Content generation */
 
@@ -186,26 +185,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         if (module_globals->mpm->vhosts[idx].server_shutdown) continue;
 
-        /*
-        ap_set_content_type(w->r,apr_pstrdup(w->r->pool,DEFAULT_HEADER_TYPE));
-        ap_send_http_header(w->r);
-        page = apr_psprintf(w->r->pool,"%s: vh %d, idle threads: %d, nreqs: %d",BASIC_PAGE,idx,
-                            (int) apr_atomic_read32(module_globals->mpm->vhosts[idx].idle_threads_cnt),w->nreqs);
-        ap_rwrite(page,strlen(page),w->r);
-        ap_rflush(w->r);
-        */
-
-        apr_thread_mutex_lock(w->mutex2);
         w->status = done;
         w->ap_sts = http_code;
-        apr_thread_cond_signal(w->condition2);
-        apr_thread_mutex_unlock(w->mutex2);
-
-        apr_thread_mutex_lock(w->mutex1);
+        apr_thread_cond_signal(w->condition);
         while (w->status == done) {
-            apr_thread_cond_wait(w->condition1,w->mutex1);
+            apr_thread_cond_wait(w->condition,w->mutex);
         } 
-        apr_thread_mutex_unlock(w->mutex1);
  
         // rescheduling itself in the array of idle threads
        
@@ -214,12 +199,13 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
 
     } while (private->ext->keep_going);
+    apr_thread_mutex_unlock(w->mutex);
 
     apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
     (module_globals->mpm->vhosts[idx].threads_count)--;
     apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
 
-    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server, "processor thread orderly exit");
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"processor thread orderly exit");
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
@@ -232,10 +218,8 @@ static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
 
     w->status = idle;
     w->server = server;
-    ap_assert(apr_thread_mutex_create(&w->mutex1,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
-    ap_assert(apr_thread_cond_create(&w->condition1, pool) == APR_SUCCESS); 
-    ap_assert(apr_thread_mutex_create(&w->mutex2,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
-    ap_assert(apr_thread_cond_create(&w->condition2, pool) == APR_SUCCESS); 
+    ap_assert(apr_thread_mutex_create(&w->mutex,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
+    ap_assert(apr_thread_cond_create(&w->condition, pool) == APR_SUCCESS); 
     apr_thread_create(&w->thread_id, NULL, request_processor, w, module_globals->pool);
 
     return w;
@@ -249,17 +233,15 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
 
-    //module_globals->mpm->vhosts = (vhost *) apr_pcalloc(pool,sizeof(vhost) * module_globals->vhosts_count);
-
     rv = apr_thread_mutex_create(&module_globals->mpm->mutex,APR_THREAD_MUTEX_UNNESTED,pool);
     ap_assert(rv == APR_SUCCESS);
-    rv = apr_thread_cond_create(&module_globals->mpm->condition, pool); 
-    ap_assert(rv == APR_SUCCESS);
+
+    // rv = apr_thread_cond_create(&module_globals->mpm->condition, pool); 
+    // ap_assert(rv == APR_SUCCESS);
 
     module_globals->mpm->vhosts = (vhost *) apr_pcalloc(pool,module_globals->vhosts_count * sizeof(vhost));
     ap_assert(module_globals->mpm->vhosts != NULL);
 
-    //for (vh = 0; vh < module_globals->vhosts_count; vh++)
     for (s = root_server; s != NULL; s = s->next)
     {
         int                 vh;
@@ -267,13 +249,13 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         rivet_server_conf*  rsc = RIVET_SERVER_CONF(s->module_config);
 
         vh = rsc->idx;
-        ap_assert(apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,APR_THREAD_MUTEX_UNNESTED,pool) == APR_SUCCESS);
+        rv = apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,APR_THREAD_MUTEX_UNNESTED,pool);
+        ap_assert(rv == APR_SUCCESS);
         array = apr_array_make(pool,0,sizeof(void*));
         ap_assert(array != NULL);
         module_globals->mpm->vhosts[vh].array = array;
 
-        module_globals->mpm->vhosts[vh].idle_threads_cnt = (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
-        apr_atomic_set32(module_globals->mpm->vhosts[vh].idle_threads_cnt,0);
+        module_globals->mpm->vhosts[vh].idle_threads_cnt = 0;
         module_globals->mpm->vhosts[vh].threads_count = 0;
         module_globals->mpm->vhosts[vh].server_shutdown = 0;
     }
@@ -287,8 +269,6 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     apr_array_header_t* array;
     apr_thread_mutex_t* mutex;
 
-    /* If the array is empty we create a new worker thread */
-
     mutex = module_globals->mpm->vhosts[conf->idx].mutex;
     array = module_globals->mpm->vhosts[conf->idx].array;
     apr_thread_mutex_lock(mutex);
@@ -299,6 +279,8 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
         apr_thread_mutex_unlock(mutex);
         return HTTP_INTERNAL_SERVER_ERROR;
     }
+
+    /* If the array is empty we create a new worker thread */
 
     if (apr_is_empty_array(array))
     {
@@ -312,25 +294,25 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 
     apr_thread_mutex_unlock(mutex);
     
-    apr_thread_mutex_lock(w->mutex1);
+    apr_thread_mutex_lock(w->mutex);
     w->r        = r;
     w->ctype    = ctype;
     w->status   = init;
-    apr_thread_cond_signal(w->condition1);
-    apr_thread_mutex_unlock(w->mutex1);
+    apr_thread_cond_signal(w->condition);
+    //apr_thread_mutex_unlock(w->mutex);
 
-    apr_thread_mutex_lock(w->mutex2);
+    //apr_thread_mutex_lock(w->mutex);
     while (w->status != done) {
-        apr_thread_cond_wait(w->condition2,w->mutex2);
+        apr_thread_cond_wait(w->condition,w->mutex);
     } 
     ap_sts = w->ap_sts;
-    apr_thread_mutex_unlock(w->mutex2);
+    //apr_thread_mutex_unlock(w->mutex);
 
-    apr_thread_mutex_lock(w->mutex1);
+    //apr_thread_mutex_lock(w->mutex);
     w->status = idle;
     w->r      = NULL;
-    apr_thread_cond_signal(w->condition1);
-    apr_thread_mutex_unlock(w->mutex1);
+    apr_thread_cond_signal(w->condition);
+    apr_thread_mutex_unlock(w->mutex);
 
     return ap_sts;
 }
@@ -368,11 +350,11 @@ apr_status_t Lazy_MPM_Finalize (void* data)
                 lazy_tcl_worker*    w;
 
                 w = *(lazy_tcl_worker**) apr_array_pop(array); 
-                apr_thread_mutex_lock(w->mutex1);
+                apr_thread_mutex_lock(w->mutex);
                 w->r        = NULL;
                 w->status   = thread_exit;
-                apr_thread_cond_signal(w->condition1);
-                apr_thread_mutex_unlock(w->mutex1);
+                apr_thread_cond_signal(w->condition);
+                apr_thread_mutex_unlock(w->mutex);
             }
             apr_sleep(10000);
 
@@ -396,8 +378,13 @@ int Lazy_MPM_ExitHandler(int code)
 
     private->ext->keep_going = 0;
 
-    module_globals->mpm->exit_command = 1;
-    module_globals->mpm->exit_command_status = code;
+    apr_thread_mutex_lock(module_globals->mpm->mutex);
+    if (module_globals->mpm->exit_command == 0)
+    {
+        module_globals->mpm->exit_command = 1;
+        module_globals->mpm->exit_command_status = code;
+    }
+    apr_thread_mutex_unlock(module_globals->mpm->mutex);
 
     /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
      * and is sequence the whole process to shutdown by calling exit() */
@@ -411,7 +398,6 @@ RIVET_MPM_BRIDGE {
     Lazy_MPM_ChildInit,
     Lazy_MPM_Request,
     Lazy_MPM_Finalize,
-    NULL,
     Lazy_MPM_ExitHandler,
     Lazy_MPM_Interp
 };

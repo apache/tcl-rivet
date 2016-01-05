@@ -44,6 +44,7 @@
 #include <apr_errno.h>
 #include <apr_strings.h>
 
+#include "mod_rivet_generator.h"
 #include "apache_request.h"
 #include "mod_rivet.h"
 #include "rivet.h"
@@ -223,7 +224,7 @@ TCL_CMD_HEADER( Rivet_Parse )
 
         /* we treat the argument as a string and we pass it as is to Rivet_ParseExecString */
 
-            return Rivet_ParseExecString(private->req, objv[2]);
+            return Rivet_ParseExecString(private, objv[2]);
 
         } else { 
 

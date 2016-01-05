@@ -73,66 +73,56 @@
     RivetBridge_ChildInit     *mpm_child_init;
     RivetBridge_Request       *mpm_request;
     RivetBridge_Finalize      *mpm_finalize;
-    RivetBridge_Master_Interp *mpm_master_interp;
     RivetBridge_Exit_Handler  *mpm_exit_handler;
     RivetBridge_Thread_Interp *mpm_thread_interp;
 } rivet_bridge_table;</programlisting>
 		<para>
 			<itemizedlist>
-				<listitem><emphasis>mpm_server_init</emphasis>: pointer to any
-				specific server inititalization function. This field can be NULL
-				if no bridge specific initialization has to be done. The core of
-				mod_rivet runs the <command>ServerInitScript</command> before
-				calling this function.</listitem>
-				<listitem><emphasis>mpm_child_init</emphasis>: Bridge specific
-				child process initialization. If the pointer is assigned with
-				a non-NULL value the function is called by Rivet_ChildInit. 
+				<listitem>
+					<emphasis>mpm_server_init</emphasis>: pointer to any
+					specific server inititalization function. This field can be NULL
+					if no bridge specific initialization has to be done. The core of
+					mod_rivet runs the <command>ServerInitScript</command> before
+					calling this function.</listitem>
+					<listitem><emphasis>mpm_child_init</emphasis>: Bridge specific
+					child process initialization. If the pointer is assigned with
+					a non-NULL value the function is called by Rivet_ChildInit. 
 				</listitem>
-				<listitem><emphasis>mpm_request</emphasis>: This pointer must
-				be assigned with a valid function pointer to the content generator
-				implemented by the bridge. If the pointer is not defined the Apache
-				web server will stop during start up. This condition is motivated by
-				the need of avoiding useless testing of the pointer. The fundamental
-				purpose of a content generator module (like mod_rivet) is to respond
-				to requests creating content, thus whatever it is
-				a content generating function must exist (during the early stages of
-				development you can create a simple test function for that)
+				<listitem>
+					<emphasis>mpm_request</emphasis>: This pointer must
+					be assigned with a valid function pointer to the content generator
+					implemented by the bridge. If the pointer is not defined the Apache
+					web server will stop during start up. This condition is motivated by
+					the need of avoiding useless testing of the pointer. The fundamental
+					purpose of a content generator module (like mod_rivet) is to respond
+					to requests creating content, thus whatever it is
+					a content generating function must exist (during the early stages of
+					development you can create a simple test function for that)
 				</listitem>
-				<listitem><emphasis>mpm_finalize</emphasis>: pointer to a finalization
-				function called during a child process exit. This function is registered
-				as child process memory pool cleanup function. If the pointer is NULL
-				the pool is given a default cleanup function (apr_pool_cleanup_null) 
-				defined in src/mod_rivet/mod_rivet.c. For instance the finalize function
-				in the <emphasis>worker</emphasis> MPM bridge notifies
-				a supervisor thread demanding the whole pool of threads running Tcl 
-				interpreters to orderly exit. This pointer can be NULL if the bridge 
-				has no special need when a child process must exit.
+				<listitem>
+					<emphasis>mpm_finalize</emphasis>: pointer to a finalization
+					function called during a child process exit. This function is registered
+					as child process memory pool cleanup function. If the pointer is NULL
+					the pool is given a default cleanup function (apr_pool_cleanup_null) 
+					defined in src/mod_rivet/mod_rivet.c. For instance the finalize function
+					in the <emphasis>worker</emphasis> MPM bridge notifies
+					a supervisor thread demanding the whole pool of threads running Tcl 
+					interpreters to orderly exit. This pointer can be NULL if the bridge 
+					has no special need when a child process must exit.
 				</listitem>
-				<listitem><emphasis>mpm_master_interp</emphasis>: This function
-				is mainly existing to allow fork capable bridges to return
-				the child process root master interpreter descriptor. 
-				In general the master interpreter should be either the only 
-				interpreter descriptor pointer of the child process (when 
-				<command>SeparateVirtualInterps</command> is off (default)) or one of 
-				the virtual host interpreter pointers. The current implementation of
-				the prefork and worker bridges return the interpreter associated to 
-				the first record in the linked list of <command>server_rec</command>
-				records. When <command>SeparateVirtualInterps</command> is off
-				the <emphasis>prefork</emphasis> MPM bridge returns the interpreter
-				inherited through the fork call from the server parent process
-				</listitem>
-				<listitem><emphasis>mpm_exit_handler</emphasis>: mod_rivet replaces
-				the core <command>exit</command> command with a new one
-				(<command>::rivet::exit</command>) with a special handling of
-				the process exit allowing the current request process to be finished
-				interrupting the script execution and handing execution down to
-				<command>AbortScript</command>. If the bridge needs to be aware of
-				the exit call this is the function where special tasks can be carried out.
-				With the <emphasis>worker</emphasis> MPM bridge the finalize function
-				is called after the current thread itself is set up for termination.
-				See function Rivet_ExitCmd in
-				<ulink url="svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivetCore.c">rivetCore.c</ulink>
-				to have details on how and at what stage this callback is invoked.
+				<listitem>
+					<emphasis>mpm_exit_handler</emphasis>: mod_rivet replaces
+					the core <command>exit</command> command with a new one
+					(<command>::rivet::exit</command>) with a special handling of
+					the process exit allowing the current request process to be finished
+					interrupting the script execution and handing execution down to
+					<command>AbortScript</command>. If the bridge needs to be aware of
+					the exit call this is the function where special tasks can be carried out.
+					With the <emphasis>worker</emphasis> MPM bridge the finalize function
+					is called after the current thread itself is set up for termination.
+					See function Rivet_ExitCmd in
+					<ulink url="svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivetCore.c">rivetCore.c</ulink>
+					to have details on how and at what stage this callback is invoked.
 				</listitem>
 				<listitem>
 					<emphasis>mpm_thread_interp</emphasis> must be a function returning
@@ -245,10 +235,8 @@
         </para>
         <para>            
             For this purpose in <option>src/rivet.h</option> the macro
-            CHECK_REQUEST_REC was defined accepting two arguments: the copy
-            to the request_rec pointer (stored in the 
-            <structname>rivet_interp_globals</structname>
-            structure) and the command name. If the pointer is NULL
+            CHECK_REQUEST_REC was defined accepting two arguments: the thread
+				private data object and the command name. If the pointer is NULL
             the macro calls Tcl_NoRequestRec and returns TCL_ERROR
             causing the command to fail. These are the step to follow
             to implement a new C language command for mod_rivet 
@@ -269,17 +257,25 @@
                 link it into mod_rivet.so)
             </listitem>
             <listitem>
-                If the code must gain access to <command>globals->r</command>
+                If the code must gain access to <command>private->r</command>
                 put add the macro testing for the pointer
                 <programlisting>TCL_CMD_HEADER( Rivet_MyCmd )
 {
-    /* we have to fetch the thread private data */
+    /* we have to get the thread private data */
     
     THREAD_PRIVATE_DATA(private)
     ....
+
+	/* if ::rivet::mycmd works within a request processing we have
+	 * to check if 'private' is bringing a non null request_rec pointer
+	 */
+    
     CHECK_REQUEST_REC(private,"::rivet::mycmd");
     ...   
 }</programlisting>
+				In <command>Rivet_InitCore</command> define the new command and its handler
+<programlisting>RIVET_OBJ_CMD ("mycmd",Rivet_MyCmd,private);</programlisting>
+				notice the argument is the command name defined without the namespace qualification
             </listitem>
             <listitem>
                 Add a test for this command in <option>tests/checkfails.tcl</option>. For 
@@ -290,13 +286,13 @@ check_fail virtual_filename unkn
 check_fail my_cmd &lt;arg1&gt; &lt;arg2&gt;
 ....</programlisting>
                 Where <option>&lt;arg1&gt; &lt;arg2&gt;</option> are optional 
-                arguments in case the command needs to check for <command>globals->r</command>
-                in special cases. Then, if <command>::rivet::mycmd</command> must fail also
+                arguments in case the command has different forms depending on
+                the arguments. Then, if <command>::rivet::mycmd</command> must fail also
                 <option>tests/failtest.tcl</option> should modified as
                 <programlisting>virtual_filename->1
 mycmd->1</programlisting>
                 The value associated to the test must be <option>0</option> in case the
-                command doesn't need to test the <command>globals->r</command> pointer.
+                command doesn't need to test the <command>private->r</command> pointer.
             </listitem>
         </itemizedlist>
     </section>

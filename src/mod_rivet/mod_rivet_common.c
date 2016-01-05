@@ -39,6 +39,48 @@
 extern apr_threadkey_t*   rivet_thread_key;
 extern mod_rivet_globals* module_globals;
 
+/*
+ *-----------------------------------------------------------------------------
+ * Rivet_CreateTclInterp --
+ *
+ * Arguments:
+ *  server_rec* s: pointer to a server_rec structure
+ *
+ * Results:
+ *  pointer to a Tcl_Interp structure
+ * 
+ * Side Effects:
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+static Tcl_Interp* 
+Rivet_CreateTclInterp (server_rec* s)
+{
+    Tcl_Interp* interp;
+
+    /* Initialize TCL stuff  */
+    Tcl_FindExecutable(RIVET_NAMEOFEXECUTABLE);
+    interp = Tcl_CreateInterp();
+
+    if (interp == NULL)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                     MODNAME ": Error in Tcl_CreateInterp, aborting\n");
+        exit(1);
+    }
+
+    if (Tcl_Init(interp) == TCL_ERROR)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+                     MODNAME ": Error in Tcl_Init: %s, aborting\n",
+                     Tcl_GetStringResult(interp));
+        exit(1);
+    }
+
+    return interp;
+}
+
 /*----------------------------------------------------------------------------
  * -- Rivet_RunningScripts
  *
@@ -47,7 +89,7 @@ extern mod_rivet_globals* module_globals;
  *-----------------------------------------------------------------------------
  */
 
-running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf*  rivet_conf)
+running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf* rivet_conf)
 {
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_before_script);
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_after_script);

@@ -1,3 +1,11 @@
+2016-01-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet_generator.[h|c]: files holding the output generation
+    procedures on which all the bridges rely (previously stored in mod_rivet.c)
+    * src/mod_rivet/rivet_lazy_mpm.c: purged of redundant locking code and unused variables
+    * src/mod_rivet/worker_prefork_mpm.c: new file with thread private data extension to
+    bridge status 
+    * doc/xml/internals.xml: update to amend out of date explanations
+
 2015-12-28 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_lazy_mpm.c: fixed missing interpreter scripts initialization
     * doc/xml/internals.xml: documenting bridge interpreter accessor function 

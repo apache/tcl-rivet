@@ -25,9 +25,12 @@
 #include <apr_strings.h>
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
+#include "worker_prefork_common.h"
 
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
+
+extern rivet_thread_interp* MPM_MasterInterp(void);
 
 /*
  * Rivet_DuplicateVhostInterp
@@ -89,8 +92,10 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
     
-    ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp) != NULL);
-    root_interp = (*RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp))();
+    //ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp) != NULL);
+    //root_interp = (*RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp))();
+
+    root_interp = MPM_MasterInterp();
 
     /* we must assume the module was able to create the root interprter otherwise
      * it's just a null module. I try to have also this case to develop experimental
@@ -172,7 +177,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         rivet_interp->scripts = Rivet_RunningScripts (private->pool,rivet_interp->scripts,myrsc);
 
-        private->interps[myrsc->idx] = rivet_interp;
+        private->ext->interps[myrsc->idx] = rivet_interp;
 
         /* Basic Rivet packages and libraries are loaded here */
 
@@ -286,7 +291,7 @@ void Rivet_ProcessorCleanup (void *data)
         /* cleaning the cache contents and deleting it */
 
         searchCtx = apr_pcalloc(private->pool,sizeof(Tcl_HashSearch));
-        entry = Tcl_FirstHashEntry(private->interps[i]->objCache,searchCtx);    
+        entry = Tcl_FirstHashEntry(private->ext->interps[i]->objCache,searchCtx);    
         while (entry)
         {
             Tcl_DecrRefCount(Tcl_GetHashValue(entry)); /* Let Tcl clear the mem allocated */
@@ -296,9 +301,9 @@ void Rivet_ProcessorCleanup (void *data)
         }
  
         if ((i > 0) && rsc->separate_channels) 
-            Rivet_ReleaseRivetChannel(private->interps[i]->interp,private->channel);
+            Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->channel);
 
-        Tcl_DeleteInterp(private->interps[i]->interp);
+        Tcl_DeleteInterp(private->ext->interps[i]->interp);
 
         /* if separate_virtual_interps == 0 we are running the same interpreter
          * instance for each vhost, thus we can jump out of this loop after 
