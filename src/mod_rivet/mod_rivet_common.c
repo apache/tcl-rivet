@@ -267,7 +267,7 @@ void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
   *
   */
 
-rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
+rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
 {
     extern int              ap_max_requests_per_child;
     rivet_thread_interp*    interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
@@ -275,11 +275,11 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
 
     /* The cache size is global so we take it from here */
     
-    rsc = RIVET_SERVER_CONF (module_globals->server->module_config);
+    rsc = RIVET_SERVER_CONF (server->module_config);
 
     /* This calls needs the root server_rec just for logging purposes*/
 
-    interp_obj->interp = Rivet_CreateTclInterp(module_globals->server); 
+    interp_obj->interp = Rivet_CreateTclInterp(server); 
 
     /* We now read from the pointers to the cache_size and cache_free conf parameters
      * for compatibility with mod_rivet current version, but these values must become
@@ -304,7 +304,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool)
  
     if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": could not initialize cache private pool");
         return NULL;
     }

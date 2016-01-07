@@ -19,7 +19,7 @@
     under the License.
 */
 
-
+/* $Id$ */
 
 #ifndef __mod_rivet_generator_h__
 #define __mod_rivet_generator_h__

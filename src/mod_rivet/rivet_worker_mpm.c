@@ -55,7 +55,6 @@ extern apr_threadkey_t*   rivet_thread_key;
 apr_threadkey_t*        handler_thread_key;
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
-rivet_thread_interp*    Rivet_NewVHostInterp(apr_pool_t* pool);
 
 typedef struct mpm_bridge_status {
     apr_thread_t*       supervisor;
@@ -724,21 +723,21 @@ apr_status_t Worker_MPM_Finalize (void* data)
  *
  *  Arguments:
  *
- *      apr_pool_t* pool: must be the thread/child private pool
+ *      server_rec* server: a server_rec pointer
  *
  *  Results:
  *
  */
 
 
-rivet_thread_interp* MPM_MasterInterp(void)
+rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 {
     rivet_thread_private*   private;
     rivet_thread_interp*    interp_obj; 
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
-    interp_obj = Rivet_NewVHostInterp(private->pool);
+    interp_obj = Rivet_NewVHostInterp(private->pool,s);
     //interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
     interp_obj->channel = private->channel;
     return interp_obj;

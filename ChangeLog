@@ -1,3 +1,7 @@
+2016-01-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/: fixed aimed at consistently determining the virtual host
+    associated to a thread
+
 2016-01-05 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet_generator.[h|c]: files holding the output generation
     procedures on which all the bridges rely (previously stored in mod_rivet.c)

@@ -37,7 +37,6 @@ extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
-rivet_thread_interp*    Rivet_NewVHostInterp(apr_pool_t* pool);
 
 /* -- Prefork_MPM_Finalize */
 
@@ -134,7 +133,7 @@ int Prefork_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     return Rivet_SendContent(private,r);
 }
 
-rivet_thread_interp* MPM_MasterInterp(void)
+rivet_thread_interp* MPM_MasterInterp(server_rec* server)
 {
     rivet_thread_private*   private;
 

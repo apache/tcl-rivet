@@ -19,7 +19,7 @@
     under the License.
  */
 
-/* $Id: rivet_prefork_mpm.c 1719851 2015-12-14 00:50:43Z mxmanghi $ */
+/* $Id$ */
 
 #include <httpd.h>
 #include <apr_strings.h>
@@ -30,7 +30,7 @@
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
 
-extern rivet_thread_interp* MPM_MasterInterp(void);
+extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
 
 /*
  * Rivet_DuplicateVhostInterp
@@ -95,7 +95,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     //ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp) != NULL);
     //root_interp = (*RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp))();
 
-    root_interp = MPM_MasterInterp();
+    root_interp = MPM_MasterInterp(module_globals->server);
 
     /* we must assume the module was able to create the root interprter otherwise
      * it's just a null module. I try to have also this case to develop experimental
@@ -156,7 +156,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             if (root_server_conf->separate_virtual_interps)
             {
-                rivet_interp = Rivet_NewVHostInterp(private->pool);
+                rivet_interp = Rivet_NewVHostInterp(private->pool,s);
                 if (myrsc->separate_channels)
                 {
                     rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);

@@ -19,7 +19,7 @@
     under the License.
 */
 
-/* $Id: mod_rivet_generator.c 1721698 2015-12-26 00:22:11Z mxmanghi $ */
+/* $Id$ */
 
 #include <httpd.h>
 #include <tcl.h>

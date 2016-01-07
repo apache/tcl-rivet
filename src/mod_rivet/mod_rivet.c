@@ -92,7 +92,7 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
     /* we create and initialize a master (server) interpreter */
 
-    module_globals->server_interp = Rivet_NewVHostInterp(pPool); /* root interpreter */
+    module_globals->server_interp = Rivet_NewVHostInterp(pPool,s); /* root interpreter */
 
     /* We initialize the interpreter and we won't register a channel with it because
      * we couldn't send data to the stdout anyway */

@@ -40,8 +40,6 @@ extern mod_rivet_globals*   module_globals;
 extern apr_threadkey_t*     rivet_thread_key;
 extern apr_threadkey_t*     handler_thread_key;
 
-rivet_thread_interp*  Rivet_NewVHostInterp(apr_pool_t* pool);
-
 enum
 {
     init,
@@ -63,6 +61,7 @@ typedef struct lazy_tcl_worker {
     int                 ctype;
     int                 ap_sts;
     int                 nreqs;
+    rivet_server_conf*  conf;               /* rivet_server_conf* record            */
 } lazy_tcl_worker;
 
 /* virtual host descriptor */
@@ -73,6 +72,7 @@ typedef struct vhost_iface {
     apr_thread_mutex_t* mutex;              /* mutex protecting 'array' */
     apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers */
     int                 server_shutdown;
+    rivet_server_conf*  conf;               /* rivet_server_conf* record            */
 } vhost;
 
 typedef struct mpm_bridge_status {
@@ -87,21 +87,61 @@ typedef struct mpm_bridge_status {
 
 typedef struct mpm_bridge_specific {
     rivet_thread_interp*  interp;           /* thread Tcl interpreter object        */
-    rivet_server_conf*    conf;             /* rivet_server_conf* record            */
     int                   keep_going;       /* thread loop controlling variable     */
                                             /* the request_rec and TclWebRequest    *
                                              * are copied here to be passed to a    *
                                              * channel                              */
 } mpm_bridge_specific;
 
+enum {
+    child_global,
+    child_init,
+    child_exit
+};
+
 #define MOD_RIVET_QUEUE_SIZE 100
+
+static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w,int init)
+{
+    char*       errmsg = "rivet_lazy_mpm.so: Error in configuration script: %s";
+    Tcl_Obj*    tcl_conf_script; 
+    Tcl_Interp* interp = private->ext->interp->interp;
+    void*       function = NULL;
+    
+    switch (init)
+    {
+        case child_global: function = w->conf->rivet_global_init_script;
+                           break;
+        case child_init: function = w->conf->rivet_child_init_script;
+                           break;
+        case child_exit: function = w->conf->rivet_child_exit_script;
+    }
+
+    if (function)
+    {
+        tcl_conf_script = Tcl_NewStringObj(function,-1);
+        Tcl_IncrRefCount(tcl_conf_script);
+
+        if (Tcl_EvalObjEx(interp,tcl_conf_script, 0) != TCL_OK) 
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,w->server,
+                         errmsg, function);
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,w->server, 
+                         "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,w->server, 
+                         "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
+        }
+
+        Tcl_DecrRefCount(tcl_conf_script);
+    }
+}
 
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
     lazy_tcl_worker* w = (lazy_tcl_worker*) data; 
     rivet_thread_private*   private;
-    void*                   function;
     int                     idx;
+    rivet_server_conf*       rsc;
 
     private = Rivet_CreatePrivateData();
     if (private == NULL) 
@@ -112,55 +152,23 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
     Rivet_SetupTclPanicProc ();
 
+    rsc = RIVET_SERVER_CONF(w->server->module_config);
+
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
-    private->ext->interp = Rivet_NewVHostInterp(private->pool);
+    private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
     private->ext->interp->channel = private->channel;
-    private->ext->conf   = RIVET_SERVER_CONF(w->server->module_config);
     w->nreqs = 0;
     Tcl_RegisterChannel(private->ext->interp->interp,*private->channel);
 
     private->ext->interp->scripts = 
-            Rivet_RunningScripts (private->pool,private->ext->interp->scripts,private->ext->conf );
+            Rivet_RunningScripts (private->pool,private->ext->interp->scripts,rsc);
 
     Rivet_PerInterpInit(private->ext->interp,private,module_globals->server,private->pool);
     
-    function = private->ext->conf->rivet_child_init_script;
-    if (function)
-    {
-        char*       errmsg = "rivet_lazy_mpm.so: Error in thread initialization init script: %s";
-        Tcl_Obj*    tcl_child_init = Tcl_NewStringObj(function,-1);
-        Tcl_Interp* interp = private->ext->interp->interp;
+    Lazy_RunConfScript(private,w,child_init);
 
-        Tcl_IncrRefCount(tcl_child_init);
-
-        if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) 
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, w->server,
-                         errmsg, function);
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, w->server, 
-                         "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, w->server, 
-                         "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
-            apr_thread_mutex_lock(w->mutex);
-            w->status = done;
-            w->ap_sts = HTTP_INTERNAL_SERVER_ERROR;
-            apr_thread_cond_signal(w->condition);
-            apr_thread_mutex_unlock(w->mutex);
-
-            /* This is broken: there must be a way to tell the array of 
-             * available threads this thread is about to exit, otherwise
-             * it would be impossible to implement the exit command in the
-             * way we did for prefork and worker bridges */
-
-            apr_thread_exit(thd,APR_SUCCESS);
-            return NULL;
-        }
-
-        Tcl_DecrRefCount(tcl_child_init);
-    }
-
-    idx = private->ext->conf->idx;
+    idx = w->conf->idx;
     apr_thread_mutex_lock(w->mutex);
     do 
     {
@@ -200,12 +208,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     } while (private->ext->keep_going);
     apr_thread_mutex_unlock(w->mutex);
+    
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread orderly exit");
+    Lazy_RunConfScript(private,w,child_exit);
 
     apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
     (module_globals->mpm->vhosts[idx].threads_count)--;
     apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
 
-    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"processor thread orderly exit");
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
@@ -258,6 +268,7 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         module_globals->mpm->vhosts[vh].idle_threads_cnt = 0;
         module_globals->mpm->vhosts[vh].threads_count = 0;
         module_globals->mpm->vhosts[vh].server_shutdown = 0;
+        module_globals->mpm->vhosts[vh].conf = rsc;
     }
 }
 
@@ -298,6 +309,7 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     w->r        = r;
     w->ctype    = ctype;
     w->status   = init;
+    w->conf     = conf;
     apr_thread_cond_signal(w->condition);
     //apr_thread_mutex_unlock(w->mutex);
 
