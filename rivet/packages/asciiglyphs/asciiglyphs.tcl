@@ -23,6 +23,13 @@
 # of Richard Hipp
 # 
 
+# Usage:
+# 
+# package require AsciiGlyphs
+#
+# ::AsciiGlyphs toGlyphs <string>
+#
+
 namespace eval ::AsciiGlyphs:: {
 
     variable ASCIIGLYPHS
@@ -49,10 +56,7 @@ namespace eval ::AsciiGlyphs:: {
         variable ASCIIGLYPHS
         variable glyphs_avail
 
-        #if {![string is xdigit $c]} 
-        #puts -nonewline "'$c' -> "
         if {[lsearch $glyphs_avail $c] < 0} {
-            #return -code error -errocode invalid_char "Invalid non hexadecimal or non space character"
             if {[string is space $c]} {
                 set c "space"
             } elseif {$c == "\\"} {
