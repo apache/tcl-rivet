@@ -31,7 +31,7 @@
 
 typedef struct mpm_bridge_specific {
     int                   keep_going;       /* thread loop controlling variable     */
-    rivet_thread_interp** interps;          
+    rivet_thread_interp** interps;
 } mpm_bridge_specific;
 
 #endif /* */

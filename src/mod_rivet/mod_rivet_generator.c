@@ -726,14 +726,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         goto sendcleanup;
     }
 
-/* 
- * if we are handling the request we also want to check if a charset 
- * parameter was set with the content type, e.g. rivet's configuration 
- * or .htaccess had lines like 
- *
- * AddType 'application/x-httpd-rivet; charset=utf-8;' rvt 
- */
- 
+    /* URL referenced script execution and exception handling */
 
     if (Rivet_ParseExecFile (private, private->r->filename, 1) != TCL_OK)
     {
@@ -754,7 +747,6 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 
     if (private->running->after_every_script) 
     {
-        //if (Tcl_EvalObjEx(interp_obj->interp,private->running->after_every_script,0) == TCL_ERROR)
         if (Rivet_ExecuteAndCheck(private,private->running->after_every_script) == TCL_ERROR)
         {
             Rivet_PrintErrorMessage(RIVET_PEEK_INTERP(private,private->running_conf)->interp,

@@ -1,3 +1,11 @@
+2016-01-14 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: new communication method between bridge
+    controlled Tcl threads and handler threads. This method was inspired by
+    the experiment done with the lazy bridge and proved to have simpler code
+    and avoids the need to rely on the handler thread memory pool that gets
+    destroyed too often
+    * src/mod_rivet/mod_rivet.h: removed definition specific to the worker bridge
+
 2016-01-07 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/: fixed aimed at consistently determining the virtual host
     associated to a thread

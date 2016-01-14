@@ -210,11 +210,9 @@ typedef struct _thread_worker_private {
     running_scripts*    running;            /* (per request) running conf scripts   */
     int                 thread_exit;        /* Thread exit code                     */
     int                 exit_status;        /* status code to be passed to exit()   */
-
     int                 page_aborting;      /* abort_page flag                      */
     Tcl_Obj*            abort_code;         /* To be reset by before request        *
                                              * processing completes                 */
-
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
@@ -227,15 +225,6 @@ typedef struct _thread_worker_private {
 typedef struct _rivet_interp_globals {
     Tcl_Namespace*      rivet_ns;           /* Rivet commands namespace             */
 } rivet_interp_globals;
-
-/* Job types a worker thread is supposed to respond to */
-
-typedef int rivet_job_t;
-enum {
-    request,
-    orderly_exit
-};
-
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 

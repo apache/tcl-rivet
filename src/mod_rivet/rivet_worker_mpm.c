@@ -49,6 +49,8 @@
     #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
 #endif
 
+#define THREAD_MODEL_NG 1
+
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
 
@@ -76,12 +78,27 @@ typedef struct mpm_bridge_status {
 #endif
 } mpm_bridge_status;
 
-/* data private to the Apache callback handling the request */
+
+#ifdef THREAD_MODEL_NG
+/* Job types a worker thread is supposed to respond to */
+
+typedef int rivet_job_t;
+enum {
+    request,
+    orderly_exit
+};
+#endif
+
+/* 
+ * data structure to work as communication
+ * between Tcl worker thread and HTTP request handler 
+ */ 
 
 typedef struct _handler_private 
 {
-    rivet_thread_interp**   interps;        /* database of virtual host interps     */
+#ifdef THREAD_MODEL_NG
     rivet_job_t             job_type;
+#endif
     apr_thread_cond_t*      cond;
     apr_thread_mutex_t*     mutex;
     request_rec*            r;              /* request rec                 */
@@ -99,6 +116,63 @@ enum
     done,
     child_exit
 };
+
+
+#ifdef THREAD_MODEL_NG
+
+/* 
+ * -- Worker_Bridge_Shutdown
+ *
+ * Child process shutdown: no more requests are served and we
+ * pop from the queue all the threads sitting for work to do. 
+ * In case some Tcl worker threads are still running and don't
+ * get back to the queue we wait for 1 sec max before returning
+ * anyway 
+ *
+ *  Arguments:
+ *
+ *      none
+ *
+ *  Returned value:
+ *    
+ *      none
+ *
+ *  Side effects:
+ *
+ * - The whole pool of worker threads is shut down and either they
+ * must be restared or (most likely) the child process can exit.
+ *
+ */
+
+void Worker_Bridge_Shutdown (void)
+{
+    int                 waits;
+    void*               v;
+    handler_private*    thread_obj;
+    apr_status_t        rv;
+
+    waits = 5;
+    do
+    {
+        rv = apr_queue_trypop(module_globals->mpm->queue,&v);
+        if (rv == APR_EAGAIN) 
+        {
+            waits--;
+            apr_sleep(200000);
+            continue;
+        }
+        thread_obj = (handler_private*)v;
+        apr_thread_mutex_lock(thread_obj->mutex);
+
+        apr_thread_cond_signal(thread_obj->cond);
+        apr_thread_mutex_unlock(thread_obj->mutex);
+
+    } while (waits > 0);
+
+    return;
+}
+
+#else
 
 /* 
  * -- Worker_Bridge_Shutdown
@@ -121,7 +195,7 @@ enum
  *
  *  Side effects:
  *
- * - The whole pool of worker threads is shutdown and either they
+ * - The whole pool of worker threads is shut down and either they
  * must be restared or (most likely) the child process can exit.
  *
  */
@@ -154,7 +228,7 @@ void Worker_Bridge_Shutdown (void)
         if (count <= 1) break;
 
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_SUCCESS, module_globals->server, 
-            "Sending %d more stop signals to threads",count);
+                        "Sending %d more stop signals to threads",count);
         for (i = 0; i < count; i++) { apr_queue_push(module_globals->mpm->queue,job); }
 
         apr_sleep(500000);
@@ -170,6 +244,142 @@ void Worker_Bridge_Shutdown (void)
     return;
 }
 
+#endif
+
+/*
+ * -- request_processor_ng
+ */
+
+#ifdef THREAD_MODEL_NG
+
+static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
+{
+    rivet_thread_private*   private;
+    handler_private*        thread_obj;
+
+    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
+
+    private = Rivet_CreatePrivateData();
+    private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
+    private->ext->keep_going = 1;
+    private->ext->interps = 
+        apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
+
+    if (private == NULL) 
+    {
+        /* TODO: we have to log something here */
+        apr_thread_exit(thd,APR_SUCCESS);
+        return NULL;
+    }
+    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+    Rivet_SetupTclPanicProc();
+    
+    /* So far nothing differs much with what we did for the prefork bridge */
+
+    /* At this stage we have to set up the private interpreters of configured 
+     * virtual hosts (if any). We assume the server_rec stored in the module
+     * globals can be used to retrieve the reference to the root interpreter
+     * configuration and to the rivet global script
+     */
+
+    if (Rivet_VirtualHostsInterps(private) == NULL)
+    {
+        *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
+        apr_thread_cond_signal(module_globals->mpm->job_cond);
+        apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
+        apr_thread_exit(thd,APR_SUCCESS);
+        return NULL;
+    }
+
+    /* The ng model allocates here the handler_private data */
+
+    thread_obj = apr_pcalloc(private->pool,sizeof(handler_private));
+    ap_assert(apr_thread_cond_create(&(thread_obj->cond), private->pool) == APR_SUCCESS);
+    ap_assert(apr_thread_mutex_create(&(thread_obj->mutex),APR_THREAD_MUTEX_UNNESTED,private->pool) 
+                                                                          == APR_SUCCESS);
+
+    thread_obj->status = idle;
+
+    apr_thread_mutex_unlock(module_globals->mpm->job_mutex); /* unlock job initialization stage */
+
+        /* eventually we increment the number of active threads */
+
+    apr_atomic_inc32(module_globals->mpm->threads_count);
+
+    apr_thread_mutex_lock(thread_obj->mutex);
+    do
+    {
+        apr_status_t rv;
+
+        rv = apr_queue_push(module_globals->mpm->queue,thread_obj);
+        if (rv != APR_SUCCESS)
+        {
+            private->ext->keep_going = 0;
+            continue;
+        }        
+
+        while (thread_obj->status != init)
+        {
+            apr_thread_cond_wait(thread_obj->cond,thread_obj->mutex);
+        }
+
+        if (module_globals->mpm->server_shutdown)
+        {
+            private->ext->keep_going = 0;
+            continue;
+        }
+
+        /* we set the status to request_processing  */
+
+        thread_obj->status = request_processing;
+
+        /* we proceed with the request processing */
+        
+        apr_atomic_inc32(module_globals->mpm->running_threads_count);
+
+        /* these assignements are crucial for both calling Rivet_SendContent and
+         * for telling the channel where stuff must be sent to */
+
+        private->ctype = thread_obj->ctype;
+
+        HTTP_REQUESTS_PROC(thread_obj->code = Rivet_SendContent(private,thread_obj->r));
+
+        thread_obj->status = done;
+        if (private->thread_exit) thread_obj->status = child_exit;
+
+        apr_thread_cond_signal(thread_obj->cond);
+
+        while (thread_obj->status != idle)
+        {
+            apr_thread_cond_wait(thread_obj->cond,thread_obj->mutex);
+        }
+        private->req_cnt++;
+        apr_atomic_dec32(module_globals->mpm->running_threads_count);
+
+    } while (private->ext->keep_going > 0);
+    apr_thread_mutex_unlock(thread_obj->mutex);
+            
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
+
+    // We don't clean up the thread resources anymore, if the thread exits the whole process terminates
+    // Rivet_ProcessorCleanup(private);
+
+    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
+    *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
+    apr_thread_cond_signal(module_globals->mpm->job_cond);
+    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
+
+    /* the counter of active threads has to be decremented */
+
+    apr_atomic_dec32(module_globals->mpm->threads_count);
+
+    /* this call triggers thread private stuff clean up by calling processor_cleanup */
+
+    apr_thread_exit(thd,APR_SUCCESS);
+    return NULL;
+}
+
+#else
 
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
@@ -293,6 +503,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
+
+#endif
 
 static apr_status_t create_worker_thread (apr_thread_t** thd)
 {
@@ -578,13 +790,14 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
 /*
  * -- Worker_MPM_Request
  *
- * Content generation callback. Actually on the bridge this function is not
- * generating directly the requested content but instead builds a handler_private 
- * structure, which is a descriptor of the request to be placed on a global thread safe
- * queue (module_globals->mpm->queue). In this structure are also a
- * condition variable and associated mutex. Through this condition variable a
- * worker thread running a Tcl interpreter will tell the framework thread the request
- * has been served letting it return to the HTTP server framework
+ * Content generation callback. Actually this function is not
+ * generating directly content but instead builds a handler_private 
+ * structure, which is a descriptor of the request to be placed on a 
+ * global thread safe queue (module_globals->mpm->queue). In this structure 
+ * are also a condition variable and associated mutex. Through this 
+ * condition variable a worker thread running a Tcl interpreter will tell
+ * the framework thread the request has been served letting it return to the
+ * HTTP server framework
  *
  * Arguments:
  *
@@ -594,6 +807,66 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
  *
  *   HTTP status code (see the Apache HTTP web server documentation)
  */
+
+#ifdef THREAD_MODEL_NG
+
+int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
+{
+    void*           v;
+    apr_queue_t*    q = module_globals->mpm->queue;
+    apr_status_t    rv;
+    handler_private* request_obj;
+    int             http_code;
+    
+    if (module_globals->mpm->server_shutdown == 1) {
+
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r, 
+                      MODNAME ": http request aborted during child process shutdown");
+
+        return HTTP_INTERNAL_SERVER_ERROR;
+    }
+
+    do {
+
+        rv = apr_queue_pop(q, &v);
+
+    } while (rv == APR_EINTR);
+
+    if (rv != APR_SUCCESS) {
+
+        if (rv == APR_EOF) {
+            fprintf(stderr, "request_processor: queue terminated APR_EOF\n");
+        }
+
+        return HTTP_INTERNAL_SERVER_ERROR;
+    }
+    
+    request_obj = (handler_private *) v;
+    apr_thread_mutex_lock(request_obj->mutex);
+
+    request_obj->r = r;
+    request_obj->ctype = ctype;
+    request_obj->status = init;
+    request_obj->code = OK;
+    //request_obj->job_type = request;
+
+    apr_thread_cond_signal(request_obj->cond);
+
+    while (request_obj->status != done)
+    {
+        apr_thread_cond_wait(request_obj->cond,request_obj->mutex);
+    }
+
+    http_code = request_obj->code;
+    request_obj->status = idle;
+    
+    apr_thread_cond_signal(request_obj->cond);
+    apr_thread_mutex_unlock(request_obj->mutex);
+
+    return http_code;
+}
+
+#else
 
 int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
@@ -606,13 +879,15 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 
     if (apr_threadkey_private_get ((void **)&request_private,handler_thread_key) != APR_SUCCESS)
     {
-        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r, MODNAME ": cannot get private data for processor thread");
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r, 
+                    MODNAME ": cannot get private data for processor thread");
 
         return HTTP_INTERNAL_SERVER_ERROR;
 
     } else if (module_globals->mpm->server_shutdown == 1) {
 
-        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r, MODNAME ": http request aborted during child process shutdown");
+        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r, 
+                    MODNAME ": http request aborted during child process shutdown");
 
         return HTTP_INTERNAL_SERVER_ERROR;
 
@@ -631,13 +906,14 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
             tpool = apr_thread_pool_get(thread_id);
             request_private = apr_pcalloc(tpool,sizeof(handler_private));
 
-            ap_assert(apr_thread_cond_create (&(request_private->cond), tpool) == APR_SUCCESS);
-            ap_assert(apr_thread_mutex_create (&(request_private->mutex), APR_THREAD_MUTEX_UNNESTED, tpool) == APR_SUCCESS);
+            ap_assert(apr_thread_cond_create(&(request_private->cond),tpool) == APR_SUCCESS);
+            ap_assert(apr_thread_mutex_create(&(request_private->mutex),APR_THREAD_MUTEX_UNNESTED,tpool) == APR_SUCCESS);
             apr_threadkey_private_set (request_private,handler_thread_key);
 
             apr_pool_cleanup_register(tpool,(void *)request_private,Worker_RequestPrivateCleanup,apr_pool_cleanup_null);
 
-            ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, r, MODNAME ": request thread private data allocated");
+            ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, r,
+                    MODNAME ": request thread private data allocated");
 
         }
 
@@ -675,6 +951,8 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 
     return request_private->code;
 }
+
+#endif
 
 /* 
  * -- Worker_MPM_Finalize
