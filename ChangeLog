@@ -1,3 +1,7 @@
+2016-01-17 Massimo Manghi <mxmanghi@apache.org>
+    * src/trunk/rivet_worker_mpm.c: removed variable needed only when built with
+    the old thread communication model
+
 2016-01-14 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: new communication method between bridge
     controlled Tcl threads and handler threads. This method was inspired by

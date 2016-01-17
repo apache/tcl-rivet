@@ -79,7 +79,7 @@ typedef struct mpm_bridge_status {
 } mpm_bridge_status;
 
 
-#ifdef THREAD_MODEL_NG
+#ifndef THREAD_MODEL_NG
 /* Job types a worker thread is supposed to respond to */
 
 typedef int rivet_job_t;
@@ -96,7 +96,7 @@ enum {
 
 typedef struct _handler_private 
 {
-#ifdef THREAD_MODEL_NG
+#ifndef THREAD_MODEL_NG
     rivet_job_t             job_type;
 #endif
     apr_thread_cond_t*      cond;
