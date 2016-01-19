@@ -113,15 +113,19 @@
 				<listitem>
 					<emphasis>mpm_exit_handler</emphasis>: mod_rivet replaces
 					the core <command>exit</command> command with a new one
-					(<command>::rivet::exit</command>) with a special handling of
-					the process exit allowing the current request process to be finished
-					interrupting the script execution and handing execution down to
-					<command>AbortScript</command>. If the bridge needs to be aware of
-					the exit call this is the function where special tasks can be carried out.
-					With the <emphasis>worker</emphasis> MPM bridge the finalize function
+					(<command>::rivet::exit</command>). This command must handle 
+					the process exit in the best possible way for the bridge and the
+					threading model it implements (for the 2 current threaded bridges this implies
+					signaling the threads to exit). The <command>::rivet::exit</command>
+					actually doesn't terminate the process, but interrupts execution
+					returning a specific error code commands <command>::rivet::catch</command>
+					and <command>::rivet::try</command> can detect. Before the process is terminated
+					the <command>AbortScript</command> script is fired and <command>::rivet::abort_code</command>
+					returns a message describing the exit condition. For instance
+					the <emphasis>worker</emphasis> MPM bridge the finalize function
 					is called after the current thread itself is set up for termination.
 					See function Rivet_ExitCmd in
-					<ulink url="svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivetCore.c">rivetCore.c</ulink>
+					<ulink url="http://svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivetCore.c">rivetCore.c</ulink>
 					to have details on how and at what stage this callback is invoked.
 				</listitem>
 				<listitem>

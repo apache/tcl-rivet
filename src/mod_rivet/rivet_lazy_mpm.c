@@ -67,20 +67,20 @@ typedef struct lazy_tcl_worker {
 /* virtual host descriptor */
 
 typedef struct vhost_iface {
-    int                 idle_threads_cnt;   /* */
-    int                 threads_count;
-    apr_thread_mutex_t* mutex;              /* mutex protecting 'array' */
-    apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers */
-    int                 server_shutdown;
-    rivet_server_conf*  conf;               /* rivet_server_conf* record            */
+    int                 idle_threads_cnt;   /* idle threads for the virtual hosts       */
+    int                 threads_count;      /* total number of running and idle threads */
+    apr_thread_mutex_t* mutex;              /* mutex protecting 'array'                 */
+    apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers   */
 } vhost;
+
+/* Lazy bridge internal status data */
 
 typedef struct mpm_bridge_status {
     apr_thread_mutex_t* mutex;
-    //apr_thread_cond_t*   condition;
     int                 exit_command;
     int                 exit_command_status;
-    vhost*              vhosts;             /* array of vhost descriptors */
+    int                 server_shutdown;    /* the child process is shutting down       */
+    vhost*              vhosts;             /* array of vhost descriptors               */
 } mpm_bridge_status;
 
 /* lazy bridge thread private data extension */
@@ -141,7 +141,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     lazy_tcl_worker* w = (lazy_tcl_worker*) data; 
     rivet_thread_private*   private;
     int                     idx;
-    rivet_server_conf*       rsc;
+    rivet_server_conf*      rsc;
 
     private = Rivet_CreatePrivateData();
     if (private == NULL) 
@@ -191,7 +191,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         http_code = Rivet_SendContent(private,w->r);
 
-        if (module_globals->mpm->vhosts[idx].server_shutdown) continue;
+        if (module_globals->mpm->server_shutdown) continue;
 
         w->status = done;
         w->ap_sts = http_code;
@@ -200,7 +200,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             apr_thread_cond_wait(w->condition,w->mutex);
         } 
  
-        // rescheduling itself in the array of idle threads
+        /* rescheduling itself in the array of idle threads */
        
         apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
         *(lazy_tcl_worker **) apr_array_push(module_globals->mpm->vhosts[idx].array) = w;
@@ -246,9 +246,6 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     rv = apr_thread_mutex_create(&module_globals->mpm->mutex,APR_THREAD_MUTEX_UNNESTED,pool);
     ap_assert(rv == APR_SUCCESS);
 
-    // rv = apr_thread_cond_create(&module_globals->mpm->condition, pool); 
-    // ap_assert(rv == APR_SUCCESS);
-
     module_globals->mpm->vhosts = (vhost *) apr_pcalloc(pool,module_globals->vhosts_count * sizeof(vhost));
     ap_assert(module_globals->mpm->vhosts != NULL);
 
@@ -267,9 +264,8 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
         module_globals->mpm->vhosts[vh].idle_threads_cnt = 0;
         module_globals->mpm->vhosts[vh].threads_count = 0;
-        module_globals->mpm->vhosts[vh].server_shutdown = 0;
-        module_globals->mpm->vhosts[vh].conf = rsc;
     }
+    module_globals->mpm->server_shutdown = 0;
 }
 
 int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
@@ -284,7 +280,7 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     array = module_globals->mpm->vhosts[conf->idx].array;
     apr_thread_mutex_lock(mutex);
 
-    if (module_globals->mpm->vhosts[conf->idx].server_shutdown == 1) {
+    if (module_globals->mpm->server_shutdown == 1) {
         ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r,
                       MODNAME ": http request aborted during child process shutdown");
         apr_thread_mutex_unlock(mutex);
@@ -311,16 +307,14 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     w->status   = init;
     w->conf     = conf;
     apr_thread_cond_signal(w->condition);
-    //apr_thread_mutex_unlock(w->mutex);
 
-    //apr_thread_mutex_lock(w->mutex);
+    /* we wait for the Tcl worker thread to finish its job */
+
     while (w->status != done) {
         apr_thread_cond_wait(w->condition,w->mutex);
     } 
     ap_sts = w->ap_sts;
-    //apr_thread_mutex_unlock(w->mutex);
 
-    //apr_thread_mutex_lock(w->mutex);
     w->status = idle;
     w->r      = NULL;
     apr_thread_cond_signal(w->condition);
@@ -328,6 +322,9 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 
     return ap_sts;
 }
+
+/* -- Lazy_MPM_Interp
+ */
 
 rivet_thread_interp* Lazy_MPM_Interp(rivet_thread_private *private,
                                      rivet_server_conf* conf)
@@ -350,7 +347,7 @@ apr_status_t Lazy_MPM_Finalize (void* data)
         mutex = module_globals->mpm->vhosts[vh].mutex;
         array = module_globals->mpm->vhosts[vh].array;
         apr_thread_mutex_lock(mutex);
-        module_globals->mpm->vhosts[vh].server_shutdown = 1;
+        module_globals->mpm->server_shutdown = 1;
         try = 0;
         do {
 
@@ -389,6 +386,14 @@ int Lazy_MPM_ExitHandler(int code)
     /* This will force the current thread to exit */
 
     private->ext->keep_going = 0;
+
+    /*
+        This is the only place where exit_command and 
+        exit_command_status are set, anywere alse these
+        fields are only read. We lock on writing to synchronize
+        with other threads that might try to access
+        this info
+     */
 
     apr_thread_mutex_lock(module_globals->mpm->mutex);
     if (module_globals->mpm->exit_command == 0)

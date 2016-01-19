@@ -28,6 +28,7 @@
     <!ENTITY request.xml           SYSTEM "xml/request.xml" >
     <!ENTITY entities.xml          SYSTEM "xml/entities.xml" >
     <!ENTITY asciiglyphs.xml		  SYSTEM "xml/asciiglyphs.xml" >
+    <!ENTITY lazybridge.xml		  SYSTEM "xml/lazybridge.xml" >
 ]>
 
 <!--
@@ -66,6 +67,7 @@
         <year>2013</year>
         <year>2014</year>
         <year>2015</year>
+        <year>2016</year>
         <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
@@ -130,6 +132,9 @@
 
     <!-- Internals -->
     &internals.xml;
+
+	 <!-- lazybridge -->
+	 &lazybridge.xml;
 
     <!-- Upgrade -->
     &upgrade.xml;

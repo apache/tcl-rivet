@@ -1,5 +1,10 @@
+2016-01-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_lazy_mpm.c: removed unused field structures, boolean
+    for process shutdown moved to process wide module status
+    * doc/lazybridge.xml: started documentation of the lazy bridge
+
 2016-01-17 Massimo Manghi <mxmanghi@apache.org>
-    * src/trunk/rivet_worker_mpm.c: removed variable needed only when built with
+    * src/mod_rivet/rivet_worker_mpm.c: removed variable needed only when built with
     the old thread communication model
 
 2016-01-14 Massimo Manghi <mxmanghi@apache.org>
