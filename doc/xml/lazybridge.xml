@@ -8,8 +8,10 @@
     <para>
     	The lazy bridge implements all the functions (except for one)
     	defined in <command>rivet_bridge_table</command>. Therefore is
-    	a good starting point from which take inspiration for developing
-    	other threading models to handle the server workload
+    	a good starting point to understand what a Rivet MPM bridge is
+    	supposed to do and how to implement other threading models in
+    	order to serve requests. The Lazy bridge implement the following
+    	functions
     </para> 
     <programlisting>RIVET_MPM_BRIDGE {
     NULL,
@@ -20,10 +22,7 @@
     Lazy_MPM_Interp
 };</programlisting>
 	<para>
-		Let's show how the bridge works starting from the basic
-		data structures that keep the bridge internal status. First
-		off let's take a look a the structure that defined the lazy 
-		bridge internal status
+		The bridge status has to be stored in the <command>mpm_bridge_status</command>.
 	</para>
 	<programlisting>/* Lazy bridge internal status data */
 
@@ -35,17 +34,35 @@ typedef struct mpm_bridge_status {
     vhost*              vhosts;             /* array of vhost descriptors          */
 } mpm_bridge_status;</programlisting>
 	<para>
-		Most of the fields in the structure are meant to deal with the <command>::rivet::exit</command>
-		command handling and the condition of shutdown that might arise from a script calling
-		<command>::rivet::exit</command> or from a process termination issued by the Apache
-		web server framework. See function <command>Lazy_MPM_ExitHandler</command> for
-		further details.
+		By design each bridge must create exactly one instance of this structure and store the pointer
+		to the memory holding it in <command>module_globals->mpm</command>. This is usually done
+		at the very beginning of the function pointed by <command>mpm_child_init</command> in
+		the <command>rivet_bridge_table</command> structure. For the lazy bridge the this field
+		in the jump table points to <command>Lazy_MPM_ChildInit</command>
+	</para>
+	<programlisting>void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+{
+    ...
+ 	  
+    module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
+    ....
+}</programlisting>
+	<para>
+		Most of the fields in the <command>mpm_bridge_status</command> are meant to deal 
+		with the child exit process, either beacuse a <command>::rivet::exit</command> was called
+		or because the Apache web server framework required the child process to exit. This 
+		is handled by the function pointed by <command>mpm_finalize</command> (Lazy_MPM_Finalize for
+		the lazy bridge). The <command>::rivet::exit</command> command forces the bridge to 
+		initiate the exit sequence by calling the <command>mpm_exit_handler</command> 
+		(See function <command>Lazy_MPM_ExitHandler</command> in the lazy bridge code for
+		further details)
+	</para>
+	<para>
 		After the server initialization stage the Apache HTTP Web Server starts 
 		child processes and each of them in turn will read the configuration. 
-		A fundamental information built during this
-		stage is the database of virtual hosts. The lazy bridge keeps an array of virtual host
-		descriptor pointers <command>vhosts*</command> each of them referencing an
-		instance of the following structure.
+		A fundamental information built during this stage is the database of virtual hosts.
+		The lazy bridge keeps an array of virtual host descriptor pointers 
+		<command>vhosts*</command> each of them referencing an instance of the following structure.
 	</para>
 	<programlisting>/* virtual host descriptor */
 
