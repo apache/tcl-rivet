@@ -1,3 +1,9 @@
+2016-01-25 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivetInspect.c: adding handling of the MpmBridge directive
+    to the ::rivet::inspect command
+    * doc/xml/lazybridge.xml: more development to lazy bridge manual page
+    * rivet/packages/calendar/: preparing new version of package calendar
+
 2016-01-19 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_lazy_mpm.c: removed unused field structures, boolean
     for process shutdown moved to process wide module status

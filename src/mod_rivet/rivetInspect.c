@@ -58,6 +58,7 @@ static const char* confDirectives[] =
                     "SeparateVirtualInterps",
                     "SeparateChannels",
                     "HonorHeaderOnlyRequests",
+                    "MpmBridge",
                     NULL 
 };
 
@@ -77,6 +78,7 @@ enum confIndices {
                     separate_virtual_interps,
                     separate_channels,
                     honor_header_only_requests,
+                    mpm_bridge,
                     conf_index_terminator 
 };
 
@@ -130,6 +132,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case abort_script:              string_value = rsc->rivet_abort_script; break;
         case error_script:              string_value = rsc->rivet_error_script; break;
         case upload_directory:          string_value = (char *)rsc->upload_dir; break;
+        case mpm_bridge:                string_value = (char *)rsc->mpm_bridge; break;
         case upload_max:                int_value = Tcl_NewIntObj(rsc->upload_max); break;
         case upload_files_to_var:       int_value = Tcl_NewIntObj(rsc->upload_files_to_var); break;
         case separate_virtual_interps:  int_value = Tcl_NewIntObj(rsc->separate_virtual_interps); break;

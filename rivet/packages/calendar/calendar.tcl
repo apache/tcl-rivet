@@ -5,7 +5,7 @@
 #   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
 #
-#   	http://www.apache.org/licenses/LICENSE-2.0
+#       http://www.apache.org/licenses/LICENSE-2.0
 #
 #   Unless required by applicable law or agreed to in writing, software
 #   distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@
 # $Id: calendar.tcl 916 2010-07-03 00:37:44Z massimo.manghi $
 #
 
-package provide Calendar 1.1
+package provide Calendar 1.2
 package require Itcl
 
 # Calendar: base class to create a calendar table. 
@@ -31,10 +31,10 @@ package require Itcl
 # The output of Calendar (method 'emit') 
 #
 #
-#       Jun 2010	    |   header     | banner  
-#  Su Mo Tu We Th Fr Sa	    |              | weekdays
+#       Jun 2010            |   header     | banner  
+#  Su Mo Tu We Th Fr Sa     |              | weekdays
 #        1  2  3  4  5      |   table
-#  6  7  8  9 10 11 12	    |   
+#  6  7  8  9 10 11 12      |   
 # 13 14 15 16 17 18 19      |
 # 20 21 22 23 24 25 26
 # 27 28 29 30
@@ -46,36 +46,36 @@ package require Itcl
     public  common  month_names
     public  common  day_names
 
-    private variable	month_year_processed	{}
+    private variable    month_year_processed    {}
 
 # language to be used: key to be used in 'month_names' 
 # and in case in other databases
 
-    public  variable	language	en 
+    public  variable    language    en 
 
     private method  numberOfDays    { month year }
-    private method  cal		    { month year }
+    private method  cal             { month year }
 
-    protected method weekdays	    { }
-    protected method banner	    { mth yr }
-    protected method header	    { mth yr }
-    protected method first_week	    { mth yr wkday } 
+    protected method weekdays       { }
+    protected method banner         { mth yr }
+    protected method header         { mth yr }
+    protected method first_week     { mth yr wkday } 
     protected method formatDayCell  { day } 
-    protected method openRow	    { wkn }
-    protected method closeRow	    { }
-    protected method table	    { mth yr }
+    protected method openRow        { wkn }
+    protected method closeRow       { }
+    protected method table          { mth yr }
     protected method startOutput    { } 
     protected method closeOutput    { }
 
     public method cal_processed {} { return $month_year_processed }
 
-    public method emit		{ args }
+    public method emit      { args }
 
     constructor {args} {
-	set month_names(en)	{ Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec }
-	set month_names(it)	{ Gen Feb Mar Apr Mag Giu Lug Ago Set Ott Nov Dic }
-	set day_names(en)	{ Su Mo Tu We Th Fr Sa }
-	set day_names(it)	{ Do Lu Ma Me Gi Ve Sa }
+    set month_names(en) { Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec }
+    set month_names(it) { Gen Feb Mar Apr Mag Giu Lug Ago Set Ott Nov Dic }
+    set day_names(en)   { Su Mo Tu We Th Fr Sa }
+    set day_names(it)   { Do Lu Ma Me Gi Ve Sa }
     }
 }
 
@@ -106,8 +106,8 @@ package require Itcl
 # returns the header of the calendar table. The header is made of a banner (e.g. "Jul 2010")
 # and a list of the weekdays (Su Mo ... Sa)
 #
-#   Arguments:	    <month_idx> month index (0: jan, 11: dec). 
-#		    <year> year number.
+#   Arguments:      <month_idx> month index (0: jan, 11: dec). 
+#           <year> year number.
 #
 #   Returned value: text of the cal table header.
 #
@@ -138,16 +138,16 @@ package require Itcl
     set month [lindex $month_names(en) $month_idx]
     set weekday [clock format [clock scan "1 $month $year"] -format %w]
 
-    append  tbl	[$this first_week $month_idx $year $weekday]
+    append  tbl [$this first_week $month_idx $year $weekday]
 
     scan [clock format [clock scan "1 $month $year"] -format %m] %d decm
     set maxd [numberOfDays $decm $year]
 
     for {set d 1} {$d <= $maxd} {incr d} {
-	if {$weekday == 0} { 
-	    incr wk
-	    append tbl [$this openRow $wk] 
-	}
+    if {$weekday == 0} { 
+        incr wk
+        append tbl [$this openRow $wk] 
+    }
         append tbl [formatDayCell $d]
         if {[incr weekday] > 6} {append tbl [$this closeRow]; set weekday 0}
     }
@@ -173,10 +173,10 @@ package require Itcl
 
     set month_year_processed [list $month_idx $year]
 
-    set	    res	    [$this startOutput]
-    append  res	    [$this header   $month_idx $year]
-    append  res	    [$this table    $month_idx $year]
-    append  res	    [$this closeOutput]
+    set     res     [$this startOutput]
+    append  res     [$this header $month_idx $year]
+    append  res     [$this table  $month_idx $year]
+    append  res     [$this closeOutput]
     
     return $res
 
@@ -205,17 +205,17 @@ package require Itcl
 
     if {$argsnumber > 1} {
 
-	if {$argsnumber%2 == 0} {
+    if {$argsnumber%2 == 0} {
 
-	    set primo_chr [string range [lindex $args 0] 0 0]
-	    if {$primo_chr == "-"} {
+        set primo_chr [string range [lindex $args 0] 0 0]
+        if {$primo_chr == "-"} {
 
 # we proceed to eval import_arguments $args
-	
-		set numeric_parameters	{}
-		eval $this configure $args
+    
+        set numeric_parameters  {}
+        eval $this configure $args
 
-	    } else {
+        } else {
 
 # arguments number is even. If the first switch is not an option (-opt)
 # we assume we are passing 2 parameters to the methods, while the
@@ -224,72 +224,72 @@ package require Itcl
 # we assume the rest of the args are in the form -opt1 val1 -opt2 val2 ...
 # we proceed to eval import_arguments [lrange $args 2 end]
 
-		set numeric_parameters	[lrange $args 0 1]
-		eval $this configure	[lrange $args 2 end]
+        set numeric_parameters  [lrange $args 0 1]
+        eval $this configure    [lrange $args 2 end]
 
-	    }
-	} else {
+        }
+    } else {
 
 # we assume the rest of the args are in the form -opt1 val1 -opt2 val2 ... 
 # and then we eval import_arguments [lrange $args 1 end]
 
-	    set numeric_parameters  [lrange $args 0 0]
-	    eval $this configure    [lrange $args 1 end]
-	}
+        set numeric_parameters  [lrange $args 0 0]
+        eval $this configure    [lrange $args 1 end]
+    }
 
     } else {
-	set numeric_parameters $args
+    set numeric_parameters $args
     }
 
     set argsnumber  [llength $numeric_parameters]
 
     switch $argsnumber {
-	1 {
+    1 {
 
 #   if only one argument is passed to this procedure then we treat it as either as a 
 #   year (therefore must be a number) or a month name of the current year
 
-	    if {[regexp {^[0-9]+$} $numeric_parameters]} {
-		set res {}
-		set year $numeric_parameters
-		for {set m 0} {$m < 12} {incr m} {
-		    append res [cal $m $year]\n\n
-		}
-		
-		return [string trimright $res]
-	    }
+        if {[regexp {^[0-9]+$} $numeric_parameters]} {
+        set res {}
+        set year $numeric_parameters
+        for {set m 0} {$m < 12} {incr m} {
+            append res [cal $m $year]\n\n
+        }
+        
+        return [string trimright $res]
+        }
 
-	    set month_idx [lsearch $month_names($language) $numeric_parameters]
-	    if {$month_idx >= 0} {
-		set year [clock format [clock sec] -format %Y]
-		return [cal $month_idx $year]
-	    } else {
-		return ""
-	    }
-	}
-	2 {
+        set month_idx [lsearch $month_names($language) $numeric_parameters]
+        if {$month_idx >= 0} {
+        set year [clock format [clock sec] -format %Y]
+        return [cal $month_idx $year]
+        } else {
+        return ""
+        }
+    }
+    2 {
 
 # two args: the first is the month, the second the year.
 
-	    set month [lindex $numeric_parameters 0]
-	    set year  [lindex $numeric_parameters 1]	    
+        set month [lindex $numeric_parameters 0]
+        set year  [lindex $numeric_parameters 1]        
 
-	    if  {[regexp {^\d{1,2}$} $month mat] && ($month > 0) && ($month <= 12)} {
-		return [cal [incr month -1] $year]
-	    } elseif { [lsearch $month_names($language) $month] >= 0} {
-		return [cal [lsearch $month_names($language) $month] $year]
-	    }
-	}
-	0 -
-	default {
+        if  {[regexp {^\d{1,2}$} $month mat] && ($month > 0) && ($month <= 12)} {
+        return [cal [incr month -1] $year]
+        } elseif { [lsearch $month_names($language) $month] >= 0} {
+        return [cal [lsearch $month_names($language) $month] $year]
+        }
+    }
+    0 -
+    default {
 
-	    # no arguments, we take today as reference
+        # no arguments, we take today as reference
             
             scan [clock format [clock seconds] -format %m] "%d" month
-	    set year    [format "%d" [clock format [clock sec] -format %Y]]
-	    return      [cal [incr month -1] $year]
+        set year    [format "%d" [clock format [clock sec] -format %Y]]
+        return      [cal [incr month -1] $year]
 
-	}
+    }
     }
 
 }
@@ -316,7 +316,7 @@ package require Itcl
 # for every key a 'tag' and 'attr' key is defined. attr is a even-length list storing 
 # attribute-value pairs
 
-    public variable	parameters
+    public variable parameters
 
 # we are emitting (x)html code that has to be encapsulated
 # in this root element. If the value is a list the first element is
@@ -331,73 +331,73 @@ package require Itcl
 #
 
  
-    public  variable	container	{}	{ $this expandValues container	    $container }
-    public  variable	header		{}	{ $this expandValues header	    $header }
-    public  variable	body		{}	{ $this expandValues body	    $body }
-    public  variable	foot		{}	{ $this expandValues foot	    $foot }
-    public  variable	banner		{}	{ $this expandValues banner	    $banner }
-    public  variable	banner_month	{}	{ $this expandValues banner_month   $banner_month }
-    public  variable	banner_year	{}	{ $this expandValues banner_year    $banner_year }
-    public  variable	weekdays	{}	{ $this expandValues wkdays_bar	    $weekdays }
-    public  variable	weekday_cell	{}	{ $this expandValues wkday_cell     $weekday_cell }
-    public  variable	days_row        {}	{ $this expandValues days_row	    $days_row }
-    public  variable	days_cell	{}	{ $this expandValues days_cell	    $days_cell }
-    public  variable	cell_function	""
-    public  variable	current_day	0
-    public  variable	current_weekday -1	{ $this validateWeekday $current_weekday }
+    public  variable    container   {}  { $this expandValues container      $container }
+    public  variable    header      {}  { $this expandValues header     $header }
+    public  variable    body        {}  { $this expandValues body       $body }
+    public  variable    foot        {}  { $this expandValues foot       $foot }
+    public  variable    banner      {}  { $this expandValues banner     $banner }
+    public  variable    banner_month    {}  { $this expandValues banner_month   $banner_month }
+    public  variable    banner_year {}  { $this expandValues banner_year    $banner_year }
+    public  variable    weekdays    {}  { $this expandValues wkdays_bar     $weekdays }
+    public  variable    weekday_cell    {}  { $this expandValues wkday_cell     $weekday_cell }
+    public  variable    days_row        {}  { $this expandValues days_row       $days_row }
+    public  variable    days_cell   {}  { $this expandValues days_cell      $days_cell }
+    public  variable    cell_function   ""
+    public  variable    current_day 0
+    public  variable    current_weekday -1  { $this validateWeekday $current_weekday }
 
     private method  expandValues { element values_list }
 
     protected method startOutput { } 
     protected method closeOutput { } 
 
-    protected method mkOpenTag	 { tag {attrib {}} }
-    protected method mkCloseTag	 { tag }
+    protected method mkOpenTag   { tag {attrib {}} }
+    protected method mkCloseTag  { tag }
     
-    protected method header	 { mth yr }
-    protected method table	 { mth yr }
-    protected method weekdays	 { }
-    protected method banner	 { mth yr }
-    protected method first_week	 { mth yr wkday } 
-    protected method openRow	 { wkn }
-    protected method closeRow	 { }
+    protected method header  { mth yr }
+    protected method table   { mth yr }
+    protected method weekdays    { }
+    protected method banner  { mth yr }
+    protected method first_week  { mth yr wkday } 
+    protected method openRow     { wkn }
+    protected method closeRow    { }
     protected method formatDayCell { day } 
     protected method getParameters { param what }
 
     constructor {args} {Calendar::constructor $args} {
 
-	set parameters [dict create container	{tag "calendar"	    attr "" } \
-				    header	{tag "calheader"    attr "" } \
-				    body	{tag "calbody"	    attr "" } \
-				    foot	{tag "calfoot"	    attr "" } \
-				    banner	{tag "monthyear"    attr "" } \
-				    banner_month {tag "month"	    attr "" } \
-				    banner_year {tag "year"	    attr "" } \
-				    wkdays_bar	{tag "weekdays"	    attr "" } \
-				    wkday_cell	{tag "wkday"	    attr "" } \
-				    days_row	{tag "week"	    attr "" } \
-				    days_cell	{tag "day"	    attr "" }]
+    set parameters [dict create container   {tag "calendar"     attr "" } \
+                    header  {tag "calheader"    attr "" } \
+                    body    {tag "calbody"      attr "" } \
+                    foot    {tag "calfoot"      attr "" } \
+                    banner  {tag "monthyear"    attr "" } \
+                    banner_month {tag "month"       attr "" } \
+                    banner_year {tag "year"     attr "" } \
+                    wkdays_bar  {tag "weekdays"     attr "" } \
+                    wkday_cell  {tag "wkday"        attr "" } \
+                    days_row    {tag "week"     attr "" } \
+                    days_cell   {tag "day"      attr "" }]
     }
 }
 
 ::itcl::body XmlCalendar::getParameters {param what} {
     if {[dict exists $parameters $param $what]} {
-	return [dict get $parameters $param $what]
+    return [dict get $parameters $param $what]
     } else {
-	return ""
+    return ""
     }
 }
 
 ::itcl::body XmlCalendar::expandValues { element value_list } {
 
-    dict set parameters $element tag	[lindex $value_list 0]
-    dict set parameters $element attr	[lrange $value_list 1 end]
+    dict set parameters $element tag    [lindex $value_list 0]
+    dict set parameters $element attr   [lrange $value_list 1 end]
 
 }
 
 ::itcl::body XmlCalendar::validateWeekday { wkd } {
     if {$wkd == "today"} {
-	set current_weekday [clock format [clock scan today] -format %w]
+    set current_weekday [clock format [clock scan today] -format %w]
     }
 }
 
@@ -413,7 +413,7 @@ package require Itcl
 
     set open_tag "<$tag"
     foreach  {a v} $attrib {
-	append open_tag " $a=\"$v\""
+        append open_tag " $a=\"$v\""
     }
     append open_tag ">"
 
@@ -435,18 +435,18 @@ package require Itcl
 }
 
 ::itcl::body XmlCalendar::weekdays { } {
-    set rowtag	[getParameters wkdays_bar tag]
-    set xml	[mkOpenTag $rowtag]    
+    set rowtag  [getParameters wkdays_bar tag]
+    set xml [mkOpenTag $rowtag]    
 
     set tagname [getParameters wkday_cell tag]
-    set wdn	0
+    set wdn 0
     foreach dn $day_names($language) {
-	if {$wdn == $current_weekday} {
-	    append xml "[mkOpenTag $tagname {class current_wkday}]$dn[mkCloseTag $tagname]"
-	} else {
-	    append xml "[mkOpenTag $tagname]$dn[mkCloseTag $tagname]"
-	}
-	incr wdn
+        if {$wdn == $current_weekday} {
+            append xml "[mkOpenTag $tagname {class current_wkday}]$dn[mkCloseTag $tagname]"
+        } else {
+            append xml "[mkOpenTag $tagname]$dn[mkCloseTag $tagname]"
+        }
+        incr wdn
     }
     append xml [mkCloseTag $rowtag]
     return $xml
@@ -460,10 +460,10 @@ package require Itcl
     set month_open_tag [mkOpenTag [getParameters banner_month tag] [getParameters banner_month attr]]
     set year_open_tag  [mkOpenTag [getParameters banner_year tag]  [getParameters banner_year attr]]
 
-    set banner_html	[mkOpenTag $header_tag]
+    set banner_html [mkOpenTag $header_tag]
     append banner_html  "${month_open_tag}${month_name}[mkCloseTag [getParameters banner_month tag]]"
-    append banner_html	"${year_open_tag}$yr[mkCloseTag [getParameters banner_year tag]]"
-    append banner_html	[mkCloseTag $header_tag]
+    append banner_html  "${year_open_tag}$yr[mkCloseTag [getParameters banner_year tag]]"
+    append banner_html  [mkCloseTag $header_tag]
     return $banner_html
 }
 
@@ -473,18 +473,18 @@ package require Itcl
 
     array set attributes $tagattr
     if {$day == $current_day} {
-	set attributes(class) current
+    set attributes(class) current
     }
     
     if {$cell_function != "" && $day != ""} {
 
-	set month_year [$this cal_processed]	
+    set month_year [$this cal_processed]    
 
-	set month [lindex $month_names(en) [lindex $month_year 0]] 
-	set year  [lindex $month_year 1] 
-	set wkday [clock format [clock scan "$month $day $year"] -format %w]
+    set month [lindex $month_names(en) [lindex $month_year 0]] 
+    set year  [lindex $month_year 1] 
+    set wkday [clock format [clock scan "$month $day $year"] -format %w]
 
-	array set attributes [eval $cell_function $day $month_year $wkday]
+    array set attributes [eval $cell_function $day $month_year $wkday]
     }
 
     set tagattr [array get attributes]
@@ -504,7 +504,7 @@ package require Itcl
 }
 
 ::itcl::body XmlCalendar::openRow { wkn } {
-    set tagname	    [getParameters days_row tag]
+    set tagname     [getParameters days_row tag]
     set attributes  [concat class week_${wkn} [getParameters days_row attr]]
     return [mkOpenTag $tagname $attributes]
 }
@@ -523,16 +523,16 @@ package require Itcl
     inherit XmlCalendar
     
     constructor {args} {XmlCalendar::constructor $args} {
-	$this configure	    -container	    table   \
-			    -header	    thead   \
-			    -body	    tbody   \
-			    -banner	    tr	    \
-			    -banner_month   {th	colspan 3 style "text-align: right;"} \
-			    -banner_year    {th	colspan 4 style "text-align: left;"}  \
-			    -weekdays	    tr	    \
-			    -weekday_cell   th	    \
-			    -days_row	    tr	    \
-			    -days_cell	    td 
+        $this configure     -container      table   \
+                            -header     thead   \
+                            -body       tbody   \
+                            -banner     tr      \
+                            -banner_month   {th colspan 3 style "text-align: right;"} \
+                            -banner_year    {th colspan 4 style "text-align: left;"}  \
+                            -weekdays       tr      \
+                            -weekday_cell   th      \
+                            -days_row       tr      \
+                            -days_cell      td 
     }
 }
 

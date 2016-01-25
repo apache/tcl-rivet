@@ -40,8 +40,9 @@ typedef struct mpm_bridge_status {
 		<command>::rivet::exit</command> or from a process termination issued by the Apache
 		web server framework. See function <command>Lazy_MPM_ExitHandler</command> for
 		further details.
-		When the Apache HTTP Web Server starts configuration child processes are started
-		and each of them read the configuration. A fundamental information built during this
+		After the server initialization stage the Apache HTTP Web Server starts 
+		child processes and each of them in turn will read the configuration. 
+		A fundamental information built during this
 		stage is the database of virtual hosts. The lazy bridge keeps an array of virtual host
 		descriptor pointers <command>vhosts*</command> each of them referencing an
 		instance of the following structure.
@@ -55,8 +56,13 @@ typedef struct vhost_iface {
     apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers   */
 } vhost;</programlisting>
 	<para>
-		The virtual host descriptor keeps an array of thread descriptor pointers
-		each of them referencing an instance of the <command>lazy_tcl_worker</command> structure.
+		Each virtual host descriptor will maintain 
+		a list of threads referenced through their <command>lazy_tcl_worker</command>
+		structure pointers stored in a APR array container. The handler callback will determine
+		which virtual host a request belongs to and then it will gain lock on the APR array
+		to pop the first <command>lazy_tcl_worker*</command> pointer to signal the thread
+		there is work to do for it. This structure keeps the basic data needed for the 
+		inter-thread communication. 
 	</para>
 	<programlisting>/* lazy bridge Tcl thread status and communication variables */
 
@@ -73,18 +79,11 @@ typedef struct lazy_tcl_worker {
     rivet_server_conf*  conf;               /* rivet_server_conf* record            */
 } lazy_tcl_worker;</programlisting>
 	<para>
-		This structure keeps the basic data needed for the inter-thread communication. As in
-		the <ulink url="http://svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivet_worker_mpm.c">rivet_worker_mpm.c</ulink> 
-		bridge request processing is done by decoupling the the module handler thread,
-		which in <ulink url="http://svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/mod_rivet.c">mod_rivet.c</ulink> 
-		calls the function <command>Rivet_Handler</command>, from the Tcl worker threads doing the real work of producing output
-		and sending it to the client.
-	</para>
-	<para>
 		The Lazy bridge will not start any Tcl worker thread at server startup, but it will
-		wait for requests to come new worker threads will be created on demand only when, for a given
-		virtual host, no threads are idle and thus available for processing a request. The code is
-		in the <command>Lazy_MPM_Request</command> function
+		wait for requests to come in and they are handed down to a worker threads by popping 
+		a lazy_tcl_worker pointer from the related array in the virtual hosts database or,
+		in case the array is empty and no threads are available, a new worker thread is 
+		created. The code in the <command>Lazy_MPM_Request</command> function
 	</para>
 	<programlisting>    lazy_tcl_worker*    w;
 	 ...
@@ -112,30 +111,36 @@ typedef struct lazy_tcl_worker {
 
     ...</programlisting>
 	<para>
-		
+		After a request is processed the Tcl worker thread returns its own
+		lazy_tcl_worker descriptor to the array and then starts to wait
+		on the condition variable used to control and synchronize the interplay
+		of the 2 threads.
 	</para>
 	<programlisting>
      /* rescheduling itself in the array of idle threads */
        
      apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
      *(lazy_tcl_worker **) apr_array_push(module_globals->mpm->vhosts[idx].array) = w;
-     apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);</programlist>	
-	
-	<programlisting>/* lazy bridge thread private data extension */
-
-typedef struct mpm_bridge_specific {
-    rivet_thread_interp*  interp;           /* thread Tcl interpreter object        */
-    int                   keep_going;       /* thread loop controlling variable     */
-                                            /* the request_rec and TclWebRequest    *
-                                             * are copied here to be passed to a    *
-                                             * channel                              */
-} mpm_bridge_specific;</programlisting>
+     apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);</programlisting>	
 	<para>
-		
+		The lazy bridge <command>module_globals->bridge_jump_table->mpm_thread_interp</command>, which
+		is supposed to return the rivet_thread_interp structure pointer relevant to a given
+		request, has a straightforward task to do since by design each thread has
+		one interpreter
 	</para>
-	
-
+	<programlisting>rivet_thread_interp* Lazy_MPM_Interp(rivet_thread_private *private,
+                                     rivet_server_conf* conf)
+{
+    return private->ext->interp;
+}</programlisting>
 	<para>
-	
+		Running this bridge you get separate virtual interpreters and separate channels by default
+		and since by design each threads gets its own Tcl interpreter and Rivet channel you will
+		not be able to revert this behavior in the configuration with 
+	</para>
+	<programlisting>SeparateVirtualInterps Off
+SeparateChannels       Off</programlisting>
+	<para>
+		which are simply ignored
 	</para>
  </section>
