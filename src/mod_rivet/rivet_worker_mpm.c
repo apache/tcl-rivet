@@ -163,7 +163,7 @@ void Worker_Bridge_Shutdown (void)
         }
         thread_obj = (handler_private*)v;
         apr_thread_mutex_lock(thread_obj->mutex);
-
+        thread_obj->status = init;
         apr_thread_cond_signal(thread_obj->cond);
         apr_thread_mutex_unlock(thread_obj->mutex);
 
