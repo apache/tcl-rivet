@@ -1,3 +1,7 @@
+2016-02-01 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: upon process shutdown thread status 
+    has to be set to 'init' to force thread exit
+
 2016-01-25 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivetInspect.c: adding handling of the MpmBridge directive
     to the ::rivet::inspect command
