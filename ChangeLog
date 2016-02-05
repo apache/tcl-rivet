@@ -1,3 +1,9 @@
+2016-02-05 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivet_worker_mpm.c: removed code implmenting the old
+    model of inter thread communication. This should fix the problem of
+    redundant mutex/cond variable creation/destruction needed by the former
+    model to avoid memory leaks
+
 2016-02-01 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/rivet_worker_mpm.c: upon process shutdown thread status 
     has to be set to 'init' to force thread exit
