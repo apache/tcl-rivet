@@ -214,7 +214,7 @@
       </para>
     </section>
     <section>
-        <title>Extending Rivet by developing C procedures implementing new commands</title>
+        <title>Extending Rivet by developing C code procedures</title>
         <para>
             Rivet endows the Tcl interpreter with new commands
             serving as interface between the application layer and the

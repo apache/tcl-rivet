@@ -1,18 +1,53 @@
 <section id="lazybridge">
     <title>Example: the <quote>Lazy</quote> bridge</title>
+	<section>
+	<title>The rationale of threaded bridges</title>
     <para>
-    	The lazy bridge was developed to show how a threaded bridge can
-    	implement a simple yet almost fully functional threading model to
-    	handle requests.
+    	The lazy bridge was developed to outline the basic tasks
+    	carried out by each function making a rivet MPM bridge.
+    	The 'bridge' concept was originally thought out
+    	to cope with the ability of the Apache HTTP web server
+    	to adopt different multiprocessing models by loading 
+    	one of the available MPMs (Multi Processing Module)
+    	at start up. Threaded MPMs (worker, winnt) serve
+    	requests from within single threads but the Apache web server
+    	architecture demands each module to be MPM agnostic and intentionally
+    	offers no way to a module developer to hook specific code
+    	in important transitions like a worker thread termination.
+    	Furthermore Tcl itself doesn't fit very well in this scheme
+    	because a threaded Tcl_Interp* object spins its own ancillary 
+    	threads for example to control the event loop.
+    	Even if we could plug a callback function into the thread
+    	exit transition on many platforms and thread implementations
+    	we could not be guaranteed
+    	that data release functions will be called from
+    	within the same thread that allocated that
+    	memory segment. When releasing a Tcl intpreter 
+    	from such function we would get the wrong private 
+    	memory pointer or a NULL pointer, opening the way to crashes.
+    	The bridge architecture enables us to develop different
+    	threaded experiment with different models of workload
+    	management and therefore it's much more flexible that a adopting
+    	a single monolithic code design. 
     </para>
+	</section>
+	<section>
+	 <title>Lazy bridge data structures</title>
     <para>
-    	The lazy bridge implements all the functions (except for one)
-    	defined in <command>rivet_bridge_table</command>. Therefore is
-    	a good starting point to understand what a Rivet MPM bridge is
-    	supposed to do and how to implement other threading models in
-    	order to serve requests. The Lazy bridge implement the following
-    	functions
-    </para> 
+    	The lazy bridge attempts to be minimalistic
+    	but it's nearly fully functional, only a few configuration
+    	directives (SeparateVirtualInterps and SeparateChannel)
+    	are ignored because fundamentally incompatible but this is
+    	not a restriction as this values are de facto set
+    	to <command>On</command>. The bridge is experimental but perfectly fit 
+    	for many cases (for example it's good on development machines). 
+    </para>
+
+    <para>
+    	This is the lazy bridge jump table, as such it defines the functions
+    	implemented by the bridge.
+    </para>
+    
     <programlisting>RIVET_MPM_BRIDGE {
     NULL,
     Lazy_MPM_ChildInit,
@@ -21,8 +56,26 @@
     Lazy_MPM_ExitHandler,
     Lazy_MPM_Interp
 };</programlisting>
+
 	<para>
-		The bridge status has to be stored in the <command>mpm_bridge_status</command>.
+		After the server initialization stage child processes read the configuration 
+		and modules build their own configuration representation.
+		A fundamental information built during this stage is the database of virtual hosts.
+		The lazy bridge keeps an array of virtual host descriptor pointers 
+		<command>vhosts*</command> each of them referencing an instance of the 
+		following structure.
+	</para>
+	<programlisting>/* virtual host descriptor */
+
+typedef struct vhost_iface {
+    int                 idle_threads_cnt;   /* idle threads for the virtual hosts       */
+    int                 threads_count;      /* total number of running and idle threads */
+    apr_thread_mutex_t* mutex;              /* mutex protecting 'array'                 */
+    apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers   */
+} vhost;</programlisting>
+
+ 	<para>
+ 		A pointer to this array is stored in the bridge status structure
 	</para>
 	<programlisting>/* Lazy bridge internal status data */
 
@@ -35,9 +88,10 @@ typedef struct mpm_bridge_status {
 } mpm_bridge_status;</programlisting>
 	<para>
 		By design each bridge must create exactly one instance of this structure and store the pointer
-		to the memory holding it in <command>module_globals->mpm</command>. This is usually done
-		at the very beginning of the function pointed by <command>mpm_child_init</command> in
-		the <command>rivet_bridge_table</command> structure. For the lazy bridge the this field
+		to it in <command>module_globals->mpm</command>. This is usually done
+		at the very beginning of the child init script function pointed by 
+		<command>mpm_child_init</command> in
+		the <command>rivet_bridge_table</command> structure. For the lazy bridge this field
 		in the jump table points to <command>Lazy_MPM_ChildInit</command>
 	</para>
 	<programlisting>void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
@@ -45,41 +99,62 @@ typedef struct mpm_bridge_status {
     ...
  	  
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
+    
     ....
 }</programlisting>
+	</section>
+	<section>
+	 <title>Handling Tcl's exit core command</title> 
 	<para>
 		Most of the fields in the <command>mpm_bridge_status</command> are meant to deal 
-		with the child exit process, either beacuse a <command>::rivet::exit</command> was called
-		or because the Apache web server framework required the child process to exit. This 
-		is handled by the function pointed by <command>mpm_finalize</command> (Lazy_MPM_Finalize for
-		the lazy bridge). The <command>::rivet::exit</command> command forces the bridge to 
-		initiate the exit sequence by calling the <command>mpm_exit_handler</command> 
-		(See function <command>Lazy_MPM_ExitHandler</command> in the lazy bridge code for
-		further details)
+		with the child exit process. Rivet supersedes the Tcl core's exit function
+		with a <command>::rivet::exit</command> function and it does so in order to curb the effects
+		of the core function that would force a child process to immediately exit. 
+		This could have unwanted side effects, like skipping the execution of important
+		code dedicated to release locks or remove files. For threaded MPMs the abrupt
+		child process termination could be even more disruptive as all the threads
+		will be deleted without warning.	
 	</para>
 	<para>
-		After the server initialization stage the Apache HTTP Web Server starts 
-		child processes and each of them in turn will read the configuration. 
-		A fundamental information built during this stage is the database of virtual hosts.
-		The lazy bridge keeps an array of virtual host descriptor pointers 
-		<command>vhosts*</command> each of them referencing an instance of the following structure.
+		The <command>::rivet::exit</command> implementation calls the function pointed by
+		<command>mpm_exit_handler</command> which is bridge specific. Its main duty
+		is to take the proper action in order to release resources and force the
+		bridge controlled threads to exit.  
 	</para>
-	<programlisting>/* virtual host descriptor */
-
-typedef struct vhost_iface {
-    int                 idle_threads_cnt;   /* idle threads for the virtual hosts       */
-    int                 threads_count;      /* total number of running and idle threads */
-    apr_thread_mutex_t* mutex;              /* mutex protecting 'array'                 */
-    apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers   */
-} vhost;</programlisting>
+	<note>
+		Nonetheless the <command>exit</command> command should be avoided in ordinary mod_rivet
+		programming. We cannot stress this point enough. If your application must bail out
+		for some reason focus your attention on the design to find the most appropriate
+		route to exit and whenever possible avoid 
+		calling <command>exit</command> at all (which basically wraps a
+		C call to Tcl_Exit). Anyway the Rivet implementation partially transforms
+		<command>exit</command> in a sort of special <command>::rivet::abort_page</command>
+		implementation whose eventual action is to call the <command>Tcl_Exit</command>
+		library call. See the <command><xref linkend="exit">::rivet::exit</xref></command>
+		for further explanations.
+	</note>
 	<para>
-		Each virtual host descriptor will maintain 
-		a list of threads referenced through their <command>lazy_tcl_worker</command>
-		structure pointers stored in a APR array container. The handler callback will determine
-		which virtual host a request belongs to and then it will gain lock on the APR array
-		to pop the first <command>lazy_tcl_worker*</command> pointer to signal the thread
-		there is work to do for it. This structure keeps the basic data needed for the 
-		inter-thread communication. 
+		Both the worker bridge and lazy bridge 
+		implementations of <command>mpm_exit_handler</command> call the function pointed 
+		by <command>mpm_finalize</command> which also the function called by the framework 
+		when the web server shuts down.
+		See these functions' code for further details, they are very easy to 
+		read and understand
+	</para>
+	</section>
+	<section>
+		<title>HTTP request processing with the lazy bridge</title>
+	<para>
+		Requests processing with the lazy bridge is done by determining for which
+		virtual host a request was created. The <command>rivet_server_conf</command>
+		structure keeps a numerical index for each virtual host. This index is used
+		to reference the virtual host descriptor and from it the request
+		handler tries to gain lock on the mutex protecting the array of <command>lazy_tcl_worker</command>
+		structure pointers. Each instance of this structure is a descriptor of a thread created for
+		a specific virtual host; threads available for processing have their descriptor
+		on that array and the handler callback will pop the first
+		<command>lazy_tcl_worker</command> pointer to signal the thread
+		there is work to do for it. This is the <command>lazy_tcl_worker</command> structure
 	</para>
 	<programlisting>/* lazy bridge Tcl thread status and communication variables */
 
@@ -95,6 +170,12 @@ typedef struct lazy_tcl_worker {
     int                 nreqs;
     rivet_server_conf*  conf;               /* rivet_server_conf* record            */
 } lazy_tcl_worker;</programlisting>
+	<para>
+		The server field is assigned with the virtual host server record. Whereas the <command>conf</command>
+		field keeps the pointer to a run time computed <command>rivet_server_conf</command>. This structure
+		may change from request to request because <command>&lt;Directory ...&gt;...&lt;/Directory&gt;</command> could
+		change the configuration with directory specific directive values
+	</para>
 	<para>
 		The Lazy bridge will not start any Tcl worker thread at server startup, but it will
 		wait for requests to come in and they are handed down to a worker threads by popping 
@@ -129,9 +210,8 @@ typedef struct lazy_tcl_worker {
     ...</programlisting>
 	<para>
 		After a request is processed the Tcl worker thread returns its own
-		lazy_tcl_worker descriptor to the array and then starts to wait
-		on the condition variable used to control and synchronize the interplay
-		of the 2 threads.
+		lazy_tcl_worker descriptor to the array and then waits
+		on the condition variable used to control and synchronize 2 threads.
 	</para>
 	<programlisting>
      /* rescheduling itself in the array of idle threads */
@@ -151,7 +231,8 @@ typedef struct lazy_tcl_worker {
     return private->ext->interp;
 }</programlisting>
 	<para>
-		Running this bridge you get separate virtual interpreters and separate channels by default
+		As already pointed out
+		running this bridge you get separate virtual interpreters and separate channels by default
 		and since by design each threads gets its own Tcl interpreter and Rivet channel you will
 		not be able to revert this behavior in the configuration with 
 	</para>
@@ -160,4 +241,5 @@ SeparateChannels       Off</programlisting>
 	<para>
 		which are simply ignored
 	</para>
+	</section>
  </section>
