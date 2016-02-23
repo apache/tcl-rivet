@@ -3,44 +3,43 @@
 	<section>
 	<title>The rationale of threaded bridges</title>
     <para>
-    	The lazy bridge was developed to outline the basic tasks
-    	carried out by each function making a rivet MPM bridge.
-    	The 'bridge' concept was originally thought out
+    	
+    	The 'bridge' concept was introduced
     	to cope with the ability of the Apache HTTP web server
-    	to adopt different multiprocessing models by loading 
-    	one of the available MPMs (Multi Processing Module)
-    	at start up. Threaded MPMs (worker, winnt) serve
+    	to adopt different multiprocessing models implemented by 
+    	one of the available MPMs (Multi Processing Modules). 
+    	Threaded MPMs (worker, winnt) serve
     	requests from within single threads but the Apache web server
-    	architecture demands each module to be MPM agnostic and intentionally
-    	offers no way to a module developer to hook specific code
+    	architecture demands each module to be MPM agnostic and 
+    	offers to a module developer no way to hook callbacks
     	in important transitions like a worker thread termination.
     	Furthermore Tcl itself doesn't fit very well in this scheme
     	because a threaded Tcl_Interp* object spins its own ancillary 
-    	threads for example to control the event loop.
+    	threads, for example to control the event loop.
     	Even if we could plug a callback function into the thread
     	exit transition on many platforms and thread implementations
-    	we could not be guaranteed
-    	that data release functions will be called from
-    	within the same thread that allocated that
-    	memory segment. When releasing a Tcl intpreter 
-    	from such function we would get the wrong private 
+    	we could not be guaranteed that data release functions will be 
+    	called from within the same thread that allocated that
+    	thread private memory. When releasing a Tcl intpreter 
+    	from such function the Tcl C library would get the wrong private 
     	memory pointer or a NULL pointer, opening the way to crashes.
-    	The bridge architecture enables us to develop different
-    	threaded experiment with different models of workload
-    	management and therefore it's much more flexible that a adopting
-    	a single monolithic code design. 
-    </para>
+    	Furthermore the bridge solution enables us to develop different
+    	threaded models of workload management and therefore it's much 
+    	more flexible that a adopting a single monolithic code design. 
+   </para>
 	</section>
 	<section>
 	 <title>Lazy bridge data structures</title>
     <para>
+	   The lazy bridge was developed to outline the basic tasks
+    	carried out by each function making a rivet MPM bridge. 
     	The lazy bridge attempts to be minimalistic
     	but it's nearly fully functional, only a few configuration
     	directives (SeparateVirtualInterps and SeparateChannel)
-    	are ignored because fundamentally incompatible but this is
-    	not a restriction as this values are de facto set
-    	to <command>On</command>. The bridge is experimental but perfectly fit 
-    	for many cases (for example it's good on development machines). 
+    	are ignored because fundamentally incompatible. 
+    	The bridge is experimental but perfectly fit for many applications,
+    	for example it's good on development machines where server restarts
+    	are frequent. 
     </para>
 
     <para>
@@ -75,7 +74,8 @@ typedef struct vhost_iface {
 } vhost;</programlisting>
 
  	<para>
- 		A pointer to this array is stored in the bridge status structure
+ 		A pointer to this array is stored in the bridge status structure which a basic
+ 		structure that likely every bridge has to create.
 	</para>
 	<programlisting>/* Lazy bridge internal status data */
 
@@ -87,7 +87,7 @@ typedef struct mpm_bridge_status {
     vhost*              vhosts;             /* array of vhost descriptors          */
 } mpm_bridge_status;</programlisting>
 	<para>
-		By design each bridge must create exactly one instance of this structure and store the pointer
+		By design the bridge must create exactly one instance of this structure and store the pointer
 		to it in <command>module_globals->mpm</command>. This is usually done
 		at the very beginning of the child init script function pointed by 
 		<command>mpm_child_init</command> in
