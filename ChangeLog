@@ -1,5 +1,8 @@
+2016-02-26 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/asciiglyphs.tcl: merging changes done in trunk
+
 2015-12-14 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/asciiglyphs.tcl: removed debugging lines
+    * rivet/packages/asciiglyphs/asciiglyphs.tcl: removed debugging lines
     
 2015-12-09 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/asciiglyphs.tcl: character selection mechanism amended
