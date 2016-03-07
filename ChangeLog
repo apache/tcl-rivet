@@ -1,3 +1,8 @@
+2016-03-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/parser/rivetParser.c: Add Apache 2.0 mandatory copyright notice.
+    removed unneed inclusion of config.h (cruft left over since many
+    years)
+
 2016-02-26 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/asciiglyphs.tcl: merging changes done in trunk
 
