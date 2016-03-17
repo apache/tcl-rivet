@@ -1,3 +1,7 @@
+2016-03-17 Massimo Manghi <mxmanghi@apache.org>
+    * tclconfig/tcl.m4,install-sh,ltmain.sh,libtool.m4: updating autotools 
+    and libtool macros to the latest versions available
+
 2016-03-07 Massimo Manghi <mxmanghi@apache.org>
     * src/parser/rivetParser.c: Add Apache 2.0 mandatory copyright notice.
     removed unneed inclusion of config.h (cruft left over since many
