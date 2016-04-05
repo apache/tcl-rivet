@@ -1,5 +1,11 @@
+2016-04-05 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form2.tcl: wrong element created by 'file' method
+
 2016-04-04 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xml: Add 2016 to copyright notice
+
+2016-03-26 Massimo Manghi <mxmanghi@apache.org>
+    * .: Relased as 2.3.0
 
 2016-03-18 Massimo Manghi <mxmanghi@apache.org>
     * tclconfig/: reverting to previous release
