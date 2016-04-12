@@ -280,7 +280,7 @@
 	    apache access.log file, even though the html is never reloaded.
 	</para>
     </example>
-    <example id="calendar">
+    <example id="calexample">
 	<title>A Calendar Utility</title>
 	<para>
 	    Rivet comes with a <emphasis>Calendar</emphasis> package that provides classes for printing 
