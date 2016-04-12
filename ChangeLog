@@ -1,4 +1,7 @@
 2016-04-05 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form.tcl: wrong element created by 'file' method
+
+2016-04-05 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form2.tcl: wrong element created by 'file' method
 
 2016-04-04 Massimo Manghi <mxmanghi@apache.org>
