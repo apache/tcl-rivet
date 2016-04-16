@@ -1,3 +1,9 @@
+2016-06-16 Massimo Manghi <mxmanghi@apache.org>
+    * .: released as 2.3.1
+
+2016-04-13 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION,configure.ac: version number set to 2.3.1
+
 2016-04-05 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form.tcl: wrong element created by 'file' method
     * doc/xml/examples.xml: conflicting target fixed
