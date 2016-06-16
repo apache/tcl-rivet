@@ -349,30 +349,34 @@
 			    <arg><replaceable>script</replaceable></arg>
 			    <arg><replaceable>error_code_var_name</replaceable></arg>
 			    <arg><replaceable>options_var_name</replaceable></arg>
-	
 			</cmdsynopsis>
 		</refsynopsisdiv>
 
 	   <refsect1>
 			<title>Description</title>
 			<para>
-		    	<command>::rivet::catch</command> is a utility command wrapping of the core language's same command. 
-		    	Within mod_rivet a script execution can be interrupted by either calling 
-		    	<command>::rivet::exit</command> or <command>::rivet::abort_page</command> that
-		    	return an error code and hand the execution down to any <command>AbortScript</command> and
-		    	eventually to <command>AfterEveryScript</command>.
-		    	Any procedure fired under control of the core <command>::catch</command> would be trapped and
-		    	the error code should be checked and in case the error should be confirmed. <command>::rivet::catch</command>
-		    	checks for these conditions and in case handles the condition in a proper way interrupting the execution 
-		    	and returning control to mod_rivet which in turn calls <link linkend="directives"><command>AbortScript</command></link>
+		    	<command>::rivet::catch</command> wraps the core language's same command adding some
+                extra error handling needed by mod_rivet design.
+		    	The rationale for Rivet to have its own <command>::rivet::catch</command> reads as follows: 
+                within mod_rivet a script execution can be interrupted by either calling 
+		    	<command>::rivet::exit</command>(deprecated) or <command>::rivet::abort_page</command>. These commands
+                implement a simple internal exception mechanism by 
+                returning a special error code so that execution is in turn handed down to the
+                <command>AbortScript</command> and eventually to <command>AfterEveryScript</command> (if any of them is 
+                defined). Any code calling one of these commands which runs under control of the
+                <command>::catch</command> command would need to do this chore itself, checking the error info and in case 
+                throw the error again if it had been originated by one of mod_rivet's exceptions calls. 
+                This is what <command>::rivet::catch</command> does hiding the implementation
+                details provide a better and more compatibile way to handle this condition.
 			</para>
 			
 			<note>
-				This command is not exported from the <command>::rivet</command> namespace and therefore has
-				to be fully qualified.
+				This command is not meant to replace the core command, thus it's notexported from the 
+                <command>::rivet</command> namespace and therefore has to be fully qualified.
 			</note>
 	    </refsect1>
-	</refentry>
+
+	</refentry>	
     <!-- Reference page for command 'clock_to_rfc' -->
 	<refentry id="clock_to_rfc">
 	    <refnamediv>
