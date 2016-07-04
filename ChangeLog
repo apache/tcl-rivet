@@ -1,3 +1,10 @@
+2016-07-04 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: ::rivet::catch man page example corrected
+    * rivet/packages/form/form2.tcl: fixed output in code for the 
+    <select>...</select> form element method
+    * src/mod_rivet/mod_rivet_generator.c: removed code commented away 
+    * src/mod_rivet/rivetCore.c: FQ var command name 
+
 2016-06-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: rephrasing the ::rivet::catch manual page
 

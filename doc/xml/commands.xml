@@ -371,11 +371,11 @@
 			</para>
 			
 			<note>
-				This command is not meant to replace the core command, thus it's notexported from the 
-                <command>::rivet</command> namespace and therefore has to be fully qualified.
+				This command is not meant to replace the core command, thus it's not exported from the 
+            <command>::rivet</command> namespace and therefore has to be fully qualified.
 			</note>
 	    </refsect1>
-
+	    
 	</refentry>	
     <!-- Reference page for command 'clock_to_rfc' -->
 	<refentry id="clock_to_rfc">
@@ -1595,9 +1595,9 @@ bab</programlisting>
 			</para>
 			<programlisting>&lt;html&gt;&lt;?::rivet::try {
 	if {[::rivet::var_qs exists exit]} {
-	    ::rivet::exit 100
+	    ::rivet::exit [::rivet::var_qs get exit]
 	} elseif {[::rivet::var_qs exists abort]} {
-	    ::rivet::abort_page 
+	    ::rivet::abort_page [::rivet::var_qs get abort]
 	} elseif {[::rivet::var_qs exists fail]} {
 	    # this is just a non existent command
 	    wrong_command

@@ -582,7 +582,7 @@ TCL_CMD_HEADER ( Rivet_Var )
     int                     source;
 
     THREAD_PRIVATE_DATA(private)
-    CHECK_REQUEST_REC(private,"::rivet::var,var_post,var_qs")
+    CHECK_REQUEST_REC(private,"::rivet::var,::rivet::var_post,::rivet::var_qs")
     if (objc < 2 || objc > 4)
     {
         Tcl_WrongNumArgs(interp, 1, objv,

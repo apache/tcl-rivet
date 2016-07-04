@@ -15,12 +15,12 @@
 # limitations under the License.
 
 package require Itcl
-
 package provide form 2.0
 
-#
 # Rivet form class
 #
+#
+
 ::itcl::class form {
 
     constructor {args} {
@@ -60,6 +60,10 @@ package provide form 2.0
     #
     protected method import_data {type name arrayName list} {
         upvar 1 $arrayName data
+
+        # we now guarantee an array, though empty, will exist
+
+        array set data {}
 
         #
         # If there are elements in the defaultArgs array for the
@@ -557,19 +561,18 @@ package provide form 2.0
             set labels $values 
         }
 
-        # emit the selector
-        html "<select name=\"$name\" [argstring data]>"
-
-        # emit each label-value pair
+        # emit the selector with each label-value pair
+        # we adopt the style imposed by the ::rivet::xml command generating
+        # the innermost elements and then wrapping them up with the 'select' tag
+        set options_list {}
         foreach label $labels value $values {
             if {[info exists default_list] && $value in $default_list } {
-                set string "<option value=\"$value\" selected=\"selected\">"
+                lappend options_list [::rivet::xml $label [list option value $value selected selected]]
             } else {
-                set string "<option value=\"$value\">"
+                lappend options_list [::rivet::xml $label [list option value $value]]
             }
-            html "$string$label</option>"
         }
-        html "</select>"
+        puts [::rivet::xml [join $options_list "\n"] [list select name $name {*}[array get data]]]
     }
 
     #

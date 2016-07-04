@@ -82,7 +82,7 @@ Rivet_ReleaseScripts (running_scripts* scripts)
 
 /* -- Rivet_ExecuteErrorHandler
  *
- * Invoking either the default error handler or the ErrorScript.
+ * Invoking either the default error handler or ErrorScript.
  * In case the error handler fails a standard error message is printed
  * (you're better off if you make your error handlers fail save)
  *
@@ -248,24 +248,9 @@ Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
          * as normal
          */
 
-        // if (strcmp (Tcl_GetString (errorCodeElementObj), "RIVET") == 0) 
         if (private->page_aborting)
         {
-            //char*       errorCodeSubString;
-
-            /* dig the second element out of the errorCode list, make sure
-             * it succeeds -- it should always
-             */
-            //ap_assert (Tcl_ListObjIndex (interp_obj->interp, errorCodeListObj, 1, &errorCodeElementObj) == TCL_OK);
-
-            //errorCodeSubString = Tcl_GetString (errorCodeElementObj);
-            //if ((strcmp(errorCodeSubString, ABORTPAGE_CODE) == 0) || 
-            //    (strcmp(errorCodeSubString, THREAD_EXIT_CODE) == 0))
-            //
-            //{
-                Rivet_RunAbortScript(private);
-            //}
- 
+            Rivet_RunAbortScript(private);
         }
         else 
         {
