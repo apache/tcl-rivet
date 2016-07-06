@@ -1,3 +1,9 @@
+2016-07-06 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.tcl: typo in section ::rivet::xml corrected
+    * rivet/packages/form/form2.tcl: merging recent fix of the select
+    element generation
+    * configure.ac,VERSION: changing version to 2.3.2
+
 2016-06-16 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: manual page for ::rivet::catch rewritten
     * Changelog: entry for 2.3.1 release corrected (the date was 

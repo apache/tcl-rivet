@@ -364,16 +364,16 @@
                 implement a simple internal exception mechanism by 
                 returning a special error code so that execution is in turn handed down to the
                 <command>AbortScript</command> and eventually to <command>AfterEveryScript</command> (if any of them is 
-                defined). Any code calling one of these commands running under control of the core
+                defined). Any code calling one of these commands which runs under control of the
                 <command>::catch</command> command would need to do this chore itself, checking the error info and in case 
-                rethrow the error if it was originated by one of mod_rivet's exceptions calls. 
-                This is what <command>::rivet::catch</command> does, but by hiding the implementation
-                details provide a better and more compatibile way to handle this condition.
+                throw the error again if it had been originated by one of mod_rivet's exceptions calls. 
+                This is what <command>::rivet::catch</command> does hiding the implementation
+                details to provide a better and more compatibile way to handle this condition.                
 			</para>
 			
 			<note>
-				This command is not meant to replace the core command, thus it's notexported from the 
-                <command>::rivet</command> namespace and therefore has to be fully qualified.
+				This command is not meant to replace the core command, thus it's not exported from the 
+            <command>::rivet</command> namespace and therefore has to be fully qualified.
 			</note>
 	    </refsect1>
 
@@ -2070,7 +2070,7 @@ form_request end</programlisting>
                 Given a string and a variable number of tag descriptors return XML framgment made
                 by nesting the tags with the same hierarchical order they are listed on the command
                 line. The tag descriptors can be a one element list (the tag) or an odd-length list whose
-                first argument is the tag namme and the remaining elements are interpreted as 
+                first argument is the tag name and the remaining elements are interpreted as 
                 attribute name-attribute value pairs. 
             </para>
             <para>
