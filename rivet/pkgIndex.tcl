@@ -22,7 +22,7 @@ package ifneeded dio_Postgresql 0.1 [list source [file join $dir packages/dio/di
 package ifneeded dio_Sqlite 0.1 [list source [file join $dir packages/dio/dio_Sqlite.tcl]]
 package ifneeded dio_Tdbc 0.1 [list source [file join $dir packages/dio/dio_Tdbc.tcl]]
 package ifneeded form 1.0 [list source [file join $dir packages/form/form.tcl]]
-package ifneeded form 2.0 [list source [file join $dir packages/form/form2.tcl]]
+package ifneeded form 2.1 [list source [file join $dir packages/form/form2.tcl]]
 package ifneeded ncgi 1.0 [list source [file join $dir packages/rivet_ncgi/rivet_ncgi.tcl]]
 package ifneeded rivetlib 2.3.0 [list load [file join $dir librivetlib.so]]
 package ifneeded rivetparser 0.2 [list load [file join $dir librivetparser.so]]

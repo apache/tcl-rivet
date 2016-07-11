@@ -15,7 +15,7 @@
 # limitations under the License.
 
 package require Itcl
-package provide form 2.0
+package provide form 2.1
 
 # Rivet form class
 #
