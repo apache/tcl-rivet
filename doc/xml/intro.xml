@@ -27,7 +27,7 @@
     </para>
     
     <simplesect>
-        <title>Acknowledgements</title>
+        <title>New commands in Rivet 2.3</title>
         <para>
         		Rivet 2.3 introduces 2 new commands <command>::rivet::exit</command>
         		and <command>::rivet::catch</command>
@@ -44,11 +44,14 @@
     			</listitem>
          	<listitem>
          		Since <command>::rivet::abort_page</command> and <command>::rivet::exit</command>
-         		interrupt the execution returning a <emphasis>TCL_ERROR</emphasis> code any <command>catch</command>
-         		could trap them and AbortScript could be executed only by throwing the error again. We introduced
-         		the <command>::rivet::catch</command> in order to simplify these operations. If any real error occurs
-         		during a script execution the procedure returns 1 and fills the optional arguments with their
-         		expected values, otherwise interrupts execution and allows for passing control to <command>AbortScript</command>
+         		interrupt the execution returning a <emphasis>TCL_ERROR</emphasis> code
+         		any <command>catch</command> could trap them and AbortScript could be
+         		executed only by throwing the error again. We introduced the
+         		<command>::rivet::catch</command> in order to simplify these operations.
+         		If any real error occurs during a script execution the procedure returns 
+         		1 and fills the optional arguments with their expected values, otherwise
+         		interrupts execution and allows for passing control to
+         		<command>AbortScript</command>
          	</listitem>
 		 </itemizedlist>
     </simplesect>
