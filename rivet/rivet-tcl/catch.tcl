@@ -12,7 +12,7 @@ namespace eval ::rivet {
 
     proc catch {script args} {
 
-        set catch_ret [uplevel ::catch $script $args]
+        set catch_ret [uplevel [list ::catch $script] $args]
 
         if {$catch_ret && [::rivet::abort_page -aborting]} {
 
