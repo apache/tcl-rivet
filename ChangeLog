@@ -1,3 +1,6 @@
+2016-09-07 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/catch.tcl: fixed argument management in ::catch call
+
 2016-07-14 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/intro.xml: amended wrong section title in introduction
 
