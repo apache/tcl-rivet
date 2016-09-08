@@ -2,7 +2,7 @@
 #
 # Wrapper of the core [try] command 
 #
-# $Id: $
+# $Id $
 #
 
 namespace eval ::rivet {

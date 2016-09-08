@@ -5,7 +5,7 @@
 # or [::rivet::exit]. In case the error is thrown again to allow
 # the interpreter to interrupt and pass execution to AbortScript
 #
-# $Id: $
+# $Id $
 #
 
 namespace eval ::rivet {

@@ -1,3 +1,9 @@
+2016-09-08 Massimo Manghi <mxmanghi@apache.org>
+    * Changelog: removed spurious duplicated entry 
+    * rivet/rivet-tcl/try.tcl: enable Id svn keyword
+    * rivet/rivet-tcl/catch.tcl: fixed wrong script invocation, enable Id svn keyword
+    * rivet/rivet-tcl/url_query.tcl: add new command ::rivet::url_query
+
 2016-09-07 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/catch.tcl: fixed argument management in ::catch call
 
@@ -23,10 +29,7 @@
 
 2016-04-05 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form.tcl: wrong element created by 'file' method
-    * doc/xml/examples.xml: conflicting target fixed
-
-2016-04-05 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/form/form2.tcl: wrong element created by 'file' method
+    * doc/xml/examples.xml: conflicting targets fixed
 
 2016-04-04 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xml: Add 2016 to copyright notice
