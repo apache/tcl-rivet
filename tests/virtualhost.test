@@ -6,15 +6,15 @@ set docroot1 [file join [pwd] docroot1]
 set docroot2 [file join [pwd] docroot2]
 
 set vhostconf {
-    NameVirtualHost 127.0.0.1
+    #NameVirtualHost 127.0.0.1
     <VirtualHost 127.0.0.1>
-    DocumentRoot $docroot1
-    ServerName vhost1
+        DocumentRoot $docroot1
+        ServerName vhost1
     </VirtualHost>
 
     <VirtualHost 127.0.0.1>
-    DocumentRoot $docroot2
-    ServerName vhost2
+        DocumentRoot $docroot2
+        ServerName vhost2
     </VirtualHost>
 }
 
@@ -40,7 +40,7 @@ set vhostconf {
     apachetest::start {} {
         RivetServerConf SeparateVirtualInterps off
         RivetServerConf ChildInitScript "source [file join $docroot1 childinit.tcl]"
-        NameVirtualHost 127.0.0.1
+        #NameVirtualHost 127.0.0.1
         <VirtualHost 127.0.0.1>
             DocumentRoot $docroot1
             ServerName vhost1
@@ -67,7 +67,7 @@ set vhostconf {
 ::tcltest::test vhost-2.2 {virtual host w/ ChildInitScript in vhost} {
     set data {}
     apachetest::start {} {
-	NameVirtualHost 127.0.0.1
+	#NameVirtualHost 127.0.0.1
 	<VirtualHost 127.0.0.1>
         DocumentRoot $docroot1
         ServerName vhost1
@@ -97,7 +97,7 @@ set vhostconf {
     set data {}
     apachetest::start {} {
 	RivetServerConf BeforeScript "source [file join $docroot1 beforescript.tcl]"
-	NameVirtualHost 127.0.0.1
+	#NameVirtualHost 127.0.0.1
 	<VirtualHost 127.0.0.1>
 	DocumentRoot $docroot1
 	ServerName vhost1
@@ -128,7 +128,7 @@ set vhostconf {
     set data {}
     apachetest::start {} {
         RivetServerConf SeparateVirtualInterps on
-        NameVirtualHost 127.0.0.1
+        #NameVirtualHost 127.0.0.1
         <VirtualHost 127.0.0.1>
             RivetServerConf ChildInitScript "set ::childinit1 1"
             DocumentRoot $docroot1
@@ -173,7 +173,7 @@ foreach {conf file re1 re2} $configs {
 	apachetest::start {} "
 RivetServerConf SeparateVirtualInterps off
 RivetServerConf $conf \"source [file join $docroot1 $file]\"
-NameVirtualHost 127.0.0.1
+#NameVirtualHost 127.0.0.1
 <VirtualHost 127.0.0.1>
 DocumentRoot $docroot1
 ServerName vhost1
@@ -214,7 +214,7 @@ foreach {conf file re1 re2} $configs {
 	apachetest::start {} "
 RivetServerConf SeparateVirtualInterps on
 RivetServerConf $conf \"source [file join $docroot1 $file]\"
-NameVirtualHost 127.0.0.1
+#NameVirtualHost 127.0.0.1
 <VirtualHost 127.0.0.1>
 DocumentRoot $docroot1
 ServerName vhost1

@@ -1,6 +1,6 @@
 # $Id: $
 
-::tcltest::test shorthand {shorthand expression for simple output} {
+::tcltest::test shorthand-1.1 {shorthand expression for simple output} {
     set page  [::http::geturl "${urlbase}shorthand.rvt"]
     set match [::http::data $page]
     set match
