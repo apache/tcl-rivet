@@ -1,0 +1,41 @@
+<?
+
+    proc failproc {arg1} {
+
+        switch $arg1 {
+            0 {
+                return -code ok
+            }
+            1 {
+                return -code error -options [dict create cmd try condition 1] "Errore"
+            }
+            3 {
+                return -code break -options [dict create cmd try condition 3] "Break"
+            }
+            4 {
+                return -code continue -options [dict create cmd try condition 4] "Continue"
+            }
+            abort {
+                ::rivet::abort_page arg1
+            }
+            exit {
+                ::rivet::exit 101
+            }
+        }
+
+    }
+
+    ::rivet::try {
+        failproc [::rivet::var_qs get cond]
+    } on continue {er opt} {
+        dict with opt { puts -nonewline "$cmd $condition " }
+    } on error {er opt} {
+        dict with opt { puts -nonewline "$cmd $condition " }
+    } on break {er opt} {
+        dict with opt { puts -nonewline "$cmd $condition " }
+    } finally {
+        puts -nonewline "finalize"
+    }
+
+
+?>

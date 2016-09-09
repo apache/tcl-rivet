@@ -1,0 +1,38 @@
+<?
+    proc failproc {arg1} {
+        switch $arg1 {
+            1 {
+                fail
+            }
+            3 {
+                return -code error -options [dict create argument $arg1 code error] "errore"
+            }
+        }
+    }
+
+    switch [::rivet::var_qs get abort] {
+        1 {
+            if {[::rivet::catch {failproc 1}]} {
+                puts -nonewline "OK"
+            }
+        }
+        2 {
+            if {[::rivet::catch {::rivet::abort_page}]} {
+                ?>should never get here if AbortScript is defined<?
+            }
+        }
+        3 {
+            if {[::rivet::catch {failproc 3} er opt]} {
+                dict with opt {
+                    puts -nonewline "$argument $code"
+                }
+            }
+        }
+        default {
+            if {![::rivet::catch {set a 1}]} {
+                ?>OK<?
+            }
+        }
+    }
+
+?>
