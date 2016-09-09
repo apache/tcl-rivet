@@ -24,10 +24,11 @@ ServerName localhost
 DocumentRoot "$CWD"
 
 <Directory "$CWD">
-Options All MultiViews
-AllowOverride All
-Order allow,deny
-Allow from all
+    Options All MultiViews
+    AllowOverride All
+    #Order allow,deny
+    #Allow from all
+    Require all granted
 </Directory>
 
 <IfModule mod_dir.c>

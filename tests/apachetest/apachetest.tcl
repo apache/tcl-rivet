@@ -41,7 +41,7 @@ namespace eval apachetest {
 	variable httpd_version  $::httpd_version
     # this file should be in the same directory this script is.
     variable templatefile [file join [file dirname [info script]] \
-			       template.conf.$httpd_version\.tcl]
+			       template.conf.2.tcl]
 }
 
 # apachetest::need_modules --
@@ -121,13 +121,13 @@ proc apachetest::start { options conftext code } {
     #OpenBSD related workaround, their stock apache tries to chroot by default
     #have to  add -u to the arguments to prevent this
     catch {exec uname} uname_str
-    if {[string equal $uname_str OpenBSD] && $httpd_version == 1 } {
+    if {[string equal $uname_str OpenBSD]} {
         set server_args "-u -X -f"
     } else {
-        set server_args "-X -f"
+        set server_args [list -X -f]
     }
     # There has got to be a better way to do this, aside from waiting.
-    set serverpid [eval exec  $binname $server_args \
+    set serverpid [eval exec $binname $server_args \
 	       [file join [pwd] server.conf] $options >& apachelog.txt &] 
     apachetest::connect
     if { $debug > 0 } {
@@ -138,15 +138,13 @@ proc apachetest::start { options conftext code } {
 
     # Kill and wait are the only reasons we need TclX.
     # apache2 binary started with -X reacts to SIGQUIT and ignores TERM
-    #kill QUIT $serverpid 
-
-    eval exec $binname -k stop -f [file join [pwd] server.conf]
-    #catch {
-    #    set waitres [wait $serverpid]
-    #    if { $debug > 0 } {
-    #        puts $waitres
-    ##    }
-    #} 
+    kill QUIT $serverpid 
+    catch {
+        set waitres [wait $serverpid]
+        if { $debug > 0 } {
+            puts $waitres
+        }
+    } 
 }
 
 # startserver - start the server with 'options'.
@@ -210,7 +208,7 @@ proc apachetest::getcompiledin { binname } {
 # find the httpd.conf file
 
 proc apachetest::gethttpdconf { binname } {
-    set bin [open [list | "$binname" -V] r]
+    set bin [open [list | $binname -V] r]
     set options [read $bin]
     close $bin
     regexp {SERVER_CONFIG_FILE="(.*?)"} "$options" match filename

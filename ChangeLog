@@ -1,3 +1,13 @@
+2016-09-08 Massimo Manghi <mxmanghi@apache.org>
+    * tests/runtests.tcl: support for Apache 1.3 dropped. Add modules needed by
+    Apache 2.4
+    * tests/apachetests/apachetests.tcl: Dropped support for Apache 1.3
+    * tests/shorthand.test: shorthand notation test versioning added
+    * tests/virtualhost.test: removed NameVirtualHost directive no longer supported
+    * tests/bailout.test: add tests for ::rivet::catch and ::rivet::try
+    * tests/catch.rvt,try.rvt: script testing handling various conditions
+    * rivet/rivet-tcl/url_query.tcl: add new command ::rivet::url_query
+    
 2016-09-07 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/catch.tcl: fixed argument management in ::catch call
 

@@ -1,17 +1,16 @@
-# redirect.test -- test redirect command.
+# bailout.test -- test redirect command.
 #
 # redirect must trigger an AbortScript and have
 # predictable data stored in the abort code
 
-# $Id: $
+# $Id: bailout.test 1760054 2016-09-09 16:02:29Z mxmanghi $
 
-::tcltest::test bailout-1.1 {redirect command} {
+::tcltest::test bailout-1.1 {::rivet::redirect command} {
     apachetest::start {} {
         RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching redirect\\\""
         RivetServerConf AbortScript "set tmpfp \[open redirect_code.txt w+\]"
         RivetServerConf AbortScript "puts \$tmpfp \[::rivet::abort_code\]"
         RivetServerConf AbortScript "close \$tmpfp"
-        RivetServerConf AbortScript "touch /tmp/aaaaaa"
     } {
         set url "${urlbase}redirect.rvt?base=$urlbase"
         #puts $url
@@ -25,7 +24,8 @@
     list $r1 $r2
 } {1 1}
 
-::tcltest::test bailout-1.2 {exit command} {
+
+::tcltest::test bailout-1.2 {::rivet::exit command} {
     apachetest::start {} {
         RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching exit\\\""
         RivetServerConf AbortScript "set abcode \[::rivet::abort_code\]"
@@ -41,5 +41,131 @@
     set r
 } {1 exit 100} 
 
+::tcltest::test bailout-2.0 {::rivet::catch procedure successful execution} {
+    apachetest::start {} {
+    } {
+        set url "${urlbase}catch.rvt"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {OK}
 
+::tcltest::test bailout-2.1 {::rivet::catch command generic error handling} {
+    apachetest::start {} {
+    } {
+        set url "${urlbase}catch.rvt?abort=1"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {OK}
 
+::tcltest::test bailout-2.2 {::rivet::catch command abort_page handling} {
+    apachetest::start {} {
+        RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching abort condition\\\""
+        RivetServerConf AbortScript "puts -nonewline \[::rivet::abort_page -aborting\]"
+    } {
+        puts "test ::rivet::catch and ::rivet::abort_page interaction"
+        set url "${urlbase}catch.rvt?abort=2"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r
+} {1}
+
+::tcltest::test bailout-2.3 {::rivet::catch handling options dictionary} {
+    apachetest::start {} {
+    } {
+        set url "${urlbase}catch.rvt?abort=3"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {3 error}
+
+::tcltest::test bailout-3.0 {::rivet::try successful procedure call} {
+    apachetest::start {} {
+    } {
+        set url "${urlbase}try.rvt"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {finalize}
+
+::tcltest::test bailout-3.1 {::rivet::try handling break return code} {
+    apachetest::start {} {
+    } {
+        set url "${urlbase}try.rvt?cond=3"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {try 3 finalize}
+
+::tcltest::test bailout-3.2 {::rivet::try handling error return code} {
+    apachetest::start {} {
+    } {
+        set url "${urlbase}try.rvt?cond=1"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {try 1 finalize}
+
+::tcltest::test bailout-3.3 {::rivet::try handling continue return code} {
+    apachetest::start {} {
+    } {
+        set url "${urlbase}try.rvt?cond=4"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {try 4 finalize}
+
+::tcltest::test bailout-3.4 {::rivet::try abort_page handling} {
+    apachetest::start {} {
+        RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching abort condition\\\""
+        RivetServerConf AbortScript "puts -nonewline \\\" \[::rivet::abort_page -aborting\]\\\""
+        RivetServerConf AbortScript "puts -nonewline \\\" \[::rivet::abort_code\]\\\""
+    } {
+        set url "${urlbase}try.rvt?cond=abort"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {finalize 1 arg1}
+
+::tcltest::test bailout-3.4 {::rivet::try handling ::rivet::exit} {
+    apachetest::start {} {
+        RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching abort condition\\\""
+        RivetServerConf AbortScript "set abcode \[::rivet::abort_code\]"
+        RivetServerConf AbortScript "puts -nonewline \\\" \[::rivet::abort_page -exiting\]\\\""
+        RivetServerConf AbortScript "puts -nonewline \\\" \[dict get \$abcode error_code\] \[dict get \$abcode return_code\]\\\""
+    } {
+        set url "${urlbase}try.rvt?cond=exit"
+        set page [::http::geturl $url]
+        set r [::http::data $page]
+        ::http::cleanup $page
+    }
+    set r [string trim $r]
+    set r
+} {finalize 1 exit 101}
