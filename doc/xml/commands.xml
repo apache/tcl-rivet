@@ -1830,6 +1830,31 @@ bab</programlisting>
 		</para>
 	    </refsect1>
 	</refentry>
+	<refentry id="url_query">
+		<refnamediv>
+			<refname>url_query</refname>
+			<refpurpose>builds a URL query from parameter-value pairs</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+		    <command>::rivet::url_query</command>
+		    <arg>par1 value1 par2 value2 ...</arg>
+		   </cmdsynopsis>
+		</refsynopsisdiv>
+	   <refsect1>
+			<title>Description</title>
+			<para>
+				Builds a URL query out of a list of parameter-value pairs. If
+				the argument list has an odd length the last element is silently
+				discarded. The values of each pair in the list are passed through 
+				<command>::rivet::escape_string</command> for proper representation
+				of characters that could break the URL syntax
+			</para>
+			<programlisting>set query [::rivet::url_query par1 val1 par2 val2 par3 val3]
+puts $query
+par1=val1&amp;par2=val2&amp;par3=val3</programlisting>				
+		</refsect1>
+	</refentry>
 
 	<refentry id="var">
 	    <refnamediv>
