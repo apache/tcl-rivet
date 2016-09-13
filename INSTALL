@@ -1,4 +1,4 @@
-              Rivet 2.2 Installation
+              Rivet 2.3 Installation
               ======================
 
 For more detailed instructions, see the docs/html/ directory.
@@ -16,7 +16,7 @@ Example:
             --with-apache=/usr/local/apache2            \
             --with-apxs=/usr/local/apache2/bin/apxs     \
             --with-tclsh=/usr/bin/tclsh8.5              \
-            --with-rivet-target-dir=/usr/lib/rivet2.2   \
+            --with-rivet-target-dir=/usr/lib/rivet2.3   \
             --enable-version-display
 
 2) if 'configure' was successful Rivet is ready for compilation
