@@ -50,7 +50,7 @@ namespace eval ::Rivet {
 
         set command_list [namespace eval ::rivet_temp {array names auto_index}]
 
-        # we won't left anything behind
+        # we won't leave anything behind
         namespace delete ::rivet_temp
 
         return $command_list

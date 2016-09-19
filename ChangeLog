@@ -1,3 +1,6 @@
+2016-09-19 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet.tcl.in,rivet.tcl: fixed errors in comments
+
 2016-09-13 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: correct version number
     * doc/commands.xml: Documenting new ::rivet::url_query command
