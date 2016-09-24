@@ -170,6 +170,13 @@ namespace eval DIO {
                             }
                         }
                     }
+                    NULL {
+                        if {[string toupper $val] == "NULL"} {
+                            return $val
+                        } else {
+                            return "'[quote $val]'"
+                        }
+                    }
                     default {
                         # no special code for that type!!
                         return "'[quote $val]'"

@@ -657,6 +657,9 @@
 				If you need to restart the child processes from time to time we recommend to check the 
 				MaxRequests parameter in the 
 				<ulink url="https://httpd.apache.org/docs/2.4/mod/prefork.html">prefork MPM documentation</ulink>
+				or the 
+				<ulink url="http://httpd.apache.org/docs/2.0/mod/mpm_common.html#maxrequestsperchild">MaxRequestsPerChild</ulink>
+				configuration parameter
 			</note>
 		</refsect1>
 	</refentry>

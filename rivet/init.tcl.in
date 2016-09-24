@@ -17,7 +17,8 @@ package provide Rivet @INIT_VERSION@
 namespace eval ::Rivet {
 
     ###
-    ## export_tcl_commands --
+    ## -- tcl_commands_export_list
+    #
     ## this is temporary hack to export names of Tcl commands in rivet-tcl/.
     ## This function will be removed in future versions of Rivet and it's
     ## meant to provide a basic way to guarantee compatibility with older
@@ -52,7 +53,7 @@ namespace eval ::Rivet {
 
         set command_list [namespace eval ::rivet_temp {array names auto_index}]
 
-        # we won't left anything behind
+        # we won't leave anything behind
         namespace delete ::rivet_temp
 
         return $command_list

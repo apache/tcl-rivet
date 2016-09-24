@@ -789,11 +789,16 @@ proc handle {interface args} {
                 }
                 if {$return} { return $var }
             }
-
+            "-dict" {
+                foreach field $fields elem $list {
+                    lappend var -$field $elem
+                }
+                if {$return} { return [dict create {*}$var] }
+            }
             default {
                 incr rowid -1
                 return -code error \
-                    "In-valid type: must be -list, -array or -keyvalue"
+                    "In-valid type: must be -list, -array, -dict or -keyvalue"
             }
         }
         return [expr [lempty $list] == 0]
