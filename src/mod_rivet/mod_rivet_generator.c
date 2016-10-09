@@ -109,7 +109,7 @@ Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thr
      * can either be the request processing script or conf->rivet_abort_script
      */
 
-    Tcl_SetVar( interp, "errorOutbuf",Tcl_GetStringFromObj( tcl_script_obj, NULL ),TCL_GLOBAL_ONLY );
+    Tcl_SetVar(interp,"errorOutbuf",Tcl_GetStringFromObj(tcl_script_obj,NULL),TCL_GLOBAL_ONLY);
 
     /* If we don't have an error script, use the default error handler. */
     if (conf->rivet_error_script) {
@@ -185,11 +185,11 @@ Rivet_RunAbortScript (rivet_thread_private *private)
 /* -- Rivet_ExecuteAndCheck
  * 
  * Tcl script execution central procedure. The script stored in
- * outbuf is evaluated and in case an error occurs in the execution
- * an error handler is executed. In case the error code returned
- * is RIVET then the error was caused by the invocation of a 
- * abort_page command and the script stored in conf->abort_script
- * is run istead. The default error script prints the error buffer
+ * outbuf is evaluated and in case the execution results with an
+ * error the error handler is executed. If the returned error code
+ * is RIVET then the error was caused by the ::rivet::abort_page 
+ * command and conf->abort_script is run instead (if not NULL). 
+ * The default error script prints the error buffer
  *
  *   Arguments:
  * 
@@ -445,10 +445,9 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 
         } else if (rivet_interp->cache_size) { /* If it's zero, we just skip this. */
 
-/*
-        instead of removing the last entry in the cache (for what purpose after all??)
-        we signal a 'cache full' condition
- */
+        /*  instead of removing the last entry in the cache (for what purpose after all??)
+         *  we signal a 'cache full' condition
+         */
             
             if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
             {
@@ -460,7 +459,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
 
     } else {
 
-        /* We found a compiled version of this page. */
+        /* we fetch the cached copy of the script */
         outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
         Tcl_IncrRefCount(outbuf);
 

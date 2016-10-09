@@ -1,3 +1,9 @@
+2016-10-09 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet_generator.c: improved comments in view of
+    branching for new version of content generation script
+    * rivet/packages/formbroker/formbroker.tcl: inital reworking for
+    a transaction type form broker and validator
+
 2016-09-24 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: add proposed form broker
     * rivet/packages/dio/dio.tcl: now returning also results in a dictionary
