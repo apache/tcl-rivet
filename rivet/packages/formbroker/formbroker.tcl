@@ -22,8 +22,8 @@
 # under the License.
 
 namespace eval FormBroker {
-    variable form_database [dict create]
-    variable field_database [dict create]
+    variable form_definitions [dict create]
+    variable form_list [dict create]
     variable string_quote   force_quote
     #
     # response_security_error - issue an error with errorCode
@@ -264,7 +264,7 @@ namespace eval FormBroker {
 
     proc validate_form_var {_var_d} {
         upvar $_var_d var_d
-        variable form_database
+        variable form_definitions
 
         set validator [dict get $var_d validator]
         if {[info commands $validator] == ""} {
@@ -322,59 +322,59 @@ namespace eval FormBroker {
     }
 
     proc failing {form_name} {
-        variable field_database
+        variable form_list
 
-        return [dict get $field_database $form_name failing]
+        return [dict get $form_list $form_name failing]
     }
 
     proc fields {form_name} {
-        variable form_database
+        variable form_definitions
 
-        return [dict get $form_database $form_name]
+        return [dict get $form_definitions $form_name]
     }
 
     proc results {form_name form_field} {
-        variable form_database
+        variable form_definitions
 
-        return [dict get $form_database $form_name $form_field]
+        return [dict get $form_definitions $form_name $form_field]
     }
 
     proc validate { form_name _response} {
         upvar $_response response
-        variable form_database
-        variable field_database
+        variable form_definitions
+        variable form_list
 
         set form_valid true
-        #set fd [dict get $form_database $form_name]
+        #set fd [dict get $form_definitions $form_name]
         set form_validation FB_VALIDATION_ERROR
 
-        set vars_to_validate [dict get $field_database $form_name vars]
+        set vars_to_validate [dict get $form_list $form_name vars]
         if {[catch {
                 require_response_vars response {*}$vars_to_validate
             } er eopts]} {
 
             #puts "$er $eopts"
-            dict set field_database $form_name form_validation $er
+            dict set form_list $form_name form_validation $er
             return false
 
         }
 
         # field validation
 
-        dict with field_database $form_name {
+        dict with form_list $form_name {
             set failing             {}
             set form_validation     FB_OK
         }
 
-        set form_d [dict get $form_database $form_name]
+        set form_d [dict get $form_definitions $form_name]
         #puts "form_d: $form_d"
 
         dict for {var variable_d} $form_d {
 
             dict set variable_d var $response($var)
             if {[validate_form_var variable_d] == 0} {
-                dict set field_database $form_name form_validation FB_VALIDATION_ERROR
-                dict with field_database $form_name {
+                dict set form_list $form_name form_validation FB_VALIDATION_ERROR
+                dict with form_list $form_name {
                     ::lappend failing $var
                 }
                 set form_valid false
@@ -387,12 +387,12 @@ namespace eval FormBroker {
                 set response($var) [dict get $variable_d var] 
             }
 
-            dict set form_database $form_name $var $variable_d
+            dict set form_definitions $form_name $var $variable_d
             #puts "validate $var -> $variable_d"
 
         }
 
-        #dict set form_database $form_name $fd
+        #dict set form_definitions $form_name $fd
         return $form_valid
     }
 
@@ -414,8 +414,8 @@ namespace eval FormBroker {
     #
 
     proc initialize {form_name args} {
-        variable form_database
-        variable field_database
+        variable form_definitions
+        variable form_list
 
         catch { namespace delete $form_name }
         namespace eval $form_name {
@@ -429,8 +429,8 @@ namespace eval FormBroker {
             unset cmd
         }
 
-        dict set form_database  $form_name [dict create]
-        dict set field_database $form_name [dict create vars {} failing {} form_validation FB_OK]
+        dict set form_definitions $form_name [dict create]
+        dict set form_list $form_name [dict create vars {} failing {} form_validation FB_OK]
 
         foreach e $args {
             set e [::lassign $e field_name field_type]
@@ -440,20 +440,20 @@ namespace eval FormBroker {
             # (in general it's destroyed by the internal hash
             # tables algoritm).
 
-            dict with field_database $form_name {::lappend vars $field_name}
+            dict with form_list $form_name {::lappend vars $field_name}
 
             if {$field_type == ""} {
                 set field_type string
             }
 
-            dict set form_database $form_name $field_name \
+            dict set form_definitions $form_name $field_name \
                 [list   type            $field_type \
                         bounds           0           \
                         constrain        0           \
                         validator       [namespace current]::validate_string \
                         field_validation FB_OK]
 
-            dict with form_database $form_name $field_name {
+            dict with form_definitions $form_name $field_name {
 
                 switch $field_type {
                     integer {
