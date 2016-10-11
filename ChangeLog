@@ -1,3 +1,9 @@
+2016-10-11 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/formbroker/formbroker.tcl: first stable
+    version of the FormBroker package. The package checks and
+    validates form data stored in response array as produced
+    by ::rivet::response
+
 2016-10-09 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet_generator.c: improved comments in view of
     branching for new version of content generation script
