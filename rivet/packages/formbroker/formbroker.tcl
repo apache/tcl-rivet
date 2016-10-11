@@ -504,4 +504,4 @@ namespace eval FormBroker {
     namespace ensemble create
 }
 
-package provide formbroker
+package provide formbroker 1.0
