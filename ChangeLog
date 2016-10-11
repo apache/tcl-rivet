@@ -3,6 +3,9 @@
     version of the FormBroker package. The package checks and
     validates form data stored in response array as produced
     by ::rivet::response
+    * contrib/validate_mac.tcl: example of validator checking
+    and mangling a network mac address. This function is meant
+    to work with the FormBroker
 
 2016-10-09 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet_generator.c: improved comments in view of
