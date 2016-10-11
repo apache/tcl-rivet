@@ -164,6 +164,7 @@ namespace eval FormBroker {
 
     proc validate_integer {_var_d} {
         upvar $_var_d var_d
+        #puts "var_d: $var_d"
 
         set valid FB_OK
         dict with var_d {
@@ -189,7 +190,7 @@ namespace eval FormBroker {
 
                 if {$constrain} {
                     set var [expr min($bounds,$var)]
-                    set var [expr -max($bounds,$var)]
+                    set var [expr max(-$bounds,$var)]
                     set valid FB_OK
                 } elseif {(abs($var) > $bounds)} {
                     set valid FB_OUT_OF_BOUNDS
@@ -269,8 +270,11 @@ namespace eval FormBroker {
         if {[info commands $validator] == ""} {
             set validator ::FormBroker::validate_string
         }
+        set validation [$validator var_d]
 
-        return [string match [$validator var_d] FB_OK]
+        dict set var_d field_validation $validation
+
+        return [string match $validation FB_OK]
     }
 
 
@@ -363,7 +367,7 @@ namespace eval FormBroker {
         }
 
         set form_d [dict get $form_database $form_name]
-        puts "form_d: $form_d"
+        #puts "form_d: $form_d"
 
         dict for {var variable_d} $form_d {
 
@@ -384,7 +388,7 @@ namespace eval FormBroker {
             }
 
             dict set form_database $form_name $var $variable_d
-            puts "validate $var -> $variable_d"
+            #puts "validate $var -> $variable_d"
 
         }
 
