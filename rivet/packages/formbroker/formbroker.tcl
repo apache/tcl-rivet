@@ -22,9 +22,10 @@
 # under the License.
 
 namespace eval FormBroker {
-    variable form_definitions [dict create]
-    variable form_list [dict create]
-    variable string_quote   force_quote
+    variable form_definitions   [dict create]
+    variable form_list          [dict create]
+    variable string_quote       force_quote
+    variable form_count         0
     #
     # response_security_error - issue an error with errorCode
     #
@@ -321,11 +322,14 @@ namespace eval FormBroker {
         }
     }
 
-    proc failing {form_name} {
-        variable form_list
-
-        return [dict get $form_list $form_name failing]
-    }
+    # - fields
+    #
+    # currently this call returns the dictionary
+    # of form field definitions. It's not meant to be
+    # used in regular development. It's supposed to be
+    # private to the FormBroker package
+    # and it may go away with future developments or
+    # change its interface and returned value
 
     proc fields {form_name} {
         variable form_definitions
@@ -333,11 +337,40 @@ namespace eval FormBroker {
         return [dict get $form_definitions $form_name]
     }
 
-    proc results {form_name form_field} {
+    # -- failing
+    #
+    # returns a list of variable-status pairs for each
+    # field in a form that did not validate
+    #
+
+    proc failing {form_name} {
+        set res {}
+        dict for {field field_d} [fields $form_name] {
+            dict with field_d {
+                if {$field_validation != "FB_OK"} {
+                    lappend res $field $field_validation
+                }
+            }
+        }
+        return $res
+    }
+
+    # -- result
+    #
+    # accessor to the form field definitions. This procedure
+    # too is not (at least temporarily) to be called from
+    # outside the package
+    #
+
+    proc result {form_name form_field} {
         variable form_definitions
 
         return [dict get $form_definitions $form_name $form_field]
     }
+
+    # -- validate
+    #
+    # 
 
     proc validate { form_name _response} {
         upvar $_response response
@@ -362,7 +395,7 @@ namespace eval FormBroker {
         # field validation
 
         dict with form_list $form_name {
-            set failing             {}
+            #set failing            {}
             set form_validation     FB_OK
         }
 
@@ -374,9 +407,9 @@ namespace eval FormBroker {
             dict set variable_d var $response($var)
             if {[validate_form_var variable_d] == 0} {
                 dict set form_list $form_name form_validation FB_VALIDATION_ERROR
-                dict with form_list $form_name {
-                    ::lappend failing $var
-                }
+                #dict with form_list $form_name {
+                #    ::lappend failing $var
+                #}
                 set form_valid false
             }
 
@@ -396,6 +429,19 @@ namespace eval FormBroker {
         return $form_valid
     }
 
+    # -- destroy
+    #
+    #
+
+    proc destroy {form_name} {
+        variable form_definitions
+        variable form_list
+
+        dict unset form_definition $form_name
+        dict unset form_list       $form_name
+        namespace delete $form_name
+    }
+
     # -- initialize
     #
     # creates a form object starting from a list of element descriptors
@@ -413,14 +459,18 @@ namespace eval FormBroker {
     #  - length [max length]
     #
 
-    proc initialize {form_name args} {
+    proc initialize {args} {
         variable form_definitions
         variable form_list
+        variable form_count
+
+        set form_name "form${form_count}"
+        incr form_count
 
         catch { namespace delete $form_name }
         namespace eval $form_name {
 
-            foreach cmd {validate failing fields results} {
+            foreach cmd {validate failing fields result} {
                 lappend cmdmap $cmd [list [namespace parent] $cmd [namespace tail [namespace current]]]
             }
 
@@ -430,7 +480,7 @@ namespace eval FormBroker {
         }
 
         dict set form_definitions $form_name [dict create]
-        dict set form_list $form_name [dict create vars {} failing {} form_validation FB_OK]
+        dict set form_list $form_name [dict create vars {} form_validation FB_OK failing {}]
 
         foreach e $args {
             set e [::lassign $e field_name field_type]
@@ -504,4 +554,4 @@ namespace eval FormBroker {
     namespace ensemble create
 }
 
-package provide formbroker 1.0
+package provide formbroker 0.1

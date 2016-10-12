@@ -1,3 +1,10 @@
+2016-10-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/formbroker/formbroker.tcl: removed need
+    for a form_name argument. Now forms receive automatic names.
+    The list of fields whose validation failed is now
+    a flat list of field_name - validation_error pairs suitable
+    to be put in dictionary or array
+
 2016-10-11 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: first stable
     version of the FormBroker package. The package checks and
