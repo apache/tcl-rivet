@@ -1,3 +1,7 @@
+2016-10-15 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/formbroker/formbroker.tcl: add quote 
+    mechanism
+
 2016-10-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: removed need
     for a form_name argument. Now forms receive automatic names.
