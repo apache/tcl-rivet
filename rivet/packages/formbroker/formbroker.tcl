@@ -163,6 +163,18 @@ namespace eval FormBroker {
         return $valid
     }
 
+    # -- validate_integer
+    #
+    # integer validation checks whether
+    #
+    # 1- the representation *is* an integer
+    # 2- if buonds exist the value must be between [-bound,bound] 
+    # 3- if the bounds is a list of 2 elements the value must 
+    #    be between them
+    #
+    # If needed the variable is constrained within the bounds.
+    # 
+
     proc validate_integer {_var_d} {
         upvar $_var_d var_d
         #puts "var_d: $var_d"
@@ -263,7 +275,7 @@ namespace eval FormBroker {
         }
     }
 
-    proc validate_form_var {_var_d} {
+    proc validate_variable_representation {_var_d} {
         upvar $_var_d var_d
         variable form_definitions
 
@@ -278,6 +290,24 @@ namespace eval FormBroker {
         return [string match $validation FB_OK]
     }
 
+
+    proc validate_var {form_name var_name var_value {force_quoting "-noforcequote"}} {
+        variable form_definitions
+        upvar    $var_value value
+
+        set force_quote_var [string match $force_quoting "-forcequote"]
+
+        set variable_d [dict get $form_definitions $form_name $var_name]
+        
+        dict set variable_d var $value
+        set valid [validate_variable_representation variable_d]
+
+        set value [dict get $variable_d var] 
+        if {[dict get $variable_d force_quote] || $force_quote_var} {
+            set value  [$string_quote $value]
+        }
+        return $valid
+    }
 
     # -- constrain_bounds
     #
@@ -322,7 +352,7 @@ namespace eval FormBroker {
         }
     }
 
-    # - fields
+    # - form_definition
     #
     # currently this call returns the dictionary
     # of form field definitions. It's not meant to be
@@ -331,7 +361,7 @@ namespace eval FormBroker {
     # and it may go away with future developments or
     # change its interface and returned value
 
-    proc fields {form_name} {
+    proc form_definition {form_name} {
         variable form_definitions
 
         return [dict get $form_definitions $form_name]
@@ -345,7 +375,7 @@ namespace eval FormBroker {
 
     proc failing {form_name} {
         set res {}
-        dict for {field field_d} [fields $form_name] {
+        dict for {field field_d} [form_definition $form_name] {
             dict with field_d {
                 if {$field_validation != "FB_OK"} {
                     lappend res $field $field_validation
@@ -372,14 +402,21 @@ namespace eval FormBroker {
     #
     # 
 
-    proc validate { form_name _response} {
+    proc validate { form_name _response {force_quoting "-noforcequote"}} {
         upvar $_response response
         variable form_definitions
         variable form_list
         variable string_quote
 
+        # first of all let's determine if we are quoting the
+        # whole response away
+
+        set force_quote_vars 0
+        if {$force_quoting == "-forcequote"} {
+            set force_quote_vars 1
+        } 
+
         set form_valid true
-        #set fd [dict get $form_definitions $form_name]
         set form_validation FB_VALIDATION_ERROR
 
         set vars_to_validate [dict get $form_list $form_name vars]
@@ -396,7 +433,6 @@ namespace eval FormBroker {
         # field validation
 
         dict with form_list $form_name {
-            #set failing            {}
             set form_validation     FB_OK
         }
 
@@ -406,11 +442,8 @@ namespace eval FormBroker {
         dict for {var variable_d} $form_d {
 
             dict set variable_d var $response($var)
-            if {[validate_form_var variable_d] == 0} {
+            if {[validate_variable_representation variable_d] == 0} {
                 dict set form_list $form_name form_validation FB_VALIDATION_ERROR
-                #dict with form_list $form_name {
-                #    ::lappend failing $var
-                #}
                 set form_valid false
             }
 
@@ -421,10 +454,9 @@ namespace eval FormBroker {
                 set response($var) [dict get $variable_d var] 
             }
 
-            if {[dict get $variable_d force_quote]} {
+            if {[dict get $variable_d force_quote] || $force_quote_vars} {
                 set response($var)  [$string_quote [dict get $variable_d var]]
             }
-
 
             dict set form_definitions $form_name $var $variable_d
             #puts "validate $var -> $variable_d"
@@ -437,18 +469,22 @@ namespace eval FormBroker {
 
     # -- destroy
     #
+    #   this method is designed to be called
+    # by an 'trace unset' event on the variable
+    # keeping the form description object. 
     #
 
-    proc destroy {form_name} {
+    proc destroy {form_name args} {
         variable form_definitions
         variable form_list
 
-        dict unset form_definition $form_name
-        dict unset form_list       $form_name
-        namespace delete $form_name
+        dict unset form_definitions $form_name
+        dict unset form_list        $form_name
+        namespace delete            ::FormBroker::${form_name}
+        #puts "destroy of $form_name finished"
     }
 
-    # -- initialize
+    # -- create
     #
     # creates a form object starting from a list of element descriptors
     #
@@ -465,7 +501,7 @@ namespace eval FormBroker {
     #  - length [max length]
     #
 
-    proc initialize {args} {
+    proc create {args} {
         variable form_definitions
         variable form_list
         variable form_count
@@ -477,7 +513,7 @@ namespace eval FormBroker {
         catch { namespace delete $form_name }
         namespace eval $form_name {
 
-            foreach cmd {validate failing fields result destroy} {
+            foreach cmd {validate failing form_definition result validate_var destroy} {
                 lappend cmdmap $cmd [list [namespace parent] $cmd [namespace tail [namespace current]]]
             }
 
@@ -488,10 +524,10 @@ namespace eval FormBroker {
         }
 
         dict set form_definitions $form_name [dict create]
-        dict set form_list $form_name   [dict create    vars            {}      \
-                                                        form_validation FB_OK   \
-                                                        failing         {}      \
-                                                        quoting         $string_quote]
+        dict set form_list $form_name   [dict create vars            {}      \
+                                                     form_validation FB_OK   \
+                                                     failing         {}      \
+                                                     quoting         $string_quote]
 
         while {[llength $args]} {
 
@@ -502,11 +538,11 @@ namespace eval FormBroker {
                 dict with form_list $form_name {
                     set args [::lassign $args quoting]
 
-                    if {[info proc $quoting] == ""} {
+                    if {[uplevel [list info proc $quoting]] == ""} {
                         error [list RIVET INVALID_QUOTING_PROC \
                                           "Non existing quoting proc '$quoting'"]
                     }
-
+                    set string_quote $quoting
                 }
                 continue
 
@@ -538,6 +574,7 @@ namespace eval FormBroker {
                                 constrain           0           \
                                 validator           [namespace current]::validate_string \
                                 force_quote         0           \
+                                var                 ""          \
                                 field_validation    FB_OK]
 
             dict with form_definitions $form_name $field_name {
@@ -589,6 +626,14 @@ namespace eval FormBroker {
             }
         }
         return [namespace current]::$form_name 
+    }
+
+    proc creategc {varname args} {
+        set formv [uplevel [list set $varname [::FormBroker::create $args]]]
+        uplevel [list trace add variable $varname unset \
+                [list [namespace current]::destroy [namespace tail $formv]]]
+
+        return $formv
     }
 
     namespace export *
