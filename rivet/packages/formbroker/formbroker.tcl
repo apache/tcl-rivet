@@ -40,23 +40,6 @@ namespace eval FormBroker {
     }
 
     #
-    # require_response_vars - error if any of the specified are not in the response
-    #
-
-    proc require_response_vars {_response args} {
-        upvar $_response response
-
-        foreach var $args {
-            if {![info exists response($var)]} {
-
-                response_security_error MISSING_VAR \
-                            "var $var not present in $_response"
-
-            }
-        }
-    }
-
-    #
     # force_response_integers - error if any of named vars in response doesn't exist
     #
     #   or isn't an integer
@@ -74,9 +57,7 @@ namespace eval FormBroker {
             }
 
             if {![scan $response($var) %d response($var)]} {
-
                 response_security_error NOT_INTEGER "illegal content in $var"
-
             }
         }
 
@@ -197,7 +178,6 @@ namespace eval FormBroker {
                 } else {
                     set valid FB_OK
                 }
-
 
             } elseif {([llength $bounds] == 1) && ($bounds > 0)} {
 
@@ -352,7 +332,7 @@ namespace eval FormBroker {
         }
     }
 
-    # - form_definition
+    # -- form_definition
     #
     # currently this call returns the dictionary
     # of form field definitions. It's not meant to be
@@ -366,6 +346,20 @@ namespace eval FormBroker {
 
         return [dict get $form_definitions $form_name]
     }
+
+    # -- validation_error
+    #
+    # returns the result of the last validation
+    # operation called on for this form.
+    #
+
+
+    proc validation_error {form_name} {
+        variable form_list
+
+        return [dict get $form_list $form_name form_validation]
+    }
+
 
     # -- failing
     #
@@ -398,34 +392,92 @@ namespace eval FormBroker {
         return [dict get $form_definitions $form_name $form_field]
     }
 
+    # --require_response_vars 
+    # 
+    # error if any of the specified are not in the response
+    #
+
+    proc require_response_vars {form_name _response} {
+        upvar $_response response
+        variable form_definitions
+
+        set missing_vars 0
+        dict for {var variable_d} [dict get $form_definitions $form_name] {
+            if {![info exists response($var)]} { 
+                dict with form_definitions $form_name $var {
+
+                    # if the variable was not in the response
+                    # but a default was set then we copy this
+                    # value in the variable descriptor and
+                    # the response array as well
+
+                    if {$default_set} {
+                        set response($var) $default
+                        set var $default
+                    } else {
+                        set field_validation MISSING_VAR
+                        set missing_vars 1
+                    }
+
+                }
+            }
+        }
+
+        if {$missing_vars} {
+            response_security_error MISSING_VAR \
+                "var $var not present in $_response"
+        }
+
+
+    }
+
+
     # -- validate
     #
     # 
 
-    proc validate { form_name _response {force_quoting "-noforcequote"}} {
-        upvar $_response response
+    proc validate { form_name args } {
         variable form_definitions
         variable form_list
         variable string_quote
 
-        # first of all let's determine if we are quoting the
-        # whole response away
-
         set force_quote_vars 0
-        if {$force_quoting == "-forcequote"} {
-            set force_quote_vars 1
-        } 
+        set arguments        $args
+        if {[llength $arguments] == 0} { 
+            error "missing required arguments" 
+        } elseif {[llength $arguments] > 3} {
+            error "error calling validate, usage: validate ?-forcequote? response ?copy_response?"
+        }
+
+        while {[llength $arguments]} {
+            
+            set arguments [::lassign $arguments a]
+            if {$a == "-forcequote"} {
+                set force_quote_vars 1
+            } elseif {![array exists response]} {
+                upvar $a response
+            } else {
+                upvar $a filtered_response
+                array set filtered_response {}
+            }
+
+        }
+
+        if {![array exists response]} {
+            error "error calling validate, usage: validate ?-forcequote? response ?copy_response?"
+        }
+
+        # we now go ahead validating the response variables
 
         set form_valid true
-        set form_validation FB_VALIDATION_ERROR
 
         set vars_to_validate [dict get $form_list $form_name vars]
         if {[catch {
-                require_response_vars response {*}$vars_to_validate
+                require_response_vars $form_name response
             } er eopts]} {
 
             #puts "$er $eopts"
-            dict set form_list $form_name form_validation $er
+            dict set form_list $form_name form_validation FB_MISSING_VARS
             return false
 
         }
@@ -439,31 +491,45 @@ namespace eval FormBroker {
         set form_d [dict get $form_definitions $form_name]
         #puts "form_d: $form_d"
 
+        array unset response_a
         dict for {var variable_d} $form_d {
 
             dict set variable_d var $response($var)
             if {[validate_variable_representation variable_d] == 0} {
                 dict set form_list $form_name form_validation FB_VALIDATION_ERROR
                 set form_valid false
+                continue
             }
 
             # in case it was constrained we write the value back
             # into the response array
 
             if {[dict get $variable_d constrain]} { 
-                set response($var) [dict get $variable_d var] 
+                set response_a($var) [dict get $variable_d var] 
+            } else {
+                set response_a($var) $response($var)
             }
 
             if {[dict get $variable_d force_quote] || $force_quote_vars} {
-                set response($var)  [$string_quote [dict get $variable_d var]]
+                set response_a($var)  [$string_quote [dict get $variable_d var]]
             }
 
             dict set form_definitions $form_name $var $variable_d
-            #puts "validate $var -> $variable_d"
+            #puts "validated $var -> $variable_d"
 
         }
 
-        #dict set form_definitions $form_name $fd
+        #parray response_a
+
+        # if 'validate' has been called with a filtered_response array
+        # we clean it up and proceed copying the variable values into it
+
+        if {[array exists filtered_response]} {
+            array unset filtered_response
+            array set filtered_response [array get response_a]
+        } else {
+            array set response [array get response_a] 
+        }
         return $form_valid
     }
 
@@ -513,7 +579,10 @@ namespace eval FormBroker {
         catch { namespace delete $form_name }
         namespace eval $form_name {
 
-            foreach cmd {validate failing form_definition result validate_var destroy} {
+            foreach cmd { validate failing      \
+                          form_definition       \
+                          result validate_var   \
+                          destroy validation_error} {
                 lappend cmdmap $cmd [list [namespace parent] $cmd [namespace tail [namespace current]]]
             }
 
@@ -524,10 +593,11 @@ namespace eval FormBroker {
         }
 
         dict set form_definitions $form_name [dict create]
-        dict set form_list $form_name   [dict create vars            {}      \
-                                                     form_validation FB_OK   \
-                                                     failing         {}      \
-                                                     quoting         $string_quote]
+        dict set form_list        $form_name [dict create vars            {}     \
+                                                          form_validation FB_OK  \
+                                                          failing         {}     \
+                                                          default         ""     \
+                                                          quoting         $string_quote]
 
         while {[llength $args]} {
 
@@ -574,7 +644,8 @@ namespace eval FormBroker {
                                 constrain           0           \
                                 validator           [namespace current]::validate_string \
                                 force_quote         0           \
-                                var                 ""          \
+                                default_set         0           \
+                                default             ""          \
                                 field_validation    FB_OK]
 
             dict with form_definitions $form_name $field_name {
@@ -582,16 +653,20 @@ namespace eval FormBroker {
                 switch $field_type {
                     integer {
                         set validator [namespace current]::validate_integer
+                        set default   ""
                     }
                     unsigned {
                         set validator [namespace current]::validate_unsigned
+                        set default   ""
                     }
                     email {
                         set validator [namespace current]::validate_email
+                        set default   ""
                     }
                     string -
                     default {
                         set validator [namespace current]::validate_string
+                        set default   ""
                     }
                 }
 
@@ -610,6 +685,10 @@ namespace eval FormBroker {
                             set e [::lassign $e bounds]
                             constrain_bounds $field_type bounds
                         }
+                        default {
+                            set e [::lassign $e default]
+                            set default_set 1
+                        }
                         constrain {
                             set constrain 1
                         }
@@ -622,14 +701,24 @@ namespace eval FormBroker {
                     }
 
                 }
+            }
 
+            # let's check for possible inconsitency between
+            # data type and default value. For this purpose
+            # we create a copy of the variable representation
+            # dictionary and then we call the validator
+
+            set variable_d [dict get $form_definitions $form_name $field_name]
+            dict set variable_d var $default
+            if {[$validator variable_d] != "FB_OK"} {
+                dict set form_definitions $form_name $field_name default ""
             }
         }
         return [namespace current]::$form_name 
     }
 
     proc creategc {varname args} {
-        set formv [uplevel [list set $varname [::FormBroker::create $args]]]
+        set formv [uplevel [list set $varname [::FormBroker::create {*}$args]]]
         uplevel [list trace add variable $varname unset \
                 [list [namespace current]::destroy [namespace tail $formv]]]
 

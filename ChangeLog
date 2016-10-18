@@ -1,3 +1,7 @@
+2016-10-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/formbroker/formbroker.tcl: add response copy
+    and default value management
+    
 2016-10-17 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: add global
     quoting switch, add method for single form variable method (untested)
