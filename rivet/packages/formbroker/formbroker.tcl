@@ -411,12 +411,12 @@ namespace eval FormBroker {
                     # value in the variable descriptor and
                     # the response array as well
 
-                    if {$default_set} {
-                        set response($var) $default
-                        set var $default
+                    if {[info exists default]} {
+                        set response($var)  $default
+                        set var             $default
                     } else {
-                        set field_validation MISSING_VAR
-                        set missing_vars 1
+                        set field_validation    MISSING_VAR
+                        set missing_vars        1
                     }
 
                 }
@@ -430,7 +430,6 @@ namespace eval FormBroker {
 
 
     }
-
 
     # -- validate
     #
@@ -496,30 +495,31 @@ namespace eval FormBroker {
 
             dict set variable_d var $response($var)
             if {[validate_variable_representation variable_d] == 0} {
+
                 dict set form_list $form_name form_validation FB_VALIDATION_ERROR
                 set form_valid false
-                continue
-            }
 
-            # in case it was constrained we write the value back
-            # into the response array
-
-            if {[dict get $variable_d constrain]} { 
-                set response_a($var) [dict get $variable_d var] 
             } else {
-                set response_a($var) $response($var)
-            }
 
-            if {[dict get $variable_d force_quote] || $force_quote_vars} {
-                set response_a($var)  [$string_quote [dict get $variable_d var]]
-            }
+                # in case it was constrained we write the value back
+                # into the response array
 
+                if {[dict get $variable_d constrain]} { 
+                    set response_a($var) [dict get $variable_d var] 
+                } else {
+                    set response_a($var) $response($var)
+                }
+
+                if {[dict get $variable_d force_quote] || $force_quote_vars} {
+
+                    set response_a($var)  [$string_quote [dict get $variable_d var]]
+
+                }
+            }
             dict set form_definitions $form_name $var $variable_d
             #puts "validated $var -> $variable_d"
 
         }
-
-        #parray response_a
 
         # if 'validate' has been called with a filtered_response array
         # we clean it up and proceed copying the variable values into it
@@ -532,6 +532,30 @@ namespace eval FormBroker {
         }
         return $form_valid
     }
+
+    # -- response 
+    #
+    #
+
+    proc response {form_name {resp_a response}} {
+        upvar $resp_a response
+        variable form_definitions
+
+        dict for {var_name var_d} [dict get $form_definitions $form_name] {
+        
+            dict with var_d {
+
+                if {[info exists var]} {
+                    set response($var_name) $var
+                } elseif {[info exists default]} {
+                    set response($var_name) $default
+                } 
+
+            }
+
+        }
+    }
+
 
     # -- destroy
     #
@@ -582,7 +606,8 @@ namespace eval FormBroker {
             foreach cmd { validate failing      \
                           form_definition       \
                           result validate_var   \
-                          destroy validation_error} {
+                          destroy validation_error \
+                          response } {
                 lappend cmdmap $cmd [list [namespace parent] $cmd [namespace tail [namespace current]]]
             }
 
@@ -644,8 +669,6 @@ namespace eval FormBroker {
                                 constrain           0           \
                                 validator           [namespace current]::validate_string \
                                 force_quote         0           \
-                                default_set         0           \
-                                default             ""          \
                                 field_validation    FB_OK]
 
             dict with form_definitions $form_name $field_name {
@@ -653,20 +676,16 @@ namespace eval FormBroker {
                 switch $field_type {
                     integer {
                         set validator [namespace current]::validate_integer
-                        set default   ""
                     }
                     unsigned {
                         set validator [namespace current]::validate_unsigned
-                        set default   ""
                     }
                     email {
                         set validator [namespace current]::validate_email
-                        set default   ""
                     }
                     string -
                     default {
                         set validator [namespace current]::validate_string
-                        set default   ""
                     }
                 }
 
@@ -687,7 +706,12 @@ namespace eval FormBroker {
                         }
                         default {
                             set e [::lassign $e default]
-                            set default_set 1
+
+                            # we must not assume the variable 'default'
+                            # exists in the dictionary because we 
+                            # set it only in this code branch
+
+                            dict set form_definitions $form_name $field_name default $default
                         }
                         constrain {
                             set constrain 1
@@ -699,19 +723,18 @@ namespace eval FormBroker {
                             set force_quote 1
                         }
                     }
-
                 }
-            }
 
-            # let's check for possible inconsitency between
-            # data type and default value. For this purpose
-            # we create a copy of the variable representation
-            # dictionary and then we call the validator
+                # let's check for possible inconsitencies between
+                # data type and default value. For this purpose
+                # we create a copy of the variable dictionary 
+                # representation then we call the validator on it
 
-            set variable_d [dict get $form_definitions $form_name $field_name]
-            dict set variable_d var $default
-            if {[$validator variable_d] != "FB_OK"} {
-                dict set form_definitions $form_name $field_name default ""
+                set variable_d [dict get $form_definitions $form_name $field_name]
+                dict set variable_d var $default
+                if {[$validator variable_d] != "FB_OK"} {
+                    dict unset form_definitions $form_name $field_name default
+                }
             }
         }
         return [namespace current]::$form_name 
