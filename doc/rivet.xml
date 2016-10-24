@@ -29,6 +29,7 @@
     <!ENTITY entities.xml          SYSTEM "xml/entities.xml" >
     <!ENTITY asciiglyphs.xml		  SYSTEM "xml/asciiglyphs.xml" >
     <!ENTITY lazybridge.xml		  SYSTEM "xml/lazybridge.xml" >
+    <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
 ]>
 
 <!--
@@ -126,6 +127,9 @@
     
     <!-- AsciiGlyphs -->
 	 &asciiglyphs.xml; 
+
+	 <!-- FormBroker -->
+	 &formbroker.xml;
 
     <!-- Help -->
     &help.xml;

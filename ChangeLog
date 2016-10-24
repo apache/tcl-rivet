@@ -1,3 +1,11 @@
+2016-10-24 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/formbroker/formbroker.tcl: new method
+    'reset' restores a form internal status
+    * rivet/rivet-tcl/try.tcl: tab expansion to fix
+    indentation
+    * doc/xml/formbroker.xml: add XML manual page for the
+    form broker package
+
 2016-10-20 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: new method
     'response' returns an array with the last processed response

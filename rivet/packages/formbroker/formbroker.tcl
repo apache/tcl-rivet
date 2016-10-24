@@ -556,10 +556,22 @@ namespace eval FormBroker {
         }
     }
 
+    # -- reset
+    #
+
+    proc reset {form_name} {
+        variable form_definitions
+        variable form_list
+        
+        dict set form_list $form_name form_validation FB_OK
+        dict for {var_name var_d} [dict get $form_definitions $form_name] {
+            catch {dict unset var_d $var_name var}
+        }
+    }
 
     # -- destroy
     #
-    #   this method is designed to be called
+    # this method is designed to be called
     # by an 'trace unset' event on the variable
     # keeping the form description object. 
     #

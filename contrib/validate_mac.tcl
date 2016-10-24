@@ -20,7 +20,7 @@
                 # the 'constrain' field is bidirectional:
                 # it tells the validator to curb/change the value
                 # within bonds/forms/representation. By setting it the
-                # validator tells the Form Broker to copy the value
+                # validator we tell the FormBroker to copy the value
                 # back in the response array
 
                 set constrain 1

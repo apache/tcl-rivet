@@ -42,12 +42,12 @@
 };</programlisting>
 
 	<para>
-		After the server initialization stage child processes read the configuration 
-		and modules build their own configuration representation.
+		After the server initialization stage, child processes read the configuration 
+		and modules build their own configuration representation. MPM bridges hooks into
+		this stage to store and/or build data structures relevant to their design.
 		A fundamental information built during this stage is the database of virtual hosts.
-		The lazy bridge keeps an array of virtual host descriptor pointers 
-		<command>vhosts*</command> each of them referencing an instance of the 
-		following structure.
+		The lazy bridge keeps an array of virtual host descriptor pointers
+		each of them referencing an instance of the following structure.
 	</para>
 	<programlisting>/* virtual host descriptor */
 
@@ -116,7 +116,7 @@ typedef struct mpm_bridge_status {
 		<command>exit</command> in a sort of special <command>::rivet::abort_page</command>
 		implementation whose eventual action is to call the <command>Tcl_Exit</command>
 		library call. See the <command><xref linkend="exit">::rivet::exit</xref></command>
-		for further explanations.
+		command for further explanations.
 	</note>
 	<para>
 		Both the worker bridge and lazy bridge 
