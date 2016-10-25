@@ -278,7 +278,6 @@ namespace eval FormBroker {
         set force_quote_var [string match $force_quoting "-forcequote"]
 
         set variable_d [dict get $form_definitions $form_name $var_name]
-        
         dict set variable_d var $value
         set valid [validate_variable_representation variable_d]
 
@@ -619,7 +618,7 @@ namespace eval FormBroker {
                           form_definition       \
                           result validate_var   \
                           destroy validation_error \
-                          response } {
+                          response reset } {
                 lappend cmdmap $cmd [list [namespace parent] $cmd [namespace tail [namespace current]]]
             }
 
