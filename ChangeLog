@@ -1,4 +1,6 @@
 2016-10-24 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/mod_rivet_ng: new directory to develop new 
+    module having a Tcl based content generation script
     * rivet/packages/formbroker/formbroker.tcl: new method
     'reset' restores a form internal status
     * rivet/rivet-tcl/try.tcl: tab expansion to fix
