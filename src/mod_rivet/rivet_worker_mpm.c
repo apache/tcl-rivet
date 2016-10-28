@@ -165,20 +165,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
 
-    private = Rivet_CreatePrivateData();
+    private = Rivet_ExecutionThreadInit();
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     private->ext->interps = 
         apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
 
-    if (private == NULL) 
-    {
-        /* TODO: we have to log something here */
-        apr_thread_exit(thd,APR_SUCCESS);
-        return NULL;
-    }
-    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-    Rivet_SetupTclPanicProc();
     
     /* So far nothing differs much with what we did for the prefork bridge */
 
@@ -506,8 +498,9 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         exit(1);
     }
 
-    /* In order to prepare load balancing let's query apache for some configuration 
-     * parameters of the worker MPM */
+    /* In order to set up some workload balancing let's 
+     * query apache for some configuration parameters of the worker MPM 
+     */
 
     if (ap_mpm_query(AP_MPMQ_MAX_THREADS,&module_globals->mpm->max_threads) != APR_SUCCESS)
     {

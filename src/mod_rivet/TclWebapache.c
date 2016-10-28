@@ -531,7 +531,6 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar,rivet_thread_private* private)
     Tcl_Obj *val;
     TclWebRequest *req;
 
-
     TclWeb_InitEnvVars(private);
 
     req = private->req;
@@ -541,27 +540,27 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar,rivet_thread_private* private)
     env     = (apr_table_entry_t *) env_arr->elts;
     for (i = 0; i < env_arr->nelts; ++i)
     {
-	if ((!env[i].key) || (!env[i].val)) {
-	    continue;
-	}
+        if ((!env[i].key) || (!env[i].val)) {
+            continue;
+        }
 
-	key = TclWeb_StringToUtfToObj(env[i].key, req);
-	val = TclWeb_StringToUtfToObj(env[i].val, req);
-	Tcl_IncrRefCount(key);
-	Tcl_IncrRefCount(val);
+        key = TclWeb_StringToUtfToObj(env[i].key, req);
+        val = TclWeb_StringToUtfToObj(env[i].val, req);
+        Tcl_IncrRefCount(key);
+        Tcl_IncrRefCount(val);
 
-    /* Variable scope resolution changed to default (flags: 0)
-     * to enable creation of the array in the caller's local scope.
-     * Default behavior (creation in the ::request namespace)
-     * is now more consistently constrained by fully qualifying
-     * the default array names (see rivetCore.c). This should fix
-     * Bug 48963 
-     */
+        /* Variable scope resolution changed to default (flags: 0)
+         * to enable creation of the array in the caller's local scope.
+         * Default behavior (creation in the ::request namespace)
+         * is now more consistently constrained by fully qualifying
+         * the default array names (see rivetCore.c). This should fix
+         * Bug #48963 
+         */
 
         Tcl_ObjSetVar2(req->interp, envvar, key, val, 0);
 
- 	Tcl_DecrRefCount(key);
-	Tcl_DecrRefCount(val);
+        Tcl_DecrRefCount(key);
+        Tcl_DecrRefCount(val);
     }
     Tcl_DecrRefCount(envvar);
 

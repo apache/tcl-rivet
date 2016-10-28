@@ -1,3 +1,12 @@
+2016-10-28 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/[lazy|worker|prefork]_mpm_bridge.c: new
+    Rivet_ExecutionThreadInit unifies thread initialization
+    common to each bridge
+    * src/mod_rivet/apache_config.c: the Rivet_MergeConfig 
+    method did not merge the cache size value
+    * src/mod_rivet/mod_rivet_common.c: New function
+    Rivet_ExecutionThreadInit
+
 2016-10-24 Massimo Manghi <mxmanghi@apache.org>
     * rivet/mod_rivet_ng: new directory to develop new 
     module having a Tcl based content generation script
