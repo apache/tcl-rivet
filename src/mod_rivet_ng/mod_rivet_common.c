@@ -141,9 +141,6 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
 
     globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                             (Tcl_NamespaceDeleteProc *)NULL);
-    //globals->req    = TclWeb_NewRequestObject (p); 
-    //globals->r      = NULL;
-    //globals->srec   = s;
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
@@ -172,24 +169,10 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
     Tcl_DecrRefCount(rivet_tcl);
 
     /* Initialize the interpreter with Rivet's Tcl commands. */
-
-    if (private == NULL)
-    {
-        /* reduced core for the server init interpreter */
-
-        // RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,private);
-        
-    } 
-    else
-    {
-        /* full fledged rivet core */
-
-        Rivet_InitCore(interp,private);
-
-    }
+    if (private != NULL) Rivet_InitCore(interp,private);
 
     /* Create a global array with information about the server. */
-    Rivet_InitServerVariables(interp, p );
+    Rivet_InitServerVariables(interp,p);
 
     /* Loading into the interpreter commands in librivet.so */
     /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
@@ -232,25 +215,6 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
 
     Tcl_Release(interp);
     interp_obj->flags |= RIVET_INTERP_INITIALIZED;
-}
-/*
- * Rivet_CreateCache --
- *
- * Arguments:
- *     rsc: pointer to a server_rec structure
- *
- * Results:
- *     None
- *
- * Side Effects:
- *
- */
-
-void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
-{
-    interp_obj->objCacheList = apr_pcalloc(p, (signed)((interp_obj->cache_size)*sizeof(char *)));
-    interp_obj->objCache = apr_pcalloc(p, sizeof(Tcl_HashTable));
-    Tcl_InitHashTable(interp_obj->objCache, TCL_STRING_KEYS);
 }
 
  /* -- Rivet_NewVHostInterp
@@ -315,8 +279,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
         Rivet_CreateCache(pool,interp_obj); 
     }
 
-    interp_obj->flags = 0;
-
+    interp_obj->flags           = 0;
     interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
     interp_obj->per_dir_scripts = apr_hash_make(pool); 
 
@@ -438,12 +401,32 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     private->thread_exit    = 0;
     private->exit_status    = 0;
     private->abort_code     = NULL;
-    private->request_init = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+    private->request_init   = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
     private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
     Tcl_IncrRefCount(private->request_init);
     Tcl_IncrRefCount(private->request_cleanup);
 
     apr_threadkey_private_set (private,rivet_thread_key);
+    return private;
+}
+
+/*
+ * -- Rivet_ExecutionThreadInit 
+ *
+ * We keep here the basic initilization each execution thread likely does
+ *
+ *  - create the thread private data
+ *  - create a Tcl channel
+ *  - set up the Panic procedure
+ */
+
+rivet_thread_private* Rivet_ExecutionThreadInit (void)
+{
+    rivet_thread_private* private = Rivet_CreatePrivateData();
+    ap_assert(private != NULL);
+    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+    Rivet_SetupTclPanicProc();
+
     return private;
 }
 
@@ -723,42 +706,4 @@ int Rivet_chdir_file (const char *file)
         
     return chdir_retval;
 }
-/* 
- * -- Rivet_CheckType (request_rec *r)
- *
- * Utility function internally used to determine which type
- * of file (whether rvt template or plain Tcl script) we are
- * dealing with. In order to speed up multiple tests the
- * the test returns an integer (RIVET_TEMPLATE) for rvt templates
- * or RIVET_TCLFILE for Tcl scripts
- *
- * Argument: 
- *
- *    request_rec*: pointer to the current request record
- *
- * Returns:
- *
- *    integer number meaning the type of file we are dealing with
- *
- * Side effects:
- *
- *    none.
- *
- */
-
-rivet_req_ctype
-Rivet_CheckType (request_rec *req)
-{
-    rivet_req_ctype ctype = CTYPE_NOT_HANDLED;
-
-    if ( req->content_type != NULL ) {
-        if( STRNEQU( req->content_type, RIVET_TEMPLATE_CTYPE) ) {
-            ctype  = RIVET_TEMPLATE;
-        } else if( STRNEQU( req->content_type, RIVET_TCLFILE_CTYPE) ) {
-            ctype = RIVET_TCLFILE;
-        } 
-    }
-    return ctype; 
-}
-
 

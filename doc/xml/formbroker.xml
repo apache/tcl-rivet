@@ -1,10 +1,19 @@
 <section id="formbroker">
     <title>The Form Broker</title>
     <section>
-        <title>Introduction</title>
-        <para>
-         ....
-        </para>
+    	<title>Introduction</title>
+      <para>
+         The <command>FormBroker</command> package creates instances of 
+         <command>FormBroker</command> controlled objects each representing
+         a form data description. These objects expose a simple set of methods
+         meant to validate and control data typically posted through an HTML form, 
+         thus data represented the association of form variables with their values as 
+         returned by the <command>::rivet::load_response</command> command
+      </para>
+		<para>
+			The <command>FormBroker</command> creates new instances 	        
+        
+        
      </section>
     <refentry id="fb">
     </refentry>

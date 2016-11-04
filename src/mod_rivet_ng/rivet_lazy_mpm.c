@@ -143,22 +143,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     int                     idx;
     rivet_server_conf*      rsc;
 
-    private = Rivet_CreatePrivateData();
-    if (private == NULL) 
-    {
-        /* TODO: we have to log something here */
-        apr_thread_exit(thd,APR_SUCCESS);
-    }
-    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-    Rivet_SetupTclPanicProc ();
-
     rsc = RIVET_SERVER_CONF(w->server->module_config);
+    w->nreqs = 0;
+
+    private = Rivet_ExecutionThreadInit();
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
     private->ext->interp->channel = private->channel;
-    w->nreqs = 0;
     Tcl_RegisterChannel(private->ext->interp->interp,*private->channel);
 
     private->ext->interp->scripts = 

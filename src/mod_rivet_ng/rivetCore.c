@@ -45,10 +45,13 @@
 #include <apr_strings.h>
 
 #include "mod_rivet_generator.h"
+
 #include "apache_request.h"
 #include "mod_rivet.h"
+#include "mod_rivet_cache.h"
 #include "rivet.h"
 #include "TclWeb.h"
+#include "rivetParser.h"
 
 #define ENV_ARRAY_NAME     "::request::env"
 #define HEADERS_ARRAY_NAME "::request::headers"
@@ -250,7 +253,7 @@ TCL_CMD_HEADER( Rivet_Parse )
         return TCL_ERROR;
     }
 
-    return Rivet_ParseExecFile(private, filename, 0);
+    return Rivet_ParseExecFile(private,filename,0);
 }
 
 /*
@@ -1131,6 +1134,7 @@ TCL_CMD_HEADER ( Rivet_RawPost )
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::raw_post")
+
     data = TclWeb_GetRawPost(private->req);
 
     if (!data) {
@@ -1164,6 +1168,7 @@ TCL_CMD_HEADER( Rivet_NoBody )
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::no_body")
+
     if (private->req->content_sent == 1) {
         Tcl_AddErrorInfo(interp, "Content already sent");
         return TCL_ERROR;
@@ -1306,8 +1311,8 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
     rivet_thread_private*   private;
     
     THREAD_PRIVATE_DATA(private)
-
     CHECK_REQUEST_REC(private,"::rivet::env")
+
     if( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "variable" );
         return TCL_ERROR;
@@ -1729,6 +1734,99 @@ TestpanicCmd(dummy, interp, argc, argv)
 /*
  *-----------------------------------------------------------------------------
  *
+ * Rivet_UrlScript --
+ *
+ *      Builds the full URL referenced script composed by before_script,
+ *      url referenced script and after_script. This command should not
+ *      be called by ordinary application development
+ *
+ * Results:
+ *      Standard Tcl result.
+ *
+ * Side Effects:
+ *      returns a Tcl script.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_UrlScript )
+{
+    rivet_thread_private* private;
+    char*                cache_key;
+    rivet_thread_interp* rivet_interp;
+    Tcl_HashEntry*       entry  = NULL;
+    Tcl_Obj*             script = NULL;
+    int                  result;
+    unsigned int         user_conf; 
+    time_t               ctime;
+    time_t               mtime;
+
+    THREAD_PRIVATE_DATA(private)
+    CHECK_REQUEST_REC(private,"::rivet::url_script")
+
+    user_conf = IS_USER_CONF(private->running_conf);
+
+    rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
+    ctime = private->r->finfo.ctime;
+    mtime = private->r->finfo.mtime;
+    cache_key = Rivet_MakeCacheKey(private->pool,private->r->filename,ctime,mtime,user_conf,1);
+
+    entry = Rivet_CacheEntryLookup (rivet_interp,cache_key);
+    if (entry == NULL)
+    {
+        Tcl_Interp*     interp;
+        
+        interp = rivet_interp->interp;
+
+        script = Tcl_NewObj();
+        Tcl_IncrRefCount(script);
+
+        if (private->running->rivet_before_script) 
+        {
+            Tcl_AppendObjToObj(script,private->running->rivet_before_script);
+        }
+
+    /*
+     * We check whether we are dealing with a pure Tcl script or a Rivet template.
+     * Actually this check is done only if we are processing a toplevel file, every nested 
+     * file (files included through the 'parse' command) is treated as a template.
+     */
+
+        if (Rivet_CheckType(private->r) == RIVET_TEMPLATE)
+        {
+            result = Rivet_GetRivetFile(private->r->filename, 1, script, interp);
+
+        } else {
+
+            /* It's a plain Tcl file */
+            result = Rivet_GetTclFile(private->r->filename, script, interp);
+
+        }
+
+        if (result != TCL_OK)
+        {
+            Tcl_DecrRefCount(script);
+            return result;
+        }
+
+        if (private->running->rivet_after_script) {
+            Tcl_AppendObjToObj(script,private->running->rivet_after_script);
+        }
+
+        Rivet_CacheStoreScript(rivet_interp,entry,script);
+    }
+    else
+    {
+        script = Rivet_CacheFetchScript(entry);
+    }
+
+    Tcl_SetObjResult(rivet_interp->interp, script);
+    return TCL_OK;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
  * Rivet_InitCore --
  *
  *      Creates the core rivet commands.
@@ -1769,6 +1867,7 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("apache_log_error",Rivet_LogErrorCmd,private);
     RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,private);
     RIVET_OBJ_CMD ("exit",Rivet_ExitCmd,private);
+    RIVET_OBJ_CMD ("url_script",Rivet_UrlScript,private);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
@@ -1802,7 +1901,6 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
         RIVET_EXPORT_CMD(interp,rivet_ns,"apache_log_error");
         RIVET_EXPORT_CMD(interp,rivet_ns,"inspect");
         // ::rivet::exit is not exported
-        //Tcl_Export(interp,rivet_ns,"*",0);
     }
 #endif
 

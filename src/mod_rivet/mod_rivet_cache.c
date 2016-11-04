@@ -1,5 +1,4 @@
-/* mod_rivet_generator.h -- Content generation functions */
-
+/* -- mod_rivet_cache.c                                 */
 /*
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -19,16 +18,32 @@
     under the License.
 */
 
-/* $Id$ */
+/* $Id: mod_rivet_common.c 1767022 2016-10-28 13:27:18Z mxmanghi $ */
 
-#ifndef __mod_rivet_generator_h__
-#define __mod_rivet_generator_h__
-
+#include <apr_pools.h>
 #include "mod_rivet.h"
 
-extern int Rivet_CheckType (request_rec* r);
-extern int Rivet_ParseExecFile (rivet_thread_private* req, char* filename, int toplevel);
-extern int Rivet_ParseExecString (rivet_thread_private* req, Tcl_Obj* inbuf);
-extern int Rivet_SendContent (rivet_thread_private* private,request_rec* r);
+/*
+ * -- Rivet_CreateCache 
+ *
+ * Creates a per interpreter script cach
+ *
+ * Arguments:
+ *     apr_pool_t *p - APR memory pool pointer, 
+ *     rivet_thread_interp* interp_obj - interpreter object
+ *
+ *
+ * Results:
+ *     None
+ *
+ * Side Effects:
+ *
+ */
 
-#endif
+void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
+{
+    interp_obj->objCacheList = apr_pcalloc(p,(signed)((interp_obj->cache_size)*sizeof(char *)));
+    interp_obj->objCache = apr_pcalloc(p,sizeof(Tcl_HashTable));
+    Tcl_InitHashTable(interp_obj->objCache,TCL_STRING_KEYS);
+}
+

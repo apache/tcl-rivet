@@ -27,6 +27,7 @@
 
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
+#include "mod_rivet_cache.h"
 #include "rivetParser.h"
 #include "rivetCore.h"
 #include "apache_config.h"
@@ -34,6 +35,47 @@
 
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
+
+
+/* 
+ * -- Rivet_CheckType (request_rec *r)
+ *
+ * Utility function internally used to determine which type
+ * of file (whether rvt template or plain Tcl script) we are
+ * dealing with. In order to speed up multiple tests the
+ * the test returns an integer (RIVET_TEMPLATE) for rvt templates
+ * or RIVET_TCLFILE for Tcl scripts
+ *
+ * Argument: 
+ *
+ *    request_rec*: pointer to the current request record
+ *
+ * Returns:
+ *
+ *    integer number meaning the type of file we are dealing with
+ *
+ * Side effects:
+ *
+ *    none.
+ *
+ */
+
+rivet_req_ctype
+Rivet_CheckType (request_rec *req)
+{
+    rivet_req_ctype ctype = CTYPE_NOT_HANDLED;
+
+    if ( req->content_type != NULL ) {
+        if (STRNEQU( req->content_type, RIVET_TEMPLATE_CTYPE) ) {
+            ctype  = RIVET_TEMPLATE;
+        } else if ( STRNEQU( req->content_type, RIVET_TCLFILE_CTYPE) ) {
+            ctype = RIVET_TCLFILE;
+        }
+    }
+    return ctype; 
+}
+
+
 
 /* -- Rivet_PrintErrorMessage
  *
@@ -294,13 +336,14 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
     char*           hashKey = NULL;
     int             isNew   = 0;
     int             result  = 0;
-    rivet_thread_interp*   rivet_interp;
+    rivet_thread_interp*
+                    rivet_interp;
     Tcl_Obj*        outbuf  = NULL;
     Tcl_HashEntry*  entry   = NULL;
     Tcl_Interp*     interp;
     time_t          ctime;
     time_t          mtime;
-    int             res = 0;
+    int             res     = 0;
 
     /* We have to fetch the interpreter data from the thread private environment */
 
@@ -317,41 +360,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
     if (USER_CONF_UPDATED(private->running_conf) && (rivet_interp->cache_size != 0) && 
                                                     (rivet_interp->cache_free < rivet_interp->cache_size)) 
     {
-        int ct;
-        Tcl_HashEntry *delEntry;
-
-        /* Clean out the list. */
-        ct = rivet_interp->cache_free;
-        while (ct < rivet_interp->cache_size) {
-            /* Free the corresponding hash entry. */
-            delEntry = Tcl_FindHashEntry(
-                    rivet_interp->objCache,
-                    rivet_interp->objCacheList[ct]);
-
-            if (delEntry != NULL) {
-                Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
-                Tcl_DeleteHashEntry(delEntry);
-                rivet_interp->objCacheList[ct] = NULL;
-            }
-
-            ct++;
-        }
-        apr_pool_destroy(rivet_interp->pool);
-        
-        /* let's recreate the cache list */
-
-        if (apr_pool_create(&rivet_interp->pool, private->pool) != APR_SUCCESS)
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
-                         MODNAME ": could not recreate cache private pool. Cache disabled");
-            rivet_interp->cache_free = rivet_interp->cache_size = 0;
-        }
-        else
-        {
-            rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
-                                                    (signed)(rivet_interp->cache_size*sizeof(char *)));
-            rivet_interp->cache_free = rivet_interp->cache_size;
-        }
+        Rivet_CacheCleanup(private,rivet_interp);
     }
 
     /* If toplevel is 0, we are being called from Parse, which means
@@ -483,7 +492,7 @@ Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
  * -- Rivet_ParseExecString
  *
  * This function accepts a Tcl_Obj carrying a string to be interpreted as
- * a Rivet template. This function is the core for command 'parsestr'
+ * a Rivet template. This function is the core for command 'parse -string'
  * 
  * Arguments:
  *
@@ -507,7 +516,7 @@ Rivet_ParseExecString (rivet_thread_private* private, Tcl_Obj* inbuf)
         Tcl_AppendToObj(outbuf, "\"\n", 2);
     } 
 
-    Tcl_AppendToObj(outbuf, "\n", -1);
+    Tcl_AppendToObj(outbuf,"\n",-1);
 
     res = Rivet_ExecuteAndCheck(private, outbuf);
     Tcl_DecrRefCount(outbuf);

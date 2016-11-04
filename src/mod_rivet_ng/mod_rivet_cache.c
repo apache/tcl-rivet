@@ -1,0 +1,219 @@
+/* mod_rivet_cache.c -- The mod_rivet cache */
+/*
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+*/
+#include <apr_strings.h>
+
+#include "mod_rivet.h"
+#include "mod_rivet_cache.h"
+
+extern mod_rivet_globals* module_globals;
+
+/*
+ * -- Rivet_CreateCache 
+ *
+ * Creates a per interpreter script cach
+ *
+ * Arguments:
+ *     apr_pool_t *p - APR memory pool pointer, 
+ *     rivet_thread_interp* interp_obj - interpreter object
+ *
+ *
+ * Results:
+ *     None
+ *
+ * Side Effects:
+ *
+ */
+
+void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
+{
+    interp_obj->objCacheList = 
+                apr_pcalloc(p,(signed)((interp_obj->cache_size)*sizeof(char *)));
+    interp_obj->objCache    = 
+                apr_pcalloc(p,sizeof(Tcl_HashTable));
+
+    Tcl_InitHashTable(interp_obj->objCache,TCL_STRING_KEYS);
+}
+
+/*
+ * -- Rivet_CacheCleanup
+ *
+ * Cache clean-up. This function is called when a user configuration
+ * is changed thus invalidating the whole cache. A better solution is
+ * still to be found though
+ *
+ * Arguments:
+ *     rivet_thread_interp* interp_obj - interpreter object
+ *
+ * Results:
+ *     None
+ *
+ * Side Effects:
+ *
+ *      the cache associated to the thread interpreter is emptied
+ */
+
+void Rivet_CacheCleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp)
+{
+    int ct;
+    Tcl_HashEntry *delEntry;
+
+    /* Clean out the list. */
+    ct = rivet_interp->cache_free;
+    while (ct < rivet_interp->cache_size) {
+        /* Free the corresponding hash entry. */
+        delEntry = Tcl_FindHashEntry(rivet_interp->objCache,
+                                     rivet_interp->objCacheList[ct]);
+
+        if (delEntry != NULL) {
+            Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+            Tcl_DeleteHashEntry(delEntry);
+            rivet_interp->objCacheList[ct] = NULL;
+        }
+
+        ct++;
+    }
+    apr_pool_destroy(rivet_interp->pool);
+    
+    /* let's recreate the cache list */
+
+    if (apr_pool_create(&rivet_interp->pool, private->pool) != APR_SUCCESS)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": could not recreate cache private pool. Cache disabled");
+        rivet_interp->cache_free = rivet_interp->cache_size = 0;
+    }
+    else
+    {
+        rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
+                                                (signed)(rivet_interp->cache_size*sizeof(char *)));
+        rivet_interp->cache_free = rivet_interp->cache_size;
+    }
+    
+}
+
+/* 
+ * -- Rivet_MakeCacheKey
+ *
+ * Arguments:
+ *      apr_pool_t*         pool
+ *      char*               filename
+ *      time_t              ctime      - file creation time
+ *      time_t              mtime      - file last modification
+ *      unsigned int        user_conf  - user configuration flag
+ *      int                 toplevel   - toplevel template
+ */
+
+char* Rivet_MakeCacheKey (apr_pool_t*   pool,
+                          char*         filename,
+                          time_t        ctime, 
+                          time_t        mtime,
+                          unsigned int  user_conf,
+                          int           toplevel)
+{
+    return (char*) apr_psprintf (pool, "%s%lx%lx%d-%d", filename,
+                                 mtime, ctime, toplevel, user_conf);
+}
+
+/*
+ * -- Rivet_CacheEntryLookup
+ *
+ * Cache entry lookiup. A hash table lookup key is created and an entry
+ * searched in the cache. If an entry is not found the function returns NULL
+ *
+ * Arguments:
+ *      char*                hashKey    - key to the cache
+ *      rivet_thread_interp* interp_obj - interpreter object
+ *
+ * Results:
+ *      Tcl_HashEntry*       entry object
+ *
+ * Side Effects:
+ *
+ */
+
+Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* hashKey)
+{
+    Tcl_HashEntry*  entry = NULL;
+    int             isNew = 0;
+
+    entry = Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, &isNew);
+
+    if (isNew) {
+        return NULL;
+    } else {
+        return entry;
+    }
+
+}
+
+/*
+ * -- Rivet_CacheFetchScript
+ *
+ * Cache entry lookiup. A hash table lookup key is created and an entry
+ * searched in the cache. If an entry is not found the function returns NULL
+ *
+ * Arguments:
+ *      Tcl_HashEntry*      entry
+ *
+ * Results:
+ *      Tcl_Obj*            entry_object
+ *
+ * Side Effects:
+ *
+ */
+Tcl_Obj* Rivet_CacheFetchScript (Tcl_HashEntry* entry)
+{
+    return (Tcl_Obj *)Tcl_GetHashValue(entry);
+}
+
+/* -- Rivet_CacheStoreScript 
+ *
+ */
+
+int Rivet_CacheStoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* entry, Tcl_Obj* script)
+{
+    if (rivet_interp->cache_size) {
+
+        if (rivet_interp->cache_free) {
+            char* hashKey = (char *) Tcl_GetHashKey (rivet_interp->objCache,entry);
+
+            /* We need to incr the reference count of outbuf because we want
+             * it to outlive this function.  This allows it to stay alive
+             * as long as it's in the object cache.
+             */
+
+            Tcl_IncrRefCount (script);
+            Tcl_SetHashValue (entry,(ClientData)script);
+
+            rivet_interp->objCacheList[--rivet_interp->cache_free] = 
+                (char*) apr_pcalloc (rivet_interp->pool,(strlen(hashKey)+1)*sizeof(char));
+            strcpy(rivet_interp->objCacheList[rivet_interp->cache_free], hashKey);
+
+            return 0;
+
+        } else {
+            /* cache full */
+
+            return 1;
+        }
+
+    }
+    return 0;
+}

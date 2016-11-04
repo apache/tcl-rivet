@@ -1,5 +1,4 @@
-/* mod_rivet_generator.h -- Content generation functions */
-
+/* mod_rivet_cache.h -- The mod_rivet cache */
 /*
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -19,16 +18,12 @@
     under the License.
 */
 
-/* $Id$ */
+/* $Id: $ */
 
-#ifndef __mod_rivet_generator_h__
-#define __mod_rivet_generator_h__
+#ifndef __mod_rivet_cache__
+#define __mod_rivet_cache__
 
-#include "mod_rivet.h"
+EXTERN void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
+// EXTERN void Rivet_CacheCleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp);
 
-extern int Rivet_CheckType (request_rec* r);
-extern int Rivet_ParseExecFile (rivet_thread_private* req, char* filename, int toplevel);
-extern int Rivet_ParseExecString (rivet_thread_private* req, Tcl_Obj* inbuf);
-extern int Rivet_SendContent (rivet_thread_private* private,request_rec* r);
-
-#endif
+#endif /* mod_rivet_cache.h */

@@ -217,30 +217,6 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
     interp_obj->flags |= RIVET_INTERP_INITIALIZED;
 }
 
-/*
- * -- Rivet_CreateCache 
- *
- * Creates a per interpreter script cach
- *
- * Arguments:
- *     apr_pool_t *p - APR memory pool pointer, 
- *     rivet_thread_interp* interp_obj - interpreter object
- *
- *
- * Results:
- *     None
- *
- * Side Effects:
- *
- */
-
-void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
-{
-    interp_obj->objCacheList = apr_pcalloc(p,(signed)((interp_obj->cache_size)*sizeof(char *)));
-    interp_obj->objCache = apr_pcalloc(p,sizeof(Tcl_HashTable));
-    Tcl_InitHashTable(interp_obj->objCache,TCL_STRING_KEYS);
-}
-
  /* -- Rivet_NewVHostInterp
   *
   * Returns a new rivet_thread_interp object with a new Tcl interpreter

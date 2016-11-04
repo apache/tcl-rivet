@@ -63,11 +63,6 @@
 
 /* End Configuration options  */
 
-/* For Tcl 8.3/8.4 compatibility - see http://wiki.tcl.tk/3669 */
-#ifndef CONST84
-#   define CONST84
-#endif
-
 #define VAR_SRC_QUERYSTRING 1
 #define VAR_SRC_POST 2
 #define VAR_SRC_ALL 3
@@ -161,8 +156,8 @@ typedef struct _thread_worker_private rivet_thread_private;
 typedef int  (RivetBridge_ServerInit)   (apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
 typedef void (RivetBridge_ChildInit)    (apr_pool_t* pPool,server_rec* s);
 typedef int  (RivetBridge_Request)      (request_rec*,rivet_req_ctype);
-typedef apr_status_t                    (RivetBridge_Finalize)(void*);
-typedef rivet_thread_interp*            (RivetBridge_Master_Interp) (void);
+typedef apr_status_t (RivetBridge_Finalize)(void*);
+typedef rivet_thread_interp* (RivetBridge_Master_Interp) (void);
 typedef int  (RivetBridge_Exit_Handler) (int);
 typedef rivet_thread_interp* (RivetBridge_Thread_Interp)(rivet_thread_private*,rivet_server_conf *);
 

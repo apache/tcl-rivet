@@ -27,12 +27,12 @@ EXTERN void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
 EXTERN rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* s);
 EXTERN void Rivet_ProcessorCleanup (void *data);
 EXTERN int Rivet_chdir_file (const char *file);
-EXTERN int Rivet_CheckType (request_rec* r);
 EXTERN void Rivet_CleanupRequest(request_rec *r);
 EXTERN void Rivet_InitServerVariables(Tcl_Interp *interp, apr_pool_t *pool);
 EXTERN void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1);
 EXTERN Tcl_Channel* Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key);
 EXTERN rivet_thread_private* Rivet_CreatePrivateData (void);
+EXTERN rivet_thread_private* Rivet_ExecutionThreadInit (void);
 EXTERN rivet_thread_private* Rivet_SetupTclPanicProc (void);
 EXTERN void Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel);
 

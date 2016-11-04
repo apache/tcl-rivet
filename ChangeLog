@@ -1,3 +1,16 @@
+2016-11-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet_cache.[c|h]: new file
+    for the cache code created to have uniform file structure
+    in order to build the module
+    * src/mod_rivet_ng/mod_rivet_cache.c: completed code for cache management
+    * src/mod_rivet_ng/rivetCore.c: new command ::rivet::url_script
+    returns the full URL referenced script to be parsed
+    subsequently
+    * src/mod_rivet/mod_rivet_generator.c: we are now
+    calling the cache routines, but it won't be needed any longer
+    as the cache control and interaction are devolved to 
+    the parse routines
+   
 2016-10-28 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/[lazy|worker|prefork]_mpm_bridge.c: new
     Rivet_ExecutionThreadInit unifies thread initialization

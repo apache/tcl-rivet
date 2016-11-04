@@ -68,18 +68,11 @@ void Prefork_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
      * private data should have been created by the httpd parent process
      */
 
-    private = Rivet_CreatePrivateData();
+    private = Rivet_ExecutionThreadInit();
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->interps = 
         apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
    
-    Rivet_SetupTclPanicProc ();
-    ap_assert(private != NULL);
-
-    if (private->channel == NULL)
-    {
-        private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-    }
 
     /* we now establish the full rivet core command set for the root interpreter */
 

@@ -102,6 +102,25 @@ namespace eval ::Rivet {
     }
 
     ###
+    ## -- Default request processing
+    ##
+    ## a request will handled by this procedure
+
+    proc request_handling {} {
+        ::try {
+            #<content-generation-script>
+        } trap {RIVET ABORTPAGE} {
+            #<abort-script>
+        } trap {RIVET THREAD_EXIT} {
+            #<sudden-exit-script>
+        } on error {::rivet::error_code ::rivet::error_options} {
+	        #<error-script>
+        } finally {
+            #<after-every-script>
+        }
+    }
+
+    ###
     ## The main initialization procedure for Rivet.
     ###
     proc init {} {
