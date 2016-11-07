@@ -721,9 +721,10 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 
     /* URL referenced script execution and exception handling */
 
-    if (Rivet_ParseExecFile (private, private->r->filename, 1) != TCL_OK)
+    if (Tcl_EvalObjEx(interp, private->request_processing,0) == TCL_ERROR) 
+    //if (Rivet_ParseExecFile (private, private->r->filename, 1) != TCL_OK)
+    //if (Rivet_ExecuteAndCheck(private,private->request_processing) == TCL_ERROR)
     {
-
         /* we don't report errors coming from abort_page execution */
 
         if (!private->page_aborting) 

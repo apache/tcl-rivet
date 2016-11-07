@@ -148,18 +148,12 @@ char* Rivet_MakeCacheKey (apr_pool_t*   pool,
  *
  */
 
-Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* hashKey)
+Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew)
 {
     Tcl_HashEntry*  entry = NULL;
-    int             isNew = 0;
 
-    entry = Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, &isNew);
-
-    if (isNew) {
-        return NULL;
-    } else {
-        return entry;
-    }
+    entry = Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, isNew);
+    return entry;
 
 }
 

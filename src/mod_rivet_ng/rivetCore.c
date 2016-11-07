@@ -201,6 +201,12 @@ TCL_CMD_HEADER( Rivet_Parse )
     char*                   filename;
     apr_status_t            stat_s;
     apr_finfo_t             finfo_b;
+    char*                   cache_key;
+    rivet_thread_interp*    rivet_interp;
+    Tcl_HashEntry*          entry  = NULL;
+    Tcl_Obj*                script = NULL;
+    int                     result;
+    int                     isNew;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::parse")
@@ -253,7 +259,36 @@ TCL_CMD_HEADER( Rivet_Parse )
         return TCL_ERROR;
     }
 
-    return Rivet_ParseExecFile(private,filename,0);
+    /* */
+
+    cache_key = 
+        Rivet_MakeCacheKey( private->pool,
+                            private->r->filename,
+                            finfo_b.ctime,finfo_b.mtime,
+                            IS_USER_CONF(private->running_conf),0);
+
+    rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
+    entry = Rivet_CacheEntryLookup (rivet_interp,cache_key,&isNew);
+
+    if (isNew)
+    {
+        script = Tcl_NewObj();
+        Tcl_IncrRefCount(script);
+
+        result = Rivet_GetRivetFile(filename,0,script,interp);
+        if (result != TCL_OK)
+        {
+            Tcl_AddErrorInfo(interp,apr_pstrcat(private->pool,"Could not read file ",filename,NULL));
+            return result;
+        }
+        
+        Rivet_CacheStoreScript(rivet_interp,entry,script);
+    } else {
+        script = Rivet_CacheFetchScript(entry);
+    }
+
+    return Tcl_EvalObjEx(interp,script,0); 
+    //return Rivet_ParseExecFile(private,filename,0);
 }
 
 /*
@@ -1760,6 +1795,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     unsigned int         user_conf; 
     time_t               ctime;
     time_t               mtime;
+    int                  isNew;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::url_script")
@@ -1771,8 +1807,8 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     mtime = private->r->finfo.mtime;
     cache_key = Rivet_MakeCacheKey(private->pool,private->r->filename,ctime,mtime,user_conf,1);
 
-    entry = Rivet_CacheEntryLookup (rivet_interp,cache_key);
-    if (entry == NULL)
+    entry = Rivet_CacheEntryLookup (rivet_interp,cache_key,&isNew);
+    if (isNew)
     {
         Tcl_Interp*     interp;
         

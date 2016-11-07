@@ -28,7 +28,7 @@ EXTERN char* Rivet_MakeCacheKey (apr_pool_t* pool, char*         filename,
                                                       time_t        mtime,
                                                       unsigned int  user_conf,
                                                       int           toplevel);
-EXTERN Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* hashKey);
+EXTERN Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew);
 EXTERN Tcl_Obj* Rivet_CacheFetchScript (Tcl_HashEntry* entry);
 EXTERN int Rivet_CacheStoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* entry, Tcl_Obj* script);
 

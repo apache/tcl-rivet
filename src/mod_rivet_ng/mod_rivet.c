@@ -55,6 +55,7 @@
 #include "apache_config.h"
 #include "rivet.h"
 #include "mod_rivet_common.h"
+#include "mod_rivet_generator.h"
 
 rivet_interp_globals    interp_globals;
 

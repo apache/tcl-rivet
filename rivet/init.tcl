@@ -108,10 +108,22 @@ namespace eval ::Rivet {
 
     proc request_handling {} {
         ::try {
-            #<content-generation-script>
-        } trap {RIVET ABORTPAGE} {
-            #<abort-script>
-        } trap {RIVET THREAD_EXIT} {
+
+            puts "<h2>New request processing</h2>"
+            eval [::rivet::url_script]
+
+        } trap {RIVET ABORTPAGE} {::rivet::error_code ::rivet::error_options} {
+
+            puts "<h2>New request processing calls AbortScript</h2>"
+            puts "<h4>Error code and options: $::rivet::error_code $::rivet::error_options</h2>"
+            set abort_script [::rivet::inspect AbortScript]
+            if {![string equal $abort_script "undefined"} {
+
+                eval $abort_script
+
+            }
+
+        } trap {RIVET THREAD_EXIT} {::rivet::error_code ::rivet::error_options} {
             #<sudden-exit-script>
         } on error {::rivet::error_code ::rivet::error_options} {
 	        #<error-script>
@@ -123,6 +135,7 @@ namespace eval ::Rivet {
     ###
     ## The main initialization procedure for Rivet.
     ###
+
     proc init {} {
         global auto_path
         global server

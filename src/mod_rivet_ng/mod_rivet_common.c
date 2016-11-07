@@ -402,9 +402,12 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     private->exit_status    = 0;
     private->abort_code     = NULL;
     private->request_init   = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+    //private->request_processing = Tcl_NewStringObj("::Rivet::request_handling\n",-1);
+    private->request_processing = Tcl_NewStringObj("::Rivet::request_handling\n",-1);
     private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
     Tcl_IncrRefCount(private->request_init);
     Tcl_IncrRefCount(private->request_cleanup);
+    Tcl_IncrRefCount(private->request_processing);
 
     apr_threadkey_private_set (private,rivet_thread_key);
     return private;

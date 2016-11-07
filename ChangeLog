@@ -1,3 +1,14 @@
+2016-11-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/rivetCore.c: changed also code
+    of command ::rivet::parse, now handling the
+    cache and calling directly Tcl
+    * src/mod_rivet/mod_rivet_generator.c: now
+    calling Tcl_EvalObjEx instead of Rivet_ParseExec
+    * src/mod_rivet/mod_rivet_common.c: now initializing
+    the thread interpreter private cache with
+    the new calls to the cache handler
+    * rivet/init.tcl.in: tested also call to AbortScript
+
 2016-11-03 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet/mod_rivet_cache.[c|h]: new file
     for the cache code created to have uniform file structure

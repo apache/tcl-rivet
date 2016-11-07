@@ -21,8 +21,8 @@
 
 /* $Id$ */
 
-#ifndef _MOD_RIVET_H_
-#define _MOD_RIVET_H_
+#ifndef __mod_rivet_h__
+#define __mod_rivet_h__
 
 #include <apr_queue.h>
 #include <apr_tables.h>
@@ -200,6 +200,7 @@ typedef struct _thread_worker_private {
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
     Tcl_Obj*            request_init;
+    Tcl_Obj*            request_processing; /* request processing central procedure */
     Tcl_Obj*            request_cleanup;
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */
