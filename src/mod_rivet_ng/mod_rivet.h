@@ -96,7 +96,7 @@ typedef struct _rivet_server_conf {
     char*       rivet_error_script;         /*            for errors            */
     char*       rivet_abort_script;         /* script run upon abort_page call  */
     char*       after_every_script;         /* script to be always run          */
-    char*       rivet_default_error_script; /* for errors */
+    //char*       rivet_default_error_script; /* for errors */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
@@ -209,6 +209,7 @@ typedef struct _thread_worker_private {
     int                 page_aborting;      /* abort_page flag                      */
     Tcl_Obj*            abort_code;         /* To be reset by before request        *
                                              * processing completes                 */
+    Tcl_Obj*            default_error_script; /* mod_rivet default error handler    */
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
@@ -234,17 +235,10 @@ rivet_server_conf *Rivet_GetConf(request_rec *r);
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 #define RIVET_NEW_CONF(p)         (rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
 
-Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*        interp,
-                                    rivet_server_conf*  rivet_conf);
-
-Tcl_Obj* Rivet_ReadConfParameter ( Tcl_Interp*         interp,
-                                   rivet_server_conf*  rivet_conf,
-                                   Tcl_Obj*            par_name);
-
-Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
-                                 rivet_server_conf*    rivet_conf);
-
-Tcl_Obj* Rivet_CurrentServerRec ( Tcl_Interp* interp, server_rec* s );
+Tcl_Obj* Rivet_BuildConfDictionary (Tcl_Interp* interp,rivet_server_conf* rivet_conf);
+Tcl_Obj* Rivet_ReadConfParameter (Tcl_Interp* interp,rivet_server_conf* rivet_conf,Tcl_Obj* par_name);
+Tcl_Obj* Rivet_CurrentConfDict (Tcl_Interp* interp,rivet_server_conf* rivet_conf);
+Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 /* rivet or tcl file */
 
@@ -256,7 +250,6 @@ Tcl_Obj* Rivet_CurrentServerRec ( Tcl_Interp* interp, server_rec* s );
 #define RIVET_TCLFILE       2
 
 /* these three must go in their own file */
-
 
 /* temporary content generation handler */
 //EXTERN int RivetContent (rivet_thread_private* private);

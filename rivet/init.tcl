@@ -126,8 +126,27 @@ namespace eval ::Rivet {
         } trap {RIVET THREAD_EXIT} {::rivet::error_code ::rivet::error_options} {
             #<sudden-exit-script>
         } on error {::rivet::error_code ::rivet::error_options} {
-	        #<error-script>
+            puts "<h2>New request processing calls ErrorScript</h2>"
+            puts "<h4>Error code and options: $::rivet::error_code $::rivet::error_options</h2>"
+            set error_script [::rivet::inspect ErrorScript]
+            if {![string equal $error_script "undefined"} {
+
+                eval $error_script
+
+            } else {
+
+                ::Rivet::handle_error
+
+            }
+
         } finally {
+            puts "<h2>New request processing calls AfterEveryScript</h2>"
+            set after_every_script [::rivet::inspect AfterEveryScript]
+            if {![string equal $after_every_script "undefined"} {
+
+                eval $after_every_script
+
+            }
             #<after-every-script>
         }
     }

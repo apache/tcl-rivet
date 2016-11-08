@@ -216,7 +216,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->rivet_abort_script = oldrsc->rivet_abort_script;
     newrsc->after_every_script = oldrsc->after_every_script;
     //newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
-    newrsc->rivet_default_error_script = oldrsc->rivet_default_error_script;
+    //newrsc->rivet_default_error_script = oldrsc->rivet_default_error_script;
     newrsc->default_cache_size = oldrsc->default_cache_size;
     newrsc->upload_max = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
@@ -409,11 +409,11 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_before_script)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_after_script)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_error_script)
-    RIVET_CONF_SELECT(rsc,base,overrides,rivet_default_error_script)
+    //RIVET_CONF_SELECT(rsc,base,overrides,rivet_default_error_script)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_abort_script)
     RIVET_CONF_SELECT(rsc,base,overrides,after_every_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,default_cache_size);
 
-    rsc->default_cache_size = base->default_cache_size;
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
     rsc->separate_channels = base->separate_channels;
@@ -461,7 +461,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
 
     rsc->user_scripts_status        = 0;
 
-    rsc->rivet_default_error_script = "::Rivet::handle_error";
+    //rsc->rivet_default_error_script = "::Rivet::handle_error";
 
     rsc->default_cache_size         = -1;
     rsc->upload_max                 = RIVET_MAX_POST;

@@ -231,9 +231,28 @@ TCL_CMD_HEADER( Rivet_Parse )
 
         } else if ( STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-string")) {
 
-        /* we treat the argument as a string and we pass it as is to Rivet_ParseExecString */
+            int      res;
+            Tcl_Obj* script = objv[2];
+            Tcl_Obj* outbuf = Tcl_NewObj();
 
-            return Rivet_ParseExecString(private, objv[2]);
+            /* we parse and compose the script ourselves before passing it to Tcl_EvalObjEx */
+
+            Tcl_IncrRefCount(outbuf);
+            Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
+
+            /* If we are not inside a <? ?> section, add the closing ". */
+            if (Rivet_Parser(outbuf, script) == 0)
+            {
+                Tcl_AppendToObj(outbuf, "\"\n", 2);
+            } 
+
+            Tcl_AppendToObj(outbuf,"\n",-1);
+
+            res = Tcl_EvalObjEx(interp,outbuf,0);
+
+            Tcl_DecrRefCount(outbuf);
+            return res;
+            //return Rivet_ParseExecString(private, objv[2]);
 
         } else { 
 

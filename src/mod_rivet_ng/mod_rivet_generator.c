@@ -157,7 +157,8 @@ Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thr
     if (conf->rivet_error_script) {
         errscript = Tcl_NewStringObj(conf->rivet_error_script,-1);
     } else {
-        errscript = Tcl_NewStringObj(conf->rivet_default_error_script,-1);
+        //errscript = Tcl_NewStringObj(conf->rivet_default_error_script,-1);
+        errscript = private->default_error_script;
     }
 
     Tcl_IncrRefCount(errscript);
@@ -165,10 +166,6 @@ Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thr
     if (result == TCL_ERROR) {
         Rivet_PrintErrorMessage(interp,"<b>Rivet ErrorScript failed</b>");
     }
-
-    /* This shouldn't make the default_error_script go away,
-     * because it gets a Tcl_IncrRefCount when it is created.
-     */
 
     Tcl_DecrRefCount(errscript);
 
@@ -739,6 +736,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 
     /* We execute also the AfterEveryScript if one was set */
 
+    /*
     if (private->running->after_every_script) 
     {
         if (Rivet_ExecuteAndCheck(private,private->running->after_every_script) == TCL_ERROR)
@@ -747,6 +745,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
                                     "<b>Rivet AfterEveryScript failed</b>");
         }
     }
+    */
 
     /* and finally we run the request_cleanup procedure (always set) */
 

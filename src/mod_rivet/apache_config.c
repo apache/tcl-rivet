@@ -412,8 +412,8 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_default_error_script)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_abort_script)
     RIVET_CONF_SELECT(rsc,base,overrides,after_every_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,default_cache_size);
 
-    rsc->default_cache_size = base->default_cache_size;
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
     rsc->separate_channels = base->separate_channels;

@@ -1,10 +1,19 @@
+2016-11-08 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/apache_config.c: fixed conf
+    merge that didn't assign the correct cache size
+    * rivet/init.tcl: fixed exception scripts checks
+    * src/mod_rivet_ng/rivetCore.c: command 'parse -string'
+    composes the script and calls directly Tcl_EvalObjEx
+    * src/mod_rivet/apache_config.c: fixed same bug
+    found in Rivet_MergeConf developing mod_rivet_ng
+
 2016-11-07 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet/rivetCore.c: changed also code
+    * src/mod_rivet_ng/rivetCore.c: changed also code
     of command ::rivet::parse, now handling the
     cache and calling directly Tcl
-    * src/mod_rivet/mod_rivet_generator.c: now
+    * src/mod_rivet_ng/mod_rivet_generator.c: now
     calling Tcl_EvalObjEx instead of Rivet_ParseExec
-    * src/mod_rivet/mod_rivet_common.c: now initializing
+    * src/mod_rivet_ng/mod_rivet_common.c: now initializing
     the thread interpreter private cache with
     the new calls to the cache handler
     * rivet/init.tcl.in: tested also call to AbortScript

@@ -405,9 +405,11 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     //private->request_processing = Tcl_NewStringObj("::Rivet::request_handling\n",-1);
     private->request_processing = Tcl_NewStringObj("::Rivet::request_handling\n",-1);
     private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
+    private->default_error_script = Tcl_NewStringObj("::Rivet::handle_error\n",-1);
     Tcl_IncrRefCount(private->request_init);
     Tcl_IncrRefCount(private->request_cleanup);
     Tcl_IncrRefCount(private->request_processing);
+    Tcl_IncrRefCount(private->default_error_script);
 
     apr_threadkey_private_set (private,rivet_thread_key);
     return private;
