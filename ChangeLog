@@ -1,3 +1,12 @@
+2016-11-09 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet/mod_rivet_common.c: the request_rec
+    field to be checked in order to determine whether we
+    are serving the request is 'header' non 'content_type'.
+    This bug didn't surface because their set to the same
+    string when a request is handed to the module chain, but
+    it's been around ever since.
+    * VERSION,configure.ac: version set to 2.3.3
+
 2016-09-21 Massimo Manghi <mxmanghi@apache.org>
     * Changelog: logging release of this artifact as rivet 2.3.2
 
