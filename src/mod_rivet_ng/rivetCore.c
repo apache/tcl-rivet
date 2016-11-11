@@ -1515,27 +1515,6 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
     int                     status = TCL_OK;
 
     THREAD_PRIVATE_DATA(private)
-    if (objc == 2)
-    {
-        Tcl_Obj* par_name = objv[1];
-
-        if (STRNEQU(Tcl_GetStringFromObj(par_name,NULL),"script"))
-        {
-            if (private->r == NULL)
-            {
-                Tcl_Obj* cmd = Tcl_NewStringObj("return [info script]",-1);
-
-                Tcl_IncrRefCount(cmd); 
-                status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
-                Tcl_DecrRefCount(cmd); 
-            }            
-            else
-            {
-                Tcl_SetObjResult(interp,Tcl_NewStringObj(private->r->filename,-1));
-            }
-            return TCL_OK;
-        }
-    }
 
     if (objc == 1)
     {
@@ -1556,10 +1535,27 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
     else if (objc == 2)
     {
         Tcl_Obj* par_name = objv[1];
-        char*    cmd_arg  = Tcl_GetStringFromObj(par_name,NULL);
+        char*    cmd_arg;
 
         Tcl_IncrRefCount(par_name);
-        if (STRNEQU(cmd_arg,"-all"))
+        cmd_arg  = Tcl_GetStringFromObj(par_name,NULL);
+
+        if (STRNEQU(cmd_arg,"script"))
+        {
+            if (private->r == NULL)
+            {
+                Tcl_Obj* cmd = Tcl_NewStringObj("return [info script]",-1);
+
+                Tcl_IncrRefCount(cmd); 
+                status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
+                Tcl_DecrRefCount(cmd); 
+            }            
+            else
+            {
+                Tcl_SetObjResult(interp,Tcl_NewStringObj(private->r->filename,-1));
+            }
+        } 
+        else if (STRNEQU(cmd_arg,"-all"))
         {
             Tcl_Obj* dictObj;
             
@@ -1836,10 +1832,12 @@ TCL_CMD_HEADER( Rivet_UrlScript )
         script = Tcl_NewObj();
         Tcl_IncrRefCount(script);
 
+    /*
         if (private->running->rivet_before_script) 
         {
             Tcl_AppendObjToObj(script,private->running->rivet_before_script);
         }
+    */
 
     /*
      * We check whether we are dealing with a pure Tcl script or a Rivet template.
@@ -1864,9 +1862,11 @@ TCL_CMD_HEADER( Rivet_UrlScript )
             return result;
         }
 
+    /*
         if (private->running->rivet_after_script) {
             Tcl_AppendObjToObj(script,private->running->rivet_after_script);
         }
+    */
 
         Rivet_CacheStoreScript(rivet_interp,entry,script);
     }

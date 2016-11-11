@@ -101,55 +101,147 @@ namespace eval ::Rivet {
     proc cleanup_request {} {
     }
 
+
+    ######## mod_rivet_ng specific ++++++++
+
+    ### 
+    # -- error_message
+    #
+    # this message should be transparently equivalent
+    # to the Rivet_PrintErrorMessage function in mod_rivet_generator.c
+    #
+
+    proc print_error_message {error_header} {
+        global errorInfo
+
+        puts "$error_header <br/>"
+        puts "<pre> $errorInfo </pre>"
+
+    }
+
+
+    ###
+    ## -- error_handler
+    ##
+    ###
+
+    proc error_handler {script err_code err_options} {
+        global errorOutbuf
+
+        set error_script [::rivet::inspect ErrorScript]
+        if {$error_script != "undefined"} {
+            if {[catch {namespace eval :: $error_script} err_code err_info]} {
+                ::rivet::apache_log_err err "error script failed ($errorInfo)"
+                print_error_message "<b>Rivet ErrorScript failed</b>"
+            }
+        } else {
+            set errorOutbuf $script
+            ::Rivet::handle_error
+        }
+    }
+
+    ###
+    ## -- url_handler
+    ##
+    ### 
+
+    proc url_handler {} {
+
+        set script ""
+
+        set before_script [::rivet::inspect BeforeScript]
+        if {$before_script == "undefined"} {
+            set before_script "" 
+        }
+            
+        set script [::rivet::url_script]
+
+        set after_script [::rivet::inspect AfterScript]
+        if {$after_script == "undefined"} {
+
+            set after_script ""
+
+        }
+
+        set script [concat $before_script "\n" $script "\n" $after_script]
+
+        set fp [open "/tmp/script-[pid].tcl" w+]
+        puts $fp $script
+        close $fp
+
+        return $script
+    }
+
     ###
     ## -- Default request processing
     ##
     ## a request will handled by this procedure
 
     proc request_handling {} {
+        puts "<h2>New request processing</h2>"
+        
+        set script [::Rivet::url_handler]
+
         ::try {
 
-            puts "<h2>New request processing</h2>"
-            eval [::rivet::url_script]
+            namespace eval :: $script
 
-        } trap {RIVET ABORTPAGE} {::rivet::error_code ::rivet::error_options} {
+        } trap {RIVET ABORTPAGE} {::Rivet::error_code ::Rivet::error_options} {
 
             puts "<h2>New request processing calls AbortScript</h2>"
-            puts "<h4>Error code and options: $::rivet::error_code $::rivet::error_options</h2>"
+            puts "<h4>Error code and options: $::Rivet::error_code $::Rivet::error_options</h4>"
             set abort_script [::rivet::inspect AbortScript]
             if {$abort_script != "undefined"} {
 
-                eval $abort_script
+                if {[catch {namespace eval :: $abort_script} ::Rivet::error_code ::Rivet::error_options]} {
+                    ::rivet::apache_log_err err "abort script failed ($errorInfo)"
+                    print_error_message "<b>Rivet AbortScript failed</b>"
+
+                    ::Rivet::error_handler $abort_script $::Rivet::error_code $::Rivet::error_options
+                }
 
             }
 
-        } trap {RIVET THREAD_EXIT} {::rivet::error_code ::rivet::error_options} {
+        } trap {RIVET THREAD_EXIT} {::Rivet::error_code ::Rivet::error_options} {
+
+            puts "<h2>New request processing handles exit</h2>"
+            set abort_script [::rivet::inspect AbortScript]
+            if {$abort_script != "undefined"} {
+
+                if {[catch {namespace eval :: $abort_script} ::Rivet::error_code ::Rivet::error_options]} {
+                    ::rivet::apache_log_err err "abort script failed ($errorInfo)"
+                    print_error_message "<b>Rivet AbortScript failed</b>"
+
+                    ::Rivet::error_handler $abort_script $::Rivet::error_code $::Rivet::error_options
+                }
+
+            }
+
             #<sudden-exit-script>
-        } on error {::rivet::error_code ::rivet::error_options} {
+
+        } on error {::Rivet::error_code ::Rivet::error_options} {
+
             puts "<h2>New request processing calls ErrorScript</h2>"
-            puts "<h4>Error code and options: $::rivet::error_code $::rivet::error_options</h2>"
-            set error_script [::rivet::inspect ErrorScript]
-            if {$error_script != "undefined"} {
-
-                eval $error_script
-
-            } else {
-
-                ::Rivet::handle_error
-
-            }
+            puts "<h4>Error code and options: $::Rivet::error_code $::Rivet::error_options</h2>"
+            ::Rivet::error_handler $script $::Rivet::error_code $::Rivet::error_options
 
         } finally {
+
             puts "<h2>New request processing calls AfterEveryScript</h2>"
             set after_every_script [::rivet::inspect AfterEveryScript]
             if {$after_every_script != "undefined"} {
+                if {[catch {namespace eval :: $after_every_script} ::Rivet::error_code ::Rivet::error_options]} {
+                    ::rivet::apache_log_err err "AfterEveryScript failed ($errorInfo)"
+                    print_error_message "<b>Rivet AfterEveryScript failed</b>"
 
-                eval $after_every_script
-
+                    ::Rivet::error_handler $after_every_script $::Rivet::error_code $::Rivet::error_options
+                }
             }
             #<after-every-script>
         }
     }
+
+    ######## mod_rivet_ng specific ---------
 
     ###
     ## The main initialization procedure for Rivet.
