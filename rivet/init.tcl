@@ -163,11 +163,11 @@ namespace eval ::Rivet {
 
         }
 
-        set script [concat $before_script "\n" $script "\n" $after_script]
+        set script [join [list $before_script $script $after_script] "\n"]
 
-        set fp [open "/tmp/script-[pid].tcl" w+]
-        puts $fp $script
-        close $fp
+        #set fp [open "/tmp/script-[pid].tcl" w+]
+        #puts $fp $script
+        #close $fp
 
         return $script
     }
@@ -240,6 +240,7 @@ namespace eval ::Rivet {
             #<after-every-script>
         }
     }
+    ######## mod_rivet_ng specific ---------
 
     ######## mod_rivet_ng specific ---------
 
