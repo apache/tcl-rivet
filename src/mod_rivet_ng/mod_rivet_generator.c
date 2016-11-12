@@ -75,34 +75,6 @@ Rivet_CheckType (request_rec *req)
     return ctype; 
 }
 
-
-
-/* -- Rivet_PrintErrorMessage
- *
- * Utility function to print the error message stored in errorInfo
- * with a custom header. This procedure is called to print standard
- * errors when one of Tcl scripts fails
- * 
- * Arguments:
- *
- *   - Tcl_Interp* interp: the Tcl interpreter that was running the script
- *                         (and therefore the built-in variable errorInfo
- *                          keeps the message)
- *   - const char* error: Custom error header
- */
-
-static void 
-Rivet_PrintErrorMessage (Tcl_Interp* interp,const char* error_header)
-{
-    Tcl_Obj* errormsg  = Tcl_NewObj();
-
-    Tcl_IncrRefCount(errormsg);
-    Tcl_AppendStringsToObj(errormsg,"puts \"",error_header,"<br />\"\n",NULL);
-    Tcl_AppendStringsToObj(errormsg,"puts \"<pre>$errorInfo</pre>\"\n",NULL);
-    Tcl_EvalObjEx(interp,errormsg,0);
-    Tcl_DecrRefCount(errormsg);
-}
-
 /*
  * -- Rivet_ReleaseScript
  *
@@ -120,405 +92,6 @@ Rivet_ReleaseScripts (running_scripts* scripts)
     if (scripts->rivet_error_script) Tcl_DecrRefCount(scripts->rivet_error_script);
     if (scripts->rivet_abort_script) Tcl_DecrRefCount(scripts->rivet_abort_script);
     if (scripts->after_every_script) Tcl_DecrRefCount(scripts->after_every_script);
-}
-
-/* -- Rivet_ExecuteErrorHandler
- *
- * Invoking either the default error handler or ErrorScript.
- * In case the error handler fails a standard error message is printed
- * (you're better off if you make your error handlers fail save)
- *
- * Arguments:
- *
- *  - Tcl_Interp* interp: the Tcl interpreter
- *  - Tcl_Obj*    tcl_script_obj: the script that failed (to retrieve error
- *                info from it
- *  - request_rec* req: current request obj pointer
- * 
- * Returned value:
- *
- *  - A Tcl status
- */
-
-static int 
-Rivet_ExecuteErrorHandler (Tcl_Interp* interp,Tcl_Obj* tcl_script_obj, rivet_thread_private* private)
-{
-    int                 result;
-    Tcl_Obj*            errscript;
-    rivet_server_conf*  conf = private->running_conf;
-
-    /* We extract information from the errorOutbuf variable. Notice that tcl_script_obj
-     * can either be the request processing script or conf->rivet_abort_script
-     */
-
-    Tcl_SetVar(interp,"errorOutbuf",Tcl_GetStringFromObj(tcl_script_obj,NULL),TCL_GLOBAL_ONLY);
-
-    /* If we don't have an error script, use the default error handler. */
-    if (conf->rivet_error_script) {
-        errscript = Tcl_NewStringObj(conf->rivet_error_script,-1);
-    } else {
-        //errscript = Tcl_NewStringObj(conf->rivet_default_error_script,-1);
-        errscript = private->default_error_script;
-    }
-
-    Tcl_IncrRefCount(errscript);
-    result = Tcl_EvalObjEx(interp, errscript, 0);
-    if (result == TCL_ERROR) {
-        Rivet_PrintErrorMessage(interp,"<b>Rivet ErrorScript failed</b>");
-    }
-
-    Tcl_DecrRefCount(errscript);
-
-    /* In case we are handling an error occurring after an abort_page call (for
-     * example because the AbortString itself failed) we must reset this
-     * flag or the logging will be inihibited
-     */
-
-    private->page_aborting = 0;
-
-    return result;
-}
-
-/*
- * -- Rivet_RunAbortScript
- *
- * 
- */
-
-static int
-Rivet_RunAbortScript (rivet_thread_private *private)
-{
-    int retcode = TCL_OK;
-    Tcl_Interp* interp = RIVET_PEEK_INTERP(private,private->running_conf)->interp;
-
-    if (private->running->rivet_abort_script) 
-    {
-
-        /* Ideally an AbortScript should be fail safe, but in case
-         * it fails we give a chance to the subsequent ErrorScript
-         * to catch this error.
-         */
-
-        retcode = Tcl_EvalObjEx(interp,private->running->rivet_abort_script,0);
-
-        if (retcode == TCL_ERROR)
-        {
-            /* This is not elegant, but we want to avoid to print
-             * this error message if an ErrorScript will handle this error.
-             * Thus we print the usual error message only if we are running the
-             * default error handler
-             */
-
-            if (private->running->rivet_error_script == NULL) {
-
-                Rivet_PrintErrorMessage(interp,"<b>Rivet AbortScript failed</b>");
-
-            }
-            Rivet_ExecuteErrorHandler(interp,private->running->rivet_abort_script,private);
-        }
-
-    }
-    return retcode;
-}
-
-/* -- Rivet_ExecuteAndCheck
- * 
- * Tcl script execution central procedure. The script stored in
- * outbuf is evaluated and in case the execution results with an
- * error the error handler is executed. If the returned error code
- * is RIVET then the error was caused by the ::rivet::abort_page 
- * command and conf->abort_script is run instead (if not NULL). 
- * The default error script prints the error buffer
- *
- *   Arguments:
- * 
- *      - Tcl_Interp* interp:      the Tcl interpreter 
- *      - Tcl_Obj* tcl_script_obj: a pointer to the Tcl_Obj holding the script
- *      - request_rec* req:        the current request_rec object pointer
- *
- *   Returned value:
- *
- *      - One of the Tcl defined returned value of Tcl_EvelObjExe (TCL_OK, 
- *        TCL_ERROR, TCL_BREAK etc.)
- *
- *   Side effects:
- *
- *      The Tcl interpreter internal status is changed by the execution
- *      of the script
- *
- */
-
-static int
-Rivet_ExecuteAndCheck(rivet_thread_private *private, Tcl_Obj *tcl_script_obj)
-{
-    int           tcl_result;
-    rivet_thread_interp* interp_obj;
-
-    interp_obj = RIVET_PEEK_INTERP(private,private->running_conf);
-    //rivet_interp_globals *globals = Tcl_GetAssocData(interp_obj->interp, "rivet", NULL);
-
-    Tcl_Preserve (interp_obj->interp);
-
-    tcl_result = Tcl_EvalObjEx(interp_obj->interp, tcl_script_obj, 0);
-    if (tcl_result == TCL_ERROR) {
-        Tcl_Obj*    errorCodeListObj;
-        Tcl_Obj*    errorCodeElementObj;
-
-        /* There was an error, see if it's from Rivet and it was caused
-         * by abort_page.
-         */
-
-        errorCodeListObj = Tcl_GetVar2Ex (interp_obj->interp, "errorCode", (char *)NULL, TCL_GLOBAL_ONLY);
-
-        /* errorCode is guaranteed to be set to NONE, but let's make sure
-         * anyway rather than causing a SIGSEGV
-         */
-        ap_assert (errorCodeListObj != (Tcl_Obj *)NULL);
-
-        /* dig the first element out of the errorCode list and see if it
-         * says Rivet -- this shouldn't fail either, but let's assert
-         * success so we don't get a SIGSEGV afterwards */
-        ap_assert (Tcl_ListObjIndex (interp_obj->interp, errorCodeListObj, 0, &errorCodeElementObj) == TCL_OK);
-
-        /* if the error was thrown by Rivet, see if it's abort_page and,
-         * if so, don't treat it as an error, i.e. don't execute the
-         * installed error handler or the default one, just check if
-         * a rivet_abort_script is defined, otherwise the page emits 
-         * as normal
-         */
-
-        if (private->page_aborting)
-        {
-            Rivet_RunAbortScript(private);
-        }
-        else 
-        {
-            Rivet_ExecuteErrorHandler (interp_obj->interp,tcl_script_obj,private);
-        }
-    }
-    
-    Tcl_Release(interp_obj->interp);
-
-    return tcl_result;
-}
-
-/*
- * -- Rivet_ParseExecFile
- *
- * given a filename if the file exists it's either parsed (when a rivet
- * template) and then executed as a Tcl_Obj instance or directly executed
- * if a Tcl script.
- *
- * This is a separate function so that it may be called from command 'parse'
- *
- * Arguments:
- *
- *   - rivet_thread_private:  pointer to the structure collecting thread private data
- *                            for Tcl and current request
- *   - filename:              pointer to a string storing the path to the template or
- *                            Tcl script
- *   - toplevel:              boolean value set when the argument 'filename' is the request 
- *                            toplevel script. The value is 0 when the function is called
- *                            by command ::rivet::parse
- *
- * Returned value:
- *
- *  this function must return a Tcl valid status code (TCL_OK, TCL_ERROR ....)
- *
- */
-
-int
-Rivet_ParseExecFile(rivet_thread_private* private, char *filename, int toplevel)
-{
-    char*           hashKey = NULL;
-    int             isNew   = 0;
-    int             result  = 0;
-    rivet_thread_interp*
-                    rivet_interp;
-    Tcl_Obj*        outbuf  = NULL;
-    Tcl_HashEntry*  entry   = NULL;
-    Tcl_Interp*     interp;
-    time_t          ctime;
-    time_t          mtime;
-    int             res     = 0;
-
-    /* We have to fetch the interpreter data from the thread private environment */
-
-    rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
-    interp = rivet_interp->interp;
-
-    /* If the user configuration has indeed been updated, I guess that
-       pretty much invalidates anything that might have been cached. */
-
-    /* This is all horrendously slow, and means we should *also* be
-       doing caching on the modification time of the .htaccess files
-       that concern us. FIXME */
-
-    if (USER_CONF_UPDATED(private->running_conf) && (rivet_interp->cache_size != 0) && 
-                                                    (rivet_interp->cache_free < rivet_interp->cache_size)) 
-    {
-        Rivet_CacheCleanup(private,rivet_interp);
-    }
-
-    /* If toplevel is 0, we are being called from Parse, which means
-       we need to get the information about the file ourselves. */
-
-    if (toplevel == 0)
-    {
-        Tcl_Obj *fnobj;
-        Tcl_StatBuf buf;
-
-        fnobj = Tcl_NewStringObj(filename, -1);
-        Tcl_IncrRefCount(fnobj);
-        if (Tcl_FSStat(fnobj, &buf) < 0)
-            return TCL_ERROR;
-        Tcl_DecrRefCount(fnobj);
-        ctime = buf.st_ctime;
-        mtime = buf.st_mtime;
-    } else {
-        ctime = private->r->finfo.ctime;
-        mtime = private->r->finfo.mtime;
-    }
-
-    /* Look for the script's compiled version.  If it's not found,
-     * create it.
-     */
-
-    if (rivet_interp->cache_size)
-    {
-        unsigned int user_conf = IS_USER_CONF(private->running_conf);
-
-        hashKey = (char*) apr_psprintf(private->r->pool, "%s%lx%lx%d-%d", filename,
-                mtime, ctime, toplevel,user_conf);
-        entry = Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, &isNew);
-    }
-
-    /* We don't have a compiled version.  Let's create one. */
-    if (isNew || (rivet_interp->cache_size == 0))
-    {
-        outbuf = Tcl_NewObj();
-        Tcl_IncrRefCount(outbuf);
-
-        if (toplevel && private->running->rivet_before_script) 
-        {
-            Tcl_AppendObjToObj(outbuf,private->running->rivet_before_script);
-        }
-
-/*
- * We check whether we are dealing with a pure Tcl script or a Rivet template.
- * Actually this check is done only if we are processing a toplevel file, every nested 
- * file (files included through the 'parse' command) is treated as a template.
- */
-
-        if (!toplevel || (Rivet_CheckType(private->r) == RIVET_TEMPLATE))
-        {
-            /* toplevel == 0 means we are being called from the parse
-             * command, which only works on Rivet .rvt files. */
-
-            result = Rivet_GetRivetFile(filename, toplevel, outbuf, interp);
-
-        } else {
-            /* It's a plain Tcl file */
-            result = Rivet_GetTclFile(filename, outbuf, interp);
-        }
-
-        if (result != TCL_OK)
-        {
-            Tcl_DecrRefCount(outbuf);
-            return result;
-        }
-
-        if (toplevel && private->running->rivet_after_script) {
-            Tcl_AppendObjToObj(outbuf,private->running->rivet_after_script);
-        }
-
-        if (rivet_interp->cache_size) {
-
-            /* We need to incr the reference count of outbuf because we want
-             * it to outlive this function.  This allows it to stay alive
-             * as long as it's in the object cache.
-             */
-
-            Tcl_IncrRefCount (outbuf);
-            Tcl_SetHashValue (entry,(ClientData)outbuf);
-        }
-
-        if (rivet_interp->cache_free) {
-
-            rivet_interp->objCacheList[--rivet_interp->cache_free] = 
-                (char*) apr_pcalloc (rivet_interp->pool,(strlen(hashKey)+1)*sizeof(char));
-            strcpy(rivet_interp->objCacheList[rivet_interp->cache_free], hashKey);
-
-        } else if (rivet_interp->cache_size) { /* If it's zero, we just skip this. */
-
-        /*  instead of removing the last entry in the cache (for what purpose after all??)
-         *  we signal a 'cache full' condition
-         */
-            
-            if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
-            {
-                ap_log_error(APLOG_MARK, APLOG_NOTICE, APR_EGENERAL, private->r->server, 
-                             MODNAME ": Cache full");
-                rivet_interp->flags |= RIVET_CACHE_FULL;
-            }
-        }
-
-    } else {
-
-        /* we fetch the cached copy of the script */
-        outbuf = (Tcl_Obj *)Tcl_GetHashValue(entry);
-        Tcl_IncrRefCount(outbuf);
-
-    }
-
-    res = Rivet_ExecuteAndCheck (private, outbuf);
-    Tcl_DecrRefCount(outbuf);
-
-    /* We don't keep user script until we find a way to cache them consistently */
-
-    if (IS_USER_CONF(private->running_conf))
-    {
-        Rivet_ReleaseScripts(private->running);
-        private->running_conf->user_scripts_status &= ~(unsigned int)USER_SCRIPTS_UPDATED;
-    }
-
-    return res;
-}
-
-/*
- * -- Rivet_ParseExecString
- *
- * This function accepts a Tcl_Obj carrying a string to be interpreted as
- * a Rivet template. This function is the core for command 'parse -string'
- * 
- * Arguments:
- *
- *   - TclWebRequest* req: pointer to the structure collecting Tcl and
- *   Apache data
- *   - Tcl_Obj* inbuf: Tcl object storing the template to be parsed.
- */
-
-int
-Rivet_ParseExecString (rivet_thread_private* private, Tcl_Obj* inbuf)
-{
-    int res = 0;
-    Tcl_Obj* outbuf = Tcl_NewObj();
-
-    Tcl_IncrRefCount(outbuf);
-    Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
-
-    /* If we are not inside a <? ?> section, add the closing ". */
-    if (Rivet_Parser(outbuf, inbuf) == 0)
-    {
-        Tcl_AppendToObj(outbuf, "\"\n", 2);
-    } 
-
-    Tcl_AppendToObj(outbuf,"\n",-1);
-
-    res = Rivet_ExecuteAndCheck(private, outbuf);
-    Tcl_DecrRefCount(outbuf);
-
-    return res;
 }
 
 /*
@@ -716,6 +289,19 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         goto sendcleanup;
     }
 
+    /* If the user configuration has indeed been updated, I guess that
+       pretty much invalidates anything that might have been cached. */
+
+    /* This is all horrendously slow, and means we should *also* be
+       doing caching on the modification time of the .htaccess files
+       that concern us. FIXME */
+
+    if (USER_CONF_UPDATED(private->running_conf) && (interp_obj->cache_size != 0) && 
+                                                    (interp_obj->cache_free < interp_obj->cache_size)) 
+    {
+        Rivet_CacheCleanup(private,interp_obj);
+    }
+
     /* URL referenced script execution and exception handling */
 
     if (Tcl_EvalObjEx(interp, private->request_processing,0) == TCL_ERROR) 
@@ -734,28 +320,23 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         }
     }
 
-    /* We execute also the AfterEveryScript if one was set */
+    /* We don't keep user script until we find a way to cache them consistently */
 
-    /*
-    if (private->running->after_every_script) 
+    if (IS_USER_CONF(private->running_conf))
     {
-        if (Rivet_ExecuteAndCheck(private,private->running->after_every_script) == TCL_ERROR)
-        {
-            Rivet_PrintErrorMessage(RIVET_PEEK_INTERP(private,private->running_conf)->interp,
-                                    "<b>Rivet AfterEveryScript failed</b>");
-        }
+        Rivet_ReleaseScripts(private->running);
+        private->running_conf->user_scripts_status &= ~(unsigned int)USER_SCRIPTS_UPDATED;
     }
-    */
 
     /* and finally we run the request_cleanup procedure (always set) */
-
-    if (Tcl_EvalObjEx(interp, private->request_cleanup, 0) == TCL_ERROR) {
-
-        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, private->r, 
-                     MODNAME ": Error evaluating cleanup request: %s",
-                     Tcl_GetVar(interp, "errorInfo", 0));
-
-    }
+    
+    //if (Tcl_EvalObjEx(interp, private->request_cleanup, 0) == TCL_ERROR) {
+    //
+    //    ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, private->r, 
+    //                 MODNAME ": Error evaluating cleanup request: %s",
+    //                 Tcl_GetVar(interp, "errorInfo", 0));
+    //
+    //}
 
     /* We finalize the request processing by printing the headers and flushing
        the rivet channel internal buffer */

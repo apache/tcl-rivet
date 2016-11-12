@@ -1,3 +1,18 @@
+2016-11-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl.in: removed debugging messages,
+    request handling made much simpler after
+    ::rivet::inspect changed its behavior when
+    a script is undefined
+    * src/mod_rivet_ng/rivetInspect.c: changed 
+    to an empty string the value returned when
+    a configuration script is undefined
+    * src/mod_rivet_ng/mod_rivet_common.c: we don't
+    need to handle at C level the error handler
+    and the request cleanup Tcl scritps: they are
+    called from Tcl
+    * src/mod_rivet_ng/mod_rivet_generator.c: removed
+    code unused by this version of the module
+
 2016-11-11 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.it: further development of the
     url processing procedures allows script level

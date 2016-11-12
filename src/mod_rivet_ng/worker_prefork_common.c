@@ -314,6 +314,6 @@ void Rivet_ProcessorCleanup (void *data)
     } while ((++i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
 
     Tcl_DecrRefCount(private->request_init);
-    Tcl_DecrRefCount(private->request_cleanup);
+    //Tcl_DecrRefCount(private->request_cleanup);
     apr_pool_destroy(private->pool);
 }

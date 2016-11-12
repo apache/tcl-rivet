@@ -102,7 +102,7 @@ enum confIndices {
  *  - A Tcl_Obj pointer to the parameter value. A NULL
  * pointer works as a signal for an error (invalid parameter)
  * - If the parameter value in the configuration is undefined
- * then the Tcl_Obj string contains the string 'undefined'
+ * then the procedure returns an empty string
  *
  */
 
@@ -141,15 +141,17 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         default: return NULL;
     }
 
-    /* if int_value == NULL and string_value == NULL
-     * we have to return one of the string valued options 
-     * which is underfined, thus we gave it the conventional
-     * value "<undefined>"
-     */
 
     if ((string_value == NULL) && (int_value == NULL))
     {
-        return Tcl_NewStringObj("undefined",-1);
+        /* this case is a bit convoluted and needs a more linear coding. 
+         * Basically: if the function hasn't returned (default branch in the 'switch' selector)
+         * that means the arguent was valid. Since any integer parameter would produce a valid Tcl_Obj
+         * pointer if both the int_value and string_value pointers are NULL that means the value
+         * was a NULL pointer to a string value. We therefore return an empty string 
+         */
+
+        return Tcl_NewStringObj("",-1);
     }
     else if (string_value != NULL)
     {
