@@ -119,8 +119,14 @@
     <!-- Calendar -->
     &calendar.xml;
 
+    <!-- AsciiGlyphs -->
+	&asciiglyphs.xml; 
+
     <!-- Entities -->
     &entities.xml;
+
+	<!-- FormBroker -->
+	&formbroker.xml;
 
     <!-- Help -->
     &help.xml;
