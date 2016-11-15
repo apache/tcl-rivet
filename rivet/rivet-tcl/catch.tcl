@@ -12,15 +12,15 @@ namespace eval ::rivet {
 
     proc catch {script args} {
 
-        set catch_ret [uplevel [list ::catch $script] $args]
+        set catch_ret [uplevel [list ::catch $script {*}$args]]
 
         if {$catch_ret && [::rivet::abort_page -aborting]} {
 
-            return -code error -errorcode ABORTPAGE 
+            return -code error -errorcode {RIVET ABORTPAGE} "Page abort"
 
         } elseif {$catch_ret && [::rivet::abort_page -exiting]} {
 
-            return -code error -errorcode THREAD_EXIT 
+            return -code error -errorcode {RIVET THREAD_EXIT} "Thread exit"
 
         } else {
 

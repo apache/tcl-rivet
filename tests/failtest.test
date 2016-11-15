@@ -1,6 +1,7 @@
 # This test is for those commands that must not run outside of a request processing
-# Also command ::rivet::inspect is tested in either forms, those that allow a call from
-# outside request processing and those that must denied it.
+# and return an error if called outside of that context (child process/thread initialization or
+# termination). Command ::rivet::inspect can be called various forms and depending 
+# on its arguments
 
 ::tcltest::test failtest-1.1 {commands that must refuse to run in child init or exit} {
     apachetest::start { 

@@ -134,7 +134,7 @@ proc ::Rivet::error_handler {script err_code err_options} {
             print_error_message "<b>Rivet ErrorScript failed</b>"
         }
     } else {
-        set errorOutbuf $script
+        set errorOutbuf [string trim $script]
         ::Rivet::handle_error
     }
 }

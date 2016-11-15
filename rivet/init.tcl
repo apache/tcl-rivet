@@ -14,279 +14,277 @@
 
 package provide Rivet 3.0
 
-namespace eval ::Rivet {
+namespace eval ::Rivet {} ; ## create the namespace
 
-    ###
-    ## -- tcl_commands_export_list
-    #
-    ## this is temporary hack to export names of Tcl commands in rivet-tcl/.
-    ## This function will be removed in future versions of Rivet and it's
-    ## meant to provide a basic way to guarantee compatibility with older
-    ## versions of Rivet (see code in ::Rivet::init)
-    ##
+###
+## -- tcl_commands_export_list
+#
+## this is temporary hack to export names of Tcl commands in rivet-tcl/.
+## This function will be removed in future versions of Rivet and it's
+## meant to provide a basic way to guarantee compatibility with older
+## versions of Rivet (see code in ::Rivet::init)
+##
 
-    proc tcl_commands_export_list {tclpath} {
+proc ::Rivet::tcl_commands_export_list {tclpath} {
 
-        # we collect the commands in rivet-tcl by reading the tclIndex
-        # file and then we extract the command list from auto_index
+    # we collect the commands in rivet-tcl by reading the tclIndex
+    # file and then we extract the command list from auto_index
 
-        namespace eval ::rivet_temp { }
-        set ::rivet_temp::tclpath $tclpath
+    namespace eval ::rivet_temp { }
+    set ::rivet_temp::tclpath $tclpath
 
-        namespace eval ::rivet_temp {
-            variable auto_index
-            array set auto_index {}
+    namespace eval ::rivet_temp {
+        variable auto_index
+        array set auto_index {}
 
-            # the auto_index in ${tclpath}/tclIndex is loaded
-            # this array is used to fetch a list of Rivet commands
-            # implemented in Rivet
+        # the auto_index in ${tclpath}/tclIndex is loaded
+        # this array is used to fetch a list of Rivet commands
+        # implemented in Rivet
 
-            set dir $tclpath
-            source [file join $tclpath tclIndex]
+        set dir $tclpath
+        source [file join $tclpath tclIndex]
 
-            # Rivet Tcl commands not meant to go onto the export list must
-            # be unset from auto_index here
+        # Rivet Tcl commands not meant to go onto the export list must
+        # be unset from auto_index here
 
-            unset auto_index(::rivet::catch)
-            unset auto_index(::rivet::try)
-        }
-
-        set command_list [namespace eval ::rivet_temp {array names auto_index}]
-
-        # we won't leave anything behind
-        namespace delete ::rivet_temp
-
-        return $command_list
+        unset auto_index(::rivet::catch)
+        unset auto_index(::rivet::try)
     }
 
-    ###
-    ## This routine gets called each time a new request comes in.
-    ## It sets up the request namespace and creates a global command
-    ## to replace the default global.  This ensures that when a user
-    ## uses global variables, they're actually contained within the
-    ## namespace.  So, everything gets deleted when the request is finished.
-    ###
-    proc initialize_request {} {
-        catch { namespace delete ::request }
+    set command_list [namespace eval ::rivet_temp {array names auto_index}]
 
-        namespace eval ::request { }
+    # we won't leave anything behind
+    namespace delete ::rivet_temp
 
-        proc ::request::global {args} {
-            foreach arg $args {
-                uplevel "::global ::request::$arg"
-            }
-        }
-    }
+    return $command_list
+}
 
-    ###
-    ## The default error handler for Rivet.  Any time a page runs into an
-    ## error, this routine will be called to handle the error information.
-    ## If an ErrorScript has been specified, this routine will not be called.
-    ###
-    proc handle_error {} {
-        global errorInfo
-        global errorOutbuf
+###
+## This routine gets called each time a new request comes in.
+## It sets up the request namespace and creates a global command
+## to replace the default global.  This ensures that when a user
+## uses global variables, they're actually contained within the
+## namespace.  So, everything gets deleted when the request is finished.
+###
+proc ::Rivet::initialize_request {} {
+    catch { namespace delete ::request }
 
-        puts <PRE>
-        puts "<HR>$errorInfo<HR>"
-        puts "<P><B>OUTPUT BUFFER:</B></P>"
-        puts $errorOutbuf
-        puts </PRE>
-    }
+    namespace eval ::request { }
 
-    ###
-    ## This routine gets called each time a request is finished.  Any kind
-    ## of special cleanup can be placed here.
-    ###
-    proc cleanup_request {} { }
-
-
-    ######## mod_rivet_ng specific ++++++++
-
-    ### 
-    # -- error_message
-    #
-    # this message should be transparently equivalent
-    # to the Rivet_PrintErrorMessage function in mod_rivet_generator.c
-    #
-
-    proc print_error_message {error_header} {
-        global errorInfo
-
-        puts "$error_header <br/>"
-        puts "<pre> $errorInfo </pre>"
-
-    }
-
-
-    ###
-    ## -- error_handler
-    ##
-    ###
-
-    proc error_handler {script err_code err_options} {
-        global errorOutbuf
-
-        set error_script [::rivet::inspect ErrorScript]
-        if {$error_script != ""} {
-            if {[catch {namespace eval :: $error_script} err_code err_info]} {
-                ::rivet::apache_log_err err "error script failed ($errorInfo)"
-                print_error_message "<b>Rivet ErrorScript failed</b>"
-            }
-        } else {
-            set errorOutbuf $script
-            ::Rivet::handle_error
+    proc ::request::global {args} {
+        foreach arg $args {
+            uplevel "::global ::request::$arg"
         }
     }
+}
 
-    ###
-    ## -- url_handler
-    ##
-    ### 
+###
+## The default error handler for Rivet.  Any time a page runs into an
+## error, this routine will be called to handle the error information.
+## If an ErrorScript has been specified, this routine will not be called.
+###
+proc ::Rivet::handle_error {} {
+    global errorInfo
+    global errorOutbuf
 
-    proc url_handler {} {
+    puts <PRE>
+    puts "<HR>$errorInfo<HR>"
+    puts "<P><B>OUTPUT BUFFER:</B></P>"
+    puts $errorOutbuf
+    puts </PRE>
+}
 
-        set script [join [list  [::rivet::inspect BeforeScript]     \
-                                [::rivet::url_script]               \
-                                [::rivet::inspect AfterScript]] "\n"]
-
-        #set fp [open "/tmp/script-[pid].tcl" w+]
-        #puts $fp $script
-        #close $fp
-
-        return $script
-
-    }
-
-    ###
-    ## -- Default request processing
-    ##
-    ## a request will handled by this procedure
-
-    proc request_handling {} {
-     
-        set script [::Rivet::url_handler]
-
-        ::try {
-
-            namespace eval :: $script
-
-        } trap {RIVET ABORTPAGE} {::Rivet::error_code ::Rivet::error_options} {
-
-            set abort_script [::rivet::inspect AbortScript]
-            if {[catch {namespace eval :: $abort_script} ::Rivet::error_code ::Rivet::error_options]} {
-                ::rivet::apache_log_err err "abort script failed ($errorInfo)"
-                print_error_message "<b>Rivet AbortScript failed</b>"
-
-                ::Rivet::error_handler $abort_script $::Rivet::error_code $::Rivet::error_options
-            }
+###
+## This routine gets called each time a request is finished.  Any kind
+## of special cleanup can be placed here.
+###
+proc ::Rivet::cleanup_request {} { }
 
 
-        } trap {RIVET THREAD_EXIT} {::Rivet::error_code ::Rivet::error_options} {
+######## mod_rivet_ng specific ++++++++
 
-            set abort_script [::rivet::inspect AbortScript]
-            if {[catch {namespace eval :: $abort_script} ::Rivet::error_code ::Rivet::error_options]} {
-                ::rivet::apache_log_err err "abort script failed ($errorInfo)"
-                print_error_message "<b>Rivet AbortScript failed</b>"
+### 
+# -- error_message
+#
+# this message should be transparently equivalent
+# to the Rivet_PrintErrorMessage function in mod_rivet_generator.c
+#
 
-                ::Rivet::error_handler $abort_script $::Rivet::error_code $::Rivet::error_options
-            }
+proc ::Rivet::print_error_message {error_header} {
+    global errorInfo
 
-            #<sudden-exit-script>
+    puts "$error_header <br/>"
+    puts "<pre> $errorInfo </pre>"
 
-        } on error {::Rivet::error_code ::Rivet::error_options} {
+}
 
-            ::Rivet::error_handler $script $::Rivet::error_code $::Rivet::error_options
 
-        } finally {
+###
+## -- error_handler
+##
+###
 
-            set after_every_script [::rivet::inspect AfterEveryScript]
-            if {[catch {namespace eval :: $after_every_script} ::Rivet::error_code ::Rivet::error_options]} {
-                ::rivet::apache_log_err err "AfterEveryScript failed ($errorInfo)"
-                print_error_message "<b>Rivet AfterEveryScript failed</b>"
+proc ::Rivet::error_handler {script err_code err_options} {
+    global errorOutbuf
 
-                ::Rivet::error_handler $after_every_script $::Rivet::error_code $::Rivet::error_options
-            }
-            #<after-every-script>
+    set error_script [::rivet::inspect ErrorScript]
+    if {$error_script != ""} {
+        if {[catch {namespace eval :: $error_script} err_code err_info]} {
+            ::rivet::apache_log_err err "error script failed ($errorInfo)"
+            print_error_message "<b>Rivet ErrorScript failed</b>"
         }
+    } else {
+        set errorOutbuf [string trim $script]
+        ::Rivet::handle_error
+    }
+}
+
+###
+## -- url_handler
+##
+### 
+
+proc ::Rivet::url_handler {} {
+
+    set script [join [list  [::rivet::inspect BeforeScript]     \
+                            [::rivet::url_script]               \
+                            [::rivet::inspect AfterScript]] "\n"]
+
+    #set fp [open "/tmp/script-[pid].tcl" w+]
+    #puts $fp $script
+    #close $fp
+
+    return $script
+
+}
+
+###
+## -- Default request processing
+##
+## a request will handled by this procedure
+
+proc ::Rivet::request_handling {} {
  
-        namespace eval :: ::Rivet::cleanup_request  
+    set script [::Rivet::url_handler]
+
+    ::try {
+
+        namespace eval :: $script
+
+    } trap {RIVET ABORTPAGE} {::Rivet::error_code ::Rivet::error_options} {
+
+        set abort_script [::rivet::inspect AbortScript]
+        if {[catch {namespace eval :: $abort_script} ::Rivet::error_code ::Rivet::error_options]} {
+            ::rivet::apache_log_err err "abort script failed ($errorInfo)"
+            print_error_message "<b>Rivet AbortScript failed</b>"
+
+            ::Rivet::error_handler $abort_script $::Rivet::error_code $::Rivet::error_options
+        }
+
+
+    } trap {RIVET THREAD_EXIT} {::Rivet::error_code ::Rivet::error_options} {
+
+        set abort_script [::rivet::inspect AbortScript]
+        if {[catch {namespace eval :: $abort_script} ::Rivet::error_code ::Rivet::error_options]} {
+            ::rivet::apache_log_err err "abort script failed ($errorInfo)"
+            print_error_message "<b>Rivet AbortScript failed</b>"
+
+            ::Rivet::error_handler $abort_script $::Rivet::error_code $::Rivet::error_options
+        }
+
+        #<sudden-exit-script>
+
+    } on error {::Rivet::error_code ::Rivet::error_options} {
+
+        ::Rivet::error_handler $script $::Rivet::error_code $::Rivet::error_options
+
+    } finally {
+
+        set after_every_script [::rivet::inspect AfterEveryScript]
+        if {[catch {namespace eval :: $after_every_script} ::Rivet::error_code ::Rivet::error_options]} {
+            ::rivet::apache_log_err err "AfterEveryScript failed ($errorInfo)"
+            print_error_message "<b>Rivet AfterEveryScript failed</b>"
+
+            ::Rivet::error_handler $after_every_script $::Rivet::error_code $::Rivet::error_options
+        }
+        #<after-every-script>
     }
 
-    ######## mod_rivet_ng specific ---------
+    namespace eval :: ::Rivet::cleanup_request  
+}
 
-    ###
-    ## The main initialization procedure for Rivet.
-    ###
+######## mod_rivet_ng specific ---------
 
-    proc init {} {
-        global auto_path
-        global server
+###
+## The main initialization procedure for Rivet.
+###
 
-        ## Add the rivet-tcl directory to Tcl's auto search path.
-        ## We insert it at the head of the list because we want any of
-        ## our procs named the same as Tcl's procs to be overridden.
-        ## Example: parray
-        set tclpath [file join [file dirname [info script]] rivet-tcl]
-        set auto_path [linsert $auto_path 0 $tclpath]
+proc ::Rivet::init {} {
+    global auto_path
+    global server
 
-        ## As we moved the commands set to ::rivet namespace we
-        ## we want to guarantee the commands are still accessible
-        ## at global level by putting them on the export list.
-        ## Importing the ::rivet namespace is deprecated and we should
-        ## make it clear in the manual
+    ## Add the rivet-tcl directory to Tcl's auto search path.
+    ## We insert it at the head of the list because we want any of
+    ## our procs named the same as Tcl's procs to be overridden.
+    ## Example: parray
+    set tclpath [file join [file dirname [info script]] rivet-tcl]
+    set auto_path [linsert $auto_path 0 $tclpath]
 
-        ## we keep in ::rivet::export_list a list of importable commands
+    ## As we moved the commands set to ::rivet namespace we
+    ## we want to guarantee the commands are still accessible
+    ## at global level by putting them on the export list.
+    ## Importing the ::rivet namespace is deprecated and we should
+    ## make it clear in the manual
 
-        namespace eval ::rivet [list set cmd_export_list [tcl_commands_export_list $tclpath]]
-        namespace eval ::rivet {
+    ## we keep in ::rivet::export_list a list of importable commands
 
-        ## init.tcl is run by mod_rivet (which creates the ::rivet namespace) but it gets run
-        ## standalone by mkPkgindex during the installation phase. We have to make sure the
-        ## procedure won't fail in this case, so we check for the existence of the variable.
+    namespace eval ::rivet [list set cmd_export_list [tcl_commands_export_list $tclpath]]
+    namespace eval ::rivet {
 
-            if {[info exists module_conf(export_namespace_commands)] && \
-                 $module_conf(export_namespace_commands)} {
+    ## init.tcl is run by mod_rivet (which creates the ::rivet namespace) but it gets run
+    ## standalone by mkPkgindex during the installation phase. We have to make sure the
+    ## procedure won't fail in this case, so we check for the existence of the variable.
 
-                # commands in 'command_list' are prefixed with ::rivet, so we have to
-                # remove it to build an export list 
-                
-                set export_list {}
-                foreach c $cmd_export_list {
-                    lappend export_list [namespace tail $c]
-                }
+        if {[info exists module_conf(export_namespace_commands)] && \
+             $module_conf(export_namespace_commands)} {
 
-                #puts stderr "exporting $export_list"
-                eval namespace export $export_list
-
+            # commands in 'command_list' are prefixed with ::rivet, so we have to
+            # remove it to build an export list 
+            
+            set export_list {}
+            foreach c $cmd_export_list {
+                lappend export_list [namespace tail $c]
             }
+
+            #puts stderr "exporting $export_list"
+            eval namespace export $export_list
+
         }
-        ## Add the packages directory to the auto_path.
-        ## If we have a packages$tcl_version directory
-        ## (IE: packages8.3, packages8.4) append that as well.
+    }
+    ## Add the packages directory to the auto_path.
+    ## If we have a packages$tcl_version directory
+    ## (IE: packages8.3, packages8.4) append that as well.
 
-        ## The packages directory come right after the rivet-tcl directory.
-        set pkgpath [file join [file dirname [info script]] packages]
-        set auto_path [linsert $auto_path 1 $pkgpath]
-        set auto_path [linsert $auto_path 2 ${pkgpath}-local]
+    ## The packages directory come right after the rivet-tcl directory.
+    set pkgpath [file join [file dirname [info script]] packages]
+    set auto_path [linsert $auto_path 1 $pkgpath]
+    set auto_path [linsert $auto_path 2 ${pkgpath}-local]
 
-        if { [file exists ${pkgpath}$::tcl_version] } {
-            lappend auto_path ${pkgpath}$::tcl_version
-        }
-
-        ## Likewise we have also to add to auto_path the directory containing 
-        ## this script since it holds the pkgIndex.tcl file for package Rivet. 
-
-        set auto_path [linsert $auto_path 0 [file dirname [info script]]]
-
-        ## This will allow users to create proc libraries and tclIndex files
-        ## in the local directory that can be autoloaded.
-        ## Perhaps this must go to the front of the list to allow the user
-        ## to override even Rivet's procs.
-        lappend auto_path .
+    if { [file exists ${pkgpath}$::tcl_version] } {
+        lappend auto_path ${pkgpath}$::tcl_version
     }
 
-} ;## namespace eval ::Rivet
+    ## Likewise we have also to add to auto_path the directory containing 
+    ## this script since it holds the pkgIndex.tcl file for package Rivet. 
+
+    set auto_path [linsert $auto_path 0 [file dirname [info script]]]
+
+    ## This will allow users to create proc libraries and tclIndex files
+    ## in the local directory that can be autoloaded.
+    ## Perhaps this must go to the front of the list to allow the user
+    ## to override even Rivet's procs.
+    lappend auto_path .
+}
 
 ## eventually we have to divert Tcl ::exit to ::rivet::exit
 

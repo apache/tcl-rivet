@@ -9,7 +9,9 @@ proc check_inspect { cmd_form args } {
     set ::failtest(inspect${cmd_form}) 0
     
     set cmdeval [list ::rivet::inspect {*}$args]
-    if {[catch {eval $cmdeval}]} { set ::failtest(inspect${cmd_form}) 1 }
+    if {[::catch $cmdeval e opts]} { 
+        set ::failtest(inspect${cmd_form}) 1 
+    }
 
 }
 

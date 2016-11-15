@@ -28,11 +28,11 @@
     ::rivet::try {
         failproc [::rivet::var_qs get cond]
     } on continue {er opt} {
-        dict with opt { puts -nonewline "$cmd $condition " }
+        dict with opt { puts -nonewline "continue $cmd $condition " }
     } on error {er opt} {
-        dict with opt { puts -nonewline "$cmd $condition " }
+        dict with opt { puts -nonewline "error $cmd $condition " }
     } on break {er opt} {
-        dict with opt { puts -nonewline "$cmd $condition " }
+        dict with opt { puts -nonewline "break $cmd $condition " }
     } finally {
         puts -nonewline "finalize"
     }

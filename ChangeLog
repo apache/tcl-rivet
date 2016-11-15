@@ -1,3 +1,14 @@
+2016-11-15 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl.in: trimming error buffer
+    to make test message matching easier
+    * rivet/rivet-tcl/catch.tcl|try.tcl: better
+    script evaluation is catch/try construct, complete
+    error codes in case ::rivet::abort_page is to be
+    handled
+    * src/mod_rivet_ng/rivetCore.c: direct
+    result object handling in [::rivet::inspect script]
+    * try.rvt: changed test expression matching
+
 2016-11-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: removed debugging messages,
     request handling made much simpler after

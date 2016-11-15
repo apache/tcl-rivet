@@ -113,7 +113,7 @@
     }
     set r [string trim $r]
     set r
-} {try 3 finalize}
+} {break try 3 finalize}
 
 ::tcltest::test bailout-3.2 {::rivet::try handling error return code} {
     apachetest::start {} {
@@ -125,7 +125,7 @@
     }
     set r [string trim $r]
     set r
-} {try 1 finalize}
+} {error try 1 finalize}
 
 ::tcltest::test bailout-3.3 {::rivet::try handling continue return code} {
     apachetest::start {} {
@@ -137,7 +137,7 @@
     }
     set r [string trim $r]
     set r
-} {try 4 finalize}
+} {continue try 4 finalize}
 
 ::tcltest::test bailout-3.4 {::rivet::try abort_page handling} {
     apachetest::start {} {
@@ -154,7 +154,7 @@
     set r
 } {finalize 1 arg1}
 
-::tcltest::test bailout-3.4 {::rivet::try handling ::rivet::exit} {
+::tcltest::test bailout-3.5 {::rivet::try handling ::rivet::exit} {
     apachetest::start {} {
         RivetServerConf AbortScript "::rivet::apache_log_error err \\\"catching abort condition\\\""
         RivetServerConf AbortScript "set abcode \[::rivet::abort_code\]"

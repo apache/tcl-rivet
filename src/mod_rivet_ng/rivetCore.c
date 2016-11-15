@@ -1544,7 +1544,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         {
             if (private->r == NULL)
             {
-                Tcl_Obj* cmd = Tcl_NewStringObj("return [info script]",-1);
+                Tcl_Obj* cmd = Tcl_NewStringObj("info script",-1);
 
                 Tcl_IncrRefCount(cmd); 
                 status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
@@ -1553,6 +1553,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             else
             {
                 Tcl_SetObjResult(interp,Tcl_NewStringObj(private->r->filename,-1));
+                status = TCL_OK;
             }
         } 
         else if (STRNEQU(cmd_arg,"-all"))
