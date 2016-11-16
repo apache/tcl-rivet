@@ -1,3 +1,8 @@
+2016-11-17 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Postgresql.tcl: applied
+    consistent single quote character handling by
+    calling PgTcl function pg_quote (closes bug #60378)
+
 2016-11-15 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: trimming error buffer
     to make test message matching easier

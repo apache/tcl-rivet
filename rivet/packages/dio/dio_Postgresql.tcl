@@ -151,11 +151,11 @@ namespace eval DIO {
                 }
                 default {
                     # no special code for that type!!
-                    return "'[quote $val]'"
+                    return [pg_quote $val]
                 }
             }
         } else {
-                return "'[quote $val]'"
+                return [pg_quote $val]
         }
     }
 
