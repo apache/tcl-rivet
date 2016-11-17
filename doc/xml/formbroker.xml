@@ -301,6 +301,76 @@ a(var4) = 0</programlisting>
 
             </variablelist>
         </refsect1>
+        <refsect1>
+            <title>Writing a special variable form validator</title>
+            <para>
+            	The form broker is by no means restricted to work only with its native
+            	data types: you may define your own form variable types and have
+            	them validated with their own variable validator. 
+            </para>
+            <para>
+            	A validator is a function accepting a dictionary as single argument and
+            	must return either FB_OK, if the variable value is valid, 
+            	or any other used defined error code. The dictionary argument stores
+            	the variable descriptor used internally by the form broker. The dictionary
+            	keys are listed 
+				</para>
+				<para>
+            	Suppose you're writing an HTML that accept as input a network 
+            	interface MAC address. 
+            	A mac address is represented by 6 hexadecimal octets separated by 
+            	either a <quote>-</quote> (Windows convention) or <quote>:</quote> 
+            	(Unix, Mac convention). The procedure <command>validate_mac</command>
+            	checks the validity of the mac address and if compliant transforms its 
+            	representation in the Unix form. By setting the key <quote>constrain</quote>
+            	in the dictionary <emphasis>mac_address_d</emphasis> the procedure
+            	is telling the form broker to copy the transformed value back
+            	in the input response array
+            </para>
+<programlisting>proc validate_mac {_mac_address_d} {
+    upvar $_mac_address_d mac_address_d
+
+    dict with mac_address_d {
+		  
+        set var [string trim $var]
+        if {[regexp {^[[:xdigit:]]{2}([:-][[:xdigit:]]{2}){5}$} $var]} {
+
+            set var [string tolower $var]
+
+            # we normalize the mac address to the Unix form.
+            # The dash '-' characters in the windows representation 
+            # are replaced by columns ':'
+
+            set var [regsub -all -- {-} $var :]
+
+            # the 'constrain' field is bidirectional:
+            # it tells the validator to curb/change the value
+            # within bonds/forms/representation. By setting it the
+            # validator we tell the FormBroker to copy the value
+            # back in the response array
+
+            set constrain 1
+            return FB_OK
+
+         } else {
+
+            return FB_WRONG_MAC
+
+         }
+
+    }
+
+}
+% set fbroker [::FormBroker create {mac mac_address validator validate_mac}]
+% ::rivet::load_response
+% parray response
+% parray r
+r(mac) = 00-A1-B2-C3-D4-C5
+% $fbroker validate r
+true
+% parray r
+r(mac) = 00:a1:b2:c3:d4:c5</programlisting>
+ 			</refsect1>
       </refentry>
 </section>
    

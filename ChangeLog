@@ -6,7 +6,10 @@
     bug in method response. Package version number
     bumped up to 1.0
     * doc/xml/formbroker.xml: first draft of the
-    manual page of package formbroker
+    manual page of package formbroker with example
+    of implementation of a validator
+    * doc/xml/commands.xml: fixed type in page
+    of ::rivet::xml
 
 2016-11-15 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: trimming error buffer

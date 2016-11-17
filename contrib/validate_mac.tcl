@@ -1,5 +1,6 @@
 # -- validate_mac 
 #
+# mac address validator to be used with the form broker 
 
     proc validate_mac {_mac_address_d} {
         upvar $_mac_address_d mac_address_d
@@ -19,9 +20,9 @@
 
                 # the 'constrain' field is bidirectional:
                 # it tells the validator to curb/change the value
-                # within bonds/forms/representation. By setting it the
-                # validator we tell the FormBroker to copy the value
-                # back in the response array
+                # within the bonds/forms/representation suitable. 
+                # By setting it the validator tells the FormBroker
+                # to copy the value back in the response array
 
                 set constrain 1
                 return FB_OK

@@ -2074,7 +2074,7 @@ form_request end</programlisting>
         <refsect1>
             <title>Description</title>
             <para>
-                Given a string and a variable number of tag descriptors return XML framgment made
+                Given a string and a variable number of tag descriptors return XML fragment made
                 by nesting the tags with the same hierarchical order they are listed on the command
                 line. The tag descriptors can be a one element list (the tag) or an odd-length list whose
                 first argument is the tag namme and the remaining elements are interpreted as 
