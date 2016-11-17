@@ -1,21 +1,306 @@
 <section id="formbroker">
     <title>The Form Broker</title>
     <section>
-    	<title>Introduction</title>
+      <title>Introduction</title>
       <para>
          The <command>FormBroker</command> package creates instances of 
-         <command>FormBroker</command> controlled objects each representing
-         a form data description. These objects expose a simple set of methods
-         meant to validate and control data typically posted through an HTML form, 
-         thus data represented the association of form variables with their values as 
-         returned by the <command>::rivet::load_response</command> command
+         objects representing a form data description. These objects offer a 
+         simple interface of methods meant to validate and control data 
+         as typically posted through an HTML form, 
+         thus data represented through the association of form variables 
+         with their values as returned, for example, 
+         by the <command>::rivet::load_response</command> command
       </para>
-		<para>
-			The <command>FormBroker</command> creates new instances 	        
-        
-        
-     </section>
-    <refentry id="fb">
-    </refentry>
+      <!-- programlisting>
+      
+      </programlisting -->
+      </section>
+      <refentry id="fb">
+        <refnamediv>
+            <refname>FormBroker</refname>
+            <refpurpose>
+               Form broker object creator
+            </refpurpose>
+        </refnamediv>
+        <refsynopsisdiv>
+            <cmdsynopsis>
+                <command>::FormBroker</command>
+                <arg choice="plain">create</arg>
+                <arg><option>-quoting quoting_procedure</option></arg>
+                <arg><option>variable1 descriptor</option></arg>
+                <arg><option>variable2 descriptor</option></arg>
+                <arg>...</arg>
+            </cmdsynopsis>
+        </refsynopsisdiv>
+        <refsect1>
+            <title>Description</title>
+            <para>
+               The command returns a reference to a form broker object by creating
+               a representation of the form data using the list of variable 
+               descriptors passed to <command>create</command>. Each descriptor
+               is a list of parameter or parameter-value pairs whose order has as only requirement
+               to begin with the <command>{variable_name variable_type}</command> pair.
+               A formbroker object handles natively integer, unsigned, string and email data types.
+               The programmer can defined new data type and provide in the descriptor a
+               reference to a validating procedure for that type.
+            </para>
+            <para>
+               The optional <arg>-quoting quoting_procedure</arg> switch assigns a procedure to
+               be called to quote the form response values. The quoting procedure is any
+               procedure accepting a single string argument and returning its quoted value. A most
+               basic example is the FormBroker default quoting procedure
+            </para>
+            <programlisting>proc force_quote {str} {
+    return "'$str'"
+}</programlisting>
+            <para>
+               Other parameters of a descriptors are
+            </para>
+            <itemizedlist>
+               <listitem><command>type</command>: the data type of the variable</listitem>
+               <listitem><command>bounds</command>: limits of a variable value. The
+                  meanining of bounds depends on the variable type. For an integer is the
+                  maximum absolute value for that variable (for an unsigned the lower 
+                  limit is invariably 0), for a string is the maximum length of the string. The
+                  parameter bounds has no effect on an email data type
+               </listitem>
+               <listitem><command>constrain</command>: boolean value telling the variable has to be
+               forced to fulfill the constrain imposed by <command>bounds</command>. This field
+               is bidirectional in that it can be used by the validator to force the
+               variable value rewriting</listitem>
+               <listitem><command>validator</command>: name of the specialized validator for this variable</listitem>
+               <listitem><command>default</command>: default value of the variable if not set in a response array. 
+               When a variable is given a default value the form validation will not fail on the fact that
+               this variable may be missing from the form response array</listitem>
+               <listitem><command>quote</command>: the variable value has to be quoted when written back in
+               the response array</listitem>
+               <listitem><command>validator</command>: name of the validator procedure. The procedure
+                  can be any Tcl procedure accepting as argument the name of a dictionary
+                  holding the variable	internal representation. 
+               </listitem>
+            </itemizedlist>
+            <para>
+               An example of a form accepting four variable, one for each native type of a form broker object
+            </para>
+            <programlisting> % set fbroker [::FormBroker create {var1 integer} {var2 unsigned} {var3 string} {var4 integer bounds {-10 100}}]
+::FormBroker::form0</programlisting>
+        </refsect1>
+        <refsect1>
+            <title>Form broker object methods</title>
+            <para>
+               The central method of a form broker object is <command>validate</command> 
+            </para>
+            <variablelist>
+				
+               <varlistentry>
+                  <listitem>
+                     <cmdsynopsis>
+                        <arg choice="plain"><replaceable>formBroker_object</replaceable></arg>
+                        <arg choice="plain">validate</arg>
+                        <arg><option>-forcequote</option></arg>
+                        <arg choice="plain">response</arg>
+                        <arg><replaceable>response copy</replaceable></arg>
+                     </cmdsynopsis>
+                     <para>
+                        The method <command>validate</command> takes as argument the name of an array of variables
+                        in the way this is produced by command <xref linkend="load_response">::rivet::load_response</xref>
+                        returning a form response. The optional argument <replaceable>-forcequote</replaceable> causes the
+                        variable values to be rewritten and quoted. If the optional argument <replaceable>response copy</replaceable>
+                        is present the validated response is copied in this array instead of the input <arg choice="plain">response</arg>
+                        array.
+                     </para>
+                     <para>
+                        If the form data have been validated the method <command>validate</command> returns <emphasis>true</emphasis>
+                     </para>
+                     <para>
+                        Example of form data validation (assuming ::rivet::load_response is loading the array <emphasis>response</emphasis>
+                        with data taken from a form non displayed here)
+                     </para>
+                     <programlisting>% set fbroker [::FormBroker create {var1 integer} {var2 unsigned} {var3 string} {var4 integer bounds {-10 100}}]
+::FormBroker::form0
+
+% ::rivet::load_response
+% parray response
+response(var1) = -10
+response(var2) = 20
+response(var3) = a string
+response(var4) = 50
+
+# let's keep a copy of the response
+
+% array set response_copy [array get response]
+
+# form data validation
+
+% $fbroker validate response
+true
+% $fbroker validate -forcequote response
+% parray response
+response(var1) = '-10'
+response(var2) = '20'
+response(var3) = 'a string'
+response(var4) = '50'
+
+# restore response original value
+
+% array set response [array get response_copy]
+% $fbroker validate -forcequote response response_copy
+true
+% parray response
+response(var1) = -10
+response(var2) = 20
+response(var3) = a string
+response(var4) = 50
+% parray response_copy 
+response_copy(var1) = '-10'
+response_copy(var2) = '20'
+response_copy(var3) = 'a string'
+response_copy(var4) = '50'
+
+# a form object has to be destroyed if it's not needed anymore
+
+% $fbroker destroy</programlisting>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <listitem>
+                     <cmdsynopsis>
+                        <arg choice="plain"><replaceable>formBroker_object</replaceable></arg>
+                        <arg choice="plain">failing</arg>
+                     </cmdsynopsis>
+                     <para>
+                        In case the validation fails method <command>failing</command> returns a list
+                        of <emphasis>variable_name - error_condition</emphasis> pairs for each 
+                        variable whose value failed to validate and was impossible to fix. This list
+                        is suitable to populate an array or used directly as a dictionary
+                     </para>
+<programlisting>% package require formbroker
+1.0
+% set fbroker [::FormBroker create {var1 integer} \
+         {var2 unsigned} \
+         {var3 string} \
+         {var4 integer}]
+::FormBroker::form0
+% ::rivet::load_response
+
+# let's suppose we have an incomplete response
+% parray response
+response(var1) = '100'
+response(var2) = '20'
+response(var3) = 'a string'
+% $fbroker validate response
+false
+$fbroker failing
+var4 MISSING_VAR
+
+# this can be prevented by assigning a variable a default value
+
+% set fbroker [::FormBroker create {var1 integer} \
+                                   {var2 unsigned} \
+                                   {var3 string} \
+                                   {var4 integer default 0}]						
+::FormBroker::form1
+% $fbroker validate response
+true
+% parray response
+response(var1) = 100
+response(var2) = 20
+response(var3) = a string
+response(var4) = 0
+
+% set fbroker [::FormBroker create {var1 integer} \
+                                   {var2 unsigned} \
+                                   {var3 string length 10 constrain} \
+                                   {var4 integer bounds {-10 100}}]
+::FormBroker::form2
+% ::rivet::load_response
+
+# this time the response has invalid data
+
+% parray response
+response(var1) = 'aaaaa'
+response(var2) = '-20'
+response(var3) = 'a longer string that breaks the 10 chars max limit imposed'
+response(var4) = '150'
+% $fbroker validate response
+false
+% $fbroker failing
+var1 NOT_INTEGER var2 FB_OUT_OF_BOUNDS var4 FB_OUT_OF_BOUNDS</programlisting>
+                     <para>
+                        Notice that even though $response(var3) exceeds the 10 characters max length imposed to variable <emphasis>var3</emphasis>
+                        this variable is not in the list returned by <command>failing</command> because
+                        the 'constrain' attribute forced the truncation of the string. 
+                        In fact this applies also to the integer and unsigned values 
+                     </para>
+<programlisting>% set fbroker [::FormBroker create {var1 integer bounds 10 constrain} \
+			            {var2 unsigned constrain} \
+			            {var3 string length 10 constrain} \
+			            {var4 integer bounds {-10 100} constrain}]
+::FormBroker::form0
+% ::rivet::load_response
+% parray response
+response(var1) = abcdef
+response(var2) = -20
+response(var3) = a longer string that breaks the 10 chars max limit imposed
+response(var4) = 150
+% $fbroker validate response response_copy
+false
+% $fbroker failing
+var1 NOT_INTEGER
+% parray response_copy 
+response_copy(var2) = 0
+response_copy(var3) = a longer s
+response_copy(var4) = 100</programlisting>
+                  <para>
+                     The variable <emphasis>var1</emphasis> could not be constrained because the input
+                     value "abcdef" is fundamentally incompatible
+                  </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <listitem>
+                     <cmdsynopsis>
+                        <arg choice="plain"><replaceable>formBroker_object</replaceable></arg>
+                        <arg choice="plain">response</arg>
+                        <arg><option>response_array_name</option></arg>
+                     </cmdsynopsis>
+                     <para>
+                        The <command>response</command> method fills 
+                        the array whose name is passed as optional argument
+                        with the last response processing. If this argument is omitted
+                        the method creates an array named <emphasis>response</emphasis>.
+                     </para>
+                     <para>
+                        This method can be called also if no form response validation has taken place: it
+                        simply populates the array with the default values assigned to the form variables. As
+                        such is a way to create form default arrays to initialize forms created with
+                        the <xref linkend="form_package">form</xref> package.
+                     </para>
+<programlisting>set fbroker [::FormBroker create {var1 integer default 0} \
+            {var2 unsigned default 1} \
+            {var3 string} \
+            {var4 integer default 0}]
+% $fbroker response a
+% parray a
+a(var1) = 0
+a(var2) = 1
+a(var4) = 0</programlisting>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <listitem>
+                     <cmdsynopsis>
+                        <arg choice="plain"><replaceable>formBroker_object</replaceable></arg>
+                        <arg choice="plain">reset</arg>
+                     </cmdsynopsis>
+                     <para>
+                     	The method resets the object to its initial defaults
+                     </para>
+                  </listitem>
+               </varlistentry>
+
+            </variablelist>
+        </refsect1>
+      </refentry>
 </section>
    

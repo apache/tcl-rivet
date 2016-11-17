@@ -201,8 +201,10 @@
 		<arg choice="plain"><replaceable>objectName</replaceable></arg>
 		<arg>close</arg>
 	      </cmdsynopsis>
-	      <para>	      Close the current database connection.  This command is
-		automatically called when the DIO object is destroyed.</para>
+	      <para>
+	      	Close the current database connection.  This command is
+				automatically called when the DIO object is destroyed.
+			</para>
 	    </listitem>
 	  </varlistentry>
 

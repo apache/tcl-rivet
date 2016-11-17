@@ -27,10 +27,13 @@
     <!ENTITY upgrade.xml           SYSTEM "xml/upgrade.xml" >
     <!ENTITY request.xml           SYSTEM "xml/request.xml" >
     <!ENTITY entities.xml          SYSTEM "xml/entities.xml" >
+    <!ENTITY asciiglyphs.xml		  SYSTEM "xml/asciiglyphs.xml" >
+    <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
 ]>
 
 <!--
-   Copyright 2002-2005 The Apache Software Foundation
+
+   Copyright 2002-2016 The Apache Software Foundation
 
    Licensed under the Apache License, Version 2.0 (the "License"); you
    may not use this file except in compliance with the License.  You
@@ -51,21 +54,7 @@
   <articleinfo>
     <title>Apache Rivet</title>
     <copyright>
-        <year>2002</year>
-        <year>2003</year>
-        <year>2004</year>
-        <year>2005</year>
-        <year>2006</year>
-        <year>2007</year>
-        <year>2008</year>
-        <year>2009</year>
-        <year>2010</year>
-        <year>2011</year>
-        <year>2012</year>
-        <year>2013</year>
-        <year>2014</year>
-        <year>2015</year>
-        <year>2016</year>        
+        <year>2002-2016</year>
         <holder>Apache Software Foundation</holder>
     </copyright>
     <author>
