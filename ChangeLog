@@ -6,7 +6,8 @@
     bug in method response. Package version number
     bumped up to 1.0
     * doc/xml/formbroker.xml: first draft of the
-    manual page of package formbroker
+    manual page of package formbroker with 
+    example of implementation of a validator
     * contrib/validate_mac.tcl: add example of
     a validator
     * doc/xml/commands.xml: fixed typo in ::rivet::xml
