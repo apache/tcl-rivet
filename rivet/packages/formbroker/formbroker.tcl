@@ -238,6 +238,7 @@ namespace eval FormBroker {
                 } else {
                     set valid FB_OK
                 }
+
             }
         }
         return $valid
@@ -541,7 +542,9 @@ namespace eval FormBroker {
         variable form_definitions
 
         dict for {var_name var_d} [dict get $form_definitions $form_name] {
-        
+            catch {unset var}
+            catch {unset default}        
+
             dict with var_d {
 
                 if {[info exists var]} {
@@ -556,6 +559,7 @@ namespace eval FormBroker {
     }
 
     # -- reset
+    #
     #
 
     proc reset {form_name} {
@@ -763,4 +767,4 @@ namespace eval FormBroker {
     namespace ensemble create
 }
 
-package provide formbroker 0.1
+package provide formbroker 1.0

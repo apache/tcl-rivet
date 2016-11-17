@@ -2,6 +2,11 @@
     * rivet/packages/dio/dio_Postgresql.tcl: applied
     consistent single quote character handling by
     calling PgTcl function pg_quote (closes bug #60378)
+    * rivet/packages/formbroker/formbroker.tcl: fixed
+    bug in method response. Package version number
+    bumped up to 1.0
+    * doc/xml/formbroker.xml: first draft of the
+    manual page of package formbroker
 
 2016-11-15 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: trimming error buffer
