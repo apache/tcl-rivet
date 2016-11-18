@@ -11,6 +11,14 @@
          with their values as returned, for example, 
          by the <command>::rivet::load_response</command> command
       </para>
+      <note>
+      	The <command>FormBroker</command> package is still experimental. 
+      	Basic functionalities and interface are not likely to change but
+      	internal details and implementation could be redesigned
+      	in future releases. More specifically the external validator mechanism
+      	could be improved with the purpose of shielding the <command>FormBroker</command>
+      	internals from a data validation procedure.
+      </note>
       <!-- programlisting>
       
       </programlisting -->
@@ -362,8 +370,7 @@ a(var4) = 0</programlisting>
 
 }
 % set fbroker [::FormBroker create {mac mac_address validator validate_mac}]
-% ::rivet::load_response
-% parray response
+% ::rivet::load_response r
 % parray r
 r(mac) = 00-A1-B2-C3-D4-C5
 % $fbroker validate r
