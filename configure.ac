@@ -759,7 +759,7 @@ AC_DEFUN([IMPORT_RIVET_COMMANDS],[
         import-rivet-commands,
         [  --disable-import-rivet-commands requires explicit namespace import],
         [ import_rivet_commands=$enable_import_rivet_commands],
-        [ import_rivet_commands="yes"]
+        [ import_rivet_commands="no"]
     )
 
     AC_MSG_CHECKING(if ::rivet namespace will be automatically imported for compatibility)

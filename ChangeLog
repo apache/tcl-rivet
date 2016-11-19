@@ -1,3 +1,9 @@
+2016-11-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod-rivet/rivetInspect.c: now returning
+    an empty string if a value is undefined
+    * configure.ac: now defaults to non automatic
+    import of ::rivet namespace into global namespace
+
 2016-11-17 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Postgresql.tcl: applied
     consistent single quote character handling by
