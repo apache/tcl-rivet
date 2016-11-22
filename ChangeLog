@@ -1,4 +1,4 @@
-2016-11-22  Damon J. Courtney <damon@unreality.com>
+2016-11-22  Damon J. Courtney <damon.courtney@gmail.com>
     * rivet/init.tcl.it: Rewrite init.tcl.in from the top down
 
 2016-11-22 Massimo Manghi <mxmanghi@apache.org>
