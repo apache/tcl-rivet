@@ -1,7 +1,8 @@
 2016-11-22 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/session/session-class.tcl:
     * rivet/packages/form/form.tcl,form2.tcl: now
-    fully qualifying mod_rivet commands
+    fully qualifying mod_rivet commands, fixed
+    'file' method that emits an 'email' HTML input element
     * doc/xml/formbroker.xml: correct coding example
 
 2016-11-19 Massimo Manghi <mxmanghi@apache.org>

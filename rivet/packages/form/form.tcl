@@ -353,7 +353,7 @@ package provide form 1.0
     # file -- emit an HTML 5 "file" form field
     #
     method file {name args} {
-        eval field email $name $args
+        eval field file $name $args
     }
 
     #
