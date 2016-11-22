@@ -150,7 +150,7 @@ package require Itcl
 	# if the Apache unique ID module is installed, the environment
 	# variable UNIQUE_ID will have been set.  If not, we'll get an
 	# empty string, which won't hurt anything.
-	set uniqueID [env UNIQUE_ID]
+	set uniqueID [::rivet::env UNIQUE_ID]
 
 	set sessionIdKey "$uniqueID[clock clicks][pid]$args[clock seconds]$scrambleCode[get_entropy_bytes]"
 	debug "gen_session_id - feeding this to md5: '$sessionIdKey'"
@@ -192,7 +192,7 @@ package require Itcl
     #  object
     #
     method set_session_cookie {value} {
-	cookie set $cookieName $value \
+	::rivet::cookie set $cookieName $value \
 	    -path $cookiePath \
 	    -minutes $cookieLifetime \
 	    -secure $cookieSecure \
@@ -231,7 +231,7 @@ package require Itcl
 	# see if they have a session cookie.  if they don't,
 	# set status and return.
 	#
-	set sessionCookie [cookie get $cookieName]
+	set sessionCookie [::rivet::cookie get $cookieName]
 	if {$sessionCookie == ""} {
 	    # they did not have a cookie set, they are not logged in
 	    status "no_cookie"
@@ -247,14 +247,14 @@ package require Itcl
 	debug "id: found session cookie '$cookieName' value '$sessionCookie'"
 
 	set a(session_id) $sessionCookie
-	set a(ip_address) [env REMOTE_ADDR]
+	set a(ip_address) [::rivet::env REMOTE_ADDR]
 
 	# see if there's a record matching the session ID cookie and
 	# IP address
 	set kf [list session_id ip_address]
 	set key [$dioObject makekey a $kf]
 	if {![$dioObject fetch $key a -table $sessionTable -keyfield $kf]} {
-	    debug "id: no entry in the session table for session '$sessionCookie' and address [env REMOTE_ADDR]: [$dioObject errorinfo]"
+	    debug "id: no entry in the session table for session '$sessionCookie' and address [::rivet::env REMOTE_ADDR]: [$dioObject errorinfo]"
 	    status "no_session"
 	    return ""
 	}
@@ -383,7 +383,7 @@ package require Itcl
     #
     method delete_session {{session_id ""}} {
 
-	set ip_address [env REMOTE_ADDR]
+	set ip_address [::rivet::env REMOTE_ADDR]
 
 	if {$session_id == ""} {
 	    set session_id [id]
@@ -408,7 +408,7 @@ package require Itcl
 
 	## Create their session by storing their session information in 
 	# the session table.
-	set a(ip_address) [env REMOTE_ADDR]
+	set a(ip_address) [::rivet::env REMOTE_ADDR]
 	set a(session_start_time) now
 	set a(session_update_time) now
 

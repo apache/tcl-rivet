@@ -1,3 +1,8 @@
+2016-11-22 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-class.tcl: now
+    fully qualifying mod_rivet commands
+    * doc/xml/formbroker.xml: correct coding example
+
 2016-11-19 Massimo Manghi <mxmanghi@apache.org>
     * src/mod-rivet/rivetInspect.c: now returning
     an empty string if a value is undefined
