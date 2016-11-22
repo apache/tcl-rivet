@@ -131,18 +131,15 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
     globals = apr_pcalloc (p, sizeof(rivet_interp_globals));
     Tcl_SetAssocData (interp,"rivet",NULL,globals);
     
-    /* 
-     * abort_page status variables in globals are set here and then 
-     * reset in Rivet_SendContent just before the request processing is 
-     * completed 
+    /*
+     * the ::rivet namespace is the only information still stored
+     * in the interpreter global data 
      */
 
     /* Rivet commands namespace is created */
 
     globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                             (Tcl_NamespaceDeleteProc *)NULL);
-
-    /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
     /* We put in front the auto_path list the path to the directory where
      * init.tcl is located (provides package Rivet, previously RivetTcl)

@@ -457,7 +457,7 @@ AC_DEFUN([APACHE_VERSION],[
         [with_apache_version="2"]
     )
 
-    AC_MSG_CHECKING(for apache version)
+    AC_MSG_CHECKING([for apache version])
     if test "$with_apache_version" = "1"; then
         AC_MSG_ERROR([Rivet 2.1 is no more supporting Apache 1.x])
     else
@@ -481,7 +481,7 @@ AC_DEFUN([MOD_RIVET_CORE],[
        [with_rivet_core="mod_rivet"]
     )
 
-    AC_MSG_CHECKING(mod_rivet core)
+    AC_MSG_CHECKING([mod_rivet core])
 
     #if [[ -d "src/${with_rivet_core}" ]]; then
     #    rivet_core=$(pwd)/src/${with_rivet_core}
@@ -543,7 +543,7 @@ AC_DEFUN([APACHE_REQUEST],[
         [with_apache_request="request"]
     )
 
-    AC_MSG_CHECKING(code for request handling)
+    AC_MSG_CHECKING([code for request handling])
     apache_request=${with_apache_request}
     AC_SUBST(apache_request)
     AC_MSG_RESULT([$apache_request])
@@ -561,7 +561,7 @@ AC_DEFUN([RIVET_CORE_CMDS],[
         [with_rivet_commands=$default_rivet_commands]
     )
 
-    AC_MSG_CHECKING(for Rivet core commands code)
+    AC_MSG_CHECKING([for Rivet core commands code])
     rivet_commands=${with_rivet_commands}
     AC_SUBST(rivet_commands)
     AC_MSG_RESULT([$rivet_commands])
@@ -579,7 +579,7 @@ AC_DEFUN([RIVET_CHANNEL],[
         [with_rivet_channel=$default_rivet_channel]
     )
 
-    AC_MSG_CHECKING(for Rivet channel code path)
+    AC_MSG_CHECKING([for Rivet channel code path])
     rivet_channel=${with_rivet_channel}
 
     AC_SUBST(rivet_channel)
@@ -596,7 +596,7 @@ AC_DEFUN([RIVET_TCL_LIB],[
         [  --with-rivet-target-dir=DIR  Rivet tcl and binary libraries target dir ],,
         with_rivet_target_dir="${apache_base}/lib/rivet${PACKAGE_VERSION}"
     )
-    AC_MSG_CHECKING(for Rivet libraries target)
+    AC_MSG_CHECKING([for Rivet libraries target])
     RIVET_TCL_TARGET=${with_rivet_target_dir}
     AC_SUBST(RIVET_TCL_TARGET)
     AC_MSG_RESULT([$with_rivet_target_dir])
@@ -617,7 +617,7 @@ AC_DEFUN([DISPLAY_RIVET_VERSION],[
     [ signature_version_display="no" ]
     )
 
-    AC_MSG_CHECKING(whether rivet version is printed in Apache signature)
+    AC_MSG_CHECKING([whether rivet version is printed in Apache signature])
     if test "$signature_version_display" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(DISPLAY_VERSION,1,[Display Rivet version in Apache signature])
@@ -666,7 +666,7 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
     [ honor_head_requests="no"]
     )
 
-    AC_MSG_CHECKING(whether Rivet has to honor HEAD requests)
+    AC_MSG_CHECKING([if Rivet has to honor HEAD requests])
     if test "$honor_head_requests" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(HEAD_REQUESTS,1,[Honor HEAD requests])
@@ -692,7 +692,7 @@ AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
     [ single_thread="no"]
     )
 
-    AC_MSG_CHECKING(whether MPM bridge has to run a single thread)
+    AC_MSG_CHECKING([if MPM bridge has to run a single thread])
     if test "$single_thread" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(MPM_SINGLE_TCL_THREAD,1,[yes, MPM worker single thread])
@@ -717,7 +717,7 @@ AC_DEFUN([HTTP_REQUESTS_MUTEX],[
         [ requests_serialization="no" ]
     )
 
-    AC_MSG_CHECKING([whether we want to serialize HTTP requests among threads])
+    AC_MSG_CHECKING([if we want to serialize HTTP requests among threads])
     if test "$requests_serialization" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(SERIALIZE_HTTP_REQUESTS,1,[requests will be serialized])
@@ -739,7 +739,7 @@ AC_DEFUN([RIVET_COMMANDS_EXPORT],[
         [ rivet_commands_export="yes"]
     )
 
-    AC_MSG_CHECKING(whether the commands in ::rivet namespace will be exported)
+    AC_MSG_CHECKING([if the commands in ::rivet namespace will be exported])
     if test "$rivet_commands_export" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(NAMESPACE_EXPORT,1,[commands will be exported])
@@ -762,7 +762,7 @@ AC_DEFUN([IMPORT_RIVET_COMMANDS],[
         [ import_rivet_commands="no"]
     )
 
-    AC_MSG_CHECKING(if ::rivet namespace will be automatically imported for compatibility)
+    AC_MSG_CHECKING([if ::rivet namespace will be automatically imported for compatibility])
     if test "$import_rivet_commands" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(NAMESPACE_IMPORT,1,[commands will be imported into the global namespace])

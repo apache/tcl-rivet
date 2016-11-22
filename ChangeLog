@@ -1,4 +1,12 @@
-2016-11-22  Damon J. Courtney <damon.courtney@gmail.com>
+2016-11-23 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/form/form.tcl,form2.tcl: fix full
+    qualification of the ::rivet::lempty command
+    * src/mod_rivet_ng/mod_rivet_common.c: changed or removed
+    old comments that don't apply to the current code
+    * configure.ac: now quoting strings when passed 
+    to macro AC_MSG_CHECKING
+
+2016-11-22 Damon J. Courtney <damon.courtney@gmail.com>
     * rivet/init.tcl.it: Rewrite init.tcl.in from the top down
 
 2016-11-22 Massimo Manghi <mxmanghi@apache.org>
