@@ -1,5 +1,6 @@
 2016-11-22 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/session/session-class.tcl: now
+    * rivet/packages/session/session-class.tcl:
+    * rivet/packages/form/form.tcl,form2.tcl: now
     fully qualifying mod_rivet commands
     * doc/xml/formbroker.xml: correct coding example
 

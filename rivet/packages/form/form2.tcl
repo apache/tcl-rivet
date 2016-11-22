@@ -242,14 +242,14 @@ package provide form 2.1
             # replicated in constructor
             import_data form $this arguments $args
         }
-        html "<form [argstring arguments]>"
+        ::rivet::html "<form [argstring arguments]>"
     }
 
     #
     # end - generate the </form>
     #
     method end {} {
-        html "</form>"
+        ::rivet::html "</form>"
     }
 
     #
@@ -311,7 +311,7 @@ package provide form 2.1
         }
 
         # ...and emit it
-        html $string
+        ::rivet::html $string
 
     }
 
@@ -587,7 +587,7 @@ package provide form 2.1
         } elseif {[default_exists $name]} {
 			set value [default_value_get $name]
 		}
-        html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
+        ::rivet::html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
     }
 
     #

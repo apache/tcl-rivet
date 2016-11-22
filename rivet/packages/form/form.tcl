@@ -179,14 +179,14 @@ package provide form 1.0
             # replicated in constructor
             import_data form $this arguments $args
         }
-        html "<form [argstring arguments]>"
+        ::rivet::html "<form [argstring arguments]>"
     }
 
     #
     # end - generate the </form>
     #
     method end {} {
-        html "</form>"
+        ::rivet::html "</form>"
     }
 
     #
@@ -247,7 +247,7 @@ package provide form 1.0
         }
 
         # ...and emit it
-        html $string
+        ::rivet::html $string
 
     }
 
@@ -475,7 +475,7 @@ package provide form 1.0
         }
 
         # emit the selector
-        html "<select name=\"$name\" [argstring data]>"
+        ::rivet::html "<select name=\"$name\" [argstring data]>"
 
         # emit each label-value pair
         foreach label $labels value $values {
@@ -484,9 +484,9 @@ package provide form 1.0
             } else {
             set string "<option value=\"$value\">"
             }
-            html "$string$label</option>"
+            ::rivet::html "$string$label</option>"
         }
-        html "</select>"
+        ::rivet::html "</select>"
     }
 
     #
@@ -499,7 +499,7 @@ package provide form 1.0
             set value $data(value)
             unset data(value)
         }
-        html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
+        ::rivet::html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
     }
 
     #
