@@ -1,3 +1,15 @@
+2016-11-28 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/: new configuration directives
+    RequestHandler (request handling procedure), ImportRivetNS
+    and ExportRivetNS (override parameters for
+    build options). RequestHandler enables rivet
+    to run an application specific request handler.
+    * src/mod_rivet_ng/rivetInspect.c: now runs also
+    during the server initialization stage. The whole
+    rivet core is setup during that phase but only
+    a few commands are actually operational (most
+    of them make sense only during an HTTP request processing)
+
 2016-11-23 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/form/form.tcl,form2.tcl: fix full
     qualification of the ::rivet::lempty command

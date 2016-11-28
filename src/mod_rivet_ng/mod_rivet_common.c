@@ -96,7 +96,16 @@ running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_error_script);
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_abort_script);
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,after_every_script);
-
+    /*
+    if (rivet_conf->request_handler == NULL)
+    {
+        scripts->request_processing = Tcl_NewStringObj(RIVET_CR_TERM(pool,"::Rivet::request_handling\n"),-1);
+    } else {
+        scripts->request_processing = Tcl_NewStringObj(rivet_conf->request_handler,-1);
+    } */
+    scripts->request_processing = Tcl_NewStringObj(rivet_conf->request_handler,-1);
+    Tcl_IncrRefCount(scripts->request_processing);
+    
     return scripts;
 }
 
@@ -166,7 +175,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
     Tcl_DecrRefCount(rivet_tcl);
 
     /* Initialize the interpreter with Rivet's Tcl commands. */
-    if (private != NULL) Rivet_InitCore(interp,private);
+    Rivet_InitCore(interp,private);
 
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables(interp,p);
@@ -189,8 +198,8 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
      *  This array will be unset after commands are exported.
      */
 
-    Tcl_SetVar2Ex(interp,"module_conf","export_namespace_commands",Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
-    Tcl_SetVar2Ex(interp,"module_conf","import_rivet_commands",Tcl_NewIntObj(RIVET_NAMESPACE_IMPORT),0);
+    //Tcl_SetVar2Ex(interp,"module_conf","export_namespace_commands",Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
+    //Tcl_SetVar2Ex(interp,"module_conf","import_rivet_commands",Tcl_NewIntObj(RIVET_NAMESPACE_IMPORT),0);
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
@@ -393,15 +402,15 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     }
     private->req_cnt        = 0;
     private->r              = NULL;
-    private->req            = TclWeb_NewRequestObject (private->pool);
+    private->req            = TclWeb_NewRequestObject(private->pool);
     private->page_aborting  = 0;
     private->thread_exit    = 0;
     private->exit_status    = 0;
     private->abort_code     = NULL;
-    private->request_init   = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
-    Tcl_IncrRefCount(private->request_init);
-    private->request_processing = Tcl_NewStringObj("::Rivet::request_handling\n",-1);
-    Tcl_IncrRefCount(private->request_processing);
+    //private->request_init   = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
+    //Tcl_IncrRefCount(private->request_init);
+    //private->request_processing = Tcl_NewStringObj("::Rivet::request_handling\n",-1);
+    //Tcl_IncrRefCount(private->request_processing);
     //private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
     //Tcl_IncrRefCount(private->request_cleanup);
     //private->default_error_script = Tcl_NewStringObj("::Rivet::handle_error\n",-1);

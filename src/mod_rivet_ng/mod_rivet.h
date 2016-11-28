@@ -91,12 +91,17 @@ typedef struct _rivet_server_conf {
     char*       rivet_global_init_script;   /* run once when apache is started */
     char*       rivet_child_init_script;
     char*       rivet_child_exit_script;
-    char*       rivet_before_script;        /* script run before each page      */
-    char*       rivet_after_script;         /*            after                 */
+    char*       request_handler;            /* request handler script           */
     char*       rivet_error_script;         /*            for errors            */
     char*       rivet_abort_script;         /* script run upon abort_page call  */
     char*       after_every_script;         /* script to be always run          */
-    //char*       rivet_default_error_script; /* for errors */
+
+    /* these scripts are kept for compatibility. They may disappear in future versions */
+
+    char*       rivet_before_script;        /* script run before each page      */
+    char*       rivet_after_script;         /*            after                 */
+
+    /* --------------------------------------------------------------------------- */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
@@ -108,6 +113,9 @@ typedef struct _rivet_server_conf {
     int             separate_virtual_interps;
     int             honor_header_only_reqs;
     int             separate_channels;      /* when true a vhosts get their private channel */
+    int             export_rivet_ns;        /* export the ::rivet namespace commands        */
+    int             import_rivet_ns;        /* import into the global namespace the
+                                               exported ::rivet commands                    */
     char*           server_name;
     const char*     upload_dir;
     apr_table_t*    rivet_server_vars;
@@ -131,6 +139,7 @@ typedef struct _rivet_server_conf {
 #define RIVET_INTERP_INITIALIZED    2
 
 typedef struct _interp_running_scripts {
+    Tcl_Obj*    request_processing;         /* request processing central procedure             */
     Tcl_Obj*    rivet_before_script;        /* script run before each page                      */
     Tcl_Obj*    rivet_after_script;         /*            after                                 */
     Tcl_Obj*    rivet_error_script;
@@ -199,8 +208,7 @@ typedef struct _thread_worker_private {
     rivet_req_ctype     ctype;              /*                                      */
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
-    Tcl_Obj*            request_init;
-    Tcl_Obj*            request_processing; /* request processing central procedure */
+    //Tcl_Obj*          request_init;
     Tcl_Obj*            request_cleanup;
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */

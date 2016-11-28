@@ -47,9 +47,10 @@ proc ::Rivet::init {} {
     ## Importing the ::rivet namespace is deprecated and we should
     ## make it clear in the manual.
 
-    set ::rivet::cmd_export_list [tcl_commands_export_list $::Rivet::rivet_tcl]
-    if {[info exists ::module_conf(export_namespace_commands)]
-        && $::module_conf(export_namespace_commands)} {
+    if {([::rivet::inspect ExportRivetNS] == 1) || \
+        ([::rivet::inspect ImportRivetNS] == 1)} {
+
+        set ::rivet::cmd_export_list [tcl_commands_export_list $::Rivet::rivet_tcl]
 
         ## init.tcl is run by mod_rivet (which creates the ::rivet
         ## namespace) but it gets run standalone by mkPkgindex during
@@ -78,11 +79,10 @@ proc ::Rivet::init {} {
 
     ## If Rivet was configured for backward compatibility, import commands
     ## from the ::rivet namespace into the global namespace.
-    if {[info exists ::module_conf(import_rivet_commands)]
-        && $::module_conf(import_rivet_commands)} {
+    if {[::rivet::inspect ImportRivetNS] == 1} {
         uplevel #0 { namespace import ::rivet::* }
     }
-    unset -nocomplain ::module_conf
+    #unset -nocomplain ::module_conf
 }
 
 ###
@@ -126,6 +126,8 @@ proc ::Rivet::handle_error {} {
 ## other bits and calls them in order.
 
 proc ::Rivet::request_handling {} {
+
+    catch {uplevel #0 ::Rivet::initialize_request}
     ::try {
         set script [::rivet::inspect BeforeScript]
         if {$script ne ""} {

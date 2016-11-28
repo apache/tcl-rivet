@@ -59,6 +59,9 @@ static const char* confDirectives[] =
                     "SeparateChannels",
                     "HonorHeaderOnlyRequests",
                     "MpmBridge",
+                    "RequestHandler",
+                    "ExportRivetNS",
+                    "ImportRivetNS",
                     NULL 
 };
 
@@ -79,6 +82,9 @@ enum confIndices {
                     separate_channels,
                     honor_header_only_requests,
                     mpm_bridge,
+                    request_handler,
+                    export_rivet_ns,
+                    import_rivet_ns,
                     conf_index_terminator 
 };
 
@@ -126,6 +132,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case global_init_script:        string_value = rsc->rivet_global_init_script; break;
         case child_init_script:         string_value = rsc->rivet_child_init_script; break;
         case child_exit_script:         string_value = rsc->rivet_child_exit_script; break;
+        case request_handler:           string_value = rsc->request_handler; break;
         case before_script:             string_value = rsc->rivet_before_script; break;
         case after_script:              string_value = rsc->rivet_after_script; break;
         case after_every_script:        string_value = rsc->after_every_script; break;
@@ -138,19 +145,20 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case separate_virtual_interps:  int_value = Tcl_NewIntObj(rsc->separate_virtual_interps); break;
         case separate_channels:         int_value = Tcl_NewIntObj(rsc->separate_channels); break;
         case honor_header_only_requests: int_value = Tcl_NewIntObj(rsc->honor_header_only_reqs); break;
+        case export_rivet_ns:           int_value = Tcl_NewIntObj(rsc->export_rivet_ns); break;
+        case import_rivet_ns:           int_value = Tcl_NewIntObj(rsc->import_rivet_ns); break;
         default: return NULL;
     }
 
+    /* this case is a bit convoluted and needs a more linear coding. 
+     * Basically: if the function hasn't returned (default branch in the 'switch' selector)
+     * that means the arguent was valid. Since any integer parameter would produce a valid Tcl_Obj
+     * pointer if both the int_value and string_value pointers are NULL that means the value
+     * was a NULL pointer to a string value. We therefore return an empty string 
+     */
 
     if ((string_value == NULL) && (int_value == NULL))
     {
-        /* this case is a bit convoluted and needs a more linear coding. 
-         * Basically: if the function hasn't returned (default branch in the 'switch' selector)
-         * that means the arguent was valid. Since any integer parameter would produce a valid Tcl_Obj
-         * pointer if both the int_value and string_value pointers are NULL that means the value
-         * was a NULL pointer to a string value. We therefore return an empty string 
-         */
-
         return Tcl_NewStringObj("",-1);
     }
     else if (string_value != NULL)

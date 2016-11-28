@@ -255,6 +255,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         goto sendcleanup;
     }
 
+    /*
     if (Tcl_EvalObjEx(interp, private->request_init, 0) == TCL_ERROR)
     {
         request_rec* r = private->r;
@@ -266,6 +267,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         retval = HTTP_INTERNAL_SERVER_ERROR;
         goto sendcleanup;
     }
+    */
 
     /* Apache Request stuff */
 
@@ -304,7 +306,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 
     /* URL referenced script execution and exception handling */
 
-    if (Tcl_EvalObjEx(interp, private->request_processing,0) == TCL_ERROR) 
+    if (Tcl_EvalObjEx(interp, private->running->request_processing,0) == TCL_ERROR) 
     //if (Rivet_ParseExecFile (private, private->r->filename, 1) != TCL_OK)
     //if (Rivet_ExecuteAndCheck(private,private->request_processing) == TCL_ERROR)
     {

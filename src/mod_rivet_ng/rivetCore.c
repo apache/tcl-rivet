@@ -1542,7 +1542,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
 
         if (STRNEQU(cmd_arg,"script"))
         {
-            if (private->r == NULL)
+            if ((private == NULL) || (private->r == NULL))
             {
                 Tcl_Obj* cmd = Tcl_NewStringObj("info script",-1);
 
@@ -1573,7 +1573,9 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             Tcl_Obj*    dictObj;
             server_rec* srec;
 
-            if (private->r == NULL) {
+            if (private == NULL) {
+                srec = module_globals->server;
+            } else if (private->r == NULL) {
                 srec = module_globals->server;
             } else {
                 srec = private->r->server;
@@ -1600,8 +1602,16 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         {
             Tcl_Obj* par_value = NULL;
 
-            CHECK_REQUEST_REC(private,"::rivet::inspect")
-            rsc = Rivet_GetConf(private->r); 
+            //CHECK_REQUEST_REC(private,"::rivet::inspect")
+            if (private == NULL)
+            {
+                rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+            } else if (private->r == NULL) {
+                rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+            } else {
+                rsc = Rivet_GetConf(private->r); 
+            }
+
             par_value = Rivet_ReadConfParameter(interp,rsc,par_name);
             if (par_value == NULL)
             {
@@ -1735,7 +1745,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
     /* if we are serving a page, we know our server, 
      * else send null for server
      */
-    serverRec = (private->r == NULL) ? NULL : private->r->server;
+    serverRec = ((private == NULL) || (private->r == NULL)) ? module_globals->server : private->r->server;
 
     ap_log_error (APLOG_MARK, apLogLevel, 0, serverRec, "%s", message);
     return TCL_OK;
@@ -1899,6 +1909,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 int
 Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 {
+    rivet_server_conf*      server_conf; 
 
 #if RIVET_NAMESPACE_EXPORT == 1
 #endif
@@ -1929,7 +1940,15 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
 #endif
 
-#if RIVET_NAMESPACE_EXPORT == 1
+    /*
+     * we don't need to check the virtual host server conf
+     * stored in 'private' in order to determine if we are
+     * export the command names, as this flag is meaningful
+     * at the global level
+     */
+    server_conf = RIVET_SERVER_CONF(module_globals->server->module_config);
+
+    if (server_conf->export_rivet_ns)
     {
         rivet_interp_globals *globals = NULL;
         Tcl_Namespace *rivet_ns;
@@ -1958,7 +1977,6 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
         RIVET_EXPORT_CMD(interp,rivet_ns,"inspect");
         // ::rivet::exit is not exported
     }
-#endif
 
     return TCL_OK;
 }

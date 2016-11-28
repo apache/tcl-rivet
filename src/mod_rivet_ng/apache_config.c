@@ -118,6 +118,8 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
         c = &rsc->rivet_child_init_script;
     } else if ( STREQU( script, "ChildExitScript" ) ) {
         c = &rsc->rivet_child_exit_script;
+    } else if ( STREQU( script, "RequestHandler" ) ) {
+        c = &rsc->request_handler;
     } else if ( STREQU( script, "BeforeScript" ) ) {
         c = &rsc->rivet_before_script;
     } else if ( STREQU( script, "AfterScript" ) ) {
@@ -210,6 +212,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 
     newrsc->rivet_server_init_script = oldrsc->rivet_server_init_script;
     newrsc->rivet_global_init_script = oldrsc->rivet_global_init_script;
+    newrsc->request_handler = oldrsc->request_handler;
     newrsc->rivet_before_script = oldrsc->rivet_before_script;
     newrsc->rivet_after_script = oldrsc->rivet_after_script;
     newrsc->rivet_error_script = oldrsc->rivet_error_script;
@@ -221,6 +224,8 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->upload_max = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
     newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
+    newrsc->export_rivet_ns = oldrsc->export_rivet_ns;
+    newrsc->import_rivet_ns = oldrsc->import_rivet_ns;
     newrsc->honor_header_only_reqs = oldrsc->honor_header_only_reqs;
     newrsc->separate_channels = oldrsc->separate_channels;
     newrsc->server_name = oldrsc->server_name;
@@ -273,6 +278,8 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
         add->rivet_child_init_script : base->rivet_child_init_script;
     new->rivet_child_exit_script = add->rivet_child_exit_script ?
         add->rivet_child_exit_script : base->rivet_child_exit_script;
+    new->request_handler = add->request_handler ?
+        add->request_handler : base->request_handler;
 
     new->rivet_before_script = add->rivet_before_script ?
         add->rivet_before_script : base->rivet_before_script;
@@ -406,6 +413,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
 
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_child_init_script)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_child_exit_script)
+    RIVET_CONF_SELECT(rsc,base,overrides,request_handler)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_before_script)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_after_script)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_error_script)
@@ -417,6 +425,8 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
     rsc->separate_channels = base->separate_channels;
+    rsc->import_rivet_ns = base->import_rivet_ns;
+    rsc->export_rivet_ns = base->export_rivet_ns;
     rsc->mpm_bridge = base->mpm_bridge;
     rsc->upload_max = base->upload_max;
     rsc->upload_dir = base->upload_dir;
@@ -454,6 +464,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->rivet_child_init_script    = NULL;
     rsc->rivet_child_exit_script    = NULL;
     rsc->rivet_before_script        = NULL;
+    rsc->request_handler            = "::Rivet::request_handling";
     rsc->rivet_after_script         = NULL;
     rsc->rivet_error_script         = NULL;
     rsc->rivet_abort_script         = NULL;
@@ -467,6 +478,8 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->upload_max                 = RIVET_MAX_POST;
     rsc->upload_files_to_var        = RIVET_UPLOAD_FILES_TO_VAR;
     rsc->separate_virtual_interps   = RIVET_SEPARATE_VIRTUAL_INTERPS;
+    rsc->export_rivet_ns            = RIVET_NAMESPACE_EXPORT;
+    rsc->import_rivet_ns            = RIVET_NAMESPACE_IMPORT;
     rsc->honor_header_only_reqs     = RIVET_HEAD_REQUESTS;
     rsc->separate_channels          = RIVET_SEPARATE_CHANNELS;
     rsc->upload_dir                 = RIVET_UPLOAD_DIR;
@@ -648,6 +661,10 @@ Rivet_ServerConf(cmd_parms *cmd,void *dummy,const char *var,const char *val)
         Tcl_GetBoolean (NULL, val, &rsc->separate_channels);
     } else if ( STREQU ( var, "MpmBridge" ) ) {
         rsc->mpm_bridge = val;
+    } else if ( STREQU (var, "ImportRivetNS")) {
+        Tcl_GetBoolean (NULL,val, &rsc->import_rivet_ns);
+    } else if ( STREQU (var,"ExportRivetNS")) {
+        Tcl_GetBoolean (NULL, val, &rsc->export_rivet_ns);
     } else {
         string = Rivet_SetScript( cmd->pool, rsc, var, val);
     }
