@@ -1,3 +1,6 @@
+2016-11-28 Massimo Manghi <mxmanghi@apache.org>
+    * .: releasing rivet 2.3.3
+
 2016-11-17 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Postgresql.tcl: applied
     consistent single quote character handling by
