@@ -1607,7 +1607,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             {
                 rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
             } else if (private->r == NULL) {
-                rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+                rsc = private->running_conf;
             } else {
                 rsc = Rivet_GetConf(private->r); 
             }

@@ -1,3 +1,15 @@
+2016-11-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivet_lazy_mpm.c:
+    * src/mod_rivet_ng/worker_prefork_mpm.c: setting
+    the running_conf pointer in the thread private
+    data enables ::rivet::inspect to return 
+    meaningful data even outside of request processing (in
+    the forms that make sense)
+    * src/mod_rivet_ng/rivetCore.c: more accurate
+    determination of the rivet_server_rec makes
+    possible to determine the pointer also
+    outside a request processing
+
 2016-11-28 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/: new configuration directives
     RequestHandler (request handling procedure), ImportRivetNS

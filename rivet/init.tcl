@@ -82,7 +82,7 @@ proc ::Rivet::init {} {
     if {[::rivet::inspect ImportRivetNS] == 1} {
         uplevel #0 { namespace import ::rivet::* }
     }
-    unset -nocomplain ::module_conf
+    #unset -nocomplain ::module_conf
 }
 
 ###

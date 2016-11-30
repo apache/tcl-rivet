@@ -64,7 +64,7 @@ typedef struct lazy_tcl_worker {
     rivet_server_conf*  conf;               /* rivet_server_conf* record            */
 } lazy_tcl_worker;
 
-/* virtual host descriptor */
+/* virtual host thread queue descriptor */
 
 typedef struct vhost_iface {
     int                 idle_threads_cnt;   /* idle threads for the virtual hosts       */
@@ -148,6 +148,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     private = Rivet_ExecutionThreadInit();
 
+    /* at thread initialization the running conf is determined by the context
+     * of exectution. The lazy bridge threads are associated to a single virtual.
+     * host. We let the interpreter inizialization run with its configuration
+     * stored in the running_conf field */ 
+
+    private->running_conf = rsc;
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);

@@ -1,17 +1,31 @@
 <section id="lazybridge">
     <title>Example: the <quote>Lazy</quote> bridge</title>
 	<section>
-	<title>The rationale of threaded bridges</title>
-    <para>
-    	
-    	The 'bridge' concept was introduced to cope with the ability of 
-    	the Apache HTTP web server to adopt different multiprocessing 
-    	models loading one of the available MPMs (Multi Processing Modules). 
-		A bridge primary task is to adapt mod_rivet internal calls so that it fits
-		the running multiprocessing model, but separating mod_rivet core 
-		function from the MPM machinery worked also a solution for
-		a flexible and extensible approach to workload and resource management. 
-   </para>
+		<title>The rationale of threaded bridges</title>
+    	<para>    	
+	    	The 'bridge' concept was introduced to cope with the ability of 
+	    	the Apache HTTP web server to adopt different multiprocessing 
+	    	models by loading one of the available MPMs (Multi Processing Modules). 
+			A bridge's task is to let mod_rivet fit the selected multiprocessing
+			model in the first place. Still separating mod_rivet core
+			functions from the MPM machinery provided also a solution for
+			implementing a flexible and extensible design that enables 
+			a programmer to develop alternative approaches to workload and 
+			resource management. 
+   	</para>
+   	<para>
+   		The Apache HTTP web server demands its module to
+   		run with any MPM irrespective of its internal architecture and its
+   		a general design constrain to make no assumptions about the MPM. 
+   		Unfortunately for Tcl is a relevant fact to be running as only execution
+   		thread within a process (like with the 'prefork' MPM) 
+   		or within one of many execution threads. First of all Tcl is itself 
+   		threaded (unless threads are disabled at compile time) and many
+   		of the basic Tcl data structures (namely Tcl_Obj) cannot be safely 
+   		shared among threads. This demands that Tcl interpreters run 
+   		on separated threads communicating with the HTTP web server 
+   		through suitable methods.
+   	</para>
 	</section>
 	<section>
 	 <title>Lazy bridge data structures</title>

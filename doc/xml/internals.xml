@@ -46,13 +46,14 @@
     		<listitem>rivet_worker_mpm.c: a threaded bridge creating a pool of threads
     		each running Tcl interpreters and communicating with the worker MPM threads
     		through a thread safe queue. This bridge is needed by the worker MPM.</listitem>
+    		<listitem>rivet_lazy_mpm.c: a threaded bridge where Tcl threads are
+    		started <quote>on demand</quote>. The bridge creates no threads and Tcl interpreters
+    		at start up and only when requests come in Tcl execution threads are created.
+    		This bridge is explained in detail in the <xref linkend="lazybridge">next section</xref>.     		
+    		Since the resource demand at startup is minimal this bridge should work well for 
+    		development machines that go through frequent web server restarts or desktop machines
+    		in use also for other tasks.</listitem>
     	</itemizedlist>
-    	<para>
-    		A third bridge for threaded MPMs (rivet_lazy_mpm.c) is under development and it aims at
-    		a more conservative resource consumption that suits well the need of web sites having
-    		low to middle workload and many virtual hosts having a roughly uniform workload distribution.
-    		This bridge should work well also for development web servers.
-    	</para>
     </section>
     <section>
     	<title>mod_rivet MPM Bridge callbacks</title> 
@@ -66,7 +67,11 @@
     		statements that implied useless complexity, error prone programming and performance costs. 
     		New bridges could be imagined also to implement different models of workload
     		distribution and resource management (like the resources demanded by the Tcl interpreters). 
-			We designed mod_rivet in order to call functions defined in the rivet_bridge_table structure    		
+			We designed an interface between the core of mod_rivet and its MPM bridges 
+			based on a set of functions defined in the rivet_bridge_table structure. 
+			Many of these functions need not to be defined if the bridge model
+			they implement does not require it. Two of them (mpm_request, mpm_thread_interp)
+			must be implemented and defined 		
     	</para>
     	<programlisting>typedef struct _mpm_bridge_table {
     RivetBridge_ServerInit    *mpm_server_init;
@@ -97,7 +102,13 @@
 					purpose of a content generator module (like mod_rivet) is to respond
 					to requests creating content, thus whatever it is
 					a content generating function must exist (during the early stages of
-					development you can create a simple test function for that)
+					development you can create a simple test function for that). In a
+					threaded MPM this function typically prepares the request processing 
+					stuffing somewhere the pointer to the request_rec structure 
+					passed by the web server and then it calls some method to communicate
+					these data to the Tcl execution thread waiting for result to be
+					returned. The <quote>prefork</quote> is an exception since there
+					are no multiple threads and the bridge calls directly Rivet_SendContent
 				</listitem>
 				<listitem>
 					<emphasis>mpm_finalize</emphasis>: pointer to a finalization
@@ -108,7 +119,8 @@
 					in the <emphasis>worker</emphasis> MPM bridge notifies
 					a supervisor thread demanding the whole pool of threads running Tcl 
 					interpreters to orderly exit. This pointer can be NULL if the bridge 
-					has no special need when a child process must exit.
+					has no special need when a child process must exit (unlikely if you have
+					multiple threads running)
 				</listitem>
 				<listitem>
 					<emphasis>mpm_exit_handler</emphasis>: mod_rivet replaces
@@ -153,10 +165,10 @@
       <para>
 			The <structname>RivetChan</structname> system was created in
 			order to have an actual Tcl channel that we could redirect
-			standard output to.  This lets us use, for instance, the
+			standard output to.  This enables us use, for instance, the
 			regular <command>puts</command> command in .rvt pages.  It
 			works by creating a channel that buffers output, and, at
-			predetermined times, passes it on to Apache's IO system.
+			predetermined times, passes it on to Apache's I/O system.
 			Tcl's regular standard output is replaced with an instance of
 			this channel type, so that, by default, output will go to the
 			web page. 

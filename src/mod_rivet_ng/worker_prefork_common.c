@@ -179,6 +179,14 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         private->ext->interps[myrsc->idx] = rivet_interp;
 
+        /* Let's fetch the virtual host configuration and stuff 
+         * its pointer in the running_conf field of the private data.
+         * Commands running in the initialization context know how to get 
+         * the configuation from it (e.g. ::rivet::inspect)
+         */
+
+        private->running_conf = myrsc;
+
         /* Basic Rivet packages and libraries are loaded here */
 
         if ((rivet_interp->flags & RIVET_INTERP_INITIALIZED) == 0)
