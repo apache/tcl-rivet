@@ -174,6 +174,16 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
 
     Tcl_DecrRefCount(rivet_tcl);
 
+    /* If the thread has private data we stuff the server conf
+     * pointer in the 'running_conf' field.
+     * Commands running ouside the request processing know how to
+     * get the configuration from the initialization context 
+     * (e.g. ::rivet::inspect). If private is null they get the
+     * server configuration from module_globals->server
+     */
+
+    if (private != NULL) private->running_conf = RIVET_SERVER_CONF (s->module_config);
+
     /* Initialize the interpreter with Rivet's Tcl commands. */
     Rivet_InitCore(interp,private);
 

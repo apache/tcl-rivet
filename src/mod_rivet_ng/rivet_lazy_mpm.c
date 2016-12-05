@@ -148,12 +148,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     private = Rivet_ExecutionThreadInit();
 
-    /* at thread initialization the running conf is determined by the context
-     * of exectution. The lazy bridge threads are associated to a single virtual.
-     * host. We let the interpreter inizialization run with its configuration
-     * stored in the running_conf field */ 
-
-    private->running_conf = rsc;
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
@@ -163,7 +157,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private->ext->interp->scripts = 
             Rivet_RunningScripts (private->pool,private->ext->interp->scripts,rsc);
 
-    Rivet_PerInterpInit(private->ext->interp,private,module_globals->server,private->pool);
+    Rivet_PerInterpInit(private->ext->interp,private,w->server,private->pool);
     
     Lazy_RunConfScript(private,w,child_init);
 

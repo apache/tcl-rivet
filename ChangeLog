@@ -1,3 +1,12 @@
+2016-12-05 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-class.tcl: new
+    method synch saves in the session cache data
+    coming from form
+    * src/mod_rivet_ng/mod_rivet_common.c: more
+    careful design assign to a single function
+    the task of determining the current configuration
+    when an interpreter is initialized
+
 2016-11-30 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivet_lazy_mpm.c:
     * src/mod_rivet_ng/worker_prefork_mpm.c: setting

@@ -106,7 +106,7 @@ package require Itcl
     constructor {args} {
 	eval configure $args
     	$dioObject registerSpecialField $sessionTable session_update_time NOW
-	$dioObject registerSpecialField $sessionTable session_start_time NOW
+	    $dioObject registerSpecialField $sessionTable session_start_time NOW
     }
 
     method status {args} {
@@ -347,13 +347,30 @@ package require Itcl
     }
 
     #
+    # stash -
+    #
+    #
+
+    method stash {packageName keyvalue_d} {
+
+        dict for {key value} $keyvalue_d {
+
+            $this store $packageName $key $value
+
+        }
+
+    }
+
+
+    #
     # load - given a package names returns a dictionary storing the key - value pairs for this session
     #
     #
     method load {packageName} {
         set package_d [dict create]
         
-        $dioObject forall "select key_,data from $sessionCacheTable where package_='$packageName' and session_id='[$this id]'" a {
+        $dioObject forall \
+        "select key_,data from $sessionCacheTable where package_='$packageName' and session_id='[$this id]'" a {
             dict set package_d $a(key_) $a(data)
         }
 
