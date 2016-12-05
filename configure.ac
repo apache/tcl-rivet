@@ -478,7 +478,7 @@ AC_DEFUN([MOD_RIVET_CORE],[
     AC_ARG_WITH(
        rivet_core,
        [  --with-rivet-core[=path] mod_rivet core directory],,
-       [with_rivet_core="mod_rivet"]
+       [with_rivet_core="mod_rivet_ng"]
     )
 
     AC_MSG_CHECKING([mod_rivet core])

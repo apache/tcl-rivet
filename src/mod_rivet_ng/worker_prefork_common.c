@@ -183,7 +183,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         if ((rivet_interp->flags & RIVET_INTERP_INITIALIZED) == 0)
         {
-            Rivet_PerInterpInit(rivet_interp, private, root_server, private->pool);
+            Rivet_PerInterpInit(rivet_interp, private, s, private->pool);
         }
 
         /*  TODO: check if it's absolutely necessary to lock the pool_mutex in order

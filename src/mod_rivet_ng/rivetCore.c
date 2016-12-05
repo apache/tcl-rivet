@@ -1591,6 +1591,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         }
         else if (STRNEQU(cmd_arg,"exit"))
         {
+            CHECK_REQUEST_REC(private,"::rivet::inspect")
             /* thread exit status flag */
             Tcl_Obj* exit_flag = Tcl_NewIntObj(private->thread_exit);
 
