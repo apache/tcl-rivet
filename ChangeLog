@@ -1,3 +1,17 @@
+2016-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: mod_rivet_ng now default for
+    builing mod_rivet
+    * src/mod_rivet_ng/rivetCore.c: safer condition
+    testing should avoid assumptions about how
+    the compiler builds pointer comparisons
+    * src/mod_rivet_ng/worker_prefork_common.c: 
+    before running the child init script the
+    running configuration pointer is the thread
+    private data has to be set
+    * tests/broken.test: new error message structure
+    * tests/checkfails.tcl, failtest.tcl: changed
+    value returned by one of the tests
+
 2016-12-05 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/session/session-class.tcl: new
     method synch saves in the session cache data

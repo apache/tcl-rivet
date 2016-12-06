@@ -1,11 +1,13 @@
-
+#
 # -- check_inspect 
 #
 # tests ::rivet::inspect in its different forms
 #
+::rivet::apache_log_error info "preparing failtest array"
 
 proc check_inspect { cmd_form args } {
 
+    ::rivet::apache_log_error info "checking cmd_form $cmd_form ($args)"
     set ::failtest(inspect${cmd_form}) 0
     
     set cmdeval [list ::rivet::inspect {*}$args]
@@ -49,3 +51,4 @@ check_inspect 2 -all
 check_inspect 3 server
 check_inspect 4 script
 
+::rivet::apache_log_error info [array get ::failtest]

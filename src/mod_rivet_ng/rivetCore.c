@@ -1542,19 +1542,22 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
 
         if (STRNEQU(cmd_arg,"script"))
         {
-            if ((private == NULL) || (private->r == NULL))
-            {
-                Tcl_Obj* cmd = Tcl_NewStringObj("info script",-1);
 
-                Tcl_IncrRefCount(cmd); 
-                status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
-                Tcl_DecrRefCount(cmd); 
-            }            
-            else
+            if (private != NULL)
             {
-                Tcl_SetObjResult(interp,Tcl_NewStringObj(private->r->filename,-1));
-                status = TCL_OK;
+                if (private->r != NULL)
+                {
+                    Tcl_SetObjResult(interp,Tcl_NewStringObj(private->r->filename,-1));
+                    return TCL_OK;
+                }
             }
+
+            Tcl_Obj* cmd = Tcl_NewStringObj("info script",-1);
+
+            Tcl_IncrRefCount(cmd); 
+            status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
+            Tcl_DecrRefCount(cmd); 
+        
         } 
         else if (STRNEQU(cmd_arg,"-all"))
         {
@@ -1575,10 +1578,14 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
 
             if (private == NULL) {
                 srec = module_globals->server;
-            } else if (private->r == NULL) {
-                srec = module_globals->server;
             } else {
-                srec = private->r->server;
+
+                if (private->r == NULL) {
+                    srec = module_globals->server; 
+                } else {
+                    srec = private->r->server;
+                }
+
             }
 
             /* we read data from the server_rec */
@@ -1604,13 +1611,16 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             Tcl_Obj* par_value = NULL;
 
             //CHECK_REQUEST_REC(private,"::rivet::inspect")
-            if (private == NULL)
-            {
+            if (private == NULL) {
                 rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
-            } else if (private->r == NULL) {
-                rsc = private->running_conf;
             } else {
-                rsc = Rivet_GetConf(private->r); 
+
+                if (private->r == NULL) {
+                    rsc = private->running_conf;
+                } else {
+                    rsc = Rivet_GetConf(private->r); 
+                }
+
             }
 
             par_value = Rivet_ReadConfParameter(interp,rsc,par_name);

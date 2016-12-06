@@ -218,6 +218,13 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
              * any sense. TODO
              */
 
+            /* before we run a script we have to store the pointer to the
+               running configuration in the thread private data. The design has
+               to improve and running a script must have everything sanely
+               prepared TODO */ 
+
+            private->running_conf = myrsc;
+
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              errmsg, function);

@@ -5,6 +5,8 @@
 # in the ChildInitScript procedure (source checkfail.tcl)
 # 
 #
+::rivet::apache_log_error info "running [info script]"
 foreach cmd [lsort [array names ::failtest]] {
     puts "$cmd->$::failtest($cmd)"
 }
+::rivet::apache_log_error info "failtest terminates"
