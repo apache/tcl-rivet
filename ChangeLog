@@ -1,3 +1,11 @@
+2016-12-07 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-class.tcl:
+    * rivet/packages/session/form*.tcl: fully qualifying
+    ::rivet::* command names in this packages
+    * src/librivet/rivetWWW.c: new buffer size allocation
+    to prevent apache from crashing when too many
+    characters needed escaping are in a string
+
 2016-11-28 Massimo Manghi <mxmanghi@apache.org>
     * .: releasing rivet 2.3.3
 

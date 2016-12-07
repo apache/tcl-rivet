@@ -180,7 +180,7 @@ TCL_CMD_HEADER( Rivet_EscapeStringCmd )
     /* If they sent us an empty string, we're done */
     if (origLength == 0) return TCL_OK;
 
-    newString = (char *)Tcl_Alloc( (unsigned)origLength * 3 + 1 );
+    newString = (char *)Tcl_Alloc( (unsigned)origLength * 6 + 1 );
 
     /* for all the characters in the source string */
     for (origStringP = origString, newStringP = newString;
