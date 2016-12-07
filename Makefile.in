@@ -375,7 +375,6 @@ am__tar = @am__tar@
 am__untar = @am__untar@
 apache_include = @apache_include@
 apache_request = @apache_request@
-apache_version_dir = @apache_version_dir@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@

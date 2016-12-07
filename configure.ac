@@ -266,34 +266,31 @@ AC_DEFUN([CHECK_APXS],[
         [  --with-apxs=FILE        location of Apache apxs tool],  
         [if test -x "${with_apxs}" ; then
             apxs_found="${with_apxs}"
-                AC_MSG_RESULT([$apxs_found])
-        fi]
+            AC_MSG_RESULT([$apxs_found])
+         fi]
         ,
         [ 
-        APXS_NAMES=apxs
-        if test "${apache_version}"="2"; then
-            APXS_NAMES="$APXS_NAMES apxs2"
-        fi
-        for apxs_file in ${APXS_NAMES}; do 
-            for apxs_path in bin sbin; do 
-                 if test -x "${apache_base}"/"${apxs_path}"/"${apxs_file}"; then
-                        apxs_found="${apache_base}"/"${apxs_path}"/"${apxs_file}" 
-                        break 2
-                  fi
+            APXS_NAMES=apxs
+            for apxs_file in ${APXS_NAMES}; do 
+                for apxs_path in bin sbin; do 
+                     if test -x "${apache_base}"/"${apxs_path}"/"${apxs_file}"; then
+                            apxs_found="${apache_base}"/"${apxs_path}"/"${apxs_file}" 
+                            break 2
+                      fi
+                done
             done
-        done
-        if test x"$apxs_found" = x; then
-            AC_PATH_PROGS(with_apxs, apxs)
-            if test "${with_apxs+set}" = set ; then
-                apxs_found="${with_apxs}"
+            if test x"$apxs_found" = x; then
+                AC_PATH_PROGS(with_apxs, apxs)
+                if test "${with_apxs+set}" = set ; then
+                    apxs_found="${with_apxs}"
+                fi
             fi
-        fi
-        if test x"${apxs_found}" = x; then
-            AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
-        else
-            AC_MSG_RESULT([$apxs_found])
-        fi
-       ]
+            if test x"${apxs_found}" = x; then
+                AC_MSG_ERROR([Could not find apxs.  apxs must be in your PATH or you must specify the location of the apxs script using --with-apxs])
+            else
+                AC_MSG_RESULT([$apxs_found])
+            fi
+        ]
     )
     if test "${apxs_found+set}" = set ; then
         dnl At this point we already have apr sorted out
@@ -442,32 +439,6 @@ AX_COMPARE_VERSION([$TCL_VERSION],[eq],[8.6],[
         print_fileevent_msg="1"
     fi
 ] , )
-
-# APACHE_VERSION
-#
-# let's determine whether we are building for apache1.x or apache2.x.
-# This variable has consequences on the default values for the remaining 
-# site options. We try to guess some of them. 
-#
-
-AC_DEFUN([APACHE_VERSION],[
-    AC_ARG_WITH(
-        apache_version,
-        [  --with-apache-version[=VER]  build for apache 1.x or 2.x],,
-        [with_apache_version="2"]
-    )
-
-    AC_MSG_CHECKING([for apache version])
-    if test "$with_apache_version" = "1"; then
-        AC_MSG_ERROR([Rivet 2.1 is no more supporting Apache 1.x])
-    else
-        AC_MSG_RESULT([building for apache 2.x])
-        AC_CONFIG_FILES([src/apache-2/Makefile])
-        apache_version_dir="apache-2"
-        AC_DEFINE(APACHE2,1,[APACHE2 definition in config.h])
-    fi
-    MOD_RIVET_INCLUDES="-I${apache_version_dir}"
-])
 
 # MOD_RIVET_CORE
 #
@@ -881,7 +852,7 @@ else
 fi
 AC_C_INLINE
 
-AC_SUBST(apache_version_dir)
+#AC_SUBST(apache_version_dir)
 AC_SUBST(MOD_RIVET_INCLUDES)
 
 AC_DEFINE_UNQUOTED(RIVETLIB_DESTDIR,"${RIVET_TCL_TARGET}",[The path to the rivet tcl library])

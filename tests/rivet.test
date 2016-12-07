@@ -29,6 +29,8 @@ set testgroup1 1
 set testgroup2 1
 set testgroup3 1
 
+#lappend TestList failtest.test
+
 # Run all tests against one server process.
 
 if { $testgroup1 } {

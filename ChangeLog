@@ -1,3 +1,9 @@
+2016-12-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/librivet/rivetWWW.c: enlarging buffer 
+    allocated in ::rivet::escape_sgml_chars
+    * configure.ac: removed test on the apache
+    version (we don't support apache-1 anymore)
+    
 2016-12-06 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: mod_rivet_ng now default for
     builing mod_rivet
