@@ -138,7 +138,7 @@ package provide form 1.0
     # name (and the new default value is returned).
     #
     method default_value {name {newValue ""}} {
-	if {[lempty $newValue]} {
+	if {[::rivet::lempty $newValue]} {
 	    if {![info exists DefaultValues($name)]} { return }
 	    return $DefaultValues($name)
 	}
@@ -157,7 +157,7 @@ package provide form 1.0
     method default_args {type args} {
 
         # if only one argument was specified
-        if {[lempty $args]} {
+        if {[::rivet::lempty $args]} {
             if {![info exists DefaultArgs($type)]} { return }
             return $DefaultArgs($type)
         }
@@ -175,7 +175,7 @@ package provide form 1.0
     # start - generate the <form> with all of its arguments
     #
     method start {{args ""}} {
-        if {![lempty $args]} {
+        if {![::rivet::lempty $args]} {
             # replicated in constructor
             import_data form $this arguments $args
         }
@@ -421,7 +421,7 @@ package provide form 1.0
 
         set list [import_data radiobuttons $name data $args]
 
-        if {[lempty $data(labels)]} { 
+        if {[::rivet::lempty $data(labels)]} { 
             set data(labels) $data(values) 
         }
 
@@ -470,7 +470,7 @@ package provide form 1.0
         # if there are no separate labels defined, use the list of
         # values for the labels
         #
-        if {[lempty $labels]} { 
+        if {[::rivet::lempty $labels]} { 
             set labels $values 
         }
 

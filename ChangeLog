@@ -1,5 +1,7 @@
 2016-12-07 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/session/session-class.tcl:
+    * rivet/packages/session/session-class.tcl: fully qualifying
+    ::rivet::* command names in this packages. Add method
+    'stash' to store form data in the session cache
     * rivet/packages/session/form*.tcl: fully qualifying
     ::rivet::* command names in this packages
     * src/librivet/rivetWWW.c: new buffer size allocation
