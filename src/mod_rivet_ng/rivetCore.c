@@ -1869,7 +1869,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
         if (Rivet_CheckType(private->r) == RIVET_TEMPLATE)
         {
-            result = Rivet_GetRivetFile(private->r->filename, 1, script, interp);
+            result = Rivet_GetRivetFile(private->r->filename, 0, script, interp);
 
         } else {
 

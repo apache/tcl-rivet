@@ -1,3 +1,13 @@
+2016-12-12 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl.in: [url_script] now evaluated
+    explicitly in the ::request name space. We
+    don't need the Rivet parser to place a script
+    in this namespace
+    * rivet/mod_rivet_ng/rivetCore.c: now Rivet_GetRivetFile
+    is called with the flag 'toplevel' set to zero. The
+    code handling this flag could be removed if we 
+    abandoned the traditional mod_rivet core
+
 2016-12-07 Massimo Manghi <mxmanghi@apache.org>
     * src/librivet/rivetWWW.c: enlarging buffer 
     allocated in ::rivet::escape_sgml_chars
