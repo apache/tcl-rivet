@@ -301,7 +301,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     if (USER_CONF_UPDATED(private->running_conf) && (interp_obj->cache_size != 0) && 
                                                     (interp_obj->cache_free < interp_obj->cache_size)) 
     {
-        Rivet_CacheCleanup(private,interp_obj);
+        RivetCache_Cleanup(private,interp_obj);
     }
 
     /* URL referenced script execution and exception handling */

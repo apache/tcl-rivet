@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "mod_rivet.h"
+#include "mod_rivet_cache.h"
 #include "rivetChannel.h"
 #include "mod_rivet_common.h"
 #include "TclWeb.h"
@@ -292,7 +293,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
     // Initialize cache structures
 
     if (interp_obj->cache_size) {
-        Rivet_CreateCache(pool,interp_obj); 
+        RivetCache_Create(pool,interp_obj); 
     }
 
     interp_obj->flags           = 0;

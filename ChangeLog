@@ -1,3 +1,7 @@
+2016-12-19 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/mod_rivet_ng/mod_rivet_cache.c: better wording of cache 
+    functions names. 
+
 2016-12-12 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: [url_script] now evaluated
     explicitly in the ::request name space. We

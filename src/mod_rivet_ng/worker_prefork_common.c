@@ -25,6 +25,7 @@
 #include <apr_strings.h>
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
+#include "mod_rivet_cache.h"
 #include "worker_prefork_common.h"
 
 extern mod_rivet_globals* module_globals;
@@ -51,7 +52,7 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
     /* TODO: decouple cache by creating a new cache object */
 
     if (interp_obj->cache_size) {
-        Rivet_CreateCache(pool,interp_obj); 
+        RivetCache_Create(pool,interp_obj); 
     }
 
     interp_obj->pool            = source_obj->pool;

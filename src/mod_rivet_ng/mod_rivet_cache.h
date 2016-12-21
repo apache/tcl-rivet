@@ -21,15 +21,15 @@
 #ifndef __mod_rivet_cache_h__
 #define __mod_rivet_cache_h__
 
-EXTERN void  Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
-EXTERN void  Rivet_CacheCleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp);
-EXTERN char* Rivet_MakeCacheKey (apr_pool_t* pool, char*         filename,
-                                                      time_t        ctime, 
-                                                      time_t        mtime,
-                                                      unsigned int  user_conf,
-                                                      int           toplevel);
-EXTERN Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew);
-EXTERN Tcl_Obj* Rivet_CacheFetchScript (Tcl_HashEntry* entry);
-EXTERN int Rivet_CacheStoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* entry, Tcl_Obj* script);
+EXTERN void  RivetCache_Create  (apr_pool_t *p, rivet_thread_interp* interp_obj);
+EXTERN void  RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp);
+EXTERN char* RivetCache_MakeKey (apr_pool_t* pool, char*         filename,
+                                                   time_t        ctime, 
+                                                   time_t        mtime,
+                                                   unsigned int  user_conf,
+                                                   int           toplevel);
+EXTERN Tcl_HashEntry* RivetCache_EntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew);
+EXTERN Tcl_Obj* RivetCache_FetchScript (Tcl_HashEntry* entry);
+EXTERN int RivetCache_StoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* entry, Tcl_Obj* script);
 
 #endif /* __mod_rivet_cache_h__ */

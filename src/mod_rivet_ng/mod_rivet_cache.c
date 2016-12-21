@@ -17,6 +17,9 @@
     specific language governing permissions and limitations
     under the License.
 */
+
+/* $Id: */
+
 #include <apr_strings.h>
 
 #include "mod_rivet.h"
@@ -25,7 +28,7 @@
 extern mod_rivet_globals* module_globals;
 
 /*
- * -- Rivet_CreateCache 
+ * -- RivetCache_Create 
  *
  * Creates a per interpreter script cach
  *
@@ -41,7 +44,7 @@ extern mod_rivet_globals* module_globals;
  *
  */
 
-void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
+void RivetCache_Create (apr_pool_t *p, rivet_thread_interp* interp_obj)
 {
     interp_obj->objCacheList = 
                 apr_pcalloc(p,(signed)((interp_obj->cache_size)*sizeof(char *)));
@@ -52,7 +55,7 @@ void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
 }
 
 /*
- * -- Rivet_CacheCleanup
+ * -- RivetCache_Cleanup
  *
  * Cache clean-up. This function is called when a user configuration
  * is changed thus invalidating the whole cache. A better solution is
@@ -69,7 +72,7 @@ void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj)
  *      the cache associated to the thread interpreter is emptied
  */
 
-void Rivet_CacheCleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp)
+void RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp)
 {
     int ct;
     Tcl_HashEntry *delEntry;
@@ -120,7 +123,7 @@ void Rivet_CacheCleanup (rivet_thread_private* private,rivet_thread_interp* rive
  *      int                 toplevel   - toplevel template
  */
 
-char* Rivet_MakeCacheKey (apr_pool_t*   pool,
+char* RivetCache_MakeKey (apr_pool_t*   pool,
                           char*         filename,
                           time_t        ctime, 
                           time_t        mtime,
@@ -132,7 +135,7 @@ char* Rivet_MakeCacheKey (apr_pool_t*   pool,
 }
 
 /*
- * -- Rivet_CacheEntryLookup
+ * -- RivetCache_EntryLookup
  *
  * Cache entry lookiup. A hash table lookup key is created and an entry
  * searched in the cache. If an entry is not found the function returns NULL
@@ -148,7 +151,7 @@ char* Rivet_MakeCacheKey (apr_pool_t*   pool,
  *
  */
 
-Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew)
+Tcl_HashEntry* RivetCache_EntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew)
 {
     Tcl_HashEntry*  entry = NULL;
 
@@ -158,7 +161,7 @@ Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* h
 }
 
 /*
- * -- Rivet_CacheFetchScript
+ * -- RivetCache_FetchScript
  *
  * Cache entry lookiup. A hash table lookup key is created and an entry
  * searched in the cache. If an entry is not found the function returns NULL
@@ -172,16 +175,16 @@ Tcl_HashEntry* Rivet_CacheEntryLookup (rivet_thread_interp* rivet_interp,char* h
  * Side Effects:
  *
  */
-Tcl_Obj* Rivet_CacheFetchScript (Tcl_HashEntry* entry)
+Tcl_Obj* RivetCache_FetchScript (Tcl_HashEntry* entry)
 {
     return (Tcl_Obj *)Tcl_GetHashValue(entry);
 }
 
-/* -- Rivet_CacheStoreScript 
+/* -- RivetCache_StoreScript 
  *
  */
 
-int Rivet_CacheStoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* entry, Tcl_Obj* script)
+int RivetCache_StoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* entry, Tcl_Obj* script)
 {
     if (rivet_interp->cache_size) {
 

@@ -281,13 +281,13 @@ TCL_CMD_HEADER( Rivet_Parse )
     /* */
 
     cache_key = 
-        Rivet_MakeCacheKey( private->pool,
+        RivetCache_MakeKey( private->pool,
                             private->r->filename,
                             finfo_b.ctime,finfo_b.mtime,
                             IS_USER_CONF(private->running_conf),0);
 
     rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
-    entry = Rivet_CacheEntryLookup (rivet_interp,cache_key,&isNew);
+    entry = RivetCache_EntryLookup (rivet_interp,cache_key,&isNew);
 
     if (isNew)
     {
@@ -301,9 +301,9 @@ TCL_CMD_HEADER( Rivet_Parse )
             return result;
         }
         
-        Rivet_CacheStoreScript(rivet_interp,entry,script);
+        RivetCache_StoreScript(rivet_interp,entry,script);
     } else {
-        script = Rivet_CacheFetchScript(entry);
+        script = RivetCache_FetchScript(entry);
     }
 
     return Tcl_EvalObjEx(interp,script,0); 
@@ -1842,9 +1842,9 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
     ctime = private->r->finfo.ctime;
     mtime = private->r->finfo.mtime;
-    cache_key = Rivet_MakeCacheKey(private->pool,private->r->filename,ctime,mtime,user_conf,1);
+    cache_key = RivetCache_MakeKey(private->pool,private->r->filename,ctime,mtime,user_conf,1);
 
-    entry = Rivet_CacheEntryLookup (rivet_interp,cache_key,&isNew);
+    entry = RivetCache_EntryLookup (rivet_interp,cache_key,&isNew);
     if (isNew)
     {
         Tcl_Interp*     interp;
@@ -1890,11 +1890,11 @@ TCL_CMD_HEADER( Rivet_UrlScript )
         }
     */
 
-        Rivet_CacheStoreScript(rivet_interp,entry,script);
+        RivetCache_StoreScript(rivet_interp,entry,script);
     }
     else
     {
-        script = Rivet_CacheFetchScript(entry);
+        script = RivetCache_FetchScript(entry);
     }
 
     Tcl_SetObjResult(rivet_interp->interp, script);
