@@ -25,7 +25,7 @@
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <rivet_config.h>
 #endif
 
 #include <string.h>
@@ -77,6 +77,62 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
     return TCL_OK;
 }
 
+#if RIVET_CORE == mod_rivet_ng
+/*
+ *-----------------------------------------------------------------------------
+ * Rivet_GetRivetFileNG -- 
+ *
+ * The mod_rivet_ng core doesn't assume the parsed script to be 
+ * enclosed in the ::request namespace. The whole ::request lifecycle is
+ * devolved to the Rivet::request_handling procedure
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+int
+Rivet_GetRivetFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
+{
+    int sz = 0;
+    Tcl_Obj *inbuf;
+    Tcl_Channel rivetfile;
+
+    /*
+     * we call Tcl to read this file but the caveat exposed in 
+     * in Rivet_GetRivetFile still holds true (TODO)
+     */
+
+    rivetfile = Tcl_OpenFileChannel(interp, filename, "r", 0664);
+    if (rivetfile == NULL) {
+        /* Don't need to adderrorinfo - Tcl_OpenFileChannel takes care
+           of that for us. */
+        return TCL_ERROR;
+    }
+
+    Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
+    inbuf = Tcl_NewObj();
+    Tcl_IncrRefCount(inbuf);
+    sz = Tcl_ReadChars(rivetfile, inbuf, -1, 0);
+
+    Tcl_Close(interp, rivetfile);
+    if (sz == -1)
+    {
+        Tcl_AddErrorInfo(interp, Tcl_PosixError(interp));
+        Tcl_DecrRefCount(inbuf);
+        return TCL_ERROR;
+    }
+
+    /* If we are not inside a <? ?> section, add the closing ". */
+    if (Rivet_Parser(outbuf, inbuf) == 0)
+    {
+        Tcl_AppendToObj(outbuf, "\"\n", 2);
+    }
+
+    Tcl_DecrRefCount(inbuf);
+    /* END PARSER  */
+    return TCL_OK;
+}
+
+#else /* traditional rivet file processing with enclosion within the ::request namespace */
 
 /*
  *-----------------------------------------------------------------------------
@@ -149,6 +205,8 @@ Rivet_GetRivetFile(char *filename, int toplevel,
     /* END PARSER  */
     return TCL_OK;
 }
+
+#endif
 
 /*
  *-----------------------------------------------------------------------------

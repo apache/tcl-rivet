@@ -294,7 +294,7 @@ TCL_CMD_HEADER( Rivet_Parse )
         script = Tcl_NewObj();
         Tcl_IncrRefCount(script);
 
-        result = Rivet_GetRivetFile(filename,0,script,interp);
+        result = Rivet_GetRivetFile(filename,script,interp);
         if (result != TCL_OK)
         {
             Tcl_AddErrorInfo(interp,apr_pstrcat(private->pool,"Could not read file ",filename,NULL));
@@ -1869,7 +1869,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
         if (Rivet_CheckType(private->r) == RIVET_TEMPLATE)
         {
-            result = Rivet_GetRivetFile(private->r->filename, 0, script, interp);
+            result = Rivet_GetRivetFile(private->r->filename,script,interp);
 
         } else {
 

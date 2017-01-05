@@ -22,10 +22,10 @@ lib_libexec_LTLIBRARIES = librivetparser.la librivetlib.la
 #
 # Rivet Parser Library
 #
-librivetparser_la_SOURCES = parser/rivetParser.c parser/parserPkgInit.c
+librivetparser_la_SOURCES = parser/rivetParser.c parser/parserPkgInit.c parser/rivetParser.h
 librivetparser_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 librivetparser_la_LIBADD  = @APXS_LIBS@
-librivetparser_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS
+librivetparser_la_CPPFLAGS = @apache_include@ -I$(srcdir)/@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS
 
 #
 # Rivet Library
@@ -33,27 +33,40 @@ librivetparser_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APX
 librivetlib_la_SOURCES = librivet/rivetList.c librivet/rivetCrypt.c librivet/rivetWWW.c librivet/rivetPkgInit.c
 librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ @APU_LDFLAGS@ -module -avoid-version
 librivetlib_la_LIBADD  = @APXS_LIBS@
-librivetlib_la_CPPFLAGS = -I@rivet_core@ -I@apache_request@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APU_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
+librivetlib_la_CPPFLAGS = -I$(srcdir)/@rivet_core@ -I$(srcdir)/@apache_request@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APU_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
 
-apxs_libexecdir = @APXS_LIBEXECDIR@
+apxs_libexecdir = $(DESTDIR)@APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
-mod_rivet_la_SOURCES =  @rivet_core@/mod_rivet.c                            \
-                        @apache_request@/apache_multipart_buffer.c 	        \
-                        @apache_request@/apache_request.c                   \
-                        @rivet_commands@/rivetCore.c                        \
-                        @rivet_commands@/rivetInspect.c                     \
-                        @rivet_channel@/rivetChannel.c                      \
-                        parser/rivetParser.c                                \
-                        @rivet_core@/TclWebapache.c                         \
-                        @rivet_core@/apache_config.c                        \
-                        @rivet_core@/mod_rivet_common.c                     \
-                        @rivet_core@/mod_rivet_generator.c                  \
-                        @rivet_core@/mod_rivet_cache.c
+mod_rivet_la_SOURCES =  @rivet_core@/mod_rivet.c                        \
+                        @apache_request@/apache_multipart_buffer.c 	    \
+                        @apache_request@/apache_multipart_buffer.h 	    \
+                        @apache_request@/apache_request.c               \
+                        @apache_request@/apache_request.h               \
+                        @rivet_commands@/rivetCore.c                    \
+                        @rivet_commands@/rivetInspect.c                 \
+                        @rivet_channel@/rivetChannel.c                  \
+                        parser/rivetParser.c                            \
+                        @rivet_core@/TclWebapache.c                     \
+                        @rivet_core@/apache_config.c                    \
+                        @rivet_core@/mod_rivet_common.c                 \
+                        @rivet_core@/mod_rivet_generator.c              \
+                        @rivet_core@/mod_rivet_cache.c                  \
+                        @rivet_core@/apache_config.h                    \
+                        @rivet_core@/mod_rivet_cache.h                  \
+                        @rivet_core@/mod_rivet_common.h                 \
+                        @rivet_core@/mod_rivet_generator.h              \
+                        @rivet_core@/mod_rivet.h                        \
+                        @rivet_core@/rivetChannel.h                     \
+                        @rivet_core@/rivetCore.h                        \
+                        @rivet_core@/rivet_types.h                      \
+                        @rivet_core@/worker_prefork_common.h            \
+                        rivet.h                                         \
+                        TclWeb.h
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
-mod_rivet_la_CPPFLAGS = -I@rivet_core@ -I@rivet_channel@ -I@RIVET_BASE_INCLUDE@/parser -I@apache_request@ @apache_include@ -I@RIVET_BASE_INCLUDE@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = -I$(srcdir) -I$(srcdir)/@rivet_core@ -I$(srcdir)/@rivet_channel@ -I$(srcdir)/parser -I$(srcdir)/@apache_request@ @apache_include@ -I. @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 lib_libmpmdir = @RIVET_TCL_TARGET@/mpm
 lib_libmpm_LTLIBRARIES = rivet_worker_mpm.la rivet_prefork_mpm.la rivet_lazy_mpm.la
@@ -61,22 +74,29 @@ lib_libmpm_LTLIBRARIES = rivet_worker_mpm.la rivet_prefork_mpm.la rivet_lazy_mpm
 rivet_worker_mpm_la_SOURCES = @rivet_core@/rivet_worker_mpm.c @rivet_core@/worker_prefork_common.c
 rivet_worker_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_worker_mpm_la_LIBADD  = @APXS_LIBS@
-rivet_worker_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
-
+rivet_worker_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I$(srcdir)/@apache_request@ -I$(srcdir) -I$(srcdir)/@rivet_core@
+ 
 rivet_prefork_mpm_la_SOURCES = @rivet_core@/rivet_prefork_mpm.c @rivet_core@/worker_prefork_common.c
 rivet_prefork_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_prefork_mpm_la_LIBADD  = @APXS_LIBS@
-rivet_prefork_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
+rivet_prefork_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I$(srcdir)/@apache_request@ -I$(srcdir) -I$(srcdir)/@rivet_core@
 
 rivet_lazy_mpm_la_SOURCES = @rivet_core@/rivet_lazy_mpm.c
 rivet_lazy_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_lazy_mpm_la_LIBADD  = @APXS_LIBS@
-rivet_lazy_mpm_la_CPPFLAGS = @apache_include@ -I@rivet_core@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I@apache_request@ -I@RIVET_BASE_INCLUDE@
+rivet_lazy_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I$(srcdir)/@apache_request@ -I$(srcdir) -I$(srcdir)/@rivet_core@
 
 # Removing libtool .la files from installation
 
 install-data-hook:
-	echo 'removing unwanted libtool .la files'
-	rm -f $(DESTDIR)/$(lib_libexecdir)/*.la
-	rm -f $(DESTDIR)/$(apxs_libexecdir)/*.la
+	echo 'target install-data-hook: removing unwanted libtool .la files'
+	rm -f $(DESTDIR)$(lib_libexecdir)/*.la
+	rm -f $(DESTDIR)$(apxs_libexecdir)/*.la
+	rm -f $(DESTDIR)$(lib_libmpmdir)/*.la
 
+uninstall:
+	echo 'target uninstall: removing mod_rivet.so module'
+	rm -f $(DESTDIR)$(lib_libmpmdir)/*.so
+	rm -f $(DESTDIR)$(lib_libexecdir)/*.so
+	rm -f $(DESTDIR)$(apxs_libexecdir)/mod_rivet.so
+    

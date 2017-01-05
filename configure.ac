@@ -861,6 +861,7 @@ AC_DEFINE_UNQUOTED(UPLOAD_DIR,"${RIVET_UPLOAD_DIR}",[Path to the disk directory 
 AC_DEFINE_UNQUOTED(MAX_POST,[$MAX_POST],[Max size of data in POST operations])
 AC_DEFINE_UNQUOTED(SEPARATE_CHANNELS,0,[Separate Channels for virtual hosts])
 AC_DEFINE_UNQUOTED(CONFIGURE_CMD,"${CONFIGURE_CMD}",[configure command string])
+AC_DEFINE_UNQUOTED(RIVET_CORE,"${rivet_core}",[mod_rivet core])
 
 # We need to use the package path for the installation procedure.  On
 #Debian linux TCL_PACKAGE_PATH may have more than one path in the
@@ -873,7 +874,7 @@ AC_SUBST(TCL_PACKAGE_PATH)
 # You may alternatively have a special pkgIndex.tcl.in or other files
 # which require substituting the AC variables in.  Include these here.
 #--------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile src/Makefile rivet/init.tcl src/parser/Makefile doc/Makefile doc/convert_examples.tcl])
+AC_CONFIG_FILES([Makefile src/Makefile rivet/init.tcl doc/Makefile doc/convert_examples.tcl])
 
 #case $apache_version_dir in
 #    apache-1) AC_CONFIG_FILES([Makefile src/Makefile src/apache-1/Makefile doc/Makefile]) ;;

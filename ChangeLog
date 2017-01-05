@@ -1,3 +1,14 @@
+2017-01-04 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am,src/Makefile.am: now handling the 'dist'
+    and 'distcheck' targets of the automake generated
+    Makefile
+    * configure.ac: add RIVET_CORE definition
+    * src/mod_rivet_ng/rivetCore.c: now calls
+    the alternate form of RivetParse
+    * src/parser/parserPkgInit.c: altenate form of
+    function Rivet_Parser elimianates the need of
+    enclosing the code in the namespace ::request
+
 2016-12-19 Massimo Manghi <mxmanghi@apache.org>
     * rivet/mod_rivet_ng/mod_rivet_cache.c: better wording of cache 
     functions names. 

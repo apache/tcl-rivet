@@ -55,6 +55,7 @@ Parse_Rivet(
     Tcl_Obj *CONST objv[])
 {
     Tcl_Obj *outbuf;
+    int     tclcode;
 
     outbuf = Tcl_NewObj();
     Tcl_IncrRefCount(outbuf);
@@ -65,10 +66,16 @@ Parse_Rivet(
         return TCL_ERROR;
     }
 
-    if (Rivet_GetRivetFile(Tcl_GetString(objv[1]),
-                           1, outbuf, interp) == TCL_ERROR) {
-        return TCL_ERROR;
-    }
+#if RIVET_CORE == mod_rivet_ng
+    Tcl_AppendToObj(outbuf, "namespace eval request {\n", -1);
+    tclcode = Rivet_GetRivetFile(Tcl_GetString(objv[1]),outbuf,interp);
+    if (tclcode == TCL_ERROR) return TCL_ERROR;
+    Tcl_AppendToObj(outbuf, "\n}\n", -1);
+#else
+    tclcode = Rivet_GetRivetFile(Tcl_GetString(objv[1]),1,outbuf,interp);
+    if (tclcode == TCL_ERROR) return TCL_ERROR;
+#endif
+
     Tcl_SetObjResult(interp, outbuf);
     Tcl_DecrRefCount(outbuf);
     return TCL_OK;

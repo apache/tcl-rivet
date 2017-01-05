@@ -77,4 +77,7 @@ distclean:
 	-rm -f graphics
 	-rm Makefile
 
+uninstall-local:
+	rm -fr $(builddir)/convert_examples.tcl
+
 .PHONY: examples

@@ -138,7 +138,7 @@ proc ::Rivet::request_handling {} {
         set script [::rivet::url_script]
         if {$script ne ""} {
             set ::Rivet::script $script
-            uplevel #0 $script
+            namespace eval ::request $script
         }
 
         set script [::rivet::inspect AfterScript]
