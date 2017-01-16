@@ -17,7 +17,7 @@
 #
 # top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
-# $Id: Makefile.am 1616967 2014-08-09 15:29:07Z mxmanghi $
+# $Id: Makefile.am 1777395 2017-01-05 01:16:33Z mxmanghi $
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
 # 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
@@ -985,6 +985,7 @@ uninstall-packages:
 # 
 distclean-local:
 	rm -fr rivet_config.h
+	rm -fr _configs.sed
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

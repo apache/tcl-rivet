@@ -86,3 +86,4 @@ uninstall-packages:
 # 
 distclean-local:
 	rm -fr rivet_config.h
+	rm -fr _configs.sed

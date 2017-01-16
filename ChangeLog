@@ -1,3 +1,8 @@
+2017-01-16 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: removing the _configs.sed file generated
+    by configure in distclean target rule fulfills now
+    entirely the 'distcheck' target
+    
 2017-01-04 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am,src/Makefile.am: now handling the 'dist'
     and 'distcheck' targets of the automake generated
