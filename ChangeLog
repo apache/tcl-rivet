@@ -1,3 +1,10 @@
+2017-01-17 Massimo Manghi <mxmanghi@apache.org>
+    * Makefile.am: removing the mpm shared library
+    directory only if exists (it's removed by
+    the libtool generated rules by the src/Makefile.am)
+    * src/Makefile.am: installation directories
+    have been prepended by DESTDIR
+
 2017-01-16 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: removing the _configs.sed file generated
     by configure in distclean target rule fulfills now
@@ -155,9 +162,9 @@
     * src/mod_rivet/mod_rivet_common.c: the request_rec
     field to be checked in order to determine whether we
     are serving the request is 'header' non 'content_type'.
-    This bug didn't surface because their set to the same
-    string when a request is handed to the module chain, but
-    it's been around ever since.
+    This bug didn't surface because it's set to the same
+    string when a request is handed down to the module 
+    chain, but it's been around ever since.
 
 2016-11-08 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/apache_config.c: fixed conf

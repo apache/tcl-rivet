@@ -17,7 +17,7 @@
 #
 # top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
-# $Id: Makefile.am 1777395 2017-01-05 01:16:33Z mxmanghi $
+# $Id: Makefile.am 1779042 2017-01-16 15:29:36Z mxmanghi $
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
 # 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
@@ -942,11 +942,15 @@ uninstall-local:
 	rm -f  $(RIVETLIB_DESTDIR)/librivetparser.so
 	rm -fr $(RIVETLIB_DESTDIR)/packages
 	rm -f  $(RIVETLIB_DESTDIR)/pkgIndex.tcl
-	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/mpm/*)' ]; then \
-		rmdir $(RIVETLIB_DESTDIR)/mpm; \
+	@if [ -e $(RIVETLIB_DESTDIR)/mpm/ ] && [ -d $(RIVETLIB_DESTDIR)/mpm/ ]; then \
+		rm -fr $(RIVETLIB_DESTDIR)/mpm ; \
+	else \
+		echo "Directory $(RIVETLIB_DESTDIR)/mpm not existing"; \
 	fi
-	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
+	@if [ -e $(RIVETLIB_DESTDIR) ] && [ -d $(RIVETLIB_DESTDIR) ]; then \
 		rmdir $(RIVETLIB_DESTDIR); \
+	else \
+		echo "Directory $(RIVETLIB_DESTDIR) not existing"; \
 	fi
 
 install-packages:

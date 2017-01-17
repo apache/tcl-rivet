@@ -43,11 +43,15 @@ uninstall-local:
 	rm -f  $(RIVETLIB_DESTDIR)/librivetparser.so
 	rm -fr $(RIVETLIB_DESTDIR)/packages
 	rm -f  $(RIVETLIB_DESTDIR)/pkgIndex.tcl
-	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/mpm/*)' ]; then \
-		rmdir $(RIVETLIB_DESTDIR)/mpm; \
+	@if [ -e $(RIVETLIB_DESTDIR)/mpm/ ] && [ -d $(RIVETLIB_DESTDIR)/mpm/ ]; then \
+		rm -fr $(RIVETLIB_DESTDIR)/mpm ; \
+	else \
+		echo "Directory $(RIVETLIB_DESTDIR)/mpm not existing"; \
 	fi
-	@if [ -z '$(wildcard $(RIVETLIB_DESTDIR)/*)' ]; then \
+	@if [ -e $(RIVETLIB_DESTDIR) ] && [ -d $(RIVETLIB_DESTDIR) ]; then \
 		rmdir $(RIVETLIB_DESTDIR); \
+	else \
+		echo "Directory $(RIVETLIB_DESTDIR) not existing"; \
 	fi
 
 install-packages:
