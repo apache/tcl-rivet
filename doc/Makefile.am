@@ -18,45 +18,48 @@
 
 .PHONY:	clean 
 
-MANDIRS = html/ html/images
+MANDIRS = $(srcdir)/html/ $(srcdir)/html/images
+
 PICTURES:=$(wildcard images/*.png)
 EXAMPLES_SGML:=$(wildcard examples-sgml/*.*)
 EXAMPLES:=$(wildcard examples/*.*)
 
 # English, multiple files.
-html/index.html: rivet.xml rivet-chunk.xsl rivet.xsl xml/*.xml
+$(buildir)/html/index.html: $(srcdir)/rivet.xml $(srcdir)/rivet-chunk.xsl $(srcdir)/rivet.xsl $(srcdir)/xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css \
 	--stringparam html.ext ".html" \
 	--stringparam chunker.output.encoding UTF-8  \
-	--nonet -o html/ rivet-chunk.xsl rivet.xml
+	--nonet -o $(builddir)/html/ $(srcdir)/rivet-chunk.xsl $(srcdir)/rivet.xml
 
 # English, one big file.
-html/rivet.html: rivet.xml rivet-nochunk.xsl rivet.xsl xml/*.xml
+$(buildir)/html/rivet.html: $(srcdir)/rivet.xml $(srcdir)/rivet-nochunk.xsl $(srcdir)/rivet.xsl $(srcdir)/xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css \
 	--stringparam html.ext ".html" \
 	--stringparam chunker.output.encoding UTF-8  \
-	--nonet -o html/rivet.html rivet-nochunk.xsl \
-	rivet.xml
+	--nonet -o $(builddir)/html/rivet.html $(srcdir)/rivet-nochunk.xsl \
+	$(srcdir)/rivet.xml
 
 # This means these are not build automatically, but at least
 # people aren't forced to build them either.
 
-docs: picts html/rivet.css html/index.html
+docs: $(buildir)/html/rivet.css $(buildir)/html/index.html picts
 
-docs-nochunk: picts html/rivet.css html/rivet.html
+docs-nochunk: html/rivet.css html/rivet.html picts 
 
-html/rivet.css: mandirs rivet.css
-	cp -v rivet.css html/
+$(buildir)/html/rivet.css: rivet.css
+	$(mkinstalldirs) $(builddir)/html
+	$(install_sh) -C -m 644 $(srcdir)/rivet.css $(builddir)/html/
 
 # target picts checks the directory tree exists, then lets target 'graphics' copy new
 # or updated files to the target tree.
 
-picts:	mandirs graphics
+picts: graphics
 
 graphics: $(PICTURES)
-	for gfile in $?; do \
-	    cp -v $$gfile html/images/ ; \
-	done ; \
+	$(mkinstalldirs) $(builddir)/html/images
+	@for gfile in $?; do \
+		$(install_sh) -C -m 644 $(srcdir)/$$gfile $(builddir)/html/images/ ; \
+	done  
 	touch graphics
 
 examples: 
@@ -70,11 +73,13 @@ mandirs: $(MANDIRS)
 $(MANDIRS):
 	mkdir $@  
 
+install-data-local: docs
+
 # this target cleans everything up in the html directory
 
 distclean:
-	-rm -fr html/*.html 
-	-rm -f graphics
+	-rm -fr $(builddir)/html/
+	-rm -f  $(builddir)/graphics
 	-rm Makefile
 
 uninstall-local:

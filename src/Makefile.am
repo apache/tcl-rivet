@@ -16,7 +16,7 @@
 
 #SUBDIRS = @rivet_core@
 
-lib_libexecdir = $(DESTDIR)@RIVET_TCL_TARGET@
+lib_libexecdir = @RIVET_TCL_TARGET@
 lib_libexec_LTLIBRARIES = librivetparser.la librivetlib.la 
 
 #
@@ -35,7 +35,7 @@ librivetlib_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ @APU_L
 librivetlib_la_LIBADD  = @APXS_LIBS@
 librivetlib_la_CPPFLAGS = -I$(srcdir)/@rivet_core@ -I$(srcdir)/@apache_request@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_INCLUDES@ @APU_INCLUDES@ @APR_CPPFLAGS@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"' -DUSE_TCL_STUBS 
 
-apxs_libexecdir = $(DESTDIR)@APXS_LIBEXECDIR@
+apxs_libexecdir = @APXS_LIBEXECDIR@
 apxs_libexec_LTLIBRARIES = mod_rivet.la
 
 mod_rivet_la_SOURCES =  @rivet_core@/mod_rivet.c                        \
@@ -68,7 +68,7 @@ mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoi
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
 mod_rivet_la_CPPFLAGS = -I$(srcdir) -I$(srcdir)/@rivet_core@ -I$(srcdir)/@rivet_channel@ -I$(srcdir)/parser -I$(srcdir)/@apache_request@ @apache_include@ -I. @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
-lib_libmpmdir = $(DESTDIR)@RIVET_TCL_TARGET@/mpm
+lib_libmpmdir = @RIVET_TCL_TARGET@/mpm
 lib_libmpm_LTLIBRARIES = rivet_worker_mpm.la rivet_prefork_mpm.la rivet_lazy_mpm.la
 
 rivet_worker_mpm_la_SOURCES = @rivet_core@/rivet_worker_mpm.c @rivet_core@/worker_prefork_common.c
@@ -89,13 +89,13 @@ rivet_lazy_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @AP
 # Removing libtool .la files from installation
 
 install-data-hook:
-	echo 'target install-data-hook: removing unwanted libtool .la files'
+	echo 'target install-data-hook: removing unwanted libtool .la files from $(lib_libexecdir) $(apxs_libexecdir) $(lib_libmpmdir)'
 	rm -f $(DESTDIR)$(lib_libexecdir)/*.la
 	rm -f $(DESTDIR)$(apxs_libexecdir)/*.la
 	rm -f $(DESTDIR)$(lib_libmpmdir)/*.la
 
 uninstall:
-	echo 'target uninstall: removing mod_rivet.so module'
+	echo 'target uninstall: removing shared libraries from $(lib_libexecdir) $(apxs_libexecdir) $(lib_libmpmdir)'
 	rm -f $(DESTDIR)$(lib_libmpmdir)/*.so
 	rm -f $(DESTDIR)$(lib_libexecdir)/*.so
 	rm -f $(DESTDIR)$(apxs_libexecdir)/mod_rivet.so

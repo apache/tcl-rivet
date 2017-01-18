@@ -1,3 +1,9 @@
+2017-01-18 Massimo Manghi <mxmanghi@apache.org>
+    * doc/Makefile.am: integration of the automake
+    infrastructure and rules
+    * src/Makefile.am: removed prefixing of
+    library names with DESTDIR
+
 2017-01-17 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: removing the mpm shared library
     directory only if exists (it's removed by
