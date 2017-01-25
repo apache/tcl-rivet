@@ -40,6 +40,11 @@
       <listitem>
 			<para>calendar - a package providing a simple configurable calendar generator</para>
       </listitem>
+
+      <listitem>
+			<para>formbroker - a form data validators broker</para>
+      </listitem>
+
       
     </itemizedlist>
   </section>
