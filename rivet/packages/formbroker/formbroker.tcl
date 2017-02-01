@@ -669,10 +669,13 @@ namespace eval FormBroker {
 
             # the 'vars' dictionary field stores the
             # order of form fields in which they are processed
-            # (in general this order is destroyed by the Tcl's hash
-            # tables algorithm)
+            # (in general this order would be destroyed by the Tcl's hash
+            # tables)
 
             dict with form_list $form_name {::lappend vars $field_name}
+
+            # this test would handle the case of the most simple possible
+            # variable definition (just the variable name)
 
             if {$field_type == ""} {
                 set field_type string

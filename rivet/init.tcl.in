@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace eval ::rivet {} ; ## create namespace
+package require @RIVETLIB_PACKAGE@ @RIVETLIB_PACKAGE_VERSION@
+
+# the ::rivet namespace is created in mod_rivet_commoc.c:Rivet_PerInterpInit
+# namespace eval ::rivet {} ; ## create namespace
 namespace eval ::Rivet {} ; ## create namespace
 
 ## ::Rivet::init
@@ -41,8 +44,8 @@ proc ::Rivet::init {} {
     ## to override even Rivet's procs.
     lappend ::auto_path $::Rivet::packages$::tcl_version .
 
-    ## As we moved the commands set to the ::rivet namespace we
-    ## we want to guarantee the commands are still accessible
+    ## As we moved the command set to the ::rivet namespace we
+    ## still want to guarantee the commands to be accessible
     ## at the global level by putting them on the export list.
     ## Importing the ::rivet namespace is deprecated and we should
     ## make it clear in the manual.

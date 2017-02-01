@@ -381,6 +381,7 @@ package require Itcl
     #         when also the key value is specified only the row for that package-key pair is deleted
     #
     method clear {packageName {key ""}} {
+
         if {$key == ""} {
             set keyval      [list [$this id] $packageName]
             set keyfield    {session_id package_}

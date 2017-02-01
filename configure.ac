@@ -843,6 +843,8 @@ AX_SPLIT_VERSION
 AC_DEFINE_UNQUOTED(INIT_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}",[Rivet Tcl package version])
 AC_MSG_NOTICE([Rivet package version is ${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}])
 AC_SUBST(INIT_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}")
+AC_SUBST(RIVETLIB_PACKAGE,"rivetlib",[rivetlib package name])
+AC_SUBST(RIVETLIB_PACKAGE_VERSION,"${AX_MAJOR_VERSION}.${AX_MINOR_VERSION}")
 
 if test $import_rivet_commands = "yes"; then
     AC_MSG_NOTICE([forcing Rivet to export commands from ::rivet namespace])

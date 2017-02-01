@@ -177,10 +177,9 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
 
     /* If the thread has private data we stuff the server conf
      * pointer in the 'running_conf' field.
-     * Commands running ouside the request processing know how to
-     * get the configuration from the initialization context 
-     * (e.g. ::rivet::inspect). If private is null they get the
-     * server configuration from module_globals->server
+     * Commands running ouside a request processing must figure out 
+     * themselves how get a pointer to the configuration from the 
+     * context (e.g. ::rivet::inspect) 
      */
 
     if (private != NULL) private->running_conf = RIVET_SERVER_CONF (s->module_config);
@@ -190,27 +189,6 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* p
 
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables(interp,p);
-
-    /* Loading into the interpreter commands in librivet.so */
-    /* Tcl Bug #3216070 has been solved with 8.5.10 and commands shipped with
-     * Rivetlib can be mapped at this stage
-     */
-
-    if (Tcl_PkgRequire(interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION, 1) == NULL)
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
-                     MODNAME ": Error loading rivetlib package: %s",
-                     Tcl_GetStringResult(interp) );
-        exit(1);
-    }
-
-    /*  If rivet is configured to export the ::rivet namespace commands we set the
-     *  array variable ::rivet::module_conf(export_namespace_commands) before calling init.tcl
-     *  This array will be unset after commands are exported.
-     */
-
-    //Tcl_SetVar2Ex(interp,"module_conf","export_namespace_commands",Tcl_NewIntObj(RIVET_NAMESPACE_EXPORT),0);
-    //Tcl_SetVar2Ex(interp,"module_conf","import_rivet_commands",Tcl_NewIntObj(RIVET_NAMESPACE_IMPORT),0);
 
     /* Eval Rivet's init.tcl file to load in the Tcl-level commands. */
 
