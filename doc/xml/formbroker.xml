@@ -310,7 +310,7 @@ a(var4) = 0</programlisting>
             </variablelist>
         </refsect1>
         <refsect1>
-            <title>Writing a special variable form validator</title>
+            <title>Writing a variable form validator</title>
             <para>
             	The form broker is by no means restricted to work only with its native
             	data types: you may define your own form variable types and have
