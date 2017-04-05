@@ -1,3 +1,8 @@
+2017-04-05 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/formbroker.xml: better wording of a few
+    concepts. Add documentation for the boolean data type
+    * doc/xml/internals.xml: fixed incomplete sentence
+
 2017-02-10 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: now
     handling natively also boolean in the form y|n or

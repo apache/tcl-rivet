@@ -273,8 +273,11 @@
                 link it into mod_rivet.so)
             </listitem>
             <listitem>
-                If the code must gain access to <command>private->r</command>
-                put add the macro testing for the pointer
+                If the code must have access to the request record in <command>private->r</command>
+                use the macro THREAD_PRIVATE_DATA in order to claim the thread private data, then
+                check for the validity of the pointer using the macro 
+                CHECK_REQUEST_REC(private,"::rivet::&lt;cmd_name&gt;")
+
                 <programlisting>TCL_CMD_HEADER( Rivet_MyCmd )
 {
     /* we have to get the thread private data */

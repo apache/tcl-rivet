@@ -48,7 +48,7 @@
                descriptors passed to <command>create</command>. Each descriptor
                is a list of parameter or parameter-value pairs whose order has as only requirement
                to begin with the <command>{variable_name variable_type}</command> pair.
-               A formbroker object handles natively integer, unsigned, string and email data types.
+               A formbroker object handles natively integer, unsigned, string, boolean and email data types.
                The programmer can defined new data type and provide in the descriptor a
                reference to a validating procedure for that type.
             </para>
@@ -324,13 +324,14 @@ a(var4) = 0</programlisting>
             	keys are listed 
 				</para>
 				<para>
-            	Suppose you're writing an HTML that accept as input a network 
+            	Suppose you're writing a form text entry that demands as input a network 
             	interface MAC address. 
             	A mac address is represented by 6 hexadecimal octets separated by 
             	either a <quote>-</quote> (Windows convention) or <quote>:</quote> 
             	(Unix, Mac convention). The procedure <command>validate_mac</command>
-            	checks the validity of the mac address and if compliant transforms its 
-            	representation in the Unix form. By setting the key <quote>constrain</quote>
+            	checks the validity of the mac address and if validation is successful it
+            	transforms its representation into the Unix form. 
+            	By setting the key <quote>constrain</quote>
             	in the dictionary <emphasis>mac_address_d</emphasis> the procedure
             	is telling the form broker to copy the transformed value back
             	in the input response array
@@ -354,7 +355,7 @@ a(var4) = 0</programlisting>
             # the 'constrain' field is bidirectional:
             # it tells the validator to curb/change the value
             # within bonds/forms/representation. By setting it the
-            # validator we tell the FormBroker to copy the value
+            # validator tells the FormBroker to copy the value
             # back in the response array
 
             set constrain 1
