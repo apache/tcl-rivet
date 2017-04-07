@@ -142,9 +142,11 @@
 				</listitem>
 				<listitem>
 					<emphasis>mpm_thread_interp</emphasis> must be a function returning
-					the interpreter object (a pointer to record of type <command>rivet_thread_interp</command>) associated
-					to a given configuration as stored in a <command>rivet_server_conf*</command> object. This element
-					was temporarily introduced in the <command>mpm_bridge_table</command> table and should be accessed
+					the interpreter object (a pointer to record of type
+					<command>rivet_thread_interp</command>) associated
+					to a given configuration as stored in a <command>rivet_server_conf*</command>
+					object. This element was temporarily introduced in the 
+					<command>mpm_bridge_table</command> table and should be accessed
 					through the macro RIVET_PEEK_INTERP.
 					<programlisting>interp_obj = RIVET_PEEK_INTERP(private,private->conf);</programlisting>
 					Every bridge implementation should have its own way to store interpreter data and manage their
@@ -278,7 +280,7 @@
                 check for the validity of the pointer using the macro 
                 CHECK_REQUEST_REC(private,"::rivet::&lt;cmd_name&gt;")
 
-                <programlisting>TCL_CMD_HEADER( Rivet_MyCmd )
+                <programlisting>TCL_CMD_HEADER(Rivet_MyCmd)
 {
     /* we have to get the thread private data */
     
@@ -290,7 +292,7 @@
 	 */
     
     CHECK_REQUEST_REC(private,"::rivet::mycmd");
-    ...   
+    ....
 }</programlisting>
 				In <command>Rivet_InitCore</command> define the new command and its handler
 <programlisting>RIVET_OBJ_CMD ("mycmd",Rivet_MyCmd,private);</programlisting>

@@ -1,3 +1,11 @@
+2017-04-06 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: server_rec
+    argument in error logging changed to global
+    root server. Passing the virtual host server rec 
+    makes the call to ap_log_error quiet and
+    if something goes wrong in the thread's Tcl interp
+    initialization we don't read anything!
+
 2017-04-05 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/formbroker.xml: better wording of a few
     concepts. Add documentation for the boolean data type

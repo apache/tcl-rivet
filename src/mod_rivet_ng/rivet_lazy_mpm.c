@@ -103,7 +103,6 @@ enum {
 
 static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w,int init)
 {
-    char*       errmsg = "rivet_lazy_mpm.so: Error in configuration script: %s";
     Tcl_Obj*    tcl_conf_script; 
     Tcl_Interp* interp = private->ext->interp->interp;
     void*       function = NULL;
@@ -124,11 +123,14 @@ static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w
 
         if (Tcl_EvalObjEx(interp,tcl_conf_script, 0) != TCL_OK) 
         {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,w->server,
+            char*       errmsg = "rivet_lazy_mpm.so: Error in configuration script: %s";
+            server_rec* root_server = module_globals->server;
+
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,root_server,
                          errmsg, function);
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,w->server, 
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,root_server, 
                          "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,w->server, 
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,root_server, 
                          "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
         }
 
