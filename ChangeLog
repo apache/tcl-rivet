@@ -1,3 +1,7 @@
+2017-04-07 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: Fixed bug
+    in argument list passed to RivetCache_MakeKey
+
 2017-04-06 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivet_lazy_mpm.c: server_rec
     argument in error logging changed to global

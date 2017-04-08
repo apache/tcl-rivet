@@ -281,8 +281,7 @@ TCL_CMD_HEADER( Rivet_Parse )
     /* */
 
     cache_key = 
-        RivetCache_MakeKey( private->pool,
-                            private->r->filename,
+        RivetCache_MakeKey( private->pool,filename,
                             finfo_b.ctime,finfo_b.mtime,
                             IS_USER_CONF(private->running_conf),0);
 
