@@ -1,3 +1,8 @@
+2017-04-19 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml: fixed typo
+    * VERSION,configure.ac: bumping version number to 2.3.4
+    * doc/xml/formbroker.xml: various corrections
+
 2017-02-10 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: now
     handling natively also boolean in the form y|n or
