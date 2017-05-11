@@ -368,7 +368,7 @@
       			buffers.
       		</para>
       		<note>
-      			This option is implemented in order to have fine grain control over mod_rivet. In
+      			This option is implemented in order to have fine-grained control over mod_rivet. In
       			nearly all practical cases you won't need to change Rivet Channel (stdout) settings
       			for different applications by calling <command>fconfigure stdout ....</command>. 
       			This option is, by nature, only available at the global level and has effect only if 

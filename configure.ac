@@ -627,6 +627,7 @@ AC_DEFUN([UPLOAD_DIRECTORY],[
 # can be useful to let Rivet honor a HEAD request as if the whole content was 
 # generated so that the real headers are returned (this can be set in configuration 
 # by adding "RivetServerConf HonorHeaderOnlyRequests yes" to the server configuration)
+#
 # Default: no
 
 AC_DEFUN([HONOR_HEAD_REQUESTS],[
@@ -649,11 +650,11 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
 
 # SINGLE_WORKER_TCL_THREAD 
 #
-# This options applies to the worker MPM bridge and it's useful only when debugging it.
-# When enabled rivet_worker_bridge will create a single Tcl interp running thread instead 
-# of the whole pool
+# This options is used by the worker MPM bridge for debugging.
+# When enabled rivet_worker_bridge will create a single Tcl interp thread instead 
+# of the a whole pool of them
+# 
 # Defautl: no
-
 
 AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
     AC_ARG_ENABLE(
@@ -663,7 +664,7 @@ AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
     [ single_thread="no"]
     )
 
-    AC_MSG_CHECKING([if MPM bridge has to run a single thread])
+    AC_MSG_CHECKING([if the worker MPM bridge will run in single thread mode])
     if test "$single_thread" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(MPM_SINGLE_TCL_THREAD,1,[yes, MPM worker single thread])
@@ -674,10 +675,12 @@ AC_DEFUN([SINGLE_WORKER_TCL_THREAD],[
 
 # -- SERIALIZE_HTTP_REQUEST
 #
-# this macro is introduced to make debugging easier when
-# we want threads to serialize the access to the request handling 
-# central method Rivet_SendContent. The macro defines the symbol
-# SERIALIZE_HTTP_REQUESTS and cooperates with macro HTTP_REQUESTS_PROC
+# The macro defines the symbol SERIALIZE_HTTP_REQUESTS and cooperates 
+# with macro HTTP_REQUESTS_PROC. This option is useful only 
+# for debugging (avoids threads concurrency). See the code of the
+# worker bridge to see the preprocessor macros cooperating to
+# attain this feature
+#
 # Default: no
 
 AC_DEFUN([HTTP_REQUESTS_MUTEX],[
@@ -688,7 +691,7 @@ AC_DEFUN([HTTP_REQUESTS_MUTEX],[
         [ requests_serialization="no" ]
     )
 
-    AC_MSG_CHECKING([if we want to serialize HTTP requests among threads])
+    AC_MSG_CHECKING([if we want the worker bridge to serialize HTTP requests])
     if test "$requests_serialization" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(SERIALIZE_HTTP_REQUESTS,1,[requests will be serialized])

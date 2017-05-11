@@ -42,7 +42,7 @@ proc ::Rivet::init {} {
     ## in the local directory that can be autoloaded.
     ## Perhaps this must go to the front of the list to allow the user
     ## to override even Rivet's procs.
-    lappend ::auto_path $::Rivet::packages$::tcl_version .
+    lappend ::auto_path ${::Rivet::packages}${::tcl_version} .
 
     ## As we moved the command set to the ::rivet namespace we
     ## still want to guarantee the commands to be accessible
@@ -50,10 +50,11 @@ proc ::Rivet::init {} {
     ## Importing the ::rivet namespace is deprecated and we should
     ## make it clear in the manual.
 
-    if {([::rivet::inspect ExportRivetNS] == 1) || \
-        ([::rivet::inspect ImportRivetNS] == 1)} {
+    if {[string is true -strict [::rivet::inspect ExportRivetNS]]
+        || [string is true -strict [::rivet::inspect ImportRivetNS]]} {
 
-        set ::rivet::cmd_export_list [tcl_commands_export_list $::Rivet::rivet_tcl]
+        set ::rivet::cmd_export_list \
+            [tcl_commands_export_list $::Rivet::rivet_tcl]
 
         ## init.tcl is run by mod_rivet (which creates the ::rivet
         ## namespace) but it gets run standalone by mkPkgindex during
@@ -82,7 +83,7 @@ proc ::Rivet::init {} {
 
     ## If Rivet was configured for backward compatibility, import commands
     ## from the ::rivet namespace into the global namespace.
-    if {[::rivet::inspect ImportRivetNS] == 1} {
+    if {[string is true -strict [::rivet::inspect ImportRivetNS]]} {
         uplevel #0 { namespace import ::rivet::* }
     }
     #unset -nocomplain ::module_conf
@@ -107,13 +108,6 @@ proc ::Rivet::initialize_request {} {
     }
 }
 
-## ::Rivet::cleanup_request
-##
-## This routine gets called each time a request is finished.  Any kind
-## of special cleanup can be placed here. We don't do anything by default.
-
-proc ::Rivet::cleanup_request {} {}
-
 ## ::Rivet::handle_error
 ##
 ## If an ErrorScript has been specified, this routine will not be called.
@@ -129,8 +123,13 @@ proc ::Rivet::handle_error {} {
 ## other bits and calls them in order.
 
 proc ::Rivet::request_handling {} {
+    ::try {
+        uplevel #0 ::Rivet::initialize_request
+    } on error {err} {
+        ::rivet::apache_log_error crit \
+            "Rivet request initialization failed: $::errorInfo"
+    }
 
-    catch {uplevel #0 ::Rivet::initialize_request}
     ::try {
         set script [::rivet::inspect BeforeScript]
         if {$script ne ""} {
@@ -159,7 +158,6 @@ proc ::Rivet::request_handling {} {
         ::Rivet::finish_request $script "" "" AfterEveryScript
     }
 
-    catch {uplevel #0 ::Rivet::cleanup_request}
 }
 
 ## ::Rivet::finish_request
@@ -179,7 +177,8 @@ proc ::Rivet::finish_request {script errorCode errorOpts {scriptName ""}} {
         } on ok {} {
             return
         } on error {} {
-            ::rivet::apache_log_err err "$scriptName failed: $::errorInfo"
+            ::rivet::apache_log_error err \
+                "Rivet $scriptName failed: $::errorInfo"
             print_error_message "Rivet $scriptName failed"
         }
     }
@@ -193,7 +192,7 @@ proc ::Rivet::finish_request {script errorCode errorOpts {scriptName ""}} {
     ::try {
         uplevel #0 $error_script
     } on error {err} {
-        ::rivet::apache_log_err err "ErrorScript failed: $::errorInfo"
+        ::rivet::apache_log_error err "Rivet ErrorScript failed: $::errorInfo"
         print_error_message "Rivet ErrorScript failed"
     }
 }
