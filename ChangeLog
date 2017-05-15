@@ -1,3 +1,7 @@
+2017-05-15 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivet_prefork_mpm.c: server root 
+    interpreter needs to re-seed the random number generator
+
 2017-05-11 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: apply Damon's patch concerning
     some tests and error handling. Removed call to the

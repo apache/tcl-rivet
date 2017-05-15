@@ -129,10 +129,29 @@ int Prefork_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 rivet_thread_interp* MPM_MasterInterp(server_rec* server)
 {
     rivet_thread_private*   private;
+    int                     tcl_status;
 
     RIVET_PRIVATE_DATA_NOT_NULL (rivet_thread_key, private);
 
     module_globals->server_interp->channel = private->channel;
+
+    /*
+     * We are returning the interpreter inherited from
+     * the parent process. The fork preserves the internal status
+     * of the process, math engine status included. This fact implies
+     * the random number generator has the same seed and every
+     * child process for which SeparateVirtualInterps would generate
+     * the same random number sequence. We therefore reseed the RNG 
+     * calling a Tcl script fragment
+     */
+
+    tcl_status = Tcl_Eval (module_globals->server_interp->interp,"expr {srand([clock clicks] + [pid])}");
+    if (tcl_status != TCL_OK)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                     MODNAME ": Tcl interpreter random number generation reseeding failed");
+        
+    }
     return module_globals->server_interp;
 }
 

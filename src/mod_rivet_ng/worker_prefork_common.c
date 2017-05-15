@@ -49,7 +49,7 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
     interp_obj->cache_free  = source_obj->cache_free;
     interp_obj->cache_size  = source_obj->cache_size;
 
-    /* TODO: decouple cache by creating a new cache object */
+    /* An intepreter must have its own cache */
 
     if (interp_obj->cache_size) {
         RivetCache_Create(pool,interp_obj); 
@@ -98,12 +98,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
     root_interp = MPM_MasterInterp(module_globals->server);
 
-    /* we must assume the module was able to create the root interprter otherwise
-     * it's just a null module. I try to have also this case to develop experimental
-     * bridges without the Tcl stuff 
-     */ 
-
-    //if (root_interp == NULL) return private;
+    /* we must assume the module was able to create the root interprter */ 
 
     ap_assert (root_interp != NULL);
 
@@ -170,7 +165,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             }
             else
             {
-                rivet_interp = Rivet_DuplicateVHostInterp(private->pool,root_interp);           
+                rivet_interp = Rivet_DuplicateVHostInterp(private->pool,root_interp);
             }
         }
 
@@ -187,8 +182,9 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             Rivet_PerInterpInit(rivet_interp, private, s, private->pool);
         }
 
-        /*  TODO: check if it's absolutely necessary to lock the pool_mutex in order
-         *  to allocate from the module global pool
+        /* It seems that allocating from a shared APR memory pool is not thread safe,
+         * but it's not very well documented actually. I any case we protect this
+         * memory allcation with a mutex
          */
 
         /*  this stuff must be allocated from the module global pool which
