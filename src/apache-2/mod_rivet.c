@@ -1214,6 +1214,25 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
         }
     }
 
+    /*
+     * The fork preserves the internal status
+     * of the process, math engine status included. This fact implies
+     * the random number generator has the same seed and every
+     * child process for which SeparateVirtualInterps would generate
+     * the same random number sequence. We therefore reseed the RNG 
+     * calling a Tcl script fragment
+     */
+
+    if (rsc->separate_virtual_interps == 0) {
+        if (Tcl_Eval(rsc->server_interp,"expr {srand([clock clicks] + [pid])}") != TCL_OK)
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                         MODNAME ": Tcl interpreter random number generation reseeding failed");
+            
+        }
+    }
+
+
     for (sr = s; sr; sr = sr->next)
     {
         myrsc = RIVET_SERVER_CONF(sr->module_config);
@@ -1231,6 +1250,7 @@ Rivet_InitTclStuff(server_rec *s, apr_pool_t *p)
         myrsc->outchannel = rsc->outchannel;
 
         /* This sets up slave interpreters for other virtual hosts. */
+
         if (sr != s) /* not the first one  */
         {
             if (rsc->separate_virtual_interps != 0) {
