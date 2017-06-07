@@ -136,13 +136,13 @@
 	<simplesect>
     	<title>Apache Rivet Error and Exception Scripts Directives</title>
         <para>
-            Rivet is highly configurable and each of the webserver lifecycle stages 
-            can be exploited to control a web application. 
-            Not only the orderly sequence of stages
-            in a child lifecycle can be controlled with Tcl scripts, but also
-            Tcl error or abnormal conditions taking place during
-            the execution can be caught and handled with specific scripts.
-        </para>
+         Rivet is highly configurable and each of the webserver lifecycle stages 
+         can be exploited to control a web application. 
+         Not only the orderly sequence of stages
+         in a child lifecycle can be controlled with Tcl scripts, but also
+         Tcl error or abnormal conditions taking place during
+         the execution can be caught and handled with specific scripts.
+       </para>
 	    <para>
 	    	Tcl errors (conditions generated when a command exits with code TCL_ERROR) 
 	    	usually result in the printing of a backtrace of the code fragment
@@ -218,7 +218,6 @@
 				<tr class="processing"><td>AfterEveryScript</td><td>::</td></tr>
 				<tr class="childexit"><td>Child Termination</td><td>ChildExitScript</td><td>::</td></tr>
 				<tr class="processing"><td>Error Handling</td><td>ErrorScript</td><td>::</td></tr>
-
 			</tbody>
 		</table>
 	</simplesect>

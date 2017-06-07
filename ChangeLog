@@ -1,3 +1,7 @@
+2017-06-07 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml-2/: XML manual moved to xml-2 to make
+    rewriting easier
+
 2017-05-15 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivet_prefork_mpm.c: server root 
     interpreter needs to re-seed the random number generator

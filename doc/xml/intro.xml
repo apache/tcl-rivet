@@ -1,15 +1,15 @@
 <section id="introduction">
-    <title>Introduction to Apache Rivet</title>
+    <title>Introduction to Apache Rivet version &version;</title>
     <para>
-      Apache Rivet is a system for creating dynamic web content via a
-      programming language integrated with Apache Web Server.  It is
-      designed to be fast, powerful and extensible, consume few system
-      resources, be easy to learn, and to provide the user with a
+      Apache Rivet is a system for creating dynamic web content by
+      integrating the 
+		<ulink url="http://www.tcl.tk/">Tcl programming language</ulink> within the 
+      <ulink url="http://httpd.apache.org">Apache Web Server</ulink>.
+      It is designed to be fast, powerful and extensible, consume 
+      few system resources, be easy to learn, and to provide the user with a
       platform that can also be used for other programming tasks
       outside the web (GUI's, system administration tasks, text
-      processing, database manipulation, XML, and so on).  In order to
-      meet these goals, we have chosen the Tcl programming language to
-      combine with the Apache Web Server.
+      processing, database manipulation, XML, and so on).
     </para>
     <para>
       In this manual, we aim to help get you started, and then
@@ -29,17 +29,46 @@
     <simplesect>
         <title>Introduction</title>
         <para>
-	        	Rivet 3.0 ships with a major rewriting of mod_rivet, the Apache HTTP
+	        	Rivet &version; ships with a major rewriting of mod_rivet, the Apache HTTP
 	        	Websever module at the core of Rivet. With this version of the module
 	        	we attained full support of different MPM (Multiprocessing Modules) for
 	        	the Apache framework, whereas previous version of mod_rivet only supported
 	        	the prefork MPM.
         </para>
-        <!-- itemizedlist>
-    			<listitem>
-    			</listitem>
-         	<listitem>
-         	</listitem>
-		 </itemizedlist -->
+        <para>
+        		Threaded <ulink href="https://httpd.apache.org/docs/2.4/mpm.html">MPM</ulink>
+        		integration was achieved by making mod_rivet multithreaded and
+        		modular itself, introducing the concept of MPM bridges, a set of loadable modules 
+        		responsible to offer the running MPM the best possible integration with 
+        		mod_rivet. As a side effect of this design we now have a the whole module 
+        		is now not only able to integrate
+        		with its environment but also to work as a platform for writing more MPM bridges
+        		designed following different multi-threading schemes and workload management. 
+        		See the <link linkend="internals">internals</link> section of this manual for
+        		further reading.
+        </para>
+    </simplesect>
+    <simplesect>
+    	<title>Request Processing</title>
+    	<para>
+    			Request processing was performed in mod_rivet by chaining together 3 scripts
+    	</para>
+    	<itemizedlist>
+    		 	<listitem>BeforeScript, if defined in the configuration</listitem>
+ 				<listitem>The URI referenced Tcl script or rvt template (using the defaults defined in the
+ 				Apache webserver configuration)</listitem>
+ 				<listitem>AfterScript, if defined in the configuration</listitem> 
+		</itemizedlist>
+		<para>
+			Errors and exceptions (raised by the <link linkend="abort_page">::rivet::abort_page</link> command)
+			are handled by the ErrorScript and AbortScript (ErrorScript has a default implementation
+			if undefined in the configuration)
+		</para>
+		
+		<para>
+			Rivet &version; supports a new <link linkend="request">request processing scheme</link> 
+			entirely based on Tcl. By default this scheme emulates the historic way to handle a request
+			but developers are encouraged to think up their own way to request handling.
+		</para>
     </simplesect>
 </section>
