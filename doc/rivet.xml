@@ -55,7 +55,7 @@
 
 <article>
   <articleinfo>
-    <title>Apache Rivet</title>
+    <title>Apache Rivet &version;</title>
     <copyright>
         <year>2002-2017</year>
         <holder>Apache Software Foundation</holder>
