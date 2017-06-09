@@ -2,7 +2,7 @@
     <title>Apache Rivet Installation</title>
     <procedure>
         <para> 
-            Rivet 2.2 runs with the Apache 2.2.x and 2.4.x HTTP web server. 
+            Rivet 2.3 runs with the Apache 2.2.x and 2.4.x HTTP web server. 
             It is known to build and run on various Linux distributions 
             (Debian &amp; Ubuntu, Redhat, SuSE and CentOS), FreeBSD and OpenBSD. For some
             of these Unix-like operative systems 
@@ -10,7 +10,7 @@
             are already available for download.
         </para>
         <para>
-            Currently there is no way to run Apache Rivet 2.2 on Windows&copy; because            
+            Currently there is no way to run Apache Rivet 2.3 on Windows&copy; because            
             Rivet currently requires the 
             <ulink url="http://httpd.apache.org/docs/2.2/mod/prefork.html">prefork</ulink>, which
             is supported only on Unix/Linux systems. Efforts are under way to extend the support to the 
@@ -48,11 +48,11 @@
             <para>
                 Rivet needs some of the include (.h) files shipped with the webserver source code. 
                 The easiest way to get them is to download the Apache source.  
-                If can build Rivet either statically (compiled into the Apache web
-                server instead of loaded dynamically) or dynamically (as a loadable shared library).  
-                We recommend that you build Rivet as a shared library, for maximum flexibility,
-                meaning that you also build Apache to be able to load modules. Other than that, 
-                the default Apache install is fine.  We will tell Rivet where it is located via the 
+                You can rebuild the Apache Web Server having mod_rivet linked statically 
+                but the regular course of action is to build mod_rivet separately and then dynamically 
+                loaded (as shared library) into the Web Server.  
+                We recommend that you follow this approach  for maximum flexibility.
+                We will tell Rivet where it is located via the 
                 <option>--with-apxs</option> option to <command>configure</command> (see below).
             </para>
             <para>

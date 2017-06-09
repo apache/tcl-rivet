@@ -1,3 +1,6 @@
+2017-06-09 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/: more documentation fixing
+
 2017-05-15 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: server root interpreter
     needs to re-seed the random number generator

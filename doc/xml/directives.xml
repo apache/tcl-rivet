@@ -10,20 +10,6 @@
 	      <command>RivetServerConf</command>, meaning that DirConf will
 	      override UserConf, which will in turn override ServerConf.
 	   </para>
-	   <para>
-	    	The directive <command>ServerInitScript</command> plays a special
-	    	role since the script runs within the master interpreter,
-	    	an interpreter created before the Apache parent process spawns
-	    	the children that actually will serve the requests coming from
-	    	the network. During this stage Apache is still running as a 
-	    	single process, so this is the right place for doing 
-	    	initializations or loading packages. Since this
-	    	script will be running in a single process environment (from the
-	    	Apache point of view) <command>ServerInitScript</command> 
-	    	is also the right place for doing anything needs to avoid
-        	resource concurrency among processes (e.g. the creation and 
-	    	initialization of an IPC system)
-	   </para>
 	</section>
 	<section>
 	   <variablelist>
@@ -100,6 +86,20 @@
 			   		<para>
                         This option is only available at the global level.
 			   		</para>
+			   		<para>
+					    	The directive <command>ServerInitScript</command> plays a special
+					    	role since the script runs within the master interpreter,
+					    	an interpreter created before the Apache parent process spawns
+					    	the children that actually will serve the requests coming from
+					    	the network. During this stage Apache is still running as a 
+					    	single process, so this is the right place for doing 
+					    	initializations or loading packages. Since this
+					    	script will be running in a single process environment (from the
+					    	Apache point of view) <command>ServerInitScript</command> 
+					    	is also the right place for doing anything needs to avoid
+				        	resource concurrency among processes (e.g. the creation and 
+					    	initialization of an IPC system)
+	   				</para>
 	   			</listitem>
 				</varlistentry>
 	   		<varlistentry>
