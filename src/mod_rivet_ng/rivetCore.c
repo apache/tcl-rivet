@@ -1921,9 +1921,6 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 {
     rivet_server_conf*      server_conf; 
 
-#if RIVET_NAMESPACE_EXPORT == 1
-#endif
-
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,private);
     RIVET_OBJ_CMD ("headers",Rivet_Headers,private);
     RIVET_OBJ_CMD ("load_env",Rivet_LoadEnv,private);

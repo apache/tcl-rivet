@@ -12,8 +12,8 @@
     <!ENTITY download.tcl	        SYSTEM	"examples-sgml/download.tcl" >
     <!ENTITY rivet_web_service.tcl SYSTEM "examples-sgml/rivet_web_service.tcl" >
     <!ENTITY intro.xml		        SYSTEM "xml/intro.xml" >
-    <!ENTITY install.xml	        SYSTEM "xml-2/install.xml" >
-    <!ENTITY directives.xml	     SYSTEM "xml-2/directives.xml" >
+    <!ENTITY install.xml	        SYSTEM "xml/installation.xml" >
+    <!ENTITY directives.xml	     SYSTEM "xml/directives.xml" >
     <!ENTITY commands.xml          SYSTEM "xml-2/commands.xml" >
     <!ENTITY examples.xml          SYSTEM "xml-2/examples.xml" >
     <!ENTITY packages.xml          SYSTEM "xml-2/packages.xml" >
@@ -28,10 +28,12 @@
     <!ENTITY request.xml           SYSTEM "xml-2/request.xml" >
     <!ENTITY entities.xml          SYSTEM "xml-2/entities.xml" >
     <!ENTITY asciiglyphs.xml		  SYSTEM "xml-2/asciiglyphs.xml" >
-    <!ENTITY lazybridge.xml		  SYSTEM "xml-2/lazybridge.xml" >
-    <!ENTITY formbroker.xml        SYSTEM "xml-2/formbroker.xml" >
+    <!ENTITY lazybridge.xml		  SYSTEM "xml/lazybridge.xml" >
+    <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
     <!ENTITY version	"3.0" >
     <!ENTITY fullversion "3.0.0" >
+    <!ENTITY version2-series	"2.0,2.1,2.2,2.3" >
+    <!ENTITY version2-generic	"2.x" >
 
 ]>
 

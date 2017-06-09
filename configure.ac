@@ -510,11 +510,11 @@ AC_DEFUN([GET_RIVET_BASE], [
 AC_DEFUN([APACHE_REQUEST],[
     AC_ARG_WITH(
         apache_request,
-        [  --with-apache-request[=dir] path to Apache request handling code],,
+        [  --with-apache-request=DIR path to rivet HTML form and urlencoded data handler],,
         [with_apache_request="request"]
     )
 
-    AC_MSG_CHECKING([code for request handling])
+    AC_MSG_CHECKING([code for HTML form and urlencoded data handling])
     apache_request=${with_apache_request}
     AC_SUBST(apache_request)
     AC_MSG_RESULT([$apache_request])
@@ -731,7 +731,7 @@ AC_DEFUN([RIVET_COMMANDS_EXPORT],[
 AC_DEFUN([IMPORT_RIVET_COMMANDS],[
     AC_ARG_ENABLE(
         import-rivet-commands,
-        [  --disable-import-rivet-commands requires explicit namespace import],
+        [  --enable-import-rivet-commands requires explicit namespace import],
         [ import_rivet_commands=$enable_import_rivet_commands],
         [ import_rivet_commands="no"]
     )
@@ -761,7 +761,7 @@ AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
     [ separate_virtual_interps="no"]
     )
 
-    AC_MSG_CHECKING(whether Rivet will create an interpreter for each virtual host)
+    AC_MSG_CHECKING([whether Rivet will create an interpreter for each virtual host])
     if test "$separate_virtual_interps" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(SEPARATE_VIRTUAL_INTERPS,1,[virtual hosts will have their own interp])
@@ -782,7 +782,7 @@ AC_DEFUN([POST_MAX_SIZE],[
         with_post_max=0
     )
     
-    AC_MSG_CHECKING(maximum size of a POST)
+    AC_MSG_CHECKING([maximum size of a POST])
     MAX_POST=${with_post_max}
     AC_SUBST(MAX_POST)
     if test $with_post_max = 0; then
@@ -799,12 +799,12 @@ AC_DEFUN([POST_MAX_SIZE],[
 AC_DEFUN([UPLOAD_TO_VAR],[
     AC_ARG_ENABLE(
     upload-var,
-    [  --disable-upload-var to enable automatic upload to variables ],
+    [  --disable-upload-var to disable automatic upload to variables ],
     [ upload_var=$enable_upload_var ],
     [ upload_var="yes"]
     )
 
-    AC_MSG_CHECKING(whether files are uploaded to Tcl variables)
+    AC_MSG_CHECKING([whether files are uploaded to Tcl variables])
     if test "$upload_var" = "yes"; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(UPLOAD_FILES_TO_VAR,1,[Files are uploaded to Tcl variables])

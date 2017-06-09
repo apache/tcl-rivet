@@ -35,23 +35,24 @@
 	        	the Apache framework, whereas previous version of mod_rivet only supported
 	        	the prefork MPM.
         </para>
+        <title>Rivet - MPM Bridge</title>
         <para>
         		Threaded <ulink href="https://httpd.apache.org/docs/2.4/mpm.html">MPM</ulink>
         		integration was achieved by making mod_rivet multithreaded and
         		modular itself, introducing the concept of MPM bridges, a set of loadable modules 
         		responsible to offer the running MPM the best possible integration with 
-        		mod_rivet. As a side effect of this design we now have a the whole module 
-        		is now not only able to integrate
+        		mod_rivet. As a side effect of this modular design mod_rivet is not only able to integrate
         		with its environment but also to work as a platform for writing more MPM bridges
-        		designed following different multi-threading schemes and workload management. 
+        		designed along different multi-threading schemes and workload management models. 
         		See the <link linkend="internals">internals</link> section of this manual for
-        		further reading.
+        		further reading. MPM bridges can be determined in the configuration and only 
+        		a bridge can be loaded at a time.
         </para>
     </simplesect>
     <simplesect>
     	<title>Request Processing</title>
     	<para>
-    			Request processing was performed in mod_rivet by chaining together 3 scripts
+    			Request processing was performed in mod_rivet version 2.x by chaining together 3 scripts
     	</para>
     	<itemizedlist>
     		 	<listitem>BeforeScript, if defined in the configuration</listitem>
@@ -67,8 +68,10 @@
 		
 		<para>
 			Rivet &version; supports a new <link linkend="request">request processing scheme</link> 
-			entirely based on Tcl. By default this scheme emulates the historic way to handle a request
-			but developers are encouraged to think up their own way to request handling.
+			entirely based on Tcl. By default rivet &version; provide compatiblity with the 
+			version 2.x scheme to handle a request but this can be entirely overridden by
+			the developer replacing the central request handling procedure. See the 
+			<link linkend="request">request processing</link> page for further reading 
 		</para>
     </simplesect>
 </section>

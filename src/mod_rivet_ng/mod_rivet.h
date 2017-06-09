@@ -179,7 +179,7 @@ typedef struct _mpm_bridge_table {
     RivetBridge_Thread_Interp *mpm_thread_interp;
 } rivet_bridge_table;
 
-/* we need also a place where to store module wide globals */
+/* we need also a place where to store globals with module wide scope */
 
 typedef struct mpm_bridge_status mpm_bridge_status;
 

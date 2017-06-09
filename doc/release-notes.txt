@@ -1,0 +1,1 @@
+-- the default for the command export has changed: commands are not exported from ::rivet by default
