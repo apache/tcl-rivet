@@ -4,181 +4,144 @@
 	   <para>
 	      Rivet directives are used within the Apache httpd server
 	      configuration to set up the environment where Rivet script
-	      will be run.  Their precedence is as follows: 
-	      <command>RivetDirConf</command>,
-	      <command>RivetUserConf</command>,
-	      <command>RivetServerConf</command>, meaning that DirConf will
-	      override UserConf, which will in turn override ServerConf.
-	   </para>
-	   
-	</section>
-	<section>
-	   <variablelist>
-   		<varlistentry>
-			<term>
-				<cmdsynopsis>
-			   	<command>RivetServerConf</command>
-			   	<group choice="req">
-				      <arg>CacheSize</arg>
-				      <arg>ServerInitScript</arg>
-				      <arg>GlobalInitScript</arg>
-				      <arg>ChildInitScript</arg>
-				      <arg>ChildExitScript</arg>
-				      <arg>BeforeScript</arg>
-				      <arg>AfterScript</arg>
-				      <arg>ErrorScript</arg>
-				      <arg>AbortScript</arg>
-				      <arg>AfterEveryScript</arg>
-				      <arg>UploadDirectory</arg>
-				      <arg>UploadMaxSize</arg>
-				      <arg>UploadFilesToVar</arg>
-				      <arg>SeparateChannels</arg>
-				      <arg>SeparateVirtualInterps</arg>
-				      <arg>HonorHeaderOnlyRequests</arg>
-	    			</group>
-			  </cmdsynopsis>
-			</term>
-			<listitem>
-				<para>
-					<command>RivetServerConf</command> specifies a global
-			    	option that is valid for the whole server.  If you have a
-			    	virtual host, in some cases, the option specified in the
-			    	virtualhost takes precedence over the 'global' version.
-				</para>
-			</listitem>
-			<listitem>
-				<variablelist>
-	   		<varlistentry>
-	      		<term>
-						<cmdsynopsis>
-				  			<arg choice="plain">CacheSize</arg>
-				  			<arg><replaceable>size</replaceable></arg>
-						</cmdsynopsis>
-	      		</term>
-			   	<listitem>
-						<para>
-						  Sets the size of the internal page cache, where
-						  <option><replaceable>size</replaceable></option> is
-						  the number of byte-compiled pages to be cached for
-						  future use.  Default is
-						  <command>MaxRequestsPerChild</command> / 5, or 50,
-						  if <command>MaxRequestsPerChild</command> is 0.
-						</para>
-						<para>
-						  This option is completely global, even when using
-						  separate, per-virtual host interpreters.
-						</para>
-					</listitem>
-	   		</varlistentry>
-	   		<varlistentry>
-	   			<term>
-	   				<cmdsynopsis>
-			   			<arg choice="plain">ServerInitScript</arg>
-			   			<arg><replaceable>script</replaceable></arg>
-	   				</cmdsynopsis>
-	   			</term>
-	   			<listitem>
-			   		<para>
-			   			Tcl script which is to run when the master interpreter is created. 
-			   			Namespaces, variables and packages loaded during this stage will 
-			   			be copied later on in the startup process, when child
-			   			processes are created. 
-			   		</para>
-			   		<para>
-                        This option is only available at the global level.
-			   		</para>
-			   		<para>
-					    	The directive <command>ServerInitScript</command> plays a special
-					    	role since the script runs within the master interpreter,
-					    	an interpreter created before the Apache parent process spawns
-					    	the children that actually will serve the requests coming from
-					    	the network. During this stage Apache is still running as a 
-					    	single process, so this is the right place for doing 
-					    	initializations or loading packages. Since this
-					    	script will be running in a single process environment (from the
-					    	Apache point of view) <command>ServerInitScript</command> 
-					    	is also the right place for doing anything needs to avoid
-				        	resource concurrency among processes (e.g. the creation and 
-					    	initialization of an IPC system)
-	   				</para>
-	   			</listitem>
-				</varlistentry>
-	   		<varlistentry>
-			      <term>
-						<cmdsynopsis>
-						  <arg choice="plain">GlobalInitScript</arg>
-						  <arg><replaceable>script</replaceable></arg>
-						</cmdsynopsis>
-			      </term>
-			      <listitem>
-						<para>
-						  Tcl script run as part of a child process initialization. 
-						  If the option <option>SeparateVirtualInterp</option> is not used this is
-						  the right place where file handles, database connections or sockets can 
-						  be opened.
-						  The argument <replaceable><option>script</option></replaceable>
-						  is an actual Tcl script, so to run a file, you would
-						  do: <programlisting>RivetServerConf GlobalInitScript "source /var/www/foobar.tcl"</programlisting>
-						</para>
-						<para>
-						  This option is ignored in virtual hosts.
-						</para>
-			      </listitem>
-	  			</varlistentry>
+	      will be run.
+		</para>
+		<title>Apache Rivet Configuration lines</title>
+		<para>
+			Rivet has 3 general <quote>scope</quote> directives
 
-			  <varlistentry>
+			<itemizedlist>
+				<listitem>RivetDirConf: for configuration directives meant to
+				apply to a directory tree</listitem>
+				<listitem>RivetUserConf: for directives specific to
+				a user private space</listitem>
+				<listitem>RivetServerConf: for any directive meant to apply
+				globally (either to the whole Rivet installation or a	single 
+				<ulink url="&apachedoc-vhost;">virtual host</ulink>)
+				</listitem>
+			</itemizedlist>	      
+	      
+			These directives are applied so that RivetDirConf will
+	      override RivetUserConf, which in turn overrides any 
+	      RivetServerConf directives. Not every configuration directory
+	      is meaningful to a scope directive, as shown in the table below. The scope
+	      of application of a configuration line is matched also with the context where
+	      it appears. Virtual hosts definitions are contexts where rivet configuration
+	      lines can appear in many adding further customization to a given virtual
+	      host server.
+	   </para>
+		<para>
+			Example of configuration of a web server having independent 
+			interpreters for each virtual host, a larger default cache and a specific
+			script to be executed before any templates/scripts located in /var/www/myrivetapp
+		</para>
+		<programlisting>&lt;IfModule rivet_module&gt;
+    AddType application/x-httpd-rivet .rvt
+    AddType application/x-rivet-tcl   .tcl
+
+    RivetServerConf CacheSize              100
+    RivetServerConf SeparateVirtualInterps On
+&lt;/IfModule&gt;
+
+&lt;Directory /var/www/myrivetapp&gt;
+    RivetDirConf BeforeScript &quot;source /var/www/myrivetapp/before_script.tcl&quot;
+&lt;/Directory&gt;</programlisting>
+	   
+	</section>	
+	
+	<section>
+		<title>Configuration Directives</title>
+		<table align="center" title="Configuration Directives application scopes" class="directives">
+			<thead>
+				<td>Configuration Directives</td><td>DirConf</td><td>UserConf</td><td>ServerConf</td><td>Virtual Host</td><td>Notes</td>
+			</thead>
+			<tbody>
+				<tr><td>AbortScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
+				<tr><td>AfterScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
+				<tr><td>AfterEveryScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
+				<tr><td>BeforeScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
+				<tr><td>CacheSize</td><td></td><td></td><td>X</td><td></td><td></td></tr>
+				<tr><td>ChildExitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>ChildInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>ErrorScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 				
+				<tr><td>ExportRivetNS</td><td></td><td></td><td>X</td><td></td><td></td></tr>
+				<tr><td>GlobalInitScript</td><td></td><td></td><td>X</td><td></td><td>effective only when SeparateVirtualInterps is Off (default)</td></tr> 
+				<tr><td>ImportRivetNS</td><td></td><td></td><td>X</td><td></td><td></td></tr>
+				<tr><td>HonorHeaderOnlyRequests</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>MpmBridge</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
+				<tr><td>SeparateChannels</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
+				<tr><td>SeparateVirtualInterps</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
+				<tr><td>ServerInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>UploadDirectory</td><td></td><td>X</td><td>X</td><td>X</td><td></td></tr> 
+				<tr><td>UploadFilesToVar</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>UploadMaxSize</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
+			</tbody>
+		</table>
+
+		<variablelist>
+			<varlistentry>
+				<term>
+					<cmdsynopsis>
+						<arg choice="plain">AbortScript</arg>
+						<arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+				</term>
+				<listitem>
+					<para>
+						The execution of a can be interrupted by
+						invoking <xref linkend="abort_page" />. If  
+						an <option>AbortScript</option> is defined for the page
+						being generated, control is passed to it. <option>AbortScript</option>
+						is the right place where specific actions can be taken
+						to catch resources left dangling by the sudden interruption.				
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
 		      <term>
 					<cmdsynopsis>
-					  <arg choice="plain">ChildInitScript</arg>
+					  <arg choice="plain">AfterScript</arg>
+					  <arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+		      </term>
+	
+   			<listitem>
+					<para>
+					  Script to be called after each parsed .rvt template or .tcl script
+					  is executed
+					</para>
+					<para>
+					  In virtual hosts, this option overrides any AfterScript
+					  definitions at the global level.
+					</para>
+				</listitem>
+ 			</varlistentry>
+
+			<varlistentry>
+		      <term>
+					<cmdsynopsis>
+					  <arg choice="plain">AfterEveryScript</arg>
 					  <arg><replaceable>script</replaceable></arg>
 					</cmdsynopsis>
 		      </term>
 		      <listitem>
 					<para>
-					  Script to be evaluated when each Apache child
-					  process is initialized. This is the recommended
-					  place to load modules, create global variables, open
-					  connections to other facilities (such as databases)
-					  and so on.
-					</para>
-					<para>
-					  In virtual hosts, this script is run in addition to
-					  any global childinitscript. 
-	                  When <command>SeparateVirtualInterp</command>
-	                  any <command>ChildInitScript</command> placed within a 
-	                  <option>&lt;VirtualHost ...&gt;....&lt;/VirtualHost&gt;</option>
-	                  will be that Virtual Host specific ininitalization
+						<option>AfterEveryScript</option> is a script that is to
+						be run anyway before requests processing ends. This script
+						is therefore run both when the content generation script
+						completes successfully and when its execution is interrupted
+						by <xref linkend="abort_page" />. The code in this script
+						can understand whether it's running after the page was
+						interrupted by calling <xref linkend="abort_page" />	
+						with the argument <arg>-aborting</arg>. The command
+						will return 1 if an abort_page call took place 
+						earlier in the request processing.
 					</para>
 		      </listitem>
-			</varlistentry>
+	    	</varlistentry>
 
 			<varlistentry>
-	      	<term>
-					<cmdsynopsis>
-				  		<arg choice="plain">ChildExitScript</arg>
-				  		<arg><replaceable>script</replaceable></arg>
-					</cmdsynopsis>
-	      	</term>
-	      	<listitem>
-					<para>
-					  Script to be evaluated when each Apache child
-					  process exits. This is the logical place to clean
-					  up resources created in <option>ChildInitScript</option>, 
-					  if necessary.
-					</para>
-					<para>
-					  In virtual hosts, this script is run in addition to
-					  any global childexitscript.
-	              
-	              When <command>SeparateVirtualInterp</command>
-	              any <command>ChildExitScript</command> placed within a 
-	              <option>&lt;VirtualHost ...&gt;....&lt;/VirtualHost&gt;</option>
-	              will be that Virtual Host specific exit handler
-					</para>
-	      	</listitem>
-			</varlistentry>
-
-		   <varlistentry>
 		      <term>
 					<cmdsynopsis>
 					  <arg choice="plain">BeforeScript</arg>
@@ -207,276 +170,303 @@
 		    	</listitem>
 			</varlistentry>
 
-	   <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">AfterScript</arg>
-		  <arg><replaceable>script</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  Script to be called after each server parsed (.rvt) page.
-		</para>
-		<para>
-		  In virtual hosts, this option takes precedence over
-		  the global setting.
-		</para>
-	      </listitem>
-	    </varlistentry>
+			<varlistentry>
+   			<term>
+					<cmdsynopsis>
+		  				<arg choice="plain">CacheSize</arg>
+		  				<arg><replaceable>size</replaceable></arg>
+					</cmdsynopsis>
+   			</term>
+	   		<listitem>
+					<para>
+						  Sets the size of the internal page cache, where
+						  <option><replaceable>size</replaceable></option> is
+						  the number of byte-compiled pages to be cached for
+						  future use.  Default is
+						  <command>MaxRequestsPerChild</command> / 5, or 50,
+						  if <command>MaxRequestsPerChild</command> is 0.
+						</para>
+						<para>
+						  This option is completely global, even when using
+						  separate per-virtual host interpreters.
+						</para>
+				</listitem>	   			
+	   	</varlistentry>
 
-	    <varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">ErrorScript</arg>
-				  <arg><replaceable>script</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-	      <listitem>
-				<para>
-				  When Rivet encounters an error in a script, it
-				  constructs an HTML page with some information about
-				  the error, and the script that was being
-				  evaluated. If an <option>ErrorScript</option> is
-				  specified, it is possible to create custom error
-				  pages.  This may be useful if you want to make sure
-				  that users never view your source code.
-				</para>
-				<para>
-				  In virtual hosts, this option takes precedence over
-				  the global setting.
-				</para>
-	      </listitem>
-	    </varlistentry>
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+				  		<arg choice="plain">ChildExitScript</arg>
+				  		<arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+	      	</term>
+	      	<listitem>
+					<para>
+					  Script to be evaluated when each Apache child
+					  process exits. This is the logical place to clean
+					  up resources created in <option>ChildInitScript</option>, 
+					  if necessary.
+					</para>
+					<para>
+					  In virtual hosts, this script is run in addition to
+					  any global childexitscript.
+	              
+	              When <command>SeparateVirtualInterp</command>
+	              any <command>ChildExitScript</command> placed within a 
+	              <option>&lt;VirtualHost ...&gt;....&lt;/VirtualHost&gt;</option>
+	              will be that Virtual Host specific exit handler
+					</para>
+	      	</listitem>
+			</varlistentry>
 
-	    <varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">AfterEveryScript</arg>
-				  <arg><replaceable>script</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-	      <listitem>
-				<para>
-					<option>AfterEveryScript</option> is a script that is to
-					be run anyway before requests processing ends. This script
-					is therefore run both when the content generation script
-					completes successfully and when its execution is interrupted
-					by <xref linkend="abort_page" />. The code in this script
-					can understand whether it's running after the page was
-					interrupted by calling <xref linkend="abort_page" />	
-					with the argument <arg>-aborting</arg>. The command
-					will return 1 if an abort_page call took place 
-					earlier in the request processing.
-				</para>
-	      </listitem>
-	    </varlistentry>
+			<varlistentry>
+		      <term>
+					<cmdsynopsis>
+					  <arg choice="plain">ChildInitScript</arg>
+					  <arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+		      </term>
+		      <listitem>
+					<para>
+					  Script to be evaluated when each Apache child
+					  process is initialized. This is the recommended
+					  place to load modules, create global variables, open
+					  connections to other facilities (such as databases)
+					  and so on.
+					</para>
+					<para>
+					  In virtual hosts, this script is run in addition to
+					  any global childinitscript. 
+	                  When <command>SeparateVirtualInterp</command>
+	                  any <command>ChildInitScript</command> placed within a 
+	                  <option>&lt;VirtualHost ...&gt;....&lt;/VirtualHost&gt;</option>
+	                  will be that Virtual Host specific ininitalization
+					</para>
+		      </listitem>
+			</varlistentry>	   	
 
-		<varlistentry>
-			<term>
-				<cmdsynopsis>
-					<arg choice="plain">AbortScript</arg>
-					<arg><replaceable>script</replaceable></arg>
-				</cmdsynopsis>
-			</term>
-			<listitem>
-				<para>
-					The execution of a can be interrupted by
-					invoking <xref linkend="abort_page" />. If  
-					an <option>AbortScript</option> is defined for the page
-					being generated, control is passed to it. <option>AbortScript</option>
-					is the right place where specific actions can be taken
-					to catch resources left dangling by the sudden interruption.				
-				</para>
-			</listitem>
-		</varlistentry>
+	    	<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+				  		<arg choice="plain">ErrorScript</arg>
+				  		<arg><replaceable>script</replaceable></arg>
+					</cmdsynopsis>
+	      	</term>
+	      	<listitem>
+					<para>
+					  When Rivet encounters an error in a script, it
+					  constructs an HTML page with some information about
+					  the error, and the script that was being
+					  evaluated. If an <option>ErrorScript</option> is
+					  specified, it is possible to create custom error
+					  pages.  This may be useful if you want to make sure
+					  that users never view your source code.
+					</para>
+					<para>
+					  In virtual hosts, this option takes precedence over
+					  the global setting.
+					</para>
+	      	</listitem>
+	    	</varlistentry>
 
-	   <varlistentry>
-	      <term>
-				<cmdsynopsis>
-				  <arg choice="plain">UploadDirectory</arg>
-				  <arg><replaceable>directory</replaceable></arg>
-				</cmdsynopsis>
-	      </term>
-	      <listitem>
-				<para>Directory to place uploaded files.</para>
-				<para>
-		  			In virtual hosts, this option takes precedence over
-		  			the global setting.
-				</para>
-	      </listitem>
-	  </varlistentry>
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+		  				<arg choice="plain">ExportRivetNS</arg>
+						<group choice="req">
+			         	<arg>yes</arg>
+			          	<arg>no</arg>
+			       	</group>
+			       </cmdsynopsis>
+			  	</term>
+	    		<listitem>
+					<para>
+						Rivet commands are created within the ::rivet namespace. Setting
+						this option you tell mod_rivet to place the whole command set on
+						the export list of namespace, enabling your scripts to import
+						them in a different namespace.
+					</para>
+					<para>This option is, by nature, only available at the global level</para>
+	      	</listitem>
+	    	
+	    	</varlistentry>
+	    	
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+		  				<arg choice="plain">HonorHeaderOnlyRequests</arg>
+		  				<group choice="req">
+					    	<arg>yes</arg>
+					    	<arg>no</arg>
+					  	</group>
+					</cmdsynopsis>
+	      	</term>
+	      	<listitem>
+					<para>
+					  If a HEAD requests is issued by the client Rivet detects
+					  this case and sends back to the client a standard header 
+					  response. If the real header has to be examined (e.g. 
+					  for debugging) you can turn this options on. 
+					</para>
+					<para>This option is, by nature, only available at the global level</para>
+	      	</listitem>
+	    	</varlistentry>
+	    	    	
+			<varlistentry>
+		      <term>
+			     <cmdsynopsis>
+			       <arg choice="plain">SeparateChannels</arg>
+			       <group choice="req">
+			          <arg>yes</arg>
+			          <arg>no</arg>
+			       </group>
+			     </cmdsynopsis>
+			  </term>
+		      <listitem>
+	      		<para>
+	      			Internally mod_rivet creates a new Tcl channel (Rivet channel) which is configured
+	      			as <command>stdout</command> and registered to each existing interpreter.
+	      			There is no need of multiple channels in a single thread as each thread can 
+	      			serve only one request at a time. But if you are deploying mod_rivet in a
+	      			complex environment running unrelated applications developed by 
+	      			different teams, it could be the case to have <command>SeparateVirtualInterps</command>
+	      			set. If you want to enhance the environment separation you may also
+	      			set <command>SeparateChannels</command> to force mod_rivet to create
+	      			a channel per each Tcl interpreter thus enabling single application
+	      			code to change the Rivet channel parameters without affecting other
+	      			applications (even though changing the Tcl channel parameters is a rare 
+	      			necessity). Setting this options increases the system overheads as each
+	      			Rivet channel needs to allocate its own control structures and internal
+	      			buffers.
+	      		</para>
+	      		<note>
+	      			This option is implemented in order to have fine-grained control over mod_rivet. In
+	      			nearly all practical cases you won't need to change Rivet Channel (stdout) settings
+	      			for different applications by calling <command>fconfigure stdout ....</command>. 
+	      			This option is, by nature, only available at the global level and has effect only if 
+	   		      also <command>SeparateVirtualInterps</command> is set
+	   		   </note>
+		      </listitem>
+	    	</varlistentry>
+	   	
+ 			<varlistentry>
+	      	<term>
+		     		<cmdsynopsis>
+		       		<arg choice="plain">SeparateVirtualInterps</arg>
+		       		<group choice="req">
+					   	<arg>yes</arg>
+					      <arg>no</arg>
+					   </group>
+					 </cmdsynopsis>
+		  		</term>
+		      <listitem>
+	      		<para>
+	      		  If on, Rivet will create a separate Tcl interpreter
+	      		  for each Apache virtual host.  This is useful in an
+	      		  ISP type situation where it is desirable to separate
+	      		  clients into separate interpreters, so that they
+	      		  don't accidentally interfere with one another.
+	      		</para>
+	   		    <note>
+	   		      This option is, by nature, only available at the
+	   		      global level. By enabling <command>SeparateVirtualInterps</command>
+	   		      you must rely only on <command>ChildInitScript</command> to
+	   		      initialize the interpreters. Don't expect the 
+	   		      initialization done in <command>ServerInitScript</command> and 
+	   		      <command>GlobalInitScript</command> to be handed down to the
+	   		      slave interpreters that are private to each configured 
+	   		      virtual host.
+	   		   </note>
+		      </listitem>
+	    	</varlistentry>	   	
+	   	
+	   	
+			<varlistentry>
+   			<term>
+   				<cmdsynopsis>
+		   			<arg choice="plain">ServerInitScript</arg>
+		   			<arg><replaceable>script</replaceable></arg>
+   				</cmdsynopsis>
+   			</term>
+   			<listitem>
+		   		<para>
+				    	The directive <command>ServerInitScript</command> plays a special
+				    	role since the script runs within the master interpreter,
+				    	an interpreter created when the Apache web server is setting up
+				    	for answering requests and before worker processes/threads are
+				    	started. During this stage Apache is still running as a 
+				    	single process, so this is the right place for doing 
+				    	initialization of systems such as any IPC systems.
+   				</para>
+		   		<para>
+		   			On systems with the capability of forking child processes
+		   			the Apache web server can run the prefork MPM. By default 
+		   			rivet selects the prefork brigde which makes mod_rivet work
+		   			the way mod_rivet &version2-generic; work.
+		   			In a web server with this set up child processes inherit a copy of the 
+		   			address space from the parent processes and therefore
+		   			Tcl interpreters too are replicated into the child address space. 
+		   			If SeparateVirtualInteprs is Off child processes run with a
+		   			copy of the Tcl master interpreter and ServerInitScipt
+		   			thus provides a way to initialize only once  
+		   			any subsequent Tcl interpreters created by fork calls as each
+		   			of them are clones of the master interpreter.
+		   		</para>
 
-	  <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">UploadMaxSize</arg>
-		  <arg><replaceable>size</replaceable></arg>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>Maximum size for uploaded files.</para>
-		<para>
-		  In virtual hosts, this option takes precedence over
-		  the global setting.
-		</para>
-	      </listitem>
-	    </varlistentry>
+   			</listitem>
+			</varlistentry>
 
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">UploadFilesToVar</arg>
-		  <group choice="req"><arg>yes</arg><arg>no</arg></group>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  This option controls whether it is possible to
-		  upload files to a Tcl variable.  If you have a size
-		  limit, and don't have to deal with large files, this
-		  might be more convenient than sending the data to a
-		  file on disk.
-		</para>
-	      </listitem>
-	    </varlistentry>
+			<varlistentry>
+		      <term>
+					<cmdsynopsis>
+					  <arg choice="plain">UploadDirectory</arg>
+					  <arg><replaceable>directory</replaceable></arg>
+					</cmdsynopsis>
+		      </term>
+		      <listitem>
+					<para>Directory to place uploaded files.</para>
+					<para>
+			  			In virtual hosts, this option takes precedence over
+			  			the global setting.
+					</para>
+		      </listitem>
+	  		</varlistentry>
 
-	    <varlistentry>
-	      <term>
-		     <cmdsynopsis>
-		       <arg choice="plain">SeparateChannels</arg>
-		       <group choice="req">
-		          <arg>yes</arg>
-		          <arg>no</arg>
-		       </group>
-		     </cmdsynopsis>
-		  </term>
-	      <listitem>
-      		<para>
-      			Internally mod_rivet creates a new Tcl channel (Rivet channel) which is configured
-      			as <command>stdout</command> and registered to each existing interpreter.
-      			There is no need of multiple channels in a single thread as each thread can 
-      			serve only one request at a time. But if you are deploying mod_rivet in a
-      			complex environment running unrelated applications developed by 
-      			different teams, it could be the case to have <command>SeparateVirtualInterps</command>
-      			set. If you want to enhance the environment separation you may also
-      			set <command>SeparateChannels</command> to force mod_rivet to create
-      			a channel per each Tcl interpreter thus enabling single application
-      			code to change the Rivet channel parameters without affecting other
-      			applications (even though changing the Tcl channel parameters is a rare 
-      			necessity). Setting this options increases the system overheads as each
-      			Rivet channel needs to allocate its own control structures and internal
-      			buffers.
-      		</para>
-      		<note>
-      			This option is implemented in order to have fine-grained control over mod_rivet. In
-      			nearly all practical cases you won't need to change Rivet Channel (stdout) settings
-      			for different applications by calling <command>fconfigure stdout ....</command>. 
-      			This option is, by nature, only available at the global level and has effect only if 
-   		      also <command>SeparateVirtualInterps</command> is set
-   		   </note>
-	      </listitem>
-	    </varlistentry>
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+		  				<arg choice="plain">UploadFilesToVar</arg>
+		  				<group choice="req"><arg>yes</arg><arg>no</arg></group>
+					</cmdsynopsis>
+	      	</term>
+	      	<listitem>
+					<para>
+					  This option controls whether it is possible to
+					  upload files to a Tcl variable.  If you have a size
+					  limit, and don't have to deal with large files, this
+					  might be more convenient than sending the data to a
+					  file on disk.
+					</para>
+	      	</listitem>
+	    	</varlistentry>
 
-	    <varlistentry>
-	      <term>
-		     <cmdsynopsis>
-		       <arg choice="plain">SeparateVirtualInterps</arg>
-		       <group choice="req">
-		          <arg>yes</arg>
-		          <arg>no</arg>
-		       </group>
-		     </cmdsynopsis>
-		  </term>
-	      <listitem>
-      		<para>
-      		  If on, Rivet will create a separate Tcl interpreter
-      		  for each Apache virtual host.  This is useful in an
-      		  ISP type situation where it is desirable to separate
-      		  clients into separate interpreters, so that they
-      		  don't accidentally interfere with one another.
-      		</para>
-   		    <note>
-   		      This option is, by nature, only available at the
-   		      global level. By enabling <command>SeparateVirtualInterps</command>
-   		      you must rely only on <command>ChildInitScript</command> to
-   		      initialize the interpreters. Don't expect the 
-   		      initialization done in <command>ServerInitScript</command> and 
-   		      <command>GlobalInitScript</command> to be handed down to the
-   		      slave interpreters that are private to each configured 
-   		      virtual host.
-   		   </note>
-	      </listitem>
-	    </varlistentry>
 
-	    <varlistentry>
-	      <term>
-		<cmdsynopsis>
-		  <arg choice="plain">HonorHeaderOnlyRequests</arg>
-		  <group choice="req">
-		    <arg>yes</arg>
-		    <arg>no</arg>
-		  </group>
-		</cmdsynopsis>
-	      </term>
-	      <listitem>
-		<para>
-		  If a HEAD requests is issued by the client Rivet detects
-		  this case and sends back to the client a standard header 
-		  response. If the real header has to be examined (e.g. 
-		  for debugging) you can turn this options on. 
-		</para>
-		<para>This option is, by nature, only available at the global level</para>
-	      </listitem>
-	    </varlistentry>
-	  </variablelist>
-	</listitem>
-      </varlistentry>
-      	<varlistentry>
-			<term>
-			  <cmdsynopsis>
-			    <command>RivetDirConf</command>
-			    <group choice="req">
-			      <arg>BeforeScript</arg>
-			      <arg>AfterScript</arg>
-			      <arg>ErrorScript</arg>
-			      <arg>UploadDirectory</arg>
-                  <arg>AfterEveryScript</arg>
-			    </group>
-			  </cmdsynopsis>
-			</term>
-			<listitem>
-			  <para>
-			    These options are the same as for
-			    <command>RivetServerConf</command>, except that they are
-			    only valid for the directory where they are specified, and
-			    its subdirectories.  It may be specified in <command>Directory</command> 
-			    sections.
-			  </para>
-			</listitem>
-      </varlistentry>
-      	<varlistentry>
-			<term>
-			  <cmdsynopsis>
-			    <command>RivetUserConf</command>
-			    <group choice="req">
-			      <arg>BeforeScript</arg>
-			      <arg>AfterScript</arg>
-			      <arg>ErrorScript</arg>
-			      <arg>UploadDirectory</arg>
-                  <arg>AfterEveryScript</arg>
-			    </group>
-			  </cmdsynopsis>
-			</term>
-			<listitem>
-			  <para>
-			    These options are the same as for
-			    <command>RivetServerConf</command>, except that they are
-			    only valid for the directory where they are specified, and
-			    its subdirectories.
-			  </para>
-			</listitem>
-      </varlistentry>
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+					  <arg choice="plain">UploadMaxSize</arg>
+					  <arg><replaceable>size</replaceable></arg>
+					</cmdsynopsis>
+				</term>
+				<listitem>
+					<para>Maximum size for uploaded files.</para>
+					<para>
+					  In virtual hosts, this option takes precedence over
+					  the global setting.
+					</para>
+				</listitem>
+	    	</varlistentry>
+
 		</variablelist>
 	</section>
 </section>

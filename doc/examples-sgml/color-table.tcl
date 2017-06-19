@@ -1,9 +1,10 @@
 puts &quot;&lt;html&gt;&lt;head&gt;&quot;
-puts &quot;&lt;style&gt;\n  td { font-size: 12px; }\n  td.bright { color: #eee; }\n  td.dark { color: #222; }\n&lt;/style&gt;&quot;
+puts &quot;&lt;style&gt;\n  td { font-size: 12px; text-align: center; padding-left: 3px; padding-right: 3px}&quot;
+puts &quot;  td.bright { color: #eee; }\n  td.dark { color: #222; }\n&lt;/style&gt;&quot;
 puts &quot;&lt;/head&gt;&lt;body&gt;&quot;
 puts &quot;&lt;table&gt;&quot;
 
-# we create a 8x8 table selecting a different background for each cell
+# we create a 9x9 table selecting a different background for each cell
 
 for {set i 0} { $i &lt; 9 } {incr i} {
     puts &quot;&lt;tr&gt;&quot;
@@ -16,7 +17,7 @@ for {set i 0} { $i &lt; 9 } {incr i} {
 # determining the background luminosity (YIQ space of NTSC) and choosing
 # the foreground color accordingly in order maintain maximum contrast
 
-        if { [expr ($r*0.29894)+($g*0.58704)+($b*0.11402)] &gt; 128} {
+        if { [expr ($r*0.29894)+($g*0.58704)+($b*0.11402)] &gt; 128.0} {
             set cssclass &quot;dark&quot;
         } else {
             set cssclass &quot;bright&quot;

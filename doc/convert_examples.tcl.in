@@ -42,7 +42,7 @@ foreach example $source_examples {
     if {!$example_sgml_exists || \
         ([file mtime $example] > [file mtime $example_sgml])} { 
 
-        puts "$example needs rebuild"
+        puts "$example needs to be escaped"
         
         set example_text [string trim [::rivet::read_file $example]]
 

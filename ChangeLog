@@ -1,3 +1,10 @@
+2017-06-19 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml: first rewriting into a new page.
+    Still more directives to be documented
+    * doc/convert_examples.tcl.in: changed message
+    * doc/rivet.css: add directives for styling the
+    directives page
+
 2017-06-09 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/: manual rewriting started
 

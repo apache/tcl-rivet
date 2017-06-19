@@ -342,10 +342,49 @@ UL  {
 	background-color: #eee;		
 }
 
+table.directives {
+	border-collapse: collapse;
+}
+.directives thead {
+    background-color:   #bbf;
+    font-size:          1em;
+    text-decoration:    none;
+}
+
+.directives thead td {
+    padding:            8px;
+}
+
+.directives tbody tr > :first-child {
+    background-color:   #eee;
+    padding-left:       2em;
+    padding-right:      2em;
+    text-align:         left;
+}
+
+.directives tbody tr > :last-child {
+   text-decoration:    	none;
+   font-weight: 			normal;
+	font-size: 				small;
+	border-left:			1px solid black;
+	text-align:         	left;
+}
+
+.directives tbody tr td {
+   text-align:         center;
+   text-decoration:    none;
+   font-weight: 			normal;
+	padding-left:			1em;
+	padding-right: 		1em;
+	padding-bottom: 		4px;
+	padding-top: 			4px;
+	border-bottom:			1px solid black;
+}
+
 .note td {
-    font-size: small;
+    font-size:          small;
 }
 
 li.listitem {
-    font-size: small;
+    font-size:          small;
 }

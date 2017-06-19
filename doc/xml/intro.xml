@@ -3,8 +3,8 @@
     <para>
       Apache Rivet is a system for creating dynamic web content by
       integrating the 
-		<ulink url="http://www.tcl.tk/">Tcl programming language</ulink> within the 
-      <ulink url="http://httpd.apache.org">Apache Web Server</ulink>.
+		<ulink url="&tcltk-url;">Tcl programming language</ulink> within the 
+      <ulink url="&apache-url;">Apache Web Server</ulink>.
       It is designed to be fast, powerful and extensible, consume 
       few system resources, be easy to learn, and to provide the user with a
       platform that can also be used for other programming tasks
@@ -37,7 +37,7 @@
         </para>
         <title>Rivet - MPM Bridge</title>
         <para>
-        		Threaded <ulink href="https://httpd.apache.org/docs/2.4/mpm.html">MPM</ulink>
+        		Threaded <ulink href="&apachedoc-mpm;">MPM</ulink>
         		integration was achieved by making mod_rivet multithreaded and
         		modular itself, introducing the concept of MPM bridges, a set of loadable modules 
         		responsible to offer the running MPM the best possible integration with 

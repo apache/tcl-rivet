@@ -30,11 +30,14 @@
     <!ENTITY asciiglyphs.xml		  SYSTEM "xml-2/asciiglyphs.xml" >
     <!ENTITY lazybridge.xml		  SYSTEM "xml/lazybridge.xml" >
     <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
-    <!ENTITY version	"3.0" >
-    <!ENTITY fullversion "3.0.0" >
-    <!ENTITY version2-series	"2.0,2.1,2.2,2.3" >
-    <!ENTITY version2-generic	"2.x" >
-
+    <!ENTITY version					  "3.0" >
+    <!ENTITY fullversion 		     "3.0.0" >
+    <!ENTITY version2-series	     "2.0,2.1,2.2,2.3" >
+    <!ENTITY version2-generic	     "2.x" >
+    <!ENTITY tcltk-url             "http://www.tcl.tk/" >
+    <!ENTITY apache-url            "http://httpd.apache.org" >
+	 <!ENTITY apachedoc-vhost       "https://httpd.apache.org/docs/2.4/vhosts" >
+	 <!ENTITY apachedoc-mpm			  "https://httpd.apache.org/docs/2.4/mpm.html" >
 ]>
 
 <!--
