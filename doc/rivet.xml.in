@@ -31,8 +31,8 @@
     <!ENTITY asciiglyphs.xml       SYSTEM "xml-2/asciiglyphs.xml" >
     <!ENTITY lazybridge.xml        SYSTEM "xml/lazybridge.xml" >
     <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
-    <!ENTITY version				     "3.0" >
-    <!ENTITY fullversion 		     "3.0.0" >
+    <!ENTITY version				     "@INIT_VERSION@" >
+    <!ENTITY fullversion 		     "@PACKAGE_VERSION@" >
     <!ENTITY version2-series	     "2.0,2.1,2.2,2.3" >
     <!ENTITY version2-generic	     "2.x" >
     <!ENTITY version30				  "3.0" >
@@ -58,7 +58,7 @@
    permissions and limitations under the License.
 -->
 
-<!-- $Id$ -->
+<!-- $Id: rivet.xml 1799149 2017-06-19 08:18:58Z mxmanghi $ -->
 
 <article>
   	<articleinfo>
@@ -79,7 +79,7 @@
   	</articleinfo>
 
   	<para>
-    	Document revision: $Revision$, last modified <?dbtimestamp format="Y-m-d X" ?>$ by $Author$.
+    	Document revision: $Revision: 1799149 $, last modified <?dbtimestamp format="Y-m-d X" ?>$ by $Author: mxmanghi $.
   	</para>
 
 	<!-- Introduction -->

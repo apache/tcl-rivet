@@ -339,9 +339,7 @@
 	<refentry id="catch">
 		<refnamediv>
 			<refname>catch</refname>
-			<refpurpose>wraps core command <command>catch</command> and handles in
-			a special way fake error conditions resulting from calls to <command>exit</command>
-			and <command>abort_page</command></refpurpose>
+			<refpurpose>wraps core command <command>catch</command> </refpurpose>
 		</refnamediv>
 		<refsynopsisdiv>
 			<cmdsynopsis>
@@ -356,18 +354,18 @@
 			<title>Description</title>
 			<para>
 		    	<command>::rivet::catch</command> wraps the core language's same command adding some
-                extra error handling needed by mod_rivet design.
+            extra error handling needed by mod_rivet design.
 		    	The rationale for Rivet to have its own <command>::rivet::catch</command> reads as follows: 
-                within mod_rivet a script execution can be interrupted by either calling 
+            within mod_rivet a script execution can be interrupted by either calling 
 		    	<command>::rivet::exit</command>(deprecated) or <command>::rivet::abort_page</command>. These commands
-                implement a simple internal exception mechanism by 
-                returning a special error code so that execution is in turn handed down to the
-                <command>AbortScript</command> and eventually to <command>AfterEveryScript</command> (if any of them is 
-                defined). Any code calling one of these commands which runs under control of the
-                <command>::catch</command> command would need to do this chore itself, checking the error info and in case 
-                throw the error again if it had been originated by one of mod_rivet's exceptions calls. 
-                This is what <command>::rivet::catch</command> does hiding the implementation
-                details provide a better and more compatibile way to handle this condition.
+            implement a simple internal exception mechanism by 
+            returning a special error code so that execution is in turn handed down to the
+            <command>AbortScript</command> and eventually to <command>AfterEveryScript</command> (if any of them is 
+            defined). Any code calling one of these commands which runs under control of the
+            <command>::catch</command> command would need to do this chore itself, checking the error info and in case 
+            throw the error again if it had been originated by one of mod_rivet's exceptions calls. 
+            This is what <command>::rivet::catch</command> does hiding the implementation
+            details provide a better and more compatibile way to handle this condition.
 			</para>
 			
 			<note>
@@ -1667,254 +1665,276 @@ bab</programlisting>
 	</refentry>
 
 	<refentry id="upload">
-	    <refnamediv>
-		<refname>upload</refname>
-		<refpurpose>handle a file uploaded by a client.</refpurpose>
-	    </refnamediv>
+	   <refnamediv>
+			<refname>upload</refname>
+			<refpurpose>handle a file uploaded by a client.</refpurpose>
+	   </refnamediv>
 
-	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>::rivet::upload</command>
-		    <group choice="req">
-			<arg>channel</arg>
-			<arg>save</arg>
-			<arg>data</arg>
-			<arg>exists</arg>
-			<arg>size</arg>
-			<arg>type</arg>
-			<arg>filename</arg>
-		    </group>
-		</cmdsynopsis>
-	    </refsynopsisdiv>
+	   <refsynopsisdiv>
+			<cmdsynopsis>
+			    <command>::rivet::upload</command>
+			    <group choice="req">
+				<arg>channel</arg>
+				<arg>save</arg>
+				<arg>data</arg>
+				<arg>exists</arg>
+				<arg>size</arg>
+				<arg>type</arg>
+				<arg>filename</arg>
+			    </group>
+			</cmdsynopsis>
+	   </refsynopsisdiv>
 
-	    <refsect1>
-		<title>Description</title>
-		<para>
-		    The upload command is for file upload manipulation.
-		    See the relevant Apache Directives to further configure the
-		    behavior of this Rivet feature.
-		</para>
+	   <refsect1>
+			<title>Description</title>
+				<para>
+				    The upload command is for file upload manipulation.
+				    See the relevant Apache Directives to further configure the
+				    behavior of this Rivet feature.
+				</para>
 
-		<variablelist>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">channel</arg>
-    				<arg><replaceable>uploadname</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				    When given the name of a file upload
-	    			<option><replaceable>uploadname</replaceable></option>,
-				    returns a Tcl channel that can be used to access the
-				    uploaded file.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">save</arg>
-				<arg><replaceable>uploadname</replaceable></arg>
-				<arg><replaceable>filename</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Saves the <option><replaceable>uploadname</replaceable></option> in
-				the file <option><replaceable>filename</replaceable></option>.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">data</arg>
-				<arg><replaceable>uploadname</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Returns data uploaded to the server.  This is binary clean
-				- in other words, it will work even with files like
-				images, executables, compressed files, and so on.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">exists</arg>
-				<arg><replaceable>uploadname</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Returns true if an upload named <arg>uploadname</arg>
-				exists.  This can be used in scripts that are meant to
-				be run by different forms that send over uploads that
-				might need specific processing.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">size</arg>
-				<arg><replaceable>uploadname</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Returns the size of the file uploaded.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">type</arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				If the <varname>Content-type</varname> is set, it is
-				returned, otherwise, an empty string.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">filename</arg>
-				<arg><replaceable>uploadname</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Returns the filename on the remote host that uploaded the file.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">tempname</arg>
-				<arg><replaceable>uploadname</replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Returns the name of the temporary file on the local host that the file was uploaded into.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::upload</command>
-				<arg choice="plain">names</arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Returns the variable names, as a list, of all the files uploaded.
-			    </para>
-			</listitem>
-		    </varlistentry>
-		</variablelist>
-		<para>
-		    See <xref linkend="file_upload"/>.
-		</para>
-	    </refsect1>
+				<variablelist>
+				   <varlistentry>
+						<term>
+							<cmdsynopsis>
+								<command>::rivet::upload</command>
+								<arg choice="plain">channel</arg>
+			    				<arg><replaceable>uploadname</replaceable></arg>
+						   </cmdsynopsis>
+						</term>
+						<listitem>
+						    <para>
+							    When given the name of a file upload
+				    			<option><replaceable>uploadname</replaceable></option>,
+							    returns a Tcl channel that can be used to access the
+							    uploaded file.
+						    </para>
+						</listitem>
+				  	</varlistentry>
+				   <varlistentry>
+						<term>
+						    <cmdsynopsis>
+							<command>::rivet::upload</command>
+							<arg choice="plain">save</arg>
+							<arg><replaceable>uploadname</replaceable></arg>
+							<arg><replaceable>filename</replaceable></arg>
+						    </cmdsynopsis>
+						</term>
+						<listitem>
+						    <para>
+							Saves the <option><replaceable>uploadname</replaceable></option> in
+							the file <option><replaceable>filename</replaceable></option>.
+						    </para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<cmdsynopsis>
+								<command>::rivet::upload</command>
+								<arg choice="plain">data</arg>
+								<arg><replaceable>uploadname</replaceable></arg>
+						   </cmdsynopsis>
+						</term>
+						<listitem>
+						   <para>
+								Returns data uploaded to the server.  This is binary clean
+								- in other words, it will work even with files like
+								images, executables, compressed files, and so on.
+						    </para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+						   <cmdsynopsis>
+								<command>::rivet::upload</command>
+								<arg choice="plain">exists</arg>
+								<arg><replaceable>uploadname</replaceable></arg>
+						   </cmdsynopsis>
+						</term>
+						<listitem>
+						    <para>
+									Returns true if an upload named <arg>uploadname</arg>
+									exists.  This can be used in scripts that are meant to
+									be run by different forms that send over uploads that
+									might need specific processing.
+						    </para>
+						</listitem>
+				   </varlistentry>
+		    		<varlistentry>
+						<term>
+						    <cmdsynopsis>
+							<command>::rivet::upload</command>
+							<arg choice="plain">size</arg>
+							<arg><replaceable>uploadname</replaceable></arg>
+						    </cmdsynopsis>
+						</term>
+						<listitem>
+			    			<para>
+								Returns the size of the file uploaded.
+			    			</para>
+						</listitem>
+		    		</varlistentry>
+	    		<varlistentry>
+					<term>
+					    <cmdsynopsis>
+						<command>::rivet::upload</command>
+						<arg choice="plain">type</arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+			    		<para>
+							If the <varname>Content-type</varname> is set, it is
+							returned, otherwise, an empty string.
+			    		</para>
+					</listitem>
+	    		</varlistentry>
+	    		<varlistentry>
+					<term>
+					    <cmdsynopsis>
+						<command>::rivet::upload</command>
+						<arg choice="plain">filename</arg>
+						<arg><replaceable>uploadname</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+		    			<para>
+							Returns the filename on the remote host that uploaded the file.
+		    			</para>
+					</listitem>
+	    		</varlistentry>
+	    		<varlistentry>
+					<term>
+					    <cmdsynopsis>
+						<command>::rivet::upload</command>
+						<arg choice="plain">tempname</arg>
+						<arg><replaceable>uploadname</replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+		    			<para>
+							Returns the name of the temporary file on the local host that the file was uploaded into.
+		    			</para>
+					</listitem>
+		    	</varlistentry>
+	    		<varlistentry>
+					<term>
+					    <cmdsynopsis>
+						<command>::rivet::upload</command>
+						<arg choice="plain">names</arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+						<para>
+							Returns the variable names, as a list, of all the files uploaded.
+					   </para>
+					</listitem>
+		   	</varlistentry>
+			</variablelist>
+			<para>
+			    See <xref linkend="file_upload"/>.
+			</para>
+		</refsect1>
+	</refentry>
+	
+	<refentry id="url_script">
+		<refnamediv>
+			<refname>url_script</refname>
+			<refpurpose>get the code of the URL referenced Tcl script or Rivet template</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+				<command>::rivet::url_script</command>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<title>Description</title>
+			<para>
+				This command is used internally by the rivet central Tcl
+				procedure (::Rivet::request_handling) executed by
+				the default traditional code for HTTP requests processing.
+				Unless you're implementing your own ::Rivet::request_handling
+				procedure it's unlikely it can be of any use.
+			</para>
+		</refsect1>
 	</refentry>
 
 	<refentry id="var">
-	    <refnamediv>
-		<refname>var</refname>
-		<refname>var_qs</refname>
-		<refname>var_post</refname>
-		<refpurpose>get the value of a form variable.</refpurpose>
-	    </refnamediv>
+		<refnamediv>
+			<refname>var</refname>
+			<refname>var_qs</refname>
+			<refname>var_post</refname>
+			<refpurpose>get the value of a form variable.</refpurpose>
+	   </refnamediv>
 
-	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>::rivet::var</command>
-		    <group choice="req">
-			<arg>get</arg>
-			<arg>list</arg>
-			<arg>exists</arg>
-			<arg>number</arg>
-			<arg>all</arg>
-		    </group>
-		</cmdsynopsis>
+	   <refsynopsisdiv>
+			<cmdsynopsis>
+			   <command>::rivet::var</command>
+			   <group choice="req">
+					<arg>get</arg>
+					<arg>list</arg>
+					<arg>exists</arg>
+					<arg>number</arg>
+					<arg>all</arg>
+			   </group>
+			</cmdsynopsis>
 		
-		<cmdsynopsis>
-		    <command>::rivet::var_qs</command>
-		    <group choice="req">
-			<arg>get</arg>
-			<arg>list</arg>
-			<arg>exists</arg>
-			<arg>number</arg>
-			<arg>all</arg>
-		    </group>
-		</cmdsynopsis>
-		
-		<cmdsynopsis>
-		    <command>::rivet::var_post</command>
-		    <group choice="req">
-			<arg>get</arg>
-			<arg>list</arg>
-			<arg>exists</arg>
-			<arg>number</arg>
-			<arg>all</arg>
-		    </group>
-		</cmdsynopsis>
-	    </refsynopsisdiv>
-	    <refsect1>
-		<title>Description</title>
-		<para>
-		    The <command>var</command> command retrieves information
-		    about GET or POST variables sent to the script via client
-		    request.  It treats both GET and POST variables the same,
-		    regardless of their origin.  Note that there are two
-		    additional forms of <command>::rivet::var</command>:
-		    <command>rivet::var_qs</command> and 
-		    <command>::rivet::var_post</command>.
-		    These two restrict the retrieval of information to
-		    parameters arriving via the querystring
-		    (?foo=bar&amp;bee=bop) or POSTing, respectively.
-		</para>
-		<variablelist>
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::var</command>
-				<arg choice="plain">get</arg>
-				<arg><replaceable>varname</replaceable></arg>
-				<arg><replaceable><optional>default</optional></replaceable></arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Returns the value of variable
-				<option><replaceable>varname</replaceable></option>
-				as a string (even if there are multiple values).  If
-				the variable doesn't exist as a GET or POST
-				variable, the
-				<option><replaceable><optional>default</optional></replaceable></option>
-				value is returned, otherwise "" - an empty string -
-				is returned.
-			    </para>
+			<cmdsynopsis>
+				<command>::rivet::var_qs</command>
+			   	<group choice="req">
+						<arg>get</arg>
+						<arg>list</arg>
+						<arg>exists</arg>
+						<arg>number</arg>
+						<arg>all</arg>
+			    	</group>
+			</cmdsynopsis>
+			
+			<cmdsynopsis>
+			   <command>::rivet::var_post</command>
+			   <group choice="req">
+					<arg>get</arg>
+					<arg>list</arg>
+					<arg>exists</arg>
+					<arg>number</arg>
+					<arg>all</arg>
+			   </group>
+			</cmdsynopsis>
+	   </refsynopsisdiv>
+	   <refsect1>
+			<title>Description</title>
+			<para>
+			    The <command>var</command> command retrieves information
+			    about GET or POST variables sent to the script via client
+			    request.  It treats both GET and POST variables the same,
+			    regardless of their origin.  Note that there are two
+			    additional forms of <command>::rivet::var</command>:
+			    <command>rivet::var_qs</command> and 
+			    <command>::rivet::var_post</command>.
+			    These two restrict the retrieval of information to
+			    parameters arriving via the querystring
+			    (?foo=bar&amp;bee=bop) or POSTing, respectively.
+			</para>
+			<variablelist>
+		    	<varlistentry>
+					<term>
+					    <cmdsynopsis>
+						<command>::rivet::var</command>
+						<arg choice="plain">get</arg>
+						<arg><replaceable>varname</replaceable></arg>
+						<arg><replaceable><optional>default</optional></replaceable></arg>
+					    </cmdsynopsis>
+					</term>
+					<listitem>
+			    		<para>
+							Returns the value of variable
+							<option><replaceable>varname</replaceable></option>
+							as a string (even if there are multiple values).  If
+							the variable doesn't exist as a GET or POST
+							variable, the
+							<option><replaceable><optional>default</optional></replaceable></option>
+							value is returned, otherwise "" - an empty string -
+							is returned.
+			    		</para>
 			</listitem>
 		    </varlistentry>
 		    

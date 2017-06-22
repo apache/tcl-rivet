@@ -1,4 +1,4 @@
-<section id="introduction">
+	<section id="introduction">
     <title>Introduction to Apache Rivet version &version;</title>
     <para>
       Apache Rivet is a system for creating dynamic web content by

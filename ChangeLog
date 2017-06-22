@@ -1,3 +1,10 @@
+2017-06-22 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml.in: introducing rivet.xml.in for
+    automatic and consistent definition of versioning entities
+    * doc/xml/commands.xml: moved into final directory
+    * doc/xml/processing.xml: add new file to separate request
+    processing from MPM bridge interface documentation
+
 2017-06-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/directives.xml: first rewriting into a new page.
     Still more directives to be documented

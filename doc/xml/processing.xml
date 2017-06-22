@@ -1,0 +1,69 @@
+<section id="processing">
+	<title>Apache Rivet HTTP Request Processing</title>
+	<section>
+		<title>Tcl Scripts Processing</title>
+		<para>
+			The traditional &version2-generic; way to handle an HTTP request
+			requires the execution of Tcl script or Rivet template (.rvt files)
+			whose path appears encoded in the URI (alias or rewriting might occur
+			to establish the real path). The execution of such script
+			can be preceded by the execution of a script (BeforeScript) and/or 
+			followed by other scripts (AfterScript).
+			This extra script can be configured on a per virtual host, 
+			per directory or per user basis. Execution of such code can 
+			interrupt because of coding errors (triggering the
+			ErrorScript execution or bail out of ordinary execution when
+			the ::rivet::abort_page is called, implicitly invoking the execution
+			of an AbortScript. This handling in case can be followed by
+			a further configurable script (AfterEveryScript)
+		</para>
+		<para>
+			The whole machinery of request handling was developed to fulfill the
+			programmer's necessity as they emerged in the Rivet development history.
+			The script execution was called from mod_rivet.so and implemented in
+			C code. With Rivet &version30; the Tcl code execution is implemented
+			by calling a single Tcl procedure
+		</para>
+		<programlisting>proc ::Rivet::request_handling {} {
+    ::try {
+        uplevel #0 ::Rivet::initialize_request
+    } on error {err} {
+        ::rivet::apache_log_error crit \
+            "Rivet request initialization failed: $::errorInfo"
+    }
+
+    ::try {
+        set script [::rivet::inspect BeforeScript]
+        if {$script ne ""} {
+            set ::Rivet::script $script
+            uplevel #0 $script
+        }
+
+        set script [::rivet::url_script]
+        if {$script ne ""} {
+            set ::Rivet::script $script
+            namespace eval ::request $script
+        }
+
+        set script [::rivet::inspect AfterScript]
+        if {$script ne ""} {
+            set ::Rivet::script $script
+            uplevel #0 $script
+        }
+    } trap {RIVET ABORTPAGE} {err opts} {
+        ::Rivet::finish_request $script $err $opts AbortScript
+    } trap {RIVET THREAD_EXIT} {err opts} {
+        ::Rivet::finish_request $script $err $opts AbortScript
+    } on error {err opts} {
+        ::Rivet::finish_request $script $err $opts
+    } finally {
+        ::Rivet::finish_request $script "" "" AfterEveryScript
+    }
+
+}</programlisting>
+	</section>
+	<section>
+		<title>Apache Multi Processing Models Support</title>
+		<para>second section</para>
+	</section>
+</section>
