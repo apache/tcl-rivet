@@ -122,6 +122,7 @@ int Prefork_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     RIVET_PRIVATE_DATA_NOT_NULL (rivet_thread_key, private);
 
     private->ctype = ctype;
+    private->req_cnt++;
 
     return Rivet_SendContent(private,r);
 }

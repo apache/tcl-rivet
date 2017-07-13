@@ -60,7 +60,6 @@ typedef struct lazy_tcl_worker {
     request_rec*        r;
     int                 ctype;
     int                 ap_sts;
-    int                 nreqs;
     rivet_server_conf*  conf;               /* rivet_server_conf* record            */
 } lazy_tcl_worker;
 
@@ -146,7 +145,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     rivet_server_conf*      rsc;
 
     rsc = RIVET_SERVER_CONF(w->server->module_config);
-    w->nreqs = 0;
 
     private = Rivet_ExecutionThreadInit();
 
@@ -167,8 +165,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     apr_thread_mutex_lock(w->mutex);
     do 
     {
-        int   http_code;
-
         module_globals->mpm->vhosts[idx].idle_threads_cnt++;
         while ((w->status != init) && (w->status != thread_exit)) {
             apr_thread_cond_wait(w->condition,w->mutex);
@@ -179,17 +175,18 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         }
 
         w->status = processing;
-        w->nreqs++;
         module_globals->mpm->vhosts[idx].idle_threads_cnt--;
 
         /* Content generation */
 
-        http_code = Rivet_SendContent(private,w->r);
+        private->req_cnt++;
+        private->ctype = w->ctype;
+
+        w->ap_sts = Rivet_SendContent(private,w->r);
 
         if (module_globals->mpm->server_shutdown) continue;
 
         w->status = done;
-        w->ap_sts = http_code;
         apr_thread_cond_signal(w->condition);
         while (w->status == done) {
             apr_thread_cond_wait(w->condition,w->mutex);

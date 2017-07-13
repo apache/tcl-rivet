@@ -310,7 +310,7 @@ a(var4) = 0</programlisting>
             </variablelist>
         </refsect1>
         <refsect1>
-            <title>Writing a variable form validator</title>
+            <title>Writing a custom variable validator</title>
             <para>
             	The form broker is by no means restricted to work only with its native
             	data types: you may define your own form variable types and have
@@ -320,13 +320,12 @@ a(var4) = 0</programlisting>
             	A validator is a function accepting a dictionary as single argument and
             	must return either FB_OK, if the variable value is valid, 
             	or any other used defined error code. The dictionary argument stores
-            	the variable descriptor used internally by the form broker. The dictionary
-            	keys are listed 
+            	the variable descriptor used internally by the form broker. 
 				</para>
 				<para>
             	Suppose you're writing a form text entry that demands as input a network 
             	interface MAC address. 
-            	A mac address is represented by 6 hexadecimal octets separated by 
+            	A MAC address is represented by 6 hexadecimal octets separated by 
             	either a <quote>-</quote> (Windows convention) or <quote>:</quote> 
             	(Unix, Mac convention). The procedure <command>validate_mac</command>
             	checks the validity of the mac address and if validation is successful it

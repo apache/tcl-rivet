@@ -239,6 +239,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
          * for telling the channel where stuff must be sent to */
 
         private->ctype = thread_obj->ctype;
+        private->req_cnt++;
 
         HTTP_REQUESTS_PROC(thread_obj->code = Rivet_SendContent(private,thread_obj->r));
 
@@ -251,7 +252,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         {
             apr_thread_cond_wait(thread_obj->cond,thread_obj->mutex);
         }
-        private->req_cnt++;
         apr_atomic_dec32(module_globals->mpm->running_threads_count);
 
     } while (private->ext->keep_going > 0);

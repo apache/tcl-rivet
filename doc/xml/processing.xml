@@ -3,26 +3,28 @@
 	<section>
 		<title>Tcl Scripts Processing</title>
 		<para>
-			The traditional &version2-generic; way to handle an HTTP request
-			requires the execution of Tcl script or Rivet template (.rvt files)
-			whose path appears encoded in the URI (alias or rewriting might occur
-			to establish the real path). The execution of such script
-			can be preceded by the execution of a script (BeforeScript) and/or 
-			followed by other scripts (AfterScript).
-			This extra script can be configured on a per virtual host, 
-			per directory or per user basis. Execution of such code can 
-			interrupt because of coding errors (triggering the
-			ErrorScript execution or bail out of ordinary execution when
+			The mod_rivet &version2-series; modules handle an HTTP request
+			by running a Tcl script or a Rivet (.rvt file) template 
+			whose path appears encoded in the URI (an alias translation or 
+			URL rewriting might occur to establish the real path). 
+			The execution of such scripts can be preceded and/or 
+			followed by the execution scripts common to every path 
+			configured through the BeforeScript and AfterScript
+			directives. These scripts can be configured on a per virtual host, 
+			per directory or per user basis. Execution of such code combined can 
+			break because of coding errors (triggering the
+			ErrorScript execution) or bail out of ordinary execution when
 			the ::rivet::abort_page is called, implicitly invoking the execution
-			of an AbortScript. This handling in case can be followed by
-			a further configurable script (AfterEveryScript)
+			of an AbortScript. This scheme is terminated in case by
+			a further configurable script (AfterEveryScript).
+			The whole machinery of request handling was developed in
+			mod_rivet.c to fulfill the programmer's necessities as they 
+			emerged during Rivet's development history. 
 		</para>
 		<para>
-			The whole machinery of request handling was developed to fulfill the
-			programmer's necessity as they emerged in the Rivet development history.
-			The script execution was called from mod_rivet.so and implemented in
-			C code. With Rivet &version30; the Tcl code execution is implemented
-			by calling a single Tcl procedure
+ 			With Rivet &version30; we changed this approach and landed to
+ 			a new much simpler model where each request is handled by the following
+ 			Tcl procedure
 		</para>
 		<programlisting>proc ::Rivet::request_handling {} {
     ::try {
@@ -61,9 +63,85 @@
     }
 
 }</programlisting>
+
+		<para>
+			Note the call to new &version30; command ::rivet::url_script
+			that returns the body of the Tcl script or Rivet template
+			pointed by the URL. Also note that the namespace
+			of this procedure is ::Rivet (uppercase initial). 
+		</para>
+		<para>
+			This procedure emulates the &version2-generic; scheme
+			and as such works as a fully compatible request handling
+			but opens to the programmers the option of replacing it 
+			with their own	application request handling procedure by
+			replacing the current ::Rivet::request_handling
+			in any child process or thread initialization
+			scripts their own version of ::Rivet::request_handling
+		</para>
+		
+		<note>
+			Note that if you are redefining the ::Rivet::request_handling
+			procedure you need to handle yourself any error conditions
+			and any code interruption caused by calls to::rivet::abort_page.
+			The current procedure might work as a template where you can
+			place your application code though.
+		</note>
+
 	</section>
+	
 	<section>
-		<title>Apache Multi Processing Models Support</title>
-		<para>second section</para>
+		<title>Example: a one script Rivet Application</title>
+		<para>
+			An applications may have no interest in running
+			a script pointed by the URL and their code rely
+			entirely on the main application script which internally
+			will call ::rivet::parse command to display HTML code.
+			The status of such applications will be driven by the URL encoded
+			argument pairs. Such application (let's call it MyRivetApp) could be
+			represented by an Itcl object instance. In myrivetapp.tcl
+			the application class is defined and an instance of it is
+			created in the global namespace. If you want to have your applications
+			share the same 
+			
+			
+		</para>
+		<programlisting>package require Itcl
+
+::itcl::class MyRivetApp {
+
+	private variable application_name
+
+   public method init {}
+   public method request_processing {urlencoded_args}
+
+}
+
+::itcl::body MyRivetApp::init {app_name}{
+
+	# any initialization steps must go here
+	# ....
+	
+	set application_name $app_name	
+	
+}
+
+::itcl::body MyRivetApp::request_processing {urlencoded_args} {
+ .... 
+}
+
+set ::theApplication [MyRivetApp #auto]
+
+$::theApplication init [dict get [::rivet::inspect server] hostname]</programlisting>
+		<para>
+			which provides a very basic interface for both initialization
+			and request processing. Such script will be sourced into the
+			Tcl interpreter at the mod_rivet initialization stage. In the
+			Apache configuration (most likely within a &lt;VirtualHost myrivetapp.com:80&gt;...&lt;/VirtualHost&gt;
+			definition block)
+		</para>
+		<programlisting>&lt;IfModule rivet_module&gt;
+    RivetServerConf ChildInitScript "source myrivetapp.tcl"
+&lt;/IfModule&gt;</programlisting>
 	</section>
 </section>

@@ -69,6 +69,7 @@
 				<tr><td>ImportRivetNS</td><td></td><td></td><td>X</td><td></td><td></td></tr>
 				<tr><td>HonorHeaderOnlyRequests</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
 				<tr><td>MpmBridge</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
+				<tr><td>RequestHandler</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 				<tr><td>SeparateChannels</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
 				<tr><td>SeparateVirtualInterps</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
 				<tr><td>ServerInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
@@ -311,7 +312,80 @@
 					<para>This option is, by nature, only available at the global level</para>
 	      	</listitem>
 	    	</varlistentry>
-	    	    	
+
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+		  				<arg choice="plain">ImportRivetNS</arg>
+						<group choice="req">
+			         	<arg>yes</arg>
+			          	<arg>no</arg>
+			       	</group>
+			       </cmdsynopsis>
+			  	</term>
+	    		<listitem>
+					<para>
+						Rivet commands are created within the ::rivet namespace. Setting
+						this option you tell mod_rivet to place the whole command set on
+						the export list of namespace (implicitly forcing also ExportRivetNS)
+						and then importing the commands on the namespace export list into the 
+						global namespace
+					</para>
+					
+					<note>
+						This option is provided only for compatibility with existing code that assumes
+						mod_rivet commands to reside in the global namespace. It's utterly discouraged to
+						use it and it could be removed in future versions of Rivet
+						This option is, by nature, only available at the global level
+					</note>
+	      	</listitem>
+	    	</varlistentry>
+
+			<varlistentry>
+	      	<term>
+					<cmdsynopsis>
+		  				<arg choice="plain">MpmBridge</arg>
+		  				<arg><replaceable>string</replaceable></arg>
+					</cmdsynopsis>
+	      	</term>
+	      	<listitem>
+					<para>
+						This global only option tells mod_rivet which MPM bridge has
+						to be loaded. The string argument is interpreted
+						first as a name of an MPM bridge and it's interpolated in the
+						string
+						<programlisting>bridge = apr_pstrcat(pool,RIVET_DIR,"/mpm/rivet_",rsc->mpm_bridge,"_mpm.so",NULL);</programlisting>
+						Where RIVET_DIR is the location of the rivet libraries whose definition
+						is controlled by the configuration argument <term>--with-rivet-target-dir=DIR</term>.
+						For example 
+						<programlisting>RivetServerConf MpmBridge lazy</programlisting> will cause the
+						rivet_lazy_mpm.so library module to be loaded. If such library does not exists
+						mod_rivet tries to check if such definition is the fully qualified path to 
+						such MPM bridge. If this fails the module causes the web server to stop with an error.
+					</para>
+				</listitem>
+	    	</varlistentry>
+	    	
+			<varlistentry>
+				<term>
+					<cmdsynopsis>
+		       		<arg choice="plain">RequestHandler</arg>
+					   <arg>request_handler_filename</arg>
+					 </cmdsynopsis>
+				</term>
+				<listitem>
+					<para>
+						Filename of the request handler script. Overrides the default request handler. Can
+						be virtual host specific
+					</para>
+					<note>
+						Note that changing this scripts requires the programmer to understand mod_rivet
+						request processing model. See the <link linkend="processing">request processing</link>
+						manual page 
+					</note>
+				</listitem>
+			</varlistentry>	    	
+	    		    	    	
 			<varlistentry>
 		      <term>
 			     <cmdsynopsis>

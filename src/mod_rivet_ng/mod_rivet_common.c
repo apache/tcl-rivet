@@ -97,13 +97,7 @@ running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_error_script);
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_abort_script);
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,after_every_script);
-    /*
-    if (rivet_conf->request_handler == NULL)
-    {
-        scripts->request_processing = Tcl_NewStringObj(RIVET_CR_TERM(pool,"::Rivet::request_handling\n"),-1);
-    } else {
-        scripts->request_processing = Tcl_NewStringObj(rivet_conf->request_handler,-1);
-    } */
+
     scripts->request_processing = Tcl_NewStringObj(rivet_conf->request_handler,-1);
     Tcl_IncrRefCount(scripts->request_processing);
     
@@ -115,8 +109,7 @@ running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts
  *
  * Rivet_PerInterpInit --
  *
- *  Do the initialization that needs to happen for every
- *  interpreter.
+ *  Do the initialization that needs to happen to every interpreter.
  *
  * Results:
  *  None.
@@ -396,14 +389,6 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     private->thread_exit    = 0;
     private->exit_status    = 0;
     private->abort_code     = NULL;
-    //private->request_init   = Tcl_NewStringObj("::Rivet::initialize_request\n", -1);
-    //Tcl_IncrRefCount(private->request_init);
-    //private->request_processing = Tcl_NewStringObj("::Rivet::request_handling\n",-1);
-    //Tcl_IncrRefCount(private->request_processing);
-    //private->request_cleanup = Tcl_NewStringObj("::Rivet::cleanup_request\n", -1);
-    //Tcl_IncrRefCount(private->request_cleanup);
-    //private->default_error_script = Tcl_NewStringObj("::Rivet::handle_error\n",-1);
-    //Tcl_IncrRefCount(private->default_error_script);
 
     apr_threadkey_private_set (private,rivet_thread_key);
     return private;

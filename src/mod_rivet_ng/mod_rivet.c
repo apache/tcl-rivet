@@ -140,16 +140,16 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
 {
     char*   mpm_prefork_bridge = "rivet_prefork_mpm.so";
     char*   mpm_worker_bridge  = "rivet_worker_mpm.so";
-    char*   mpm_model_path;
+    char*   mpm_bridge_path;
     int     ap_mpm_result;
     rivet_server_conf* rsc = RIVET_SERVER_CONF( server->module_config );
 
     /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
        what bridge custom implementation we want to be loaded */
 
-    if (apr_env_get (&mpm_model_path,"RIVET_MPM_BRIDGE",pool) == APR_SUCCESS)
+    if (apr_env_get (&mpm_bridge_path,"RIVET_MPM_BRIDGE",pool) == APR_SUCCESS)
     {
-        return mpm_model_path;
+        return mpm_bridge_path;
     }
 
     /* we now look into the configuration record */
@@ -157,16 +157,16 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
     if (rsc->mpm_bridge != NULL)
     {
         apr_finfo_t finfo;
+        char*       proposed_bridge;
 
-        mpm_model_path = apr_pstrcat(pool,RIVET_DIR,"/mpm/rivet_",rsc->mpm_bridge,"_mpm.so",NULL);
-        if (apr_stat(&finfo,mpm_model_path,APR_FINFO_MIN,pool) == APR_SUCCESS)
+        proposed_bridge = apr_pstrcat(pool,RIVET_DIR,"/mpm/rivet_",rsc->mpm_bridge,"_mpm.so",NULL);
+        if (apr_stat(&finfo,proposed_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
         {
-            return mpm_model_path;
-        }
-
-        if (apr_stat(&finfo,rsc->mpm_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
+            mpm_bridge_path = proposed_bridge;
+        } 
+        else if (apr_stat(&finfo,rsc->mpm_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
         {
-            return apr_pstrdup(pool,rsc->mpm_bridge);
+            mpm_bridge_path = apr_pstrdup(pool,rsc->mpm_bridge);
         }
         else
         {   
@@ -175,36 +175,37 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
             exit(1);   
         }
 
-    }
+    } else {
 
-    /* Let's load the Rivet-MPM bridge */
+        /* Let's query the Rivet-MPM bridge */
 
-    if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
-    {
-        if (ap_mpm_result == AP_MPMQ_NOT_SUPPORTED)
+        if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
         {
-            /* we are forced to load the prefork MPM bridge */
+            if (ap_mpm_result == AP_MPMQ_NOT_SUPPORTED)
+            {
+                /* we are forced to load the prefork MPM bridge */
 
-            mpm_model_path = apr_pstrdup(pool,mpm_prefork_bridge);
+                mpm_bridge_path = apr_pstrdup(pool,mpm_prefork_bridge);
+            }
+            else
+            {
+                mpm_bridge_path = apr_pstrdup(pool,mpm_worker_bridge);
+            }
         }
         else
         {
-            mpm_model_path = apr_pstrdup(pool,mpm_worker_bridge);
+
+            /* Execution shouldn't get here as a failure querying about MPM is supposed
+             * to return APR_SUCCESS in every normal operative conditions. We
+             * give a default to the MPM bridge anyway
+             */
+
+            mpm_bridge_path = apr_pstrdup(pool,mpm_worker_bridge);
         }
+        mpm_bridge_path = apr_pstrcat(pool,RIVET_DIR,"/mpm/",mpm_bridge_path,NULL);
+
     }
-    else
-    {
-
-        /* Execution shouldn't get here as a failure querying about MPM is supposed
-         * to return APR_SUCCESS in every normal operative conditions. We
-         * give a default to the MPM bridge anyway
-         */
-
-        mpm_model_path = apr_pstrdup(pool,mpm_worker_bridge);
-    }
-
-    mpm_model_path = apr_pstrcat(pool,RIVET_DIR,"/mpm/",mpm_model_path,NULL);
-    return mpm_model_path;
+    return mpm_bridge_path;
 }
 
 

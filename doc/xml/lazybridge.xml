@@ -210,10 +210,10 @@ typedef struct lazy_tcl_worker {
 	<para>
 		After a request is processed the Tcl worker thread returns its own
 		lazy_tcl_worker descriptor to the array and then waits
-		on the condition variable used to control and synchronize 2 threads.
+		on the condition variable used to control and synchronize the bridge 
+		threads with the Apache worker threads.
 	</para>
-	<programlisting>
-     /* rescheduling itself in the array of idle threads */
+	<programlisting>     /* rescheduling itself in the array of idle threads */
        
      apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
      *(lazy_tcl_worker **) apr_array_push(module_globals->mpm->vhosts[idx].array) = w;
