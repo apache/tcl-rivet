@@ -17,28 +17,49 @@
 			the ::rivet::abort_page is called, implicitly invoking the execution
 			of an AbortScript. This scheme is terminated in case by
 			a further configurable script (AfterEveryScript).
-			The whole machinery of request handling was developed in
-			mod_rivet.c to fulfill the programmer's necessities as they 
+			In mod_rivet &version2-generic; module series 
+			the whole machinery of request handling was code in
+			the module and it was developed in several phases
+			to fulfill the programmer's necessities as they 
 			emerged during Rivet's development history. 
 		</para>
 		<para>
  			With Rivet &version30; we changed this approach and landed to
- 			a new much simpler model where each request is handled by the following
- 			Tcl procedure
+ 			a new much simpler and flexible model where each request is handled 
+ 			by the following Tcl procedure
 		</para>
-		<programlisting>proc ::Rivet::request_handling {} {
+		<programlisting># -- request_handler.tcl
+#
+# Copyright 2002-2017 The Apache Rivet Team
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#	http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# code of the default handler of HTTP requests
+
     ::try {
-        uplevel #0 ::Rivet::initialize_request
+        ::Rivet::initialize_request
     } on error {err} {
         ::rivet::apache_log_error crit \
             "Rivet request initialization failed: $::errorInfo"
     }
 
     ::try {
+
         set script [::rivet::inspect BeforeScript]
         if {$script ne ""} {
             set ::Rivet::script $script
-            uplevel #0 $script
+            eval $script
         }
 
         set script [::rivet::url_script]
@@ -50,8 +71,9 @@
         set script [::rivet::inspect AfterScript]
         if {$script ne ""} {
             set ::Rivet::script $script
-            uplevel #0 $script
+            eval $script
         }
+
     } trap {RIVET ABORTPAGE} {err opts} {
         ::Rivet::finish_request $script $err $opts AbortScript
     } trap {RIVET THREAD_EXIT} {err opts} {
@@ -61,8 +83,8 @@
     } finally {
         ::Rivet::finish_request $script "" "" AfterEveryScript
     }
-
-}</programlisting>
+   
+# default_request_handler.tcl ---</programlisting>
 
 		<para>
 			Note the call to new &version30; command ::rivet::url_script
@@ -74,14 +96,11 @@
 			This procedure emulates the &version2-generic; scheme
 			and as such works as a fully compatible request handling
 			but opens to the programmers the option of replacing it 
-			with their own	application request handling procedure by
-			replacing the current ::Rivet::request_handling
-			in any child process or thread initialization
-			scripts their own version of ::Rivet::request_handling
+			with their own	application request handling procedure
 		</para>
 		
 		<note>
-			Note that if you are redefining the ::Rivet::request_handling
+			Note that if you are in order to redefine the core request handler
 			procedure you need to handle yourself any error conditions
 			and any code interruption caused by calls to::rivet::abort_page.
 			The current procedure might work as a template where you can

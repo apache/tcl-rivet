@@ -1649,7 +1649,7 @@ bab</programlisting>
 		<para>
 		    Scans through each character in the specified string looking
 		    for escaped character sequences (characters containing a
-		    percent sign and two hexadecimal characters, unescaping them 
+		    percent sign and two hexadecimal characters), unescaping them 
 		    back to their original character values, as needed, also mapping
 		    plus signs to spaces, and returning the result.
 		</para>

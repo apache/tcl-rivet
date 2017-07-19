@@ -1,5 +1,10 @@
+2017-07-19 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/internals.xml: moving the internals chapter
+    to its final directory
+    * doc/xml/processing.xml: more proof reading corrections
+
 2017-07-13 Massimo Manghi <mxmanghi@apache.org>
-    * docs/xml/: further developments of the 3.0 manual
+    * doc/xml/: further developments of the 3.0 manual
     * src/mod_rivet_ng/mod_rivet.c: better coding of
     bridge module search and determination
     * rivet/default_request_handler.tcl: proposed file
