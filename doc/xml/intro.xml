@@ -18,12 +18,12 @@
       architecture to create different styles of web site.
     </para>
     <para>
-        This documentation is focused on the current version of Rivet, but
-        still a work in progress, and, like everything
-        else about Apache Rivet, it is Free Software.  If you see
-        something that needs improving, and have ideas or suggestions,
-        don't hesitate to let us know.  If you want to contribute
-        directly, better yet!
+     This documentation is focused on the current version of Rivet, but
+     still a work in progress, and, like everything
+     else about Apache Rivet, it is Free Software.  If you see
+     something that needs improving, and have ideas or suggestions,
+     don't hesitate to let us know.  If you want to contribute
+     directly, better yet!
     </para>
     
     <simplesect>
@@ -44,13 +44,13 @@
     			</listitem>
          	<listitem>
          		Since <command>::rivet::abort_page</command> and <command>::rivet::exit</command>
-         		interrupt the execution returning a <emphasis>TCL_ERROR</emphasis> code
-         		any <command>catch</command> could trap them and AbortScript could be
-         		executed only by throwing the error again. We introduced the
+         		interrupt a script execution returning a <emphasis>TCL_ERROR</emphasis> code
+         		any call to a <command>catch</command> construct would trap this error and AbortScript 
+         		could be executed only by throwing the error condition again. We introduced the
          		<command>::rivet::catch</command> in order to simplify these operations.
-         		If any real error occurs during a script execution the procedure returns 
+         		If any real error occurs the procedure returns 
          		1 and fills the optional arguments with their expected values, otherwise
-         		interrupts execution and allows for passing control to
+         		execution is interrupted control passed on to
          		<command>AbortScript</command>
          	</listitem>
 		 </itemizedlist>
