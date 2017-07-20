@@ -1,3 +1,7 @@
+2017-07-20 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/formbroker/formbroker.tcl: now using Tcl
+    [string is boolean ...]
+
 2017-07-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/intro.xml: better wording of the ::rivet::catch
     illustration in the manual introduction

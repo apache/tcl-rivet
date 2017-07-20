@@ -260,7 +260,7 @@ namespace eval FormBroker {
         upvar $_var_d var_d
 
         dict with var_d {
-            if {[regexp -nocase {Y|N|0|1} $var]} {
+            if {[string is boolean $var]} {
                 return FB_OK
             } else {
                 return FB_INVALID_BOOLEAN
