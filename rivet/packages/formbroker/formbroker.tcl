@@ -261,6 +261,9 @@ namespace eval FormBroker {
 
         dict with var_d {
             if {[string is boolean $var]} {
+                if {$constrain} {
+                    set var [string is true $var]
+                }
                 return FB_OK
             } else {
                 return FB_INVALID_BOOLEAN
