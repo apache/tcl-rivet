@@ -1,4 +1,6 @@
-/* -- mod_rivet_common.c - functions likely to be shared among different versions of mod_rivet.c */
+/* -- mod_rivet_common.c - functions likely to be shared among 
+ *                         different versions of mod_rivet.c 
+ */
 
 /*
     Licensed to the Apache Software Foundation (ASF) under one
@@ -23,9 +25,13 @@
 
 #include <httpd.h>
 #include <apr_strings.h>
+#include <apr_env.h>
 #include <ap_mpm.h>
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
 #include <unistd.h>
+
+#include <apr_file_io.h>
+#include <apr_file_info.h>
 
 #include "mod_rivet.h"
 #include "mod_rivet_cache.h"
@@ -39,6 +45,48 @@
 
 extern apr_threadkey_t*   rivet_thread_key;
 extern mod_rivet_globals* module_globals;
+
+/*
+ * -- Rivet_ReadFile
+ * 
+ */
+
+int
+Rivet_ReadFile (apr_pool_t* pool,char* filename,
+                char** buffer,int* nbytes)
+{
+    apr_finfo_t*        file_info;
+    apr_file_t*         apr_fp;
+    apr_size_t          buffer_size;
+
+    *nbytes = 0;
+
+    file_info = (apr_finfo_t*) apr_palloc(pool,sizeof(apr_finfo_t));
+    if (apr_stat(file_info,filename,APR_FINFO_SIZE,pool) != APR_SUCCESS)
+    {
+        return 1;
+    }
+     
+    if (apr_file_open(&apr_fp,filename,APR_FOPEN_READ,
+                                       APR_FPROT_OS_DEFAULT,
+                                       pool) != APR_SUCCESS)
+    {
+        return 1;
+    }
+
+    buffer_size = file_info->size;
+    *buffer = (char*) apr_palloc(pool,buffer_size);
+    
+    if (apr_file_read(apr_fp,*buffer,&buffer_size) != APR_SUCCESS)
+    {
+        return 2;
+    }
+
+    apr_file_close(apr_fp);
+ 
+    *nbytes = buffer_size;
+    return 0;
+}
 
 /*
  *-----------------------------------------------------------------------------
@@ -82,15 +130,17 @@ Rivet_CreateTclInterp (server_rec* s)
     return interp;
 }
 
-/*----------------------------------------------------------------------------
+/*---------------------------------------------------------------------
  * -- Rivet_RunningScripts
  *
  *
  *
- *-----------------------------------------------------------------------------
+ *---------------------------------------------------------------------
  */
 
-running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf* rivet_conf)
+running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
+                                        running_scripts* scripts,
+                                        rivet_server_conf* rivet_conf )
 {
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_before_script);
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_after_script);
@@ -98,14 +148,29 @@ running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_abort_script);
     RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,after_every_script);
 
-    scripts->request_processing = Tcl_NewStringObj(rivet_conf->request_handler,-1);
+    if (rivet_conf->request_handler != NULL)
+    {
+		char* request_handler;
+		int	  handler_size;
+			
+		ap_assert(Rivet_ReadFile(pool,rivet_conf->request_handler,
+		                        &request_handler,&handler_size) == 0);
+
+        scripts->request_processing = 
+				 Tcl_NewStringObj(request_handler,handler_size);
+
+    } else {
+        scripts->request_processing = 
+				 Tcl_NewStringObj(module_globals->default_handler,
+                                  module_globals->default_handler_size);
+    } 
     Tcl_IncrRefCount(scripts->request_processing);
-    
+
     return scripts;
 }
 
 /*
- *-----------------------------------------------------------------------------
+ *---------------------------------------------------------------------
  *
  * Rivet_PerInterpInit --
  *
@@ -117,9 +182,12 @@ running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts
  * Side Effects:
  *  None.
  *
- *-----------------------------------------------------------------------------
+ *---------------------------------------------------------------------
  */
-void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p)
+void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
+						 rivet_thread_private* private, 
+						 server_rec *s,
+						 apr_pool_t *p)
 {
     rivet_interp_globals*   globals     = NULL;
     Tcl_Obj*                auto_path   = NULL;
@@ -397,7 +465,7 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
 /*
  * -- Rivet_ExecutionThreadInit 
  *
- * We keep here the basic initilization each execution thread likely does
+ * We keep here the basic initilization each execution thread should undergo
  *
  *  - create the thread private data
  *  - create a Tcl channel
@@ -670,7 +738,8 @@ void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
  *                          the directory name is everything comes
  *                          before the last '/' (slash) character
  *
- * This snippet of code came from the mod_ruby project, which is under a BSD license.
+ * This snippet of code came from the mod_ruby project, 
+ * which is under a BSD license.
  */
  
 int Rivet_chdir_file (const char *file)

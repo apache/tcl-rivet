@@ -1,3 +1,21 @@
+2017-07-24 Massimo Manghi <mxmanghi@apache.org>
+	* xml/rivet.xml.in: reflects rivet.xml having been moved to doc/xml
+	* rivet/default_request_handler.tcl: code of the default 
+	request handler read by mod_rivet
+    * Makefile.am: now installing also rivet/default_request_handler.tcl
+    * src/mod_rivet_ng/mod_rivet.c: add function for creation of 
+    the module_globals strucuture. This structure is not assumed anymore
+    to be inherited through a fork operation and it's now in case 
+    re-created at child process initialization
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: removing
+    reference to unused global variable
+    * src/mod_rivet_ng/mod_rivet_common.c: Rivet_RunningScripts
+    handling default request procedure specified in the configuration
+    
+2017-07-20 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/formbroker/formbroker.tcl: now using Tcl
+    [string is boolean ...]
+    
 2017-07-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/internals.xml: moving the internals chapter
     to its final directory

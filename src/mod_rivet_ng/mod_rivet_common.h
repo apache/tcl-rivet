@@ -21,6 +21,7 @@
 
 #ifndef _MOD_RIVET_COMMON_
 #define _MOD_RIVET_COMMON_
+
 EXTERN running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf* rivet_conf);
 EXTERN void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p);
 EXTERN void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
@@ -35,5 +36,6 @@ EXTERN rivet_thread_private* Rivet_CreatePrivateData (void);
 EXTERN rivet_thread_private* Rivet_ExecutionThreadInit (void);
 EXTERN rivet_thread_private* Rivet_SetupTclPanicProc (void);
 EXTERN void Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel);
+EXTERN int Rivet_ReadFile (apr_pool_t* pool,char* filename,char** buffer,int* nbytes);
 
 #endif

@@ -464,7 +464,9 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->rivet_child_init_script    = NULL;
     rsc->rivet_child_exit_script    = NULL;
     rsc->rivet_before_script        = NULL;
-    rsc->request_handler            = "::Rivet::request_handling";
+    //rsc->request_handler            = "::Rivet::request_handling";
+    rsc->request_handler            = NULL;
+
     rsc->rivet_after_script         = NULL;
     rsc->rivet_error_script         = NULL;
     rsc->rivet_abort_script         = NULL;

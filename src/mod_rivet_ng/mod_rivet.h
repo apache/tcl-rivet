@@ -64,10 +64,10 @@
 /* End Configuration options  */
 
 #define VAR_SRC_QUERYSTRING 1
-#define VAR_SRC_POST 2
-#define VAR_SRC_ALL 3
+#define VAR_SRC_POST 		2
+#define VAR_SRC_ALL 		3
 
-#define DEFAULT_ERROR_MSG "[an error occurred while processing this directive]"
+#define DEFAULT_ERROR_MSG 	"[an error occurred while processing this directive]"
 #define DEFAULT_TIME_FORMAT "%A, %d-%b-%Y %H:%M:%S %Z"
 #define MULTIPART_FORM_DATA 1
 
@@ -189,6 +189,8 @@ typedef struct _mod_rivet_globals {
     server_rec*         server;                 /* default host server_rec obj              */
     int                 vhosts_count;           /* Number of configured virtual host including 
                                                  * the root server thus it's supposed to be >= 1 */
+	char*				default_handler;		/* Default request handler code             */
+	int					default_handler_size;	/* Size of the default_handler buffer       */
     rivet_thread_interp* 
                         server_interp;          /* server and prefork MPM interpreter       */
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */

@@ -1,18 +1,19 @@
+# calendar.tcl ---
 #
-#   Copyright 2000-2005 The Apache Software Foundation
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Copyright 2010 The Apache Rivet Team
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#	http://www.apache.org/licenses/LICENSE-2.0
 #
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 #
 # $Id: calendar.tcl 916 2010-07-03 00:37:44Z massimo.manghi $
@@ -40,7 +41,6 @@ package require Itcl
 # 27 28 29 30
 #
 # 
-
 
 ::itcl::class   Calendar {
     public  common  month_names
@@ -72,10 +72,10 @@ package require Itcl
     public method emit      { args }
 
     constructor {args} {
-    set month_names(en) { Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec }
-    set month_names(it) { Gen Feb Mar Apr Mag Giu Lug Ago Set Ott Nov Dic }
-    set day_names(en)   { Su Mo Tu We Th Fr Sa }
-    set day_names(it)   { Do Lu Ma Me Gi Ve Sa }
+        set month_names(en) { Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec }
+        set month_names(it) { Gen Feb Mar Apr Mag Giu Lug Ago Set Ott Nov Dic }
+        set day_names(en)   { Su Mo Tu We Th Fr Sa }
+        set day_names(it)   { Do Lu Ma Me Gi Ve Sa }
     }
 }
 
@@ -212,8 +212,8 @@ package require Itcl
 
 # we proceed to eval import_arguments $args
     
-        set numeric_parameters  {}
-        eval $this configure $args
+            set numeric_parameters  {}
+            eval $this configure $args
 
         } else {
 
@@ -224,8 +224,8 @@ package require Itcl
 # we assume the rest of the args are in the form -opt1 val1 -opt2 val2 ...
 # we proceed to eval import_arguments [lrange $args 2 end]
 
-        set numeric_parameters  [lrange $args 0 1]
-        eval $this configure    [lrange $args 2 end]
+            set numeric_parameters  [lrange $args 0 1]
+            eval $this configure    [lrange $args 2 end]
 
         }
     } else {
@@ -238,58 +238,58 @@ package require Itcl
     }
 
     } else {
-    set numeric_parameters $args
+        set numeric_parameters $args
     }
 
     set argsnumber  [llength $numeric_parameters]
 
     switch $argsnumber {
-    1 {
+        1 {
 
-#   if only one argument is passed to this procedure then we treat it as either as a 
-#   year (therefore must be a number) or a month name of the current year
+    #   if only one argument is passed to this procedure then we treat it as either as a 
+    #   year (therefore must be a number) or a month name of the current year
 
-        if {[regexp {^[0-9]+$} $numeric_parameters]} {
-        set res {}
-        set year $numeric_parameters
-        for {set m 0} {$m < 12} {incr m} {
-            append res [cal $m $year]\n\n
-        }
-        
-        return [string trimright $res]
-        }
-
-        set month_idx [lsearch $month_names($language) $numeric_parameters]
-        if {$month_idx >= 0} {
-        set year [clock format [clock sec] -format %Y]
-        return [cal $month_idx $year]
-        } else {
-        return ""
-        }
-    }
-    2 {
-
-# two args: the first is the month, the second the year.
-
-        set month [lindex $numeric_parameters 0]
-        set year  [lindex $numeric_parameters 1]        
-
-        if  {[regexp {^\d{1,2}$} $month mat] && ($month > 0) && ($month <= 12)} {
-        return [cal [incr month -1] $year]
-        } elseif { [lsearch $month_names($language) $month] >= 0} {
-        return [cal [lsearch $month_names($language) $month] $year]
-        }
-    }
-    0 -
-    default {
-
-        # no arguments, we take today as reference
+            if {[regexp {^[0-9]+$} $numeric_parameters]} {
+                set res {}
+                set year $numeric_parameters
+                for {set m 0} {$m < 12} {incr m} {
+                    append res [cal $m $year]\n\n
+                }
             
-            scan [clock format [clock seconds] -format %m] "%d" month
-        set year    [format "%d" [clock format [clock sec] -format %Y]]
-        return      [cal [incr month -1] $year]
+                return [string trimright $res]
+            }
 
-    }
+            set month_idx [lsearch $month_names($language) $numeric_parameters]
+            if {$month_idx >= 0} {
+                set year [clock format [clock sec] -format %Y]
+                return [cal $month_idx $year]
+            } else {
+                return ""
+            }
+        }
+        2 {
+
+    # two args: the first is the month, the second the year.
+
+            set month [lindex $numeric_parameters 0]
+            set year  [lindex $numeric_parameters 1]        
+
+            if  {[regexp {^\d{1,2}$} $month mat] && ($month > 0) && ($month <= 12)} {
+                return [cal [incr month -1] $year]
+            } elseif { [lsearch $month_names($language) $month] >= 0} {
+                return [cal [lsearch $month_names($language) $month] $year]
+            }
+        }
+        0 -
+        default {
+
+            # no arguments, we take today as reference
+                
+            scan [clock format [clock seconds] -format %m] "%d" month
+            set year    [format "%d" [clock format [clock sec] -format %Y]]
+            return      [cal [incr month -1] $year]
+
+        }
     }
 
 }
@@ -382,9 +382,9 @@ package require Itcl
 
 ::itcl::body XmlCalendar::getParameters {param what} {
     if {[dict exists $parameters $param $what]} {
-    return [dict get $parameters $param $what]
+        return [dict get $parameters $param $what]
     } else {
-    return ""
+        return ""
     }
 }
 
@@ -397,7 +397,7 @@ package require Itcl
 
 ::itcl::body XmlCalendar::validateWeekday { wkd } {
     if {$wkd == "today"} {
-    set current_weekday [clock format [clock scan today] -format %w]
+        set current_weekday [clock format [clock scan today] -format %w]
     }
 }
 
@@ -425,7 +425,6 @@ package require Itcl
 # The Xml header is made of a banner (i.e Month Year) and
 # a bar showing the weekdays with their markup.
 # 
-
 
 ::itcl::body XmlCalendar::header {mth_idx yr} {
     set header_tag [getParameters header tag]
@@ -473,18 +472,17 @@ package require Itcl
 
     array set attributes $tagattr
     if {$day == $current_day} {
-    set attributes(class) current
+        set attributes(class) current
     }
     
     if {$cell_function != "" && $day != ""} {
+        set month_year [$this cal_processed]    
 
-    set month_year [$this cal_processed]    
+        set month [lindex $month_names(en) [lindex $month_year 0]] 
+        set year  [lindex $month_year 1] 
+        set wkday [clock format [clock scan "$month $day $year"] -format %w]
 
-    set month [lindex $month_names(en) [lindex $month_year 0]] 
-    set year  [lindex $month_year 1] 
-    set wkday [clock format [clock scan "$month $day $year"] -format %w]
-
-    array set attributes [eval $cell_function $day $month_year $wkday]
+        array set attributes [eval $cell_function $day $month_year $wkday]
     }
 
     set tagattr [array get attributes]

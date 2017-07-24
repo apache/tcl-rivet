@@ -57,77 +57,12 @@
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
 
-rivet_interp_globals    interp_globals;
-
 extern Tcl_ChannelType   RivetChan;
 apr_threadkey_t*         rivet_thread_key    = NULL;
 mod_rivet_globals*       module_globals      = NULL;
 
-#define ERRORBUF_SZ     256
-
-/*
- * -- Rivet_Exit_Handler
- *
- * 
- *
- */
-
-int Rivet_Exit_Handler(int code)
-{
-    //Tcl_Exit(code);
-    /*NOTREACHED*/
-    return TCL_OK;		/* Better not ever reach this! */
-}
-
-/* 
- * -- Rivet_RunServerInit
- *
- */
-
-static int
-Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
-{
-    rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
-
-    FILEDEBUGINFO;
-
-    /* we create and initialize a master (server) interpreter */
-
-    module_globals->server_interp = Rivet_NewVHostInterp(pPool,s); /* root interpreter */
-
-    /* We initialize the interpreter and we won't register a channel with it because
-     * we couldn't send data to the stdout anyway */
-
-    Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
-
-    /* We don't create the cache here: it would make sense for prefork MPM
-     * but threaded MPM bridges have their pool of threads. Each of them
-     * will by now have their own cache
-     */
-
-    if (rsc->rivet_server_init_script != NULL) {
-        Tcl_Interp* interp = module_globals->server_interp->interp;
-        Tcl_Obj*    server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
-
-        Tcl_IncrRefCount(server_init);
-
-        if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
-                         MODNAME ": Error running ServerInitScript '%s': %s",
-                         rsc->rivet_server_init_script,
-                         Tcl_GetVar(interp, "errorInfo", 0));
-        } else {
-            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
-                         MODNAME ": ServerInitScript '%s' successful", 
-                         rsc->rivet_server_init_script);
-        }
-
-        Tcl_DecrRefCount(server_init);
-    }
-
-    return OK;
-}
+#define ERRORBUF_SZ         256
+#define TCL_HANDLER_FILE    RIVET_DIR"/default_request_handler.tcl"
 
 /*
  * -- Rivet_SeekMPMBridge 
@@ -208,6 +143,112 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
     return mpm_bridge_path;
 }
 
+/* 
+ * -- Rivet_CreateModuleGlobals
+ *
+ * module globals (mod_rivet_globals) allocation and initialization
+ * 
+ */
+
+static mod_rivet_globals* 
+Rivet_CreateModuleGlobals (apr_pool_t* pool, server_rec* server)
+{
+    mod_rivet_globals*  mod_rivet_g;
+   
+    mod_rivet_g = apr_palloc(pool,sizeof(mod_rivet_globals));
+    if (apr_pool_create(&mod_rivet_g->pool, NULL) != APR_SUCCESS) 
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                     MODNAME ": could not initialize rivet module global pool");
+        exit(1);
+    }
+
+    mod_rivet_g->rivet_mpm_bridge = Rivet_SeekMPMBridge(pool,server);
+
+    /* read the default request handler code */
+
+    if (Rivet_ReadFile(pool,TCL_HANDLER_FILE,
+                            &mod_rivet_g->default_handler,
+                            &mod_rivet_g->default_handler_size) > 0)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                     MODNAME ": could not read rivet default handler");
+        exit(1);
+    }
+    
+    /* We cannot assume we are running in an OS with a fork system call
+     * therefore we have to check module_globals in order to establish if the
+     * structure has to be allocated
+     */
+    
+    mod_rivet_g->server = server;
+
+    return mod_rivet_g;
+}
+
+/*
+ * -- Rivet_Exit_Handler
+ *
+ * 
+ *
+ */
+
+int Rivet_Exit_Handler(int code)
+{
+    //Tcl_Exit(code);
+    /*NOTREACHED*/
+    return TCL_OK;		/* Better not ever reach this! */
+}
+
+/* 
+ * -- Rivet_RunServerInit
+ *
+ */
+
+static int
+Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
+{
+    rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
+
+    FILEDEBUGINFO;
+
+    /* we create and initialize a master (server) interpreter */
+
+    module_globals->server_interp = Rivet_NewVHostInterp(pPool,s); /* root interpreter */
+
+    /* We initialize the interpreter and we won't register a channel with it because
+     * we couldn't send data to the stdout anyway */
+
+    Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
+
+    /* We don't create the cache here: it would make sense for prefork MPM
+     * but threaded MPM bridges have their pool of threads. Each of them
+     * will by now have their own cache
+     */
+
+    if (rsc->rivet_server_init_script != NULL) {
+        Tcl_Interp* interp = module_globals->server_interp->interp;
+        Tcl_Obj*    server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
+
+        Tcl_IncrRefCount(server_init);
+
+        if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+                         MODNAME ": Error running ServerInitScript '%s': %s",
+                         rsc->rivet_server_init_script,
+                         Tcl_GetVar(interp, "errorInfo", 0));
+        } else {
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, 
+                         MODNAME ": ServerInitScript '%s' successful", 
+                         rsc->rivet_server_init_script);
+        }
+
+        Tcl_DecrRefCount(server_init);
+    }
+
+    return OK;
+}
 
 /* -- Rivet_ServerInit
  *
@@ -227,22 +268,13 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     ap_add_version_component(pPool,RIVET_PACKAGE_NAME);
 #endif
 
-    /* Everything revolves around this structure */
+    /* Everything revolves around this structure: module_globals */
 
-    module_globals = apr_palloc(pPool,sizeof(mod_rivet_globals));
+    /* the module global structure is allocated and the MPM bridge name established */
 
-    /* Creating the module global pool */
+    module_globals = Rivet_CreateModuleGlobals (pPool,server);
 
-    if (apr_pool_create(&module_globals->pool, NULL) != APR_SUCCESS) 
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                     MODNAME ": could not initialize mod_rivet private pool");
-        exit(1);
-    }
-
-    module_globals->rivet_mpm_bridge = Rivet_SeekMPMBridge(pTemp,server);
-
-    /* Finally the bridge is loaded and the jump table sought */
+    /* The bridge is loaded and the jump table sought */
 
     if (apr_dso_load(&dso_handle,module_globals->rivet_mpm_bridge,pPool) == APR_SUCCESS)
     {
@@ -272,18 +304,6 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_request) != NULL);
 
         apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pPool);
-
-    /* Another crucial point: we are storing in the globals a reference to the
-     * root server_rec object from which threads are supposed to derive 
-     * all the other chain of virtual hosts server records
-     */
-
-        module_globals->server = server;
-
-        //ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pPool) == APR_SUCCESS);
-        //private = Rivet_CreatePrivateData();
-        //ap_assert (private != NULL);
-        //Rivet_SetupTclPanicProc ();
 
     }
     else
@@ -329,17 +349,26 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pChild) == APR_SUCCESS);
 
-/* This code is run once per child process. In a threaded Tcl builds the forking 
- * of a child process most likely has not preserved the thread where the Tcl 
- * notifier runs. The Notifier should have been restarted by one the 
- * pthread_atfork callbacks (setup in Tcl >= 8.5.14 and Tcl >= 8.6.1). In
- * case pthread_atfork is not supported we unconditionally call Tcl_InitNotifier
- * hoping for the best (Bug #55153)      
- */
+    /* This code is run once per child process. In a threaded Tcl builds the forking 
+     * of a child process most likely has not preserved the thread where the Tcl 
+     * notifier runs. The Notifier should have been restarted by one the 
+     * pthread_atfork callbacks (setup in Tcl >= 8.5.14 and Tcl >= 8.6.1). In
+     * case pthread_atfork is not supported we unconditionally call Tcl_InitNotifier
+     * hoping for the best (Bug #55153)      
+     */
 
 #if !defined(HAVE_PTHREAD_ATFORK)
     Tcl_InitNotifier();
 #endif
+
+    if (module_globals == NULL)
+    {
+        module_globals = Rivet_CreateModuleGlobals (pChild,server);
+    }
+
+    /* This mutex should protect the process wide pool from concurrent access by 
+     * different threads
+     */
 
     apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
 

@@ -48,7 +48,7 @@ apr_status_t Prefork_MPM_Finalize (void* data)
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, s, "Running prefork bridge finalize method");
 
-    // No, we don't clean up anymore as we are just shutting this process down
+    // No, we don't do any clean up anymore as we are just shutting this process down
     // Rivet_ProcessorCleanup(private);
 
     return OK;
