@@ -2,7 +2,7 @@
     * src/librivet/rivetWWW.c: Doubling the size of chunks 
     allocated for the buffer in Rivet_EscapeSgmlCharsCmd (6 chars) 
     and setting the chunk size in Rivet_EscapeStringCmd back to 
-    the original size (3 chars)
+    the original size (3 chars) (closes bug #61353)
     
 2017-07-20 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/formbroker/formbroker.tcl: now using Tcl
