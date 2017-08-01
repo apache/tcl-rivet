@@ -134,7 +134,9 @@ namespace eval FormBroker {
         set valid FB_OK
         dict with var_d {
             if {$bounds > 0} {
-                if {$constrain} {
+                if {($nonempty == 1) && ($var == "")} {
+                    set valid FB_EMPTY_STRING
+                } elseif {$constrain} {
                     set var [string range $var 0 $bounds-1]
                 } elseif {[string length $var] > $bounds} {
                     set valid FB_STRING_TOO_LONG
@@ -703,6 +705,7 @@ namespace eval FormBroker {
                                 constrain           0           \
                                 validator           [namespace current]::validate_string \
                                 force_quote         0           \
+                                nonempty            0           \
                                 field_validation    FB_OK]
 
             dict with form_definitions $form_name $field_name {
@@ -749,6 +752,13 @@ namespace eval FormBroker {
                             # set it only in this code branch
 
                             dict set form_definitions $form_name $field_name default $default
+                        }
+                        nonempty {
+                            
+                             # this flag forces the formbroker to
+                             # signal empty strings as form data errors
+                            
+                            set nonemtpy 1
                         }
                         constrain {
                             set constrain 1
