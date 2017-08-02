@@ -1,3 +1,6 @@
+2017-08-02 Georgios Petasis <petasis@apache.org>
+	* Created a new branch (cmake) for the CMake build system.
+
 2017-07-24 Massimo Manghi <mxmanghi@apache.org>
 	* xml/rivet.xml.in: reflects rivet.xml having been moved to doc/xml
 	* rivet/default_request_handler.tcl: code of the default 
