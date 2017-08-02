@@ -1,0 +1,75 @@
+# Check headers
+include(CheckIncludeFile)
+include(CheckIncludeFiles)
+check_include_files(dlfcn.h        HAVE_DLFCN_H)
+check_include_files(inttypes.h     HAVE_INTTYPES_H)
+check_include_files(limits.h       HAVE_LIMITS_H)
+check_include_files(memory.h       HAVE_MEMORY_H)
+check_include_files(net/errno.h    HAVE_NET_ERRNO_H)
+check_include_files(stdint.h       HAVE_STDINT_H)
+check_include_files(stdlib.h       HAVE_STDLIB_H)
+check_include_files(strings.h      HAVE_STRINGS_H)
+check_include_files(string.h       HAVE_STRING_H)
+check_include_files(sys/param.h    HAVE_SYS_PARAM_H)
+check_include_files(sys/stat.h     HAVE_SYS_STAT_H )
+check_include_files(sys/types.h    HAVE_SYS_TYPES_H )
+check_include_files(unistd.h       HAVE_UNISTD_H )
+check_include_files(dirent.h       HAVE_DIRENT_H)
+check_include_files(limits.h       HAVE_LIMITS_H)
+check_include_files(alloca.h       HAVE_ALLOCA_H )
+check_include_files(stdint.h       HAVE_STDINT_H )
+check_include_files(sys/mman.h     HAVE_SYS_MMAN_H)
+check_include_files(errno.h        HAVE_ERRNO_H)
+check_include_files(float.h        HAVE_FLOAT_H)
+check_include_files(sys/wait.h     HAVE_SYS_WAIT_H)
+check_include_files(values.h       HAVE_VALUES_H)
+
+# Check functions
+include(CheckFunctionExists)
+check_function_exists(fseek64      HAVE_FSEEK64)
+check_function_exists(open64       HAVE_OPEN64)
+check_function_exists(memcpy HAVE_MEMCPY )
+check_function_exists(mmap HAVE_MMAP )
+
+# Check types
+include ( CheckTypeSize )
+check_type_size ( "long double" HAVE_LONG_DOUBLE )
+check_type_size ( "double" SIZEOF_DOUBLE )
+check_type_size ( "long double" SIZEOF_LONG_DOUBLE )
+check_type_size ( "void*" SIZEOF_VOID_P )
+
+if(NOT HAVE_DIRENT_H)
+  set(NO_DIRENT_H 1)
+endif()
+
+if(NOT HAVE_DLFCN_H)
+  set(NO_DLFCN_H 1)
+endif()
+
+if(NOT HAVE_ERRNO_H)
+  set(NO_ERRNO_H 1)
+endif()
+
+if(NOT HAVE_FLOAT_H)
+  set(NO_FLOAT_H 1)
+endif()
+
+if(NOT HAVE_LIMITS_H)
+  set(NO_LIMITS_H 1)
+endif()
+
+if(NOT HAVE_SYS_WAIT_H)
+  set(NO_SYS_WAIT_H 1)
+endif()
+
+if(NOT HAVE_VALUES_H)
+  set(NO_VALUES_H 1)
+endif()
+
+if(NOT HAVE_STDLIB_H)
+  set(NO_STDLIB_H 1)
+endif()
+
+if(NOT HAVE_STRING_H)
+  set(NO_STRING_H 1)
+endif()
