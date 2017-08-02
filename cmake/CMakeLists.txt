@@ -59,13 +59,13 @@ set(rivetparser_sources
 set(mod_rivet_sources
   ${RIVET_SRC_DIR}/request/apache_multipart_buffer.c
   ${RIVET_SRC_DIR}/request/apache_request.c
-  ${RIVET_SRC_DIR}/mod_rivet/rivetCore.c
-  ${RIVET_SRC_DIR}/mod_rivet/rivetInspect.c
-  ${RIVET_SRC_DIR}/mod_rivet/rivetChannel.c
-  ${RIVET_SRC_DIR}/mod_rivet/TclWebapache.c
-  ${RIVET_SRC_DIR}/mod_rivet/apache_config.c
-  ${RIVET_SRC_DIR}/mod_rivet/mod_rivet_common.c
-  ${RIVET_SRC_DIR}/mod_rivet/mod_rivet_generator.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/rivetCore.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/rivetInspect.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/rivetChannel.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/TclWebapache.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/apache_config.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_common.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_generator.c
   ${RIVET_SRC_DIR}/parser/rivetParser.c
 )
 
@@ -80,7 +80,7 @@ add_library(rivet::rivet  ALIAS mod_rivet)
 # ===========================================================================
 target_compile_definitions (rivetparser PRIVATE TCL_THREADS=1 HAVE_CONFIG_H=1 )
 target_compile_definitions (mod_rivet   PRIVATE TCL_THREADS=1 HAVE_CONFIG_H=1 )
-set(RIVETLIB_DESTDIR "/usr/lib64/rivet2.1/site-packages/mod_rivet")
+set(RIVETLIB_DESTDIR "/usr/lib64/rivet3.0/site-packages/mod_rivet")
 
 # ===========================================================================
 #  Locate needed packages...
@@ -131,14 +131,14 @@ set(RIVET_INCLUDE_DIRS_PUBLIC
 )
 set(RIVET_INCLUDE_DIRS_PRIVATE
   "${RIVET_SRC_DIR}"
-  "${RIVET_SRC_DIR}/mod_rivet"
+  "${RIVET_SRC_DIR}/mod_rivet_ng"
   "${RIVET_SRC_DIR}/parser"
   "${RIVET_SRC_DIR}/request"
   "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}"
   "${PROJECT_BINARY_DIR}" 
 )
 target_include_directories(rivetparser PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
-target_include_directories(mod_rivet   PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+target_include_directories(mod_rivet_ng   PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
 
 set(CONFIGURE_CMD "cmake -${CMAKE_ARGC} ${CMAKE_ARGV0}")
 if(version-display)
