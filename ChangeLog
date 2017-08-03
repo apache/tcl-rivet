@@ -1,3 +1,7 @@
+2017-08-03 Georgios Petasis <petasis@apache.org>
+	* CMake build system: Added missing source files, enabled as default
+	the build of shared libraries, added needed link libraries.
+
 2017-08-02 Massimo Manghi <mxmanghi@apache.org>
 	* Changed references in cmake/CMakeList.txt to build with
 	code in src/mod_rivet_ng

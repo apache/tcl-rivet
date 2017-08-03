@@ -29,7 +29,7 @@ option(import-rivet-commands      "requires explicit namespace import" OFF)
 option(virtual-interps-separation "to turn on virtual host separation" OFF)
 option(requests-serialization     "Forces HTTP requests serialization among threads(debug)" OFF)
 option(upload-var                 "whether files are uploaded to Tcl variables" ON)
-
+option(BUILD_SHARED_LIBS          "build as shared libraries" ON)
 
 # Offer the user the choice of overriding the installation directories
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
@@ -64,6 +64,7 @@ set(mod_rivet_sources
   ${RIVET_SRC_DIR}/mod_rivet_ng/rivetChannel.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/TclWebapache.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/apache_config.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_cache.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_common.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_generator.c
   ${RIVET_SRC_DIR}/parser/rivetParser.c
@@ -113,15 +114,20 @@ MESSAGE ( STATUS "  TCL_LIBRARY:             " ${TCL_LIBRARY} )
 # ===========================================================================
 MESSAGE ( STATUS "Searching for Apache..." )
 find_package(APACHE REQUIRED)
+MESSAGE ( STATUS "  APACHE_INCLUDE_DIR:      " ${APACHE_INCLUDE_DIR} )
 
 #  Locate Apr...
 # ===========================================================================
 MESSAGE ( STATUS "Searching for Apr..." )
 find_package(APR REQUIRED)
+MESSAGE ( STATUS "  APR_INCLUDE_DIR:         " ${APR_INCLUDE_DIR} )
+MESSAGE ( STATUS "  APR_LIBRARY:             " ${APR_LIBRARY} )
+MESSAGE ( STATUS "  APRUTIL_INCLUDE_DIR:     " ${APRUTIL_INCLUDE_DIR} )
+MESSAGE ( STATUS "  APRUTIL_LIBRARY:         " ${APRUTIL_LIBRARY} )
 
 find_package(Threads)
 
-#  Set up include-directories...
+#  Set up include directories...
 # ===========================================================================
 set(RIVET_INCLUDE_DIRS_PUBLIC
   "${TCL_INCLUDE_PATH}"
@@ -139,6 +145,13 @@ set(RIVET_INCLUDE_DIRS_PRIVATE
 )
 target_include_directories(rivetparser PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
 target_include_directories(mod_rivet   PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+
+#  Set up libraries...
+# ===========================================================================
+target_link_libraries(rivetparser ${TCL_LIBRARY}
+                                  ${APR_LIBRARY} ${APRUTIL_LIBRARY} )
+target_link_libraries(mod_rivet   ${TCL_LIBRARY}
+                                  ${APR_LIBRARY} ${APRUTIL_LIBRARY})
 
 set(CONFIGURE_CMD "cmake -${CMAKE_ARGC} ${CMAKE_ARGV0}")
 if(version-display)
