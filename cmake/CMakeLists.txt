@@ -124,18 +124,15 @@ add_library(rivet::lazy_mpm      ALIAS rivet_lazy_mpm)
 
 #  Definitions...
 # ===========================================================================
-target_compile_definitions (rivetparser       PRIVATE
-   TCL_THREADS=1 HAVE_CONFIG_H=1 USE_TCL_STUBS=1 )
-target_compile_definitions (rivetlib          PRIVATE
-   TCL_THREADS=1 HAVE_CONFIG_H=1 USE_TCL_STUBS=1 )
-target_compile_definitions (rivet_worker_mpm  PRIVATE
-   TCL_THREADS=1 HAVE_CONFIG_H=1 )
-target_compile_definitions (rivet_prefork_mpm PRIVATE
-   TCL_THREADS=1 HAVE_CONFIG_H=1 )
-target_compile_definitions (rivet_lazy_mpm    PRIVATE
-   TCL_THREADS=1 HAVE_CONFIG_H=1 )
-target_compile_definitions (mod_rivet         PRIVATE
-   TCL_THREADS=1 HAVE_CONFIG_H=1 )
+target_compile_definitions (rivetparser        PRIVATE
+   HAVE_CONFIG_H=1 USE_TCL_STUBS=1 START_TAG="<?" END_TAG="?>" )
+target_compile_definitions (rivetlib           PRIVATE
+   HAVE_CONFIG_H=1 USE_TCL_STUBS=1 START_TAG="<?" END_TAG="?>" )
+target_compile_definitions (rivet_worker_mpm   PRIVATE HAVE_CONFIG_H=1 )
+target_compile_definitions (rivet_prefork_mpm  PRIVATE HAVE_CONFIG_H=1 )
+target_compile_definitions (rivet_lazy_mpm     PRIVATE HAVE_CONFIG_H=1 )
+target_compile_definitions (mod_rivet          PRIVATE
+   HAVE_CONFIG_H=1 START_TAG="<?" END_TAG="?>" )
 
 # ===========================================================================
 #  Locate needed packages...
@@ -277,6 +274,26 @@ if(TCL_THREADS)
     endif(PROJECT_OS_SunOS)
   endif(NOT WIN32)
 endif(TCL_THREADS)
+
+#  Definitions...
+# ===========================================================================
+if(_REENTRANT)
+  target_compile_definitions(rivetparser       PRIVATE _REENTRANT=1)
+  target_compile_definitions(rivetlib          PRIVATE _REENTRANT=1)
+  target_compile_definitions(rivet_worker_mpm  PRIVATE _REENTRANT=1)
+  target_compile_definitions(rivet_prefork_mpm PRIVATE _REENTRANT=1)
+  target_compile_definitions(rivet_lazy_mpm    PRIVATE _REENTRANT=1)
+  target_compile_definitions(mod_rivet         PRIVATE _REENTRANT=1)
+endif(_REENTRANT)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  target_compile_definitions(rivetparser       PRIVATE LINUX=1)
+  target_compile_definitions(rivetlib          PRIVATE LINUX=1)
+  target_compile_definitions(rivet_worker_mpm  PRIVATE LINUX=1)
+  target_compile_definitions(rivet_prefork_mpm PRIVATE LINUX=1)
+  target_compile_definitions(rivet_lazy_mpm    PRIVATE LINUX=1)
+  target_compile_definitions(mod_rivet         PRIVATE LINUX=1)
+endif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 #  Set variables for generating config files...
 # ===========================================================================
