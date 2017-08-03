@@ -1,4 +1,7 @@
 2017-08-03 Georgios Petasis <petasis@apache.org>
+	* CMake build system: Removed "lib" prefix from some libraris.
+
+2017-08-03 Georgios Petasis <petasis@apache.org>
 	* CMake build system: Added support for installing Rivet. Added more
 	checks for various definitions in config.h/rivet_config.h.
 

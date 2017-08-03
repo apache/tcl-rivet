@@ -126,6 +126,7 @@ add_library(rivet::worker_mpm    ALIAS rivet_worker_mpm)
 add_library(rivet::prefork_mpm   ALIAS rivet_prefork_mpm)
 add_library(rivet::lazy_mpm      ALIAS rivet_lazy_mpm)
 
+SET_TARGET_PROPERTIES(mod_rivet         PROPERTIES PREFIX "")
 SET_TARGET_PROPERTIES(rivet_worker_mpm  PROPERTIES PREFIX "")
 SET_TARGET_PROPERTIES(rivet_prefork_mpm PROPERTIES PREFIX "")
 SET_TARGET_PROPERTIES(rivet_lazy_mpm    PROPERTIES PREFIX "")
