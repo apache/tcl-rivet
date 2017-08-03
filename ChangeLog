@@ -1,5 +1,6 @@
 2017-08-03 Georgios Petasis <petasis@apache.org>
-	* CMake build system: Added support for installing Rivet.
+	* CMake build system: Added support for installing Rivet. Added more
+	checks for various definitions in config.h/rivet_config.h.
 
 2017-08-03 Georgios Petasis <petasis@apache.org>
 	* CMake build system: Added missing source files, enabled as default
@@ -11,7 +12,7 @@
 
 2017-08-02 Massimo Manghi <mxmanghi@apache.org>
 	* Changed references in cmake/CMakeList.txt to build with
-	code in src/mod_rivet_ng
+	code in src/mod_rivet_ng.
 
 2017-08-02 Georgios Petasis <petasis@apache.org>
 	* Created a new branch (cmake) for the CMake build system.

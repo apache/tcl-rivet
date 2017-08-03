@@ -26,6 +26,7 @@ set(with-tclsh "" CACHE FILEPATH "location of a working tclsh executable")
 set(with-tcl   "" CACHE PATH "directory containing tcl configuration (tclConfig.sh)")
 set(with-post-max 0 CACHE STRING  "BYTES Maximum size of data to be sent with a POST")
 set(with-rivet-core "mod_rivet_ng" CACHE STRING "mod_rivet core directory")
+set(with-upload-dir "/tmp"         CACHE STRING "Default directory for uploads")
 option(version-display            "Display Rivet version in Apache signature" OFF)
 option(head-requests              "Returns real headers in response to a HEAD request" OFF)
 option(single-thread              "forces the worker brigde to create a single thread (debug)" OFF)
@@ -34,7 +35,13 @@ option(import-rivet-commands      "requires explicit namespace import" OFF)
 option(virtual-interps-separation "to turn on virtual host separation" OFF)
 option(requests-serialization     "Forces HTTP requests serialization among threads(debug)" OFF)
 option(upload-var                 "whether files are uploaded to Tcl variables" ON)
-option(BUILD_SHARED_LIBS          "build as shared libraries" ON)
+option(BUILD_SHARED_LIBS          "build and link with shared libraries" ON)
+option(TCL_THREADS                "build with threads" ON)
+option(TCL_MEM_DEBUG              "build with memory debugging" OFF)
+
+include(CMakeDependentOption)
+CMAKE_DEPENDENT_OPTION(BUILD_STATIC_LIBS "build as static library" ON
+                       "NOT BUILD_SHARED_LIBS" OFF)
 
 # Offer the user the choice of overriding the installation directories
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
@@ -250,6 +257,7 @@ endif()
 if(upload-var)
   set(UPLOAD_FILES_TO_VAR 1)
 endif()
+set(UPLOAD_DIR ${with-upload-dir})
 
 #  Location of the Rivet library...
 # ===========================================================================
@@ -257,7 +265,20 @@ if(NOT DEFINED RIVETLIB_DESTDIR)
   set(RIVETLIB_DESTDIR "${APACHE_LIB_DIR}rivet${RIVET_VERSION}")
 endif(NOT DEFINED RIVETLIB_DESTDIR)
 
-#  Set variables for generatting config files...
+if(TCL_THREADS)
+  set(TCL_THREADS 1)
+  if(NOT WIN32)
+    set(USE_THREAD_ALLOC 1)
+    set(_REENTRANT       1)
+    set(_THREAD_SAFE     1)
+    STRING (REGEX MATCH "SunOS" PROJECT_OS_SunOS ${CMAKE_SYSTEM_NAME})
+    if(PROJECT_OS_SunOS)
+      set(_POSIX_PTHREAD_SEMANTICS 1)
+    endif(PROJECT_OS_SunOS)
+  endif(NOT WIN32)
+endif(TCL_THREADS)
+
+#  Set variables for generating config files...
 # ===========================================================================
 set(RIVET_AC_APPLE_UNIVERSAL_BUILD ${AC_APPLE_UNIVERSAL_BUILD})
 set(RIVET_CONFIGURE_CMD            ${CONFIGURE_CMD})
@@ -304,6 +325,7 @@ set(RIVET_TCL_WIDE_INT_IS_LONG     ${TCL_WIDE_INT_IS_LONG})
 set(RIVET_TCL_WIDE_INT_TYPE        ${TCL_WIDE_INT_TYPE})
 set(RIVET_UNDER_CE                 ${UNDER_CE})
 set(RIVET_UPLOAD_FILES_TO_VAR      ${UPLOAD_FILES_TO_VAR})
+set(RIVET_UPLOAD_DIR               ${UPLOAD_DIR})
 set(RIVET_USE_THREAD_ALLOC         ${USE_THREAD_ALLOC})
 set(RIVET__ISOC99_SOURCE           ${_ISOC99_SOURCE})
 set(RIVET__LARGEFILE64_SOURCE      ${_LARGEFILE64_SOURCE})
