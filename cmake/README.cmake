@@ -7,7 +7,7 @@ Compiling Rivet with cmake:
 
 1) Change the working directory to "cmake".
 
-2) Execute the following commands:
+2) Execute the following commands (all commands must be executed from the cmake directory):
   
    cmake -E make_directory build
    cmake -E chdir build cmake --config Release ..
