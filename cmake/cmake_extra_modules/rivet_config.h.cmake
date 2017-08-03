@@ -182,7 +182,7 @@
 
 /* mod_rivet core */
 #ifndef RIVET_RIVET_CORE
-#define RIVET_RIVET_CORE "mod_rivet"
+#define RIVET_RIVET_CORE "@RIVET_CORE@"
 #endif
 
 /* Separate Channels for virtual hosts */

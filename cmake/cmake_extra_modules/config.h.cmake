@@ -157,7 +157,14 @@
 #define PACKAGE_VERSION "@RIVET_VERSION@"
 
 /* The path to the rivet tcl library */
+#ifndef RIVETLIB_DESTDIR
 #define RIVETLIB_DESTDIR "@RIVETLIB_DESTDIR@"
+#endif
+
+/* mod_rivet core */
+#ifndef RIVET_CORE
+#define RIVET_CORE "@RIVET_CORE@"
+#endif
 
 /* Separate Channels for virtual hosts */
 #cmakedefine01 SEPARATE_CHANNELS

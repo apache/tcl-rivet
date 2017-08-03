@@ -12,6 +12,10 @@ set(RIVET_VERSION
   ${RIVET_MAJOR_VERSION}.${RIVET_MINOR_VERSION}.${RIVET_PATCH_VERSION})
 set(INIT_VERSION ${RIVET_MAJOR_VERSION}.${RIVET_MINOR_VERSION})
 
+# Rivetlib version:
+set(RIVETLIB_PACKAGE "rivetlib")
+set(RIVETLIB_PACKAGE_VERSION ${INIT_VERSION})
+
 # The arguments argument are optional, declares version and language
 # (in this case C).
 project(Rivet VERSION ${RIVET_VERSION} LANGUAGES C)
@@ -21,6 +25,7 @@ project(Rivet VERSION ${RIVET_VERSION} LANGUAGES C)
 set(with-tclsh "" CACHE FILEPATH "location of a working tclsh executable")
 set(with-tcl   "" CACHE PATH "directory containing tcl configuration (tclConfig.sh)")
 set(with-post-max 0 CACHE STRING  "BYTES Maximum size of data to be sent with a POST")
+set(with-rivet-core "mod_rivet_ng" CACHE STRING "mod_rivet core directory")
 option(version-display            "Display Rivet version in Apache signature" OFF)
 option(head-requests              "Returns real headers in response to a HEAD request" OFF)
 option(single-thread              "forces the worker brigde to create a single thread (debug)" OFF)
@@ -50,6 +55,8 @@ include(GNUInstallDirs)
 #  Rivet source files...
 # ===========================================================================
 set(RIVET_SRC_DIR "${PROJECT_SOURCE_DIR}/../src")
+set(RIVET_LIB_DIR "${PROJECT_SOURCE_DIR}/../rivet")
+set(RIVET_CORE ${with-rivet-core})
 
 set(rivetparser_sources
   ${RIVET_SRC_DIR}/parser/rivetParser.c
@@ -64,32 +71,32 @@ set(rivetlib_sources
 )
 
 set(rivet_worker_mpm_sources
-  ${RIVET_SRC_DIR}/mod_rivet_ng/rivet_worker_mpm.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/worker_prefork_common.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/rivet_worker_mpm.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/worker_prefork_common.c
 )
 
 set(rivet_prefork_mpm_sources
-  ${RIVET_SRC_DIR}/mod_rivet_ng/rivet_prefork_mpm.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/worker_prefork_common.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/rivet_prefork_mpm.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/worker_prefork_common.c
 )
 
 set(rivet_lazy_mpm_sources
-  ${RIVET_SRC_DIR}/mod_rivet_ng/rivet_lazy_mpm.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/rivet_lazy_mpm.c
 )
 
 set(mod_rivet_sources
-  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/mod_rivet.c
   ${RIVET_SRC_DIR}/request/apache_multipart_buffer.c
   ${RIVET_SRC_DIR}/request/apache_request.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/rivetCore.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/rivetInspect.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/rivetChannel.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/rivetCore.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/rivetInspect.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/rivetChannel.c
   ${RIVET_SRC_DIR}/parser/rivetParser.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/TclWebapache.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/apache_config.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_cache.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_common.c
-  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_generator.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/TclWebapache.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/apache_config.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/mod_rivet_cache.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/mod_rivet_common.c
+  ${RIVET_SRC_DIR}/${RIVET_CORE}/mod_rivet_generator.c
   ${RIVET_SRC_DIR}/parser/rivetParser.c
 )
 
@@ -122,7 +129,6 @@ target_compile_definitions (rivet_lazy_mpm    PRIVATE
    TCL_THREADS=1 HAVE_CONFIG_H=1 )
 target_compile_definitions (mod_rivet         PRIVATE
    TCL_THREADS=1 HAVE_CONFIG_H=1 )
-set(RIVETLIB_DESTDIR "/usr/lib64/rivet3.0/site-packages/mod_rivet")
 
 # ===========================================================================
 #  Locate needed packages...
@@ -146,8 +152,8 @@ if (NOT "${with-tcl}" STREQUAL "")
     tcl83 tcl8.3 tcl82 tcl8.2 tcl80 tcl8.0
     PATHS ${with-tcl} )
 endif ()
-FIND_PACKAGE ( TCL 8.6 REQUIRED )
-FIND_PACKAGE ( TclStub REQUIRED )
+FIND_PACKAGE ( TCL 8.5.10 REQUIRED )
+FIND_PACKAGE ( TclStub 8.5.10 REQUIRED )
 MESSAGE ( STATUS "  TCL_TCLSH:               " ${TCL_TCLSH} )
 MESSAGE ( STATUS "  TCL_INCLUDE_PATH:        " ${TCL_INCLUDE_PATH} )
 MESSAGE ( STATUS "  TCL_LIBRARY:             " ${TCL_LIBRARY} )
@@ -158,6 +164,8 @@ MESSAGE ( STATUS "  TCL_STUB_LIBRARY:        " ${TCL_STUB_LIBRARY} )
 MESSAGE ( STATUS "Searching for Apache..." )
 find_package(APACHE REQUIRED)
 MESSAGE ( STATUS "  APACHE_INCLUDE_DIR:      " ${APACHE_INCLUDE_DIR} )
+MESSAGE ( STATUS "  APACHE_MODULE_DIR:       " ${APACHE_MODULE_DIR} )
+MESSAGE ( STATUS "  APACHE_LIB_DIR:          " ${APACHE_LIB_DIR} )
 
 #  Locate Apr...
 # ===========================================================================
@@ -180,7 +188,7 @@ set(RIVET_INCLUDE_DIRS_PUBLIC
 )
 set(RIVET_INCLUDE_DIRS_PRIVATE
   "${RIVET_SRC_DIR}"
-  "${RIVET_SRC_DIR}/mod_rivet_ng"
+  "${RIVET_SRC_DIR}/${RIVET_CORE}"
   "${RIVET_SRC_DIR}/parser"
   "${RIVET_SRC_DIR}/request"
   "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}"
@@ -206,6 +214,10 @@ target_link_libraries(rivetparser        ${TCL_STUB_LIBRARY})
 target_link_libraries(rivetlib           ${TCL_STUB_LIBRARY})
 target_link_libraries(mod_rivet          ${TCL_LIBRARY})
 
+#  Handle user options...
+# ===========================================================================
+MESSAGE( STATUS "Rivet version ${RIVET_VERSION}:")
+MESSAGE( STATUS "  Core in use: " ${RIVET_CORE})
 set(CONFIGURE_CMD "cmake -${CMAKE_ARGC} ${CMAKE_ARGV0}")
 if(version-display)
   set(DISPLAY_VERSION 1)
@@ -221,11 +233,11 @@ if(single-thread)
 endif()
 set(NAMEOFEXECUTABLE ${TCL_TCLSH})
 if(import-rivet-commands)
-  message(STATUS "forcing Rivet to import commands from ::rivet namespace")
+  message(STATUS "  forcing Rivet to import commands from ::rivet namespace")
   set(NAMESPACE_IMPORT 1)
 endif()
 if(rivet-commands-export)
-  message(STATUS "forcing Rivet to export commands from ::rivet namespace")
+  message(STATUS "  forcing Rivet to export commands from ::rivet namespace")
   set(NAMESPACE_EXPORT 1)
 endif()
 set(SEPARATE_CHANNELS 0)
@@ -239,6 +251,14 @@ if(upload-var)
   set(UPLOAD_FILES_TO_VAR 1)
 endif()
 
+#  Location of the Rivet library...
+# ===========================================================================
+if(NOT DEFINED RIVETLIB_DESTDIR)
+  set(RIVETLIB_DESTDIR "${APACHE_LIB_DIR}rivet${RIVET_VERSION}")
+endif(NOT DEFINED RIVETLIB_DESTDIR)
+
+#  Set variables for generatting config files...
+# ===========================================================================
 set(RIVET_AC_APPLE_UNIVERSAL_BUILD ${AC_APPLE_UNIVERSAL_BUILD})
 set(RIVET_CONFIGURE_CMD            ${CONFIGURE_CMD})
 set(RIVET_DISPLAY_VERSION          ${DISPLAY_VERSION})
@@ -295,60 +315,77 @@ set(RIVET__THREAD_SAFE             ${_THREAD_SAFE})
 set(RIVET__WIN32_WCE               ${_WIN32_WCE})
 set(RIVET__XOPEN_SOURCE_EXTENDED   ${_XOPEN_SOURCE_EXTENDED})
 
-# Generate headers
+#  Generate headers rivet_config.h, config.h
+# ===========================================================================
 configure_file("${PROJECT_SOURCE_DIR}/cmake_extra_modules/rivet_config.h.cmake"
                "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/rivet_config.h" )
 configure_file("${PROJECT_SOURCE_DIR}/cmake_extra_modules/config.h.cmake"
                "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/config.h" )
 
-# # Make relative paths absolute (needed later on)
-# foreach(p LIB BIN INCLUDE CMAKE)
-#   set(var INSTALL_${p}_DIR)
-#   if(NOT IS_ABSOLUTE "${${var}}")
-#     set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-#   endif()
-# endforeach()
-# 
-# # 
-# # Add sub-directories
-# add_subdirectory(foo)
-# add_subdirectory(bar)
-# 
-# # The interesting stuff goes here
-# # ===============================
-# 
-# # Add all targets to the build-tree export set
-# export(TARGETS foo bar
-#   FILE "${PROJECT_BINARY_DIR}/FooBarTargets.cmake")
-# 
-# # Export the package for use from the build-tree
-# # (this registers the build-tree with a global CMake-registry)
-# export(PACKAGE FooBar)
-# 
-# # Create the FooBarConfig.cmake and FooBarConfigVersion files
-# file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
-#    "${INSTALL_INCLUDE_DIR}")
-# # ... for the build tree
-# set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
-# configure_file(FooBarConfig.cmake.in
-#   "${PROJECT_BINARY_DIR}/FooBarConfig.cmake" @ONLY)
-# # ... for the install tree
-# set(CONF_INCLUDE_DIRS "\${RIVET_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-# configure_file(FooBarConfig.cmake.in
-#   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/FooBarConfig.cmake" @ONLY)
-# # ... for both
-# configure_file(FooBarConfigVersion.cmake.in
-#   "${PROJECT_BINARY_DIR}/FooBarConfigVersion.cmake" @ONLY)
-# 
-# # Install the FooBarConfig.cmake and FooBarConfigVersion.cmake
-# install(FILES
-#   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/FooBarConfig.cmake"
-#   "${PROJECT_BINARY_DIR}/FooBarConfigVersion.cmake"
-#   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-# 
-# # Install the export set for use with the install-tree
-# install(EXPORT FooBarTargets DESTINATION
-#   "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+#  Generate init.tcl
+# ===========================================================================
+configure_file("${RIVET_LIB_DIR}/init.tcl.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/init.tcl" @ONLY)
 
+# ===========================================================================
+#  Installation section...
+# ===========================================================================
 
+MESSAGE ( STATUS
+"==========================================================================" )
+MESSAGE ( STATUS "Rivet ${RIVET_VERSION} will be installed in the following "
+                 "directories:" )
+MESSAGE ( STATUS " + ${CMAKE_SHARED_LIBRARY_PREFIX}mod_rivet${CMAKE_SHARED_LIBRARY_SUFFIX}: " ${APACHE_MODULE_DIR} )
+MESSAGE ( STATUS "     (to override this location, use -DAPACHE_MODULE_DIR=...)")
+MESSAGE ( STATUS " + Rivet library: " ${RIVETLIB_DESTDIR} )
+MESSAGE ( STATUS "     (to override this location, use -DAPACHE_LIB_DIR=... or")
+MESSAGE ( STATUS "                                     -DRIVETLIB_DESTDIR=...)")
+MESSAGE ( STATUS
+"==========================================================================" )
 
+#  Library mod_rivet (mod_rivet.so) must be installed in the directory Apache2
+#  searches for modules...
+# ===========================================================================
+install(TARGETS mod_rivet EXPORT Rivet_mod_rivet
+  ARCHIVE  DESTINATION ${APACHE_MODULE_DIR}
+  LIBRARY  DESTINATION ${APACHE_MODULE_DIR}
+  RUNTIME  DESTINATION ${APACHE_MODULE_DIR})
+
+#  Install mpms...
+# ===========================================================================
+install(TARGETS rivet_worker_mpm rivet_prefork_mpm rivet_lazy_mpm
+  EXPORT Rivet_MPMs
+  ARCHIVE  DESTINATION ${RIVETLIB_DESTDIR}/mpm
+  LIBRARY  DESTINATION ${RIVETLIB_DESTDIR}/mpm
+  RUNTIME  DESTINATION ${RIVETLIB_DESTDIR}/mpm)
+
+#  Install libraries...
+# ===========================================================================
+install(TARGETS rivetparser rivetlib
+	EXPORT Rivet_Libraries
+  ARCHIVE  DESTINATION ${RIVETLIB_DESTDIR}
+  LIBRARY  DESTINATION ${RIVETLIB_DESTDIR}
+  RUNTIME  DESTINATION ${RIVETLIB_DESTDIR})
+
+#  Install library files...
+# ===========================================================================
+install(FILES
+       	"${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/init.tcl"
+        ${RIVET_LIB_DIR}/default_request_handler.tcl
+        ${RIVET_LIB_DIR}/pkgIndex.tcl
+        DESTINATION ${RIVETLIB_DESTDIR})
+
+#  Install library directories...
+# ===========================================================================
+install(DIRECTORY   ${RIVET_LIB_DIR}/rivet-tcl
+        DESTINATION ${RIVETLIB_DESTDIR})
+install(DIRECTORY
+     	${RIVET_LIB_DIR}/packages/asciiglyphs
+     	${RIVET_LIB_DIR}/packages/calendar
+     	${RIVET_LIB_DIR}/packages/dio
+     	${RIVET_LIB_DIR}/packages/entities
+     	${RIVET_LIB_DIR}/packages/form
+     	${RIVET_LIB_DIR}/packages/formbroker
+     	${RIVET_LIB_DIR}/packages/session
+     	${RIVET_LIB_DIR}/packages/tclrivet
+        DESTINATION ${RIVETLIB_DESTDIR}/packages)

@@ -25,6 +25,18 @@ if(NOT DEFINED APACHE_MODULE_DIR)
    endif(APXS_BIN)
 endif(NOT DEFINED APACHE_MODULE_DIR)
 
+if(NOT DEFINED APACHE_LIB_DIR)
+   find_program(APXS_BIN NAMES apxs apxs2
+             PATH_SUFFIXES httpd apache apache2
+   )
+
+   if(APXS_BIN)
+      EXEC_PROGRAM(${APXS_BIN}
+         ARGS -q LIBDIR
+         OUTPUT_VARIABLE APACHE_LIB_DIR )
+   endif(APXS_BIN)
+endif(NOT DEFINED APACHE_LIB_DIR)
+
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set APACHE_FOUND to TRUE if 
 # all listed variables are TRUE

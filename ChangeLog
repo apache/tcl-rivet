@@ -1,4 +1,7 @@
 2017-08-03 Georgios Petasis <petasis@apache.org>
+	* CMake build system: Added support for installing Rivet.
+
+2017-08-03 Georgios Petasis <petasis@apache.org>
 	* CMake build system: Added missing source files, enabled as default
 	the build of shared libraries, added needed link libraries. Also
 	extended build system for all Rivet libraries (librivetlib.so,
