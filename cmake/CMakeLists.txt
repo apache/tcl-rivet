@@ -56,12 +56,35 @@ set(rivetparser_sources
   ${RIVET_SRC_DIR}/parser/parserPkgInit.c
 )
 
+set(rivetlib_sources
+  ${RIVET_SRC_DIR}/librivet/rivetList.c
+  ${RIVET_SRC_DIR}/librivet/rivetCrypt.c
+  ${RIVET_SRC_DIR}/librivet/rivetWWW.c
+  ${RIVET_SRC_DIR}/librivet/rivetPkgInit.c
+)
+
+set(rivet_worker_mpm_sources
+  ${RIVET_SRC_DIR}/mod_rivet_ng/rivet_worker_mpm.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/worker_prefork_common.c
+)
+
+set(rivet_prefork_mpm_sources
+  ${RIVET_SRC_DIR}/mod_rivet_ng/rivet_prefork_mpm.c
+  ${RIVET_SRC_DIR}/mod_rivet_ng/worker_prefork_common.c
+)
+
+set(rivet_lazy_mpm_sources
+  ${RIVET_SRC_DIR}/mod_rivet_ng/rivet_lazy_mpm.c
+)
+
 set(mod_rivet_sources
+  ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet.c
   ${RIVET_SRC_DIR}/request/apache_multipart_buffer.c
   ${RIVET_SRC_DIR}/request/apache_request.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/rivetCore.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/rivetInspect.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/rivetChannel.c
+  ${RIVET_SRC_DIR}/parser/rivetParser.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/TclWebapache.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/apache_config.c
   ${RIVET_SRC_DIR}/mod_rivet_ng/mod_rivet_cache.c
@@ -72,15 +95,33 @@ set(mod_rivet_sources
 
 #  Add build targets...
 # ===========================================================================
-add_library(rivetparser   ${rivetparser_sources})
-add_library(mod_rivet     ${mod_rivet_sources})
-add_library(rivet::parser ALIAS rivetparser)
-add_library(rivet::rivet  ALIAS mod_rivet)
+add_library(mod_rivet            ${mod_rivet_sources})
+add_library(rivetparser          ${rivetparser_sources})
+add_library(rivetlib             ${rivetlib_sources})
+add_library(rivet_worker_mpm     ${rivet_worker_mpm_sources})
+add_library(rivet_prefork_mpm    ${rivet_prefork_mpm_sources})
+add_library(rivet_lazy_mpm       ${rivet_lazy_mpm_sources})
+add_library(rivet::parser        ALIAS rivetparser)
+add_library(rivet::lib           ALIAS rivetparser)
+add_library(rivet::rivet         ALIAS mod_rivet)
+add_library(rivet::worker_mpm    ALIAS rivet_worker_mpm)
+add_library(rivet::prefork_mpm   ALIAS rivet_prefork_mpm)
+add_library(rivet::lazy_mpm      ALIAS rivet_lazy_mpm)
 
 #  Definitions...
 # ===========================================================================
-target_compile_definitions (rivetparser PRIVATE TCL_THREADS=1 HAVE_CONFIG_H=1 )
-target_compile_definitions (mod_rivet   PRIVATE TCL_THREADS=1 HAVE_CONFIG_H=1 )
+target_compile_definitions (rivetparser       PRIVATE
+   TCL_THREADS=1 HAVE_CONFIG_H=1 USE_TCL_STUBS=1 )
+target_compile_definitions (rivetlib          PRIVATE
+   TCL_THREADS=1 HAVE_CONFIG_H=1 USE_TCL_STUBS=1 )
+target_compile_definitions (rivet_worker_mpm  PRIVATE
+   TCL_THREADS=1 HAVE_CONFIG_H=1 )
+target_compile_definitions (rivet_prefork_mpm PRIVATE
+   TCL_THREADS=1 HAVE_CONFIG_H=1 )
+target_compile_definitions (rivet_lazy_mpm    PRIVATE
+   TCL_THREADS=1 HAVE_CONFIG_H=1 )
+target_compile_definitions (mod_rivet         PRIVATE
+   TCL_THREADS=1 HAVE_CONFIG_H=1 )
 set(RIVETLIB_DESTDIR "/usr/lib64/rivet3.0/site-packages/mod_rivet")
 
 # ===========================================================================
@@ -106,9 +147,11 @@ if (NOT "${with-tcl}" STREQUAL "")
     PATHS ${with-tcl} )
 endif ()
 FIND_PACKAGE ( TCL 8.6 REQUIRED )
+FIND_PACKAGE ( TclStub REQUIRED )
 MESSAGE ( STATUS "  TCL_TCLSH:               " ${TCL_TCLSH} )
 MESSAGE ( STATUS "  TCL_INCLUDE_PATH:        " ${TCL_INCLUDE_PATH} )
 MESSAGE ( STATUS "  TCL_LIBRARY:             " ${TCL_LIBRARY} )
+MESSAGE ( STATUS "  TCL_STUB_LIBRARY:        " ${TCL_STUB_LIBRARY} )
 
 #  Locate Apache...
 # ===========================================================================
@@ -143,15 +186,25 @@ set(RIVET_INCLUDE_DIRS_PRIVATE
   "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}"
   "${PROJECT_BINARY_DIR}" 
 )
-target_include_directories(rivetparser PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
-target_include_directories(mod_rivet   PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+
+target_include_directories(rivetparser
+  PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+target_include_directories(rivetlib
+  PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+target_include_directories(rivet_worker_mpm
+  PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+target_include_directories(rivet_prefork_mpm
+  PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+target_include_directories(rivet_lazy_mpm
+  PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+target_include_directories(mod_rivet
+  PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
 
 #  Set up libraries...
 # ===========================================================================
-target_link_libraries(rivetparser ${TCL_LIBRARY}
-                                  ${APR_LIBRARY} ${APRUTIL_LIBRARY} )
-target_link_libraries(mod_rivet   ${TCL_LIBRARY}
-                                  ${APR_LIBRARY} ${APRUTIL_LIBRARY})
+target_link_libraries(rivetparser        ${TCL_STUB_LIBRARY})
+target_link_libraries(rivetlib           ${TCL_STUB_LIBRARY})
+target_link_libraries(mod_rivet          ${TCL_LIBRARY})
 
 set(CONFIGURE_CMD "cmake -${CMAKE_ARGC} ${CMAKE_ARGV0}")
 if(version-display)

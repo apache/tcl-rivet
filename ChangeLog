@@ -1,6 +1,10 @@
 2017-08-03 Georgios Petasis <petasis@apache.org>
 	* CMake build system: Added missing source files, enabled as default
-	the build of shared libraries, added needed link libraries.
+	the build of shared libraries, added needed link libraries. Also
+	extended build system for all Rivet libraries (librivetlib.so,
+	librivetparser.so, librivet_worker_mpm.so, librivet_prefork_mpm.so,
+	librivet_lazy_mpm.so), and checked their linked libraries and missing
+	symbols with their versions when build with autoconf.
 
 2017-08-02 Massimo Manghi <mxmanghi@apache.org>
 	* Changed references in cmake/CMakeList.txt to build with
