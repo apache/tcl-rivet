@@ -20,7 +20,7 @@ project(Rivet VERSION ${RIVET_VERSION} LANGUAGES C)
 # ===========================================================================
 set(with-tclsh "" CACHE FILEPATH "location of a working tclsh executable")
 set(with-tcl   "" CACHE PATH "directory containing tcl configuration (tclConfig.sh)")
-set(with-post-max 0 CACHE STRING "BYTES Maximum size of data to be sent with a POST")
+set(with-post-max 0 CACHE STRING  "BYTES Maximum size of data to be sent with a POST")
 option(version-display            "Display Rivet version in Apache signature" OFF)
 option(head-requests              "Returns real headers in response to a HEAD request" OFF)
 option(single-thread              "forces the worker brigde to create a single thread (debug)" OFF)
@@ -138,7 +138,7 @@ set(RIVET_INCLUDE_DIRS_PRIVATE
   "${PROJECT_BINARY_DIR}" 
 )
 target_include_directories(rivetparser PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
-target_include_directories(mod_rivet_ng   PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
+target_include_directories(mod_rivet   PUBLIC ${RIVET_INCLUDE_DIRS_PUBLIC} PRIVATE ${RIVET_INCLUDE_DIRS_PRIVATE})
 
 set(CONFIGURE_CMD "cmake -${CMAKE_ARGC} ${CMAKE_ARGV0}")
 if(version-display)
