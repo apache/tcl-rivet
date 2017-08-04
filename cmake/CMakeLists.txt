@@ -193,6 +193,8 @@ find_package(Threads)
 
 #  Set up include directories...
 # ===========================================================================
+set(RIVET_GENERATE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR})
+set(RIVET_GENERATE_DIR ${PROJECT_BINARY_DIR}/generated)
 set(RIVET_INCLUDE_DIRS_PUBLIC
   "${TCL_INCLUDE_PATH}"
   "${APACHE_INCLUDE_DIR}"
@@ -204,7 +206,7 @@ set(RIVET_INCLUDE_DIRS_PRIVATE
   "${RIVET_SRC_DIR}/${RIVET_CORE}"
   "${RIVET_SRC_DIR}/parser"
   "${RIVET_SRC_DIR}/request"
-  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}"
+  "${RIVET_GENERATE_DIR}"
   "${PROJECT_BINARY_DIR}" 
 )
 
@@ -365,15 +367,18 @@ set(RIVET__XOPEN_SOURCE_EXTENDED   ${_XOPEN_SOURCE_EXTENDED})
 
 #  Generate headers rivet_config.h, config.h
 # ===========================================================================
+MESSAGE(STATUS "Generating: " ${RIVET_GENERATE_DIR}/rivet_config.h)
 configure_file("${PROJECT_SOURCE_DIR}/cmake_extra_modules/rivet_config.h.cmake"
-               "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/rivet_config.h" )
+               "${RIVET_GENERATE_DIR}/rivet_config.h" )
+MESSAGE(STATUS "Generating: " ${RIVET_GENERATE_DIR}/config.h)
 configure_file("${PROJECT_SOURCE_DIR}/cmake_extra_modules/config.h.cmake"
-               "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/config.h" )
+               "${RIVET_GENERATE_DIR}/config.h" )
 
 #  Generate init.tcl
 # ===========================================================================
+MESSAGE(STATUS "Generating: " ${RIVET_GENERATE_DIR}/init.tcl)
 configure_file("${RIVET_LIB_DIR}/init.tcl.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/init.tcl" @ONLY)
+               "${RIVET_GENERATE_DIR}/init.tcl" @ONLY)
 
 # ===========================================================================
 #  Installation section...
@@ -418,7 +423,7 @@ install(TARGETS rivetparser rivetlib
 #  Install library files...
 # ===========================================================================
 install(FILES
-       	"${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/init.tcl"
+       	${RIVET_GENERATE_DIR}/init.tcl
         ${RIVET_LIB_DIR}/default_request_handler.tcl
         ${RIVET_LIB_DIR}/pkgIndex.tcl
         DESTINATION ${RIVETLIB_DESTDIR})

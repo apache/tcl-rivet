@@ -1,3 +1,18 @@
+2017-08-04 Georgios Petasis <petasis@apache.org>
+	* cmake\CMakeLists.txt: Various changes for better support build under
+	Windows.
+
+	* cmake\README.cmake: Added a section for building under Windows.
+
+	* cmake\cmake_extra_modules\FindAPACHE.cmake: Enhanced customisability.
+	The user can guide detection with variables APACHE_INCLUDE_DIR_HINTS,
+	APACHE_MODULE_DIR_HINTS, APACHE_LIB_DIR_HINTS, APACHE_ROOT.
+
+	* cmake\cmake_extra_modules\FindAPR.cmake: Enhanced customisability.
+	The user can guide detection with variables APR_INCLUDE_DIR_HINTS,
+	APACHE_INCLUDE_DIR_HINTS, APACHE_ROOT, APR_LIBRARY_HINTS,
+	APRUTIL_INCLUDE_DIR_HINTS, APRUTIL_LIBRARY_HINTS.
+
 2017-08-03 Georgios Petasis <petasis@apache.org>
 	* CMake build system: Removed "lib" prefix from some libraris.
 

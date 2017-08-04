@@ -27,17 +27,22 @@
 # APR first.
 
 FIND_PATH(APR_INCLUDE_DIR apr.h
-/usr/local/include/apr-1
-/usr/local/include/apr-1.0
-/usr/include/apr-1
-/usr/include/apr-1.0
+  /usr/local/include/apr-1
+  /usr/local/include/apr-1.0
+  /usr/include/apr-1
+  /usr/include/apr-1.0
+  ${APR_INCLUDE_DIR_HINTS}
+  ${APACHE_INCLUDE_DIR_HINTS}
+  ${APACHE_ROOT}/include
 )
 
-SET(APR_NAMES ${APR_NAMES} apr-1)
+SET(APR_NAMES ${APR_NAMES} apr-1 apr-1.lib)
 FIND_LIBRARY(APR_LIBRARY
   NAMES ${APR_NAMES}
   PATHS /usr/lib /usr/local/lib
-  )
+  ${APR_LIBRARY_HINTS}
+  ${APACHE_ROOT}/lib
+)
 
 IF (APR_LIBRARY AND APR_INCLUDE_DIR)
     SET(APR_LIBRARIES ${APR_LIBRARY})
@@ -64,21 +69,26 @@ GET_FILENAME_COMPONENT (NATIVE_APR_LIB_PATH ${APR_LIBRARY} PATH)
 MARK_AS_ADVANCED(
   APR_LIBRARY
   APR_INCLUDE_DIR
-  )
+)
 
 # Next, APRUTIL.
 
 FIND_PATH(APRUTIL_INCLUDE_DIR apu.h
-/usr/local/include/apr-1
-/usr/local/include/apr-1.0
-/usr/include/apr-1
-/usr/include/apr-1.0
+  /usr/local/include/apr-1
+  /usr/local/include/apr-1.0
+  /usr/include/apr-1
+  /usr/include/apr-1.0
+  ${APRUTIL_INCLUDE_DIR_HINTS}
+  ${APACHE_INCLUDE_DIR_HINTS}
+  ${APACHE_ROOT}/include
 )
 
-SET(APRUTIL_NAMES ${APRUTIL_NAMES} aprutil-1)
+SET(APRUTIL_NAMES ${APRUTIL_NAMES} aprutil-1 aprutil-1.lib)
 FIND_LIBRARY(APRUTIL_LIBRARY
   NAMES ${APRUTIL_NAMES}
   PATHS /usr/lib /usr/local/lib
+	${APRUTIL_LIBRARY_HINTS} ${APR_LIBRARY}
+        ${APACHE_ROOT}/lib ${APR_LIBRARY_HINTS}
   )
 
 IF (APRUTIL_LIBRARY AND APRUTIL_INCLUDE_DIR)
@@ -106,4 +116,4 @@ GET_FILENAME_COMPONENT (NATIVE_APRUTIL_LIB_PATH ${APRUTIL_LIBRARY} PATH)
 MARK_AS_ADVANCED(
   APRUTIL_LIBRARY
   APRUTIL_INCLUDE_DIR
-  )
+)
