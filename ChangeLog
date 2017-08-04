@@ -1,3 +1,16 @@
+2017-08-04 Georgios Petasis <petasis@apache.org>
+	* cmake\CMakeLists.txt:
+	* cmake\cmake_extra_modules\FindAPR.cmake:
+	* src\mod_rivet_ng\TclWebapache.c:
+	* src\mod_rivet_ng\mod_rivet.c:
+	* src\mod_rivet_ng\mod_rivet.h:
+	* src\mod_rivet_ng\mod_rivet_cache.c:
+	* src\mod_rivet_ng\mod_rivet_common.c:
+	* src\mod_rivet_ng\mod_rivet_generator.c:
+	* src\mod_rivet_ng\rivetCore.c:
+	* src\parser\rivetParser.c: Changes for fixing compilation errors under
+	Windows.
+
 2017-08-04 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: changes demanded by windows compiler
     * rivet/pkgIndex.tcl: recreated with a up to date list of packages

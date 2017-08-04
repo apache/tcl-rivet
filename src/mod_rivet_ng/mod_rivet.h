@@ -235,12 +235,18 @@ typedef struct _rivet_interp_globals {
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 
+/*
+ * Petasis, 04/08/2017: I think the following is wrong, as both "functions" are
+ * defined through preprocessor definitions in http_config.h. At least under
+ * windows, they do not exist as functions in libhttpd.lib.
+ *
 #ifdef ap_get_module_config
 #undef ap_get_module_config
 #endif
 #ifdef ap_set_module_config
 #undef ap_set_module_config
 #endif
+*/
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 #define RIVET_NEW_CONF(p)         (rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))

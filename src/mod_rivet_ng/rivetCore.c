@@ -48,9 +48,15 @@
 
 #include "apache_request.h"
 #include "mod_rivet.h"
-#include "mod_rivet_cache.h"
 #include "rivet.h"
 #include "TclWeb.h"
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
+#include "mod_rivet_cache.h"
 #include "rivetParser.h"
 
 #define ENV_ARRAY_NAME     "::request::env"

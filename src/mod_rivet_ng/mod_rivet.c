@@ -48,12 +48,21 @@
 #include <tcl.h>
 
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
+#ifdef RIVET_HAVE_UNISTD_H
 #include <unistd.h>
+#endif /* RIVET_HAVE_UNISTD_H */
 
 #include "rivet_types.h"
 #include "mod_rivet.h"
 #include "apache_config.h"
 #include "rivet.h"
+
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
 

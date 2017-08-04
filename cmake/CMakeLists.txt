@@ -228,6 +228,18 @@ target_include_directories(mod_rivet
 target_link_libraries(rivetparser        ${TCL_STUB_LIBRARY})
 target_link_libraries(rivetlib           ${TCL_STUB_LIBRARY})
 target_link_libraries(mod_rivet          ${TCL_LIBRARY})
+if(WIN32)
+  # Under Windows, we need to link with all libraries, even libhttpd.lib
+  MESSAGE ( STATUS "Searching for libhttpd.lib (Windows)..." )
+  FIND_LIBRARY(APACHE_HTTPD_LIBRARY libhttpd libhttpd.lib
+    NAMES ${APACHE_HTTPD_NAMES}
+    PATHS ${APACHE_HTTPD_LIBRARY_HINTS}
+          ${APACHE_ROOT}/lib
+  )
+  MESSAGE ( STATUS "  APACHE_HTTPD_LIBRARY:    " ${APACHE_HTTPD_LIBRARY} )
+
+  target_link_libraries(mod_rivet ${APR_LIBRARY} ${APACHE_HTTPD_LIBRARY})
+endif(WIN32)
 
 #  Handle user options...
 # ===========================================================================

@@ -36,7 +36,7 @@ FIND_PATH(APR_INCLUDE_DIR apr.h
   ${APACHE_ROOT}/include
 )
 
-SET(APR_NAMES ${APR_NAMES} apr-1 apr-1.lib)
+SET(APR_NAMES ${APR_NAMES} libapr-1 apr-1)
 FIND_LIBRARY(APR_LIBRARY
   NAMES ${APR_NAMES}
   PATHS /usr/lib /usr/local/lib
@@ -83,7 +83,7 @@ FIND_PATH(APRUTIL_INCLUDE_DIR apu.h
   ${APACHE_ROOT}/include
 )
 
-SET(APRUTIL_NAMES ${APRUTIL_NAMES} aprutil-1 aprutil-1.lib)
+SET(APRUTIL_NAMES ${APRUTIL_NAMES} libaprutil-1 aprutil-1 )
 FIND_LIBRARY(APRUTIL_LIBRARY
   NAMES ${APRUTIL_NAMES}
   PATHS /usr/lib /usr/local/lib
