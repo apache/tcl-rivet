@@ -1,3 +1,6 @@
+2017-08-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: changes demanded by windows compiler
+
 2017-08-04 Georgios Petasis <petasis@apache.org>
 	* cmake\CMakeLists.txt: Various changes for better support build under
 	Windows.

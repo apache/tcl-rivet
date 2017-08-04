@@ -1541,6 +1541,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
 
         if (STRNEQU(cmd_arg,"script"))
         {
+            Tcl_Obj* cmd;
 
             if (private != NULL)
             {
@@ -1551,12 +1552,12 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
                 }
             }
 
-            Tcl_Obj* cmd = Tcl_NewStringObj("info script",-1);
+            cmd = Tcl_NewStringObj("info script",-1);
 
             Tcl_IncrRefCount(cmd); 
             status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
-            Tcl_DecrRefCount(cmd); 
-        
+            Tcl_DecrRefCount(cmd);
+
         } 
         else if (STRNEQU(cmd_arg,"-all"))
         {
@@ -1597,9 +1598,11 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         }
         else if (STRNEQU(cmd_arg,"exit"))
         {
+            Tcl_Obj* exit_flag;
+            
             CHECK_REQUEST_REC(private,"::rivet::inspect")
             /* thread exit status flag */
-            Tcl_Obj* exit_flag = Tcl_NewIntObj(private->thread_exit);
+            exit_flag = Tcl_NewIntObj(private->thread_exit);
 
             Tcl_IncrRefCount(exit_flag);
             Tcl_SetObjResult(interp,exit_flag);
