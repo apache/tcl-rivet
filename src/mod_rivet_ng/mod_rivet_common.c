@@ -27,14 +27,6 @@
 #include <apr_strings.h>
 #include <apr_env.h>
 #include <ap_mpm.h>
-/* as long as we need to emulate ap_chdir_file we need to include unistd.h */
-#ifdef RIVET_HAVE_UNISTD_H
-#include <unistd.h>
-#endif /* RIVET_HAVE_UNISTD_H */
-#ifdef WIN32
-#include <direct.h> // provides POSIX _chdir
-#endif /* WIN32 */
-
 #include <apr_file_io.h>
 #include <apr_file_info.h>
 
@@ -46,6 +38,14 @@
 #include "apache_config.h"
 #include "rivetCore.h"
 #include <mpm_common.h>
+
+/* as long as we need to emulate ap_chdir_file we need to include unistd.h */
+#ifdef RIVET_HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* RIVET_HAVE_UNISTD_H */
+#ifdef WIN32
+#include <direct.h> // provides POSIX _chdir
+#endif /* WIN32 */
 
 /* Function prototypes are defined with EXTERN. Since we are in the same DLL,
  * no need to keep this extern... */
