@@ -1,4 +1,23 @@
 2017-08-05 Georgios Petasis <petasis@apache.org>
+    * cmake\CMakeLists.txt: Exported all symbols for mod_rivet.so under Windows,
+    to copy the behaviour in UNIX systems (where all symbols are exported from
+    shared libraries).
+
+    * cmake\cmake_extra_modules\checks.cmake:
+    * cmake\cmake_extra_modules\config.h.cmake:
+    * cmake\cmake_extra_modules\rivet_config.h.cmake: Under VC11, round()
+    has not been implemented. Added checks in CMake build, for detecting
+    round()'s absence.
+
+    * src\mod_rivet_ng\rivetCore.c:
+    * src\mod_rivet_ng\rivet_lazy_mpm.c:
+    * src\mod_rivet_ng\rivet_prefork_mpm.c:
+    * src\mod_rivet_ng\rivet_worker_mpm.c:
+    * src\mod_rivet_ng\worker_prefork_common.c:
+    * src\parser\parserPkgInit.c: Changes for avoiding link error under Windows
+    (mostly) related to importing exported symbols from  mod_rivet.so.
+
+2017-08-05 Georgios Petasis <petasis@apache.org>
     * src/mod_rivet_ng/mod_rivet_common.c: Reordered header files, so
     <unistd.h> (and its check) to come after "mod_rivet.h" that includes
     "rivet_config.h".

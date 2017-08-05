@@ -33,8 +33,8 @@
 #include "rivetCore.h"
 #include "worker_prefork_common.h"
 
-extern mod_rivet_globals* module_globals;
-extern apr_threadkey_t*   rivet_thread_key;
+extern DLLIMPORT mod_rivet_globals* module_globals;
+extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
 

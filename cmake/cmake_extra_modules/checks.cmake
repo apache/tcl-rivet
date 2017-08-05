@@ -32,6 +32,9 @@ check_function_exists(open64       HAVE_OPEN64)
 check_function_exists(memcpy       HAVE_MEMCPY)
 check_function_exists(mmap         HAVE_MMAP)
 check_function_exists(lseek64      HAVE_LSEEK64)
+set(CMAKE_EXTRA_INCLUDE_FILES math.h)
+check_function_exists(round        HAVE_ROUND)
+set(CMAKE_EXTRA_INCLUDE_FILES)
 
 # Check types
 include ( CheckTypeSize )
@@ -169,6 +172,10 @@ endif()
 
 if(NOT HAVE_STRING_H)
   set(NO_STRING_H 1)
+endif()
+
+if(NOT HAVE_ROUND)
+  set(NO_HAVE_ROUND 1)
 endif()
 
 if(BUILD_STATIC_LIBS)

@@ -34,6 +34,12 @@
 #include <tcl.h>
 
 #include "rivet.h"
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "rivetParser.h"
 
 /*
@@ -127,7 +133,7 @@ Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
 
 /* Package init for standalone parser package.  */
 
-EXTERN int
+DLLEXPORT int
 Rivetparser_Init( Tcl_Interp *interp )
 {
 #ifdef USE_TCL_STUBS
@@ -144,7 +150,7 @@ Rivetparser_Init( Tcl_Interp *interp )
     return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
 }
 
-EXTERN int
+DLLEXPORT int
 Rivetparser_SafeInit( Tcl_Interp *interp )
 {
     /* rivet::parserivet is DEFINITELY unsafe -- it takes a filename,

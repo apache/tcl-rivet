@@ -126,10 +126,10 @@ add_library(rivet::worker_mpm    ALIAS rivet_worker_mpm)
 add_library(rivet::prefork_mpm   ALIAS rivet_prefork_mpm)
 add_library(rivet::lazy_mpm      ALIAS rivet_lazy_mpm)
 
-SET_TARGET_PROPERTIES(mod_rivet         PROPERTIES PREFIX "")
-SET_TARGET_PROPERTIES(rivet_worker_mpm  PROPERTIES PREFIX "")
-SET_TARGET_PROPERTIES(rivet_prefork_mpm PROPERTIES PREFIX "")
-SET_TARGET_PROPERTIES(rivet_lazy_mpm    PROPERTIES PREFIX "")
+SET_TARGET_PROPERTIES(mod_rivet         PROPERTIES PREFIX "" SUFFIX ".so")
+SET_TARGET_PROPERTIES(rivet_worker_mpm  PROPERTIES PREFIX "" SUFFIX ".so")
+SET_TARGET_PROPERTIES(rivet_prefork_mpm PROPERTIES PREFIX "" SUFFIX ".so")
+SET_TARGET_PROPERTIES(rivet_lazy_mpm    PROPERTIES PREFIX "" SUFFIX ".so")
 
 #  Definitions...
 # ===========================================================================
@@ -238,7 +238,20 @@ if(WIN32)
   )
   MESSAGE ( STATUS "  APACHE_HTTPD_LIBRARY:    " ${APACHE_HTTPD_LIBRARY} )
 
-  target_link_libraries(mod_rivet ${APR_LIBRARY} ${APACHE_HTTPD_LIBRARY})
+  # Export all symbols from mod_rivet
+  SET_TARGET_PROPERTIES(mod_rivet PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+
+  target_link_libraries(mod_rivet          ${APR_LIBRARY} ${APACHE_HTTPD_LIBRARY} )
+  target_link_libraries(rivet_worker_mpm   ${APR_LIBRARY} ${APRUTIL_LIBRARY} ${APACHE_HTTPD_LIBRARY} mod_rivet)
+  target_link_libraries(rivet_prefork_mpm  ${APR_LIBRARY} ${APACHE_HTTPD_LIBRARY} mod_rivet)
+  target_link_libraries(rivet_lazy_mpm     ${APR_LIBRARY} ${APACHE_HTTPD_LIBRARY} mod_rivet)
+  # rivet_worker_mpm.c uses round(), which is available in C99
+  SET_TARGET_PROPERTIES(rivet_worker_mpm PROPERTIES C_STANDARD 99)
+  if(MSVC)
+    # Libraries linked with tclstubs.lib library, cannot use /SAFESEH
+    SET_TARGET_PROPERTIES(rivetparser PROPERTIES LINK_FLAGS /SAFESEH:NO )
+    SET_TARGET_PROPERTIES(rivetlib    PROPERTIES LINK_FLAGS /SAFESEH:NO )
+  endif(MSVC)
 endif(WIN32)
 
 #  Handle user options...
@@ -282,7 +295,7 @@ set(UPLOAD_DIR ${with-upload-dir})
 #  Location of the Rivet library...
 # ===========================================================================
 if(NOT DEFINED RIVETLIB_DESTDIR)
-  set(RIVETLIB_DESTDIR "${APACHE_LIB_DIR}rivet${RIVET_VERSION}")
+  set(RIVETLIB_DESTDIR "${APACHE_LIB_DIR}/rivet${RIVET_VERSION}")
 endif(NOT DEFINED RIVETLIB_DESTDIR)
 
 if(TCL_THREADS)
@@ -376,6 +389,8 @@ set(RIVET__REENTRANT               ${_REENTRANT})
 set(RIVET__THREAD_SAFE             ${_THREAD_SAFE})
 set(RIVET__WIN32_WCE               ${_WIN32_WCE})
 set(RIVET__XOPEN_SOURCE_EXTENDED   ${_XOPEN_SOURCE_EXTENDED})
+set(RIVET_HAVE_ROUND               ${HAVE_ROUND})
+set(RIVET_NO_HAVE_ROUND            ${NO_HAVE_ROUND})
 
 #  Generate headers rivet_config.h, config.h
 # ===========================================================================
@@ -411,10 +426,13 @@ MESSAGE ( STATUS
 #  Library mod_rivet (mod_rivet.so) must be installed in the directory Apache2
 #  searches for modules...
 # ===========================================================================
-install(TARGETS mod_rivet EXPORT Rivet_mod_rivet
-  ARCHIVE  DESTINATION ${APACHE_MODULE_DIR}
-  LIBRARY  DESTINATION ${APACHE_MODULE_DIR}
-  RUNTIME  DESTINATION ${APACHE_MODULE_DIR})
+if(WIN32)
+  install(TARGETS mod_rivet EXPORT Rivet_mod_rivet
+    RUNTIME DESTINATION ${APACHE_MODULE_DIR})
+else(WIN32)
+  install(TARGETS mod_rivet EXPORT Rivet_mod_rivet
+    LIBRARY DESTINATION ${APACHE_MODULE_DIR})
+endif(WIN32)
 
 #  Install mpms...
 # ===========================================================================

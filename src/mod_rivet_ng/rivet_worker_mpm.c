@@ -49,10 +49,15 @@
     #define HTTP_REQUESTS_PROC(request_proc_call) request_proc_call;
 #endif
 
-extern mod_rivet_globals* module_globals;
-extern apr_threadkey_t*   rivet_thread_key;
+extern DLLIMPORT mod_rivet_globals* module_globals;
+extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 
 apr_threadkey_t*        handler_thread_key;
+
+#ifdef RIVET_NO_HAVE_ROUND
+int round(double d) { return (int)(d + 0.5); }
+#endif /* RIVET_NO_HAVE_ROUND */
+
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
 

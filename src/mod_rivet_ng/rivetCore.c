@@ -44,7 +44,6 @@
 #include <apr_errno.h>
 #include <apr_strings.h>
 
-#include "mod_rivet_generator.h"
 
 #include "apache_request.h"
 #include "mod_rivet.h"
@@ -58,6 +57,7 @@
 #endif /* EXTERN */
 #include "mod_rivet_cache.h"
 #include "rivetParser.h"
+#include "mod_rivet_generator.h"
 
 #define ENV_ARRAY_NAME     "::request::env"
 #define HEADERS_ARRAY_NAME "::request::headers"

@@ -35,6 +35,14 @@
 /* Define to 1 if you have the `open64' function. */
 #cmakedefine HAVE_OPEN64 @HAVE_OPEN64@
 
+/* Define to 1 if you have the `round' function. */
+#ifndef HAVE_ROUND
+#cmakedefine HAVE_ROUND @HAVE_ROUND@
+#endif
+#ifndef NO_HAVE_ROUND
+#cmakedefine NO_HAVE_ROUND @NO_HAVE_ROUND@
+#endif
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H @HAVE_STDINT_H@
 

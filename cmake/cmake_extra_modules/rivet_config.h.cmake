@@ -58,6 +58,14 @@
 #cmakedefine RIVET_HAVE_OPEN64 @HAVE_OPEN64@
 #endif
 
+/* Define to 1 if you have the `round' function. */
+#ifndef RIVET_HAVE_ROUND
+#cmakedefine RIVET_HAVE_ROUND @HAVE_ROUND@
+#endif
+#ifndef RIVET_NO_HAVE_ROUND
+#cmakedefine RIVET_NO_HAVE_ROUND @NO_HAVE_ROUND@
+#endif
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #ifndef RIVET_HAVE_STDINT_H
 #cmakedefine RIVET_HAVE_STDINT_H @HAVE_STDINT_H@
