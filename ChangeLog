@@ -1,4 +1,9 @@
 2017-08-05 Georgios Petasis <petasis@apache.org>
+    * src\mod_rivet_ng\rivet_lazy_mpm.c:
+    * src\mod_rivet_ng\rivet_prefork_mpm.c:
+    * src\mod_rivet_ng\rivet_worker_mpm.c: Added DLLEXPORT for the symbol
+    defined with RIVET_MPM_BRIDGE macro.
+
     * cmake\CMakeLists.txt: Exported all symbols for mod_rivet.so under Windows,
     to copy the behaviour in UNIX systems (where all symbols are exported from
     shared libraries).

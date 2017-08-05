@@ -753,6 +753,7 @@ rivet_thread_interp* Worker_MPM_Interp(rivet_thread_private *private,
     return private->ext->interps[conf->idx];   
 }
 
+DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
     Worker_MPM_ChildInit,

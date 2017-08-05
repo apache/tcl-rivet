@@ -182,6 +182,7 @@ rivet_thread_interp* Prefork_MPM_Interp(rivet_thread_private *private,rivet_serv
     return private->ext->interps[conf->idx];   
 }
 
+DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
     Prefork_MPM_ChildInit,

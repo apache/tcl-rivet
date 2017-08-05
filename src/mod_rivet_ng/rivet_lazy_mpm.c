@@ -401,6 +401,7 @@ int Lazy_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
+DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
     Lazy_MPM_ChildInit,
