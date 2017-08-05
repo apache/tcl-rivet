@@ -33,8 +33,12 @@ check_function_exists(memcpy       HAVE_MEMCPY)
 check_function_exists(mmap         HAVE_MMAP)
 check_function_exists(lseek64      HAVE_LSEEK64)
 set(CMAKE_EXTRA_INCLUDE_FILES math.h)
+if(NOT WIN32)
+set(CMAKE_REQUIRED_LIBRARIES m)
+endif()
 check_function_exists(round        HAVE_ROUND)
 set(CMAKE_EXTRA_INCLUDE_FILES)
+set(CMAKE_REQUIRED_LIBRARIES)
 
 # Check types
 include ( CheckTypeSize )
