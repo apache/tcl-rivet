@@ -28,7 +28,7 @@
  * no need to keep this extern... */
 #ifdef EXTERN
 #   undef EXTERN
-#   define EXTERN
+#   define EXTERN DLLEXPORT
 #endif /* EXTERN */
 #include "mod_rivet_cache.h"
 

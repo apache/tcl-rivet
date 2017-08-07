@@ -36,7 +36,6 @@
 #include "rivetParser.h"
 #include "rivet.h"
 #include "apache_config.h"
-#include "rivetCore.h"
 #include <mpm_common.h>
 
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
@@ -51,8 +50,9 @@
  * no need to keep this extern... */
 #ifdef EXTERN
 #   undef EXTERN
-#   define EXTERN
+#   define EXTERN DLLEXPORT
 #endif /* EXTERN */
+#include "rivetCore.h"
 #include "mod_rivet_common.h"
 #include "mod_rivet_cache.h"
 
@@ -151,6 +151,7 @@ Rivet_CreateTclInterp (server_rec* s)
  *---------------------------------------------------------------------
  */
 
+DLLEXPORT
 running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
                                         running_scripts* scripts,
                                         rivet_server_conf* rivet_conf )

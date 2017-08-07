@@ -1,4 +1,30 @@
 2017-08-05 Georgios Petasis <petasis@apache.org>
+    * cmake\CMakeLists.txt: rivetparser/rivetlib shared libraries now have the
+    prefix "lib" under all platforms.
+
+    * cmake\cmake_extra_modules\rivet_config.h.cmake: RIVET_RIVET_CORE or
+    RIVET_CORE? Added also support for RIVET_CORE, but disabled, as it causes
+    compilation errors (in C preprosessor, two strings are compared, which is
+    not supported).
+
+    * rivet\pkgIndex.tcl: Dropped ".so" in favour of "info sharedlibextension".
+
+    * src\librivet\rivetCrypt.c:
+    * src\librivet\rivetList.c:
+    * src\librivet\rivetPkgInit.c:
+    * src\librivet\rivetWWW.c: Definition of EXTERN and exported symbols through
+    DLLEXPORT.
+
+    * src\mod_rivet_ng\mod_rivet.c:
+    * src\mod_rivet_ng\mod_rivet_cache.c:
+    * src\mod_rivet_ng\mod_rivet_common.c:
+    * src\mod_rivet_ng\mod_rivet_generator.c:
+    * src\mod_rivet_ng\rivetCore.c:
+    * src\mod_rivet_ng\rivetCore.h:
+    * src\parser\parserPkgInit.c: Definition of EXTERN and exported symbols
+    through DLLEXPORT.
+
+2017-08-05 Georgios Petasis <petasis@apache.org>
     * src\mod_rivet_ng\rivet_lazy_mpm.c:
     * src\mod_rivet_ng\rivet_prefork_mpm.c:
     * src\mod_rivet_ng\rivet_worker_mpm.c: Added DLLEXPORT for the symbol
@@ -45,41 +71,41 @@
     * rivet/pkgIndex.tcl: recreated with a up to date list of packages
 
 2017-08-04 Georgios Petasis <petasis@apache.org>
-	* cmake\CMakeLists.txt: Various changes for better support build under
-	Windows.
-
-	* cmake\README.cmake: Added a section for building under Windows.
-
-	* cmake\cmake_extra_modules\FindAPACHE.cmake: Enhanced customisability.
-	The user can guide detection with variables APACHE_INCLUDE_DIR_HINTS,
-	APACHE_MODULE_DIR_HINTS, APACHE_LIB_DIR_HINTS, APACHE_ROOT.
-
-	* cmake\cmake_extra_modules\FindAPR.cmake: Enhanced customisability.
-	The user can guide detection with variables APR_INCLUDE_DIR_HINTS,
-	APACHE_INCLUDE_DIR_HINTS, APACHE_ROOT, APR_LIBRARY_HINTS,
-	APRUTIL_INCLUDE_DIR_HINTS, APRUTIL_LIBRARY_HINTS.
-
-2017-08-03 Georgios Petasis <petasis@apache.org>
-	* CMake build system: Removed "lib" prefix from some libraris.
+    * cmake\CMakeLists.txt: Various changes for better support build under
+    Windows.
+    
+    * cmake\README.cmake: Added a section for building under Windows.
+    
+    * cmake\cmake_extra_modules\FindAPACHE.cmake: Enhanced customisability.
+    The user can guide detection with variables APACHE_INCLUDE_DIR_HINTS,
+    APACHE_MODULE_DIR_HINTS, APACHE_LIB_DIR_HINTS, APACHE_ROOT.
+    
+    * cmake\cmake_extra_modules\FindAPR.cmake: Enhanced customisability.
+    The user can guide detection with variables APR_INCLUDE_DIR_HINTS,
+    APACHE_INCLUDE_DIR_HINTS, APACHE_ROOT, APR_LIBRARY_HINTS,
+    APRUTIL_INCLUDE_DIR_HINTS, APRUTIL_LIBRARY_HINTS.
 
 2017-08-03 Georgios Petasis <petasis@apache.org>
-	* CMake build system: Added support for installing Rivet. Added more
-	checks for various definitions in config.h/rivet_config.h.
+    * CMake build system: Removed "lib" prefix from some libraris.
 
 2017-08-03 Georgios Petasis <petasis@apache.org>
-	* CMake build system: Added missing source files, enabled as default
-	the build of shared libraries, added needed link libraries. Also
-	extended build system for all Rivet libraries (librivetlib.so,
-	librivetparser.so, librivet_worker_mpm.so, librivet_prefork_mpm.so,
-	librivet_lazy_mpm.so), and checked their linked libraries and missing
-	symbols with their versions when build with autoconf.
+    * CMake build system: Added support for installing Rivet. Added more
+    checks for various definitions in config.h/rivet_config.h.
+
+2017-08-03 Georgios Petasis <petasis@apache.org>
+    * CMake build system: Added missing source files, enabled as default
+    the build of shared libraries, added needed link libraries. Also
+    extended build system for all Rivet libraries (librivetlib.so,
+    librivetparser.so, librivet_worker_mpm.so, librivet_prefork_mpm.so,
+    librivet_lazy_mpm.so), and checked their linked libraries and missing
+    symbols with their versions when build with autoconf.
 
 2017-08-02 Massimo Manghi <mxmanghi@apache.org>
 	* Changed references in cmake/CMakeList.txt to build with
 	code in src/mod_rivet_ng.
 
 2017-08-02 Georgios Petasis <petasis@apache.org>
-	* Created a new branch (cmake) for the CMake build system.
+    * Created a new branch (cmake) for the CMake build system.
 
 2017-07-24 Massimo Manghi <mxmanghi@apache.org>
 	* xml/rivet.xml.in: reflects rivet.xml having been moved to doc/xml

@@ -23,6 +23,6 @@
 
 #ifndef __rivetcore_h__
 #define __rivetcore_h__
-int Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private);
+EXTERN int Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private);
 #endif
 

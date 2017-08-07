@@ -108,7 +108,6 @@ set(mod_rivet_sources
   ${RIVET_SRC_DIR}/${RIVET_CORE}/mod_rivet_cache.c
   ${RIVET_SRC_DIR}/${RIVET_CORE}/mod_rivet_common.c
   ${RIVET_SRC_DIR}/${RIVET_CORE}/mod_rivet_generator.c
-  ${RIVET_SRC_DIR}/parser/rivetParser.c
 )
 
 #  Add build targets...
@@ -130,6 +129,8 @@ SET_TARGET_PROPERTIES(mod_rivet         PROPERTIES PREFIX "" SUFFIX ".so")
 SET_TARGET_PROPERTIES(rivet_worker_mpm  PROPERTIES PREFIX "" SUFFIX ".so")
 SET_TARGET_PROPERTIES(rivet_prefork_mpm PROPERTIES PREFIX "" SUFFIX ".so")
 SET_TARGET_PROPERTIES(rivet_lazy_mpm    PROPERTIES PREFIX "" SUFFIX ".so")
+SET_TARGET_PROPERTIES(rivetparser       PROPERTIES PREFIX "lib")
+SET_TARGET_PROPERTIES(rivetlib          PROPERTIES PREFIX "lib")
 
 #  Definitions...
 # ===========================================================================

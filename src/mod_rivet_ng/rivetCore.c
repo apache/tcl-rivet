@@ -55,9 +55,11 @@
 #   undef EXTERN
 #   define EXTERN
 #endif /* EXTERN */
-#include "mod_rivet_cache.h"
 #include "rivetParser.h"
 #include "mod_rivet_generator.h"
+#undef EXTERN
+#define EXTERN DLLEXPORT
+#include "mod_rivet_cache.h"
 
 #define ENV_ARRAY_NAME     "::request::env"
 #define HEADERS_ARRAY_NAME "::request::headers"
@@ -1925,7 +1927,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
  *-----------------------------------------------------------------------------
  */
 
-int
+DLLEXPORT int
 Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 {
     rivet_server_conf*      server_conf; 

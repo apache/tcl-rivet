@@ -33,13 +33,13 @@
 #include <apr_file_io.h>
 #include <tcl.h>
 
-#include "rivet.h"
 /* Function prototypes are defined with EXTERN. Since we are in the same DLL,
  * no need to keep this extern... */
 #ifdef EXTERN
 #   undef EXTERN
 #   define EXTERN
 #endif /* EXTERN */
+#include "rivet.h"
 #include "rivetParser.h"
 
 /*

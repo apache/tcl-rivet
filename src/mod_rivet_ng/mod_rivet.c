@@ -55,7 +55,6 @@
 #include "rivet_types.h"
 #include "mod_rivet.h"
 #include "apache_config.h"
-#include "rivet.h"
 
 /* Function prototypes are defined with EXTERN. Since we are in the same DLL,
  * no need to keep this extern... */
@@ -63,12 +62,13 @@
 #   undef EXTERN
 #   define EXTERN
 #endif /* EXTERN */
+#include "rivet.h"
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
 
 extern Tcl_ChannelType   RivetChan;
-apr_threadkey_t*         rivet_thread_key    = NULL;
-mod_rivet_globals*       module_globals      = NULL;
+DLLEXPORT apr_threadkey_t*         rivet_thread_key    = NULL;
+DLLEXPORT mod_rivet_globals*       module_globals      = NULL;
 
 #define ERRORBUF_SZ         256
 #define TCL_HANDLER_FILE    RIVET_DIR"/default_request_handler.tcl"

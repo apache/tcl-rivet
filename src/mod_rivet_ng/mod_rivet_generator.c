@@ -111,7 +111,7 @@ Rivet_ReleaseScripts (running_scripts* scripts)
 
 #define USE_APACHE_RSC
 
-int
+DLLEXPORT int
 Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 {
     int                     errstatus;

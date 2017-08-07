@@ -266,6 +266,9 @@
 #ifndef RIVET_RIVET_CORE
 #define RIVET_RIVET_CORE "@RIVET_CORE@"
 #endif
+#ifndef RIVET_CORE
+/*#define RIVET_CORE "@RIVET_CORE@"*/
+#endif
 
 /* Separate Channels for virtual hosts */
 #ifndef RIVET_SEPARATE_CHANNELS
