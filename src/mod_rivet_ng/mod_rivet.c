@@ -261,12 +261,32 @@ static int
 Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *server)
 {
     apr_dso_handle_t*   dso_handle;
+	void*				userdata;
+	const char 			*userdata_key = "rivet_post_config";
 
 #if RIVET_DISPLAY_VERSION
     ap_add_version_component(pPool,RIVET_PACKAGE_NAME"/"RIVET_VERSION);
 #else
     ap_add_version_component(pPool,RIVET_PACKAGE_NAME);
 #endif
+
+	/* This function runs as post_config_hook
+	 * and as such it's run twice by design. 
+	 * This is the recommended way to avoid a double load of
+	 * external modules.
+	 */
+
+	apr_pool_userdata_get(&userdata, userdata_key, server->process->pool);
+	if (userdata == NULL)
+	{
+		apr_pool_userdata_set((const void *)1, userdata_key,
+                              apr_pool_cleanup_null, server->process->pool);
+
+        ap_log_error(APLOG_MARK,APLOG_INFO,0,server,
+                     "first post_config run: not initializing Tcl stuff");
+
+        return OK; /* This would be the first time through */
+	}
 
     /* Everything revolves around this structure: module_globals */
 
