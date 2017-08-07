@@ -1,3 +1,8 @@
+2017-08-07 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c: Rivet_ServerInit is now implementing
+	the recommended mechanism to avoid the double load of external
+	modules
+	
 2017-08-05 Georgios Petasis <petasis@apache.org>
     * cmake\CMakeLists.txt: rivetparser/rivetlib shared libraries now have the
     prefix "lib" under all platforms.
