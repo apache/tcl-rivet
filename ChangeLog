@@ -1,3 +1,13 @@
+2017-08-08 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: implementing check on post_config
+    hook calling Rivet_InitHandler. This avoids the module
+    initialization to run twice but only on the second time
+    the hook is called
+    * configure.ac: bumping version number to 2.3.5
+
+2017-08-03 Massimo Manghi <mxmanghi@apache.org>
+    * .: releasing as 2.3.4
+
 2017-07-27 Massimo Manghi <mxmanghi@apache.org>
     * src/librivet/rivetWWW.c: Doubling the size of chunks 
     allocated for the buffer in Rivet_EscapeSgmlCharsCmd (6 chars) 

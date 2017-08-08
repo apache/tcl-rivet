@@ -39,7 +39,6 @@
 #include <http_log.h>
 #include <http_main.h>
 #include <util_script.h>
-//#include "http_conf_globals.h"
 #include <http_config.h>
 
 #include <apr_pools.h>
@@ -983,9 +982,29 @@ Rivet_PerInterpInit(server_rec *s, rivet_server_conf *rsc, apr_pool_t *p, int ne
 static int
 Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
+	void*				userdata;
+	const char 			*userdata_key = "rivet_post_config";
     rivet_server_conf *rsc = RIVET_SERVER_CONF( s->module_config );
     rivet_panic_pool       = pPool;
     rivet_panic_server_rec = s;
+
+	/* This function runs as post_config_hook
+	 * and as such it's run twice by design. 
+	 * This is the recommended way to avoid a double load of
+	 * external modules.
+	 */
+
+	apr_pool_userdata_get(&userdata, userdata_key, s->process->pool);
+	if (userdata == NULL)
+	{
+		apr_pool_userdata_set((const void *)1, userdata_key,
+                              apr_pool_cleanup_null, s->process->pool);
+
+        ap_log_error(APLOG_MARK,APLOG_INFO,0,s,
+                     "first post_config run: not initializing Tcl stuff");
+
+        return OK; /* This would be the first time through */
+	}
 
     rivet_module_globals = apr_pcalloc(pPool,sizeof(mod_rivet_globals));
     rivet_module_globals->rsc_p = rsc;
