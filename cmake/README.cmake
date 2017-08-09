@@ -30,3 +30,9 @@ Compiling Rivet with cmake:
    cmake -E make_directory build
    cmake -E chdir build cmake -DAPACHE_ROOT=G:/Apache24 ..
    cmake --build build --config Release --target install
+
+5) Compile for 64 bits under Windows (for Visual Studio 2017):
+
+   cmake -E make_directory build_64
+   cmake -E chdir build_64 cmake -DAPACHE_ROOT=G:/Apache24 -G "Visual Studio 15 2017 Win64" ..
+   cmake --build build_64 --config Release --target install
