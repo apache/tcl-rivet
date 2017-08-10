@@ -83,7 +83,10 @@
  * you need to make the appropriate modinficationus to Rivet_CopyConfig,
  * Rivet_CreateConfig, Rivet_MergeConfig and so on. */
 
+/*
+ * Petasis 10 Aug 2017: This causes the symbol to be exported also from MPMs...
 module AP_MODULE_DECLARE_DATA rivet_module;
+ */
 
 typedef struct _rivet_server_conf {
 

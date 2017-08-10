@@ -58,6 +58,7 @@
 
 extern apr_threadkey_t*   rivet_thread_key;
 extern mod_rivet_globals* module_globals;
+extern module rivet_module;
 
 /*
  * -- Rivet_ReadFile
@@ -212,7 +213,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
     /* Set up interpreter associated data */
 
-    globals = apr_pcalloc (p, sizeof(rivet_interp_globals));
+    globals = ckalloc(sizeof(rivet_interp_globals));
     Tcl_SetAssocData (interp,"rivet",NULL,globals);
     
     /*

@@ -1,4 +1,18 @@
 2017-08-10 Georgios Petasis <petasis@apache.org>
+    * src\mod_rivet_ng\apache_config.c:
+    * src\mod_rivet_ng\mod_rivet.c:
+    * src\mod_rivet_ng\mod_rivet_common.c:
+    * src\mod_rivet_ng\mod_rivet_generator.c:
+    * src\mod_rivet_ng\rivet_lazy_mpm.c:
+    * src\mod_rivet_ng\worker_prefork_common.c: Locally declared symbol
+    rivet_module as extern (DLLIMPORT).
+
+    * branches\cmake\src\mod_rivet_ng\mod_rivet.h: Symbol rivet_module
+    removed from header file.
+
+    * branches\cmake\src\mod_rivet_ng\mod_rivet_common.c: Used ckalloc() instead
+    of apr_pcalloc() for variable globals, in Rivet_PerInterpInit().
+
     * cmake\README.cmake:
     * cmake\CMakeLists.txt: Added support for picking a Tcl installed at a
     non-standard location. Updated README.cmake with an example. Also disabled

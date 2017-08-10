@@ -36,6 +36,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+extern DLLIMPORT module rivet_module;
 
 extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
 

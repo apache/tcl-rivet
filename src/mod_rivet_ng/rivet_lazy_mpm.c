@@ -38,6 +38,7 @@
 
 extern DLLIMPORT mod_rivet_globals*   module_globals;
 extern DLLIMPORT apr_threadkey_t*     rivet_thread_key;
+extern DLLIMPORT module rivet_module;
 
 enum
 {

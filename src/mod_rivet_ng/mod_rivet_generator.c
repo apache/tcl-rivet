@@ -42,6 +42,7 @@
 
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
+extern module rivet_module;
 
 
 /* 
