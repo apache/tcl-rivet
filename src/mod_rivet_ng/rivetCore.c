@@ -57,8 +57,6 @@
 #endif /* EXTERN */
 #include "rivetParser.h"
 #include "mod_rivet_generator.h"
-#undef EXTERN
-#define EXTERN DLLEXPORT
 #include "mod_rivet_cache.h"
 
 #define ENV_ARRAY_NAME     "::request::env"

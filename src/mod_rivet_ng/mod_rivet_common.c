@@ -151,7 +151,6 @@ Rivet_CreateTclInterp (server_rec* s)
  *---------------------------------------------------------------------
  */
 
-DLLEXPORT
 running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
                                         running_scripts* scripts,
                                         rivet_server_conf* rivet_conf )

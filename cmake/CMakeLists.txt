@@ -153,18 +153,16 @@ include(checks)
 #  Locate Tcl...
 # ===========================================================================
 MESSAGE ( STATUS "Searching for Tcl..." )
-if (NOT "${with-tclsh}" STREQUAL "")
-  MESSAGE ( STATUS "  manually set by -Dwith-tclsh=" ${with-tclsh} )
-  find_program(TCL_TCLSH ${with-tclsh})
-endif ()
 if (NOT "${with-tcl}" STREQUAL "")
-  MESSAGE ( STATUS "  manually set by -Dwith-tcl=" ${with-tcl} )
-  find_library(TCL_LIBRARY NAMES tcl
-    tcl${TCL_LIBRARY_VERSION} tcl${TCL_TCLSH_VERSION} tcl${TK_WISH_VERSION}
-    tcl89 tcl8.9 tcl88 tcl8.8 tcl87 tcl8.7
-    tcl86 tcl8.6 tcl85 tcl8.5 tcl84 tcl8.4
-    tcl83 tcl8.3 tcl82 tcl8.2 tcl80 tcl8.0
-    PATHS ${with-tcl} )
+  MESSAGE ( STATUS "  Tcl lib directory manually set by -Dwith-tcl=" ${with-tcl} )
+  get_filename_component(RIVET_TCL_ROOT "${with-tcl}" DIRECTORY)
+  MESSAGE ( STATUS "  Setting Tcl root to: " ${RIVET_TCL_ROOT} )
+  set (TCL_ROOT ${RIVET_TCL_ROOT})
+  set (TclStub_ROOT ${RIVET_TCL_ROOT})
+endif ()
+if (NOT "${with-tclsh}" STREQUAL "")
+  MESSAGE ( STATUS "  Tclsh manually set by -Dwith-tclsh=" ${with-tclsh} )
+  set (TCL_TCLSH ${with-tclsh})
 endif ()
 FIND_PACKAGE ( TCL 8.5.10 REQUIRED )
 FIND_PACKAGE ( TclStub 8.5.10 REQUIRED )
@@ -240,7 +238,7 @@ if(WIN32)
   MESSAGE ( STATUS "  APACHE_HTTPD_LIBRARY:    " ${APACHE_HTTPD_LIBRARY} )
 
   # Export all symbols from mod_rivet
-  SET_TARGET_PROPERTIES(mod_rivet PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+  #SET_TARGET_PROPERTIES(mod_rivet PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
   target_link_libraries(mod_rivet          ${APR_LIBRARY} ${APACHE_HTTPD_LIBRARY} )
   target_link_libraries(rivet_worker_mpm   ${APR_LIBRARY} ${APRUTIL_LIBRARY} ${APACHE_HTTPD_LIBRARY} mod_rivet)
@@ -274,11 +272,11 @@ if(single-thread)
 endif()
 set(NAMEOFEXECUTABLE ${TCL_TCLSH})
 if(import-rivet-commands)
-  message(STATUS "  forcing Rivet to import commands from ::rivet namespace")
+  message(STATUS "  Forcing Rivet to import commands from ::rivet namespace")
   set(NAMESPACE_IMPORT 1)
 endif()
 if(rivet-commands-export)
-  message(STATUS "  forcing Rivet to export commands from ::rivet namespace")
+  message(STATUS "  Forcing Rivet to export commands from ::rivet namespace")
   set(NAMESPACE_EXPORT 1)
 endif()
 set(SEPARATE_CHANNELS 0)
@@ -416,7 +414,7 @@ MESSAGE ( STATUS
 "==========================================================================" )
 MESSAGE ( STATUS "Rivet ${RIVET_VERSION} will be installed in the following "
                  "directories:" )
-MESSAGE ( STATUS " + ${CMAKE_SHARED_LIBRARY_PREFIX}mod_rivet${CMAKE_SHARED_LIBRARY_SUFFIX}: " ${APACHE_MODULE_DIR} )
+MESSAGE ( STATUS " + mod_rivet.so: " ${APACHE_MODULE_DIR} )
 MESSAGE ( STATUS "     (to override this location, use -DAPACHE_MODULE_DIR=...)")
 MESSAGE ( STATUS " + Rivet library: " ${RIVETLIB_DESTDIR} )
 MESSAGE ( STATUS "     (to override this location, use -DAPACHE_LIB_DIR=... or")
