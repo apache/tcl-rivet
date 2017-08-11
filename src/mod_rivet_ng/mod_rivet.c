@@ -218,6 +218,7 @@ int Rivet_Exit_Handler(int code)
 static int
 Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
+	char*			   parent_pid_var = NULL;
     rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
 
     FILEDEBUGINFO;
@@ -230,6 +231,21 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
      * we couldn't send data to the stdout anyway */
 
     Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
+
+	/* if the environment variable AP_PARENT_PID is set 
+     * we know we are in a child process of the winnt MPM
+     */
+	
+	apr_env_get(&parent_pid_var,"AP_PARENT_PID",pTemp);
+	if (parent_pid_var != NULL)
+	{
+		ap_log_error(APLOG_MARK,APLOG_INFO,0,s,
+					"AP_PARENT_PID found: not running the Tcl server script in winnt MPM child process");
+		return OK;
+	} else {
+		ap_log_error(APLOG_MARK,APLOG_INFO,0,s,
+				 "AP_PARENT_PID undefined, we proceed with server initialization");
+	}
 
     /* We don't create the cache here: it would make sense for prefork MPM
      * but threaded MPM bridges have their pool of threads. Each of them
@@ -297,7 +313,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         return OK; /* This would be the first time through */
 	}	
-
+	
     /* Everything revolves around this structure: module_globals */
 
     /* the module global structure is allocated and the MPM bridge name established */
@@ -345,7 +361,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME " Error loading MPM manager: %s", 
                      apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-        exit(1);   
+        exit(1);
     }
 
     Rivet_RunServerInit(pPool,pLog,pTemp,server);
