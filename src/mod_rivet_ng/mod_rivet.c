@@ -228,10 +228,22 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
     module_globals->server_interp = Rivet_NewVHostInterp(pPool,s); /* root interpreter */
 
     /* We initialize the interpreter and we won't register a channel with it because
-     * we couldn't send data to the stdout anyway */
+     * we couldn't send data to the stdout anyway 
+	 */
 
     Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
 
+	/* This code is to be included only if we are building for the
+	 * Windows family of OS. The winnt MPM runs the post_config 
+	 * hooks after it has spawned a child process but we don't want
+	 * to run the Tcl server initialization script again. We
+	 * detect we are running in the a child process checking
+	 * the environment variable AP_PARENT_PID 
+	 * (https://wiki.apache.org/httpd/ModuleLife)
+	 */
+	
+	#ifdef WIN32
+	
 	/* if the environment variable AP_PARENT_PID is set 
      * we know we are in a child process of the winnt MPM
      */
@@ -246,7 +258,9 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 		ap_log_error(APLOG_MARK,APLOG_INFO,0,s,
 				 "AP_PARENT_PID undefined, we proceed with server initialization");
 	}
-
+	
+	#endif
+	
     /* We don't create the cache here: it would make sense for prefork MPM
      * but threaded MPM bridges have their pool of threads. Each of them
      * will by now have their own cache
@@ -272,6 +286,10 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
         Tcl_DecrRefCount(server_init);
     }
+
+	/* bridge specific server init script */
+	
+	RIVET_MPM_BRIDGE_CALL(mpm_server_init,pPool,pLog,pTemp,s);
 
     return OK;
 }
@@ -365,8 +383,6 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     }
 
     Rivet_RunServerInit(pPool,pLog,pTemp,server);
-
-    RIVET_MPM_BRIDGE_CALL(mpm_server_init,pPool,pLog,pTemp,server);
 
     return OK;
 }

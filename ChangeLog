@@ -1,3 +1,10 @@
+2017-08-12 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c: moving to 
+	Rivet_RunServerInit the call to the bridge specific
+	server initialization script. Confining compilation
+	of the code checking AP_PARENT_PID to Windows
+	systems
+	
 2017-08-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c: add check on 
 	environment variable AP_PARENT_PID to prevent
