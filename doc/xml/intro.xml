@@ -32,8 +32,10 @@
 	        	Rivet &version; ships with a major rewriting of mod_rivet, the Apache HTTP
 	        	Websever module at the core of Rivet. With this version of the module
 	        	we attained full support of different MPM (Multiprocessing Modules) for
-	        	the Apache framework, whereas previous version of mod_rivet only supported
-	        	the prefork MPM.
+	        	the Apache framework (previous version of mod_rivet only supported
+	        	the prefork MPM), we provide an alternate build system based on 
+	        	CMake and we support also Apache for Windows for both the 32 bit and 64 bit versions
+	        	of MS Windows.
         </para>
         <title>Rivet - MPM Bridge</title>
         <para>
@@ -68,7 +70,7 @@
 		
 		<para>
 			Rivet &version; supports a new <link linkend="request">request processing scheme</link> 
-			entirely based on Tcl. By default rivet &version; provide compatiblity with the 
+			entirely based on Tcl. By default rivet &version; provides compatiblity with the 
 			version 2.x scheme to handle a request but this can be entirely overridden by
 			the developer replacing the central request handling procedure. See the 
 			<link linkend="request">request processing</link> page for further reading 

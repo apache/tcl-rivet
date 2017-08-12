@@ -48,9 +48,8 @@
                descriptors passed to <command>create</command>. Each descriptor
                is a list of parameter or parameter-value pairs whose order has as only requirement
                to begin with the <command>{variable_name variable_type}</command> pair.
-               A formbroker object handles natively integer, unsigned, string, boolean and email data types.
-               The programmer can defined new data type and provide in the descriptor a
-               reference to a validating procedure for that type.
+               A formbroker object handles natively integer, unsigned, string, boolean and email data types,
+               but new types can be defined along with their validating procedure.
             </para>
             <para>
                The optional <arg>-quoting quoting_procedure</arg> switch assigns a procedure to
