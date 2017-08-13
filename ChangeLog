@@ -1,3 +1,8 @@
+2017-08-10 Georgios Petasis <petasis@apache.org>
+    * cmake/CMakeLists.txt: Modified also variable CMAKE_PREFIX_PATH, as
+    TCL_ROOT and TclStub_ROOT are specific to CMake 3.9.0, and will be
+    removed. See https://gitlab.kitware.com/cmake/cmake/issues/17158.
+
 2017-08-12 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c: moving to 
 	Rivet_RunServerInit the call to the bridge specific
