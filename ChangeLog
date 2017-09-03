@@ -1,3 +1,7 @@
+2017-09-03 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Mysql.c: unqualified string command conflicted
+    with Database class same method 
+
 2017-08-18 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: method build_where_clause treated
     single value key differently, but this failed to remove braces
