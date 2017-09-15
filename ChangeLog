@@ -1,3 +1,8 @@
+2017-09-15 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: new version 1.1 of class Database
+    new method mkdir for class Result
+    * docs/Makefile.am: removed automatic manual creation upon installation
+
 2017-09-03 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Mysql.c: unqualified string command conflicted
     with Database class same method 

@@ -9,7 +9,7 @@
 # full path name of this file's directory.
 
 package ifneeded Calendar 1.2 [list source [file join $dir packages/calendar/calendar.tcl]]
-package ifneeded DIO 1.0 [list source [file join $dir packages/dio/dio.tcl]]
+package ifneeded DIO 1.1 [list source [file join $dir packages/dio/dio.tcl]]
 package ifneeded DIODisplay 1.0 [list source [file join $dir packages/dio/diodisplay.tcl]]
 package ifneeded Dtcl 1.0 [list source [file join $dir packages/dtcl/dtcl.tcl]]
 package ifneeded Rivet 2.3 [list source [file join $dir init.tcl]]
