@@ -11,22 +11,20 @@
 			followed by the execution scripts common to every path 
 			configured through the BeforeScript and AfterScript
 			directives. These scripts can be configured on a per virtual host, 
-			per directory or per user basis. Execution of such code combined can 
-			break because of coding errors (triggering the
-			ErrorScript execution) or bail out of ordinary execution when
-			the ::rivet::abort_page is called, implicitly invoking the execution
-			of an AbortScript. This scheme is terminated in case by
-			a further configurable script (AfterEveryScript).
+			per directory or per user basis. Execution of such combined
+			scripts can break because of coding errors (thus triggering the
+			ErrorScript execution) or it can deliberately interrupt 
+			ordinary execution by calling ::rivet::abort_page (triggering
+			the execution of an AbortScript. This scheme is in case 
+			terminated a further configurable script (AfterEveryScript).
 			In mod_rivet &version2-generic; module series 
-			the whole machinery of request handling was code in
-			the module and it was developed in several phases
-			to fulfill the programmer's necessities as they 
-			emerged during Rivet's development history. 
+			this model of request handling was coded within
+			the module. 
 		</para>
 		<para>
  			With Rivet &version30; we changed this approach and landed to
- 			a new much simpler and flexible model where each request is handled 
- 			by the following Tcl procedure
+ 			a new much simpler and flexible model where each request is 
+ 			by default handled by the following Tcl procedure
 		</para>
 		<programlisting># -- request_handler.tcl
 #
@@ -89,8 +87,7 @@
 		<para>
 			Note the call to new &version30; command ::rivet::url_script
 			that returns the body of the Tcl script or Rivet template
-			pointed by the URL. Also note that the namespace
-			of this procedure is ::Rivet (uppercase initial). 
+			pointed by the URL. 
 		</para>
 		<para>
 			This procedure emulates the &version2-generic; scheme
@@ -100,11 +97,12 @@
 		</para>
 		
 		<note>
-			Note that if you are in order to redefine the core request handler
-			procedure you need to handle yourself any error conditions
+			Note that if you redefine the core request handler
+			you'll need to handle yourself any error conditions
 			and any code interruption caused by calls to::rivet::abort_page.
-			The current procedure might work as a template where you can
-			place your application code though.
+			The current procedure might work as a template to be
+			reworked and used as a template to develop your own
+			request handler.
 		</note>
 
 	</section>
@@ -116,12 +114,12 @@
 			a script pointed by the URL and their code rely
 			entirely on the main application script which internally
 			will call ::rivet::parse command to display HTML code.
-			The status of such applications will be driven by the URL encoded
-			argument pairs. Such application (let's call it MyRivetApp) could be
+			The status of such applications will be driven by the URL 
+			encoded argument pairs. Such application 
+			(let's call it MyRivetApp) could be
 			represented by an Itcl object instance. In myrivetapp.tcl
 			the application class is defined and an instance of it is
-			created in the global namespace. If you want to have your applications
-			share the same 
+			created in the global namespace. 
 			
 			
 		</para>
@@ -129,7 +127,7 @@
 
 ::itcl::class MyRivetApp {
 
-	private variable application_name
+   private variable application_name
 
    public method init {}
    public method request_processing {urlencoded_args}
@@ -146,7 +144,12 @@
 }
 
 ::itcl::body MyRivetApp::request_processing {urlencoded_args} {
- .... 
+
+# the whole application code will take place starting
+# from this method
+
+...
+
 }
 
 set ::theApplication [MyRivetApp #auto]
@@ -162,5 +165,31 @@ $::theApplication init [dict get [::rivet::inspect server] hostname]</programlis
 		<programlisting>&lt;IfModule rivet_module&gt;
     RivetServerConf ChildInitScript "source myrivetapp.tcl"
 &lt;/IfModule&gt;</programlisting>
+		<para>
+			By running this script when an a thread is started
+			we set it up to respond requests, but we still need to 
+			tell mod_rivet what code will eventually handle requests
+			and how this call is going to call method 
+			MyRivetApp::request_processing
+		</para>
+		<programlisting># -- myapp_request_handler.tcl
+#
+# This script will be read by mod_rivet at the thread initialization
+# stage and its content stored in a Tcl_Obj to be passed to the
+# Tcl_EvalObjExe
+
+::try {
+        ::theApplication request_processing [::rivet::var_qs all]
+    } trap {RIVET ABORTPAGE} {err opts} {
+        ::Rivet::finish_request $script $err $opts AbortScript
+    } trap {RIVET THREAD_EXIT} {err opts} {
+        ::Rivet::finish_request $script $err $opts AbortScript
+    } on error {err opts} {
+        ::Rivet::finish_request $script $err $opts
+    } finally {
+        ::Rivet::finish_request $script "" "" AfterEveryScript
+    }
+
+# -- myapp_request_handler.tcl</programlisting>
 	</section>
 </section>

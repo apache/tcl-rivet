@@ -13,9 +13,9 @@
     <!ENTITY rivet_web_service.tcl SYSTEM "examples-sgml/rivet_web_service.tcl" >
     <!ENTITY intro.xml             SYSTEM "xml/intro.xml" >
     <!ENTITY install.xml           SYSTEM "xml/installation.xml" >
-    <!ENTITY directives.xml	   SYSTEM "xml/directives.xml" >
+    <!ENTITY directives.xml	       SYSTEM "xml/directives.xml" >
     <!ENTITY commands.xml          SYSTEM "xml/commands.xml" >
-    <!ENTITY examples.xml          SYSTEM "xml-2/examples.xml" >
+    <!ENTITY examples.xml          SYSTEM "xml/examples.xml" >
     <!ENTITY packages.xml          SYSTEM "xml-2/packages.xml" >
     <!ENTITY dio.xml               SYSTEM "xml-2/dio.xml" >
     <!ENTITY diodisplay.xml        SYSTEM "xml-2/diodisplay.xml" >
@@ -31,15 +31,15 @@
     <!ENTITY asciiglyphs.xml       SYSTEM "xml-2/asciiglyphs.xml" >
     <!ENTITY lazybridge.xml        SYSTEM "xml/lazybridge.xml" >
     <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
-    <!ENTITY version		   "3.0" >
-    <!ENTITY fullversion 	   "3.0.0" >
+    <!ENTITY version		       "3.0" >
+    <!ENTITY fullversion 	       "3.0.0" >
     <!ENTITY version2-series	   "2.0,2.1,2.2,2.3" >
     <!ENTITY version2-generic	   "2.x" >
-    <!ENTITY version30		   "3.0" >
+    <!ENTITY version30	           "3.0" >
     <!ENTITY tcltk-url             "http://www.tcl.tk/" >
     <!ENTITY apache-url            "http://httpd.apache.org" >
     <!ENTITY apachedoc-vhost       "https://httpd.apache.org/docs/2.4/vhosts" >
-    <!ENTITY apachedoc-mpm	   "https://httpd.apache.org/docs/2.4/mpm.html" >
+    <!ENTITY apachedoc-mpm	       "https://httpd.apache.org/docs/2.4/mpm.html" >
 ]>
 
 <!--
