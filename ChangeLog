@@ -1,3 +1,9 @@
+2017-10-12 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/processing.xml,command.xml: further elaboration of the
+    Rivet 3.0 manual. Update ::rivet::redirect manual entry
+    * tcl/rivet-tcl/redirect.tcl: now handling generic boolean arguments
+    or any integer > 0 (as for the HTTP status codes)
+
 2017-09-17 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/examples.xml: moved into final directory
 
