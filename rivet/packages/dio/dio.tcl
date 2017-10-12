@@ -25,7 +25,7 @@ namespace eval ::DIO {
 proc handle {interface args} {
     set obj \#auto
     set first [lindex $args 0]
-    if {![lempty $first] && [string index $first 0] != "-"} {
+    if {![::rivet::lempty $first] && [string index $first 0] != "-"} {
         set obj  [lindex $args 0]
         set args [lreplace $args 0 0]
     }
@@ -170,7 +170,7 @@ proc handle {interface args} {
     protected method build_insert_query {arrayName fields {myTable ""}} {
         upvar 1 $arrayName array
 
-        if {[lempty $myTable]} { set myTable $table }
+        if {[::rivet::lempty $myTable]} { set myTable $table }
         set vals [::list]
         set vars [::list]
         foreach field $fields {
@@ -193,13 +193,14 @@ proc handle {interface args} {
     #
     protected method build_update_query {arrayName fields {myTable ""}} {
         upvar 1 $arrayName array
-        if {[lempty $myTable]} { set myTable $table }
+        if {[::rivet::lempty $myTable]} { set myTable $table }
         set string [::list]
         foreach field $fields {
             if {![info exists array($field)]} { continue }
             lappend string "$field=[makeDBFieldValue $myTable $field $array($field)]"
         }
-        return "update $myTable SET [join $string {,}]"
+
+        return "UPDATE $myTable SET [join $string {,}]"
     }
 
     #
@@ -221,7 +222,7 @@ proc handle {interface args} {
     # variable to the string.
     #
     protected method configure_variable {varName string} {
-        if {[lempty $string]} { return [cget -$varName] }
+        if {[::rivet::lempty $string]} { return [cget -$varName] }
         configure -$varName $string
     }
 
@@ -257,8 +258,8 @@ proc handle {interface args} {
     # values as a list
     ##
     method makekey {arrayName {myKeyfield ""}} {
-        if {[lempty $myKeyfield]} { set myKeyfield $keyfield }
-        if {[lempty $myKeyfield]} {
+        if {[::rivet::lempty $myKeyfield]} { set myKeyfield $keyfield }
+        if {[::rivet::lempty $myKeyfield]} {
             return -code error "No -keyfield specified in object"
         }
         upvar 1 $arrayName array
@@ -371,12 +372,12 @@ proc handle {interface args} {
         set data(-keyfield) $keyfield
         ::array set data $list
 
-        if {[lempty $data(-table)]} {
+        if {[::rivet::lempty $data(-table)]} {
             return -code error -errorcode missing_table "-table not specified in DIO object"
         }
         set $tableVar $data(-table)
 
-        if {[lempty $data(-keyfield)]} {
+        if {[::rivet::lempty $data(-keyfield)]} {
             return -code error -errorcode missing_keyfield "-keyfield not specified in DIO object"
         }
 
@@ -681,7 +682,7 @@ proc handle {interface args} {
     # variable to the string.
     #
     protected method configure_variable {varName string} {
-        if {[lempty $string]} { return [cget -$varName] }
+        if {[::rivet::lempty $string]} { return [cget -$varName] }
         configure -$varName $string
     }
 
@@ -742,7 +743,7 @@ proc handle {interface args} {
 
     method next {type {varName ""}} {
         set return 1
-        if {![lempty $varName]} {
+        if {![::rivet::lempty $varName]} {
             upvar 1 $varName var
             set return 0
         }
@@ -755,7 +756,7 @@ proc handle {interface args} {
             set list $cacheArray($rowid)
         } else {
             set list [$this nextrow]
-            if {[lempty $list]} {
+            if {[::rivet::lempty $list]} {
                 if {$return} { return }
                 set var ""
                 return 0
@@ -791,7 +792,7 @@ proc handle {interface args} {
             }
             "-dict" {
                 foreach field $fields elem $list {
-                    lappend var -$field $elem
+                    lappend var $field $elem
                 }
                 if {$return} { return [dict create {*}$var] }
             }
@@ -801,8 +802,45 @@ proc handle {interface args} {
                     "In-valid type: must be -list, -array, -dict or -keyvalue"
             }
         }
-        return [expr [lempty $list] == 0]
+        return [expr [::rivet::lempty $list] == 0]
     }
+
+    public method mkdict {key} {
+
+        set query_res_d [dict create]
+
+        # we check on the first row a value
+        # for the corresponding key exists
+
+        if {[$this next -dict d] > 0} {
+            if {[dict exists $d $key]} {
+
+                set keyvalue [dict get $d $key]
+                dict unset d $key
+
+                dict set query_res_d $keyvalue $d
+            } else {
+
+                return -code error \
+                    "Value for key '$key' not existing in the query results" 
+
+            }
+        }
+
+        # then we proceed with the remaining rows to
+        # be processed
+
+        while {[$this next -dict d]} {
+
+            set keyvalue [dict get $d $key]
+            dict unset d $key
+
+            dict set query_res_d $keyvalue $d 
+        }
+
+        return $query_res_d
+    }
+
 
     method resultid {{string ""}} { return [configure_variable resultid $string] }
     method fields {{string ""}} { return [configure_variable fields $string] }
@@ -830,4 +868,4 @@ proc handle {interface args} {
 
 } ; ## namespace eval DIO
 
-package provide DIO 1.0
+package provide DIO 1.1

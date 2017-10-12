@@ -73,7 +73,7 @@ mandirs: $(MANDIRS)
 $(MANDIRS):
 	mkdir $@  
 
-install-data-local: docs
+#install-data-local: docs
 
 # this target cleans everything up in the html directory
 

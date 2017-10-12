@@ -1,7 +1,24 @@
-2017-08-10 Georgios Petasis <petasis@apache.org>
-    * cmake/CMakeLists.txt: Modified also variable CMAKE_PREFIX_PATH, as
-    TCL_ROOT and TclStub_ROOT are specific to CMake 3.9.0, and will be
-    removed. See https://gitlab.kitware.com/cmake/cmake/issues/17158.
+2017-10-12 Massimo manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/mod_rivet.c: add preprocessor test on
+    variable declaration for the WIN32 build
+    * src/librivet/rivetWWW.c: fixed subtle buffer overflow
+    mistakenly assuming snprintf printed a byte less than
+
+2017-09-15 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: new version 1.1 of class Database
+    new method mkdir for class Result
+    * docs/Makefile.am: removed automatic manual creation upon installation
+
+2017-09-03 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Mysql.c: unqualified string command conflicted
+    with Database class same method 
+
+2017-08-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio.tcl: method build_where_clause treated
+    single value key differently, but this failed to remove braces
+    for the representation of a single element list containing space
+    characters. The method has been changed the have an uniform
+    way to handle this
 
 2017-08-12 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c: moving to 
@@ -9,6 +26,11 @@
 	server initialization script. Confining compilation
 	of the code checking AP_PARENT_PID to Windows
 	systems
+
+2017-08-10 Georgios Petasis <petasis@apache.org>
+    * cmake/CMakeLists.txt: Modified also variable CMAKE_PREFIX_PATH, as
+    TCL_ROOT and TclStub_ROOT are specific to CMake 3.9.0, and will be
+    removed. See https://gitlab.kitware.com/cmake/cmake/issues/17158.
 	
 2017-08-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c: add check on 

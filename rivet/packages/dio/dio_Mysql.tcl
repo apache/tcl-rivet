@@ -16,7 +16,7 @@
 
 # $Id$
 
-package provide dio_Mysql 0.2
+package provide dio_Mysql 0.3
 
 namespace eval DIO {
     ::itcl::class Mysql {
@@ -171,7 +171,7 @@ namespace eval DIO {
                         }
                     }
                     NULL {
-                        if {[string toupper $val] == "NULL"} {
+                        if {[::string toupper $val] == "NULL"} {
                             return $val
                         } else {
                             return "'[quote $val]'"
