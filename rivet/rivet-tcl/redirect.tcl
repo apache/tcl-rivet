@@ -7,7 +7,7 @@
 # Arguments:
 #
 #   - url               - URL to which we are redirecting the client
-#   - permanent:[0 | 1] - whether redirection will be permanent (default)
+#   - permanent:[0 | 1] - whether redirection will be permanent (default: 0)
 #     or
 #   - permanent: code   - returns any HTTP integer code. In this context
 #                         only the 3xx status codes are meaningful
