@@ -26,64 +26,7 @@
  			a new much simpler and flexible model where each request is 
  			by default handled by the following Tcl procedure
 		</para>
-		<programlisting># -- request_handler.tcl
-#
-# Copyright 2002-2017 The Apache Rivet Team
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#	http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-# code of the default handler of HTTP requests
-
-    ::try {
-        ::Rivet::initialize_request
-    } on error {err} {
-        ::rivet::apache_log_error crit \
-            "Rivet request initialization failed: $::errorInfo"
-    }
-
-    ::try {
-
-        set script [::rivet::inspect BeforeScript]
-        if {$script ne ""} {
-            set ::Rivet::script $script
-            eval $script
-        }
-
-        set script [::rivet::url_script]
-        if {$script ne ""} {
-            set ::Rivet::script $script
-            namespace eval ::request $script
-        }
-
-        set script [::rivet::inspect AfterScript]
-        if {$script ne ""} {
-            set ::Rivet::script $script
-            eval $script
-        }
-
-    } trap {RIVET ABORTPAGE} {err opts} {
-        ::Rivet::finish_request $script $err $opts AbortScript
-    } trap {RIVET THREAD_EXIT} {err opts} {
-        ::Rivet::finish_request $script $err $opts AbortScript
-    } on error {err opts} {
-        ::Rivet::finish_request $script $err $opts
-    } finally {
-        ::Rivet::finish_request $script "" "" AfterEveryScript
-    }
-   
-# default_request_handler.tcl ---</programlisting>
-
+		<programlisting>&request_handler.tcl;</programlisting>
 		<para>
 			Note the call to new &version30; command ::rivet::url_script
 			that returns the body of the Tcl script or Rivet template
@@ -115,9 +58,10 @@
 			followed by rivet inspired to the PHP philosophy of <quote>scripting
 			the HTML</quote>. A web based application
 			could be driven entirely by the URL encoded arguments and by the
-			data POSTed with HTML forms. In other words an application could
-			hinge on a single entry point to handle requests, regardless
-			the complexity of its internal design. 
+			data POSTed with HTML forms, still retaining the ability of exploiting
+			the template engine of Rivet through the <command>::rivet::parse</command>.
+			In other words an application could hinge on a single entry point to
+			handle requests, regardless the complexity of its internal design. 
 		</para>
 		<para>This section shows a template for such an application 
 			(let's call it MyRivetApp) based on an Itcl (or TclOO for what 
@@ -176,8 +120,8 @@ $::theApplication init [dict get [::rivet::inspect server] hostname]
 			By running this script when an a thread is started
 			we set it up to respond requests, but we still need to 
 			tell mod_rivet what code will eventually handle requests
-			and how this call is going to call method 
-			MyRivetApp::request_processing
+			and how the method MyRivetApp::request_processing will
+			be called with appropriate arguments
 		</para>
 		<programlisting># -- myapp_request_handler.tcl
 #
@@ -226,8 +170,8 @@ $::theApplication init [dict get [::rivet::inspect server] hostname]
 # -- myapp_request_handler.tcl</programlisting>
 	</section>
 	<para>
-		We have to tell mod_rivet to run this script when a
-		requested is delivered to myApplication and we do so
+		Finally we have to tell mod_rivet to run this script when a
+		request is delivered to myApplication and we do so
 		using the &version30; directive <command>RequestHandler</command> 
 	</para>
 <programlisting>&lt;IfModule rivet_module&gt;
@@ -237,6 +181,11 @@ $::theApplication init [dict get [::rivet::inspect server] hostname]
 	<para>
 		Notice that the argument of the directive <command>RequestHandler</command>
 		is a file name not a Tcl script as for <command>ChildInitScript</command>
+	</para>
+	<para>
+		With such approach only the <command>ChildInitScript</command>, <command>ChildExitScript</command>
+		and <command>GlobalInitScript</command> configuration directives are effective, while 
+		the effect of other handler is devolved to our request handler script.
 	</para>
 
 </section>

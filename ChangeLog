@@ -1,3 +1,6 @@
+2017-10-18 Massimo Manghi <mxmanghi@apache.org>
+    * doc/: add new cmake.xml file, further manual developments
+
 2017-10-12 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/processing.xml,command.xml: further elaboration of the
     Rivet 3.0 manual. Update ::rivet::redirect manual entry
