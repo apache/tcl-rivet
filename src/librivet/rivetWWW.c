@@ -109,8 +109,8 @@ TCL_CMD_HEADER( Rivet_UnescapeStringCmd )
             digit2 = Rivet_HexToDigit(c2 = *++origStringP);
 
             if (digit1 == -1 || digit2 == -1) {
-                char buf[2];
-                snprintf( buf, 2, "%c%c", c, c2 );
+                char buf[3];
+                snprintf (buf,3,"%c%c",c,c2);
                 Tcl_AppendResult( interp,
                     Tcl_GetStringFromObj( objv[0], NULL ),
                     ": bad char in hex sequence %", buf, (char *)NULL );

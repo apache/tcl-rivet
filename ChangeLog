@@ -1,3 +1,12 @@
+2017-10-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl.in: Following Jeff Lawson's suggestion we check
+    if init.tcl is loaded from within mod_rivet. If we're not running
+    from it we don't divert the [exit] command 
+    * tcl/rivet-tcl/redirect.tcl: now handling generic boolean arguments
+    or any integer > 0 (as for the HTTP status codes)
+    * src/librivet/rivetWWW.c: fixed subtle buffer overflow
+    with sprintfn
+
 2017-08-08 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: implementing check on post_config
     hook calling Rivet_InitHandler. This avoids the module
