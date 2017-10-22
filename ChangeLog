@@ -1,3 +1,10 @@
+2017-10-22 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl.in: Following Jeff Lawson's suggestion we check
+    if init.tcl is loaded from within mod_rivet. If we're not running
+    from it we don't divert the [exit] command 
+    * src/librivet/rivetPkgInit.c: removing code kept in the file 
+    that had been commented because not needed. 
+
 2017-10-18 Massimo Manghi <mxmanghi@apache.org>
     * doc/: add new cmake.xml file, further manual developments
 
