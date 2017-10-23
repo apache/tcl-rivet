@@ -96,9 +96,6 @@ Rivet_GetNamespace( Tcl_Interp* interp)
 DLLEXPORT int
 Rivetlib_Init( Tcl_Interp *interp )
 {
-#if RIVET_NAMESPACE_EXPORT == 1
-//    Tcl_Namespace *rivet_ns; 
-#endif
 
 #ifdef USE_TCL_STUBS
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
@@ -111,10 +108,6 @@ Rivetlib_Init( Tcl_Interp *interp )
     Rivet_InitList (interp);
     Rivet_InitCrypt(interp);
     Rivet_InitWWW  (interp);
-#if RIVET_NAMESPACE_EXPORT == 1
-//    rivet_ns = Rivet_GetNamespace(interp);
-//    Tcl_Export(interp,rivet_ns,"*",0);
-#endif
 
     return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION );
 }
@@ -135,9 +128,6 @@ Rivetlib_Init( Tcl_Interp *interp )
 DLLEXPORT int
 Rivetlib_SafeInit( Tcl_Interp *interp )
 {
-#if RIVET_NAMESPACE_EXPORT == 1
-    //Tcl_Namespace *rivet_ns;
-#endif
 
 #ifdef USE_TCL_STUBS
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
@@ -151,9 +141,5 @@ Rivetlib_SafeInit( Tcl_Interp *interp )
     Rivet_InitCrypt(interp);
     Rivet_InitWWW(interp);
 
-#if RIVET_NAMESPACE_EXPORT == 1
-    //rivet_ns = Rivet_GetNamespace(interp);
-    //Tcl_Export(interp,rivet_ns,"*",0);
-#endif
     return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION );
 }

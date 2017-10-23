@@ -1,8 +1,25 @@
-2017-10-12 Massimo manghi <mxmanghi@apache.org>
+2017-10-22 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl.in: Following Jeff Lawson's suggestion we check
+    if init.tcl is loaded from within mod_rivet. If we're not running
+    from it we don't divert the [exit] command 
+    * src/librivet/rivetPkgInit.c: removing code kept in the file 
+    that had been commented because not needed. 
+
+2017-10-18 Massimo Manghi <mxmanghi@apache.org>
+    * doc/: add new cmake.xml file, further manual developments
+
+2017-10-12 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/mod_rivet.c: add preprocessor test on
     variable declaration for the WIN32 build
     * src/librivet/rivetWWW.c: fixed subtle buffer overflow
     mistakenly assuming snprintf printed a byte less than
+    * doc/xml/processing.xml,command.xml: further elaboration of the
+    Rivet 3.0 manual. Update ::rivet::redirect manual entry
+    * tcl/rivet-tcl/redirect.tcl: now handling generic boolean arguments
+    or any integer > 0 (as for the HTTP status codes)
+
+2017-09-17 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/examples.xml: moved into final directory
 
 2017-09-15 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio.tcl: new version 1.1 of class Database

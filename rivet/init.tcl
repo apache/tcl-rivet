@@ -77,12 +77,19 @@ proc ::Rivet::init {} {
         }
     }
 
-    ## Move Tcl's exit command out of the way and replace it with
+    ## If we are running from within mod_rivet we have already
+    ## defined ::rivet::exit (mod_rivet_common.c: Rivet_PerInterpInit)
+    ## and we move Tcl's exit command out of the way and replace it with
     ## our own that handles bailing from a page request properly.
-    rename ::exit ::Rivet::tclcore_exit
-    proc ::exit {code} {
-        if {![string is integer -strict $code]} { set code 0 }
-        ::rivet::exit $code
+
+    if {[info commands ::rivet::exit] != ""} {
+
+        rename ::exit ::Rivet::tclcore_exit
+        proc ::exit {code} {
+            if {![string is integer -strict $code]} { set code 0 }
+            ::rivet::exit $code
+        }
+
     }
 
     ## If Rivet was configured for backward compatibility, import commands

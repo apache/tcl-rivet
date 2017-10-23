@@ -1489,7 +1489,7 @@ bab</programlisting>
            <cmdsynopsis>
                <command>::rivet::redirect</command>
                <arg>URL</arg>
-               <arg>permanent (default: 0)</arg>
+               <arg>permanent</arg>
            </cmdsynopsis>
        </refsynopsisdiv>
        <refsect1>
@@ -1509,9 +1509,13 @@ bab</programlisting>
        	</para>
        	<para>
        		<command>::rivet::redirect</command> drives the redirection by setting the
-       		301 (permanent redirect) or 302 (non permanent redirect) HTTP status codes and 
+       		301 (permanent = 1: permanent redirect) or 302 (permanent = 0: non permanent redirect) and 
        		attempts to discard the output the script might have already placed in the
-       		stdout channel buffer. Therefore the command can fail if
+       		stdout channel buffer. The <quote>permanent</quote> argument can also be any of the 
+       		other HTTP status codes. This is handy for returning one the 3xx status codes 
+       		dedicated to the HTTP request redirection 
+       		
+       		The command can fail if
        		<itemizedlist>
        			<listitem>A <command>flush stdout</command> was called before <command>::rivet::redirect</command>
        			thus causing the HTTP headers to be sent and preventing any possibility to 
@@ -1520,7 +1524,7 @@ bab</programlisting>
        			flush the channel</listitem>
        		</itemizedlist>
 				The <command>stdout</command> channel, like any Tcl channels, can be manipulated
-				and if needed its internal buffer streched.    
+				and if needed its internal buffer stretched.    
        	</para>
        </refsect1>
    </refentry>
