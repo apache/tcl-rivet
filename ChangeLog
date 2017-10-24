@@ -1,3 +1,6 @@
+2017-10-24 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Mysql.tcl: handling special field NULL
+
 2017-10-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: Following Jeff Lawson's suggestion we check
     if init.tcl is loaded from within mod_rivet. If we're not running

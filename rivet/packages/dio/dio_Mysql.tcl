@@ -16,7 +16,7 @@
 
 # $Id$
 
-package provide dio_Mysql 0.2
+package provide dio_Mysql 0.3
 
 namespace eval DIO {
     ::itcl::class Mysql {
@@ -168,6 +168,13 @@ namespace eval DIO {
                                 #set my_val [clock format $secs -format {%Y-%m-%d %T}]
                                 return "FROM_UNIXTIME('$secs')"
                             }
+                        }
+                    }
+                    NULL {
+                        if {[::string toupper $val] == "NULL"} {
+                            return $val
+                        } else {
+                            return "'[quote $val]'"
                         }
                     }
                     default {
