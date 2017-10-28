@@ -1,0 +1,41 @@
+<section id="cmake">
+    <title>Building Rivet &version; with CMake</title>
+    <section>
+        <para>
+				With this version Rivet has adopted <ulink href="http://cmake.org/">CMake</ulink>
+				as an alternate build system. The choice of introducing also CMake was motivated by the
+				need of an easy to use and reliable build system for Windows installations. Nonetheless the usability of
+				CMake is by no means restricted to that OS and user familiar with this alternative can
+				adopt it to build mod_rivet also on Linux and other systems. The current CMake script
+				requires CMake 3.2 or later. The <ulink href="https://cmake.org/documentation/">CMake documentation</ulink>
+				page has a complete reference of CMake features
+        </para>
+        <title>CMake build procedure and examples</title>
+        <para>Before running the build script cd into the cmake directory
+				<programlisting>cd cmake</programlisting>        		
+        	</para>
+			<para>With default arguments run the following sequence of commands that prepare the build directory
+			build the code and install the binary and application library
+				<programlisting>cmake -E make_directory build
+cmake -E chdir build cmake ..
+cmake --build build --target all --clean-first
+cmake --build build --target install</programlisting>	
+        </para>
+        <para>
+        		Installation on a Windows system with using a custom installation of the Apache HTTP web server
+        		<programlisting>cmake -E make_directory build
+cmake -E chdir build cmake -DAPACHE_ROOT=G:/Apache24 ..
+cmake --build build --config Release --target install</programlisting>
+        </para>
+        <para>
+        		Building rivet on Windows with a 64 bit build of Apache requires specific
+        		directives to the Microsoft C compiler
+        		<programlisting>cmake -E make_directory build_64
+cmake -E chdir build_64 cmake -DAPACHE_ROOT=G:/Apache24 -G "Visual Studio 15 2017 Win64" ..
+cmake --build build_64 --config Release --target install</programlisting>
+ 				-G "..." can be set to any of the available 64-bit generators available under the platform
+ 				depending on your Windows version and Apache build
+        </para>
+    </section>
+</section>
+

@@ -1,5 +1,5 @@
 <section id="installation">
-    <title>Apache Rivet Installation</title>
+    <title>Apache Rivet &version; Installation</title>
     <procedure>
         <para> 
             Rivet &version; runs with the Apache 2.2.x and 2.4.x HTTP web servers. 
