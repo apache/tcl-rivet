@@ -1,3 +1,7 @@
+2017-10-29 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl: recreated from init.tcl.in
+    * VERSION: new version 2.3.5
+
 2017-10-24 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Mysql.tcl: handling special field NULL
 

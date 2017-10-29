@@ -170,15 +170,21 @@ namespace eval ::Rivet {
 
 } ;## namespace eval ::Rivet
 
-## eventually we have to divert Tcl ::exit to ::rivet::exit
+## if we are running from within mod_rivet we have already
+## defined ::rivet::exit (mod_rivet.c: Rivet_PerInterpInit)
+## and we divert Tcl ::exit to ::rivet::exit
 
-rename ::exit ::Rivet::tclcore_exit
-proc ::exit {code} {
+if {[info commands ::rivet::exit] != ""} {
 
-    if {[string is integer $code]} {
-        eval ::rivet::exit $code
-    } else {
-        eval ::rivet::exit 0
+    rename ::exit ::Rivet::tclcore_exit
+    proc ::exit {code} {
+
+        if {[string is integer $code]} {
+            eval ::rivet::exit $code
+        } else {
+            eval ::rivet::exit 0
+        }
+
     }
 
 }
