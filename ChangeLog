@@ -1,5 +1,7 @@
 2017-10-31 Massimo Manghi <mxmanghi@apache.org>
     * merging branch cmake back into trunk
+    * tests/broken.test: the error message form has changed with
+    the Tcl based new request handling procedure
 
 2017-10-28 Massimo Manghi <mxmanghi@apache.org>
     * docs/xml/cmake.xml: draft manual page for cmake build system

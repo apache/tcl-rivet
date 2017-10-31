@@ -13,28 +13,14 @@ set testfilename1 broken.rvt
 } {<pre>invalid command name "broken"
     while executing
 "broken"
-    (in namespace eval "::request" script line 5)
+    (in namespace eval "::request" script line 4)
     invoked from within
-"namespace eval request {
-puts -nonewline ""
+"namespace eval ::request $script"
+    ("::try" body line 12)<hr/><p>OUTPUT BUFFER:</p>puts -nonewline ""
 
 # non-existent command
 broken
 
 puts -nonewline "
 "
-
-}"
-    ("uplevel" body line 1)
-    invoked from within
-"uplevel #0 $script"<hr/><p>OUTPUT BUFFER:</p>namespace eval request {
-puts -nonewline ""
-
-# non-existent command
-broken
-
-puts -nonewline "
-"
-
-}
 </pre>}

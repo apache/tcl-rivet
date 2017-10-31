@@ -2,12 +2,13 @@
     <title>Building Rivet &version; with CMake</title>
     <section>
         <para>
-				With this version Rivet has adopted <ulink href="http://cmake.org/">CMake</ulink>
-				as an alternate build system. The choice of introducing also CMake was motivated by the
-				need of an easy to use and reliable build system for Windows installations. Nonetheless the usability of
-				CMake is by no means restricted to that OS and user familiar with this alternative can
-				adopt it to build mod_rivet also on Linux and other systems. The current CMake script
-				requires CMake 3.2 or later. The <ulink href="https://cmake.org/documentation/">CMake documentation</ulink>
+				Starting with &version; Rivet has adopted <ulink href="http://cmake.org/">CMake</ulink>
+				as an alternate build system. The choice of introducing CMake was motivated by the
+				need of an easy to use and reliable build system for Windows installations. Nonetheless
+				the usability of 	CMake is by no means restricted to that OS and user familiar with this
+				alternative can adopt it to build mod_rivet also on Linux and other systems. 
+				The current CMake script requires CMake 3.2 or later. 
+				The <ulink href="https://cmake.org/documentation/">CMake documentation</ulink>
 				page has a complete reference of CMake features
         </para>
         <title>CMake build procedure and examples</title>
@@ -22,7 +23,7 @@ cmake --build build --target all --clean-first
 cmake --build build --target install</programlisting>	
         </para>
         <para>
-        		Installation on a Windows system with using a custom installation of the Apache HTTP web server
+        		Installation on a Windows system with a custom installation of the Apache HTTP web server
         		<programlisting>cmake -E make_directory build
 cmake -E chdir build cmake -DAPACHE_ROOT=G:/Apache24 ..
 cmake --build build --config Release --target install</programlisting>
