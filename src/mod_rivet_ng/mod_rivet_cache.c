@@ -23,6 +23,13 @@
 #include <apr_strings.h>
 
 #include "mod_rivet.h"
+
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN DLLEXPORT
+#endif /* EXTERN */
 #include "mod_rivet_cache.h"
 
 extern mod_rivet_globals* module_globals;

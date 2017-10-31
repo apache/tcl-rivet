@@ -29,7 +29,9 @@
 
 #include <tcl.h>
 #include <sys/types.h>
+#ifndef WIN32
 #include <pwd.h>
+#endif /* WIN32 */
 
 #include <httpd.h>
 #include <http_request.h>

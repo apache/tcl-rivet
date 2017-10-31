@@ -27,24 +27,38 @@
 #include <apr_strings.h>
 #include <apr_env.h>
 #include <ap_mpm.h>
-/* as long as we need to emulate ap_chdir_file we need to include unistd.h */
-#include <unistd.h>
-
 #include <apr_file_io.h>
 #include <apr_file_info.h>
 
 #include "mod_rivet.h"
-#include "mod_rivet_cache.h"
 #include "rivetChannel.h"
-#include "mod_rivet_common.h"
 #include "TclWeb.h"
 #include "rivetParser.h"
 #include "rivet.h"
 #include "apache_config.h"
+#include <mpm_common.h>
+
+/* as long as we need to emulate ap_chdir_file we need to include unistd.h */
+#ifdef RIVET_HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* RIVET_HAVE_UNISTD_H */
+#ifdef WIN32
+#include <direct.h> // provides POSIX _chdir
+#endif /* WIN32 */
+
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN DLLEXPORT
+#endif /* EXTERN */
 #include "rivetCore.h"
+#include "mod_rivet_common.h"
+#include "mod_rivet_cache.h"
 
 extern apr_threadkey_t*   rivet_thread_key;
 extern mod_rivet_globals* module_globals;
+extern module rivet_module;
 
 /*
  * -- Rivet_ReadFile
@@ -199,7 +213,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
     /* Set up interpreter associated data */
 
-    globals = apr_pcalloc (p, sizeof(rivet_interp_globals));
+    globals = ckalloc(sizeof(rivet_interp_globals));
     Tcl_SetAssocData (interp,"rivet",NULL,globals);
     
     /*
@@ -289,7 +303,6 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
 rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
 {
-    extern int              ap_max_requests_per_child;
     rivet_thread_interp*    interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
     rivet_server_conf*      rsc;
 
@@ -750,11 +763,19 @@ int Rivet_chdir_file (const char *file)
 
     x = strrchr(file, '/');
     if (x == NULL) {
+#ifdef WIN32
+        chdir_retval = _chdir(file);
+#else
         chdir_retval = chdir(file);
+#endif
     } else if (x - file < sizeof(chdir_buf) - 1) {
         memcpy(chdir_buf, file, x - file);
         chdir_buf[x - file] = '\0';
+#ifdef WIN32
+        chdir_retval = _chdir(chdir_buf);
+#else
         chdir_retval = chdir(chdir_buf);
+#endif
     }
         
     return chdir_retval;

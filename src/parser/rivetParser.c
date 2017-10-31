@@ -30,6 +30,13 @@
 
 #include <string.h>
 #include <tcl.h>
+
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "rivetParser.h"
 
 int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);

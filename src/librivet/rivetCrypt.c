@@ -24,6 +24,12 @@
 
 #include <tcl.h>
 #include <string.h>
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "rivet.h"
 #include "ap_config.h"
 

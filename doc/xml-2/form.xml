@@ -504,51 +504,13 @@ myform destroy</programlisting>
 								<arg>args</arg>
 							</cmdsynopsis>
 							<para>
-								hidden input element: typically embedded in a form in order to
+								hidden input element: typicall embedded in a form in order to
 								pass status variables.
 							</para>					
 						</listitem>				
 					</varlistentry>
 				</variablelist>
 			</refsect2>
-			<refsect2>
-				<variablelist>
-					<varlistentry>
-						<listitem>
-							<cmdsynopsis>
-								<arg choice="plain">text</arg>
-								<arg>name</arg>
-								<arg>args</arg>
-							</cmdsynopsis>
-							<para>
-								basic text input element
-							</para>					
-						</listitem>				
-					</varlistentry>
-				</variablelist>
-			</refsect2>
-
-			<refsect2>
-				<variablelist>
-					<varlistentry>
-						<listitem>
-							<cmdsynopsis>
-								<arg choice="plain">textarea</arg>
-								<arg>name</arg>
-								<arg>args</arg>
-							</cmdsynopsis>
-							<para>
-								textarea input element. As such this element
-								can be customized with the attributes <arg>rows</arg> and
-								<arg>columns</arg>
-								<programlisting>form textarea a_text_area -rows 20 -cols 80</programlisting>
-							</para>					
-						</listitem>				
-					</varlistentry>
-				</variablelist>
-			</refsect2>
-
-
 			<refsect2>
 				<variablelist>
 					<varlistentry>

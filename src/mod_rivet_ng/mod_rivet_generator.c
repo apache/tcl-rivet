@@ -26,15 +26,23 @@
 #include <apr_strings.h>
 
 #include "mod_rivet.h"
-#include "mod_rivet_common.h"
-#include "mod_rivet_cache.h"
 #include "rivetParser.h"
 #include "rivetCore.h"
 #include "apache_config.h"
 #include "TclWeb.h"
 
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
+#include "mod_rivet_common.h"
+#include "mod_rivet_cache.h"
+
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*   rivet_thread_key;
+extern module rivet_module;
 
 
 /* 
@@ -104,7 +112,7 @@ Rivet_ReleaseScripts (running_scripts* scripts)
 
 #define USE_APACHE_RSC
 
-int
+DLLEXPORT int
 Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 {
     int                     errstatus;

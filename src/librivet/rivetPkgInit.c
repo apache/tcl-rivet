@@ -23,6 +23,12 @@
 #endif
 
 #include <tcl.h>
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "rivet.h"
 #include "mod_rivet.h"
 
@@ -87,7 +93,7 @@ Rivet_GetNamespace( Tcl_Interp* interp)
  *-----------------------------------------------------------------------------
  */
 
-int
+DLLEXPORT int
 Rivetlib_Init( Tcl_Interp *interp )
 {
 
@@ -119,7 +125,7 @@ Rivetlib_Init( Tcl_Interp *interp )
  *-----------------------------------------------------------------------------
  */
 
-int
+DLLEXPORT int
 Rivetlib_SafeInit( Tcl_Interp *interp )
 {
 

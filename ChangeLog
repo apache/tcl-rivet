@@ -1,3 +1,6 @@
+2017-10-31 Massimo Manghi <mxmanghi@apache.org>
+    * merging branch cmake back into trunk
+
 2017-10-28 Massimo Manghi <mxmanghi@apache.org>
     * docs/xml/cmake.xml: draft manual page for cmake build system
 
@@ -12,12 +15,14 @@
     * doc/: add new cmake.xml file, further manual developments
 
 2017-10-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/mod_rivet.c: add preprocessor test on
+    variable declaration for the WIN32 build
+    * src/librivet/rivetWWW.c: fixed subtle buffer overflow
+    mistakenly assuming snprintf printed a byte less than
     * doc/xml/processing.xml,command.xml: further elaboration of the
     Rivet 3.0 manual. Update ::rivet::redirect manual entry
     * tcl/rivet-tcl/redirect.tcl: now handling generic boolean arguments
     or any integer > 0 (as for the HTTP status codes)
-    * src/librivet/rivetWWW.c: fixed subtle buffer overflow
-    with sprintfn
 
 2017-09-17 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/examples.xml: moved into final directory
@@ -38,10 +43,162 @@
     characters. The method has been changed the have an uniform
     way to handle this
 
+2017-08-12 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c: moving to 
+	Rivet_RunServerInit the call to the bridge specific
+	server initialization script. Confining compilation
+	of the code checking AP_PARENT_PID to Windows
+	systems
+
+2017-08-10 Georgios Petasis <petasis@apache.org>
+    * cmake/CMakeLists.txt: Modified also variable CMAKE_PREFIX_PATH, as
+    TCL_ROOT and TclStub_ROOT are specific to CMake 3.9.0, and will be
+    removed. See https://gitlab.kitware.com/cmake/cmake/issues/17158.
+	
+2017-08-11 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c: add check on 
+	environment variable AP_PARENT_PID to prevent
+	server Tcl init script from running in winnt
+	controlled child processes (as per Apache HTTP 
+	server documentation)
+	
+2017-08-10 Georgios Petasis <petasis@apache.org>
+    * src\mod_rivet_ng\apache_config.c:
+    * src\mod_rivet_ng\mod_rivet.c:
+    * src\mod_rivet_ng\mod_rivet_common.c:
+    * src\mod_rivet_ng\mod_rivet_generator.c:
+    * src\mod_rivet_ng\rivet_lazy_mpm.c:
+    * src\mod_rivet_ng\worker_prefork_common.c: Locally declared symbol
+    rivet_module as extern (DLLIMPORT).
+
+    * branches\cmake\src\mod_rivet_ng\mod_rivet.h: Symbol rivet_module
+    removed from header file.
+
+    * branches\cmake\src\mod_rivet_ng\mod_rivet_common.c: Used ckalloc() instead
+    of apr_pcalloc() for variable globals, in Rivet_PerInterpInit().
+
+    * cmake\README.cmake:
+    * cmake\CMakeLists.txt: Added support for picking a Tcl installed at a
+    non-standard location. Updated README.cmake with an example. Also disabled
+    the switch to export all symbols from mod_rivet.so
+    (WINDOWS_EXPORT_ALL_SYMBOLS).
+
+    * src\mod_rivet_ng\mod_rivet_common.c:
+    * src\mod_rivet_ng\rivetCore.c: Fixes in DLLEXPORT.
+
 2017-08-07 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c: Rivet_ServerInit is now implementing
 	the recommended mechanism to avoid the double load of external
 	modules
+	
+2017-08-05 Georgios Petasis <petasis@apache.org>
+    * cmake\CMakeLists.txt: rivetparser/rivetlib shared libraries now have the
+    prefix "lib" under all platforms.
+
+    * cmake\cmake_extra_modules\rivet_config.h.cmake: RIVET_RIVET_CORE or
+    RIVET_CORE? Added also support for RIVET_CORE, but disabled, as it causes
+    compilation errors (in C preprosessor, two strings are compared, which is
+    not supported).
+
+    * rivet\pkgIndex.tcl: Dropped ".so" in favour of "info sharedlibextension".
+
+    * src\librivet\rivetCrypt.c:
+    * src\librivet\rivetList.c:
+    * src\librivet\rivetPkgInit.c:
+    * src\librivet\rivetWWW.c: Definition of EXTERN and exported symbols through
+    DLLEXPORT.
+
+    * src\mod_rivet_ng\mod_rivet.c:
+    * src\mod_rivet_ng\mod_rivet_cache.c:
+    * src\mod_rivet_ng\mod_rivet_common.c:
+    * src\mod_rivet_ng\mod_rivet_generator.c:
+    * src\mod_rivet_ng\rivetCore.c:
+    * src\mod_rivet_ng\rivetCore.h:
+    * src\parser\parserPkgInit.c: Definition of EXTERN and exported symbols
+    through DLLEXPORT.
+
+2017-08-05 Georgios Petasis <petasis@apache.org>
+    * src\mod_rivet_ng\rivet_lazy_mpm.c:
+    * src\mod_rivet_ng\rivet_prefork_mpm.c:
+    * src\mod_rivet_ng\rivet_worker_mpm.c: Added DLLEXPORT for the symbol
+    defined with RIVET_MPM_BRIDGE macro.
+
+    * cmake\CMakeLists.txt: Exported all symbols for mod_rivet.so under Windows,
+    to copy the behaviour in UNIX systems (where all symbols are exported from
+    shared libraries).
+
+    * cmake\cmake_extra_modules\checks.cmake:
+    * cmake\cmake_extra_modules\config.h.cmake:
+    * cmake\cmake_extra_modules\rivet_config.h.cmake: Under VC11, round()
+    has not been implemented. Added checks in CMake build, for detecting
+    round()'s absence.
+
+    * src\mod_rivet_ng\rivetCore.c:
+    * src\mod_rivet_ng\rivet_lazy_mpm.c:
+    * src\mod_rivet_ng\rivet_prefork_mpm.c:
+    * src\mod_rivet_ng\rivet_worker_mpm.c:
+    * src\mod_rivet_ng\worker_prefork_common.c:
+    * src\parser\parserPkgInit.c: Changes for avoiding link error under Windows
+    (mostly) related to importing exported symbols from  mod_rivet.so.
+
+2017-08-05 Georgios Petasis <petasis@apache.org>
+    * src/mod_rivet_ng/mod_rivet_common.c: Reordered header files, so
+    <unistd.h> (and its check) to come after "mod_rivet.h" that includes
+    "rivet_config.h".
+
+2017-08-04 Georgios Petasis <petasis@apache.org>
+    * cmake\CMakeLists.txt:
+    * cmake\cmake_extra_modules\FindAPR.cmake:
+    * src\mod_rivet_ng\TclWebapache.c:
+    * src\mod_rivet_ng\mod_rivet.c:
+    * src\mod_rivet_ng\mod_rivet.h:
+    * src\mod_rivet_ng\mod_rivet_cache.c:
+    * src\mod_rivet_ng\mod_rivet_common.c:
+    * src\mod_rivet_ng\mod_rivet_generator.c:
+    * src\mod_rivet_ng\rivetCore.c:
+    * src\parser\rivetParser.c: Changes for fixing compilation errors under
+    Windows.
+
+2017-08-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: changes demanded by windows compiler
+    * rivet/pkgIndex.tcl: recreated with a up to date list of packages
+
+2017-08-04 Georgios Petasis <petasis@apache.org>
+    * cmake\CMakeLists.txt: Various changes for better support build under
+    Windows.
+    
+    * cmake\README.cmake: Added a section for building under Windows.
+    
+    * cmake\cmake_extra_modules\FindAPACHE.cmake: Enhanced customisability.
+    The user can guide detection with variables APACHE_INCLUDE_DIR_HINTS,
+    APACHE_MODULE_DIR_HINTS, APACHE_LIB_DIR_HINTS, APACHE_ROOT.
+    
+    * cmake\cmake_extra_modules\FindAPR.cmake: Enhanced customisability.
+    The user can guide detection with variables APR_INCLUDE_DIR_HINTS,
+    APACHE_INCLUDE_DIR_HINTS, APACHE_ROOT, APR_LIBRARY_HINTS,
+    APRUTIL_INCLUDE_DIR_HINTS, APRUTIL_LIBRARY_HINTS.
+
+2017-08-03 Georgios Petasis <petasis@apache.org>
+    * CMake build system: Removed "lib" prefix from some libraris.
+
+2017-08-03 Georgios Petasis <petasis@apache.org>
+    * CMake build system: Added support for installing Rivet. Added more
+    checks for various definitions in config.h/rivet_config.h.
+
+2017-08-03 Georgios Petasis <petasis@apache.org>
+    * CMake build system: Added missing source files, enabled as default
+    the build of shared libraries, added needed link libraries. Also
+    extended build system for all Rivet libraries (librivetlib.so,
+    librivetparser.so, librivet_worker_mpm.so, librivet_prefork_mpm.so,
+    librivet_lazy_mpm.so), and checked their linked libraries and missing
+    symbols with their versions when build with autoconf.
+
+2017-08-02 Massimo Manghi <mxmanghi@apache.org>
+	* Changed references in cmake/CMakeList.txt to build with
+	code in src/mod_rivet_ng.
+
+2017-08-02 Georgios Petasis <petasis@apache.org>
+    * Created a new branch (cmake) for the CMake build system.
 
 2017-07-24 Massimo Manghi <mxmanghi@apache.org>
 	* xml/rivet.xml.in: reflects rivet.xml having been moved to doc/xml

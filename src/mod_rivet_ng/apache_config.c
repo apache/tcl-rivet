@@ -37,6 +37,7 @@
 #include "apache_config.h"
 #include "rivet.h"
 
+extern module rivet_module;
 extern mod_rivet_globals* module_globals;
 
 /*

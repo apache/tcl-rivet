@@ -36,8 +36,9 @@
 #include "rivetChannel.h"
 #include "apache_config.h"
 
-extern mod_rivet_globals*   module_globals;
-extern apr_threadkey_t*     rivet_thread_key;
+extern DLLIMPORT mod_rivet_globals*   module_globals;
+extern DLLIMPORT apr_threadkey_t*     rivet_thread_key;
+extern DLLIMPORT module rivet_module;
 
 enum
 {
@@ -401,6 +402,7 @@ int Lazy_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
+DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
     Lazy_MPM_ChildInit,

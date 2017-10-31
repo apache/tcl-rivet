@@ -48,18 +48,28 @@
 #include <tcl.h>
 
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
+#ifdef RIVET_HAVE_UNISTD_H
 #include <unistd.h>
+#endif /* RIVET_HAVE_UNISTD_H */
 
 #include "rivet_types.h"
 #include "mod_rivet.h"
 #include "apache_config.h"
+
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "rivet.h"
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
 
+module AP_MODULE_DECLARE_DATA rivet_module;
 extern Tcl_ChannelType   RivetChan;
-apr_threadkey_t*         rivet_thread_key    = NULL;
-mod_rivet_globals*       module_globals      = NULL;
+DLLEXPORT apr_threadkey_t*         rivet_thread_key    = NULL;
+DLLEXPORT mod_rivet_globals*       module_globals      = NULL;
 
 #define ERRORBUF_SZ         256
 #define TCL_HANDLER_FILE    RIVET_DIR"/default_request_handler.tcl"
@@ -208,6 +218,9 @@ int Rivet_Exit_Handler(int code)
 static int
 Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
+#ifdef WIN32
+	char*			   parent_pid_var = NULL;
+#endif
     rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
 
     FILEDEBUGINFO;
@@ -217,10 +230,39 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
     module_globals->server_interp = Rivet_NewVHostInterp(pPool,s); /* root interpreter */
 
     /* We initialize the interpreter and we won't register a channel with it because
-     * we couldn't send data to the stdout anyway */
+     * we couldn't send data to the stdout anyway 
+	 */
 
     Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
 
+	/* This code is to be included only if we are building for the
+	 * Windows family of OS. The winnt MPM runs the post_config 
+	 * hooks after it has spawned a child process but we don't want
+	 * to run the Tcl server initialization script again. We
+	 * detect we are running in the a child process checking
+	 * the environment variable AP_PARENT_PID 
+	 * (https://wiki.apache.org/httpd/ModuleLife)
+	 */
+	
+	#ifdef WIN32
+	
+	/* if the environment variable AP_PARENT_PID is set 
+     * we know we are in a child process of the winnt MPM
+     */
+	
+	apr_env_get(&parent_pid_var,"AP_PARENT_PID",pTemp);
+	if (parent_pid_var != NULL)
+	{
+		ap_log_error(APLOG_MARK,APLOG_INFO,0,s,
+					"AP_PARENT_PID found: not running the Tcl server script in winnt MPM child process");
+		return OK;
+	} else {
+		ap_log_error(APLOG_MARK,APLOG_INFO,0,s,
+				 "AP_PARENT_PID undefined, we proceed with server initialization");
+	}
+	
+	#endif
+	
     /* We don't create the cache here: it would make sense for prefork MPM
      * but threaded MPM bridges have their pool of threads. Each of them
      * will by now have their own cache
@@ -246,6 +288,10 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
         Tcl_DecrRefCount(server_init);
     }
+
+	/* bridge specific server init script */
+	
+	RIVET_MPM_BRIDGE_CALL(mpm_server_init,pPool,pLog,pTemp,s);
 
     return OK;
 }
@@ -286,8 +332,8 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
                      "first post_config run: not initializing Tcl stuff");
 
         return OK; /* This would be the first time through */
-	}
-
+	}	
+	
     /* Everything revolves around this structure: module_globals */
 
     /* the module global structure is allocated and the MPM bridge name established */
@@ -335,12 +381,10 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME " Error loading MPM manager: %s", 
                      apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-        exit(1);   
+        exit(1);
     }
 
     Rivet_RunServerInit(pPool,pLog,pTemp,server);
-
-    RIVET_MPM_BRIDGE_CALL(mpm_server_init,pPool,pLog,pTemp,server);
 
     return OK;
 }

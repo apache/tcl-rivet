@@ -233,24 +233,18 @@ proc handle {interface args} {
     # together.
     #
     protected method build_key_where_clause {myKeyfield myKey} {
-
-        # rewritten from scratch abandoning
-        # the former approach that treated single
-        # element keys differently (anche missing the
-        # correct handling of single element lists) and
-        # also generating a clean WHERE clause
-        #
-        # mxmanghi 18/08/2017
-
-        set keyvalue_conditions {}
-        
-        while {([llength $myKeyfield] > 0) && ([llength $myKey] > 0)} {
-            set myKeyfield [lassign $myKeyfield field]
-            set myKey      [lassign $myKey key]
-            lappend keyvalue_conditions "$field = [makeDBFieldValue $table $field $key]"
+        ## If we're not using multiple keyfields, just return a simple
+        ## where clause.
+        if {[llength $myKeyfield] < 2} {
+            return " WHERE $myKeyfield = [makeDBFieldValue $table $myKeyfield $myKey]"
         }
 
-        return [format " WHERE %s;" [join $keyvalue_conditions " AND "]]
+        # multiple fields, construct it as a where-and
+        set req " WHERE 1 = 1"
+        foreach field $myKeyfield key $myKey {
+            append req " AND $field = [makeDBFieldValue $table $field $key]"
+        }
+        return $req
     }
 
     ##

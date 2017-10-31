@@ -26,10 +26,8 @@ package provide form 2.1
     constructor {args} {
         # set the form method to be a post and the action to be
         # a refetching of the current page
-        set arguments(method) POST
-        if {[catch {set arguments(action) [::rivet::env DOCUMENT_URI]}]} { 
-            set arguments(action) ""
-        }
+        set arguments(method) post
+        set arguments(action) [::rivet::env DOCUMENT_URI]
 
         # use $this for the type for form-global stuff like form arguments
         import_data form $this arguments $args
@@ -122,7 +120,7 @@ package provide form 2.1
         foreach arg [lsort [array names data]] {
             append string " $arg=\"$data($arg)\""
         }
-        return [string trimleft $string]
+        return $string
     }
 
     #

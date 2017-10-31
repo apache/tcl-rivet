@@ -24,12 +24,19 @@
 #include <httpd.h>
 #include <apr_strings.h>
 #include "mod_rivet.h"
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "mod_rivet_common.h"
 #include "mod_rivet_cache.h"
 #include "worker_prefork_common.h"
 
-extern mod_rivet_globals* module_globals;
-extern apr_threadkey_t*   rivet_thread_key;
+extern DLLIMPORT mod_rivet_globals* module_globals;
+extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+extern DLLIMPORT module rivet_module;
 
 extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
 
