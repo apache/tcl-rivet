@@ -1,3 +1,8 @@
+2017-11-06 Massimo Manghi <mxmanghi@apache.org>
+    * tests/virtualhost.test,channel.test: fixed <VirtualHost ...>
+    stanzas that caused these tests to fail in certain cases because
+    the Host: header wasn't interpreted correctly
+
 2017-10-29 Massimo Manghi <mxmanghi@apache.org>
     * win/: removing obsolete directory for windows support
     * rivet/init.tcl: recreated from init.tcl.in
