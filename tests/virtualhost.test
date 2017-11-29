@@ -7,12 +7,12 @@ set docroot2 [file join [pwd] docroot2]
 
 set vhostconf {
     #NameVirtualHost 127.0.0.1
-    <VirtualHost 127.0.0.1>
+    <VirtualHost *>
         DocumentRoot $docroot1
         ServerName vhost1
     </VirtualHost>
 
-    <VirtualHost 127.0.0.1>
+    <VirtualHost *>
         DocumentRoot $docroot2
         ServerName vhost2
     </VirtualHost>
@@ -41,12 +41,12 @@ set vhostconf {
         RivetServerConf SeparateVirtualInterps off
         RivetServerConf ChildInitScript "source [file join $docroot1 childinit.tcl]"
         #NameVirtualHost 127.0.0.1
-        <VirtualHost 127.0.0.1>
+        <VirtualHost *>
             DocumentRoot $docroot1
             ServerName vhost1
         </VirtualHost>
 
-        <VirtualHost 127.0.0.1>
+        <VirtualHost *>
             RivetServerConf ChildInitScript "source [file join $docroot2 childinit.tcl]"
             DocumentRoot $docroot2
             ServerName vhost2
@@ -68,12 +68,12 @@ set vhostconf {
     set data {}
     apachetest::start {} {
 	#NameVirtualHost 127.0.0.1
-	<VirtualHost 127.0.0.1>
+	<VirtualHost *>
         DocumentRoot $docroot1
         ServerName vhost1
 	</VirtualHost>
 
-	<VirtualHost 127.0.0.1>
+	<VirtualHost *>
         RivetServerConf ChildInitScript "source [file join $docroot2 childinit.tcl]"
         DocumentRoot $docroot2
         ServerName vhost2
@@ -98,12 +98,12 @@ set vhostconf {
     apachetest::start {} {
 	RivetServerConf BeforeScript "source [file join $docroot1 beforescript.tcl]"
 	#NameVirtualHost 127.0.0.1
-	<VirtualHost 127.0.0.1>
+	<VirtualHost *>
 	DocumentRoot $docroot1
 	ServerName vhost1
 	</VirtualHost>
 
-	<VirtualHost 127.0.0.1>
+	<VirtualHost *>
 	RivetServerConf BeforeScript "source [file join $docroot2 beforescript.tcl]"
 	DocumentRoot $docroot2
 	ServerName vhost2
@@ -129,13 +129,13 @@ set vhostconf {
     apachetest::start {} {
         RivetServerConf SeparateVirtualInterps on
         #NameVirtualHost 127.0.0.1
-        <VirtualHost 127.0.0.1>
+        <VirtualHost *>
             RivetServerConf ChildInitScript "set ::childinit1 1"
             DocumentRoot $docroot1
             ServerName vhost1
         </VirtualHost>
 
-        <VirtualHost 127.0.0.1>
+        <VirtualHost *>
             RivetServerConf ChildInitScript "set ::childinit2 1"
             DocumentRoot $docroot2
             ServerName vhost2
@@ -174,12 +174,12 @@ foreach {conf file re1 re2} $configs {
 RivetServerConf SeparateVirtualInterps off
 RivetServerConf $conf \"source [file join $docroot1 $file]\"
 #NameVirtualHost 127.0.0.1
-<VirtualHost 127.0.0.1>
+<VirtualHost *>
 DocumentRoot $docroot1
 ServerName vhost1
 </VirtualHost>
 
-<VirtualHost 127.0.0.1>
+<VirtualHost *>
 RivetServerConf $conf \"source [file join $docroot2 $file]\"
 DocumentRoot $docroot2
 ServerName vhost2
@@ -215,12 +215,12 @@ foreach {conf file re1 re2} $configs {
 RivetServerConf SeparateVirtualInterps on
 RivetServerConf $conf \"source [file join $docroot1 $file]\"
 #NameVirtualHost 127.0.0.1
-<VirtualHost 127.0.0.1>
+<VirtualHost *>
 DocumentRoot $docroot1
 ServerName vhost1
 </VirtualHost>
 
-<VirtualHost 127.0.0.1>
+<VirtualHost *>
 RivetServerConf $conf \"source [file join $docroot2 $file]\"
 DocumentRoot $docroot2
 ServerName vhost2
