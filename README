@@ -23,13 +23,10 @@ to the client
 			    RIVET NAMESPACE
 			    ===============
 
- - With the intruduction of the Rivet namespace the command set has been
-moved into '::rivet' and should now be fully qualified. Commands are exported
-though and can be imported in the global namespace, but whenever possible this
-is deprecated.  Putting the following code in the Server Conf should guarantee
-compatibility with existing scripts
-
-RivetServerConf	    ServerInitScript	"package require rivet"
-RivetServerConf	    ServerInitScript	"package require rivetlib"
-RivetServerConf	    ServerInitScript	"namespace import --force ::rivet::*"
+ - With the intruduction of the ::rivet namespace the command set has been
+moved into it and each command should now be fully qualified. 
+Building rivet you can choose in case to place the commands on the export 
+list or even automatically import them into the global namespace. This
+is a deprecated option though unless you have a compatibility issue
+with existing legacy Rivet based code.
 

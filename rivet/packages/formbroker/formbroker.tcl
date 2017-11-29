@@ -3,7 +3,8 @@
 # Form validation and sanitation tool. Kindly donated by
 # Karl Lehenbauer (Flightaware.com)
 #
-
+# Copyright 2017 The Rivet Team
+#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
