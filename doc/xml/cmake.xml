@@ -5,8 +5,8 @@
 				Starting with &version; Rivet has adopted <ulink href="http://cmake.org/">CMake</ulink>
 				as an alternate build system. The choice of introducing CMake was motivated by the
 				need of an easy to use and reliable build system for Windows installations. Nonetheless
-				the usability of 	CMake is by no means restricted to that OS and user familiar with this
-				alternative can adopt it to build mod_rivet also on Linux and other systems. 
+				the usability of CMake is by no means restricted to that OS and user familiar with this
+				tool set can adopt it to build mod_rivet also on Linux and other systems. 
 				The current CMake script requires CMake 3.2 or later. 
 				The <ulink href="https://cmake.org/documentation/">CMake documentation</ulink>
 				page has a complete reference of CMake features

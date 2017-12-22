@@ -27,7 +27,7 @@
     		MPM (Multi Processing Module) which assumes the OS to have 'fork' capabilities.
     		This prerequisite basically restricted mod_rivet to work only with
     		Unix-like operative systems. Starting with version 3.0 we reorganized
-    		mod_rivet to offer a design that could fit with different MPM and
+    		mod_rivet to offer a design that could work together with more MPM and
     		hopefully pave the way to support different OS that have no 'fork'
     		call. At the same time we tried to preserve some of the basic
     		features of mod_rivet when working with the prefork MPM, chiefly the feature of

@@ -34,7 +34,7 @@
 	    </para>
 	    <orderedlist>
 	    	<listitem>
-	    		<bridgehead>Single Process Initialization</bridgehead>
+	    		<bridgehead>Server Initialization</bridgehead>
 	    		<para>
                Apaches starts up as a single process. During this stage Apache performs 
                various preliminary tasks including reading and parsing the configuration. 
@@ -83,6 +83,12 @@
 	    			<note>
 	    				<command>GlobalInitScript</command> has no effect to working interpreters
 	    				when <command>SeparateVirtualInterps</command> is set.
+	    			</note>
+	    			<note>
+	    				The lazy MPM bridge implements a model where
+	    				every worker thread has exactly one interpreter and belongs to 
+	    				a single virtual host, therefore <command>SeparateVirtualInterps</command>
+	    				is ignored and you can't share the same interpreter among virtual host
 	    			</note>
 	    		</para>
 	    	</listitem>

@@ -6,44 +6,52 @@
     </para>
     <itemizedlist>
 
-      <listitem>
+      <!-- listitem>
 			<para>
 				commserver is a package providing a server that can be
 				used for IPC.  Still experimental.  Requires the comm package
 				from tcllib.
 			</para>
-      </listitem>
+      </listitem -->
 
       <listitem>
 			<para>dio is a database abstraction layer.</para>
       </listitem>
 
-      <listitem>
+      <!-- listitem>
 			<para>
 				dtcl is a compatibility package for mod_dtcl
 				applications.
 			</para>
-      </listitem>
+      </listitem -->
 
       <listitem>
 	   	<para>form - for creating forms.</para>
       </listitem>
 
-      <listitem>
+      <!-- listitem>
 			<para>rivet - some additional, useful routines.</para>
-      </listitem>
+      </listitem -->
 
-      <listitem>
+      <!-- listitem>
 			<para>tclrivet</para>
-      </listitem>
+      </listitem -->
       
       <listitem>
 			<para>calendar - a package providing a simple configurable calendar generator</para>
       </listitem>
       
+		<listitem>
+			<para>rivet entities - an UTF-8 / HTML entities converter</para>
+		</listitem> 
+      
       <listitem>
 			<para>formbroker - a form data validators broker</para>
       </listitem>
-      
+
+      <listitem>
+			<para>ASCII Glyphs - prints most of the ASCII character set as large ASCII art glyphs</para>
+      </listitem>
+
     </itemizedlist>
   </section>
