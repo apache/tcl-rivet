@@ -1,3 +1,9 @@
+2017-12-29 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml.in: more entities to extend documentation
+    * doc/xml/intro.xml: introduction revised and extended
+    * doc/xml-2: files used to generate the manual removed or moved into doc/xml
+    * doc/rivet.css: changed color palette
+
 2017-12-22 Massimo Manghi <mxmanghi@apache.org>
     * doc/: more changes to manual pages
 

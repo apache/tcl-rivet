@@ -19,7 +19,7 @@
 				globally (either to the whole Rivet installation or a	single 
 				<ulink url="&apachedoc-vhost;">virtual host</ulink>)
 				</listitem>
-			</itemizedlist>	      
+			</itemizedlist>
 	      
 			These directives are applied so that RivetDirConf will
 	      override RivetUserConf, which in turn overrides any 
@@ -89,10 +89,9 @@
 				</term>
 				<listitem>
 					<para>
-						The execution of a can be interrupted by
-						invoking <xref linkend="abort_page" />. If  
-						an <option>AbortScript</option> is defined for the page
-						being generated, control is passed to it. <option>AbortScript</option>
+						If an <option>AbortScript</option> is defined control is passed to it as
+						soon as the command <xref linkend="abort_page" /> is called.
+						<option>AbortScript</option>
 						is the right place where specific actions can be taken
 						to catch resources left dangling by the sudden interruption.				
 					</para>
@@ -106,7 +105,6 @@
 					  <arg><replaceable>script</replaceable></arg>
 					</cmdsynopsis>
 		      </term>
-	
    			<listitem>
 					<para>
 					  Script to be called after each parsed .rvt template or .tcl script

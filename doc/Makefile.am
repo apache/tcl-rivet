@@ -25,14 +25,14 @@ EXAMPLES_SGML:=$(wildcard examples-sgml/*.*)
 EXAMPLES:=$(wildcard examples/*.*)
 
 # English, multiple files.
-$(buildir)/html/index.html: $(srcdir)/rivet.xml $(srcdir)/rivet-chunk.xsl $(srcdir)/rivet.xsl $(srcdir)/xml-2/*.xml
+$(buildir)/html/index.html: $(srcdir)/rivet.xml $(srcdir)/rivet-chunk.xsl $(srcdir)/rivet.xsl $(srcdir)/xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css \
 	--stringparam html.ext ".html" \
 	--stringparam chunker.output.encoding UTF-8  \
 	--nonet -o $(builddir)/html/ $(srcdir)/rivet-chunk.xsl $(srcdir)/rivet.xml
 
 # English, one big file.
-$(buildir)/html/rivet.html: $(srcdir)/rivet.xml $(srcdir)/rivet-nochunk.xsl $(srcdir)/rivet.xsl $(srcdir)/xml-2/*.xml
+$(buildir)/html/rivet.html: $(srcdir)/rivet.xml $(srcdir)/rivet-nochunk.xsl $(srcdir)/rivet.xsl $(srcdir)/xml/*.xml
 	xsltproc --stringparam html.stylesheet rivet.css \
 	--stringparam html.ext ".html" \
 	--stringparam chunker.output.encoding UTF-8  \

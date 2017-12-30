@@ -1,6 +1,7 @@
 BODY
 {
         font-family: verdana;
+        background-color: #fbfcfc;
 }
 
 DIV.ABSTRACT
@@ -30,14 +31,14 @@ PRE.PROGRAMLISTING
         font-family: monospace;
         white-space: pre;
         width:  95%;
-        background-color: #ffeeee;
+        background-color: #e8ecf2;
         border: solid;
         color:  #000000;
-        border-color: #990099;
-        border-left: solid #990099 1px;
-        border-right: solid #990099 1px;
-        border-top: solid #990099 1px;
-        border-bottom: solid #990099 1px;
+        border-color: #a3b1bc;
+        border-left: solid #a3b1bc 1px;
+        border-right: solid #a3b1bc 1px;
+        border-top: solid #a3b1bc 1px;
+        border-bottom: solid #a3b1bc 1px;
         font-size:  normal;
         padding-top:    1em;
         padding-left:   1em;
@@ -47,8 +48,8 @@ PRE.PROGRAMLISTING
 H1
 {
         color: #ffffff;
-        border: solid 3px #a0a0d0;
-        background-color: #606090;
+        border: solid 3px #1d252b;
+        background-color: #a3b1bc;
         font-variant: small-caps;
         width: 100%;
 }
@@ -56,8 +57,8 @@ H1
 H1.TITLE
 {
         color: #ffffff;
-        border: solid 3px #a0a0d0;
-        background-color: #606090;
+        border: solid 3px #1d252b;
+        background-color: #a3b1bc;
         font-variant: small-caps;
         width: 100%;
 }
@@ -81,8 +82,8 @@ H2
 {       
         COLOR: #ffffff ;
         font-style: italic;
-        BACKGROUND-color: #d0a0a0;
-        BORDER: solid 3px #906060;
+        border: solid 3px #1d252b;
+        background-color: #a3b1bc;
         PADDING: 0.5em;
 }
 
@@ -121,7 +122,6 @@ TABLE.WARNING
         font-style:italic;
         font-weight: bold;
         border: ridge 4px #ff0000;
-        
         width: 70%;
         margin-left: 15%;       
 }
@@ -137,10 +137,10 @@ DIV.VARIABLELIST {
 .VARLISTENTRY {
         font-weight: bold;
         margin-top: 10px;
-        COLOR: #ffffff ;
-        BACKGROUND-color: #a0a0d0;
-        BORDER: solid 1px #606090;
-        PADDING: 1px
+        color: #ffffff ;
+        background-color: #e8ecf2;
+        border: solid 1px #a3b1bc;
+        padding: 1px
 }
 
 /*
@@ -253,38 +253,38 @@ DIV.imagelink  a[href^="http:"]:hover {
 
 
 P.C2 {
-        COLOR: #ffffff ;
-        BACKGROUND-color: #a0a0d0;
-        BORDER: solid 1px #606090;
-        PADDING: 1px
+    COLOR: #ffffff ;
+    BACKGROUND-color: #a0a0d0;
+    BORDER: solid 1px #606090;
+    PADDING: 1px
 }
 
 
 DIV.NAVFOOTER {
         color: #000000;
-        background-color: #FFDFDF;
+        background-color: #e8ecf2;
         padding: 5px;
         margin-top: 10px;
         width: 100%;
-        border: 2px solid #d0a0a0;
+        border: 2px solid #a3b1bc;
 }
 
 DIV.NUKEFOOTER {
         color: #000000;
-        background-color: #B0E0E6;
+        background-color: #e8ecf2;
         padding: 5px;
         margin-top: 10px;
         width: 100%;
-        border: thin solid #a0a0d0;
+        border: thin solid #a3b1bc;
 }
 
 DIV.NAVHEADER {
         color: #000000;
-        background-color: #FFDFDF;
+        background-color: #e8ecf2;
         padding: 5px;
         margin-bottom: 10px;
         width: 100%;
-        border: 2px solid #d0a0a0;
+        border: 2px solid #a3b1bc;
 }
 
 DIV.SECT1,DIV.SECT2,DIV.SECT3 {
@@ -292,11 +292,11 @@ DIV.SECT1,DIV.SECT2,DIV.SECT3 {
 }
 
 DIV.EXAMPLE,DIV.TOC {
-        border: thin dotted #70AAE5;
+        border: thin dotted #4e5f6e;
         padding-left: 10px;
         padding-right: 10px;
         color: #000000;
-        background-color: #FFE8E8;
+        background-color: #e8ecf2;
 }
 DIV.EXAMPLE {
         border: thin dotted #22AA22;
@@ -363,7 +363,7 @@ table.directives {
 }
 
 .directives tbody tr > :last-child {
-   text-decoration:    	none;
+   text-decoration:    	    none;
    font-weight: 			normal;
 	font-size: 				small;
 	border-left:			1px solid black;
@@ -371,14 +371,14 @@ table.directives {
 }
 
 .directives tbody tr td {
-   text-align:         center;
-   text-decoration:    none;
-   font-weight: 			normal;
-	padding-left:			1em;
+   text-align:          center;
+   text-decoration:     none;
+   font-weight: 		normal;
+	padding-left:		1em;
 	padding-right: 		1em;
-	padding-bottom: 		4px;
-	padding-top: 			4px;
-	border-bottom:			1px solid black;
+	padding-bottom: 	4px;
+	padding-top: 		4px;
+	border-bottom:		1px solid black;
 }
 
 .note td {

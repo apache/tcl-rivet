@@ -11,10 +11,12 @@
     <!ENTITY upload.rvt	           SYSTEM "examples-sgml/upload.rvt" >
     <!ENTITY download.tcl          SYSTEM "examples-sgml/download.tcl" >
     <!ENTITY rivet_web_service.tcl SYSTEM "examples-sgml/rivet_web_service.tcl" >
-    <!ENTITY request_handler.tcl   SYSTEM "../rivet/default_request_handler.tcl">
+    <!ENTITY myapp_request_handler.tcl SYSTEM "examples-sgml/myapp_request_handler.tcl" >
+    <!ENTITY myrivetapp.tcl        SYSTEM "examples-sgml/myrivetapp.tcl" >
+    <!ENTITY request_handler.tcl   SYSTEM "../rivet/default_request_handler.tcl" >
     <!ENTITY intro.xml             SYSTEM "xml/intro.xml" >
     <!ENTITY install.xml           SYSTEM "xml/installation.xml" >
-    <!ENTITY cmake.xml             SYSTEM "xml/cmake.xml">
+    <!ENTITY cmake.xml             SYSTEM "xml/cmake.xml" >
     <!ENTITY directives.xml        SYSTEM "xml/directives.xml" >
     <!ENTITY commands.xml          SYSTEM "xml/commands.xml" >
     <!ENTITY examples.xml          SYSTEM "xml/examples.xml" >
@@ -42,6 +44,9 @@
     <!ENTITY apache-url            "http://httpd.apache.org" >
     <!ENTITY apachedoc-vhost       "https://httpd.apache.org/docs/2.4/vhosts" >
     <!ENTITY apachedoc-mpm	        "https://httpd.apache.org/docs/2.4/mpm.html" >
+    <!ENTITY apachedoc-docroot     "https://httpd.apache.org/docs/2.4/mod/core.html#documentroot" >
+    <!ENTITY apachedoc-alias		  "https://httpd.apache.org/docs/2.4/mod/mod_alias.html" >
+    <!ENTITY apachedoc-rewrite     "https://httpd.apache.org/docs/2.4/mod/mod_rewrite.html" >
 ]>
 
 <!--

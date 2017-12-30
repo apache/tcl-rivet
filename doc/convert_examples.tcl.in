@@ -42,13 +42,14 @@ foreach example $source_examples {
     if {!$example_sgml_exists || \
         ([file mtime $example] > [file mtime $example_sgml])} { 
 
-        puts "$example needs to be escaped"
+        puts -nonewline "$example needs to be escaped..."
         
         set example_text [string trim [::rivet::read_file $example]]
 
         set example_sgml_fid [open $example_sgml w+]
         puts $example_sgml_fid [::rivet::escape_sgml_chars $example_text]
         close $example_sgml_fid
+        puts "done"
     }
 
 }

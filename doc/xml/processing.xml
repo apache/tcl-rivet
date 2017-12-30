@@ -15,23 +15,27 @@
 			scripts can break because of coding errors (thus triggering the
 			ErrorScript execution) or it can deliberately interrupt 
 			ordinary execution by calling ::rivet::abort_page (triggering
-			the execution of an AbortScript. This scheme is in case 
-			terminated a further configurable script (AfterEveryScript).
+			the execution of a script defined by the directive AbortScript). 
+			This scheme is in case 
+			terminated by a further configurable script (AfterEveryScript).
 			In mod_rivet &version2-generic; module series 
 			this model of request handling was coded within
-			the module. 
+			the module mod_rivet.so itself. 
 		</para>
 		<para>
  			With Rivet &version30; we changed this approach and landed to
  			a new much simpler and flexible model where each request is 
  			by default handled by the following Tcl procedure
 		</para>
+
 		<programlisting>&request_handler.tcl;</programlisting>
+
 		<para>
 			Note the call to new &version30; command ::rivet::url_script
 			that returns the body of the Tcl script or Rivet template
 			pointed by the URL. 
 		</para>
+		
 		<para>
 			This procedure emulates the &version2-generic; scheme
 			and as such works as a fully compatible request handling
@@ -42,12 +46,12 @@
 		<note>
 			Note that if you redefine the core request handler
 			you'll need to handle yourself any error conditions
-			and any code interruption caused by calls to::rivet::abort_page.
+			and any code interruption brought about by calling 
+			<command>::rivet::abort_page</command>.
 			The current procedure might work as a template to be
 			reworked and used as a template to develop your own
 			request handler.
 		</note>
-
 	</section>
 	
 	<section>
@@ -69,43 +73,7 @@
 			the application class is defined and an instance of it is
 			created in the global namespace. 
 		</para>
-		<programlisting># myrivetapp.tcl -- 
-#
-# Application class definition and instance creation
-#
-
-package require Itcl
-
-::itcl::class MyRivetApp {
-
-   private variable application_name
-
-   public method init {}
-   public method request_processing {urlencoded_args}
-
-}
-
-::itcl::body MyRivetApp::init {app_name}{
-
-   # any initialization steps must go here
-   # ....
-	
-   set application_name $app_name	
-	
-}
-
-::itcl::body MyRivetApp::request_processing {urlencoded_args} {
-
-   # the whole application code will run from this method
-   ...
-
-}
-
-set ::theApplication [MyRivetApp #auto]
-
-$::theApplication init [dict get [::rivet::inspect server] hostname]
-
-# -- myrivetapp.tcl </programlisting>
+		<programlisting>&myrivetapp.tcl;</programlisting>
 		<para>
 			which provides a very basic interface for both initialization
 			and request processing. Such script will be sourced into the
@@ -123,58 +91,14 @@ $::theApplication init [dict get [::rivet::inspect server] hostname]
 			and how the method MyRivetApp::request_processing will
 			be called with appropriate arguments
 		</para>
-		<programlisting># -- myapp_request_handler.tcl
-#
-# This script will be read by mod_rivet at the thread initialization
-# stage and its content stored in a Tcl_Obj object. This object will
-# be evaluated calling Tcl_EvalObjExe
-#
-
-::try {
-
-    ::theApplication request_processing [::rivet::var_qs all]
-
-} trap {RIVET ABORTPAGE} {err opts} {
-	 
-    switch [::rivet::abort_code] {
-	   code1 {
-		   # handling abort_page with code1
-		   ....
-	   }
-	   code2 {
-		   # handling abort_page with code2
-	      ....		
-	   }
- 	   ....
- 	   default {
-         # default abort handler	 	
- 	   }
-   }
-
-} trap {RIVET THREAD_EXIT} {err opts} {
-    
-    # myApplication sudden exit handler
-    ...
-
-} on error {err opts} {
-
-    # myApplication error handler
-    ...
-
-} finally {
-
-    # request processing final elaboration
-    
-}
-
-# -- myapp_request_handler.tcl</programlisting>
+		<programlisting>&myapp_request_handler.tcl;</programlisting>
 	</section>
 	<para>
 		Finally we have to tell mod_rivet to run this script when a
 		request is delivered to myApplication and we do so
 		using the &version30; directive <command>RequestHandler</command> 
 	</para>
-<programlisting>&lt;IfModule rivet_module&gt;
+	<programlisting>&lt;IfModule rivet_module&gt;
     RivetServerConf ChildInitScript "source myrivetapp.tcl"
     RivetServerConf RequestHandler  "myapp_request_handler.tcl"
 &lt;/IfModule&gt;</programlisting>
