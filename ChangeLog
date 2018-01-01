@@ -1,3 +1,7 @@
+2017-01-01 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/: more error checking and several improvements to
+    the manual
+
 2017-12-29 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xml.in: more entities to extend documentation
     * doc/xml/intro.xml: introduction revised and extended

@@ -173,8 +173,14 @@
 	</simplesect>
 	<simplesect>
 		<title>Tcl Namespaces in Rivet and the <command>::request</command> Namespace</title>
+		<note>
+			This paragraph applies to the standard mod_rivet way of handling requests. This 
+			method is explained in the <xref linkend="processing">request processing</xref>. 
+			If you write your own processing root procedure you have entire 
+			freedom on how to manage namespaces of your applications
+		</note>
 		<para>
-			With the sole exception of .rvt templates, Rivet runs pure Tcl scripts 
+			With the sole exception of .rvt templates, mod_rivet runs pure Tcl scripts 
 			at the global namespace. That means that every variable or procedure 
 			created in Tcl scripts resides by default in the 
 			"::" namespace (just like in traditional Tcl scripting) and they

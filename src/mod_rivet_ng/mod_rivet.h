@@ -80,13 +80,15 @@
 #define USER_CONF_MERGED(mc)    ((mc->user_scripts_status & USER_SCRIPTS_MERGED) != 0)
 
 /* IMPORTANT: If you make any changes to the rivet_server_conf struct,
- * you need to make the appropriate modinficationus to Rivet_CopyConfig,
+ * you need to make the appropriate modifications to Rivet_CopyConfig,
  * Rivet_CreateConfig, Rivet_MergeConfig and so on. */
 
 /*
  * Petasis 10 Aug 2017: This causes the symbol to be exported also from MPMs...
-module AP_MODULE_DECLARE_DATA rivet_module;
- */
+
+   module AP_MODULE_DECLARE_DATA rivet_module;
+ 
+*/
 
 typedef struct _rivet_server_conf {
 

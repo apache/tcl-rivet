@@ -23,7 +23,7 @@
     	</para>
     	<para>
     		From the very beginning mod_rivet was designed to work with
-    		the  <ulink url="http://httpd.apache.org/docs/2.4/mod/prefork.html">prefork MPM</ulink>
+    		the  <ulink url="&apachedoc-prefork;">prefork MPM</ulink>
     		MPM (Multi Processing Module) which assumes the OS to have 'fork' capabilities.
     		This prerequisite basically restricted mod_rivet to work only with
     		Unix-like operative systems. Starting with version 3.0 we reorganized
@@ -281,7 +281,6 @@
     /* we have to get the thread private data */
     
     THREAD_PRIVATE_DATA(private)
-    ....
 
 	/* if ::rivet::mycmd works within a request processing we have
 	 * to check if 'private' is bringing a non null request_rec pointer
@@ -289,10 +288,9 @@
     
     CHECK_REQUEST_REC(private,"::rivet::mycmd");
     ....
+    
+    return TCL_OK;
 }</programlisting>
-				In <command>Rivet_InitCore</command> define the new command and its handler
-<programlisting>RIVET_OBJ_CMD ("mycmd",Rivet_MyCmd,private);</programlisting>
-				notice the argument is the command name defined without the namespace qualification
             </listitem>
             <listitem>
                 Add a test for this command in <option>tests/checkfails.tcl</option>. For 
