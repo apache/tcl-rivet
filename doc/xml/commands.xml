@@ -1369,24 +1369,23 @@ bab</programlisting>
 		  Create a self referencing URL from a filename. <command>makeurl</command>
 		  can be used in three ways
 		  <itemizedlist> 
-		    <listitem> No argument is passed to the command (returns the current script URL)</listitem>
+		    <listitem>With no arguments the current script URL is returned</listitem>
 		    <listitem> 
-					A relative style path is passed (returns the argument prepended with the
-					current script's URL
+					The argument is a relative path: the command returns 
+					the argument prefixed with the current script's URL
 		    </listitem>
 		    <listitem> 
-					An absolute path is passed to the command: (returns the full URL to the
-					resource)
+					The argument is an absolute path: the full URL to the resource is returned
 		    </listitem>
-
 		  </itemizedlist>
 		</para>
 		<para>
-		    Example of absolute path: <programlisting>::rivet::makeurl /tclp.gif</programlisting> returns
+		    Example with an absolute path:
+		    <programlisting>::rivet::makeurl /tclp.gif</programlisting> returns
 		    <computeroutput>http://[hostname]:[port]/tclp.gif</computeroutput>.
 		    where hostname and port are the hostname and port of the
-		    server in question. The protocol prefix is inferred from the protocol in the URL referencing the
-		    script.
+		    server in question. The protocol prefix is inferred from the protocol
+		    in the URL referencing the script.
 		</para>
 	    </refsect1>
 	</refentry>

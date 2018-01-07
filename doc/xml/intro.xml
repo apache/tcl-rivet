@@ -75,9 +75,9 @@
 		</para>
 		
 		<para>
-			Rivet &version; supports a new <link linkend="request">request processing scheme</link> 
-			entirely based on Tcl. By default rivet &version; provide compatiblity with the 
-			version 2.x scheme to handle a request but this can be entirely overridden by
+			Rivet &version; implements a new <link linkend="request">request processing scheme</link> 
+			entirely based on Tcl. By default rivet &version; provides compatiblity with the 
+			version &version2-generic; scheme to handle a request but this can be entirely overridden by
 			the developer replacing the central request handling procedure. See the 
 			<link linkend="request">request processing</link> page for further reading 
 		</para>
