@@ -5,7 +5,8 @@
     DNS related problem)
     * doc/xml/intro.xml: add ackowledgements to George
     * win/: old Windows scripts removed
-   
+    * src/mod_rivet: old mod_rivet code removed
+
 2018-01-01 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/: more error checking and several improvements to
     the manual
