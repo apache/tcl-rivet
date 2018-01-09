@@ -1,4 +1,11 @@
-2017-01-01 Massimo Manghi <mxmanghi@apache.org>
+2018-01-09 Massimo Manghi <mxmanghi@apache.org>
+    * tests/virtualhost.test,tests/channel.test: changed
+    virtual hosts declarations. Now accepting '*' as host
+    name prevents test from failing with certain set ups (a
+    DNS related problem)
+    * doc/xml/intro.xml: add ackowledgements to George
+    
+2018-01-01 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/: more error checking and several improvements to
     the manual
 

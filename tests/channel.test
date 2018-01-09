@@ -6,13 +6,13 @@ foreach {sep_channel offset_value} {On 0 Off 1} {
 	apachetest::start {} "
 RivetServerConf SeparateVirtualInterps  On
 RivetServerConf SeparateChannels        $sep_channel
-NameVirtualHost 127.0.0.1
-<VirtualHost 127.0.0.1>
+#NameVirtualHost 127.0.0.1
+<VirtualHost *>
     ServerName vhost1
     RivetServerConf ChildInitScript \"fconfigure stdout -buffersize 8192\"
 </VirtualHost>
 
-<VirtualHost 127.0.0.1>
+<VirtualHost *>
     ServerName vhost2
     RivetServerConf ChildInitScript \"fconfigure stdout -buffersize 16384\"
 </VirtualHost>

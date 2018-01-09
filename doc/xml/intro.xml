@@ -82,4 +82,10 @@
 			<link linkend="request">request processing</link> page for further reading 
 		</para>
     </simplesect>
+    <simplesect>
+    	<title>Acknowledgements</title>
+    	<para>This version of Rivet received substantial contributions from George Petasis who solved
+    	several problems with the threaded code, improved the code in several ways and made the CMake
+    	based build scripts</para>
+    </simplesect>
 </section>

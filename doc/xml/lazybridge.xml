@@ -14,15 +14,14 @@
 			resource management. 
    	</para>
    	<para>
-   		The Apache HTTP web server demands its module to
+   		The Apache HTTP web server demands its modules to
    		run with any MPM irrespective of its internal architecture and its
    		a general design constrain to make no assumptions about the MPM. 
-   		Unfortunately for Tcl is a relevant fact to be running as only execution
-   		thread within a process (like with the 'prefork' MPM) 
-   		or within one of many execution threads. First of all Tcl is itself 
-   		threaded (unless threads are disabled at compile time) and many
-   		of the basic Tcl data structures (namely Tcl_Obj) cannot be safely 
-   		shared among threads. This demands that Tcl interpreters run 
+   		This clashes with some requirements of threaded builds of Tcl. 
+   		First of all Tcl is itself threaded (unless threads are disabled 
+   		at compile time) and many of the basic Tcl data structures (namely Tcl_Obj) 
+   		cannot be safely shared among threads. 
+   		This demands a Tcl interpreters be run 
    		on separated threads communicating with the HTTP web server 
    		through suitable methods.
    	</para>
@@ -32,7 +31,7 @@
     <para>
 	   The lazy bridge was initially developed to outline the basic tasks
     	carried out by each function making a rivet MPM bridge. 
-    	The lazy bridge attempts to be minimalistic
+    	The lazy bridge attempts to be minimalist
     	but it's nearly fully functional, only a few configuration
     	directives (SeparateVirtualInterps and SeparateChannel)
     	are ignored because fundamentally incompatible. 
@@ -86,8 +85,8 @@ typedef struct mpm_bridge_status {
     vhost*              vhosts;             /* array of vhost descriptors          */
 } mpm_bridge_status;</programlisting>
 	<para>
-		By design the bridge must create exactly one instance of this structure and store the pointer
-		to it in <command>module_globals->mpm</command>. This is usually done
+		By design the bridge must create exactly one instance of this structure and store its pointer
+		in <command>module_globals->mpm</command>. This is usually done
 		at the very beginning of the child init script function pointed by 
 		<command>mpm_child_init</command> in
 		the <command>rivet_bridge_table</command> structure. For the lazy bridge this field
