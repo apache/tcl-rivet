@@ -1,3 +1,6 @@
+2018-01-15 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/install.xml: fixed broken links
+
 2017-11-06 Massimo Manghi <mxmanghi@apache.org>
     * tests/virtualhost.test,channel.test: fixed <VirtualHost ...>
     stanzas that caused these tests to fail in certain cases because

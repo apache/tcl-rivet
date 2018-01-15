@@ -12,11 +12,11 @@
         <para>
             Currently there is no way to run Apache Rivet 2.3 on Windows&copy; because            
             Rivet currently requires the 
-            <ulink url="http://httpd.apache.org/docs/2.2/mod/prefork.html">prefork</ulink>, which
+            <ulink url="http://httpd.apache.org/docs/2.4/mod/prefork.html">prefork</ulink>, which
             is supported only on Unix/Linux systems. Efforts are under way to extend the support to the 
-            <ulink url="http://httpd.apache.org/docs/2.2/mod/worker.html">worker</ulink> 
+            <ulink url="http://httpd.apache.org/docs/2.4/mod/worker.html">worker</ulink> 
             and the
-            <ulink url="http://httpd.apache.org/docs/2.2/mod/mpm_winnt.html">winnt</ulink> MPMs.
+            <ulink url="http://httpd.apache.org/docs/2.4/mod/mpm_winnt.html">winnt</ulink> MPMs.
             Check our
             <ulink url="http://tcl.apache.org/rivet/html/about.html">development mailing list</ulink>
             for the latests updates about Rivet development
