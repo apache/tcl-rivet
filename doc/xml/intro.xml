@@ -43,7 +43,7 @@
         		modular itself, introducing the MPM-module bridge concept.
         		We developed a set of loadable modules 
         		which are supposed not only to overcome the issues related to threading but also
-        		the best possible MPM mod_rivet integration.
+        		to offer the best possible MPM mod_rivet integration.
         		As a side effect of this modular design mod_rivet is not only able to integrate
         		with its environment but also to work as a framework for writing more MPM bridges
         		designed along different multi-threading schemes and workload management models. 
