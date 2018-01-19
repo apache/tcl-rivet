@@ -92,14 +92,68 @@ typedef struct mpm_bridge_status {
 		the <command>rivet_bridge_table</command> structure. For the lazy bridge this field
 		in the jump table points to <command>Lazy_MPM_ChildInit</command>
 	</para>
-	<programlisting>void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+	<programlisting>/*
+ * Lazy_MPM_ChildInit
+ * 
+ * child process initialization. This function prepares the process
+ * data structures for virtual hosts and threads management
+ *
+ */
+
+void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
-    ...
- 	  
-    module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
-    
-    ....
+    apr_status_t    rv;
+    server_rec*     s;
+    server_rec*     root_server = module_globals-&gt;server;
+
+    module_globals-&gt;mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
+
+    /* This mutex is only used to consistently 
+     *
+     *  - set the exit status of a child process (hopefully will be 
+     *    unnecessary when Tcl is able again of calling 
+     *    Tcl_DeleteInterp safely) 
+     *  - control the server_shutdown flag. Actually this is
+     *    not entirely needed because once set this flag 
+     *    is never reset to 0
+     *
+     */
+
+    rv = apr_thread_mutex_create(&amp;module_globals-&gt;mpm-&gt;mutex,
+                                  APR_THREAD_MUTEX_UNNESTED,pool);
+    ap_assert(rv == APR_SUCCESS);
+
+    /* the mpm-&gt;vhosts array is created with as many entries as the number of
+     * configured virtual hosts */
+
+    module_globals-&gt;mpm-&gt;vhosts = 
+        (vhost *) apr_pcalloc(pool,module_globals-&gt;vhosts_count*sizeof(vhost));
+    ap_assert(module_globals-&gt;mpm-&gt;vhosts != NULL);
+
+    /*
+     * Each virtual host descriptor has its own mutex controlling
+     * the queue of available threads
+     */
+     
+    for (s = root_server; s != NULL; s = s-&gt;next)
+    {
+        int                 vh;
+        apr_array_header_t* array;
+        rivet_server_conf*  rsc = RIVET_SERVER_CONF(s-&gt;module_config);
+
+        vh = rsc-&gt;idx;
+        rv = apr_thread_mutex_create(&amp;module_globals-&gt;mpm-&gt;vhosts[vh].mutex,
+                                      APR_THREAD_MUTEX_UNNESTED,pool);
+        ap_assert(rv == APR_SUCCESS);
+        array = apr_array_make(pool,0,sizeof(void*));
+        ap_assert(array != NULL);
+        module_globals-&gt;mpm-&gt;vhosts[vh].array = array;
+        module_globals-&gt;mpm-&gt;vhosts[vh].idle_threads_cnt = 0;
+        module_globals-&gt;mpm-&gt;vhosts[vh].threads_count = 0;
+    }
+    module_globals-&gt;mpm-&gt;server_shutdown = 0;
 }</programlisting>
+
 	</section>
 	<section>
 	 <title>Handling Tcl's exit core command</title> 

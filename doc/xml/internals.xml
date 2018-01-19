@@ -39,7 +39,7 @@
     		loadable modules that are responsible to adapt the module procedural design to
     		a given class of Apache MPMs. This design is open to the development of more
     		MPM bridges coping with different multi-processing models but also to the development of
-    		different approaches to resource consumption and workload balance. By now we have only 2 bridges: 
+    		different approaches to resource consumption and workload balance. By now we have 3 bridges: 
     	</para>
     	<itemizedlist>
     		<listitem>rivet_prefork_mpm.c: a bridge for the prefork MPM</listitem>
@@ -50,7 +50,7 @@
     		started <quote>on demand</quote>. The bridge creates no threads and Tcl interpreters
     		at start up and only when requests come in Tcl execution threads are created.
     		This bridge is explained in detail in the <xref linkend="lazybridge">next section</xref>.     		
-    		Since the resource demand at startup is minimal this bridge should work well on 
+    		Since the resource demand at startup is minimal this bridge should suite 
     		development machines that go through frequent web server restarts.</listitem>
     	</itemizedlist>
     </section>
@@ -133,7 +133,7 @@
 					the <emphasis>worker</emphasis> MPM bridge the finalize function
 					is called after the current thread itself is set up for termination.
 					See function Rivet_ExitCmd in
-					<ulink url="http://svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet/rivetCore.c">rivetCore.c</ulink>
+					<ulink url="https://svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet_ng/rivetCore.c">rivetCore.c</ulink>
 					to have details on how and at what stage this callback is invoked.
 				</listitem>
 				<listitem>
@@ -258,14 +258,14 @@
         <itemizedlist>
             <listitem>
                 Define the command and associated C language procedure
-                in src/rivetcmds/rivetCore.c using the macro
+                in src/mod_rivet_ng/rivetCore.c using the macro
                 <option>RIVET_OBJ_CMD</option>
                 <programlisting>RIVET_OBJ_CMD("mycmd",Rivet_MyCmd,private)</programlisting>
                 This macro ensures the command is defined as <command>::rivet::mycmd</command>
                 and its ClientData pointer is defined with the thread private data
             </listitem>
             <listitem>
-                Add the code of Rivet_MyCmd to src/rivetcmd/rivetCore.c (in case
+                Add the code of Rivet_MyCmd to src/mod_rivet_ng/rivetCore.c (in case
                 the code resides in a different file also src/Makefile.am should be
                 changed to tell the build system how to compile the code and
                 link it into mod_rivet.so)

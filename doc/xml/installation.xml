@@ -6,7 +6,7 @@
             It is known to build and run on various Linux distributions 
             (Debian &amp; Ubuntu, Redhat, SuSE and CentOS), FreeBSD and OpenBSD. For some
             of these Unix-like operative systems 
-            <ulink url="http://tcl.apache.org/rivet/static/download.html">binary packages</ulink> 
+            <ulink url="http://tcl.apache.org/rivet/html/download.html">binary packages</ulink> 
             are already available for download.
         </para>
         <para>
@@ -57,11 +57,11 @@
             </para>
             <para>
             	The 
-            	<ulink href="http://httpd.apache.org/">Apache HTTP Webserver</ulink> development
+            	<ulink url="http://httpd.apache.org/">Apache HTTP Webserver</ulink> development
             	files and libraries are required along with the 
-            	<ulink href="http://apr.apache.org/">Apache Portable Runtime</ulink>
+            	<ulink url="http://apr.apache.org/">Apache Portable Runtime</ulink>
             	and the
-            	<ulink href="http://httpd.apache.org/apreq/">libapreq</ulink> library. 
+            	<ulink url="http://httpd.apache.org/apreq/">libapreq</ulink> library. 
             </para>
 			</step>
 			

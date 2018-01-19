@@ -137,29 +137,66 @@ static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w
     }
 }
 
+/*
+ * -- request_processor
+ *
+ * The lazy bridge worker thread. This thread prepares its control data and 
+ * will serve requests addressed to a given virtual host. Virtual host server
+ * data are stored in the lazy_tcl_worker structure stored in the generic 
+ * pointer argument 'data'
+ * 
+ */
+
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
-    lazy_tcl_worker* w = (lazy_tcl_worker*) data; 
+    lazy_tcl_worker*        w = (lazy_tcl_worker*) data; 
     rivet_thread_private*   private;
     int                     idx;
     rivet_server_conf*      rsc;
 
+    /* The server configuration */
+
     rsc = RIVET_SERVER_CONF(w->server->module_config);
 
+    /* Rivet_ExecutionThreadInit creates and returns the thread private data. */
+
     private = Rivet_ExecutionThreadInit();
+
+    /* A bridge creates and stores in private->ext its own thread private
+     * data. The lazy bridge is no exception. We just need a flag controlling 
+     * the execution and an intepreter control structure */
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
     private->ext->interp->channel = private->channel;
+
+    /* The worker thread can respond to a single request at a time therefore 
+       must handle and register its own Rivet channel */
+
     Tcl_RegisterChannel(private->ext->interp->interp,*private->channel);
+
+    /* From the rivet_server_conf structure we determine what scripts we
+     * are using to serve requests */
 
     private->ext->interp->scripts = 
             Rivet_RunningScripts (private->pool,private->ext->interp->scripts,rsc);
 
+    /* This is the standard Tcl interpreter initialization */
+
     Rivet_PerInterpInit(private->ext->interp,private,w->server,private->pool);
     
+    /* The child initialization is fired. Beware of the terminologic 
+     * trap: we inherited from prefork only modules the term 'child'
+     * meaning 'child process'. In this case the child init actually
+     * is a worker thread initialization, because in a threaded module
+     * this is the agent playing the same role a child process plays
+     * with the prefork bridge */
+
     Lazy_RunConfScript(private,w,child_init);
+
+    /* The thread is now set up to serve request within the the 
+     * do...while loop controlled by private->keep_going  */
 
     idx = w->conf->idx;
     apr_thread_mutex_lock(w->mutex);
@@ -212,6 +249,17 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     return NULL;
 }
 
+
+/*
+ * -- create_worker
+ *
+ * Utility function to allocate a worker thread control structure
+ * (lazy_tcl_worker) and start a thread. The worker thread code
+ * is in the request_processor function
+ *
+ */
+
+
 static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
 {
     lazy_tcl_worker*    w;
@@ -227,6 +275,14 @@ static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
     return w;
 }
 
+/*
+ * -- Lazy_MPM_ChildInit
+ * 
+ * child process initialization. This function prepares the process
+ * data structures for virtual hosts and threads management
+ *
+ */
+
 void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t    rv;
@@ -235,12 +291,33 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
 
-    rv = apr_thread_mutex_create(&module_globals->mpm->mutex,APR_THREAD_MUTEX_UNNESTED,pool);
+    /* This mutex is only used to consistently 
+     *
+     *  - set the exit status of a child process (hopefully will be 
+     *    unnecessary when Tcl is able again of calling 
+     *    Tcl_DeleteInterp safely) 
+     *  - control the server_shutdown flag. Actually this is
+     *    not entirely needed because once set this flag 
+     *    is never reset to 0
+     *
+     */
+
+    rv = apr_thread_mutex_create(&module_globals->mpm->mutex,
+                                  APR_THREAD_MUTEX_UNNESTED,pool);
     ap_assert(rv == APR_SUCCESS);
 
-    module_globals->mpm->vhosts = (vhost *) apr_pcalloc(pool,module_globals->vhosts_count * sizeof(vhost));
+    /* the mpm->vhosts array is created with as many entries as the number of
+     * configured virtual hosts */
+
+    module_globals->mpm->vhosts = 
+        (vhost *) apr_pcalloc(pool,module_globals->vhosts_count*sizeof(vhost));
     ap_assert(module_globals->mpm->vhosts != NULL);
 
+    /*
+     * Each virtual host descriptor has its own mutex controlling
+     * the queue of available threads
+     */
+     
     for (s = root_server; s != NULL; s = s->next)
     {
         int                 vh;
@@ -248,17 +325,26 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         rivet_server_conf*  rsc = RIVET_SERVER_CONF(s->module_config);
 
         vh = rsc->idx;
-        rv = apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,APR_THREAD_MUTEX_UNNESTED,pool);
+        rv = apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,
+                                      APR_THREAD_MUTEX_UNNESTED,pool);
         ap_assert(rv == APR_SUCCESS);
         array = apr_array_make(pool,0,sizeof(void*));
         ap_assert(array != NULL);
         module_globals->mpm->vhosts[vh].array = array;
-
         module_globals->mpm->vhosts[vh].idle_threads_cnt = 0;
         module_globals->mpm->vhosts[vh].threads_count = 0;
     }
     module_globals->mpm->server_shutdown = 0;
 }
+
+/* -- Lazy_MPM_Request
+ *
+ * The lazy bridge HTTP request function. This function 
+ * stores the request_rec pointer into the lazy_tcl_worker
+ * structure which is used to communicate with a worker thread.
+ * Then the array of idle threads is checked and if empty
+ * a new thread is created by calling create_worker
+ */
 
 int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 {
@@ -380,11 +466,18 @@ int Lazy_MPM_ExitHandler(int code)
     private->ext->keep_going = 0;
 
     /*
-        This is the only place where exit_command and 
-        exit_command_status are set, anywere alse these
-        fields are only read. We lock on writing to synchronize
-        with other threads that might try to access
-        this info
+     * This is the only place where exit_command and 
+     * exit_command_status are set, anywere alse these
+     * fields are only read. We lock on writing to synchronize
+     * with other threads that might try to access
+     * this info. That means that in the unlikely case
+     * of several threads calling ::rivet::exit 
+     * simultaneously' the first sets the exit code.
+     * This is just terrible, it highlights the bad habit
+     * of calling 'exit' when programming with mod_rivet
+     * and calls out for a version of Tcl with which
+     * we could safely call Tcl_DeleteInterp and then terminate
+     * a single thread
      */
 
     apr_thread_mutex_lock(module_globals->mpm->mutex);
