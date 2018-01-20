@@ -304,7 +304,7 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 		threads with the Apache worker threads. The worker thread code
 		is the request_processor function
 	</para>
-	<programlisting>*
+	<programlisting>/*
  * -- request_processor
  *
  * The lazy bridge worker thread. This thread prepares its control data and 
@@ -339,7 +339,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private-&gt;ext-&gt;interp-&gt;channel = private-&gt;channel;
 
     /* The worker thread can respond to a single request at a time therefore 
-       must handle and register its own Rivet channel */
+     * must handle and register its own Rivet channel */
 
     Tcl_RegisterChannel(private-&gt;ext-&gt;interp-&gt;interp,*private-&gt;channel);
 
