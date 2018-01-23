@@ -1,7 +1,14 @@
+2018-01-23 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/lazybridge.xml: more improvements and
+    inclusion of new comments to the code
+    * doc/xml/commands.xml: rather cosmetic improvment 
+    to the page of ::rivet::try
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: more comments
+
 2018-01-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/installation.xml: various broken links fixed
     * doc/xml/internals.xml: expanding some explanations and changing
-      links to the Apache server from version 2.2 to 2.4
+    links to the Apache server from version 2.2 to 2.4
     * doc/xml/lazybridge.xml: expanding code explanations
     * src/mod_rivet_ng/rivet_lazy_mpm.c: commenting code in
     various functions

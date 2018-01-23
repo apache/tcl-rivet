@@ -72,7 +72,7 @@ typedef struct vhost_iface {
 } vhost;</programlisting>
 
  	<para>
- 		A pointer to this array is stored in the bridge status structure which a basic
+ 		A pointer to this data structure array is stored in the bridge status which a basic
  		structure that likely every bridge has to create.
 	</para>
 	<programlisting>/* Lazy bridge internal status data */
@@ -85,12 +85,12 @@ typedef struct mpm_bridge_status {
     vhost*              vhosts;             /* array of vhost descriptors          */
 } mpm_bridge_status;</programlisting>
 	<para>
-		By design the bridge must create exactly one instance of this structure and store its pointer
-		in <command>module_globals->mpm</command>. This is usually done
-		at the very beginning of the child init script function pointed by 
-		<command>mpm_child_init</command> in
-		the <command>rivet_bridge_table</command> structure. For the lazy bridge this field
-		in the jump table points to <command>Lazy_MPM_ChildInit</command>
+		By design the bridge must create exactly one instance of <command>mpm_bridge_status</command>
+		and store its pointer in <command>module_globals->mpm</command>.
+		This is usually done at the very beginning of the child init script function pointed by 
+		<command>mpm_child_init</command> in the <command>rivet_bridge_table</command> structure.
+		For the lazy bridge this field in the jump table points to <command>Lazy_MPM_ChildInit</command>
+		function
 	</para>
 	<programlisting>/*
  * -- Lazy_MPM_ChildInit
@@ -108,7 +108,8 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     module_globals-&gt;mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
 
-    /* This mutex is only used to consistently 
+    /* This mutex is only used to consistently carry out these 
+     * two tasks
      *
      *  - set the exit status of a child process (hopefully will be 
      *    unnecessary when Tcl is able again of calling 
@@ -224,15 +225,17 @@ typedef struct lazy_tcl_worker {
 	<para>
 		The server field is assigned with the virtual host server record. Whereas the <command>conf</command>
 		field keeps the pointer to a run time computed <command>rivet_server_conf</command>. This structure
-		may change from request to request because <command>&lt;Directory ...&gt;...&lt;/Directory&gt;</command> could
-		change the configuration with directory specific directive values
+		may change from request to request because the request configuration changes when the URL may refer 
+		to directory specific configuration in <command>&lt;Directory ...&gt;...&lt;/Directory&gt;</command> 
+		blocks
 	</para>
 	<para>
 		The Lazy bridge will not start any Tcl worker thread at server startup, but it will
-		wait for requests to come in and they are handed down to a worker threads by popping 
-		a lazy_tcl_worker pointer from the related array in the virtual hosts database or,
-		in case the array is empty and no threads are available, a new worker thread is 
-		created. The code in the <command>Lazy_MPM_Request</command> function
+		wait for requests to come in and then if worker threads are sitting on a virtual host queue
+		a thread's <command>lazy_tcl_worker</command> structure pointer is popped
+		and the request handed to it. If no available thread is on the queue a new worker thread is 
+		created. The code in the <command>Lazy_MPM_Request</command> easy to understand and shows
+		how this is working
 	</para>
 	<programlisting>/* -- Lazy_MPM_Request
  *
@@ -254,6 +257,14 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     mutex = module_globals-&gt;mpm-&gt;vhosts[conf-&gt;idx].mutex;
     array = module_globals-&gt;mpm-&gt;vhosts[conf-&gt;idx].array;
     apr_thread_mutex_lock(mutex);
+
+   /* This request may have come while the child process was 
+    * shutting down. We cannot run the risk that incoming requests 
+    * may hang the child process by keeping its threads busy, 
+    * so we simply return an HTTP_INTERNAL_SERVER_ERROR. 
+    * This is hideous and explains why the 'exit' commands must 
+    * be avoided at any costs when programming with mod_rivet
+    */
 
     if (module_globals-&gt;mpm-&gt;server_shutdown == 1) {
         ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r,

@@ -291,7 +291,8 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
 
-    /* This mutex is only used to consistently 
+    /* This mutex is only used to consistently carry out these 
+     * two tasks
      *
      *  - set the exit status of a child process (hopefully will be 
      *    unnecessary when Tcl is able again of calling 
@@ -357,6 +358,14 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     mutex = module_globals->mpm->vhosts[conf->idx].mutex;
     array = module_globals->mpm->vhosts[conf->idx].array;
     apr_thread_mutex_lock(mutex);
+
+    /* This request may have come while the child process was 
+     * shutting down. We cannot run the risk that incoming requests 
+     * may hang the child process by keeping its threads busy, 
+     * so we simply return an HTTP_INTERNAL_SERVER_ERROR. 
+     * This is hideous and explains why the 'exit' commands must 
+     * be avoided at any costs when programming with mod_rivet
+     */
 
     if (module_globals->mpm->server_shutdown == 1) {
         ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r,
@@ -472,7 +481,7 @@ int Lazy_MPM_ExitHandler(int code)
      * with other threads that might try to access
      * this info. That means that in the unlikely case
      * of several threads calling ::rivet::exit 
-     * simultaneously' the first sets the exit code.
+     * simultaneously the first sets the exit code.
      * This is just terrible, it highlights the bad habit
      * of calling 'exit' when programming with mod_rivet
      * and calls out for a version of Tcl with which
@@ -488,8 +497,9 @@ int Lazy_MPM_ExitHandler(int code)
     }
     apr_thread_mutex_unlock(module_globals->mpm->mutex);
 
-    /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
-     * and is sequence the whole process to shutdown by calling exit() */
+    /* We now tell the supervisor to terminate the Tcl worker thread pool
+     * to exit and is sequence the whole process to shutdown 
+     * by calling exit() */
  
     Lazy_MPM_Finalize (private->r->server);
     return TCL_OK;

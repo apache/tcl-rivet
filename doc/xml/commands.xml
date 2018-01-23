@@ -1597,7 +1597,8 @@ bab</programlisting>
 				an <command>AbortScript</command>.
 				See <xref linkend="directives"><command>AbortScript</command></xref>
 			</para>
-			<programlisting>&lt;html&gt;&lt;?::rivet::try {
+			<programlisting>&lt;html&gt;&lt;?
+::rivet::try {
 	if {[::rivet::var_qs exists exit]} {
 	    ::rivet::exit [::rivet::var_qs get exit]
 	} elseif {[::rivet::var_qs exists abort]} {
@@ -1616,8 +1617,8 @@ bab</programlisting>
    puts "$fd --&amp;gt;&amp;gt; $fv&lt;br/&gt;"
 
   }
- }
-?>&lt;/html></programlisting>
+}
+?>&lt;/html&gt;</programlisting>
 		<para>
 			Placing this code in a file (try.rvt) on the 
 			web server <emphasis>DocumentRoot</emphasis> 
