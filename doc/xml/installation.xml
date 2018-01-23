@@ -23,7 +23,7 @@
 				and Rivet &version; is now able to run with the 
 				<ulink url="http://httpd.apache.org/docs/2.4/mod/worker.html">worker</ulink> 
             and the
-            <ulink url="http://httpd.apache.org/docs/2.4/mod/event.html">worker</ulink> 
+            <ulink url="http://httpd.apache.org/docs/2.4/mod/event.html">event</ulink> 
             MPMs. Rivet &version; has not been ported to OS of the Windows family
             but we feel that the current design would fit just fine with the Windows specific
             MPMs such as
