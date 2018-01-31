@@ -140,8 +140,10 @@ void Worker_Bridge_Shutdown (void)
     apr_uint32_t        threads_to_stop;
 
     waits = 5;
+    threads_to_stop = apr_atomic_read32(module_globals->mpm->threads_count);
     do
     {
+
         rv = apr_queue_trypop(module_globals->mpm->queue,&v);
 
         /* We wait for possible threads that are taking

@@ -1,11 +1,13 @@
 2018-01-23 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION,configure.ac: bumping version number to 3.0.1
     * doc/rivet.xml.in,doc/xml/request.xml: wrong links and information
     about MPM support fixed
     * src/mod_rivet_ng/mod_rivet.h: add APLOG_USE_MODULE
     macro
     * src/mod_rivet/ng/rivet_worker_mpm.c: number
     of threads waited on exit by the supervisor was wrong
-    and it's now the acutal number of threads available
+    and it's now the acutal number of threads available,
+    variable uninitalized in loop fixed 
 
 2018-01-23 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/lazybridge.xml: more improvements and
