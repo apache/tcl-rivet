@@ -137,11 +137,18 @@ void Worker_Bridge_Shutdown (void)
     void*               v;
     handler_private*    thread_obj;
     apr_status_t        rv;
+    apr_uint32_t        threads_to_stop;
 
     waits = 5;
     do
     {
         rv = apr_queue_trypop(module_globals->mpm->queue,&v);
+
+        /* We wait for possible threads that are taking
+         * time to serve requests and haven't had a chance to
+         * see the signal
+         */
+
         if (rv == APR_EAGAIN) 
         {
             waits--;
@@ -154,7 +161,9 @@ void Worker_Bridge_Shutdown (void)
         apr_thread_cond_signal(thread_obj->cond);
         apr_thread_mutex_unlock(thread_obj->mutex);
 
-    } while (waits > 0);
+        threads_to_stop = apr_atomic_read32(module_globals->mpm->threads_count);
+
+    } while ((waits > 0) && (threads_to_stop > 0));
 
     return;
 }
@@ -260,11 +269,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         apr_atomic_dec32(module_globals->mpm->running_threads_count);
 
     } while (private->ext->keep_going > 0);
+
     apr_thread_mutex_unlock(thread_obj->mutex);
-            
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
-    // We don't clean up the thread resources anymore, if the thread exits the whole process terminates
+    /* We don't clean up the thread resources anymore, if the thread exits the whole process terminates
+     * As long as Tcl can't safely delete interpreters this is the way things must be done */
     // Rivet_ProcessorCleanup(private);
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
@@ -361,13 +371,13 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 
     server_rec* s = (server_rec *)data;
 #ifdef RIVET_MPM_SINGLE_TCL_THREAD
-    int thread_to_start = 1;
+    int threads_to_start = 1;
 #else
-    int thread_to_start = (int) round(mpm->max_threads);
+    int threads_to_start = mpm->max_threads;
 #endif
 
-    ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"starting %d Tcl threads",thread_to_start);
-    start_thread_pool(thread_to_start);
+    ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"starting %d Tcl threads",threads_to_start);
+    start_thread_pool(threads_to_start);
 
     do
     {
@@ -376,7 +386,7 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
         apr_thread_mutex_lock(mpm->job_mutex);
         while (apr_is_empty_array(mpm->exiting) && !mpm->server_shutdown)
         {
-            apr_thread_cond_wait ( mpm->job_cond, mpm->job_mutex );
+            apr_thread_cond_wait (mpm->job_cond,mpm->job_mutex);
         }
 
         while (!apr_is_empty_array(mpm->exiting) && !mpm->server_shutdown)
@@ -384,7 +394,7 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
             int i;
             p = *(apr_thread_t **)apr_array_pop(mpm->exiting);
             
-            for (i = 0; (i < TCL_INTERPS) && !mpm->server_shutdown; i++)
+            for (i = 0; (i < module_globals->mpm->max_threads) && !mpm->server_shutdown; i++)
             {
                 if (p == mpm->workers[i])
                 {
@@ -706,6 +716,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
     interp_obj = Rivet_NewVHostInterp(private->pool,s);
     //interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
     interp_obj->channel = private->channel;
+    Rivet_PerInterpInit(interp_obj, private, s, private->pool);
     return interp_obj;
 }
 

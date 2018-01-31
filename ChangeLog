@@ -1,4 +1,11 @@
 2018-01-23 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/mod_rivet.h: add APLOG_USE_MODULE
+    macro
+    * src/mod_rivet/ng/rivet_worker_mpm.c: number
+    of threads waited on exit by the supervisor was wrong
+    and it's now the acutal number of threads available
+
+2018-01-23 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/lazybridge.xml: more improvements and
     inclusion of new comments to the code
     * doc/xml/commands.xml: rather cosmetic improvment 
@@ -32,7 +39,8 @@
 2017-12-29 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xml.in: more entities to extend documentation
     * doc/xml/intro.xml: introduction revised and extended
-    * doc/xml-2: files used to generate the manual removed or moved into doc/xml
+    * doc/xml-2: files used to generate the manual removed or
+    moved into doc/xml
     * doc/rivet.css: changed color palette
 
 2017-12-22 Massimo Manghi <mxmanghi@apache.org>

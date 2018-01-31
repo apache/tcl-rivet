@@ -37,6 +37,8 @@
 #include <rivet_config.h>
 #endif
 
+APLOG_USE_MODULE(rivet);
+
 /* init.tcl file relative to the server root directory */
 
 #define RIVET_DIR  RIVET_RIVETLIB_DESTDIR
