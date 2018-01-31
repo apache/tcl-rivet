@@ -1,4 +1,6 @@
 2018-01-23 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml.in,doc/xml/request.xml: wrong links and information
+    about MPM support fixed
     * src/mod_rivet_ng/mod_rivet.h: add APLOG_USE_MODULE
     macro
     * src/mod_rivet/ng/rivet_worker_mpm.c: number

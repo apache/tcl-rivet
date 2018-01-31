@@ -45,9 +45,13 @@
     <!ENTITY apachedoc-vhost       "https://httpd.apache.org/docs/2.4/vhosts" >
     <!ENTITY apachedoc-mpm	        "https://httpd.apache.org/docs/2.4/mpm.html" >
     <!ENTITY apachedoc-prefork	  "https://httpd.apache.org/docs/2.4/mod/prefork.html" >
+    <!ENTITY apachedoc-worker	     "https://httpd.apache.org/docs/2.4/mod/worker.html" >
+    <!ENTITY apachedoc-event	     "https://httpd.apache.org/docs/2.4/mod/event.html" >
+    <!ENTITY apachedoc-winnt		  "https://httpd.apache.org/docs/2.4/mod/mpm_winnt.html" >
     <!ENTITY apachedoc-docroot     "https://httpd.apache.org/docs/2.4/mod/core.html#documentroot" >
     <!ENTITY apachedoc-alias		  "https://httpd.apache.org/docs/2.4/mod/mod_alias.html" >
     <!ENTITY apachedoc-rewrite     "https://httpd.apache.org/docs/2.4/mod/mod_rewrite.html" >
+    <!ENTITY apachedoc-perftuning  "https://httpd.apache.org/docs/2.4/misc/perf-tuning.html" >
 ]>
 
 <!--

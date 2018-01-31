@@ -4,28 +4,27 @@
     <simplesect>
     	<title>Apache Child Process Lifecycle</title>
 	   <para>
-            Apache Rivet delegates to the <ulink url="">Multi-Processing Module (MPM)</ulink>
+            Apache Rivet devolves to the <ulink url="">Multi-Processing Module (MPM)</ulink>
             the task of managing the agents responding to network requests. 
             An MPM is responsible for creating such agents during the start-up, 
             and is in charge for terminating existing ones and recreating new 
             agents when the workload is requiring it. 
        </para>
        <para>
-            Apache Rivet is currently supporting only the
-            <ulink url="http://httpd.apache.org/docs/2.2/mod/prefork.html">prefork</ulink>
+            Apache Rivet &version2-series; supported only the
+            <ulink url="&apachedoc-prefork;">prefork</ulink>
             MPM which creates full fledged child processes as independent agents 
             responding to network requests. 
-            Efforts are under way to extend the support to
-            the <ulink url="http://httpd.apache.org/docs/2.2/mod/worker.html">worker</ulink> MPM,
-            a hybrid model where forked child processes in turn create threads as real
-            network agents. If we can achieve this the goal would open the possibility of
-            supporting also the Windows&copy; specific 
-            <ulink url="http://httpd.apache.org/docs/2.2/mod/mpm_winnt.html">winnt</ulink> MPM, 
+            Starting with &version30; Also we the <ulink url="&apachedoc-worker;">worker</ulink> and
+            <ulink url="&apachedoc-event;">event</ulink> MPM are supported. The worker MPM is
+            an hybrid model where forked child processes in turn create threads as real
+            network agents. Also Apache on Windows&copy; is now supported and tested
+            with the <ulink url="&apachedoc-winnt;">winnt</ulink> MPM, 
             where a single process creates and manages a large number of thread agents.
        </para>
        <para>
 	    		Configuration parameters about this critical point can be read in the
-	    		<ulink url="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">Apache
+	    		<ulink url="&apachedoc-perftuning;">Apache
 	    		documentation</ulink>. 
 	    </para>
 	    <para>
@@ -39,34 +38,48 @@
                Apaches starts up as a single process. During this stage Apache performs 
                various preliminary tasks including reading and parsing the configuration. 
 					After the configuration has been read Rivet sets up some internal resources
-					and if a Tcl script is set as argument of a <command>ServerInitScript</command> directive
-					the script is executed. 
-					Variables, arrays or dictionaries created during the execution of this script 
-					will be preserved and later replicated in the child process intepreters,
-					since the prefork MPM creates new child processes with a fork() system call (which
-               involves only in memory copy of sections of a process address space). Thus
-               <command>ServerInitScript</command>
+					and if a Tcl script is set as argument of a <command>ServerInitScript</command>
+					directive the script is executed. 
+					Variables, arrays or dictionaries created during 
+					the execution of this script will be preserved and later replicated in the 
+					child process intepreters if the prefork MPM is loaded (which restricts
+					this feature to the Unix systems). 
+					The prefork MPM creates new child processes with a fork() 
+					system call, which involves only in memory copy of sections of a
+					process address space. Tcl is careful about reproducing an environment
+					across a fork call in order to have a functional interpreter.
+				</para>
+				<para>
+					Still, regardless the OS and loaded MPM <command>ServerInitScript</command>
 		    		is a good place to do global initialization that doesn't involve
 		    		creation of private data. Example of tasks that can be done
-		    		in this context are importing namespace commands and loading packages
-		    		providing code of general interest for every application to
-		    		be served. Also IPC methods can be initialized in this stage.
+		    		in this context are IPC methods that must be initialized at this stage.
+		    		With the prefork MPM also importing from namespaces and loading packages
+		    		can be done here removing the burden from the child initialization stage. 	
 	    		</para>
 	    	</listitem>
 	    	<listitem>
 	    		<bridgehead>Child Process Initialization</bridgehead>
+
 	    		<para>
-		    		Right after the webserver has forked its child processes 
-		    		there is a chance to perform specific initialization of their Tcl interpreters.
-               This is the stage where most likely you want to open I/O channels, 
+					A child process calls the MPM bridge interface function to set up
+					the Tcl run time environment,either creating multiple threads each running its
+					Tcl interpreters or, in the case of the prefork MPM bridge, setting up
+					the environment within a the child process itself as a single Tcl thread.
+	    		</para>
+
+	    		<para>
+               This is the stage where most likely you want to open I/O channels,
                database connections or any other resource that has to be private to an 
-               interpreter. When the option <command>SeparateVirtualInterps</command> is 
+               interpreter and has to persist over a whole thread lifespan.
+               When the option <command>SeparateVirtualInterps</command> is 
                turned off child processes will have a single interpreter regardless
 		    		the number of virtual hosts configured. The
                <command>GlobalInitScript</command> is the configuration script 
                the child process will run once before getting ready to 
                serve requests
 	    		</para>
+
 	    		<para>
 	    			When <command>SeparateVirtualInterps</command> is turned on 
 	    			each configured virtual host will have its own slave interpreter which
@@ -94,6 +107,16 @@
 	    	</listitem>
 	    	<listitem>
 	    		<bridgehead>Request Processing and Content Generation</bridgehead>
+		  		<para>
+			    		<note>
+			    			This section explain the default request handling procedure which
+			    			was written to let Rivet &version30; work as a drop in replacement 
+			    			of any &version2-generic; module. For a in-depth understanding of
+			    			the new request processing mechanics please read the
+			    			<link linkend="processing">request processing</link> section of the manual
+			    		</note>
+			   </para>
+
 	    		<para>
                  After a child has been initialized it's ready to serve requests. 
                  A child process' lifetime is almost entirely spent in this phase, waiting
@@ -141,6 +164,7 @@
 	</simplesect>
 	<simplesect>
     	<title>Apache Rivet Error and Exception Scripts Directives</title>
+    	
         <para>
          Rivet is highly configurable and each of the webserver lifecycle stages 
          can be exploited to control a web application. 
@@ -173,12 +197,17 @@
 	</simplesect>
 	<simplesect>
 		<title>Tcl Namespaces in Rivet and the <command>::request</command> Namespace</title>
-		<note>
-			This paragraph applies to the standard mod_rivet way of handling requests. This 
-			method is explained in the <xref linkend="processing">request processing</xref>. 
-			If you write your own processing root procedure you have entire 
-			freedom on how to manage namespaces of your applications
-		</note>
+
+  		<para>
+    		<note>
+    			This section explain the default request handling procedure which
+    			was written to let Rivet &version30; work as a drop in replacement 
+    			of any &version2-generic; module. For a in-depth understanding of
+    			the new request processing mechanics please read the
+    			<link linkend="processing">request processing</link> section of the manual
+    		</note>
+	   </para>
+
 		<para>
 			With the sole exception of .rvt templates, mod_rivet runs pure Tcl scripts 
 			at the global namespace. That means that every variable or procedure 
