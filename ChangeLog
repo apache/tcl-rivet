@@ -1,3 +1,12 @@
+2018-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/librivet/rivetPkgInit.c: changing way we determine the
+    namespace pointer in order to avoid the necessity of gaining 
+    access to the module globals and therefore avoid including 
+    mod_rivet.h. The macro APLOG_USE_MODULE introduced in
+    mod_rivet.h makes the library load fail outside
+    mod_rivet and Apache
+    * rivet/pkgIndex.tcl: recreated from scratch
+
 2018-01-23 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: bumping version number to 3.0.1
     * doc/rivet.xml.in,doc/xml/request.xml: wrong links and information

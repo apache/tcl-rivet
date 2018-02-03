@@ -30,7 +30,7 @@
 #   define EXTERN
 #endif /* EXTERN */
 #include "rivet.h"
-#include "mod_rivet.h"
+//#include "mod_rivet.h"
 
 /*-----------------------------------------------------------------------------
  * Rivet_GetNamespace --
@@ -58,23 +58,13 @@
 Tcl_Namespace* 
 Rivet_GetNamespace( Tcl_Interp* interp)
 {
-    rivet_interp_globals *globals; 
     Tcl_Namespace *rivet_ns;
 
-    globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    if (globals != NULL)
+    rivet_ns = Tcl_FindNamespace(interp,RIVET_NS,NULL,TCL_GLOBAL_ONLY);
+    if (rivet_ns == NULL) 
     {
-        rivet_ns = globals->rivet_ns;
-    }
-    else
-    {
-//      fprintf(stderr,"no Associated data found, running standalone\n");
-        rivet_ns = Tcl_FindNamespace(interp, RIVET_NS, NULL, TCL_GLOBAL_ONLY);
-        if (rivet_ns == NULL) {
-            /* The namespace does not exist, create it */
-            rivet_ns = Tcl_CreateNamespace (interp, RIVET_NS, NULL,
-                                            (Tcl_NamespaceDeleteProc *)NULL);
-        }
+        rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
+                                        (Tcl_NamespaceDeleteProc *)NULL);
     }
 
     return rivet_ns;
