@@ -22,8 +22,39 @@
 # with the right options.
 
 set auto_path [linsert $auto_path 0 [file dirname [info script]]]
-package require Tclx
 package provide apachetest 0.1
+
+# kill --
+#	kill a process and wait until it's really gone
+#	(mimic TclX's kill and wait procs)
+#
+# Arguments:
+#	signal - signal to send (e.g. TERM, HUP, KILL...)
+#	pid - process id
+#
+# Side Effects:
+#	kills a running process/processes (if permitted)
+#
+# Results:
+#	None.
+
+proc kill {signal pid} {
+    catch {exec kill -s $signal $pid}
+    after 100
+    set i 100
+    while {1} {
+	catch {exec ps -p $pid} out
+	if {[regexp $pid $out]} {
+	    incr i 250
+	    after 250
+	} else {
+	    break
+	}
+    }
+    if {$i > 100} {
+	puts "Waiting [expr {$i/1000.0}] seconds until process was killed"
+    }
+}
 
 #package require http 2.4.5
 source [file join [file dirname [info script]] http.tcl]
@@ -134,17 +165,10 @@ proc apachetest::start { options conftext code } {
 	    puts "Apache started as PID $serverpid"
     }
 
-    if { [catch { uplevel $code } err] } { }
+    if { [catch { uplevel $code } err] } { puts stderr $::errorInfo }
 
-    # Kill and wait are the only reasons we need TclX.
-    # apache2 binary started with -X reacts to SIGQUIT and ignores TERM
-    kill QUIT $serverpid 
-    catch {
-        set waitres [wait $serverpid]
-        if { $debug > 0 } {
-            puts $waitres
-        }
-    } 
+    # apache2 binary started with -X reacts to SIGQUIT and ignores TERM, but KILL is most reliable
+    kill KILL $serverpid
 }
 
 # startserver - start the server with 'options'.
