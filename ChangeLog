@@ -1,4 +1,4 @@
-2018-02-08 Ronnie Brunner <Ronnie.Brunner@netcetera.com>
+2018-02-08 Ronnie Brunner <ronnie@apache.org>
     * doc/apachetest.tcl: make independent from TclX adding
     our own 'kill' procedure. Changing signal to stop the
     http webserver as KILL
