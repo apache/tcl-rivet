@@ -1,3 +1,9 @@
+2018-02-08 Ronnie Brunner <Ronnie.Brunner@netcetera.com>
+    * doc/apachetest.tcl: make independent from TclX adding
+    our own 'kill' procedure. Changing signal to stop the
+    http webserver as KILL
+    * doc/runtests.tcl: removing depend on the prefork module
+
 2018-02-03 Massimo Manghi <mxmanghi@apache.org>
     * src/librivet/rivetPkgInit.c: changing way we determine the
     namespace pointer in order to avoid the necessity of gaining 
