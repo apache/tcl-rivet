@@ -272,8 +272,6 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 void Rivet_ProcessorCleanup (void *data)
 {
     rivet_thread_private*   private = (rivet_thread_private *) data;
-    Tcl_HashSearch*         searchCtx; 
-    Tcl_HashEntry*          entry;
     int                     i;
     rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
@@ -293,24 +291,14 @@ void Rivet_ProcessorCleanup (void *data)
     Tcl_SetStdChannel(NULL,TCL_STDOUT);
 
     /* there must be always a root interpreter in the slot 0 of private->interps,
-       so there is always need to run at least one cycle here */
+       so we always need to run this cycle at least onece */
 
     i = 0;
     do
     {
 
-        /* cleaning the cache contents and deleting it */
+        RivetCache_Cleanup(private,private->ext->interps[i]);
 
-        searchCtx = apr_pcalloc(private->pool,sizeof(Tcl_HashSearch));
-        entry = Tcl_FirstHashEntry(private->ext->interps[i]->objCache,searchCtx);    
-        while (entry)
-        {
-            Tcl_DecrRefCount(Tcl_GetHashValue(entry)); /* Let Tcl clear the mem allocated */
-            Tcl_DeleteHashEntry(entry);
-
-            entry = Tcl_NextHashEntry(searchCtx);
-        }
- 
         if ((i > 0) && rsc->separate_channels) 
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->channel);
 
