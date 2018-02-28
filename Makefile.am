@@ -28,8 +28,8 @@ install-binaries:
 	echo 'running target install-binaries ($(RIVETLIB_DESTDIR))'
 	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
 	$(mkinstalldirs) $(RIVETLIB_DESTDIR)/rivet-tcl
-	$(install_sh) -C $(builddir)/rivet/init.tcl $(RIVETLIB_DESTDIR)
-	$(install_sh) -C $(builddir)/rivet/default_request_handler.tcl $(RIVETLIB_DESTDIR)
+	$(install_sh) -C -m 644 $(builddir)/rivet/init.tcl $(RIVETLIB_DESTDIR)
+	$(install_sh) -C -m 644 $(builddir)/rivet/default_request_handler.tcl $(RIVETLIB_DESTDIR)
 	$(install_sh) -C -m 644 $(shell /bin/ls $(srcdir)/rivet/rivet-tcl/*) $(RIVETLIB_DESTDIR)/rivet-tcl
 
 #cp -rv $(srcdir)/rivet/packages $(RIVETLIB_DESTDIR)/
