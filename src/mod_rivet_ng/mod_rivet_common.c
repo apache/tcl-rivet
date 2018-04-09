@@ -1,5 +1,5 @@
-/* -- mod_rivet_common.c - functions likely to be shared among 
- *                         different versions of mod_rivet.c 
+/* -- mod_rivet_common.c - functions likely to be shared among different 
+ *                         components of mod_rivet.c 
  */
 
 /*
@@ -292,12 +292,12 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
   * Returns a new rivet_thread_interp object with a new Tcl interpreter
   * configuration scripts and cache. The pool passed to Rivet_NewVHostInterp 
   *
-  *     Arguments: 
-  *       apr_pool_t* pool: a memory pool, it must be the private pool of a 
-  *       rivet_thread_private object (thread private)
+  * Arguments: 
+  *     apr_pool_t* pool: a memory pool, it must be the private pool of a 
+  *                         rivet_thread_private object (thread private)
   *
-  *   Returned value:
-  *       a rivet_thread_interp* record object
+  * Returned value:
+  *     a rivet_thread_interp* record object
   *
   */
 
@@ -310,7 +310,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
     
     rsc = RIVET_SERVER_CONF (server->module_config);
 
-    /* This calls needs the root server_rec just for logging purposes*/
+    /* This calls needs the root server_rec just for logging purposes */
 
     interp_obj->interp = Rivet_CreateTclInterp(server); 
 

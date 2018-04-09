@@ -168,7 +168,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
-    private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
+    //private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
+    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,w->server));
     private->ext->interp->channel = private->channel;
 
     /* The worker thread can respond to a single request at a time therefore 
@@ -187,7 +188,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     Rivet_PerInterpInit(private->ext->interp,private,w->server,private->pool);
     
     /* The child initialization is fired. Beware of the terminologic 
-     * trap: we inherited from prefork only modules the term 'child'
+     * trap: we inherited from fork capable systems the term 'child'
      * meaning 'child process'. In this case the child init actually
      * is a worker thread initialization, because in a threaded module
      * this is the agent playing the same role a child process plays
@@ -410,12 +411,16 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     return ap_sts;
 }
 
-/* -- Lazy_MPM_Interp
+/* -- Lazy_MPM_Interp: lazy bridge accessor to the interpreter database
+ *
  */
 
-rivet_thread_interp* Lazy_MPM_Interp(rivet_thread_private *private,
-                                     rivet_server_conf* conf)
+rivet_thread_interp* Lazy_MPM_Interp (rivet_thread_private* private,
+                                      rivet_server_conf*    conf,
+                                      rivet_thread_interp*  interp)
 {
+    if (interp != NULL) { private->ext->interp = interp; }
+
     return private->ext->interp;
 }
 
@@ -443,7 +448,7 @@ apr_status_t Lazy_MPM_Finalize (void* data)
 
             while (!apr_is_empty_array(array)) 
             {
-                lazy_tcl_worker*    w;
+                lazy_tcl_worker* w;
 
                 w = *(lazy_tcl_worker**) apr_array_pop(array); 
                 apr_thread_mutex_lock(w->mutex);

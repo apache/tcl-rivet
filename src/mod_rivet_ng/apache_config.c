@@ -272,31 +272,15 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
 {
     FILEDEBUGINFO;
 
-    /* TODO: conf assignement should be converted into a macro (already in mod_rivet.h) */
-    // RIVET_CONF_SELECT(new,base,add,rivet_child_init_script)
-
-    new->rivet_child_init_script = add->rivet_child_init_script ?
-        add->rivet_child_init_script : base->rivet_child_init_script;
-    new->rivet_child_exit_script = add->rivet_child_exit_script ?
-        add->rivet_child_exit_script : base->rivet_child_exit_script;
-    new->request_handler = add->request_handler ?
-        add->request_handler : base->request_handler;
-
-    new->rivet_before_script = add->rivet_before_script ?
-        add->rivet_before_script : base->rivet_before_script;
-    new->rivet_after_script = add->rivet_after_script ?
-        add->rivet_after_script : base->rivet_after_script;
-    new->rivet_error_script = add->rivet_error_script ?
-        add->rivet_error_script : base->rivet_error_script;
-    new->rivet_abort_script = add->rivet_abort_script ?
-        add->rivet_abort_script : base->rivet_abort_script;
-    new->after_every_script = add->after_every_script ?
-        add->after_every_script : base->after_every_script;
-
-    //new->user_scripts_updated = add->user_scripts_updated ?
-    //    add->user_scripts_updated : base->user_scripts_updated;
-
-    new->upload_dir = add->upload_dir ? add->upload_dir : base->upload_dir;
+    RIVET_CONF_SELECT(new,base,add,rivet_child_init_script)
+    RIVET_CONF_SELECT(new,base,add,rivet_child_exit_script)
+    RIVET_CONF_SELECT(new,base,add,request_handler)
+    RIVET_CONF_SELECT(new,base,add,rivet_before_script)
+    RIVET_CONF_SELECT(new,base,add,rivet_after_script)
+    RIVET_CONF_SELECT(new,base,add,rivet_error_script)
+    RIVET_CONF_SELECT(new,base,add,rivet_abort_script)
+    RIVET_CONF_SELECT(new,base,add,after_every_script)
+    RIVET_CONF_SELECT(new,base,add,upload_dir)
 
     /* Merge the tables of dir and user variables. */
     if (base->rivet_dir_vars && add->rivet_dir_vars) {

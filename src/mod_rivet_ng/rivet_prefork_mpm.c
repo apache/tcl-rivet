@@ -54,7 +54,11 @@ apr_status_t Prefork_MPM_Finalize (void* data)
     return OK;
 }
 
-//int Prefork_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
+
+/* -- Prefork_MPM_ChildInit: bridge child process initialization
+ *
+ */
+
 
 void Prefork_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
@@ -146,7 +150,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
      * calling a Tcl script fragment
      */
 
-    tcl_status = Tcl_Eval (module_globals->server_interp->interp,"expr {srand([clock clicks] + [pid])}");
+    tcl_status = Tcl_Eval(module_globals->server_interp->interp,"expr {srand([clock clicks] + [pid])}");
     if (tcl_status != TCL_OK)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
@@ -177,8 +181,12 @@ int Prefork_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
-rivet_thread_interp* Prefork_MPM_Interp(rivet_thread_private *private,rivet_server_conf* conf)
+rivet_thread_interp* Prefork_MPM_Interp (rivet_thread_private* private,
+                                         rivet_server_conf*    conf,
+                                         rivet_thread_interp*  interp)
 {
+    if (interp != NULL) { private->ext->interps[conf->idx] = interp; }
+
     return private->ext->interps[conf->idx];   
 }
 

@@ -17,7 +17,7 @@
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
- */
+*/
 
 /* $Id$ */
 
@@ -99,10 +99,6 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     void*               function;
 
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
-    
-    //ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp) != NULL);
-    //root_interp = (*RIVET_MPM_BRIDGE_FUNCTION(mpm_master_interp))();
-
     root_interp = MPM_MasterInterp(module_globals->server);
 
     /* we must assume the module was able to create the root interprter */ 
@@ -131,9 +127,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         Tcl_DecrRefCount(global_tcl_script);
     }
 
-    /* then we proceed assigning/creating the interpreters for the
-     * virtual hosts known to the server
-     */
+    /* then we proceed assigning/creating the interpreters for each virtual host */
 
     parentfunction = root_server_conf->rivet_child_init_script;
 
@@ -180,7 +174,9 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         rivet_interp->scripts = Rivet_RunningScripts (private->pool,rivet_interp->scripts,myrsc);
 
-        private->ext->interps[myrsc->idx] = rivet_interp;
+        //private->ext->interps[myrsc->idx] = rivet_interp;
+        
+        RIVET_POKE_INTERP(private,myrsc,rivet_interp);
 
         /* Basic Rivet packages and libraries are loaded here */
 
@@ -190,8 +186,8 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         }
 
         /* It seems that allocating from a shared APR memory pool is not thread safe,
-         * but it's not very well documented actually. I any case we protect this
-         * memory allcation with a mutex
+         * but it's not very well documented actually. In any case we protect this
+         * memory allocation with a mutex
          */
 
         /*  this stuff must be allocated from the module global pool which
@@ -215,17 +211,18 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             Tcl_IncrRefCount(tcl_child_init);
             Tcl_Preserve (interp);
 
-            /* There is a lot of passing around of pointers among various record 
-             * objects. We should understand if this is all that necessary.
+            /* There is a lot of passing pointers around among various structures. 
+             * We should understand if this is all that necessary.
              * Here we assign the server_rec pointer to the interpreter which
              * is wrong, because without separate interpreters it doens't make
              * any sense. TODO
              */
 
             /* before we run a script we have to store the pointer to the
-               running configuration in the thread private data. The design has
-               to improve and running a script must have everything sanely
-               prepared TODO */ 
+             * running configuration in the thread private data. The design has
+             * to improve and running a script must have everything sanely
+             * prepared TODO 
+             */ 
 
             private->running_conf = myrsc;
 
@@ -248,8 +245,9 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 /*
  * -- Rivet_ProcessorCleanup
  *
- * Thread private data cleanup. This function is called by MPM bridges to 
- * release data owned by private and pointed in the array of rivet_thread_interp
+ * Thread private data cleanup. This function was meant to be 
+ * called by the worker and prefork MPM bridges to release resources
+ * owned by thread private data and pointed in the array of rivet_thread_interp
  * objects. It has to be called just before an agent, either thread or
  * process, exits. We aren't calling this function anymore as we rely entirely
  * on the child process termination
@@ -271,15 +269,15 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
 void Rivet_ProcessorCleanup (void *data)
 {
-    rivet_thread_private*   private = (rivet_thread_private *) data;
     int                     i;
+    rivet_thread_private*   private = (rivet_thread_private *) data;
     rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
                  "Thread exiting after %d requests served (%d vhosts)", 
                                         private->req_cnt,module_globals->vhosts_count);
 
-    /* We are deleting the interpreters and release the thread channel. 
+    /* We are about to delete the interpreters and release the thread channel. 
      * Rivet channel is set as stdout channel of Tcl and as such is treated
      * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
      * the channel is released immediately by forcing the refCount to 0
@@ -291,7 +289,8 @@ void Rivet_ProcessorCleanup (void *data)
     Tcl_SetStdChannel(NULL,TCL_STDOUT);
 
     /* there must be always a root interpreter in the slot 0 of private->interps,
-       so we always need to run this cycle at least onece */
+     * so we always need to run this cycle at least once 
+     */
 
     i = 0;
     do

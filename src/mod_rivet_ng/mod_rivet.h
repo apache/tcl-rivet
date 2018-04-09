@@ -169,13 +169,13 @@ typedef struct _rivet_thread_interp {
 
 typedef struct _thread_worker_private rivet_thread_private;
 
-typedef int  (RivetBridge_ServerInit)   (apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
-typedef void (RivetBridge_ChildInit)    (apr_pool_t* pPool,server_rec* s);
-typedef int  (RivetBridge_Request)      (request_rec*,rivet_req_ctype);
-typedef apr_status_t (RivetBridge_Finalize)(void*);
-typedef rivet_thread_interp* (RivetBridge_Master_Interp) (void);
-typedef int  (RivetBridge_Exit_Handler) (int);
-typedef rivet_thread_interp* (RivetBridge_Thread_Interp)(rivet_thread_private*,rivet_server_conf *);
+typedef int                     (RivetBridge_ServerInit)    (apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
+typedef void                    (RivetBridge_ChildInit)     (apr_pool_t* pPool,server_rec* s);
+typedef int                     (RivetBridge_Request)       (request_rec*,rivet_req_ctype);
+typedef apr_status_t            (RivetBridge_Finalize)      (void*);
+typedef rivet_thread_interp*    (RivetBridge_Master_Interp) (void);
+typedef int                     (RivetBridge_Exit_Handler)  (int);
+typedef rivet_thread_interp*    (RivetBridge_Thread_Interp) (rivet_thread_private*,rivet_server_conf *,rivet_thread_interp*);
 
 typedef struct _mpm_bridge_table {
     RivetBridge_ServerInit    *mpm_server_init;
@@ -312,7 +312,11 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
     (*module_globals->bridge_jump_table->fun)(__VA_ARGS__);\
 }
 
-#define RIVET_PEEK_INTERP (module_globals->bridge_jump_table->mpm_thread_interp)
+#define RIVET_PEEK_INTERP(thread_private,running_conf) \
+        (module_globals->bridge_jump_table->mpm_thread_interp)(thread_private,running_conf,NULL)
+
+#define RIVET_POKE_INTERP(thread_private,running_conf,interp) \
+        (module_globals->bridge_jump_table->mpm_thread_interp)(thread_private,running_conf,interp)
 
 #define RIVET_MPM_BRIDGE rivet_bridge_table bridge_jump_table =
 

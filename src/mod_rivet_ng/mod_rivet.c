@@ -213,6 +213,7 @@ int Rivet_Exit_Handler(int code)
 /* 
  * -- Rivet_RunServerInit
  *
+ * 
  */
 
 static int
@@ -235,11 +236,11 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
     Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
 
-	/* This code is to be included only if we are building for the
+	/* This code conditionally compiled when we are building for the
 	 * Windows family of OS. The winnt MPM runs the post_config 
 	 * hooks after it has spawned a child process but we don't want
 	 * to run the Tcl server initialization script again. We
-	 * detect we are running in the a child process checking
+	 * detect we are in a child process by checking
 	 * the environment variable AP_PARENT_PID 
 	 * (https://wiki.apache.org/httpd/ModuleLife)
 	 */
@@ -344,8 +345,8 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
     if (apr_dso_load(&dso_handle,module_globals->rivet_mpm_bridge,pPool) == APR_SUCCESS)
     {
-        apr_status_t                rv;
-        apr_dso_handle_sym_t        func = NULL;
+        apr_status_t            rv;
+        apr_dso_handle_sym_t    func = NULL;
 
         ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server,
                      "MPM bridge loaded: %s",module_globals->rivet_mpm_bridge);
@@ -359,15 +360,16 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             char errorbuf[ERRORBUF_SZ];
 
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                         MODNAME ": Error loading symbol bridge_jump_table: %s", 
-                         apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
+            ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                          MODNAME ": Error loading symbol bridge_jump_table: %s", 
+                          apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
             exit(1);   
         }
 
-        /* we require only mpm_request and mpm_master_interp to be defined */
+        /* we require only mpm_request and mpm_thread_interp to be defined */
 
         ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_request) != NULL);
+        ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_thread_interp) != NULL);
 
         apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pPool);
 

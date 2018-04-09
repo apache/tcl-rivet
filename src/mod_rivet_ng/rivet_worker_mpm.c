@@ -58,7 +58,6 @@ apr_threadkey_t*        handler_thread_key;
 int round(double d) { return (int)(d + 0.5); }
 #endif /* RIVET_NO_HAVE_ROUND */
 
-
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
 
 typedef struct mpm_bridge_status {
@@ -707,7 +706,6 @@ apr_status_t Worker_MPM_Finalize (void* data)
  *
  */
 
-
 rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 {
     rivet_thread_private*   private;
@@ -716,7 +714,6 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
     interp_obj = Rivet_NewVHostInterp(private->pool,s);
-    //interp_obj->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
     interp_obj->channel = private->channel;
     Rivet_PerInterpInit(interp_obj, private, s, private->pool);
     return interp_obj;
@@ -760,9 +757,12 @@ int Worker_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
-rivet_thread_interp* Worker_MPM_Interp(rivet_thread_private *private,
-                                       rivet_server_conf *conf)
+rivet_thread_interp* Worker_MPM_Interp (rivet_thread_private* private,
+                                         rivet_server_conf*    conf,
+                                         rivet_thread_interp*  interp)
 {
+    if (interp != NULL) { private->ext->interps[conf->idx] = interp; }
+
     return private->ext->interps[conf->idx];   
 }
 

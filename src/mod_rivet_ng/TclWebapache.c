@@ -515,9 +515,9 @@ TclWeb_InitEnvVars (rivet_thread_private* private)
     /* Here we create some variables with Rivet internal information. */
 
     apr_table_set (table, "RIVET_CACHE_FREE",
-            (char*) apr_psprintf (TCLWEBPOOL, "%d",RIVET_PEEK_INTERP(private,private->running_conf)->cache_free));
+            (char*) apr_psprintf (TCLWEBPOOL, "%d",(RIVET_PEEK_INTERP(private,private->running_conf))->cache_free));
     apr_table_set (table, "RIVET_CACHE_SIZE",
-            (char*) apr_psprintf (TCLWEBPOOL, "%d",RIVET_PEEK_INTERP(private,private->running_conf)->cache_size));
+            (char*) apr_psprintf (TCLWEBPOOL, "%d",(RIVET_PEEK_INTERP(private,private->running_conf))->cache_size));
 
     req->environment_set = 1;
 }

@@ -1,3 +1,9 @@
+2018-04-09 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/mod_rivet.h: changing argument list of function
+    *mpm_thread_interp in the bridge interface. It must work
+    as an accessor to the interpreter database when both getting
+    and storing an interpreter pointer
+
 2018-02-28 Massimo Manghi <mxmanghi@apache.org>
     * Makefile.am: default_request_handler.tcl and init.tcl can be
     installed without the exec bit set

@@ -13,9 +13,8 @@
        <para>
             Apache Rivet &version2-series; supported only the
             <ulink url="&apachedoc-prefork;">prefork</ulink>
-            MPM which creates full fledged child processes as independent agents 
-            responding to network requests. 
-            Starting with &version30; Also we the <ulink url="&apachedoc-worker;">worker</ulink> and
+            MPM which creates child processes as independent agents responding to network requests. 
+            Starting with &version30; also the <ulink url="&apachedoc-worker;">worker</ulink> and
             <ulink url="&apachedoc-event;">event</ulink> MPM are supported. The worker MPM is
             an hybrid model where forked child processes in turn create threads as real
             network agents. Also Apache on Windows&copy; is now supported and tested
