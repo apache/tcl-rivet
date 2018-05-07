@@ -1,3 +1,6 @@
+2018-02-09 Massimo Manghi <mxmanghi@apache.org>
+    * : released as 3.0.1
+
 2018-02-03 Massimo Manghi <mxmanghi@apache.org>
     * src/librivet/rivetPkgInit.c: changing way we determine the
     namespace pointer in order to avoid the necessity of gaining 
