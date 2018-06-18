@@ -48,13 +48,13 @@ namespace eval DIO {
         set command "pg_connect"
 
         set info ""
-        if {![lempty $user]} { append info " user=$user" }
-        if {![lempty $pass]} { append info " password=$pass" }
-        if {![lempty $host]} { append info " host=$host" }
-        if {![lempty $port]} { append info " port=$port" }
-        if {![lempty $db]}   { append info " dbname=$db" }
+        if {![::rivet::lempty $user]} { append info " user=$user" }
+        if {![::rivet::lempty $pass]} { append info " password=$pass" }
+        if {![::rivet::lempty $host]} { append info " host=$host" }
+        if {![::rivet::lempty $port]} { append info " port=$port" }
+        if {![::rivet::lempty $db]}   { append info " dbname=$db" }
 
-        if {![lempty $info]} { append command " -conninfo [::list $info]" }
+        if {![::rivet::lempty $info]} { append command " -conninfo [::list $info]" }
 
         if {[catch $command error]} { return -code error $error }
 
@@ -89,7 +89,7 @@ namespace eval DIO {
 
     method sql_limit_syntax {limit {offset ""}} {
         set sql " LIMIT $limit"
-        if {![lempty $offset]} { append sql " OFFSET $offset" }
+        if {![::rivet::lempty $offset]} { append sql " OFFSET $offset" }
         return $sql
     }
 
@@ -183,7 +183,7 @@ namespace eval DIO {
         constructor {args} {
             eval configure $args
 
-            if {[lempty $resultid]} {
+            if {[::rivet::lempty $resultid]} {
                 return -code error "No resultid specified while creating result"
             }
 

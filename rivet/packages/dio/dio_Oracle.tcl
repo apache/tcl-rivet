@@ -24,16 +24,16 @@ namespace eval DIO {
 
 	constructor {args} {eval configure $args} {
 	    if {[catch {package require Oratcl}]} {
-		return -code error "No Oracle Tcl package available"
+            return -code error "No Oracle Tcl package available"
 	    }
 
 	    eval configure $args
 
-	    if {[lempty $db]} {
-		if {[lempty $user]} {
-		    set user $::env(USER)
-		}
-		set db $user
+	    if {[::rivet::lempty $db]} {
+            if {[::rivet::lempty $user]} {
+                set user $::env(USER)
+            }
+            set db $user
 	    }
 	}
 
@@ -44,16 +44,16 @@ namespace eval DIO {
 	method open {} {
 	    set command "::oralogon"
 
-	    if {![lempty $user]} { append command " $user" }
-	    if {![lempty $pass]} { append command "/$pass" }
-	    if {![lempty $host]} { append command "@$host" }
-	    if {![lempty $port]} { append command -port $port }
+	    if {![::rivet::lempty $user]} { append command " $user" }
+	    if {![::rivet::lempty $pass]} { append command "/$pass" }
+	    if {![::rivet::lempty $host]} { append command "@$host" }
+	    if {![::rivet::lempty $port]} { append command -port $port }
 
 	    if {[catch $command error]} { return -code error $error }
 
 	    set conn $error
 
-	    if {![lempty $db]} { 
+	    if {![::rivet::lempty $db]} { 
 	    	# ??? mysqluse $conn $db 
 	    }
 	}
@@ -71,17 +71,17 @@ namespace eval DIO {
 	    set cmd ::orasql
 	    set is_select 0
 	    if {[::string tolower [lindex $req 0]] == "select"} {
-		set cmd ::orasql
-		set is_select 1
+            set cmd ::orasql
+            set is_select 1
 	    }
 	    set errorinfo ""
 #puts "ORA:$is_select:$req:<br>"
 	    if {[catch {$cmd $_cur $req} error]} {
 #puts "ORA:error:$error:<br>"
-		set errorinfo $error
-		catch {::oraclose $_cur}
-		set obj [result $interface -error 1 -errorinfo [::list $error]]
-		return $obj
+            set errorinfo $error
+            catch {::oraclose $_cur}
+            set obj [result $interface -error 1 -errorinfo [::list $error]]
+            return $obj
 	    }
 	    if {[catch {::oracols $_cur name} fields]} { set fields "" }
 	    ::oracommit $conn
@@ -116,7 +116,7 @@ namespace eval DIO {
 	method sql_limit_syntax {limit {offset ""}} {
 	    # temporary
 	    return ""
-	    if {[lempty $offset]} {
+	    if {[::rivet::lempty $offset]} {
 		return " LIMIT $limit"
 	    }
 	    return " LIMIT [expr $offset - 1],$limit"

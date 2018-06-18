@@ -1,3 +1,6 @@
+2018-06-18 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/*.tcl: fully qualifying calls to ::rivet::lempty
+
 2018-06-14 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl: fixed bug in error scripts' error handling (the
     case of handling an error that occurs in the default error script may
