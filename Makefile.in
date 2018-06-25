@@ -17,7 +17,7 @@
 #
 # top-level Makefile.am for Apache Rivet: gets turned into a Makefile.in by automake
 #
-# $Id: Makefile.am 1802791 2017-07-24 11:47:04Z mxmanghi $
+# $Id: Makefile.am 1825602 2018-02-28 20:45:34Z mxmanghi $
 #
 # 2007/12/25: Added target uninistall-local that removes the tcl stuff (mxmanghi)
 # 2010/06/22: target instal-data-local searches for pkgIndex.tcl files and deletes them
@@ -929,8 +929,8 @@ install-binaries:
 	echo 'running target install-binaries ($(RIVETLIB_DESTDIR))'
 	$(mkinstalldirs) $(RIVETLIB_DESTDIR)
 	$(mkinstalldirs) $(RIVETLIB_DESTDIR)/rivet-tcl
-	$(install_sh) -C $(builddir)/rivet/init.tcl $(RIVETLIB_DESTDIR)
-	$(install_sh) -C $(builddir)/rivet/default_request_handler.tcl $(RIVETLIB_DESTDIR)
+	$(install_sh) -C -m 644 $(builddir)/rivet/init.tcl $(RIVETLIB_DESTDIR)
+	$(install_sh) -C -m 644 $(builddir)/rivet/default_request_handler.tcl $(RIVETLIB_DESTDIR)
 	$(install_sh) -C -m 644 $(shell /bin/ls $(srcdir)/rivet/rivet-tcl/*) $(RIVETLIB_DESTDIR)/rivet-tcl
 
 #cp -rv $(srcdir)/rivet/packages $(RIVETLIB_DESTDIR)/

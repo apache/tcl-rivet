@@ -201,7 +201,7 @@ proc ::Rivet::finish_request {script errorCode errorOpts {scriptName ""}} {
     }
 
     ::try {
-        set ::Rivet::script $error_script
+        set ::Rivet::script $script
         uplevel #0 $error_script
     } on error {err} {
         ::rivet::apache_log_error err "Rivet ErrorScript failed: $::errorInfo"
