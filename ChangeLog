@@ -1,5 +1,9 @@
+2018-08-05 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac,VERSION: setting version as 3.1.0 and testing
+    first push of a git commit
+
 2018-06-25 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/init.tcl.it: the error handler of error scripts requires
+    * rivet/init.tcl.in: the error handler of error scripts requires
     ::Rivet::script to keep the actual 'script' being run 
     (reintegrated into trunk from branches/3.0)
 
