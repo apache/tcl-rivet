@@ -4,6 +4,8 @@
     setting the master branch version as 3.1.0.
     * .gitignore: untracking Makefile.in and putting in .gitignore
     autools generated files
+    * doc/rivet.xml.in: removing references to now unsupported 
+    svn keywords substitutions
 
 2018-06-25 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: the error handler of error scripts requires

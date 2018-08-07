@@ -35,11 +35,12 @@
     <!ENTITY asciiglyphs.xml       SYSTEM "xml/asciiglyphs.xml" >
     <!ENTITY lazybridge.xml        SYSTEM "xml/lazybridge.xml" >
     <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
-    <!ENTITY version	              "3.0" >
-    <!ENTITY fullversion           "3.0.2" >
+    <!ENTITY version	              "3.1" >
+    <!ENTITY fullversion           "3.1.0" >
     <!ENTITY version2-series	     "2.0,2.1,2.2,2.3" >
     <!ENTITY version2-generic	     "2.x" >
     <!ENTITY version30		        "3.0" >
+    <!ENTITY version31		        "3.1" >
     <!ENTITY tcltk-url             "http://www.tcl.tk/" >
     <!ENTITY apache-url            "http://httpd.apache.org" >
     <!ENTITY apachedoc-vhost       "https://httpd.apache.org/docs/2.4/vhosts" >
@@ -70,8 +71,6 @@
    permissions and limitations under the License.
 -->
 
-<!-- $Id$ -->
-
 <article>
   	<articleinfo>
     	<title>Apache Rivet &version;</title>
@@ -91,7 +90,7 @@
   	</articleinfo>
 
   	<para>
-    	Document revision: $Revision$, last modified <?dbtimestamp format="Y-m-d X" ?>$ by $Author$.
+    	This manual was generated on <?dbtimestamp format="A Y-m-d X" ?>$  $.
   	</para>
 
 	<!-- Introduction -->
