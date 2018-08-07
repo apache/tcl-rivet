@@ -23,3 +23,8 @@ src/parser/.deps/
 src/request/.deps/
 stamp-h1
 *~
+*.libs/
+*.dirstamp
+*.lo
+*.la
+tags
