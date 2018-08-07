@@ -1,6 +1,7 @@
-2018-08-05 Massimo Manghi <mxmanghi@apache.org>
-    * configure.ac,VERSION: setting version as 3.1.0 and testing
-    first push of a git commit
+2018-08-07 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION,configure.ac: first commit after svn to git migration.
+    The trunk branch is now the master branch of the git repository.
+    setting the master branch version as 3.1.0
 
 2018-06-25 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl.in: the error handler of error scripts requires
