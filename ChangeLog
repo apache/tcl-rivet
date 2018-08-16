@@ -1,3 +1,7 @@
+2018-08-16 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/xml.tcl: now printing XML elements such as
+    <tag attr1="val1" attr2="val2".... /> if the text string is empty
+
 2018-08-07 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: first commit after svn to git migration.
     The trunk branch is now the master branch of the git repository.
