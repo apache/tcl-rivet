@@ -1,0 +1,15 @@
+# -- commands.test
+# 
+# Tcl commands suite tests
+#
+# Testing the output of various commands that 
+# provide a swiss knife for formatting, generating, etc.etc.
+#
+
+::tcltest::test tcl-xml-1.1 {::rivet::xml command} {
+    set page [::http::geturl "${urlbase}commands.tcl?cmd=xml"]
+    ::http::data $page
+} {<a><b a1="v1" a2="v2"><c a1="v1" a2="v2"/></b></a>
+<b a1="v1" a2="v2"><c a1="v1" a2="v2"><a /></c></b>
+<a><b a1="v1" a2="v2"><c a1="v1" a2="v2">element text</c></b></a>}
+
