@@ -40,6 +40,7 @@ namespace eval ::rivet {
             }
 
             append xmlout ">"
+            set last_elem_attr $el
         }
 
 
@@ -50,12 +51,21 @@ namespace eval ::rivet {
         } else {
 
             if {$textstring == ""} {
-                set xmlout [string replace $xmlout end end " />"]
-                return [append xmlout "</[join [lreverse [lrange $tags_stack 0 end-1]] "></"]>"]
+
+                if {[llength $last_elem_attr]} { 
+                    set closing_seq "/>"
+                } else {
+                    set closing_seq " />"
+                }
+                set xmlout [string replace $xmlout end end $closing_seq]
+                if {[llength $tags_stack] > 1} {
+                    set xmlout [append xmlout "</[join [lreverse [lrange $tags_stack 0 end-1]] "></"]>"]
+                }
+                return $xmlout
+
             }
             return [append xmlout "$textstring</[join [lreverse $tags_stack] "></"]>"]
 
         }
     }
-
 }

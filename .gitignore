@@ -29,3 +29,13 @@ stamp-h1
 *.la
 *.swp
 tags
+tests/access_log
+tests/apachelog.txt
+tests/error_log
+tests/htaccess2
+tests/httpd.pid
+tests/redirect_code.txt
+tests/rivet/
+tests/server.conf
+tests/test.conf
+tests/uploadedjpeg.jpg
