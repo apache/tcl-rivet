@@ -6,8 +6,6 @@
 
 # See README file for more information.
 
-# $Id$
-
 package require tcltest
 
 set auto_path [linsert $auto_path 0 [file join [pwd] rivet]]
@@ -18,7 +16,7 @@ set urlbase "http://localhost:8081/"
 set TestList {rivetlib.test shorthand.test headers.test \
               cookies.test get.test post.test tclfile.test \
               env.test hello.test include.test binary.test \
-              parse.test upload.test makeurl.test}
+              parse.test upload.test makeurl.test commands.test}
 
 # Test stanzas are created by giving the test a name and a
 # description.  The code is then executed, and the results compared

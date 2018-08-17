@@ -1,4 +1,6 @@
-# $Id$
+# -- binary file download
+#
+# 
 
 set testfilename1 binary.rvt
 set binaryfile AngeloFish.jpg
