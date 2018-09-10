@@ -1,6 +1,9 @@
 2018-08-16 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/rivet-tcl/xml.tcl: now printing XML elements such as
-    <tag attr1="val1" attr2="val2".... /> if the text string is empty
+    * rivet/rivet-tcl/xml.tcl: changing form to support single self
+    closing XML elements such as <tag attr1="val1" attr2="val2".... /> 
+    when if the text string is empty
+    * tests/commands.tcl: changing ::rivet::xml test accordingly
+    * doc/xml/commands.xml: documenting new ::rivet::xml feature
 
 2018-08-07 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: first commit after svn to git migration.

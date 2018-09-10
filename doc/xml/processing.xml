@@ -49,8 +49,7 @@
 			and any code interruption brought about by calling 
 			<command>::rivet::abort_page</command>.
 			The current procedure might work as a template to be
-			reworked and used as a template to develop your own
-			request handler.
+			reworked into your own request handler.
 		</note>
 	</section>
 	

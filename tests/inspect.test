@@ -1,5 +1,5 @@
 
-::tcltest::test inspect-1.1 {basic introspection } {
+::tcltest::test inspect-1.1 {basic introspection 1.1} {
     apachetest::start { 
             -c "RivetServerConf ChildInitScript \"set init 1\"" } {} {
         catch {
@@ -11,7 +11,7 @@
     set match
 } {set init 1}
 
-::tcltest::test inspect-1.2 {basic introspection} {
+::tcltest::test inspect-1.2 {basic introspection 1.2} {
     apachetest::start { 
             -c "RivetServerConf ChildInitScript \"set init 1\"" } {} {
         catch {
@@ -23,7 +23,7 @@
     set match
 } {server {ChildInitScript {set init 1}}}
 
-::tcltest::test inspect-1.3 {basic introspection} {
+::tcltest::test inspect-1.3 {basic introspection 1.3} {
     file copy -force inspect.tcl /tmp/
     apachetest::start {
         -c "DocumentRoot /tmp" } {} {

@@ -9,7 +9,8 @@
 ::tcltest::test tcl-xml-1.1 {::rivet::xml command} {
     set page [::http::geturl "${urlbase}commands.tcl?cmd=xml"]
     ::http::data $page
-} {<a><b a1="v1" a2="v2"><c a1="v1" a2="v2"/></b></a>
-<b a1="v1" a2="v2"><c a1="v1" a2="v2"><a /></c></b>
-<a><b a1="v1" a2="v2"><c a1="v1" a2="v2">element text</c></b></a>}
-
+} {<a><b a1="v1" a2="v2"><c a1="v1" a2="v2">a text string</c></b></a>
+<b a1="v1" a2="v2"><c a1="v1" a2="v2"><a>a text string</a></c></b>
+<b a1="v1" a2="v2"><c a1="v1" a2="v2"><a></a></c></b>
+<a a1="v1" a2="v2"/>
+<p />}

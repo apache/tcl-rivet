@@ -2,7 +2,7 @@
 	<title>Rivet Tcl Commands and Variables</title>
 	<section>
 		<para>
-			Starting with version 2.1.0 Rivet command set moved into the 
+			Starting with version 2.1.0 the Rivet command set moved into the 
 			<command>::rivet</command> namespace.
 		</para>
 		<para>
@@ -2111,12 +2111,29 @@ form_request end</programlisting>
             <programlisting>::rivet::xml "a string" b u
 &lt;== &lt;b&gt;&lt;u&gt;a string&lt;/u&gt;&lt;/b&gt;</programlisting>
             <para>
-                You can tell the tags which attributes they must have
+                You can specify the tags attributes by replacing a tag specification
+                with a odd-length list containing the tag name and a series of
+                attribute-value pairs
             </para>
             <programlisting><command>::rivet::xml "a string" [list div class box id testbox] b i</command>
 &lt;== &lt;div class=&quot;box&quot; id=&quot;testbox&quot;&gt;&lt;b&gt;&lt;i&gt;a string&lt;/i&gt;&lt;/b&gt;&lt;/div&gt;</programlisting>
             <programlisting><command>::rivet::xml "text to be wrapped in XML" div [list a href "http://..../" title "info message"]</command> 
 &lt;== &lt;div&gt;&lt;a href=&quot;http://..../&quot; title=&quot;info message&quot;&gt;text to be wrapped in XML&lt;/a&gt;&lt;/div&gt;</programlisting>  
+				<para>
+					A single argument is interpreted as a list of tag name and attributes to be 
+					coded as a self closing element
+				</para>
+				<programlisting><command>::rivet::xml [list b a1 v1 a2 v2]</command>
+&lt;== &lt;b a1=&quot;v1&quot; a2=&quot;v2&quot; /&gt;</programlisting>
+				<para>
+					Unless the string is literally an empty string
+				</para>
+				<programlisting><command>::rivet::xml "" [list b a1 v1 a2 v2]</command>
+&lt;== &lt;b a1=&quot;v1&quot; a2=&quot;v2&quot;&gt;/b&gt;</programlisting>
+				<para>which is useful for generating 'script' elements in an HTML page header that wouldn't be understood 
+				as such</para>
+				<programlisting><command>::rivet::xml "" [list script type "text/javascript" src js/myscripts.js]</command>
+&lt;== &lt;script type=&quot;text/javascript&quot; src=&quot;js/myscripts.js&quot;&gt;&lt;/script&gt;</programlisting>
        </refsect1>
     </refentry>
 </section>
