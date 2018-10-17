@@ -1,3 +1,9 @@
+2018-10-17 Massimo Manghi <mxmanghi@apache.org>
+    * tests/commands.tcl: changing test on self closing element
+    * [doc/rivet.xml.in|doc/rivet.xml]: removed delimiters of
+    symbols expanded by svn
+    * doc/xml/commands.xml: fixed entities in ::rivet::xml manual page
+
 2018-08-16 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/xml.tcl: changing form to support single self
     closing XML elements such as <tag attr1="val1" attr2="val2".... /> 

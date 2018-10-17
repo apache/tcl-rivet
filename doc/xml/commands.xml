@@ -2117,7 +2117,7 @@ form_request end</programlisting>
             </para>
             <programlisting><command>::rivet::xml "a string" [list div class box id testbox] b i</command>
 &lt;== &lt;div class=&quot;box&quot; id=&quot;testbox&quot;&gt;&lt;b&gt;&lt;i&gt;a string&lt;/i&gt;&lt;/b&gt;&lt;/div&gt;</programlisting>
-            <programlisting><command>::rivet::xml "text to be wrapped in XML" div [list a href "http://..../" title "info message"]</command> 
+            <programlisting><command>::rivet::xml "text to be wrapped in XML" div [list a href http://..../ title "info message"]</command> 
 &lt;== &lt;div&gt;&lt;a href=&quot;http://..../&quot; title=&quot;info message&quot;&gt;text to be wrapped in XML&lt;/a&gt;&lt;/div&gt;</programlisting>  
 				<para>
 					A single argument is interpreted as a list of tag name and attributes to be 
@@ -2129,9 +2129,9 @@ form_request end</programlisting>
 					Unless the string is literally an empty string
 				</para>
 				<programlisting><command>::rivet::xml "" [list b a1 v1 a2 v2]</command>
-&lt;== &lt;b a1=&quot;v1&quot; a2=&quot;v2&quot;&gt;/b&gt;</programlisting>
+&lt;== &lt;b a1=&quot;v1&quot; a2=&quot;v2&quot;&gt;&lt;/b&gt;</programlisting>
 				<para>which is useful for generating 'script' elements in an HTML page header that wouldn't be understood 
-				as such</para>
+				as single closing element</para>
 				<programlisting><command>::rivet::xml "" [list script type "text/javascript" src js/myscripts.js]</command>
 &lt;== &lt;script type=&quot;text/javascript&quot; src=&quot;js/myscripts.js&quot;&gt;&lt;/script&gt;</programlisting>
        </refsect1>

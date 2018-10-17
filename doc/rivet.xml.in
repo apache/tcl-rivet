@@ -90,7 +90,7 @@
   	</articleinfo>
 
   	<para>
-    	This manual was generated on <?dbtimestamp format="A Y-m-d X" ?>$  $.
+    	This manual was generated on <?dbtimestamp format="A Y-m-d X" ?>
   	</para>
 
 	<!-- Introduction -->
