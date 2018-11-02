@@ -30,18 +30,18 @@ catch { ::itcl::delete class DIODisplay }
 	eval configure $args
 	load_response
 
-	if {[lempty $DIO]} {
+	if {[::rivet::lempty $DIO]} {
 	    return -code error "You must specify a DIO object"
 	}
 
-	if {[lempty $form]} {
+	if {[::rivet::lempty $form]} {
 	    set form [namespace which [::form #auto -defaults response]]
 	}
 
 	set document [env DOCUMENT_NAME]
 
 	if {[info exists response(num)] \
-	    && ![lempty $response(num)]} {
+	    && ![::rivet::lempty $response(num)]} {
 	    set pagesize $response(num)
 	}
 
@@ -61,7 +61,7 @@ catch { ::itcl::delete class DIODisplay }
     #  set and fetch one of the object's variables
     #
     method configvar {varName string} {
-	if {[lempty $string]} { return [set $varName] }
+	if {[::rivet::lempty $string]} { return [set $varName] }
 	configure -$varName $string
     }
 
@@ -108,7 +108,7 @@ catch { ::itcl::delete class DIODisplay }
     #  recognize CSS info and emit it in appropriate places
     #
     method read_css_file {} {
-	if {[lempty $css]} { return }
+	if {[::rivet::lempty $css]} { return }
 	if {[catch {open [virtual_filename $css]} fp]} { return }
 	set contents [read $fp]
 	close $fp
@@ -205,7 +205,7 @@ catch { ::itcl::delete class DIODisplay }
 	}
 
 	# if there is a style sheet defined, emit HTML to reference it
-	if {![lempty $css]} {
+	if {![::rivet::lempty $css]} {
 	    puts "<LINK REL=\"stylesheet\" TYPE=\"text/css\" HREF=\"$css\">"
 	}
 
@@ -274,14 +274,14 @@ catch { ::itcl::delete class DIODisplay }
 	puts "<TABLE>"
 	puts "<TR>"
 	puts "<TD>"
-	if {![lempty $save]} {
+	if {![::rivet::lempty $save]} {
 	    $form image save -src $save -class DIOFormSaveButton
 	} else {
 	    $form submit save.x -value "Save" -class DIOFormSaveButton
 	}
 	puts "</TD>"
 	puts "<TD>"
-	if {![lempty $cancel]} {
+	if {![::rivet::lempty $cancel]} {
 	    $form image cancel -src $cancel -class DIOFormSaveButton
 	} else {
 	    $form submit cancel.x -value "Cancel" -class DIOFormCancelButton
@@ -437,7 +437,7 @@ catch { ::itcl::delete class DIODisplay }
 
     method rowheader {{total 0}} {
 	set fieldList $fields
-	if {![lempty $rowfields]} { set fieldList $rowfields }
+	if {![::rivet::lempty $rowfields]} { set fieldList $rowfields }
 
 	set rowcount 0
 
@@ -452,7 +452,7 @@ catch { ::itcl::delete class DIODisplay }
 	    set sorting $allowsort
 	    ## If sorting is turned off, or this field is not in the
 	    ## sortfields, we don't display the sort option.
-	    if {$sorting && ![lempty $sortfields]} {
+	    if {$sorting && ![::rivet::lempty $sortfields]} {
 		if {[lsearch $sortfields $field] < 0} {
 		    set sorting 0
 	        }
@@ -482,7 +482,7 @@ catch { ::itcl::delete class DIODisplay }
 	    puts "<TH CLASS=\"$class\">$html</TH>"
 	}
 
-	if {![lempty $rowfunctions] && "$rowfunctions" != "-"} {
+	if {![::rivet::lempty $rowfunctions] && "$rowfunctions" != "-"} {
 	  puts {<TH CLASS="DIORowHeaderFunctions">Functions</TH>}
         }
 	puts "</TR>"
@@ -496,7 +496,7 @@ catch { ::itcl::delete class DIODisplay }
 	if {$alternaterows && ![expr $rowcount % 2]} { set alt Alt }
 
 	set fieldList $fields
-	if {![lempty $rowfields]} { set fieldList $rowfields }
+	if {![::rivet::lempty $rowfields]} { set fieldList $rowfields }
 
 	puts "<TR>"
 	foreach field $fieldList {
@@ -514,7 +514,7 @@ catch { ::itcl::delete class DIODisplay }
 	    puts "<TD CLASS=\"$class\">$text</TD>"
 	}
 
-	if {![lempty $rowfunctions] && "$rowfunctions" != "-"} {
+	if {![::rivet::lempty $rowfunctions] && "$rowfunctions" != "-"} {
 	    set f [::form #auto]
 	    puts "<TD NOWRAP CLASS=\"DIORowFunctions$alt\">"
 	    $f start
@@ -556,7 +556,7 @@ catch { ::itcl::delete class DIODisplay }
 
 	set class DIODisplayField
 	if {[info exists data(type)]} {
-	    if {![lempty [::itcl::find classes *DIODisplayField_$data(type)]]} {
+	    if {![::rivet::lempty [::itcl::find classes *DIODisplayField_$data(type)]]} {
 		set class DIODisplayField_$data(type)
 	    }
 
@@ -570,7 +570,7 @@ catch { ::itcl::delete class DIODisplay }
 	upvar 1 $arrayName $arrayName
 	set result [$DIO fetch $key $arrayName]
 	set error  [$DIO errorinfo]
-	if {![lempty $error]} { return -code error $error }
+	if {![::rivet::lempty $error]} { return -code error $error }
 	return $result
     }
 
@@ -578,7 +578,7 @@ catch { ::itcl::delete class DIODisplay }
 	upvar 1 $arrayName array
 	set result [$DIO store array]
 	set error  [$DIO errorinfo]
-	if {![lempty $error]} { return -code error $error }
+	if {![::rivet::lempty $error]} { return -code error $error }
 	return $result
     }
 
@@ -586,14 +586,14 @@ catch { ::itcl::delete class DIODisplay }
 	upvar 1 $arrayName array
 	set result [$DIO update_with_explicit_key $key array]
 	set error [$DIO errorinfo]
-	if {![lempty $error]} {return -code error $error}
+	if {![::rivet::lempty $error]} {return -code error $error}
 	return $result
     }
 
     method delete {key} {
 	set result [$DIO delete $key]
 	set error  [$DIO errorinfo]
-	if {![lempty $error]} { return -code error $error }
+	if {![::rivet::lempty $error]} { return -code error $error }
 	return $result
     }
 
@@ -702,7 +702,7 @@ catch { ::itcl::delete class DIODisplay }
 	}
 
 	set useFields $fields
-	if {![lempty $searchfields]} { set useFields $searchfields }
+	if {![::rivet::lempty $searchfields]} { set useFields $searchfields }
 
 	$form select by -values [pretty_fields $useFields] \
 	    -class DIOMainSearchBy
@@ -727,7 +727,7 @@ catch { ::itcl::delete class DIODisplay }
 	}
 	puts "</TD></TR>"
 
-	if {![lempty $numresults]} {
+	if {![::rivet::lempty $numresults]} {
 	    puts "<TR><TD CLASS=DIOForm>Results per page: "
 	    $form select num -values $numresults -class DIOMainNumResults
 	    puts "</TD></TR>"
@@ -738,11 +738,11 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method sql_order_by_syntax {} {
-	if {[info exists response(sort)] && ![lempty $response(sort)]} {
+	if {[info exists response(sort)] && ![::rivet::lempty $response(sort)]} {
 	    return " ORDER BY $response(sort)"
 	}
 
-	if {![lempty $defaultsortfield]} {
+	if {![::rivet::lempty $defaultsortfield]} {
 	    return " ORDER BY $defaultsortfield"
 	}
     }
@@ -912,7 +912,7 @@ catch { ::itcl::delete class DIODisplay }
     ###
 
     method fields {{list ""}} {
-	if {[lempty $list]} { return $fields }
+	if {[::rivet::lempty $list]} { return $fields }
 	foreach field $list {
 	    if {[lsearch $allfields $field] < 0} {
 		return -code error "Field $field does not exist."
@@ -922,7 +922,7 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method searchfields {{list ""}} {
-	if {[lempty $list]} { return $searchfields }
+	if {[::rivet::lempty $list]} { return $searchfields }
 	foreach field $list {
 	    if {[lsearch $allfields $field] < 0} {
 		return -code error "Field $field does not exist."
@@ -932,7 +932,7 @@ catch { ::itcl::delete class DIODisplay }
     }
 
     method rowfields {{list ""}} {
-	if {[lempty $list]} { return $rowfields }
+	if {[::rivet::lempty $list]} { return $rowfields }
 	foreach field $list {
 	    if {[lsearch $allfields $field] < 0} {
 		return -code error "Field $field does not exist."
@@ -1002,7 +1002,7 @@ catch { ::itcl::delete class DIODisplay }
     public variable confirmdelete 1
 
     public variable css			"diodisplay.css" {
-	if {![lempty $css]} {
+	if {![::rivet::lempty $css]} {
 	    catch {unset cssArray}
 	    read_css_file
 	}
@@ -1067,7 +1067,7 @@ catch { ::itcl::delete class ::DIODisplayField }
 
 	# if text (field description) isn't set, prettify the actual
 	# field name and use that
-	if {[lempty $text]} { set text [pretty [split $name _]] }
+	if {[::rivet::lempty $text]} { set text [pretty [split $name _]] }
     }
 
     destructor {
@@ -1118,7 +1118,7 @@ catch { ::itcl::delete class ::DIODisplayField }
     }
 
     method configvar {varName string} {
-	if {[lempty $string]} { return [set $varName] }
+	if {[::rivet::lempty $string]} { return [set $varName] }
 	configure -$varName $string
     }
 

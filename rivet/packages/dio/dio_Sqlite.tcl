@@ -88,7 +88,7 @@ namespace eval DIO {
 
         method sql_limit_syntax {limit {offset ""}} {
             set sql " LIMIT $limit"
-            if {![lempty $offset]} { append sql " OFFSET $offset" }
+            if {![::rivet::lempty $offset]} { append sql " OFFSET $offset" }
             return $sql
         }
 
