@@ -1,6 +1,13 @@
 2018-11-02 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/: integrating changes done in the master branch. 
     Basically fully qualifying commands that need the ::rivet namespace
+2018-08-07 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/init.tcl: reflecting the changes in init.tcl.in 
+    * doc/rivet.xml: removed subversion related keyword
+
+2018-08-16 Massimo Manghi <mxmanghi@apache.org>
+    * .gitignore: add file copied from master
+    * doc/rivet.xml.in: removed no more supported SVN keywords
 
 2018-07-07 Massimo Manghi <mxmanghi@apache.org>
     * Changelog: released as rivet 3.0.2

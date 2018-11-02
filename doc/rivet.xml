@@ -70,8 +70,6 @@
    permissions and limitations under the License.
 -->
 
-<!-- $Id$ -->
-
 <article>
   	<articleinfo>
     	<title>Apache Rivet &version;</title>
@@ -91,7 +89,7 @@
   	</articleinfo>
 
   	<para>
-    	Document revision: $Revision$, last modified <?dbtimestamp format="Y-m-d X" ?>$ by $Author$.
+    	This manual was generated on <?dbtimestamp format="A Y-m-d X" ?>.
   	</para>
 
 	<!-- Introduction -->
