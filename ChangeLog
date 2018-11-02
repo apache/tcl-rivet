@@ -1,3 +1,7 @@
+2018-11-02 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/: integrating changes done in the master branch. 
+    Basically fully qualifying commands that need the ::rivet namespace
+
 2018-07-07 Massimo Manghi <mxmanghi@apache.org>
     * Changelog: released as rivet 3.0.2
 
