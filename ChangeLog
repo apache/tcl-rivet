@@ -1,3 +1,7 @@
+2017-11-02 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/mod_rivet.[c|h]: add macro RIVET_MPM_BRIDGE to
+    compose rivet bridge names
+
 2018-10-17 Massimo Manghi <mxmanghi@apache.org>
     * tests/commands.tcl: changing test on self closing element
     * [doc/rivet.xml.in|doc/rivet.xml]: removed delimiters of

@@ -104,7 +104,7 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
         apr_finfo_t finfo;
         char*       proposed_bridge;
 
-        proposed_bridge = apr_pstrcat(pool,RIVET_DIR,"/mpm/rivet_",rsc->mpm_bridge,"_mpm.so",NULL);
+        proposed_bridge = apr_pstrcat(pool,RIVET_MPM_BRIDGE_COMPOSE(rsc->mpm_bridge),NULL);
         if (apr_stat(&finfo,proposed_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
         {
             mpm_bridge_path = proposed_bridge;

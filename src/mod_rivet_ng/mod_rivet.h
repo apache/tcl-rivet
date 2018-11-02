@@ -320,4 +320,6 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 #define RIVET_MPM_BRIDGE rivet_bridge_table bridge_jump_table =
 
+#define RIVET_MPM_BRIDGE_COMPOSE(bridge) RIVET_DIR,"/mpm/rivet_",bridge,"_mpm.so"
+
 #endif /* MOD_RIVET_H */
