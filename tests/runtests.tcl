@@ -80,6 +80,7 @@ apachetest::need_modules {
     {mod_authz_core     authz_core_module}
     {mod_authz_host     authz_host_module}
     {mod_unixd          unixd_module}
+    {mod_mpm_prefork    mpm_prefork_module}
 }
 
 apachetest::makeconf server.conf {

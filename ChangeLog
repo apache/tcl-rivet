@@ -1,6 +1,15 @@
+2018-11-04 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/rivet-tcl/xml.tcl: New ::rivet::xml command simplified and
+    new construct for self closing elements
+    * doc/xml/commands.xml: documenting new ::rivet::xml command 
+    * tests/commands.[test|tcl]: add new test for commands that don't need
+    their own test script
+    * tests/runtest.tcl: Now is supposed to load 'prefork' by default
+
 2018-11-02 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/: integrating changes done in the master branch. 
     Basically fully qualifying commands that need the ::rivet namespace
+
 2018-08-07 Massimo Manghi <mxmanghi@apache.org>
     * rivet/init.tcl: reflecting the changes in init.tcl.in 
     * doc/rivet.xml: removed subversion related keyword
