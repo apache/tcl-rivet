@@ -726,7 +726,7 @@ AC_DEFUN([RIVET_COMMANDS_EXPORT],[
 # IMPORT_RIVET_COMMANDS (--enable-import-rivet-commands).
 # For compatibility the module can be compiled and installed forcing rivet
 # to import commands from ::rivet into the global namespace.
-# Default: yes
+# Default: no
 
 AC_DEFUN([IMPORT_RIVET_COMMANDS],[
     AC_ARG_ENABLE(

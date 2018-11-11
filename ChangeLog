@@ -1,3 +1,8 @@
+2018-11-11 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: correct macro description
+    * src/mod_rivet_ng/rivetChannel.c: new copyright notice
+    * doc/xml/commands.xml: correct sentence in ::rivet::exit manual page
+
 2018-11-02 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/mod_rivet.[c|h]: add macro RIVET_MPM_BRIDGE to
     compose rivet bridge names
