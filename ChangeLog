@@ -1,3 +1,6 @@
+2018-11-18 Massimo Manghi <mxmanghi@apache.org>
+    * : version 3.0.3 released
+
 2018-11-04 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/xml.tcl: New ::rivet::xml command simplified and
     new construct for self closing elements

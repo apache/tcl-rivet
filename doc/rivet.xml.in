@@ -89,7 +89,7 @@
   	</articleinfo>
 
   	<para>
-    	This manual was generated on <?dbtimestamp format="A Y-m-d X" ?>.
+    	This manual is released as part of Apache/Rivet &fullversion; (<?dbtimestamp format="A Y-m-d X" ?>).
   	</para>
 
 	<!-- Introduction -->
