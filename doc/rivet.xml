@@ -69,7 +69,7 @@
   </articleinfo>
 
   <para>
-    Document revision: $Revision$, last modified <?dbtimestamp format="Y-m-d X" ?>$ by $Author$.
+    Document released as part of Rivet 2.3.6 (<?dbtimestamp format="Y-m-d X" ?>).
   </para>
 
     <!-- Introduction -->
