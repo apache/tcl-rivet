@@ -638,7 +638,7 @@ TCL_CMD_HEADER ( Rivet_LoadHeaders )
 TCL_CMD_HEADER ( Rivet_Var )
 {
     rivet_thread_private*   private;
-    char*                   cmd; 
+    const char*             cmd; 
     char*                   command;
     Tcl_Obj*                result = NULL;
     int                     source;
