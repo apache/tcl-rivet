@@ -1,6 +1,7 @@
 2018-11-20 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: reverting to version 2.3.6 as we never
     released that version
+    * doc/rivet.xml: changed release notice
 
 2018-11-19 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: bumping version to 2.3.7
