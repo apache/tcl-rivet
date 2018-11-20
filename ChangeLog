@@ -1,3 +1,6 @@
+2018-11-20 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: add const specifier to variable definition
+
 2018-11-18 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac,VERSION: bumping to version 3.0.4
     * src/mod_rivet_ng/rivetCore.c: stripping the namespace in the commands
