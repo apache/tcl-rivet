@@ -1,3 +1,9 @@
+2018-11-20 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: patching from 3.0 to fix bug #92926
+    * tests/post.rvt,fqrivet_var.tcl: add tests to prevent post and get
+    variables crosstalk (bug #92926)
+    * doc/rivet.xml.in: displaying full version associated to the manual
+
 2018-11-11 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: correct macro description
     * src/mod_rivet_ng/rivetChannel.c: new copyright notice
