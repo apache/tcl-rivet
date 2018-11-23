@@ -1,5 +1,10 @@
+2018-11-23 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION,configure,ac: version number bumped to 3.2.0 as we created
+    3.1 out of branch 3.0 in order to highlight possible regressions that
+    may surface as a consequence of fixing bug #62926
+
 2018-11-20 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetCore.c: patching from 3.0 to fix bug #92926
+    * src/mod_rivet_ng/rivetCore.c: patching from 3.0 to fix bug #62926
     * tests/post.rvt,fqrivet_var.tcl: add tests to prevent post and get
     variables crosstalk (bug #92926)
     * doc/rivet.xml.in: displaying full version associated to the manual
