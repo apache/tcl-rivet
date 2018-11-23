@@ -638,10 +638,11 @@ TCL_CMD_HEADER ( Rivet_LoadHeaders )
 TCL_CMD_HEADER ( Rivet_Var )
 {
     rivet_thread_private*   private;
-    char*                   cmd;
+    const char*             cmd; 
     char*                   command;
     Tcl_Obj*                result = NULL;
     int                     source;
+    register const char     *p;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::var,::rivet::var_post,::rivet::var_qs")
@@ -657,6 +658,26 @@ TCL_CMD_HEADER ( Rivet_Var )
     result = Tcl_NewObj();
 
     /* determine if var_qs, var_post or var was called */
+
+    /* first of all we have to skip the namespace string at the beginning of the command:
+     * 
+     * This fragment of code is taken from tcl 8.6.6 (tclNamesp.c) and it's part of the
+     * function implementing Tcl "namespace tail", as such it should be authoritative
+     * regarding the determination of the namespace stripped command name 
+     */
+
+    for (p = cmd;  *p != '\0';  p++) {
+	    /* empty body */
+    }
+    
+    while (--p > cmd) {
+        if ((*p == ':') && (*(p-1) == ':')) {
+            p++;			/* Just after the last "::" */
+            break;
+        }
+    }
+    cmd = p;
+
     if (!strcmp(cmd, "var_qs")) source = VAR_SRC_QUERYSTRING;
     else if (!strcmp(cmd, "var_post")) source = VAR_SRC_POST;
     else source = VAR_SRC_ALL;

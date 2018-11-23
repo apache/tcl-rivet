@@ -37,3 +37,26 @@ set testfilename1 post.rvt
     regexp -line {^\[::rivet::var_post get foobar\] = goober$} [ ::http::data $page ] match
     set match
 } {[::rivet::var_post get foobar] = goober}
+
+set rivetscript "${urlbase}fqrivet_var.tcl"
+
+::tcltest::test postvariables-5.1 {::rivet::var_qs and ::rivet::var_post} {
+    set page [::http::geturl "${rivetscript}?qsarg1=val1&qsarg2=val2&t1=1" \
+                            -query [::http::formatQuery postarg1 val1 postarg2 val2]]
+    set match [::http::data $page]
+    set match
+} {var_qs = qsarg1 val1 qsarg2 val2
+var_post = postarg1 val1 postarg2 val2}
+
+::tcltest::test postvariables-5.2 {::rivet::var_post and ::rivet::var_qs crosstalk 1} {
+    set page [::http::geturl "${rivetscript}?qsarg1=val1&qsarg2=val2&t1=2"]
+    set match [::http::data $page]
+    set match
+} {OK}
+
+::tcltest::test postvariables-5.3 {::rivet::var_post and ::rivet::var_qs crosstalk 2} {
+    set page [::http::geturl "${rivetscript}?t1=3" \
+                              -query [::http::formatQuery postarg1 val1 postarg2 val2]]
+    set match [::http::data $page]
+    set match
+} {OK}

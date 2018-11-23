@@ -1,3 +1,21 @@
+2018-11-23 Massimo Manghi <mxmanghi@apache.org>
+    * : code branched as branch 3.1
+    * configure.ac,VERSION: bumping to version 3.0.4
+
+2018-11-20 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: add const specifier to variable definition
+
+2018-11-18 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: stripping the namespace in the commands
+    implemented by Rivet_Var (fixes bug #62926)
+    * tests/post.test: add test to prevent the POST and GET arguments 
+    crosstalk
+    * tests/fqrivet_var.tcl: test fully qualified ::rivet::var[xxx] commands
+
+2018-11-18 Massimo Manghi <mxmanghi@apache.org>
+    * : version 3.0.3 released
+    * doc/rivet.xml.in: print manual the full version in the cover page 
+
 2018-11-04 Massimo Manghi <mxmanghi@apache.org>
     * rivet/rivet-tcl/xml.tcl: New ::rivet::xml command simplified and
     new construct for self closing elements
