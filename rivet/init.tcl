@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package require rivetlib 3.1
+package require rivetlib 3.2
 
 # the ::rivet namespace is created in mod_rivet_commoc.c:Rivet_PerInterpInit
 # namespace eval ::rivet {} ; ## create namespace
@@ -259,4 +259,4 @@ proc ::Rivet::tcl_commands_export_list {tclpath} {
 
 ::Rivet::init
 
-package provide Rivet 3.1
+package provide Rivet 3.2

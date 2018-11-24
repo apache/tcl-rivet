@@ -75,7 +75,7 @@
   	<articleinfo>
     	<title>Apache Rivet &version;</title>
     	<copyright>
-        	<year>2002-2018</year>
+        	<year>2002-<?dbtimestamp format="Y" ?></year>
         	<holder>Apache Software Foundation</holder>
     	</copyright>
     	<author>
