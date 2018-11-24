@@ -27,9 +27,9 @@
     </para>
     
     <simplesect>
-        <title>New commands in Rivet 2.3</title>
+        <title>New commands in Rivet 2.4</title>
         <para>
-        		Rivet 2.3 introduces 2 new commands <command>::rivet::exit</command>
+        		Rivet 2.4 introduces 2 new commands <command>::rivet::exit</command>
         		and <command>::rivet::catch</command>
         </para>
         <itemizedlist>
