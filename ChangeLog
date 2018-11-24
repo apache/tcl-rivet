@@ -5,6 +5,8 @@
     kept out of distribution
     * tests/fqrivet_var.tcl: test script for FQ var,var_post,var_qs
     * src/channel/rivetChannel.c: new copyright statement
+    * doc/rivet.xml,doc/xml/intro.xml,doc/xml/install.xml: update
+    date and version numbers
 
 2018-11-20 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xml: changed release notice
