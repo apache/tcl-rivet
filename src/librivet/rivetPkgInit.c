@@ -2,20 +2,24 @@
  * rivetPkgInit.c - Initialize all of the Rivet commands into a Tcl interp.
  */
 
-/* Copyright 2002-2004 The Apache Software Foundation
+/*
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
 
-   	http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
@@ -23,8 +27,13 @@
 #endif
 
 #include <tcl.h>
+/* Function prototypes are defined with EXTERN. Since we are in the same DLL,
+ * no need to keep this extern... */
+#ifdef EXTERN
+#   undef EXTERN
+#   define EXTERN
+#endif /* EXTERN */
 #include "rivet.h"
-#include "mod_rivet.h"
 
 /*-----------------------------------------------------------------------------
  * Rivet_GetNamespace --
@@ -49,25 +58,16 @@
 
 #if RIVET_NAMESPACE_EXPORT == 1
 
-Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp)
+Tcl_Namespace* 
+Rivet_GetNamespace( Tcl_Interp* interp)
 {
-    rivet_interp_globals *globals; 
     Tcl_Namespace *rivet_ns;
 
-    globals = Tcl_GetAssocData(interp, "rivet", NULL);
-    if (globals != NULL)
+    rivet_ns = Tcl_FindNamespace(interp,RIVET_NS,NULL,TCL_GLOBAL_ONLY);
+    if (rivet_ns == NULL) 
     {
-        rivet_ns = globals->rivet_ns;
-    }
-    else
-    {
-//      fprintf(stderr,"no Associated data found, running standalone\n");
-        rivet_ns = Tcl_FindNamespace(interp, RIVET_NS, NULL, TCL_GLOBAL_ONLY);
-        if (rivet_ns == NULL) {
-            /* The namespace does not exist, create it */
-            rivet_ns = Tcl_CreateNamespace (interp, RIVET_NS, NULL,
-                                            (Tcl_NamespaceDeleteProc *)NULL);
-        }
+        rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
+                                        (Tcl_NamespaceDeleteProc *)NULL);
     }
 
     return rivet_ns;
@@ -86,12 +86,9 @@ Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp)
  *-----------------------------------------------------------------------------
  */
 
-int
+DLLEXPORT int
 Rivetlib_Init( Tcl_Interp *interp )
 {
-#if RIVET_NAMESPACE_EXPORT == 1
-    //Tcl_Namespace *rivet_ns; 
-#endif
 
 #ifdef USE_TCL_STUBS
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
@@ -104,16 +101,13 @@ Rivetlib_Init( Tcl_Interp *interp )
     Rivet_InitList (interp);
     Rivet_InitCrypt(interp);
     Rivet_InitWWW  (interp);
-#if RIVET_NAMESPACE_EXPORT == 1
-    //rivet_ns = Rivet_GetNamespace(interp);
-    //Tcl_Export(interp,rivet_ns,"*",0);
-#endif
 
     return Tcl_PkgProvide( interp, RIVETLIB_TCL_PACKAGE, RIVET_VERSION );
 }
 
 /*-----------------------------------------------------------------------------
  * Rivetlib_SafeInit --
+ *
  *   Install the commands provided by librivet that are believed to be
  *   safe for use in safe interpreters, into a safe interpreter.
  *
@@ -124,9 +118,10 @@ Rivetlib_Init( Tcl_Interp *interp )
  *-----------------------------------------------------------------------------
  */
 
-int
+DLLEXPORT int
 Rivetlib_SafeInit( Tcl_Interp *interp )
 {
+
 #ifdef USE_TCL_STUBS
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
 #else
