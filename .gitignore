@@ -17,10 +17,7 @@ doc/graphics
 doc/html/
 libtool
 src/Makefile
-src/librivet/.deps/
-src/mod_rivet_ng/.deps/
-src/parser/.deps/
-src/request/.deps/
+src/*/.deps/
 stamp-h1
 *~
 *.libs/
@@ -39,3 +36,4 @@ tests/rivet/
 tests/server.conf
 tests/test.conf
 tests/uploadedjpeg.jpg
+
