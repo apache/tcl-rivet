@@ -1,3 +1,6 @@
+2018-11-28 Massimo Manghi <mxmanghi@apache.org>
+    * : released as 2.4.0
+
 2018-11-24 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure.ac: moving to version 2.4.0 to mark
     potential regressions introduced by fixing bug #29692
