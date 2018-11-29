@@ -4,20 +4,22 @@
       <title>Introduction</title>
       <para>
          The <command>FormBroker</command> package creates instances of 
-         objects representing a form data description. These objects offer a 
-         simple interface of methods meant to validate and control data 
-         as typically posted through an HTML form, 
-         thus data represented through the association of form variables 
-         with their values as returned, for example, 
-         by the <command>::rivet::load_response</command> command
+         form data description objects. These objects instances have
+         a simple set of methods to validate and control data
+         as typically posted by HTML forms,
+         thus data represented as the map of form variables
+         to their values. In Rivet this association can be obtained either
+         calling <xref linkend="load_response">::rivet::load_response</xref> or
+         <xref linkend="var">::rivet::var</xref> (form variables can be selectively
+         read also calling <command>::rivet::var_post</command> or
+         <command>::rivet::var_qs</command>)
       </para>
       <note>
       	The <command>FormBroker</command> package is still experimental. 
       	Basic functionalities and interface are not likely to change but
       	internal details and implementation could be redesigned
       	in future releases. More specifically the external validator mechanism
-      	could be improved with the purpose of shielding the <command>FormBroker</command>
-      	internals from a data validation procedure.
+			will likely need design improvements.
       </note>
       <!-- programlisting>
       
@@ -45,18 +47,19 @@
             <para>
                The command returns a reference to a form broker object by creating
                a representation of the form data using the list of variable 
-               descriptors passed to <command>create</command>. Each descriptor
-               is a list of parameter or parameter-value pairs whose order has as only requirement
-               to begin with the <command>{variable_name variable_type}</command> pair.
-               A formbroker object handles natively integer, unsigned, string, boolean and email data types.
-               The programmer can defined new data type and provide in the descriptor a
-               reference to a validating procedure for that type.
+               descriptors passed to method <command>create</command>. Each descriptor
+               is a list of parameter or parameter-value pairs that must
+               begin with the <command>{variable_name variable_type}</command> pair as only
+               requirement. A formbroker object provide native support for
+               integer, unsigned integer, string, boolean and email data types.
+               The programmer can defined new data types and provide in the descriptor a
+               reference to a validation procedure for that type.
             </para>
             <para>
-               The optional <arg>-quoting quoting_procedure</arg> switch assigns a procedure to
-               be called to quote the form response values. The quoting procedure is any
-               procedure accepting a single string argument and returning its quoted value. A most
-               basic example is the FormBroker default quoting procedure
+               The optional <arg>-quoting quoting_procedure</arg> switch defines an
+               external procedure to quote or reformat the response values. 
+               The quoting procedure is any procedure accepting a single string argument
+               and returning its quoted value. A most basic example is the FormBroker default quoting procedure
             </para>
             <programlisting>proc force_quote {str} {
     return "'$str'"
