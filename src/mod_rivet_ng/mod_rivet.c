@@ -292,7 +292,7 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
 	/* bridge specific server init script */
 	
-	RIVET_MPM_BRIDGE_CALL(mpm_server_init,pPool,pLog,pTemp,s);
+	RIVET_MPM_BRIDGE_CALL(server_init,pPool,pLog,pTemp,s);
 
     return OK;
 }
@@ -366,10 +366,10 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
             exit(1);   
         }
 
-        /* we require only mpm_request and mpm_thread_interp to be defined */
+        /* we require only request_processor and thread_interp to be defined */
 
-        ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_request) != NULL);
-        ap_assert(RIVET_MPM_BRIDGE_FUNCTION(mpm_thread_interp) != NULL);
+        ap_assert(RIVET_MPM_BRIDGE_FUNCTION(request_processor) != NULL);
+        ap_assert(RIVET_MPM_BRIDGE_FUNCTION(thread_interp) != NULL);
 
         apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pPool);
 
@@ -399,7 +399,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 apr_status_t Rivet_Finalize(void* data)
 {
 
-    RIVET_MPM_BRIDGE_CALL(mpm_finalize,data);
+    RIVET_MPM_BRIDGE_CALL(child_finalize,data);
     apr_threadkey_private_delete (rivet_thread_key);
 
     return OK;
@@ -467,7 +467,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     /* Calling the brigde child process initialization */
 
-    RIVET_MPM_BRIDGE_CALL(mpm_child_init,pChild,server);
+    RIVET_MPM_BRIDGE_CALL(thread_init,pChild,server);
 
     apr_pool_cleanup_register (pChild,server,Rivet_Finalize,Rivet_Finalize);
 }
@@ -480,7 +480,7 @@ static int Rivet_Handler (request_rec *r)
         return DECLINED;
     }
 
-    return (*RIVET_MPM_BRIDGE_FUNCTION(mpm_request))(r,ctype);
+    return (*RIVET_MPM_BRIDGE_FUNCTION(request_processor))(r,ctype);
 }
 
 /*

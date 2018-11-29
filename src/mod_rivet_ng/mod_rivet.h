@@ -170,7 +170,7 @@ typedef struct _rivet_thread_interp {
 typedef struct _thread_worker_private rivet_thread_private;
 
 typedef int                     (RivetBridge_ServerInit)    (apr_pool_t*,apr_pool_t*,apr_pool_t*,server_rec*);
-typedef void                    (RivetBridge_ChildInit)     (apr_pool_t* pPool,server_rec* s);
+typedef void                    (RivetBridge_ThreadInit)    (apr_pool_t* pPool,server_rec* s);
 typedef int                     (RivetBridge_Request)       (request_rec*,rivet_req_ctype);
 typedef apr_status_t            (RivetBridge_Finalize)      (void*);
 typedef rivet_thread_interp*    (RivetBridge_Master_Interp) (void);
@@ -178,12 +178,12 @@ typedef int                     (RivetBridge_Exit_Handler)  (int);
 typedef rivet_thread_interp*    (RivetBridge_Thread_Interp) (rivet_thread_private*,rivet_server_conf *,rivet_thread_interp*);
 
 typedef struct _mpm_bridge_table {
-    RivetBridge_ServerInit    *mpm_server_init;
-    RivetBridge_ChildInit     *mpm_child_init;
-    RivetBridge_Request       *mpm_request;
-    RivetBridge_Finalize      *mpm_finalize;
-    RivetBridge_Exit_Handler  *mpm_exit_handler;
-    RivetBridge_Thread_Interp *mpm_thread_interp;
+    RivetBridge_ServerInit    *server_init;
+    RivetBridge_ThreadInit    *thread_init;
+    RivetBridge_Request       *request_processor;
+    RivetBridge_Finalize      *child_finalize;
+    RivetBridge_Exit_Handler  *exit_handler;
+    RivetBridge_Thread_Interp *thread_interp;
 } rivet_bridge_table;
 
 /* we need also a place where to store globals with module wide scope */
@@ -313,10 +313,10 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 }
 
 #define RIVET_PEEK_INTERP(thread_private,running_conf) \
-        (module_globals->bridge_jump_table->mpm_thread_interp)(thread_private,running_conf,NULL)
+        (module_globals->bridge_jump_table->thread_interp)(thread_private,running_conf,NULL)
 
 #define RIVET_POKE_INTERP(thread_private,running_conf,interp) \
-        (module_globals->bridge_jump_table->mpm_thread_interp)(thread_private,running_conf,interp)
+        (module_globals->bridge_jump_table->thread_interp)(thread_private,running_conf,interp)
 
 #define RIVET_MPM_BRIDGE rivet_bridge_table bridge_jump_table =
 
