@@ -5,9 +5,20 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 # Rivet version:
-set(RIVET_MAJOR_VERSION 3)
-set(RIVET_MINOR_VERSION 0)
-set(RIVET_PATCH_VERSION 0)
+
+# in order to avoid chasing around multiple definition of the module version we infer
+# this information from the file VERSION, which must stay in the project root directory
+# and assuming we are working from a direct child directory
+
+execute_process(COMMAND pwd)
+execute_process(COMMAND cut -s --fields=1 --delimiter='.' '../../VERSION' OUTPUT_VARIABLE RIVET_MAJOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND cut -s --fields=2 --delimiter='.' '../../VERSION' OUTPUT_VARIABLE RIVET_MINOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND cut -s --fields=3 --delimiter='.' '../../VERSION' OUTPUT_VARIABLE RIVET_PATCH_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+#set(RIVET_MAJOR_VERSION 3)
+#set(RIVET_MINOR_VERSION 2)
+#set(RIVET_PATCH_VERSION 0)
+
 set(RIVET_VERSION
   ${RIVET_MAJOR_VERSION}.${RIVET_MINOR_VERSION}.${RIVET_PATCH_VERSION})
 set(INIT_VERSION ${RIVET_MAJOR_VERSION}.${RIVET_MINOR_VERSION})
