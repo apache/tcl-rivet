@@ -239,8 +239,8 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
     const char *strstart = START_TAG;
     const char *strend = END_TAG;
 
-    int endseqlen = strlen(END_TAG);
-    int startseqlen = strlen(START_TAG);
+    int endseqlen 	= 	(int) strlen(END_TAG);
+    int startseqlen = 	(int) strlen(START_TAG);
     int inside = 0, p = 0, check_echo = 0;
     int inLen = 0;
 
@@ -297,7 +297,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
                         Tcl_AppendToObj(outbuf, "\\\\", 2);
                         break;
                     default:
-                        Tcl_AppendToObj(outbuf, cur, next - cur);
+                        Tcl_AppendToObj(outbuf, cur, (int)(next - cur));
                         break;
                 }
                 continue;
@@ -328,7 +328,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
                     Tcl_AppendToObj(outbuf, (char *)strend, p);
                     p = 0;
                 }
-                Tcl_AppendToObj(outbuf, cur, next - cur);
+                Tcl_AppendToObj(outbuf, cur, (int)(next - cur));
             }
         }
     }

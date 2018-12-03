@@ -98,7 +98,7 @@ Rivet_ReadFile (apr_pool_t* pool,char* filename,
 
     apr_file_close(apr_fp);
  
-    *nbytes = buffer_size;
+    *nbytes = (int)buffer_size;
     return 0;
 }
 

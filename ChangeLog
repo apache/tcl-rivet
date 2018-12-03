@@ -1,3 +1,10 @@
+2018-12-03 Massimo Manghi <mxmanghi@apache.org>
+	* cmake/CMakeList.c: we infer the version number from the file
+	VERSION assumed to reside in the project root directory
+	* src/parser/rivetParser.c: 
+	* src/mod_rivet_ng/mod_rivet_common.c: type cast of pointer
+	arithmetics into int
+
 2018-11-23 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure,ac: version number bumped to 3.2.0 as we created
     3.1 out of branch 3.0 in order to highlight possible regressions that
