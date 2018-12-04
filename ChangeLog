@@ -1,3 +1,6 @@
+2018-12-04 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: now inferring version number from VERSION
+
 2018-12-01 Massimo Manghi <mxmanghi@apache.org>
 	* cmake/CMakeList.txt: Update version number to 3.1.0. We have
 	to figure out how to keep it update automatically
