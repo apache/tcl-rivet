@@ -1,3 +1,7 @@
+2018-12-04 Massimo Manghi <mxmanghi@apache.org>
+    * configure.ac: now infer the version number from VERSION.
+    * doc/rivet.xml,doc/xml/examples.xml: modified example "color table"
+
 2018-12-03 Massimo Manghi <mxmanghi@apache.org>
 	* cmake/CMakeList.c: we infer the version number from the file
 	VERSION assumed to reside in the project root directory

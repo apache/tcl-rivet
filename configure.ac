@@ -22,7 +22,7 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[3.2.0])
+AC_INIT([Rivet],[m4_esyscmd_s([cat VERSION])],[rivet-dev@tcl.apache.org])
 TEA_INIT([3.9])
 
 # we are storing here the configure command line, as recursive

@@ -45,9 +45,9 @@
 	   	In another simple example, we dynamically generate a table selecting
 	   	a different background color for each cell. The font color is determined
 	   	through a simple CSS rule embedded in a HTML &lt;style&gt; element. Create
-	   	the file color-table.tcl and put the following code in it
+	   	the file colortable.rvt and put the following code in it
 	  	</para>
-	  	<programlisting>&color-table.tcl;</programlisting>
+	  	<programlisting>&colortable;</programlisting>
 	  	<para>
 	    	If you read the code, you can see that this is pure Tcl.  We
 	    	could take the same code, run it outside of Rivet, and it

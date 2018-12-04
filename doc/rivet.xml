@@ -4,7 +4,7 @@
   "http://www.oasis-open.org/committees/docbook/xml/4.1.2/docbookx.dtd" [
     <!ENTITY hello.rvt             SYSTEM "examples-sgml/hello.rvt" >
     <!ENTITY hello1.rvt            SYSTEM "examples-sgml/hello1.rvt" >
-    <!ENTITY color-table.tcl       SYSTEM "examples-sgml/color-table.tcl" >
+    <!ENTITY colortable            SYSTEM "examples-sgml/colortable.rvt" >
     <!ENTITY vars.html             SYSTEM "examples-sgml/vars.html" >
     <!ENTITY vars.rvt              SYSTEM "examples-sgml/vars.rvt" >
     <!ENTITY upload.html           SYSTEM "examples-sgml/upload.html" >
