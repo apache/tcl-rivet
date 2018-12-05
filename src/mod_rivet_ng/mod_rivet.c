@@ -67,7 +67,7 @@
 #include "mod_rivet_generator.h"
 
 module AP_MODULE_DECLARE_DATA rivet_module;
-extern Tcl_ChannelType   RivetChan;
+extern    Tcl_ChannelType   RivetChan;
 DLLEXPORT apr_threadkey_t*         rivet_thread_key    = NULL;
 DLLEXPORT mod_rivet_globals*       module_globals      = NULL;
 

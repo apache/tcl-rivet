@@ -322,4 +322,10 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 #define RIVET_MPM_BRIDGE_COMPOSE(bridge) RIVET_DIR,"/mpm/rivet_",bridge,"_mpm.so"
 
+#ifdef WIN32
+#define DLLIMPORT   __declspec( dllimport )
+#else
+#define DLLIMPORT
+#endif
+
 #endif /* MOD_RIVET_H */
