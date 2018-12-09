@@ -51,6 +51,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+DLLIMPORT module rivet_module;
 
 apr_threadkey_t*        handler_thread_key;
 

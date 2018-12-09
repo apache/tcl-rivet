@@ -36,9 +36,9 @@
 #include "rivetChannel.h"
 #include "apache_config.h"
 
-extern DLLIMPORT mod_rivet_globals*   module_globals;
-extern DLLIMPORT apr_threadkey_t*     rivet_thread_key;
-extern DLLIMPORT module 			  rivet_module;
+DLLIMPORT mod_rivet_globals* module_globals;
+DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+module rivet_module;
 
 enum
 {

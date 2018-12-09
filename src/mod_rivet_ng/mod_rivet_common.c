@@ -166,7 +166,10 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
     {
 		char* request_handler;
 		int	  handler_size;
-			
+
+		ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": reading request handler %s",rivet_conf->request_handler);
+
 		ap_assert(Rivet_ReadFile(pool,rivet_conf->request_handler,
 		                        &request_handler,&handler_size) == 0);
 
@@ -174,6 +177,10 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
 				 Tcl_NewStringObj(request_handler,handler_size);
 
     } else {
+
+		ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": reading default request handler %s",module_globals->default_handler);
+
         scripts->request_processing = 
 				 Tcl_NewStringObj(module_globals->default_handler,
                                   module_globals->default_handler_size);

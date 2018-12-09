@@ -1,3 +1,8 @@
+2018-12-08 Massimo Manghi <mxmanghi@apache.org>
+	* cmake/CMakeList.c: changed suffix of librivetparser.so and librivet.so
+	* src/mod_rivet_ng: various changes to have a compilable module
+	on Windows. Still the module not working tough
+	
 2018-12-04 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: now infer the version number from VERSION.
     * doc/rivet.xml,doc/xml/examples.xml: modified example "color table"

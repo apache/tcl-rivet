@@ -67,9 +67,15 @@
 #include "mod_rivet_generator.h"
 
 module AP_MODULE_DECLARE_DATA rivet_module;
-extern    Tcl_ChannelType   RivetChan;
-DLLEXPORT apr_threadkey_t*         rivet_thread_key    = NULL;
-DLLEXPORT mod_rivet_globals*       module_globals      = NULL;
+
+/*
+ * Macros DLLIMPORT and DLLEXPORT are defined in tcl.h
+ */
+
+extern    Tcl_ChannelType   	RivetChan;
+DLLEXPORT apr_threadkey_t*      rivet_thread_key    = NULL;
+DLLEXPORT mod_rivet_globals*    module_globals      = NULL;
+DLLEXPORT module				rivet_module;
 
 #define ERRORBUF_SZ         256
 #define TCL_HANDLER_FILE    RIVET_DIR"/default_request_handler.tcl"

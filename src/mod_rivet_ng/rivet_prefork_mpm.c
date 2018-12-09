@@ -35,6 +35,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+module           rivet_module;
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
 
