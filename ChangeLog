@@ -1,3 +1,12 @@
+2018-12-16 Georgios Petasis <petasisg@apache.org>
+    * cmake/CMakeLists.txt: Set policy CMP0074 to new behaviour. Rivet version
+    is read from file VERSION.
+
+    * cmake/README.cmake: Some changes in directories used.
+
+    * src/mod_rivet_ng/mod_rivet.h: Removed statement "APLOG_USE_MODULE(rivet);"
+    from the module header file.
+
 2018-12-07 Massimo Manghi <mxmanghi@apache.org>
     * rivet/pkgIndex.tcl: completed with actual list of packages
 
@@ -6,11 +15,11 @@
     * doc/rivet.xml,doc/xml/examples.xml: modified example "color table"
 
 2018-12-03 Massimo Manghi <mxmanghi@apache.org>
-	* cmake/CMakeList.c: we infer the version number from the file
-	VERSION assumed to reside in the project root directory
-	* src/parser/rivetParser.c: 
-	* src/mod_rivet_ng/mod_rivet_common.c: type cast of pointer
-	arithmetics into int
+    * cmake/CMakeList.c: we infer the version number from the file
+    VERSION assumed to reside in the project root directory
+    * src/parser/rivetParser.c: 
+    * src/mod_rivet_ng/mod_rivet_common.c: type cast of pointer
+    arithmetics into int
 
 2018-11-23 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure,ac: version number bumped to 3.2.0 as we created

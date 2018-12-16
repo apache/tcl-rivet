@@ -3,6 +3,7 @@
 # The minimum version of cmake required. This may work also in 2.8,
 # but I have not tested. My cmake is version 3.9.0.
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_policy(SET CMP0074 NEW)
 
 # Rivet version:
 # In order to avoid chasing around multiple definition of the module version we infer

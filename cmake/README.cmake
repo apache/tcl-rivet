@@ -43,7 +43,7 @@ Compiling Rivet with cmake:
 6) Specify Tcl at a non standard location:
 
    cmake -E make_directory build_64
-   cmake -E chdir build_64 cmake -DAPACHE_ROOT=F:/Apache24 -G "Visual Studio 15 2017 Win64" -Dwith-tcl=C:/TclApps/Tcl64/lib ..
+   cmake -E chdir build_64 cmake -DAPACHE_ROOT=F:/Apache24_64 -G "Visual Studio 15 2017 Win64" -Dwith-tcl=C:/TclApps/Tcl64/lib ..
    cmake --build build_64 --config Release --target install
 
    Instead of -Dwith-tcl=, -DTCL_ROOT=, -DTclStub_ROOT, and -DTCL_TCLSH= can be
