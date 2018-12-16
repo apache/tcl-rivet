@@ -37,7 +37,15 @@
 #include <rivet_config.h>
 #endif
 
-APLOG_USE_MODULE(rivet);
+/*
+ * Petasis 16 Dec 2018: This causes the symbol to be exported also from MPMs...
+
+  APLOG_USE_MODULE(rivet);
+
+  PLEASE: do not use any of APLOG_USE_MODULE, AP_DECLARE_MODULE,
+  AP_MODULE_DECLARE_DATA in this header file!
+ 
+*/
 
 
 

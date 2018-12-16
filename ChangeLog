@@ -1,8 +1,23 @@
+2018-12-16 Georgios Petasis <petasisg@apache.org>
+    * Readme.md: Added a Markdown README file, which shows the build status
+    from Appveyor, for Windows.
+
+    * .appveyor.yml: Started a build configuration for Appveyor:
+    https://ci.appveyor.com/project/petasis/tcl-rivet
+
+    * cmake/CMakeLists.txt: Set policy CMP0074 to new behaviour. Rivet version
+    is read from file VERSION.
+
+    * cmake/README.cmake: Some changes in directories used.
+
+    * src/mod_rivet_ng/mod_rivet.h: Removed statement "APLOG_USE_MODULE(rivet);"
+    from the module header file.
+
 2018-12-08 Massimo Manghi <mxmanghi@apache.org>
 	* cmake/CMakeList.c: changed suffix of librivetparser.so and librivet.so
 	* src/mod_rivet_ng: various changes to have a compilable module
 	on Windows. Still the module not working tough
-	
+
 2018-12-07 Massimo Manghi <mxmanghi@apache.org>
     * rivet/pkgIndex.tcl: completed with actual list of packages
 
@@ -11,11 +26,11 @@
     * doc/rivet.xml,doc/xml/examples.xml: modified example "color table"
 
 2018-12-03 Massimo Manghi <mxmanghi@apache.org>
-	* cmake/CMakeList.c: we infer the version number from the file
-	VERSION assumed to reside in the project root directory
-	* src/parser/rivetParser.c: 
-	* src/mod_rivet_ng/mod_rivet_common.c: type cast of pointer
-	arithmetics into int
+    * cmake/CMakeList.c: we infer the version number from the file
+    VERSION assumed to reside in the project root directory
+    * src/parser/rivetParser.c: 
+    * src/mod_rivet_ng/mod_rivet_common.c: type cast of pointer
+    arithmetics into int
 
 2018-11-23 Massimo Manghi <mxmanghi@apache.org>
     * VERSION,configure,ac: version number bumped to 3.2.0 as we created
