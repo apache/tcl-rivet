@@ -40,4 +40,4 @@ install:
   - cmd: cmake -E chdir build cmake -DAPACHE_ROOT=C:/Apache24 -G %CMAKE_GENERATOR% ..
 
 build:
-  project: C:\projects\tcl-rivet\build\Rivet.sln      # path to Visual Studio solution or project
+  project: C:\projects\tcl-rivet\cmake\build\Rivet.sln      # path to Visual Studio solution or project
