@@ -1,4 +1,7 @@
 2018-12-16 Georgios Petasis <petasisg@apache.org>
+    * Readme.md: Added a Markdown README file, which shows the build status
+    from Appveyor, for Windows.
+
     * .appveyor.yml: Started a build configuration for Appveyor:
     https://ci.appveyor.com/project/petasis/tcl-rivet
 
