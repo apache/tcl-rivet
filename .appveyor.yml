@@ -35,6 +35,7 @@ install:
   - cmd: appveyor DownloadFile https://home.apache.org/~steffenal/%APACHE_COMPILER%/binaries/httpd-%APACHE_VERSION%-%APACHE_DOWNLOAD_PLATFORM%-%APACHE_COMPILER%.zip
   - cmd: cmake -E tar xf httpd-%APACHE_VERSION%-%APACHE_DOWNLOAD_PLATFORM%-%APACHE_COMPILER%.zip
   # Generate solution...
+  - cmd: cd cmake
   - cmd: cmake -E make_directory "build"
   - cmd: cmake -E chdir build cmake -DAPACHE_ROOT=C:/Apache24 -G %CMAKE_GENERATOR% ..
 
