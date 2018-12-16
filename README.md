@@ -1,23 +1,21 @@
 # ![Rivet Logo](doc/images/home.png) <center>Apache Rivet</center> 
----
 
 [Apache Rivet](https://tcl.apache.org/rivet/) is a powerful, flexible, consistent, fast, and robust solution to creating web applications with the help of the [Tcl](http://www.tcl.tk/) language and [Apache HTTP Server](https://httpd.apache.org/).
 
-See the doc/html/installation.html directory for installation and usage instructions.
+See the [doc/html/installation.html](doc/html/installation.html) directory for installation and usage instructions.
 
-See INSTALL for brief installation instructions - although the above docs in HTML are more thorough and extensive.
+See [INSTALL](INSTALL) for brief installation instructions - although the above docs in HTML are more thorough and extensive.
 
-See LICENSE for licensing terms.
+See [LICENSE](LICENSE) for licensing terms.
 
-$Id$
 
 ## Current Travis/AppVeyor CI build status for Rivet:
 
 | OS | Master Branch | Release Branch |
 ---|---|---
-| Linux 64, Tcl/Tk 8.6 |  | |
-| Windows 64, Tcl/Tk 8.6 | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet) | |
-| macOS 64 (Darwin), Tcl/Tk 8.5 |  | |
+| Linux 64, Apache 2.4.37, Tcl/Tk 8.6 |  | |
+| Windows 64, Apache 2.4.37, Tcl/Tk 8.6.7 | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet) | |
+| macOS 64 (Darwin), Apache 2.4.37, Tcl/Tk 8.5 |  | |
 
 
 ## KNOWN PROBLEMS
