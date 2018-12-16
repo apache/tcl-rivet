@@ -1,0 +1,42 @@
+branches:
+  only:
+    - master
+
+image:
+  - Visual Studio 2017
+
+platform:
+  - x64
+
+configuration:
+  - Release
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - platform: x86
+      configuration: Release
+
+install:
+  # Install Tcl/Tk
+  - cmd: if %platform%==x86 set DOWNLOAD_PLATFORM=win32
+  - cmd: if %platform%==x64 set DOWNLOAD_PLATFORM=amd64
+  - cmd: if %platform%==x86 set APACHE_DOWNLOAD_PLATFORM=win32
+  - cmd: if %platform%==x64 set APACHE_DOWNLOAD_PLATFORM=win64
+  - cmd: if %platform%==x86 set CMAKE_GENERATOR="Visual Studio 15"
+  - cmd: if %platform%==x64 set CMAKE_GENERATOR="Visual Studio 15 Win64"
+  - cmd: set IRONTCL_VERSION="8.6.7"
+  - cmd: appveyor DownloadFile https://www.irontcl.com/downloads/irontcl-%DOWNLOAD_PLATFORM%-%IRONTCL_VERSION%.zip
+  - cmd: cmake -E tar xf irontcl-%DOWNLOAD_PLATFORM%-%IRONTCL_VERSION%.zip
+  - cmd: set PATH=%cd%\IronTcl\bin;%PATH%
+  # Install Apache
+  - cmd: set APACHE_VERSION="2.4.37"
+  - cmd: set APACHE_COMPILER="VC15"
+  - cmd: appveyor DownloadFile https://home.apache.org/~steffenal/%APACHE_COMPILER%/binaries/httpd-%APACHE_VERSION%-%APACHE_DOWNLOAD_PLATFORM%-%APACHE_COMPILER%.zip
+  - cmd: cmake -E tar xf httpd-%APACHE_VERSION%-%APACHE_DOWNLOAD_PLATFORM%-%APACHE_COMPILER%.zip
+  # Generate solution...
+  - cmd: cmake -E make_directory "build"
+  - cmd: cmake -E chdir build cmake -DAPACHE_ROOT=C:/Apache24 -G %CMAKE_GENERATOR% ..
+
+build:
+  project: C:\projects\tcl-rivet\build\Rivet.sln      # path to Visual Studio solution or project

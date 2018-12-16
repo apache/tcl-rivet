@@ -1,4 +1,7 @@
 2018-12-16 Georgios Petasis <petasisg@apache.org>
+    * .appveyor.yml: Started a build configuration for Appveyor:
+    https://ci.appveyor.com/project/petasis/tcl-rivet
+
     * cmake/CMakeLists.txt: Set policy CMP0074 to new behaviour. Rivet version
     is read from file VERSION.
 
