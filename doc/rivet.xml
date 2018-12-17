@@ -36,7 +36,7 @@
     <!ENTITY lazybridge.xml        SYSTEM "xml/lazybridge.xml" >
     <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
     <!ENTITY version	           "3.1" >
-    <!ENTITY fullversion           "3.1.0" >
+    <!ENTITY fullversion           "3.1.1" >
     <!ENTITY version2-series	   "2.0,2.1,2.2,2.3" >
     <!ENTITY version2-generic	   "2.x" >
     <!ENTITY version30		       "3.0" >

@@ -1,3 +1,14 @@
+2018-12-17 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: moving version number to 3.1.1
+    * mod_rivet.h: AP_USE_MODULE replicates what AP_DECLARE_DATA does 
+      in mod_rivet.c but it isn't meant to stay in mod_rivet.h in the first 
+      place
+    * cmake/CMakeLists.txt: update to let it rely entirely on CMake to
+    determine the version from VERSION (check out from master)
+    * cmake/README.cmake: mergin updates done by Georgios Petasis in the
+    master branch
+    * .appveryor.yml: using Appveyor to check the window build
+
 2018-12-04 Massimo Manghi <mxmanghi@apache.org>
     * configure.ac: now inferring version number from VERSION
 

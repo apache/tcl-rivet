@@ -3,11 +3,21 @@
 # The minimum version of cmake required. This may work also in 2.8,
 # but I have not tested. My cmake is version 3.9.0.
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_policy(SET CMP0074 NEW)
 
 # Rivet version:
-set(RIVET_MAJOR_VERSION 3)
-set(RIVET_MINOR_VERSION 1)
-set(RIVET_PATCH_VERSION 0)
+# In order to avoid chasing around multiple definition of the module version we infer
+# this information from the file VERSION, which must stay in the project root directory
+# and assuming we are working from a direct child directory
+SET ( RIVET_TOP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." )
+# Read the file named VERSION from the top Rivet directory...
+FILE ( READ "${RIVET_TOP_DIR}/VERSION" RIVET_VERSION_FROM_FILE )
+STRING ( REGEX MATCH "([0-9]+)\.([0-9]+)\.([0-9]+)" _ ${RIVET_VERSION_FROM_FILE} )
+SET ( RIVET_MAJOR_VERSION ${CMAKE_MATCH_1} )
+SET ( RIVET_MINOR_VERSION ${CMAKE_MATCH_2} )
+SET ( RIVET_PATCH_VERSION ${CMAKE_MATCH_3} )
+MESSAGE ( STATUS "Rivet version: ${RIVET_MAJOR_VERSION}.${RIVET_MINOR_VERSION}.${RIVET_PATCH_VERSION}" )
+
 set(RIVET_VERSION
   ${RIVET_MAJOR_VERSION}.${RIVET_MINOR_VERSION}.${RIVET_PATCH_VERSION})
 set(INIT_VERSION ${RIVET_MAJOR_VERSION}.${RIVET_MINOR_VERSION})

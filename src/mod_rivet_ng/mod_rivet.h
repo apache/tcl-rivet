@@ -37,7 +37,12 @@
 #include <rivet_config.h>
 #endif
 
-APLOG_USE_MODULE(rivet);
+/*
+ * this macro replicates what AP_DECLARE_DATA does in mod_rivet.c but
+ * it isn't meant to stay in mod_rivet.h in the first place
+ * 
+ * APLOG_USE_MODULE(rivet);
+ */
 
 /* init.tcl file relative to the server root directory */
 
