@@ -1,3 +1,6 @@
+2018-12-17 Georgios Petasis <petasisg@apache.org>
+    * Readme.md: Added a separate badge for winbuild branch.
+
 2018-12-16 Georgios Petasis <petasisg@apache.org>
     * Readme.md: Added a Markdown README file, which shows the build status
     from Appveyor, for Windows.
