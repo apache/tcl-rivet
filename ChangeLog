@@ -1,4 +1,5 @@
 2018-12-17 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: changing version to 3.2.1 attempting to trigger an appveyor rebuild
 	* src/request/apache_request.c,src/request/apache_multipart_buffer.[c|h]: 
 	explicit cast to int wherever needed by calls to Tcl_* functions and changed 
 	int to size_t wherever required 
