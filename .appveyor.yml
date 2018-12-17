@@ -1,6 +1,6 @@
 branches:
   only:
-    - /*/
+    - /.*/
 
 image:
   - Visual Studio 2017
