@@ -30,27 +30,27 @@
 
 typedef struct _multipart_buffer {
     /* request info */
-    request_rec *r;
-    long request_length;
+    request_rec*		r;
+    apr_off_t 			request_length;
 
     /* read buffer */
-    char *buffer;
-    char *buf_begin;
-    int  bufsize;
-    int  bytes_in_buffer;
+    char*				buffer;
+    char*				buf_begin;
+    int  				bufsize;
+    int  				bytes_in_buffer;
 
     /* boundary info */
-    char *boundary;
-    char *boundary_next;
-    char *boundary_end;
+    char*				boundary;
+    char*				boundary_next;
+    char*				boundary_end;
 } multipart_buffer;
 
-multipart_buffer	*multipart_buffer_new(char *boundary, long length, request_rec *r);
+multipart_buffer*	multipart_buffer_new(char* boundary,apr_off_t length,request_rec* r);
 ///*table*/apr_table_t	*multipart_buffer_headers(multipart_buffer *self);
-int			multipart_buffer_read(multipart_buffer *self, char *buf, int bytes);
-char			*multipart_buffer_read_body(multipart_buffer *self); 
-apr_table_t		*multipart_buffer_headers(multipart_buffer *self);
-int			multipart_buffer_eof(multipart_buffer *self);
+size_t				multipart_buffer_read(multipart_buffer* self,char* buf,size_t bytes);
+char*				multipart_buffer_read_body(multipart_buffer *self); 
+apr_table_t*		multipart_buffer_headers(multipart_buffer *self);
+int					multipart_buffer_eof(multipart_buffer *self);
 
 #ifdef __cplusplus
  }

@@ -151,7 +151,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
         {
             /* relative path */
             char* script_name = TclWeb_GetEnvVar (private,"SCRIPT_NAME");
-            int   script_name_l = strlen(script_name);
+            size_t script_name_l = strlen(script_name);
 
             // regardless the reason for a SCRIPT_NAME being undefined we
             // prevent a segfault and we revert the behavior of makeurl
@@ -1791,8 +1791,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
     return TCL_OK;
 }
 
-#define TESTPANIC 0
-
+#undef TESTPANIC
 #ifdef TESTPANIC
 /*
  *----------------------------------------------------------------------
