@@ -725,7 +725,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
 	}
 
 	/* Put data in a variable  */
-	Tcl_ReadChars(chan, data, ApacheUpload_size(req->upload), 0);
+	Tcl_ReadChars(chan, data, (int)ApacheUpload_size(req->upload), 0);
 	if (Tcl_Close(req->interp, chan) == TCL_ERROR) {
 	    return TCL_ERROR;
 	}
@@ -739,7 +739,7 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
 
 int TclWeb_UploadSize(Tcl_Obj *sz, TclWebRequest *req)
 {
-    Tcl_SetIntObj(sz, ApacheUpload_size(req->upload));
+    Tcl_SetIntObj(sz, (int)ApacheUpload_size(req->upload));
     return TCL_OK;
 }
 
