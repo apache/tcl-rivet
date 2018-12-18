@@ -226,7 +226,7 @@ static int
 Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
 #ifdef WIN32
-	char*			   parent_pid_var = NULL;
+	char* parent_pid_var = NULL;
 #endif
     rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
 

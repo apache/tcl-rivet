@@ -1,3 +1,8 @@
+2018-12-18 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/pkgIndex.tcl: update rivetlib version. The CMake build script doesn't run
+	pkg_mkIndex in order to update this file, so we still have to keep the package version
+	aligned with the those actually provided.
+	
 2018-12-17 Massimo Manghi <mxmanghi@apache.org>
     * VERSION: changing version to 3.2.1 attempting to trigger an appveyor rebuild
 	* src/request/apache_request.c,src/request/apache_multipart_buffer.[c|h]: 
