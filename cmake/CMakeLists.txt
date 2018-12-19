@@ -499,3 +499,20 @@ install(DIRECTORY
      	${RIVET_LIB_DIR}/packages/session
      	${RIVET_LIB_DIR}/packages/tclrivet
         DESTINATION ${RIVETLIB_DESTDIR}/packages)
+
+#  Regenerate pkgIndex.tcl in all libraries...
+# ===========================================================================
+SET ( RIVET_LIBS_ARCH ${RIVETLIB_DESTDIR}/mpm )
+file(WRITE ${RIVETLIB_DESTDIR}/regenerate_pkgIndex.tcl
+"puts \"Regenerating pkgIndex.tcl in [pwd]:\"
+file delete {*}[glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl
+pkg_mkIndex -verbose [pwd] init.tcl \\
+      {*}[glob [file join packages * *.tcl] \\
+      [file join ${RIVET_LIBS_ARCH} *[info sharedlibextension]]]"
+)
+install(CODE "
+  execute_process(COMMAND ${TCL_TCLSH} regenerate_pkgIndex.tcl
+                  WORKING_DIRECTORY ${RIVETLIB_DESTDIR})
+  file(REMOVE ${RIVETLIB_DESTDIR}/regenerate_pkgIndex.tcl)
+  "
+)
