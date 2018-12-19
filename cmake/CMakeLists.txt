@@ -135,12 +135,15 @@ add_library(rivet::worker_mpm    ALIAS rivet_worker_mpm)
 add_library(rivet::prefork_mpm   ALIAS rivet_prefork_mpm)
 add_library(rivet::lazy_mpm      ALIAS rivet_lazy_mpm)
 
-SET_TARGET_PROPERTIES(mod_rivet         PROPERTIES PREFIX "" SUFFIX ".so")
-SET_TARGET_PROPERTIES(rivet_worker_mpm  PROPERTIES PREFIX "" SUFFIX ".so")
-SET_TARGET_PROPERTIES(rivet_prefork_mpm PROPERTIES PREFIX "" SUFFIX ".so")
-SET_TARGET_PROPERTIES(rivet_lazy_mpm    PROPERTIES PREFIX "" SUFFIX ".so")
-SET_TARGET_PROPERTIES(rivetparser       PROPERTIES PREFIX "lib")
-SET_TARGET_PROPERTIES(rivetlib          PROPERTIES PREFIX "lib")
+SET ( RIVET_LIB_SUFFIX ".so" )
+SET ( RIVET_LIB_PREFIX "lib" )
+
+SET_TARGET_PROPERTIES(mod_rivet         PROPERTIES PREFIX "" SUFFIX ${RIVET_LIB_SUFFIX})
+SET_TARGET_PROPERTIES(rivet_worker_mpm  PROPERTIES PREFIX "" SUFFIX ${RIVET_LIB_SUFFIX})
+SET_TARGET_PROPERTIES(rivet_prefork_mpm PROPERTIES PREFIX "" SUFFIX ${RIVET_LIB_SUFFIX})
+SET_TARGET_PROPERTIES(rivet_lazy_mpm    PROPERTIES PREFIX "" SUFFIX ${RIVET_LIB_SUFFIX})
+SET_TARGET_PROPERTIES(rivetparser       PROPERTIES PREFIX ${RIVET_LIB_PREFIX})
+SET_TARGET_PROPERTIES(rivetlib          PROPERTIES PREFIX ${RIVET_LIB_PREFIX})
 
 #  Definitions...
 # ===========================================================================
@@ -485,13 +488,11 @@ install(DIRECTORY
 
 #  Regenerate pkgIndex.tcl in all libraries...
 # ===========================================================================
-SET ( RIVET_LIBS_ARCH ${RIVETLIB_DESTDIR}/mpm )
+SET ( RIVET_LIBS_ARCH ${RIVETLIB_DESTDIR} )
 file(WRITE ${RIVETLIB_DESTDIR}/regenerate_pkgIndex.tcl
 "puts \"Regenerating pkgIndex.tcl in [pwd]:\"
 file delete {*}[glob [file join packages * pkgIndex.tcl]] pkgIndex.tcl
-pkg_mkIndex -verbose [pwd] init.tcl \\
-      {*}[glob [file join packages * *.tcl] \\
-      [file join ${RIVET_LIBS_ARCH} *[info sharedlibextension]]]"
+pkg_mkIndex -verbose [pwd] init.tcl packages/*/*.tcl *[info sharedlibextension]"
 )
 install(CODE "
   execute_process(COMMAND ${TCL_TCLSH} regenerate_pkgIndex.tcl
