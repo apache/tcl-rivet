@@ -1,3 +1,12 @@
+2018-12-20 Georgios Petasis <petasisg@apache.org>
+    * cmake/CMakeLists.txt: Set policy behaviour of CMP0074, only if policy is
+    defined (i.e. cmake version >= 3.12).
+
+2018-12-19 Georgios Petasis <petasisg@apache.org>
+    * cmake/CMakeLists.txt: Added support for regenerating pkgIndex.tcl in the
+    installation directory of rivetlib, after files have been installed.
+    This executes "tclsh".
+
 2018-12-17 Massimo Manghi <mxmanghi@apache.org>
     * VERSION: moving version number to 3.1.1
     * mod_rivet.h: AP_USE_MODULE replicates what AP_DECLARE_DATA does 
@@ -13,8 +22,8 @@
     * configure.ac: now inferring version number from VERSION
 
 2018-12-01 Massimo Manghi <mxmanghi@apache.org>
-	* cmake/CMakeList.txt: Update version number to 3.1.0. We have
-	to figure out how to keep it update automatically
+    * cmake/CMakeList.txt: Update version number to 3.1.0. We have
+      to figure out how to keep it update automatically
 
 2018-11-28 Massimo Manghi <mxmanghi@apache.org>
     * : Released as 3.1.0
