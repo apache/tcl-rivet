@@ -647,7 +647,7 @@
 				could be the only way to exit a process and force the Apache HTTP web server to start
 				a fresh one. Moreover the core <command>exit</command> could be called from third parties
 				software and you may not be aware of it. We thus decided to trap this command and give it 
-				the most gentle behavior still preserving the its basic purpose.
+				the most gentle behavior still preserving its basic purpose.
 			</para>
 			<note>
 				Nonetheless we discourage the programmer to use such command, and suggest to focus on proper

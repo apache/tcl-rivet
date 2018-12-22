@@ -30,20 +30,20 @@
         <!-- title>Introduction</title -->
         <title>Apache MPM and Rivet Bridge Modules</title>
         <para>
-	        	Rivet &version; is a major rewriting of mod_rivet, the Apache HTTP
-	        	Websever module at the core of Rivet. Unlike in previous versions of 
-	        	mod_rivet which only supported the <ulink href="&apachedoc-prefork;">prefork MPM</ulink>
-	        	(<ulink href="&apachedoc-mpm;">Multiprocessing Module</ulink>), 
-	        	starting with &version30; we attained full support of different MPM for
-	        	the Apache framework.
+				Rivet &version; is a successor to Rivet &version30;, a major rewriting of mod_rivet,
+				the Apache HTTP Websever module at the core of Rivet. Unlike in &version2-generic; of
+				mod_rivet, which only supported the <ulink href="&apachedoc-prefork;">prefork MPM</ulink>
+				(<ulink href="&apachedoc-mpm;">Multiprocessing Module</ulink>),
+				starting with &version30; we attained full support of different MPM for
+				the Apache framework.
         </para>
         <para>
         		Threaded <ulink href="&apachedoc-mpm;">MPM</ulink>
         		integration was achieved by making mod_rivet multithreaded and
         		modular itself, introducing the MPM-module bridge concept.
-        		We developed a set of loadable modules 
-        		which are supposed not only to overcome the issues related to threading but also
-        		to offer the best possible MPM mod_rivet integration.
+				We developed a set of loadable modules which are supposed not only to overcome 
+            the issues related to threading but also to offer the best possible MPM mod_rivet 
+            integration.
         		As a side effect of this modular design mod_rivet is not only able to integrate
         		with its environment but also to work as a framework for writing more MPM bridges
         		designed along different multi-threading schemes and workload management models. 
@@ -79,7 +79,7 @@
 			entirely based on Tcl. By default rivet &version; provides compatiblity with the 
 			version &version2-generic; scheme to handle a request but this can be entirely overridden by
 			the developer replacing the central request handling procedure. See the 
-			<link linkend="request">request processing</link> page for further reading 
+			<link linkend="request">request processing</link> page.
 		</para>
     </simplesect>
     <simplesect>
