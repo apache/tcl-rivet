@@ -14,7 +14,7 @@ See [LICENSE](LICENSE) for licensing terms.
 | OS | Master Branch | Release Branch | Branch 'winbuild' |
 ---|---|---|--
 | Linux 64, Apache 2.4.37, Tcl/Tk 8.6 |  | | |
-| Windows 64, Apache 2.4.37, Tcl/Tk 8.6.7 | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg/branch/master?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet/branch/master) <br/>fork: [![Build status](https://ci.appveyor.com/api/projects/status/69nj1qs4ia8pj87v?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet-scuqj) | | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg/branch/winbuild?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet/branch/winbuild) <br/>fork: [![Build status](https://ci.appveyor.com/api/projects/status/69nj1qs4ia8pj87v?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet-scuqj/branch/winbuild) |
+| Windows 64, Apache 2.4.37, Tcl/Tk 8.6.7 | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg/branch/master?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet/branch/master) <br/>fork: [![Build status](https://ci.appveyor.com/api/projects/status/69nj1qs4ia8pj87v/branch/master?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet-scuqj/branch/master) | | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg/branch/winbuild?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet/branch/winbuild) <br/>fork: [![Build status](https://ci.appveyor.com/api/projects/status/69nj1qs4ia8pj87v/branch/winbuild?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet-scuqj/branch/winbuild) |
 | macOS 64 (Darwin), Apache 2.4.37, Tcl/Tk 8.5 |  | | |
 
 
