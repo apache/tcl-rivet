@@ -22,6 +22,7 @@ install:
   # Capture environment:
   - cmd: set RIVET_HOME=%cd%
   - cmd: set /p RIVET_VERSION=<VERSION
+  - cmd: echo %RIVET_VERSION%
   # Install Tcl/Tk
   - cmd: if %platform%==x86 set DOWNLOAD_PLATFORM=win32
   - cmd: if %platform%==x64 set DOWNLOAD_PLATFORM=amd64
@@ -56,6 +57,7 @@ before_build:
 
 build_script:
   - cmd: echo %cd%
+  - cmd: cd build
   - cmd: msbuild Rivet.sln /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - cmd: msbuild INSTALL.vcxproj /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
