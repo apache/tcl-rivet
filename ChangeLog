@@ -1,3 +1,6 @@
+2018-12-23 Massimo Manghi <mxmanghi@apache.org>
+	* cmake/CMakeLists.txt: starting with rivet 3 we need Tcl > 8.6.1
+
 2018-12-20 Georgios Petasis <petasisg@apache.org>
     * cmake/CMakeLists.txt: Set policy behaviour of CMP0074, only if policy is
     defined (i.e. cmake version >= 3.12).
