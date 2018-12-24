@@ -55,6 +55,7 @@ before_build:
   - cmd: if %platform%==x64 set RIVET_PLATFORM=x64
 
 build_script:
+  - cmd: echo %cd%
   - cmd: msbuild Rivet.sln /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - cmd: msbuild INSTALL.vcxproj /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
