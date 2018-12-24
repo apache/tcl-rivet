@@ -1,4 +1,7 @@
 2018-12-24 Georgios Petasis <petasisg@apache.org>
+    * README.md: Added badges also for the GitHub fork at:
+    https://github.com/petasis/tcl-rivet.
+
     * .appveyor.yml: Enhancements to not rely on hard-coded paths.
 
 2018-12-23 Massimo Manghi <mxmanghi@apache.org>
