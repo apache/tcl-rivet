@@ -48,7 +48,7 @@ install:
   - cmd: cmake -E chdir build cmake -DAPACHE_ROOT=%APACHE_ROOT% -DTCL_ROOT=%TCL_ROOT% -DTCL_TCLSH=%TCL_TCLSH% -DTK_WISH=%TK_WISH% -G %CMAKE_GENERATOR% ..
 
 build:
-  project: %RIVET_HOME%\cmake\build\Rivet.sln      # path to Visual Studio solution or project
+  project: cmake\build\Rivet.sln      # path to Visual Studio solution or project
 
 before_build:
   - cmd: if %platform%==x86 set RIVET_PLATFORM=Win32
