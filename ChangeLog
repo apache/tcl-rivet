@@ -1,3 +1,6 @@
+2019-01-05 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml.in,doc/rivet.xml: update copyright notice
+
 2018-12-20 Massimo Manghi <mxmanghi@apache.org>
     * doc/: regenarating rivet.xml and adding new version for an example and
     several manual corrections
@@ -14,8 +17,8 @@
 2018-12-17 Massimo Manghi <mxmanghi@apache.org>
     * VERSION: moving version number to 3.1.1
     * mod_rivet.h: AP_USE_MODULE replicates what AP_DECLARE_DATA does 
-      in mod_rivet.c but it isn't meant to stay in mod_rivet.h in the first 
-      place
+    in mod_rivet.c but it isn't meant to stay in mod_rivet.h in the first 
+    place
     * cmake/CMakeLists.txt: update to let it rely entirely on CMake to
     determine the version from VERSION (check out from master)
     * cmake/README.cmake: mergin updates done by Georgios Petasis in the
