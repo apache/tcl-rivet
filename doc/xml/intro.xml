@@ -1,4 +1,4 @@
-	<section id="introduction">
+<section id="introduction">
     <title>Introduction to Apache Rivet version &version;</title>
     <para>
       Apache Rivet is a system for creating dynamic web content by
@@ -18,27 +18,26 @@
       architecture to create different styles of web site.
     </para>
     <para>
-        This documentation is focused on the current version of Rivet, but
-        still a work in progress, and, like everything
-        else about Apache Rivet, it is Free Software.  If you see
-        something that needs improving, and have ideas or suggestions,
-        don't hesitate to let us know.  If you want to contribute
-        directly, better yet!
+      This documentation is focused on the current version of Rivet, but
+      still a work in progress, and, like everything
+      else about Apache Rivet, it is Free Software. If you see
+      something that needs improving, and have ideas or suggestions,
+      don't hesitate to let us know.  If you want to contribute
+      directly, better yet!
     </para>
-    
     <simplesect>
-        <!-- title>Introduction</title -->
         <title>Apache MPM and Rivet Bridge Modules</title>
         <para>
 				Rivet &version; is a successor to Rivet &version30;, a major rewriting of mod_rivet,
 				the Apache HTTP Websever module at the core of Rivet. Unlike in &version2-generic; of
-				mod_rivet, which only supported the <ulink href="&apachedoc-prefork;">prefork MPM</ulink>
-				(<ulink href="&apachedoc-mpm;">Multiprocessing Module</ulink>),
+				mod_rivet, which only supported the
+				<ulink url="&apachedoc-prefork;">prefork MPM</ulink>
+				(<ulink url="&apachedoc-mpm;">Multiprocessing Module</ulink>),
 				starting with &version30; we attained full support of different MPM for
 				the Apache framework.
         </para>
         <para>
-        		Threaded <ulink href="&apachedoc-mpm;">MPM</ulink>
+        		Threaded <ulink url="&apachedoc-mpm;">MPM</ulink>
         		integration was achieved by making mod_rivet multithreaded and
         		modular itself, introducing the MPM-module bridge concept.
 				We developed a set of loadable modules which are supposed not only to overcome 

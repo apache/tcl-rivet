@@ -1,5 +1,9 @@
 2019-01-05 Massimo Manghi <mxmanghi@apache.org>
-    * doc/rivet.xml.in,doc/rivet.xml: update copyright notice
+    * doc/rivet.xml.in,doc/rivet.xml: update copyright notice, add entities
+    for various Apache resources
+    * doc/xml/intro.xml: wrong attributes prevented correct link generation
+    * doc/xml/installation.xml: using entities to link to resources that
+    might change URL in future
 
 2018-12-20 Massimo Manghi <mxmanghi@apache.org>
     * doc/: regenarating rivet.xml and adding new version for an example and

@@ -43,6 +43,9 @@
     <!ENTITY version31		        "3.1" >
     <!ENTITY tcltk-url             "http://www.tcl.tk/" >
     <!ENTITY apache-url            "http://httpd.apache.org" >
+    <!ENTITY apache-apr            "http://apr.apache.org/" >
+    <!ENTITY apache-apreq          "http://httpd.apache.org/apreq/" >
+    <!ENTITY rivet-download        "http://tcl.apache.org/rivet/html/download.html" >
     <!ENTITY apachedoc-vhost       "https://httpd.apache.org/docs/2.4/vhosts" >
     <!ENTITY apachedoc-mpm	        "https://httpd.apache.org/docs/2.4/mpm.html" >
     <!ENTITY apachedoc-prefork	  "https://httpd.apache.org/docs/2.4/mod/prefork.html" >
