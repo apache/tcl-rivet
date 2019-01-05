@@ -11,7 +11,7 @@
         </para>
         <para>
 				Rivet &version2-generic; was restricted to work with the 
-				<ulink url="http://httpd.apache.org/docs/2.4/mod/prefork.html">prefork</ulink> MPM
+				<ulink url="&apachedoc-prefork;">prefork</ulink> MPM
 				of the Apache HTTP webserver. MPM modules are fundamental components of the
 				webserver architecture. They provide multiple implementations of multiprocessing
 				in order to better suit specific OS features and scalability requirements.
@@ -21,13 +21,13 @@
 				system call. This model has several limitations but also some advantages. The 
 				solution we adopted tries to attain the best from any MPM as much as possible
 				and Rivet &version; is now able to run with the 
-				<ulink url="http://httpd.apache.org/docs/2.4/mod/worker.html">worker</ulink> 
+				<ulink url="&apachedoc-worker;">worker</ulink> 
             and the
-            <ulink url="http://httpd.apache.org/docs/2.4/mod/event.html">event</ulink> 
+            <ulink url="&apachedoc-event;">event</ulink> 
             MPMs. Rivet &version; has not been ported to OS of the Windows family
             but we feel that the current design would fit just fine with the Windows specific
             MPMs such as
-            <ulink url="http://httpd.apache.org/docs/2.4/mod/mpm_winnt.html">winnt</ulink>.
+            <ulink url="&apachedoc-winnt;">winnt</ulink>.
         </para>
         
         <para>
@@ -57,11 +57,11 @@
             </para>
             <para>
             	The 
-            	<ulink url="http://httpd.apache.org/">Apache HTTP Webserver</ulink> development
+            	<ulink url="&apache-url;">Apache HTTP Webserver</ulink> development
             	files and libraries are required along with the 
-            	<ulink url="http://apr.apache.org/">Apache Portable Runtime</ulink>
+            	<ulink url="&apache-apr;">Apache Portable Runtime</ulink>
             	and the
-            	<ulink url="http://httpd.apache.org/apreq/">libapreq</ulink> library. 
+            	<ulink url="&apache-apreq;">libapreq</ulink> library. 
             </para>
 			</step>
 			
@@ -88,7 +88,7 @@
           <step>
             <title>Uncompress Sources</title>
             <para>
-                Download the sources at <ulink url="http://tcl.apache.org/rivet/html/download.html"/>.  
+                Download the sources at <ulink url="&rivet-download;"/>.  
             </para>
 
             <para>

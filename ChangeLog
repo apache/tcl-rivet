@@ -1,3 +1,7 @@
+2019-01-05 Massimo Manghi <mxmanghi@apache.org>
+    * doc/: merging from 3.1 fixes to various broken docbook elements
+    and new entities to external resources' URLs
+
 2018-12-24 Georgios Petasis <petasisg@apache.org>
     * README.md: Added badges also for the GitHub fork at:
     https://github.com/petasis/tcl-rivet.
