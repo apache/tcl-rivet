@@ -21,14 +21,13 @@
     under the License.
 */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <apr_strings.h>
 #include <apr_env.h>
 #include <ap_mpm.h>
 #include <apr_file_io.h>
 #include <apr_file_info.h>
+#include <mpm_common.h>
 
 #include "mod_rivet.h"
 #include "rivetChannel.h"
@@ -36,7 +35,7 @@
 #include "rivetParser.h"
 #include "rivet.h"
 #include "apache_config.h"
-#include <mpm_common.h>
+
 
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
 #ifdef RIVET_HAVE_UNISTD_H
@@ -58,7 +57,37 @@
 
 extern apr_threadkey_t*   rivet_thread_key;
 extern mod_rivet_globals* module_globals;
-extern module rivet_module;
+extern module             rivet_module;
+
+/*
+ * Rivet_DuplicateVhostInterp
+ *
+ *
+ */
+
+rivet_thread_interp* 
+Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
+{
+    rivet_thread_interp* interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
+
+    interp_obj->interp      = source_obj->interp;
+    interp_obj->channel     = source_obj->channel;
+    interp_obj->cache_free  = source_obj->cache_free;
+    interp_obj->cache_size  = source_obj->cache_size;
+    interp_obj->rivet_ns    = source_obj->rivet_ns;
+
+    /* An intepreter must have its own cache */
+
+    if (interp_obj->cache_size) {
+        RivetCache_Create(pool,interp_obj); 
+    }
+
+    interp_obj->pool            = source_obj->pool;
+    interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
+    interp_obj->per_dir_scripts = apr_hash_make(pool); 
+    interp_obj->flags           = source_obj->flags;
+    return interp_obj;
+}
 
 /*
  * -- Rivet_ReadFile
@@ -66,12 +95,11 @@ extern module rivet_module;
  */
 
 int
-Rivet_ReadFile (apr_pool_t* pool,char* filename,
-                char** buffer,int* nbytes)
+Rivet_ReadFile (apr_pool_t* pool,char* filename,char** buffer,int* nbytes)
 {
-    apr_finfo_t*        file_info;
-    apr_file_t*         apr_fp;
-    apr_size_t          buffer_size;
+    apr_finfo_t* file_info;
+    apr_file_t*  apr_fp;
+    apr_size_t   buffer_size;
 
     *nbytes = 0;
 
@@ -166,14 +194,20 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
     {
 		char* request_handler;
 		int	  handler_size;
-			
+
+		ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": reading request handler %s",rivet_conf->request_handler);
+
 		ap_assert(Rivet_ReadFile(pool,rivet_conf->request_handler,
 		                        &request_handler,&handler_size) == 0);
 
-        scripts->request_processing = 
-				 Tcl_NewStringObj(request_handler,handler_size);
+        scripts->request_processing = Tcl_NewStringObj(request_handler,handler_size);
 
     } else {
+
+		ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": reading default request handler %s",module_globals->default_handler);
+
         scripts->request_processing = 
 				 Tcl_NewStringObj(module_globals->default_handler,
                                   module_globals->default_handler_size);
@@ -203,7 +237,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 						 server_rec *s,
 						 apr_pool_t *p)
 {
-    rivet_interp_globals*   globals     = NULL;
+    // rivet_interp_globals*   globals     = NULL;
     Tcl_Obj*                auto_path   = NULL;
     Tcl_Obj*                rivet_tcl   = NULL;
     Tcl_Interp*             interp      = interp_obj->interp;
@@ -213,8 +247,8 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
     /* Set up interpreter associated data */
 
-    globals = ckalloc(sizeof(rivet_interp_globals));
-    Tcl_SetAssocData (interp,"rivet",NULL,globals);
+    //globals = ckalloc(sizeof(rivet_interp_globals));
+    //Tcl_SetAssocData (interp,"rivet",NULL,globals);
     
     /*
      * the ::rivet namespace is the only information still stored
@@ -223,8 +257,8 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
     /* Rivet commands namespace is created */
 
-    globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
-                                            (Tcl_NamespaceDeleteProc *)NULL);
+    interp_obj->rivet_ns = 
+        Tcl_CreateNamespace (interp,RIVET_NS,private,(Tcl_NamespaceDeleteProc *)NULL);
 
     /* We put in front the auto_path list the path to the directory where
      * init.tcl is located (provides package Rivet, previously RivetTcl)
@@ -260,7 +294,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
     if (private != NULL) private->running_conf = RIVET_SERVER_CONF (s->module_config);
 
     /* Initialize the interpreter with Rivet's Tcl commands. */
-    Rivet_InitCore(interp,private);
+    Rivet_InitCore(interp_obj,private);
 
     /* Create a global array with information about the server. */
     Rivet_InitServerVariables(interp,p);
@@ -275,11 +309,11 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
      * across patchlevel releases
      */
 
-    if (Tcl_PkgRequire(interp, "Rivet", RIVET_INIT_VERSION, 1) == NULL)
+    if (Tcl_PkgRequire(interp,"Rivet",RIVET_INIT_VERSION,1) == NULL)
     {
-        ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+        ap_log_error (APLOG_MARK,APLOG_ERR,APR_EGENERAL,s,
                       MODNAME ": init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
-                      Tcl_GetStringResult(interp), RIVET_DIR );
+                      Tcl_GetStringResult(interp),RIVET_DIR);
         exit(1);
     }
 
@@ -301,8 +335,9 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
   *
   */
 
-rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
+rivet_thread_interp* Rivet_NewVHostInterp(rivet_thread_private* private,server_rec* server)
 {
+    apr_pool_t*             pool = private->pool;
     rivet_thread_interp*    interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
     rivet_server_conf*      rsc;
 
@@ -313,12 +348,9 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
     /* This calls needs the root server_rec just for logging purposes */
 
     interp_obj->interp = Rivet_CreateTclInterp(server); 
-
-    /* We now read from the pointers to the cache_size and cache_free conf parameters
-     * for compatibility with mod_rivet current version, but these values must become
-     * integers not pointers
-     */
     
+    /* We establish the cache size */
+
     if (rsc->default_cache_size < 0) {
         if (ap_max_requests_per_child != 0) {
             interp_obj->cache_size = ap_max_requests_per_child / 5;
@@ -361,11 +393,11 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
  *
  * -- Rivet_CreateRivetChannel
  *
- * Creates a channel and registers with to the interpreter
+ * Creates a channel 
  *
  *  Arguments:
  *
- *     - apr_pool_t*        pPool: a pointer to an APR memory pool
+ *     - apr_pool_t* pPool: a pointer to an APR memory pool
  *
  *  Returned value:
  *
@@ -438,38 +470,56 @@ Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel)
  *
  *  Arguments:
  * 
- *    - apr_threadkey_t*  rivet_thread_key
+ *    - apr_pool_t* pPool:   parent thread memory pool
+ *    - bool create_req_obj: the field req (ApacheTcl_Req *) has to be allocate
+ *                           a thread private data structure created during server
+ *                           initialization doesn't need to process any HTTP request
+ *                           That mean the fork based bridge need to allocate it 
+ *                           themselves
  *
  *  Returned value:
  * 
- *    - rivet_thread_private*   private data object
+ *    - rivet_thread_private* thread private data structure instance
  *
  *-----------------------------------------------------------------------------
  */
 
-rivet_thread_private* Rivet_CreatePrivateData (void)
+rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* pPool,bool create_request_obj)
 {
     rivet_thread_private*   private;
 
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
-    apr_thread_mutex_lock(module_globals->pool_mutex);
-    private = apr_pcalloc (module_globals->pool,sizeof(*private));
-    apr_thread_mutex_unlock(module_globals->pool_mutex);
+    //apr_thread_mutex_lock(module_globals->pool_mutex);
+    private = apr_pcalloc (pPool,sizeof(*private));
+    //apr_thread_mutex_unlock(module_globals->pool_mutex);
 
-    if (apr_pool_create (&private->pool, NULL) != APR_SUCCESS) 
+    /*
+    if (create_pool)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
-                     MODNAME ": could not create thread private pool");
-        return NULL;
+        if (apr_pool_create (&private->pool, NULL) != APR_SUCCESS) 
+        {
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                         MODNAME ": could not create thread private pool");
+            return NULL;
+        }
     }
+    */
+
+    private->pool           = pPool;
     private->req_cnt        = 0;
     private->r              = NULL;
-    private->req            = TclWeb_NewRequestObject(private->pool);
     private->page_aborting  = 0;
     private->thread_exit    = 0;
     private->exit_status    = 0;
     private->abort_code     = NULL;
+    private->channel        = NULL;
+    private->req            = NULL;
+
+    if (create_request_obj)
+    {
+        private->req = TclWeb_NewRequestObject(private->pool);
+    }
 
     apr_threadkey_private_set (private,rivet_thread_key);
     return private;
@@ -484,7 +534,7 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
  *  - create a Tcl channel
  *  - set up the Panic procedure
  */
-
+/*
 rivet_thread_private* Rivet_ExecutionThreadInit (void)
 {
     rivet_thread_private* private = Rivet_CreatePrivateData();
@@ -494,6 +544,7 @@ rivet_thread_private* Rivet_ExecutionThreadInit (void)
 
     return private;
 }
+*/
 
 /*
  *-----------------------------------------------------------------------------
@@ -780,4 +831,3 @@ int Rivet_chdir_file (const char *file)
         
     return chdir_retval;
 }
-

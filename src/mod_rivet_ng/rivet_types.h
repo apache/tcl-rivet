@@ -21,13 +21,17 @@
     under the License.
  */
 
-/* $Id$ */
-
-#ifndef _RIVET_TYPES_H_
-#define _RIVET_TYPES_H_
+#ifndef __rivet_types_h__
+#define __rivet_types_h__
 
 #include <httpd.h>
 #include <tcl.h>
+
+#ifdef HAVE_STDBOOL_H
+#include <stdbool.h>
+#else
+typedef enum {false=0, true=1} bool;
+#endif
 
 typedef struct _ApacheRequest   ApacheRequest;
 typedef struct _ApacheUpload    ApacheUpload;
@@ -39,7 +43,7 @@ typedef struct _ApacheUpload {
     char*           tempname;
     apr_table_t*    info;
     apr_file_t*     fp;
-    long            size;
+    size_t          size;
     ApacheRequest*  req;
 } ApacheUpload;
 

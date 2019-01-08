@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <http_request.h>
 #include <ap_compat.h>
@@ -36,9 +34,9 @@
 #include "rivetChannel.h"
 #include "apache_config.h"
 
-extern DLLIMPORT mod_rivet_globals*   module_globals;
-extern DLLIMPORT apr_threadkey_t*     rivet_thread_key;
-extern DLLIMPORT module rivet_module;
+DLLIMPORT mod_rivet_globals* module_globals;
+DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+module rivet_module;
 
 enum
 {
@@ -160,7 +158,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     /* Rivet_ExecutionThreadInit creates and returns the thread private data. */
 
-    private = Rivet_ExecutionThreadInit();
+    private = Rivet_CreatePrivateData(apr_thread_pool_get(thd),true);
+    ap_assert(private != NULL);
+
+    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+
+    Rivet_SetupTclPanicProc();
 
     /* A bridge creates and stores in private->ext its own thread private
      * data. The lazy bridge is no exception. We just need a flag controlling 
@@ -168,8 +171,10 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
+
     //private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
-    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,w->server));
+
+    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private,w->server));
     private->ext->interp->channel = private->channel;
 
     /* The worker thread can respond to a single request at a time therefore 
@@ -289,6 +294,10 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     apr_status_t    rv;
     server_rec*     s;
     server_rec*     root_server = module_globals->server;
+
+    /* the thread key used to access to Tcl threads private data */
+
+    ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pool) == APR_SUCCESS);
 
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
 
@@ -463,6 +472,7 @@ apr_status_t Lazy_MPM_Finalize (void* data)
         apr_thread_mutex_unlock(mutex);
     }
 
+    apr_threadkey_private_delete (rivet_thread_key);
     return APR_SUCCESS;
 }
 

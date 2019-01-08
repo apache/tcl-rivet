@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$ */
-
 #ifndef __worker_prefork_common_h__
 #define __worker_prefork_common_h__
 
@@ -33,5 +31,7 @@ typedef struct mpm_bridge_specific {
     int                   keep_going;       /* thread loop controlling variable     */
     rivet_thread_interp** interps;
 } mpm_bridge_specific;
+
+int Interps_Init (rivet_thread_interp** , apr_pool_t* , server_rec* );
 
 #endif /* */

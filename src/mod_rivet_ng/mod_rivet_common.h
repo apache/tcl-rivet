@@ -19,23 +19,25 @@
     under the License.
 */
 
-#ifndef _MOD_RIVET_COMMON_
-#define _MOD_RIVET_COMMON_
+#ifndef __mod_rivet_common__
+#define __mod_rivet_common__
 
-EXTERN running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf* rivet_conf);
-EXTERN void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p);
-EXTERN void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
-EXTERN rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* s);
-EXTERN void Rivet_ProcessorCleanup (void *data);
-EXTERN int Rivet_chdir_file (const char *file);
-EXTERN void Rivet_CleanupRequest(request_rec *r);
-EXTERN void Rivet_InitServerVariables(Tcl_Interp *interp, apr_pool_t *pool);
-EXTERN void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1);
-EXTERN Tcl_Channel* Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key);
-EXTERN rivet_thread_private* Rivet_CreatePrivateData (void);
-EXTERN rivet_thread_private* Rivet_ExecutionThreadInit (void);
+EXTERN rivet_thread_interp* Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj);
+EXTERN running_scripts*     Rivet_RunningScripts (apr_pool_t* pool,running_scripts* scripts,rivet_server_conf* rivet_conf);
+EXTERN void                 Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private,
+                                                server_rec *s, apr_pool_t *p);
+EXTERN void                 Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
+EXTERN rivet_thread_interp* Rivet_NewVHostInterp(rivet_thread_private* private,server_rec* s);
+EXTERN void                 Rivet_ProcessorCleanup (void *data);
+EXTERN int                  Rivet_chdir_file (const char *file);
+EXTERN void                 Rivet_CleanupRequest(request_rec *r);
+EXTERN void                 Rivet_InitServerVariables(Tcl_Interp *interp, apr_pool_t *pool);
+EXTERN void                 Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1);
+EXTERN Tcl_Channel*         Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key);
+EXTERN rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* pool, bool create_request_obj);
+//EXTERN rivet_thread_private* Rivet_ExecutionThreadInit (void);
 EXTERN rivet_thread_private* Rivet_SetupTclPanicProc (void);
-EXTERN void Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel);
-EXTERN int Rivet_ReadFile (apr_pool_t* pool,char* filename,char** buffer,int* nbytes);
+EXTERN void                 Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel);
+EXTERN int                  Rivet_ReadFile (apr_pool_t* pool,char* filename,char** buffer,int* nbytes);
 
 #endif

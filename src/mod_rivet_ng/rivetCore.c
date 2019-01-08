@@ -151,7 +151,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
         {
             /* relative path */
             char* script_name = TclWeb_GetEnvVar (private,"SCRIPT_NAME");
-            int   script_name_l = strlen(script_name);
+            size_t script_name_l = strlen(script_name);
 
             // regardless the reason for a SCRIPT_NAME being undefined we
             // prevent a segfault and we revert the behavior of makeurl
@@ -1791,8 +1791,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
     return TCL_OK;
 }
 
-#define TESTPANIC 0
-
+#undef TESTPANIC
 #ifdef TESTPANIC
 /*
  *----------------------------------------------------------------------
@@ -1947,9 +1946,10 @@ TCL_CMD_HEADER( Rivet_UrlScript )
  */
 
 DLLEXPORT int
-Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
+Rivet_InitCore(rivet_thread_interp* interp_obj,rivet_thread_private* private)
 {
-    rivet_server_conf*      server_conf; 
+    Tcl_Interp*         interp = interp_obj->interp;
+    rivet_server_conf*  server_conf; 
 
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,private);
     RIVET_OBJ_CMD ("headers",Rivet_Headers,private);
@@ -1987,11 +1987,11 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 
     if (server_conf->export_rivet_ns)
     {
-        rivet_interp_globals *globals = NULL;
-        Tcl_Namespace *rivet_ns;
+        //rivet_interp_globals*   globals = NULL;
+        Tcl_Namespace*          rivet_ns = interp_obj->rivet_ns;
 
-        globals = Tcl_GetAssocData(interp, "rivet", NULL);
-        rivet_ns = globals->rivet_ns;
+        //globals = Tcl_GetAssocData(interp,"rivet", NULL);
+        //rivet_ns = globals->rivet_ns;
 
         RIVET_EXPORT_CMD(interp,rivet_ns,"makeurl");
         RIVET_EXPORT_CMD(interp,rivet_ns,"headers");

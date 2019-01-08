@@ -42,9 +42,12 @@ util_read(ApacheRequest *req, const char **rbuf)
 
     if (ap_should_client_block(r)) {
         char buff[HUGE_STRING_LEN];
-        int rsize, len_read, rpos=0;
-        long length = r->remaining;
+        int  len_read;
+		apr_off_t rpos;
+		apr_off_t rsize;
+        apr_off_t length = r->remaining;
 
+		rpos = 0;
         if (length > req->post_max && req->post_max > 0) {
             ap_log_rerror(REQ_ERROR,"entity too large (%d, max=%d)",
 					(int)length, req->post_max);
@@ -509,14 +512,14 @@ apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
 int
 ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
 {
-    request_rec 	*r = req->r;
-    int 		rc = OK;
-    long 		length;
-    char 		*boundary;
-    multipart_buffer 	*mbuff;
-    ApacheUpload 	*upload = NULL;
-    apr_status_t  	status;
-    char 		error[1024];
+    request_rec*       r = req->r;
+    int                rc = OK;
+    apr_off_t          length;
+    char*              boundary;
+    multipart_buffer*  mbuff;
+    ApacheUpload*      upload = NULL;
+    apr_status_t       status;
+    char               error[1024];
 
     if ((rc = ap_setup_client_block(r, REQUEST_CHUNKED_ERROR))) {
         return rc;
@@ -533,7 +536,7 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
     }
 
     do {
-        int blen;
+        size_t blen;
         boundary = ap_getword(r->pool, &ct, '=');
         if (boundary == NULL)
             return DECLINED;
@@ -550,10 +553,12 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
     }
 
     while (!multipart_buffer_eof(mbuff)) {
-        apr_table_t *header = (apr_table_t*) multipart_buffer_headers(mbuff);
-        const char *cd, *param=NULL, *filename=NULL;
-        char buff[FILLUNIT];
-        int blen;
+        apr_table_t* 	header = (apr_table_t*) multipart_buffer_headers(mbuff);
+        const char*		cd;
+		const char*  	param = NULL;
+		const char*		filename=NULL;
+        char 			buff[FILLUNIT];
+        size_t 			blen;
 
         if (!header) {
 #ifdef DEBUG
@@ -625,12 +630,13 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
             }
 
             while ((blen = multipart_buffer_read(mbuff, buff, sizeof(buff)))) {
-		apr_size_t bytes_to_write = (apr_size_t) blen;
-		status = apr_file_write(upload->fp,buff,&bytes_to_write);
-		if (status != 0) {
-		    apr_strerror(status,error,1024); 
+				apr_size_t bytes_to_write = (apr_size_t) blen;
+				status = apr_file_write(upload->fp,buff,&bytes_to_write);
+				
+				if (status != 0) {
+					apr_strerror(status,error,1024); 
                     return HTTP_INTERNAL_SERVER_ERROR;
-		}
+				}
                 upload->size += blen;
             }
         }

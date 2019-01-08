@@ -19,55 +19,27 @@
     under the License.
 */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <apr_strings.h>
 #include "mod_rivet.h"
+
 /* Function prototypes are defined with EXTERN. Since we are in the same DLL,
  * no need to keep this extern... */
-#ifdef EXTERN
-#   undef EXTERN
-#   define EXTERN
+
+#ifdef  EXTERN
+#undef  EXTERN
+#define EXTERN
 #endif /* EXTERN */
+
 #include "mod_rivet_common.h"
 #include "mod_rivet_cache.h"
 #include "worker_prefork_common.h"
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
-extern DLLIMPORT module rivet_module;
+extern DLLIMPORT module             rivet_module;
 
 extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
-
-/*
- * Rivet_DuplicateVhostInterp
- *
- *
- */
-
-static rivet_thread_interp* 
-Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
-{
-    rivet_thread_interp* interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
-
-    interp_obj->interp      = source_obj->interp;
-    interp_obj->channel     = source_obj->channel;
-    interp_obj->cache_free  = source_obj->cache_free;
-    interp_obj->cache_size  = source_obj->cache_size;
-
-    /* An intepreter must have its own cache */
-
-    if (interp_obj->cache_size) {
-        RivetCache_Create(pool,interp_obj); 
-    }
-
-    interp_obj->pool            = source_obj->pool;
-    interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
-    interp_obj->per_dir_scripts = apr_hash_make(pool); 
-    interp_obj->flags           = source_obj->flags;
-    return interp_obj;
-}
 
 /* -- Rivet_VirtualHostsInterps 
  *
@@ -90,13 +62,13 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
 
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 {
-    server_rec*         s;
-    server_rec*         root_server = module_globals->server;
-    rivet_server_conf*  root_server_conf;
-    rivet_server_conf*  myrsc; 
-    rivet_thread_interp* root_interp;
-    void*               parentfunction;     /* this is topmost initialization script */
-    void*               function;
+    server_rec*             s;
+    server_rec*             root_server = module_globals->server;
+    rivet_server_conf*      root_server_conf;
+    rivet_server_conf*      myrsc; 
+    rivet_thread_interp*    root_interp;
+    void*                   parentfunction;     /* this is topmost initialization script */
+    void*                   function;
 
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
     root_interp = MPM_MasterInterp(module_globals->server);
@@ -153,7 +125,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             if (root_server_conf->separate_virtual_interps)
             {
-                rivet_interp = Rivet_NewVHostInterp(private->pool,s);
+                rivet_interp = Rivet_NewVHostInterp(private,s);
                 if (myrsc->separate_channels)
                 {
                     rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
@@ -194,9 +166,9 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
          *  has the child process' same lifespan
          */
 
-        apr_thread_mutex_lock(module_globals->pool_mutex);
+        //apr_thread_mutex_lock(module_globals->pool_mutex);
         myrsc->server_name = (char*) apr_pstrdup (private->pool, s->server_hostname);
-        apr_thread_mutex_unlock(module_globals->pool_mutex);
+        //apr_thread_mutex_unlock(module_globals->pool_mutex);
 
         /* when configured a child init script gets evaluated */
 
@@ -227,8 +199,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             private->running_conf = myrsc;
 
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
-                             errmsg, function);
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, errmsg, function);
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
                              "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
@@ -240,7 +211,6 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     }
     return private;
 }
-
 
 /*
  * -- Rivet_ProcessorCleanup

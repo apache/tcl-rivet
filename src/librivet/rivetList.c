@@ -464,10 +464,10 @@ Rivet_CommaJoinObjCmd (notUsed, interp, objc, objv)
              * calculations right!
              */
 
-             Tcl_AppendToObj (resultPtr, strPtr, walkPtr - strPtr);
+             Tcl_AppendToObj (resultPtr, strPtr, (int)(walkPtr - strPtr));
              strPtr = walkPtr - 1;
         }
-        Tcl_AppendToObj (resultPtr, strPtr, walkPtr - strPtr);
+        Tcl_AppendToObj (resultPtr, strPtr, (int)(walkPtr - strPtr));
     }
     Tcl_AppendToObj (resultPtr, "\"", 1);
     return TCL_OK;

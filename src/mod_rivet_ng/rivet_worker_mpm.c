@@ -51,6 +51,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+DLLIMPORT module rivet_module;
 
 apr_threadkey_t*        handler_thread_key;
 
@@ -180,13 +181,20 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
 
-    private = Rivet_ExecutionThreadInit();
+    private = Rivet_CreatePrivateData(apr_thread_pool_get(thd),true);
+    ap_assert(private != NULL);
+
+    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+
+    Rivet_SetupTclPanicProc();
+
+    /* bridge specific data */
+
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     private->ext->interps = 
         apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
 
-    
     /* So far nothing differs much with what we did for the prefork bridge */
 
     /* At this stage we have to set up the private interpreters of configured 
@@ -444,8 +452,6 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
     return NULL;
 }
 
-// int Worker_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
-
 /*
  * -- Worker_MPM_ChildInit
  *
@@ -461,7 +467,15 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t        rv;
-    
+
+    /* the thread key used to access to Tcl threads private data */
+
+    ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pool) == APR_SUCCESS);
+
+    /* On some platform this is required in order to initialize the
+     * 
+     */
+ 
     apr_atomic_init(pool);
 
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
@@ -691,7 +705,7 @@ apr_status_t Worker_MPM_Finalize (void* data)
         }
     }
 
-    // apr_threadkey_private_delete (handler_thread_key);
+    apr_threadkey_private_delete (rivet_thread_key);
     return OK;
 }
 
@@ -713,7 +727,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
-    interp_obj = Rivet_NewVHostInterp(private->pool,s);
+    interp_obj = Rivet_NewVHostInterp(private,s);
     interp_obj->channel = private->channel;
     Rivet_PerInterpInit(interp_obj, private, s, private->pool);
     return interp_obj;
@@ -722,10 +736,11 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 /*
  * -- Worker_MPM_ExitHandler
  *  
- *  Signals a thread to exit by setting the loop control flag to 0
+ * Signals a thread to exit by setting the loop control flag to 0
  * and by returning a Tcl error with error code THREAD_EXIT_CODE
  *
  *  Arguments:
+ *
  *      int code
  *
  * Side Effects:
@@ -757,7 +772,7 @@ int Worker_MPM_ExitHandler(int code)
     return TCL_OK;
 }
 
-rivet_thread_interp* Worker_MPM_Interp (rivet_thread_private* private,
+rivet_thread_interp* Worker_MPM_Interp (rivet_thread_private*  private,
                                          rivet_server_conf*    conf,
                                          rivet_thread_interp*  interp)
 {

@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 #ifndef __mod_rivet_h__
 #define __mod_rivet_h__
 
@@ -116,11 +114,11 @@ typedef struct _rivet_server_conf {
     char*       rivet_before_script;        /* script run before each page      */
     char*       rivet_after_script;         /*            after                 */
 
-    /* --------------------------------------------------------------------------- */
+    /* ------------------------------------------------------------------------ */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
-    unsigned int user_scripts_status;
+    unsigned int    user_scripts_status;
 
     int             default_cache_size;
     int             upload_max;
@@ -173,6 +171,7 @@ typedef struct _rivet_thread_interp {
     running_scripts*    scripts;            /* base server conf scripts                         */
     apr_hash_t*         per_dir_scripts;    /* per dir running scripts                          */
     unsigned int        flags;              /* signals of various interp specific conditions    */
+    Tcl_Namespace*      rivet_ns;           /* the ::rivet namespace internal representation    */
 } rivet_thread_interp;
 
 typedef struct _thread_worker_private rivet_thread_private;
@@ -199,20 +198,19 @@ typedef struct _mpm_bridge_table {
 typedef struct mpm_bridge_status mpm_bridge_status;
 
 typedef struct _mod_rivet_globals {
-    apr_pool_t*         pool;               
-    char*               rivet_mpm_bridge;       /* name of the MPM bridge                   */
-    server_rec*         server;                 /* default host server_rec obj              */
-    int                 vhosts_count;           /* Number of configured virtual host including 
-                                                 * the root server thus it's supposed to be >= 1 */
-	char*				default_handler;		/* Default request handler code             */
-	int					default_handler_size;	/* Size of the default_handler buffer       */
-    rivet_thread_interp* 
-                        server_interp;          /* server and prefork MPM interpreter       */
-    apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
-    rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
-    mpm_bridge_status*  mpm;                    /* bridge private control structure         */
+    apr_pool_t*             pool;               
+    char*                   rivet_mpm_bridge;       /* name of the MPM bridge                   */
+    server_rec*             server;                 /* default host server_rec obj              */
+    int                     vhosts_count;           /* Number of configured virtual host including 
+                                                     * the root server thus it's supposed to be >= 1 */
+	char*				    default_handler;		/* Default request handler code             */
+	int					    default_handler_size;	/* Size of the default_handler buffer       */
+    rivet_thread_interp**   server_interps;         /* server and prefork MPM interpreter       */
+    //apr_thread_mutex_t*   pool_mutex;             /* threads commmon pool mutex               */
+    rivet_bridge_table*     bridge_jump_table;      /* Jump table to bridge specific procedures */
+    mpm_bridge_status*      mpm;                    /* bridge private control structure         */
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
-    apr_thread_mutex_t* req_mutex;
+    apr_thread_mutex_t*     req_mutex;
 #endif
 } mod_rivet_globals;
 
@@ -225,7 +223,6 @@ typedef struct _thread_worker_private {
     rivet_req_ctype     ctype;              /*                                      */
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
-    //Tcl_Obj*          request_init;
     Tcl_Obj*            request_cleanup;
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */

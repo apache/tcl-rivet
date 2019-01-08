@@ -1,3 +1,9 @@
+2019-01-08 Massimo Manghi <mxmanghi@apache.org>
+    * : new branch quattuor created with an initial commit that tries
+    to remodel the initialization, optimize intepreter creation, remove
+    unneeded structures and other data keeping in mind the goal of
+    abating complexity 
+
 2019-01-05 Massimo Manghi <mxmanghi@apache.org>
     * doc/: merging from 3.1 fixes to various broken docbook elements
     and new entities to external resources' URLs
@@ -20,6 +26,19 @@
     installation directory of rivetlib, after files have been installed.
     This executes "tclsh".
 
+2018-12-18 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/pkgIndex.tcl: update rivetlib version. The CMake build script doesn't run
+	pkg_mkIndex in order to update this file, so we still have to keep the package version
+	aligned with the those actually provided.
+	
+2018-12-17 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: changing version to 3.2.1 attempting to trigger an appveyor rebuild
+	* src/request/apache_request.c,src/request/apache_multipart_buffer.[c|h]: 
+	explicit cast to int wherever needed by calls to Tcl_* functions and changed 
+	int to size_t wherever required 
+	* src/mod_rivet_ng/rivet_types.h,rivetCore.c: field 'size' in structure typed as size_t
+	* src/mod_rivet_ng/TclWebapache.c: argument to Tcl_ReadChars explicitly cast to int 
+
 2018-12-17 Georgios Petasis <petasisg@apache.org>
     * Readme.md: Added a separate badge for winbuild branch.
 
@@ -37,6 +56,11 @@
 
     * src/mod_rivet_ng/mod_rivet.h: Removed statement "APLOG_USE_MODULE(rivet);"
     from the module header file.
+
+2018-12-08 Massimo Manghi <mxmanghi@apache.org>
+	* cmake/CMakeList.c: changed suffix of librivetparser.so and librivet.so
+	* src/mod_rivet_ng: various changes to have a compilable module
+	on Windows. Still the module not working tough
 
 2018-12-07 Massimo Manghi <mxmanghi@apache.org>
     * rivet/pkgIndex.tcl: completed with actual list of packages
