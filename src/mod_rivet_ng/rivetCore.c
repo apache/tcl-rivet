@@ -43,7 +43,7 @@
 #include <stdio.h>
 #include <apr_errno.h>
 #include <apr_strings.h>
-
+#include <apr_portable.h>
 
 #include "apache_request.h"
 #include "mod_rivet.h"
@@ -1932,6 +1932,36 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
 /*
  *-----------------------------------------------------------------------------
+ * Rivet_GetThreadId --
+ *
+ *
+ */
+
+#define SMALL_BUFFER_SIZE 32
+
+TCL_CMD_HEADER( Rivet_GetThreadId )
+{
+    rivet_thread_private*   private;
+    char                    buff[SMALL_BUFFER_SIZE];
+    apr_os_thread_t         threadid;
+    Tcl_Obj*                result_obj;
+    rivet_thread_interp*    interp_obj;
+
+    threadid = apr_os_thread_current();
+
+    THREAD_PRIVATE_DATA(private)
+
+    interp_obj = RIVET_PEEK_INTERP(private,private->running_conf);
+
+    threadid = apr_os_thread_current();
+    snprintf(buff,SMALL_BUFFER_SIZE,"0x%8.8lx",threadid);
+    result_obj = Tcl_NewStringObj(buff,strlen(buff));
+
+    Tcl_SetObjResult(interp_obj->interp,result_obj);
+    return TCL_OK;
+}
+/*
+ *-----------------------------------------------------------------------------
  *
  * Rivet_InitCore --
  *
@@ -1972,6 +2002,7 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("inspect",Rivet_InspectCmd,private);
     RIVET_OBJ_CMD ("exit",Rivet_ExitCmd,private);
     RIVET_OBJ_CMD ("url_script",Rivet_UrlScript,private);
+    RIVET_OBJ_CMD ("thread_id",Rivet_GetThreadId,private);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
@@ -2012,6 +2043,7 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
         RIVET_EXPORT_CMD(interp,rivet_ns,"env");
         RIVET_EXPORT_CMD(interp,rivet_ns,"apache_log_error");
         RIVET_EXPORT_CMD(interp,rivet_ns,"inspect");
+        RIVET_EXPORT_CMD(interp,rivet_ns,"thread_id");
         // ::rivet::exit is not exported
     }
 
