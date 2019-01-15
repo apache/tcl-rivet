@@ -96,7 +96,7 @@ TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp)
 {
     request_rec*        r   = private->r;
     TclWebRequest*      req = private->req;
-    int content_type_len = strlen(r->content_type);
+    size_t content_type_len = strlen(r->content_type);
 
     req->interp             = interp;
     req->req                = r;
