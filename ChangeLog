@@ -27,6 +27,13 @@
 2018-12-17 Georgios Petasis <petasisg@apache.org>
     * Readme.md: Added a separate badge for winbuild branch.
 
+2018-12-17 Massimo Manghi <mxmanghi@apache.org>
+	* src/request/apache_request.c,src/request/apache_multipart_buffer.[c|h]: 
+	explicit cast to int wherever needed by calls to Tcl_* functions and changed 
+	int to size_t wherever required 
+	* src/mod_rivet_ng/rivet_types.h,rivetCore.c: field 'size' in structure typed as size_t
+	* src/mod_rivet_ng/TclWebapache.c: argument to Tcl_ReadChars explicitly cast to int 
+
 2018-12-16 Georgios Petasis <petasisg@apache.org>
     * Readme.md: Added a Markdown README file, which shows the build status
     from Appveyor, for Windows.

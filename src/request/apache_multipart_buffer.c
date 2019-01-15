@@ -31,25 +31,25 @@
   if partial is true, partial matches are allowed at the end of the buffer.
   returns NULL if not found, or a pointer to the start of the first match.
 */
-void* my_memstr(char* haystack, int haystacklen, const char* needle,
-		int partial)
+void* my_memstr(char* haystack,int haystacklen,const char* needle,int partial)
 {
-    int needlen = strlen(needle);
+    size_t needlen = strlen(needle);
     int len = haystacklen;
     char *ptr = haystack;
 
     /* iterate through first character matches */
     while( (ptr = memchr(ptr, needle[0], len)) ) {
-	/* calculate length after match */
-	len = haystacklen - (ptr - (char *)haystack);
+		/* calculate length after match */
+		len = haystacklen - (int)(ptr - (char *)haystack);
 
-	/* done if matches up to capacity of buffer */
-	if(memcmp(needle, ptr, needlen) == 0 &&
-	   (partial || len >= needlen))
-	    break;
-
-	/* next character */
-	ptr++; len--;
+		/* done if matches up to capacity of buffer */
+		if(memcmp(needle, ptr, needlen) == 0 && (partial || len >= needlen))
+		{
+			break;
+		}
+		
+		/* next character */
+		ptr++; len--;
     }
 
     return ptr;
@@ -73,7 +73,7 @@ int fill_buffer(multipart_buffer *self)
     bytes_to_read = self->bufsize - self->bytes_in_buffer;
 
     if (bytes_to_read >= self->r->remaining) {
-        bytes_to_read = self->r->remaining - strlen(self->boundary);
+        bytes_to_read = (int)(self->r->remaining - (apr_off_t)strlen(self->boundary));
 #ifdef DEBUG
         ap_log_rerror(MPB_ERROR, "mozilla 0.97 hack: '%ld'", self->r->remaining);
 #endif
@@ -118,7 +118,7 @@ char* next_line(multipart_buffer *self)
 
 	/* bump the pointer */
 	self->buf_begin = ptr + 1;
-	self->bytes_in_buffer -= (self->buf_begin - line);
+	self->bytes_in_buffer -= (int)(self->buf_begin - line);
     }
 
     /* no LF found */
@@ -177,17 +177,18 @@ int find_boundary(multipart_buffer *self, char *boundary)
 /*********************** external functions *********************/
 
 /* create new multipart_buffer structure */
-multipart_buffer *multipart_buffer_new(char *boundary, long length, request_rec *r)
+multipart_buffer *multipart_buffer_new(char *boundary, apr_off_t length, request_rec *r)
 {
     multipart_buffer *self = (multipart_buffer *)
 	apr_pcalloc (r->pool, sizeof(multipart_buffer));
 
-    int minsize = strlen(boundary)+6;
+    size_t minsize = strlen(boundary)+6;
+
     if(minsize < FILLUNIT) minsize = FILLUNIT;
 
     self->r = r;
     self->buffer = (char *) apr_pcalloc(r->pool, minsize+1);
-    self->bufsize = minsize;
+    self->bufsize = (int)minsize;
     self->request_length = length;
     self->boundary = (char*) apr_pstrcat(r->pool, "--", boundary, NULL);
     self->boundary_next = (char*) apr_pstrcat(r->pool, "\n", self->boundary, NULL);
@@ -243,35 +244,35 @@ apr_table_t *multipart_buffer_headers(multipart_buffer *self)
 }
 
 /* read until a boundary condition */
-int multipart_buffer_read(multipart_buffer *self, char *buf, int bytes)
+size_t multipart_buffer_read(multipart_buffer *self, char *buf, size_t bytes)
 {
-    int len, max;
-    char *bound;
+	size_t 	max;
+    size_t 	len;
+    char*	bound;
 
     /* fill buffer if needed */
     if(bytes > self->bytes_in_buffer) fill_buffer(self);
 
     /* look for a potential boundary match, only read data up to that point */
-    if( (bound = my_memstr(self->buf_begin, self->bytes_in_buffer,
-			   self->boundary_next, 1)) ) {
-	max = bound - self->buf_begin;
-     } else {
-	max = self->bytes_in_buffer;
-     }
+    if( (bound = my_memstr(self->buf_begin, self->bytes_in_buffer, self->boundary_next, 1)) ) {
+		max = bound - self->buf_begin;
+    } else {
+		max = self->bytes_in_buffer;
+		}
     /* maximum number of bytes we are reading */
     len = max < bytes-1 ? max : bytes-1;
 
 
     /* if we read any data... */
-    if(len > 0) {
-	/* copy the data */
-	memcpy(buf, self->buf_begin, len);
-	buf[len] = 0;
-	if(bound && len > 0 && buf[len-1] == '\r') buf[--len] = 0;
+    if (len > 0) {
+		/* copy the data */
+		memcpy(buf, self->buf_begin, len);
+		buf[len] = 0;
+		if(bound && len > 0 && buf[len-1] == '\r') buf[--len] = 0;
 
-	/* update the buffer */
-	self->bytes_in_buffer -= len;
-	self->buf_begin += len;
+		/* update the buffer */
+		self->bytes_in_buffer -= (int)len;
+		self->buf_begin += len;
     }
 
 #ifdef DEBUG

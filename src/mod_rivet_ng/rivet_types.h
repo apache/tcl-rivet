@@ -39,7 +39,7 @@ typedef struct _ApacheUpload {
     char*           tempname;
     apr_table_t*    info;
     apr_file_t*     fp;
-    long            size;
+    size_t          size;
     ApacheRequest*  req;
 } ApacheUpload;
 
