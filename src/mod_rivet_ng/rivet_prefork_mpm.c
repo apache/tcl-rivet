@@ -327,6 +327,8 @@ RIVET_MPM_BRIDGE {
     Prefork_Bridge_Request,
     Prefork_Bridge_Finalize,
     Prefork_Bridge_ExitHandler,
-    Prefork_Bridge_Interp
+    Prefork_Bridge_Interp,
+    Prefork_MPM_Interp,
+    true
 };
 

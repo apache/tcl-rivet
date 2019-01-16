@@ -527,5 +527,6 @@ RIVET_MPM_BRIDGE {
     Lazy_MPM_Request,
     Lazy_MPM_Finalize,
     Lazy_MPM_ExitHandler,
-    Lazy_MPM_Interp
+    Lazy_MPM_Interp,
+    false
 };

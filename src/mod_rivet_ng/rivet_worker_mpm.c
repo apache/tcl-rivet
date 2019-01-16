@@ -789,4 +789,5 @@ RIVET_MPM_BRIDGE {
     Worker_MPM_Finalize,
     Worker_MPM_ExitHandler,
     Worker_MPM_Interp
+    false,
 };
