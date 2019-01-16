@@ -59,13 +59,13 @@
     	<para>
     		A bridge is a loadable library implementing different ways to handle
     		specific features needed to mod_rivet. It was originally meant as a way
-    		to handle the prefork/worker/event MPM specificities that prevented mod_rivet
-    		from supporting each of them, at the same time avoiding the need to stuff the 
+    		to handle the prefork/worker/event MPM specificities, at the same time 
+    		avoiding the need to stuff the 
     		code with conditional statements that would have implied useless complexity (an
     		instance of the Apache web server can run only an MPM at a time), 
     		error prone programming and performance costs. 
     		New bridges could be imagined also to implement different models of workload
-    		and resource management (like the resources demanded by the Tcl interpreters). 
+    		and resource management (like the resources demanded by the Tcl interpreters).
 			We designed an interface between the core of mod_rivet and its MPM bridges 
 			based on a set of functions defined in the rivet_bridge_table structure. 
     	</para>
@@ -82,10 +82,11 @@
 				<listitem>
 					<emphasis>mpm_server_init</emphasis>: pointer to any
 					specific server inititalization function. This field can be NULL
-					if no bridge specific initialization has to be done. The core of
+					if no bridge specific initialization is needed. The core of
 					mod_rivet runs the <command>ServerInitScript</command> before
-					calling this function.</listitem>
-					<listitem><emphasis>mpm_child_init</emphasis>: Bridge specific
+					calling this function.
+				</listitem>
+				<listitem><emphasis>mpm_child_init</emphasis>: Bridge specific
 					child process initialization. If the pointer is assigned with
 					a non-NULL value the function is called by Rivet_ChildInit. 
 				</listitem>
