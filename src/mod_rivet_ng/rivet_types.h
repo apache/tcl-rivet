@@ -23,11 +23,34 @@
 
 /* $Id$ */
 
-#ifndef _RIVET_TYPES_H_
-#define _RIVET_TYPES_H_
+#ifndef __RIVET_TYPES_H__
+#define __RIVET_TYPES_H__
 
 #include <httpd.h>
 #include <tcl.h>
+
+/* Definition suggested in
+ *
+ * https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/Particular-Headers.html
+ *
+ * in order to have a portable definition of the 'bool' data type
+ */
+
+#ifdef HAVE_STDBOOL_H
+# include <stdbool.h>
+#else
+# ifndef HAVE__BOOL
+#  ifdef __cplusplus
+typedef bool _Bool;
+#  else
+#   define _Bool signed char
+#  endif
+# endif
+# define bool _Bool
+# define false 0
+# define true 1
+# define __bool_true_false_are_defined 1
+#endif
 
 typedef struct _ApacheRequest   ApacheRequest;
 typedef struct _ApacheUpload    ApacheUpload;
