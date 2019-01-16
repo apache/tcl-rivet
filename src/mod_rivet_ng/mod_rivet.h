@@ -35,6 +35,8 @@
 #include <rivet_config.h>
 #endif
 
+#include "rivet_types.h"
+
 /*
  * Petasis 16 Dec 2018: This causes the symbol to be exported also from MPMs...
 
@@ -183,6 +185,7 @@ typedef apr_status_t            (RivetBridge_Finalize)      (void*);
 typedef rivet_thread_interp*    (RivetBridge_Master_Interp) (void);
 typedef int                     (RivetBridge_Exit_Handler)  (int);
 typedef rivet_thread_interp*    (RivetBridge_Thread_Interp) (rivet_thread_private*,rivet_server_conf *,rivet_thread_interp*);
+typedef bool                    RivetBridge_InheritsInterps;
 
 typedef struct _mpm_bridge_table {
     RivetBridge_ServerInit    *server_init;
@@ -191,6 +194,7 @@ typedef struct _mpm_bridge_table {
     RivetBridge_Finalize      *child_finalize;
     RivetBridge_Exit_Handler  *exit_handler;
     RivetBridge_Thread_Interp *thread_interp;
+    RivetBridge_InheritsInterps inherits_interps;
 } rivet_bridge_table;
 
 /* we need also a place where to store globals with module wide scope */

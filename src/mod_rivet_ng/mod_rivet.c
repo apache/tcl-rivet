@@ -50,7 +50,6 @@
 #include <unistd.h>
 #endif /* RIVET_HAVE_UNISTD_H */
 
-#include "rivet_types.h"
 #include "mod_rivet.h"
 #include "apache_config.h"
 
@@ -107,6 +106,7 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
     char*   mpm_worker_bridge  = "rivet_worker_mpm.so";
     char*   mpm_bridge_path;
     int     ap_mpm_result;
+
     rivet_server_conf* rsc = RIVET_SERVER_CONF( server->module_config );
 
     /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
@@ -134,7 +134,7 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
             mpm_bridge_path = apr_pstrdup(pool,rsc->mpm_bridge);
         }
         else
-        {   
+        {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                          MODNAME ": MPM bridge %s not found", rsc->mpm_bridge); 
             exit(1);   
@@ -168,7 +168,6 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
             mpm_bridge_path = apr_pstrdup(pool,mpm_worker_bridge);
         }
         mpm_bridge_path = apr_pstrcat(pool,RIVET_DIR,"/mpm/",mpm_bridge_path,NULL);
-
     }
     return mpm_bridge_path;
 }
