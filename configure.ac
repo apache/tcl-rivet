@@ -836,6 +836,7 @@ RIVET_CORE_CMDS
 RIVET_CHANNEL
 SINGLE_WORKER_TCL_THREAD
 HTTP_REQUESTS_MUTEX
+AC_HEADER_STDBOOL
 
 # Let's separate the point version from the major and minor version
 # to build a Rivet version to be substituted as basic version for 

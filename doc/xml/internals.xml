@@ -283,7 +283,7 @@
     THREAD_PRIVATE_DATA(private)
 
 	/* if ::rivet::mycmd works within a request processing we have
-	 * to check if 'private' is bringing a non null request_rec pointer
+	 * to check if 'private' is carrying a non null request_rec pointer
 	 */
     
     CHECK_REQUEST_REC(private,"::rivet::mycmd");
