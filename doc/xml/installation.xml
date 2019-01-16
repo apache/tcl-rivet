@@ -2,7 +2,7 @@
     <title>Apache Rivet &version; Installation</title>
     <procedure>
         <para> 
-            Rivet &version; runs with the Apache 2.2.x and 2.4.x HTTP web servers. 
+            Rivet &version; runs with the Apache 2.4.x HTTP web server. 
             It is known to build and run on various Linux distributions 
             (Debian &amp; Ubuntu, Redhat, SuSE and CentOS), FreeBSD and OpenBSD. For some
             of these Unix-like operative systems 
@@ -259,7 +259,7 @@ tar -xvf rivet-&fullversion;.tar.gz</programlisting>
 	    </para>
 <programlisting>./configure --with-tcl=/usr/lib/tcl8.6/ --with-tclsh=/usr/bin/tclsh8.6 \
 	    --with-apxs=/usr/local/apache2/bin/apxs --with-apache=/usr/local/apache2 \
-	    --with-rivetlib-target-dir=/usr/local/apache2/rivet3.0</programlisting>
+	    --with-rivetlib-target-dir=/usr/local/apache2/rivet&version;</programlisting>
 	  </step>
 	  <step>
 	    <title>Run make</title>
