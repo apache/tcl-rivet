@@ -1,6 +1,8 @@
 2019-01-21 Massimo Manghi <mxmanghi@apache.org>
-    * src/rivet.h: Add error message buffer size definition (was still hardcoded
-    here and there)
+	* src/rivet.h: Add error message buffer size definition (was still hardcoded
+	here and there)
+	* src/mod_rivet_ng/rivetCore.c,rivet_worker_mpm.c: hardcoded buffer size into
+	their correct macro definitions
 
 2019-01-09 Massimo Manghi <mxmanghi@apache.org>
     * .: Released as 3.1.1
