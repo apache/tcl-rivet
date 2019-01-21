@@ -1,5 +1,13 @@
+2019-01-21 Massimo Manghi <mxmanghi@apache.org>
+    * src/rivet.h: Add error message buffer size definition (was still hardcoded
+    here and there)
+
 2019-01-09 Massimo Manghi <mxmanghi@apache.org>
     * .: Released as 3.1.1
+
+2018-12-24 Georgios Petasis <petasisg@apache.org>
+    * README.md: Added badges also for the GitHub fork at:
+    https://github.com/petasis/tcl-rivet.
 
 2019-01-05 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.xml.in,doc/rivet.xml: update copyright notice, add entities
