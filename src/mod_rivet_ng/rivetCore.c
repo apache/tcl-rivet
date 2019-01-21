@@ -278,9 +278,9 @@ TCL_CMD_HEADER( Rivet_Parse )
     stat_s = apr_stat(&finfo_b,filename,APR_FINFO_NORM,private->r->pool);
     if (stat_s != APR_SUCCESS)
     {
-        char apr_error_message[256];
+        char apr_error_message[RIVET_MSG_BUFFER_SIZE];
 
-        Tcl_AddErrorInfo(interp,apr_strerror(stat_s,apr_error_message,256));
+        Tcl_AddErrorInfo(interp,apr_strerror(stat_s,apr_error_message,RIVET_MSG_BUFFER_SIZE));
         return TCL_ERROR;
     }
 
