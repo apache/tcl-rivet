@@ -40,6 +40,7 @@ typedef int rivet_req_ctype;
 #define RIVET_NS                "::rivet"
 #define RIVET_TCL_PACKAGE       "rivet"
 #define RIVETLIB_TCL_PACKAGE    "rivetlib"
+#define RIVET_MSG_BUFFER_SIZE   512
 
 /* Macros to access and check thread private data */
 

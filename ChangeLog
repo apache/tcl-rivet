@@ -1,3 +1,7 @@
+2019-01-21 Massimo Manghi <mxmanghi@apache.org>
+	* src/rivet.h: Add error message buffer size definition (was still hardcoded
+	here and there)
+
 2019-01-14 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivetCore.c: add experimental ::rivet::thread_id
 	command
@@ -9,14 +13,14 @@
 	abating complexity 
 
 2019-01-05 Massimo Manghi <mxmanghi@apache.org>
-    * doc/: merging from 3.1 fixes to various broken docbook elements
-    and new entities to external resources' URLs
+	* doc/: merging from 3.1 fixes to various broken docbook elements
+	 and new entities to external resources' URLs
 
 2018-12-24 Georgios Petasis <petasisg@apache.org>
-    * README.md: Added badges also for the GitHub fork at:
-    https://github.com/petasis/tcl-rivet.
+	* README.md: Added badges also for the GitHub fork at:
+	https://github.com/petasis/tcl-rivet.
 
-    * .appveyor.yml: Enhancements to not rely on hard-coded paths.
+	* .appveyor.yml: Enhancements to not rely on hard-coded paths.
 
 2018-12-23 Massimo Manghi <mxmanghi@apache.org>
     * cmake/CMakeLists.txt: starting with rivet 3 we need Tcl > 8.6.1
