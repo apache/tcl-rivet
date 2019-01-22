@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$*/
-
 #include <httpd.h>
 #include <math.h>
 #include <tcl.h>
@@ -59,8 +57,6 @@ apr_threadkey_t*        handler_thread_key;
 int round(double d) { return (int)(d + 0.5); }
 #endif /* RIVET_NO_HAVE_ROUND */
 
-rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
-
 typedef struct mpm_bridge_status {
     apr_thread_t*       supervisor;
     int                 server_shutdown;
@@ -91,7 +87,7 @@ typedef struct _handler_private
 {
     apr_thread_cond_t*      cond;
     apr_thread_mutex_t*     mutex;
-    request_rec*            r;              /* request rec                 */
+    request_rec*            r;              /* request rec  */
     int                     code;
     int                     status;
     rivet_req_ctype         ctype;
@@ -170,6 +166,41 @@ void Worker_Bridge_Shutdown (void)
     return;
 }
 
+/* -- Worker_CreateInterps 
+ */
+
+static void Worker_CreateInterps (rivet_thread_private* private,rivet_thread_interp** interps)
+{
+    server_rec*             server = module_globals->server;
+    server_rec*             s;
+    rivet_thread_interp*    interp_obj = NULL;
+
+    for (s = server; s != NULL; s = s->next)
+    {
+        rivet_server_conf*      server_conf;
+        rivet_thread_interp*    root_interp = NULL;
+        
+        server_conf = RIVET_SERVER_CONF(s->module_config);
+
+        if ((s == server) || (server_conf->separate_virtual_interps))
+        {
+
+            interp_obj = Rivet_NewVHostInterp(private,s);
+            Rivet_PerInterpInit(interp_obj,private,s,private->pool);
+            if (s == server) { root_interp = interp_obj; }
+
+        } else {
+
+            interp_obj = 
+                 Rivet_DuplicateVHostInterp(private->pool,root_interp);
+
+        }
+
+        interps[server_conf->idx] = interp_obj;
+
+    }
+
+}
 /*
  * -- request_processor_ng
  */
@@ -195,7 +226,9 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private->ext->interps = 
         apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
 
-    /* So far nothing differs much with what we did for the prefork bridge */
+    /* We need to create the thread's interpreters */
+
+    Worker_CreateInterps (private,private->ext->interps);
 
     /* At this stage we have to set up the private interpreters of configured 
      * virtual hosts (if any). We assume the server_rec stored in the module
@@ -203,7 +236,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
      * configuration and to the rivet global script
      */
 
-    if (Rivet_VirtualHostsInterps(private) == NULL)
+    if (Rivet_SetupInterps(private) == NULL)
     {
         *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
         apr_thread_cond_signal(module_globals->mpm->job_cond);
@@ -217,7 +250,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     thread_obj = apr_pcalloc(private->pool,sizeof(handler_private));
     ap_assert(apr_thread_cond_create(&(thread_obj->cond), private->pool) == APR_SUCCESS);
     ap_assert(apr_thread_mutex_create(&(thread_obj->mutex),APR_THREAD_MUTEX_UNNESTED,private->pool) 
-                                                                          == APR_SUCCESS);
+                                                                         == APR_SUCCESS);
 
     thread_obj->status = idle;
 
@@ -304,7 +337,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
 static apr_status_t create_worker_thread (apr_thread_t** thd)
 {
-    return apr_thread_create(thd, NULL, request_processor, NULL, module_globals->pool);
+    return apr_thread_create(thd,NULL,request_processor,NULL,module_globals->pool);
 }
 
 static void start_thread_pool (int nthreads)
@@ -377,13 +410,15 @@ static void supervisor_housekeeping (void)
 static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void *data)
 {
     mpm_bridge_status* mpm = module_globals->mpm;
+    server_rec* s;  
 
-    server_rec* s = (server_rec *)data;
 #ifdef RIVET_MPM_SINGLE_TCL_THREAD
     int threads_to_start = 1;
 #else
     int threads_to_start = mpm->max_threads;
 #endif
+
+    s = module_globals->server;
 
     ap_log_error(APLOG_MARK,APLOG_INFO,0,s,"starting %d Tcl threads",threads_to_start);
     start_thread_pool(threads_to_start);
@@ -471,8 +506,8 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pool) == APR_SUCCESS);
 
-    /* On some platform this is required in order to initialize the
-     * 
+    /* On some plattform this is required in order to initialize
+     * APR atomic function utilities
      */
  
     apr_atomic_init(pool);
@@ -511,12 +546,6 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     ap_assert (apr_threadkey_private_create(&handler_thread_key,NULL,pool) == APR_SUCCESS);
 
-    /* This bridge keeps an array of the ids of threads about to exit. This array is protected by
-     * the mutex module_globals->job_mutex and signals through module_globals->job_cond
-     */
-
-    module_globals->mpm->exiting = apr_array_make(pool,100,sizeof(apr_thread_t*));
-
     /* This APR-Util queue object is the central communication channel from the Apache
      * framework to the Tcl threads through the request handler */
 
@@ -527,8 +556,8 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         exit(1);
     }
 
-    /* In order to set up some workload balancing let's 
-     * query apache for some configuration parameters of the worker MPM 
+    /* In order to set up some data for workload balancer we
+     * query apache about some configuration parameters of the worker MPM 
      */
 
     if (ap_mpm_query(AP_MPMQ_MAX_THREADS,&module_globals->mpm->max_threads) != APR_SUCCESS)
@@ -544,12 +573,20 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         module_globals->mpm->max_spare_threads = TCL_INTERPS;
     }
 
+    /* This bridge keeps an array of the ids of threads about to exit. This array is protected by
+     * the mutex module_globals->job_mutex and signals through module_globals->job_cond
+     */
+
+    module_globals->mpm->exiting = apr_array_make(pool,module_globals->mpm->max_threads,sizeof(apr_thread_t*));
+
     /* We allocate the array of Tcl threads id. We require it to have AP_MPMQ_MAX_THREADS slots */
 
-    module_globals->mpm->workers = apr_pcalloc(pool,module_globals->mpm->max_threads * sizeof(void *));
+    module_globals->mpm->workers = apr_pcalloc(pool,module_globals->mpm->max_threads*sizeof(void *));
 
-    rv = apr_thread_create( &module_globals->mpm->supervisor, NULL, 
-                            threaded_bridge_supervisor, server, module_globals->pool);
+    /* thread arguments pass the master server record and the process pool */
+
+    rv = apr_thread_create(&module_globals->mpm->supervisor,NULL, 
+                           threaded_bridge_supervisor,NULL,pool);
 
     if (rv != APR_SUCCESS) {
         char errorbuf[RIVET_MSG_BUFFER_SIZE];
@@ -787,6 +824,6 @@ RIVET_MPM_BRIDGE {
     Worker_MPM_Request,
     Worker_MPM_Finalize,
     Worker_MPM_ExitHandler,
-    Worker_MPM_Interp
+    Worker_MPM_Interp,
     false,
 };

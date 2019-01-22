@@ -29,13 +29,12 @@
 #include "rivet.h"
 #include "rivetCore.h"
 #include "worker_prefork_common.h"
-#include "TclWeb.h"
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 module           rivet_module;
 
-rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private);
+extern TclWebRequest* TclWeb_NewRequestObject (apr_pool_t *p);
 
 int Prefork_Bridge_ServerInit (apr_pool_t *pPool, 
                                apr_pool_t *pLog,
@@ -44,14 +43,21 @@ int Prefork_Bridge_ServerInit (apr_pool_t *pPool,
 	rivet_thread_interp** server_interps = module_globals->server_interps;
     rivet_server_conf*    rsc;
     server_rec*           s;
-    rivet_thread_interp*  interp_obj; 
     rivet_thread_private* private;
+    int                   server_idx;
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
-    /* Assuming the first interpreter in server_interps array to always be set */
+    /* Enforcing the first interpreter in server_interps to be set */
 
-    interp_obj = server_interps[0];
+    rsc = RIVET_SERVER_CONF(server->module_config);
+    server_idx = rsc->idx;
+
+    if (server_interps[server_idx] == NULL)
+    {
+        server_interps[server_idx] = Rivet_NewVHostInterp(private,server);
+        Rivet_PerInterpInit(server_interps[server_idx],private,server,pPool);
+    }
 
    /*
     * Looping through all the server records and creating (or assigning
@@ -61,6 +67,8 @@ int Prefork_Bridge_ServerInit (apr_pool_t *pPool,
     for (s = server; s != NULL; s = s->next)
     {
         int idx;
+
+        if (s == server) { continue; }
 
         rsc = RIVET_SERVER_CONF(s->module_config);
         idx = rsc->idx;
@@ -72,9 +80,9 @@ int Prefork_Bridge_ServerInit (apr_pool_t *pPool,
 
         if (server_interps[idx] == NULL)
         {
-            if ((s == server) || (rsc->separate_virtual_interps == 0))
+            if (rsc->separate_virtual_interps == 0)
             {
-                module_globals->server_interps[idx] = interp_obj;
+                server_interps[idx] = server_interps[server_idx];
             }
             else
             {
@@ -83,7 +91,6 @@ int Prefork_Bridge_ServerInit (apr_pool_t *pPool,
             }
         }
     }
-
     
     return OK;
 }
@@ -104,94 +111,71 @@ apr_status_t Prefork_Bridge_Finalize (void* data)
     return OK;
 }
 
+/* -- Prefork_ReseedRNG
+ *
+ */
+
+static void Prefork_ReseedRNG(server_rec* server,rivet_thread_interp* interp_obj)
+{
+    int tcl_status;
+    // rivet_server_conf* rsc = RIVET_SERVER_CONF(server->module_config);
+
+    tcl_status = Tcl_Eval(interp_obj->interp,"expr {srand([clock clicks] + [pid])}");
+    if (tcl_status != TCL_OK)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                     MODNAME ": Tcl interpreter random number generation reseeding failed");
+    }
+
+}
+
 /* -- Prefork_Bridge_ChildInit: bridge child process initialization  */
 
 void Prefork_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
-    Tcl_Obj*                global_tcl_script;
     rivet_server_conf*      root_server_conf; 
 	rivet_thread_interp**   server_interps = module_globals->server_interps;
-    rivet_server_conf*      rsc;
-    int                     idx;
+    //Tcl_Channel*          channel;
+    //server_rec*           s;
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
-	/* 
-	 * Assuming the good global initialization script is in the
-	 * first server configuration record
-	 */
-
     root_server_conf = RIVET_SERVER_CONF(server->module_config);
-	if (root_server_conf->rivet_global_init_script != NULL) 
-	{
-        server_rec* s;
-
-		global_tcl_script = Tcl_NewStringObj(root_server_conf->rivet_global_init_script,-1);
-		Tcl_IncrRefCount(global_tcl_script);
-
-        if (root_server_conf->separate_virtual_interps)
-        {
-            for (s = server; s != NULL; s = s->next)
-            {
-
-                rsc = RIVET_SERVER_CONF(s->module_config);
-                idx = rsc->idx;
-
-                ap_assert(server_interps[idx] != NULL);
-                if (Tcl_EvalObjEx(server_interps[idx]->interp,global_tcl_script,0) != TCL_OK)
-                {
-                    ap_log_error (APLOG_MARK,APLOG_ERR,APR_EGENERAL,s, 
-                                 MODNAME ": Error running GlobalInitScript '%s': %s",
-                                 root_server_conf->rivet_global_init_script,
-                                 Tcl_GetVar(server_interps[idx]->interp, "errorInfo", 0));
-                } else {
-                    ap_log_error(APLOG_MARK,APLOG_DEBUG,0,s, 
-                                 MODNAME ": GlobalInitScript '%s' successful",
-                                 root_server_conf->rivet_global_init_script);
-                }
-                
-            }
-        }
-        else
-        {
-            rsc = RIVET_SERVER_CONF(server->module_config);
-            idx = rsc->idx;
-            Rivet_PerInterpInit(server_interps[idx],NULL,server,pool);
-            if (Tcl_EvalObjEx(server_interps[idx]->interp,global_tcl_script,0) != TCL_OK)
-            {
-                ap_log_error (APLOG_MARK,APLOG_ERR,APR_EGENERAL,server, 
-                             MODNAME ": Error running GlobalInitScript '%s': %s",
-                             root_server_conf->rivet_global_init_script,
-                             Tcl_GetVar(server_interps[idx]->interp, "errorInfo", 0));
-            } else {
-                ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server, 
-                             MODNAME ": GlobalInitScript '%s' successful",
-                             root_server_conf->rivet_global_init_script);
-            }
-        }
-
-        Tcl_DecrRefCount(global_tcl_script);
-	} 
-
-    /* The intepreter was created by the server initiazione, we now create its Rivet channel */
-
-    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-    
-    /* 
-     * Prefork bridge has inherited the parent process pool but we have to initialize ourselves
-     * the request descriptor obj 
-     */
-
-    private->req = TclWeb_NewRequestObject(private->pool);
 
     /* Bridge specific data are allocate here */
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
+
+    /* 
+     * Prefork bridge has inherited the parent process pool but we have 
+     * to initialize ourselves the request descriptor obj 
+     */
+
+    private->req = TclWeb_NewRequestObject(private->pool);
+
+    /* The prefork MPM just needs to keep a pointer 
+     * to the interpreters array in module_globals->server_interps
+     */
+
     private->ext->interps = module_globals->server_interps; 
-        
-    //apr_pcalloc(private->pool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
-   
+
+    /* reseeding the RNG for each interpreter when a new child process is created */
+
+    RIVET_FOREACH_SERVER(server,server_interps,Prefork_ReseedRNG)
+
+	if (root_server_conf->rivet_global_init_script != NULL) 
+    {
+        Tcl_Obj* global_tcl_script;
+
+		global_tcl_script = Tcl_NewStringObj(root_server_conf->rivet_global_init_script,-1);
+		Tcl_IncrRefCount(global_tcl_script);
+
+        RIVET_FOREACH_SERVER2(server,server_interps,Rivet_EvalScript,global_tcl_script,"GlobalInitScript");
+
+        Tcl_DecrRefCount(global_tcl_script);
+    }
+
     /* This step is not needed anymore, we rely on the initialization that took
      * place with the server initialization 
      */
@@ -202,29 +186,15 @@ void Prefork_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
 
 #ifdef RIVET_NAMESPACE_IMPORT
 
-    {
-        rivet_server_conf*  rsc;
-        server_rec*         s;
-        char*               tcl_import_cmd = "namespace eval :: { namespace import -force ::rivet::* }\n";
+    RIVET_FOREACH_SERVER(server,server_interps,Rivet_ImportNamespace)
 
-        for (s = server; s != NULL; s = s->next)
-        {
-            int idx;
-
-            rsc = RIVET_SERVER_CONF(s->module_config);
-            idx = rsc->idx;
-
-            Tcl_Eval (module_globals->server_interps[idx]->interp,tcl_import_cmd);
-
-        }
-    }
 #endif 
 
     /*
-     * We proceed creating the vhost interpreters database
+     * We proceed creating the whole virtual host interpreters array
      */
 
-    if (Rivet_VirtualHostsInterps (private) == NULL)
+    if (Rivet_SetupInterps(private) == NULL)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": Tcl Interpreters creation fails");
@@ -261,6 +231,7 @@ int Prefork_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
     return Rivet_SendContent(private,r);
 }
 
+#if 0
 rivet_thread_interp* MPM_MasterInterp(server_rec* server)
 {
     rivet_thread_private*   private;
@@ -289,6 +260,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
     }
     return module_globals->server_interps[0];
 }
+#endif
 
 /*
  * -- Prefork_Bridge_ExitHandler
@@ -328,7 +300,6 @@ RIVET_MPM_BRIDGE {
     Prefork_Bridge_Finalize,
     Prefork_Bridge_ExitHandler,
     Prefork_Bridge_Interp,
-    Prefork_MPM_Interp,
     true
 };
 

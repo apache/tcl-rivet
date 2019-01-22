@@ -237,11 +237,15 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 						 server_rec *s,
 						 apr_pool_t *p)
 {
-    // rivet_interp_globals*   globals     = NULL;
-    Tcl_Obj*                auto_path   = NULL;
-    Tcl_Obj*                rivet_tcl   = NULL;
-    Tcl_Interp*             interp      = interp_obj->interp;
+    Tcl_Obj*    auto_path   = NULL;
+    Tcl_Obj*    rivet_tcl   = NULL;
+    Tcl_Interp* interp;
 
+    /* Do we need to initialize this interpreter? */
+
+    if ((interp_obj->flags & RIVET_INTERP_INITIALIZED)) { return; }
+
+    interp = interp_obj->interp;
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
 
@@ -380,6 +384,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(rivet_thread_private* private,server_r
         RivetCache_Create(pool,interp_obj); 
     }
 
+    interp_obj->channel         = NULL;
     interp_obj->flags           = 0;
     interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
     interp_obj->per_dir_scripts = apr_hash_make(pool); 
@@ -431,6 +436,8 @@ Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key)
 
     return outchannel;
 }
+
+
 
 /*-----------------------------------------------------------------------------
  *
@@ -828,6 +835,85 @@ int Rivet_chdir_file (const char *file)
         chdir_retval = chdir(chdir_buf);
 #endif
     }
-        
     return chdir_retval;
 }
+
+
+/*-----------------------------------------------------------------------------
+ *
+ * -- Rivet_ImportNamespace
+ *
+ * Executes a Tcl code fragment to import into the global space
+ * the commands created in the ::rivet namespace
+ * 
+ * Arguments:
+ *
+ *     - server_rec*             server
+ *     - rivet_thread_interps*   server interps array
+ *
+ * Returned value
+ *
+ *     none
+ *
+ * Side Effects:
+ *
+ *     If needed a Rivet channel is created and registered with an interpreter
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+void Rivet_ImportNamespace (server_rec* server,rivet_thread_interp* interp)
+{
+    rivet_server_conf*  rsc;
+    server_rec*         s;
+    char*               tcl_import_cmd = 
+                        "namespace eval :: { namespace import -force ::rivet::* }\n";
+    
+    for (s = server; s != NULL; s = s->next)
+    {
+        int idx;
+
+        rsc = RIVET_SERVER_CONF(s->module_config);
+        idx = rsc->idx;
+
+        Tcl_Eval (module_globals->server_interps[idx]->interp,tcl_import_cmd);
+
+    }
+
+}
+
+/* -- Rivet_EvalScript
+ *
+ * Utility function to evaluate single Tcl scripts like configuration 
+ * specified script (GlobalInitScript,ChildInitScript and ChildExitScript) 
+ * 
+ *
+ */
+
+int Rivet_EvalScript    (server_rec*          server,
+                         rivet_thread_interp* interp_obj,
+                         Tcl_Obj*             tcl_script,
+                         const char*          script_name)
+{
+    int tcl_retcode;
+
+    tcl_retcode = Tcl_EvalObjEx(interp_obj->interp,tcl_script,0);
+    if (tcl_retcode != TCL_OK)
+    {
+
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+                      MODNAME "errorCode: %s", Tcl_GetVar(interp_obj->interp, "errorCode", 0));
+        ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,server, 
+                      MODNAME ": Error running '%s': %s",script_name,
+                      Tcl_GetVar(interp_obj->interp,"errorInfo",0));
+
+    } else {
+
+        ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server, 
+                     MODNAME ": GlobalInitScript '%s' successful",script_name);
+
+    }
+    
+    return tcl_retcode;
+}
+

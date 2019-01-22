@@ -1,4 +1,7 @@
 2019-01-21 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/*: first draft version that compiles and runs with prefork
+
+2019-01-21 Massimo Manghi <mxmanghi@apache.org>
 	* src/rivet.h: Add error message buffer size definition (was still hardcoded
 	here and there)
 

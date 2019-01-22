@@ -4,7 +4,7 @@
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
     distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
+    regarding copyright ownership. The ASF licenses this file
     to you under the Apache License, Version 2.0 (the
     "License"); you may not use this file except in compliance
     with the License.  You may obtain a copy of the License at
@@ -62,6 +62,7 @@
 #include "rivet.h"
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
+#include "rivetCore.h"
 
 /*
 * Macros DLLIMPORT and DLLEXPORT are defined in tcl.h
@@ -211,11 +212,6 @@ Rivet_CreateModuleGlobals (apr_pool_t* pool, server_rec* server)
         exit(1);
     }
 
-    /* We cannot assume we are running in an OS with a fork system call
-     * therefore we have to check module_globals in order to establish if the
-     * structure has to be allocated
-     */
-
     mod_rivet_g->server = server;
 
     return mod_rivet_g;
@@ -248,8 +244,27 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
     server_rec*             s;
     int	                    idx;
     rivet_thread_private*   private;
+    rivet_thread_interp*    root_interp = NULL;
 
     FILEDEBUGINFO;
+
+    /* In order to know the size of the server_interps array we need
+     * to count the virtual hosts. This is an extra work to do
+     * but it's done only once
+     */
+
+    idx = 0;
+    for (s = server; s != NULL; s = s->next)
+    {
+        rivet_server_conf* vhost_rsc;
+
+        vhost_rsc = RIVET_SERVER_CONF(s->module_config);
+        vhost_rsc->idx = idx++;
+
+        vhost_rsc->server_name = (char*) apr_pstrdup (pPool,s->server_hostname);
+    }
+    module_globals->vhosts_count = idx;
+    module_globals->server_interps = apr_pcalloc(pPool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
 
 #ifdef WIN32
 
@@ -292,22 +307,6 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
     Rivet_SetupTclPanicProc();
 
-    /* In order to know the size of the server_interps array we need
-     * to count the virtual hosts. This is an extra work to do
-     * but it's done only once
-     */
-
-    idx = 0;
-    for (s = server; s != NULL; s = s->next)
-    {
-        rivet_server_conf* vhost_rsc;
-
-        vhost_rsc = RIVET_SERVER_CONF(s->module_config);
-        vhost_rsc->idx = idx++;
-    }
-    module_globals->vhosts_count = idx;
-    module_globals->server_interps = apr_pcalloc(pPool,module_globals->vhosts_count*sizeof(rivet_thread_interp));
-
     for (s = server; s != NULL; s = s->next)
     {
         rivet_server_conf*      vhost_rsc;
@@ -317,7 +316,6 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
         if (vhost_rsc->rivet_server_init_script != NULL) 
         {
-            Tcl_Interp* interp;
             Tcl_Obj*    server_init;
 
             /* either we want separate virtual interps or we haven't 
@@ -334,6 +332,17 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
                  */
 
                 Rivet_PerInterpInit(interp_obj,private,s,pPool);
+
+                if (s == server)
+                {
+                    root_interp = interp_obj;
+                }
+
+            } else {
+
+                interp_obj = 
+                    Rivet_DuplicateVHostInterp(pPool,root_interp);
+
             }
 
             /* This loop enables the prefork bridge to pick
@@ -342,42 +351,21 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
             module_globals->server_interps[vhost_rsc->idx] = interp_obj;
             
+            /* we now establish the full rivet core command set for the root interpreter */
+            // Rivet_InitCore (module_globals->server_interps[vhost_rsc->idx],private);
+
             /* We don't create the cache here: it would make sense only
              * for the prefork MPM. Non-fork bridges should do it
              * themselves 
              */
 
-            interp = interp_obj->interp;
             server_init = Tcl_NewStringObj(vhost_rsc->rivet_server_init_script,-1);
 
             Tcl_IncrRefCount(server_init);
-
-            if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
-            {
-                ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                              MODNAME ": Error running ServerInitScript '%s': %s",
-                              vhost_rsc->rivet_server_init_script,
-                              Tcl_GetVar(interp, "errorInfo", 0));
-            } 
-            else 
-            {
-                ap_log_error (APLOG_MARK, APLOG_DEBUG, 0, server, 
-                              MODNAME ": ServerInitScript '%s' successful", 
-                              vhost_rsc->rivet_server_init_script);
-            }
-
+            Rivet_EvalScript (s,interp_obj,server_init,"ServerInitScript");
             Tcl_DecrRefCount(server_init);
 
-        } 
-        else if (s == server)
-        {
-            /* an interpreter on the initial position is always set */
-
-            interp_obj = Rivet_NewVHostInterp(private,s);
-            Rivet_PerInterpInit(interp_obj,private,s,pPool);
-            module_globals->server_interps[vhost_rsc->idx] = interp_obj;
         }
-        
     }
     
 	/* bridge specific server init script */
@@ -530,7 +518,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     {
         rivet_server_conf*  myrsc;
 
-        myrsc = RIVET_SERVER_CONF( s->module_config );
+        myrsc = RIVET_SERVER_CONF(s->module_config);
 
         /* We only have a different rivet_server_conf if MergeConfig
          * was called. We really need a separate one for each server,

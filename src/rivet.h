@@ -1,4 +1,4 @@
-/* rivet.h: */
+/* rivet.h */
 
 /*
     Licensed to the Apache Software Foundation (ASF) under one
@@ -19,10 +19,8 @@
     under the License.
  */
 
-/* $Id$ */
-
-#ifndef _RIVET_H_
-#define _RIVET_H_
+#ifndef __rivet_h__
+#define __rivet_h__
 
 #include <tcl.h>
 #include "rivet_types.h"
@@ -108,6 +106,49 @@ EXTERN int Rivet_InitList(Tcl_Interp *interp);
 EXTERN int Rivet_InitCrypt(Tcl_Interp *interp);
 EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
 
+#define RIVET_FOREACH_SERVER(server,interps,aFunction) \
+{\
+    server_rec*          s;   \
+    rivet_server_conf*   rsc; \
+    rivet_thread_interp* interp_obj; \
+\
+    rsc = RIVET_SERVER_CONF(server->module_config); \
+    interp_obj = interps[rsc->idx]; \
+    for (s = server; s != NULL; s = s->next) { \
+        aFunction (s, interp_obj); \
+        if (rsc->separate_virtual_interps == 0) { break; } \
+    } \
+}
+
+#define RIVET_FOREACH_SERVER2(server,interps,aFunction,...) \
+{\
+    server_rec*          s;   \
+    rivet_server_conf*   rsc; \
+    rivet_thread_interp* interp_obj; \
+\
+    rsc = RIVET_SERVER_CONF(server->module_config); \
+    interp_obj = interps[rsc->idx]; \
+    for (s = server; s != NULL; s = s->next) { \
+        aFunction (s, interp_obj, __VA_ARGS__ ); \
+        if (rsc->separate_virtual_interps == 0) { break; } \
+    } \
+}
+
+
+#define RIVET_FORALL_SERVERS(server,interps,aFunction,...) \
+{\
+    server_rec*         s;   \
+    rivet_server_conf*  rsc; \
+    rivet_thread_interp* interp_obj; \
+\
+    rsc = RIVET_SERVER_CONF(server->module_config); \
+    interp_obj = interps[rsc->idx]; \
+    for (s = server; s != NULL; s = s->next) { \
+        aFunction (s, interp_obj, __VA_ARGS__ ); \
+    } \
+}
+
 #endif
+
 
 /* _RIVET_H_ */

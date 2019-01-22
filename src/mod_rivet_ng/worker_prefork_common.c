@@ -39,9 +39,7 @@ extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 extern DLLIMPORT module             rivet_module;
 
-extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
-
-/* -- Rivet_VirtualHostsInterps 
+/* -- Rivet_SetupInterps
  *
  * The server_rec chain is walked through and server configurations is read to
  * set up the thread private configuration and interpreters database
@@ -60,143 +58,69 @@ extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
  *     
  */
 
-rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
+rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
 {
     server_rec*             s;
     server_rec*             root_server = module_globals->server;
     rivet_server_conf*      root_server_conf;
-    rivet_server_conf*      myrsc; 
-    rivet_thread_interp*    root_interp;
     void*                   parentfunction;     /* this is topmost initialization script */
     void*                   function;
+    Tcl_Channel*            channel;
 
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
-    root_interp = MPM_MasterInterp(module_globals->server);
 
-    /* we must assume the module was able to create the root interprter */ 
+    /* The intepreters were created by the server init script, we now create its Rivet channel */
 
-    ap_assert (root_interp != NULL);
-
-    /* Using the root interpreter we evaluate the global initialization script, if any */
-
-    if (root_server_conf->rivet_global_init_script != NULL) 
-    {
-        Tcl_Obj* global_tcl_script;
-
-        global_tcl_script = Tcl_NewStringObj(root_server_conf->rivet_global_init_script,-1);
-        Tcl_IncrRefCount(global_tcl_script);
-        if (Tcl_EvalObjEx(root_interp->interp, global_tcl_script, 0) != TCL_OK)
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
-                         MODNAME ": Error running GlobalInitScript '%s': %s",
-                         root_server_conf->rivet_global_init_script,
-                         Tcl_GetVar(root_interp->interp, "errorInfo", 0));
-        } else {
-            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
-                         MODNAME ": GlobalInitScript '%s' successful",
-                         root_server_conf->rivet_global_init_script);
-        }
-        Tcl_DecrRefCount(global_tcl_script);
-    }
-
-    /* then we proceed assigning/creating the interpreters for each virtual host */
-
+    channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
     parentfunction = root_server_conf->rivet_child_init_script;
 
     for (s = root_server; s != NULL; s = s->next)
     {
-        rivet_thread_interp*   rivet_interp;
+        rivet_server_conf*      rsc; 
+        rivet_thread_interp*    interp_obj; 
+        
+        rsc = RIVET_SERVER_CONF(s->module_config);
+        interp_obj = private->ext->interps[rsc->idx];
 
-        myrsc = RIVET_SERVER_CONF(s->module_config);
-
-        /* by default we assign the root_interpreter as
-         * interpreter of the virtual host. In case of separate
-         * virtual interpreters we create new ones for each
-         * virtual host 
-         */
-
-        rivet_interp = root_interp;
-
-        if (s == root_server)
+        if ((s != root_server) &&
+            (root_server_conf->separate_channels) && 
+            (root_server_conf->separate_virtual_interps))
         {
-            Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
+            channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
         }
-        else 
-        {
-            if (root_server_conf->separate_virtual_interps)
-            {
-                rivet_interp = Rivet_NewVHostInterp(private,s);
-                if (myrsc->separate_channels)
-                {
-                    rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-                    Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
-                }
-                else
-                {
-                    rivet_interp->channel = private->channel;
-                }
-            }
-            else
-            {
-                rivet_interp = Rivet_DuplicateVHostInterp(private->pool,root_interp);
-            }
-        }
+        interp_obj->channel = channel;
+
+        Tcl_RegisterChannel(interp_obj->interp,*interp_obj->channel);
 
         /* interpreter base running scripts definition and initialization */
 
-        rivet_interp->scripts = Rivet_RunningScripts (private->pool,rivet_interp->scripts,myrsc);
+        interp_obj->scripts = Rivet_RunningScripts (private->pool,interp_obj->scripts,rsc);
 
-        //private->ext->interps[myrsc->idx] = rivet_interp;
-        
-        RIVET_POKE_INTERP(private,myrsc,rivet_interp);
+        private->ext->interps[rsc->idx] = interp_obj;
 
         /* Basic Rivet packages and libraries are loaded here */
 
-        if ((rivet_interp->flags & RIVET_INTERP_INITIALIZED) == 0)
-        {
-            Rivet_PerInterpInit(rivet_interp, private, s, private->pool);
-        }
+        Rivet_PerInterpInit(interp_obj, private, s, private->pool);
 
         /* It seems that allocating from a shared APR memory pool is not thread safe,
          * but it's not very well documented actually. In any case we protect this
          * memory allocation with a mutex
          */
 
-        /*  this stuff must be allocated from the module global pool which
-         *  has the child process' same lifespan
-         */
-
-        //apr_thread_mutex_lock(module_globals->pool_mutex);
-        myrsc->server_name = (char*) apr_pstrdup (private->pool, s->server_hostname);
-        //apr_thread_mutex_unlock(module_globals->pool_mutex);
-
         /* when configured a child init script gets evaluated */
 
-        function = myrsc->rivet_child_init_script;
+        function = rsc->rivet_child_init_script;
         if (function && 
             (s == root_server || root_server_conf->separate_virtual_interps || function != parentfunction))
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
-            Tcl_Interp* interp = rivet_interp->interp;
+            Tcl_Interp* interp = interp_obj->interp;
             Tcl_Obj*    tcl_child_init = Tcl_NewStringObj(function,-1);
 
             Tcl_IncrRefCount(tcl_child_init);
             Tcl_Preserve (interp);
 
-            /* There is a lot of passing pointers around among various structures. 
-             * We should understand if this is all that necessary.
-             * Here we assign the server_rec pointer to the interpreter which
-             * is wrong, because without separate interpreters it doens't make
-             * any sense. TODO
-             */
-
-            /* before we run a script we have to store the pointer to the
-             * running configuration in the thread private data. The design has
-             * to improve and running a script must have everything sanely
-             * prepared TODO 
-             */ 
-
-            private->running_conf = myrsc;
+            private->running_conf = rsc;
 
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, errmsg, function);
