@@ -303,6 +303,13 @@ void Rivet_ProcessorCleanup (void *data)
 
         Tcl_DeleteInterp(private->ext->interps[i]->interp);
 
+       /* TODO: in view of restoring the ability of single Tcl interpreter deletion
+        * we must also consider to release the per-dir scripts hash table
+        * and the Tcl objects storing request handlers (this probably requires
+        * request handlers object to be instantiated by calling Tcl_DuplicateObj when
+        * needed TODO
+        */
+  
         /* if separate_virtual_interps == 0 we are running the same interpreter
          * instance for each vhost, thus we can jump out of this loop after 
          * the first cycle as the only real intepreter object we have is stored
