@@ -1,3 +1,26 @@
+2019-01-21 Massimo Manghi <mxmanghi@apache.org>
+	* src/rivet.h: Add error message buffer size definition (was still hardcoded
+	here and there)
+	* src/mod_rivet_ng/rivetCore.c,rivet_worker_mpm.c: hardcoded buffer size into
+	their correct macro definitions
+
+2019-01-05 Massimo Manghi <mxmanghi@apache.org>
+	* doc/: merging from 3.1 fixes to various broken docbook elements
+	and new entities to external resources' URLs
+
+2018-12-24 Georgios Petasis <petasisg@apache.org>
+    * README.md: Added badges also for the GitHub fork at:
+    https://github.com/petasis/tcl-rivet.
+
+    * .appveyor.yml: Enhancements to not rely on hard-coded paths.
+
+2018-12-23 Massimo Manghi <mxmanghi@apache.org>
+    * cmake/CMakeLists.txt: starting with rivet 3 we need Tcl > 8.6.1
+
+2018-12-20 Georgios Petasis <petasisg@apache.org>
+    * cmake/CMakeLists.txt: Set policy behaviour of CMP0074, only if policy is
+    defined (i.e. cmake version >= 3.12).
+
 2018-12-19 Georgios Petasis <petasisg@apache.org>
     * cmake/CMakeLists.txt: Added support for regenerating pkgIndex.tcl in the
     installation directory of rivetlib, after files have been installed.
@@ -18,6 +41,13 @@
 
 2018-12-17 Georgios Petasis <petasisg@apache.org>
     * Readme.md: Added a separate badge for winbuild branch.
+
+2018-12-17 Massimo Manghi <mxmanghi@apache.org>
+	* src/request/apache_request.c,src/request/apache_multipart_buffer.[c|h]: 
+	explicit cast to int wherever needed by calls to Tcl_* functions and changed 
+	int to size_t wherever required 
+	* src/mod_rivet_ng/rivet_types.h,rivetCore.c: field 'size' in structure typed as size_t
+	* src/mod_rivet_ng/TclWebapache.c: argument to Tcl_ReadChars explicitly cast to int 
 
 2018-12-16 Georgios Petasis <petasisg@apache.org>
     * Readme.md: Added a Markdown README file, which shows the build status

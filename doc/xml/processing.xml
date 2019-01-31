@@ -77,7 +77,8 @@
 			which provides a very basic interface for both initialization
 			and request processing. Such script will be sourced into the
 			Tcl interpreter at the mod_rivet initialization stage. In the
-			Apache configuration (most likely within a &lt;VirtualHost myrivetapp.com:80&gt;...&lt;/VirtualHost&gt;
+			Apache configuration (most
+			likely within a &lt;VirtualHost myrivetapp.com:80&gt;...&lt;/VirtualHost&gt;
 			definition block)
 		</para>
 		<programlisting>&lt;IfModule rivet_module&gt;

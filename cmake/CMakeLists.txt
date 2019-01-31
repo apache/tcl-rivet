@@ -3,7 +3,9 @@
 # The minimum version of cmake required. This may work also in 2.8,
 # but I have not tested. My cmake is version 3.9.0.
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-cmake_policy(SET CMP0074 NEW)
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
 
 # Rivet version:
 # In order to avoid chasing around multiple definition of the module version we infer
@@ -178,8 +180,8 @@ if (NOT "${with-tclsh}" STREQUAL "")
   MESSAGE ( STATUS "  Tclsh manually set by -Dwith-tclsh=" ${with-tclsh} )
   set (TCL_TCLSH ${with-tclsh})
 endif ()
-FIND_PACKAGE ( TCL 8.5.10 REQUIRED )
-FIND_PACKAGE ( TclStub 8.5.10 REQUIRED )
+FIND_PACKAGE ( TCL 8.6.1 REQUIRED )
+FIND_PACKAGE ( TclStub 8.6.1 REQUIRED )
 MESSAGE ( STATUS "  TCL_TCLSH:               " ${TCL_TCLSH} )
 MESSAGE ( STATUS "  TCL_INCLUDE_PATH:        " ${TCL_INCLUDE_PATH} )
 MESSAGE ( STATUS "  TCL_LIBRARY:             " ${TCL_LIBRARY} )

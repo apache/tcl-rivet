@@ -314,9 +314,9 @@ static void start_thread_pool (int nthreads)
 
         if (rv != APR_SUCCESS) 
         {
-            char    errorbuf[512];
+            char    errorbuf[RIVET_MSG_BUFFER_SIZE];
 
-            apr_strerror(rv, errorbuf,200);
+            apr_strerror(rv, errorbuf,RIVET_MSG_BUFFER_SIZE);
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
                 "Error starting request_processor thread (%d) rv=%d:%s\n",i,rv,errorbuf);
             exit(1);
@@ -410,18 +410,17 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 
                     rv = create_worker_thread (&((apr_thread_t **)mpm->workers)[i]);
                     if (rv != APR_SUCCESS) {
-                        char errorbuf[512];
+                        char errorbuf[RIVET_MSG_BUFFER_SIZE];
 
                         /* we shouldn't ever be in the condition of not being able to start a new thread
                          * Whatever is the reason we log a message and terminate the whole process
                          */
 
-                        apr_strerror(rv,errorbuf,200);
+                        apr_strerror(rv,errorbuf,RIVET_MSG_BUFFER_SIZE);
                         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                             "Error starting request_processor thread (%d) rv=%d:%s",i,rv,errorbuf);
 
                         exit(1);
-
                     }
                     
                     break;
@@ -540,9 +539,9 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
                             threaded_bridge_supervisor, server, module_globals->pool);
 
     if (rv != APR_SUCCESS) {
-        char    errorbuf[512];
+        char errorbuf[RIVET_MSG_BUFFER_SIZE];
 
-        apr_strerror(rv, errorbuf,200);
+        apr_strerror(rv, errorbuf,RIVET_MSG_BUFFER_SIZE);
         ap_log_error(APLOG_MARK, APLOG_ERR, rv, server, 
                      MODNAME "Error starting supervisor thread rv=%d:%s\n",rv,errorbuf);
         exit(1);
