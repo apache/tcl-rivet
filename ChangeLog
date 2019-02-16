@@ -1,16 +1,21 @@
+2019-02-16 Georgios Petasis <petasisg@apache.org>
+    * .appveyor.yml: Added support for creating a zip with the installed rivet
+    files (both module and library), and create an artifact. If a tag is added
+    (in all branches), the zip will be added to the release.
+
 2019-01-21 Massimo Manghi <mxmanghi@apache.org>
-	* src/rivet.h: Add error message buffer size definition (was still hardcoded
-	here and there)
-	* src/mod_rivet_ng/rivetCore.c,rivet_worker_mpm.c: hardcoded buffer size into
-	their correct macro definitions
+    * src/rivet.h: Add error message buffer size definition (was still hardcoded
+    here and there)
+    * src/mod_rivet_ng/rivetCore.c,rivet_worker_mpm.c: hardcoded buffer size
+    into their correct macro definitions
 
 2019-01-14 Massimo Manghi <mxmanghi@apache.org>
-	 * src/mod_rivet_ng/rivetCore.c: add experimental ::rivet::thread_id
-	command
+    * src/mod_rivet_ng/rivetCore.c: add experimental ::rivet::thread_id
+   command
 
 2019-01-05 Massimo Manghi <mxmanghi@apache.org>
-	* doc/: merging from 3.1 fixes to various broken docbook elements
-	and new entities to external resources' URLs
+    * doc/: merging from 3.1 fixes to various broken docbook elements
+    and new entities to external resources' URLs
 
 2018-12-24 Georgios Petasis <petasisg@apache.org>
     * README.md: Added badges also for the GitHub fork at:
@@ -34,11 +39,13 @@
     * Readme.md: Added a separate badge for winbuild branch.
 
 2018-12-17 Massimo Manghi <mxmanghi@apache.org>
-	* src/request/apache_request.c,src/request/apache_multipart_buffer.[c|h]: 
-	explicit cast to int wherever needed by calls to Tcl_* functions and changed 
-	int to size_t wherever required 
-	* src/mod_rivet_ng/rivet_types.h,rivetCore.c: field 'size' in structure typed as size_t
-	* src/mod_rivet_ng/TclWebapache.c: argument to Tcl_ReadChars explicitly cast to int 
+    * src/request/apache_request.c,src/request/apache_multipart_buffer.[c|h]: 
+    explicit cast to int wherever needed by calls to Tcl_* functions and
+    changed int to size_t wherever required 
+    * src/mod_rivet_ng/rivet_types.h,rivetCore.c: field 'size' in structure
+    typed as size_t
+    * src/mod_rivet_ng/TclWebapache.c: argument to Tcl_ReadChars explicitly
+    cast to int 
 
 2018-12-16 Georgios Petasis <petasisg@apache.org>
     * Readme.md: Added a Markdown README file, which shows the build status

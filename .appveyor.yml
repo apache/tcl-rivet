@@ -61,3 +61,40 @@ build_script:
   - cmd: msbuild Rivet.sln /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - cmd: msbuild INSTALL.vcxproj /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
+after_build:
+  - cmd: echo %cd%
+  # Copy the installed files into a new directory, so we can zip it...
+  - cmd: xcopy %APACHE_ROOT%\modules %RIVET_HOME%\artifacts\rivet-%RIVET_VERSION%-windows-%platform% /e /y /i
+  - cmd: xcopy %APACHE_ROOT%\bin\rivet%RIVET_VERSION% %RIVET_HOME%\artifacts\rivet-%RIVET_VERSION%-windows-%platform% /e /y /i
+  - cmd: cd %RIVET_HOME%\artifacts && dir
+  - cmd: cd %RIVET_HOME%\artifacts\rivet-%RIVET_VERSION%-windows-%platform% && dir
+  - cmd: cd %RIVET_HOME%\artifacts && 7z a -tzip rivet-%RIVET_VERSION%-windows-%platform%.zip *
+
+artifacts:
+  - path: '\artifacts\*.zip'
+    type: zip
+    name: rivet-%RIVET_VERSION%-windows-%platform%.zip
+
+deploy:
+  provider: GitHub
+  # The following token belongs to the user "petasis":
+  auth_token:
+    secure: "u2sUa4ovDQsL08AQjtmcIIVmHw6pFqIsT8JSBkMA2Ciebku0slhbTCGDZ19sp0Xt"
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: 'Apache Rivet binaries'
+  artifact: rivet-%RIVET_VERSION%-windows-%platform%.zip
+  draft: true
+  prerelease: true
+  on:
+    branch: master                 # release from master branch only
+    appveyor_repo_tag: true        # deploy on tag push only
+
+## How to trigger a release:
+#  Add a new tag:
+#    git tag rivet-release-test-v3.2.0-1
+#    git push origin --tags
+#
+#  If you want to remove the tag:
+#    git push --delete origin tagName ;# tagName: rivet-release-test-v3.2.0-1
+#    git tag -d tagName
