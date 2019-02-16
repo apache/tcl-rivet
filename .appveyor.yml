@@ -62,10 +62,12 @@ build_script:
   - cmd: msbuild INSTALL.vcxproj /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 after_build:
+  - cmd: set ARTIFACT_DIR=%RIVET_HOME%\artifacts\rivet-%RIVET_VERSION%-windows-%platform%
   - cmd: echo %cd%
+  - cmd: mkdir %ARTIFACT_DIR%
   # Copy the installed files into a new directory, so we can zip it...
-  - cmd: xcopy %APACHE_ROOT%\modules %RIVET_HOME%\artifacts\rivet-%RIVET_VERSION%-windows-%platform% /e /y /i
-  - cmd: xcopy %APACHE_ROOT%\bin\rivet%RIVET_VERSION% %RIVET_HOME%\artifacts\rivet-%RIVET_VERSION%-windows-%platform% /e /y /i
+  - cmd: xcopy %APACHE_ROOT%\modules\mod_rivet.so %ARTIFACT_DIR%\modules\mod_rivet.so /e /y /i
+  - cmd: xcopy %APACHE_ROOT%\bin\rivet%RIVET_VERSION% %ARTIFACT_DIR%\rivet%RIVET_VERSION% /e /y /i
   - cmd: cd %RIVET_HOME%\artifacts && dir
   - cmd: cd %RIVET_HOME%\artifacts\rivet-%RIVET_VERSION%-windows-%platform% && dir
   - cmd: cd %RIVET_HOME%\artifacts && 7z a -tzip rivet-%RIVET_VERSION%-windows-%platform%.zip *
