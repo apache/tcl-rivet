@@ -67,7 +67,7 @@ after_build:
   - cmd: mkdir %ARTIFACT_DIR%\modules
   # Copy the installed files into a new directory, so we can zip it...
   - cmd: copy /y /b %APACHE_ROOT%\modules\mod_rivet.so %ARTIFACT_DIR%\modules
-  - cmd: xcopy %APACHE_ROOT%\bin\rivet%RIVET_VERSION% %ARTIFACT_DIR% /s /e /y /i
+  - cmd: xcopy %APACHE_ROOT%\bin\rivet%RIVET_VERSION% %ARTIFACT_DIR%\rivet%RIVET_VERSION% /s /e /y /i
   - cmd: cd %RIVET_HOME%\artifacts && dir
   - cmd: cd %ARTIFACT_DIR% && dir
   - cmd: cd %RIVET_HOME%\artifacts && 7z a -tzip rivet-%RIVET_VERSION%-windows-%platform%.zip *
