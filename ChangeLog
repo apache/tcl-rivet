@@ -1,3 +1,7 @@
+2019-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * .appveyor.yml: merging from master in order to have new tags generate
+    artifacts
+
 2019-01-21 Massimo Manghi <mxmanghi@apache.org>
 	* src/rivet.h: Add error message buffer size definition (was still hardcoded
 	here and there)

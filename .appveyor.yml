@@ -7,6 +7,7 @@ image:
 
 platform:
   - x64
+  - x86
 
 configuration:
   - Release
@@ -18,6 +19,10 @@ matrix:
       configuration: Release
 
 install:
+  # Capture environment:
+  - cmd: set RIVET_HOME=%cd%
+  - cmd: set /p RIVET_VERSION=<VERSION
+  - cmd: echo %RIVET_VERSION%
   # Install Tcl/Tk
   - cmd: if %platform%==x86 set DOWNLOAD_PLATFORM=win32
   - cmd: if %platform%==x64 set DOWNLOAD_PLATFORM=amd64
@@ -30,6 +35,8 @@ install:
   - cmd: cmake -E tar xf irontcl-%DOWNLOAD_PLATFORM%-%IRONTCL_VERSION%.zip
   - cmd: set TCL_ROOT=%cd%\IronTcl
   - cmd: set PATH=%TCL_ROOT%\bin;%PATH%
+  - cmd: set TCL_TCLSH=%cd%\IronTcl\bin\tclsh86t.exe
+  - cmd: set TK_WISH=%cd%\IronTcl\bin\wish86t.exe
   # Install Apache
   - cmd: set APACHE_VERSION="2.4.37"
   - cmd: set APACHE_COMPILER="VC15"
@@ -39,7 +46,18 @@ install:
   # Generate solution...
   - cmd: cd cmake
   - cmd: cmake -E make_directory "build"
-  - cmd: cmake -E chdir build cmake -DAPACHE_ROOT=%APACHE_ROOT% -DTCL_ROOT=%TCL_ROOT% -G %CMAKE_GENERATOR% ..
+  - cmd: cmake -E chdir build cmake -DAPACHE_ROOT=%APACHE_ROOT% -DTCL_ROOT=%TCL_ROOT% -DTCL_TCLSH=%TCL_TCLSH% -DTK_WISH=%TK_WISH% -G %CMAKE_GENERATOR% ..
 
 build:
-  project: C:\projects\tcl-rivet\cmake\build\Rivet.sln      # path to Visual Studio solution or project
+  project: cmake\build\Rivet.sln      # path to Visual Studio solution or project
+
+before_build:
+  - cmd: if %platform%==x86 set RIVET_PLATFORM=Win32
+  - cmd: if %platform%==x64 set RIVET_PLATFORM=x64
+
+build_script:
+  - cmd: echo %cd%
+  - cmd: cd build
+  - cmd: msbuild Rivet.sln /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - cmd: msbuild INSTALL.vcxproj /p:Platform=%RIVET_PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
