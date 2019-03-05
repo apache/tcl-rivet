@@ -120,7 +120,7 @@ EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
     } \
 }
 
-#define RIVET_FOREACH_SERVER2(server,interps,aFunction,...) \
+#define RIVET_FOREACH_INTERPRETER(server,interps,aFunction,...) \
 {\
     server_rec*          s;   \
     rivet_server_conf*   rsc; \
@@ -135,7 +135,7 @@ EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
 }
 
 
-#define RIVET_FORALL_SERVERS(server,interps,aFunction,...) \
+#define RIVET_FOREACH_VIRTUAL_HOST(server,interps,aFunction,...) \
 {\
     server_rec*         s;   \
     rivet_server_conf*  rsc; \

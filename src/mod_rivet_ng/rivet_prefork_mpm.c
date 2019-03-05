@@ -171,7 +171,7 @@ void Prefork_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
 		global_tcl_script = Tcl_NewStringObj(root_server_conf->rivet_global_init_script,-1);
 		Tcl_IncrRefCount(global_tcl_script);
 
-        RIVET_FOREACH_SERVER2(server,server_interps,Rivet_EvalScript,global_tcl_script,"GlobalInitScript");
+        RIVET_FOREACH_INTERPRETER(server,server_interps,Rivet_EvalScript,global_tcl_script,"GlobalInitScript");
 
         Tcl_DecrRefCount(global_tcl_script);
     }
