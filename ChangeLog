@@ -1,3 +1,6 @@
+2019-04-12 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: wrong references corrected
+
 2019-02-19 Massimo Manghi <mxmanghi@apache.org>
     * .appveyor.yml: merging from master in order to have new tags generate
     artifacts
