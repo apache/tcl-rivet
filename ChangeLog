@@ -1,3 +1,6 @@
+2019-04-13 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: Correct wrong header in ::rivet::http_accept code example
+
 2019-04-12 Massimo Manghi <mxmanghi@apache.org>
     * INSTALL: wrong references corrected
 
