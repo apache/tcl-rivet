@@ -1,4 +1,4 @@
-              Rivet 3.0 Installation
+              Rivet 3.2 Installation
               ======================
 
 For more detailed instructions, see the docs/html/ directory.
@@ -14,7 +14,7 @@ Example:
 ./configure --with-tcl=/usr/lib/tcl8.6                      \
             --with-apache=/usr/local/apache2                \
             --with-apxs=/usr/local/apache2/bin/apxs         \
-            --with-rivet-target-dir=/usr/local/lib/rivet3.0 \
+            --with-rivet-target-dir=/usr/local/lib/rivet3.2 \
             --enable-version-display
 
 2) if 'configure' was successful Rivet is ready for compilation
@@ -86,5 +86,3 @@ autoreconf
 make
 
 Rivet is packaged for various Linux flavours. A list is available at http://tcl.apache.org/download.html
-
-# $Id$

@@ -879,7 +879,7 @@ fr-fr -> 0.2</programlisting>
                 the precedence values and the accepted fields 
                 are returned listed with decreasing precedence order.
             </para>
-            <programlisting> puts [::rivet::http_accept -list $headers(Accept-Language)]
+            <programlisting> puts [::rivet::http_accept -list $headers(Accept)]
 text/html application/xhtml+xml application/xml */*
             </programlisting>
             <para>

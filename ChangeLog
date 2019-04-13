@@ -1,3 +1,13 @@
+2019-04-13 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: Correct wrong header in ::rivet::http_accept code example
+
+2019-04-12 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: wrong references corrected
+
+2019-02-19 Massimo Manghi <mxmanghi@apache.org>
+    * .appveyor.yml: merging from master in order to have new tags generate
+    artifacts
+
 2019-02-16 Georgios Petasis <petasisg@apache.org>
     * .appveyor.yml: Added support for creating a zip with the installed rivet
     files (both module and library), and create an artifact. If a tag is added
