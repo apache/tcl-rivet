@@ -2,6 +2,9 @@
     * src/mod_rivet_ng/: also the worker and lazy bridge transitioned to 
     the new interpreter model
 
+2019-04-13 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: Correct wrong header in ::rivet::http_accept code example
+
 2019-03-05 Massimo Manghi <mxmanghi@apache.org>
     * src/rivet.h: Better semantics for macros RIVET_FOREACH_INTERPRETER and
     RIVET_FOREACH_VIRTUAL_HOST
