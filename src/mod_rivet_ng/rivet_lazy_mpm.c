@@ -161,7 +161,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private = Rivet_CreatePrivateData(apr_thread_pool_get(thd),true);
     ap_assert(private != NULL);
 
-    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+    //private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
     Rivet_SetupTclPanicProc();
 
@@ -172,15 +172,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
 
-    //private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
+    private->ext->interp = Rivet_NewVHostInterp(private,w->server);
+    //RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private,w->server));
+    private->ext->interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
-    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private,w->server));
-    private->ext->interp->channel = private->channel;
 
     /* The worker thread can respond to a single request at a time therefore 
        must handle and register its own Rivet channel */
 
-    Tcl_RegisterChannel(private->ext->interp->interp,*private->channel);
+    Tcl_RegisterChannel(private->ext->interp->interp,*private->ext->interp->channel);
 
     /* From the rivet_server_conf structure we determine what scripts we
      * are using to serve requests */

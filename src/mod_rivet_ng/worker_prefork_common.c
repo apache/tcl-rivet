@@ -68,10 +68,13 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
     Tcl_Channel*            channel;
 
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
-
-    /* The intepreters were created by the server init script, we now create its Rivet channel */
-
     channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+
+    /* The intepreters were created by the server init script, we now create its Rivet channel
+     * We assume the server_rec stored in the module globals can be used to retrieve the 
+     * reference to the root interpreter configuration and to the rivet global script
+     */
+
     parentfunction = root_server_conf->rivet_child_init_script;
 
     for (s = root_server; s != NULL; s = s->next)
@@ -83,18 +86,18 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
         interp_obj = private->ext->interps[rsc->idx];
 
         if ((s != root_server) &&
-            (root_server_conf->separate_channels) && 
-            (root_server_conf->separate_virtual_interps))
+            root_server_conf->separate_channels && 
+            root_server_conf->separate_virtual_interps)
         {
             channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-        }
-        interp_obj->channel = channel;
+        } 
 
-        Tcl_RegisterChannel(interp_obj->interp,*interp_obj->channel);
+        interp_obj->channel = channel;
+        Tcl_RegisterChannel(interp_obj->interp,*channel);
 
         /* interpreter base running scripts definition and initialization */
 
-        interp_obj->scripts = Rivet_RunningScripts (private->pool,interp_obj->scripts,rsc);
+        interp_obj->scripts = Rivet_RunningScripts(private->pool,interp_obj->scripts,rsc);
 
         private->ext->interps[rsc->idx] = interp_obj;
 
@@ -193,7 +196,7 @@ void Rivet_ProcessorCleanup (void *data)
         RivetCache_Cleanup(private,private->ext->interps[i]);
 
         if ((i > 0) && rsc->separate_channels) 
-            Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->channel);
+            Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
 
         Tcl_DeleteInterp(private->ext->interps[i]->interp);
 

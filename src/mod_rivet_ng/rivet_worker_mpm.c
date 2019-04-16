@@ -166,7 +166,8 @@ void Worker_Bridge_Shutdown (void)
     return;
 }
 
-/* -- Worker_CreateInterps 
+/* -- Worker_CreateInterps
+ *
  */
 
 static void Worker_CreateInterps (rivet_thread_private* private,rivet_thread_interp** interps)
@@ -201,8 +202,9 @@ static void Worker_CreateInterps (rivet_thread_private* private,rivet_thread_int
     }
 
 }
-/*
- * -- request_processor_ng
+
+/*-- request_processor_ng
+ *
  */
 
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
@@ -215,7 +217,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private = Rivet_CreatePrivateData(apr_thread_pool_get(thd),true);
     ap_assert(private != NULL);
 
-    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
+    //private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
     Rivet_SetupTclPanicProc();
 
@@ -231,9 +233,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     Worker_CreateInterps (private,private->ext->interps);
 
     /* At this stage we have to set up the private interpreters of configured 
-     * virtual hosts (if any). We assume the server_rec stored in the module
-     * globals can be used to retrieve the reference to the root interpreter
-     * configuration and to the rivet global script
+     * virtual hosts (if any). 
      */
 
     if (Rivet_SetupInterps(private) == NULL)
@@ -245,7 +245,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         return NULL;
     }
 
-    /* The ng model allocates here the handler_private data */
+    /* The ng model allocates here the handler_private data structure */
 
     thread_obj = apr_pcalloc(private->pool,sizeof(handler_private));
     ap_assert(apr_thread_cond_create(&(thread_obj->cond), private->pool) == APR_SUCCESS);
@@ -256,7 +256,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     apr_thread_mutex_unlock(module_globals->mpm->job_mutex); /* unlock job initialization stage */
 
-        /* eventually we increment the number of active threads */
+    /* Before placing the thread on the queue we increment the number of active threads */
 
     apr_atomic_inc32(module_globals->mpm->threads_count);
 
@@ -271,6 +271,10 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             private->ext->keep_going = 0;
             continue;
         }        
+
+        /* The request handler must change the status to init and then notify the thread
+         * to wake up and proceed with the request processing
+         */
 
         while (thread_obj->status != init)
         {
@@ -334,6 +338,9 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     return NULL;
 }
 
+/* -- create_worker_thread
+ *
+ */
 
 static apr_status_t create_worker_thread (apr_thread_t** thd)
 {
@@ -755,7 +762,7 @@ apr_status_t Worker_MPM_Finalize (void* data)
  *  Results:
  *
  */
-
+#if 0
 rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 {
     rivet_thread_private*   private;
@@ -768,6 +775,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
     Rivet_PerInterpInit(interp_obj, private, s, private->pool);
     return interp_obj;
 }
+#endif
 
 /*
  * -- Worker_MPM_ExitHandler

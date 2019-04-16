@@ -195,8 +195,8 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
 		char* request_handler;
 		int	  handler_size;
 
-		ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
-                     MODNAME ": reading request handler %s",rivet_conf->request_handler);
+		//ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
+        //             MODNAME ": reading request handler %s",rivet_conf->request_handler);
 
 		ap_assert(Rivet_ReadFile(pool,rivet_conf->request_handler,
 		                        &request_handler,&handler_size) == 0);
@@ -205,8 +205,8 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
 
     } else {
 
-		ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
-                     MODNAME ": reading default request handler %s",module_globals->default_handler);
+		//ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
+        //             MODNAME ": reading default request handler %s",module_globals->default_handler);
 
         scripts->request_processing = 
 				 Tcl_NewStringObj(module_globals->default_handler,
@@ -234,7 +234,7 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
  */
 void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 						 rivet_thread_private* private, 
-						 server_rec *s,
+						 server_rec *server,
 						 apr_pool_t *p)
 {
     Tcl_Obj*    auto_path   = NULL;
@@ -279,7 +279,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
     if (Tcl_ListObjReplace(interp,auto_path,0,0,1,&rivet_tcl) == TCL_ERROR)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": error setting auto_path: %s",
                      Tcl_GetStringFromObj(auto_path,NULL));
     } else {
@@ -295,7 +295,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
      * context (e.g. ::rivet::inspect) 
      */
 
-    if (private != NULL) private->running_conf = RIVET_SERVER_CONF (s->module_config);
+    if (private != NULL) private->running_conf = RIVET_SERVER_CONF (server->module_config);
 
     /* Initialize the interpreter with Rivet's Tcl commands. */
     Rivet_InitCore(interp_obj,private);
@@ -315,7 +315,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
     if (Tcl_PkgRequire(interp,"Rivet",RIVET_INIT_VERSION,1) == NULL)
     {
-        ap_log_error (APLOG_MARK,APLOG_ERR,APR_EGENERAL,s,
+        ap_log_error (APLOG_MARK,APLOG_ERR,APR_EGENERAL,server,
                       MODNAME ": init.tcl must be installed correctly for Apache Rivet to function: %s (%s)",
                       Tcl_GetStringResult(interp),RIVET_DIR);
         exit(1);
@@ -432,7 +432,7 @@ Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key)
      * programmer does a "flush stdout" or the page is completed.
      */
 
-    Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
+    Tcl_SetChannelBufferSize (*outchannel,TCL_MAX_CHANNEL_BUFFER_SIZE);
 
     return outchannel;
 }
@@ -520,7 +520,7 @@ rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* pPool,bool create_req
     private->thread_exit    = 0;
     private->exit_status    = 0;
     private->abort_code     = NULL;
-    private->channel        = NULL;
+    //private->channel        = NULL;
     private->req            = NULL;
 
     if (create_request_obj)

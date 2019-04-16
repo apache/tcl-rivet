@@ -222,7 +222,7 @@ typedef struct mpm_bridge_specific mpm_bridge_specific;
 
 typedef struct _thread_worker_private {
     apr_pool_t*         pool;               /* threads private memory pool          */
-    Tcl_Channel*        channel;            /* the Tcl thread private channel       */
+    /* Tcl_Channel*     channel;   */       /* the Tcl thread private channel       */
     int                 req_cnt;            /* requests served by thread            */
     rivet_req_ctype     ctype;              /*                                      */
     request_rec*        r;                  /* current request_rec                  */
