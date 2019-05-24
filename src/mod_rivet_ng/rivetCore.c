@@ -307,12 +307,12 @@ TCL_CMD_HEADER( Rivet_Parse )
         }
         
         RivetCache_StoreScript(rivet_interp,entry,script);
+        Tcl_DecrRefCount(script);
     } else {
         script = RivetCache_FetchScript(entry);
     }
 
     return Tcl_EvalObjEx(interp,script,0); 
-    //return Rivet_ParseExecFile(private,filename,0);
 }
 
 /*

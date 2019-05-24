@@ -198,9 +198,9 @@ int RivetCache_StoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* ent
         if (rivet_interp->cache_free) {
             char* hashKey = (char *) Tcl_GetHashKey (rivet_interp->objCache,entry);
 
-            /* We need to incr the reference count of outbuf because we want
-             * it to outlive this function.  This allows it to stay alive
-             * as long as it's in the object cache.
+            /* Tcl_SetHashValue is a macro that simply stuffs the value pointer in an array
+             * We need to incr the reference count of outbuf because we want it to outlive 
+             * this function and be kept as long as the cache is preserved
              */
 
             Tcl_IncrRefCount (script);
