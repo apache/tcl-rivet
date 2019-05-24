@@ -1,3 +1,8 @@
+2019-05-24 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: Add Tcl_DecrRefCnt after
+    RivetCache_StoreScript as this function itself calls
+    Tcl_IncrRefCnt to preserve the Tcl_Obj with the script code
+    
 2019-04-16 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/: also the worker and lazy bridge transitioned to 
     the new interpreter model
