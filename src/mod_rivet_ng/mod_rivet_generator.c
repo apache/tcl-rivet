@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <tcl.h>
 #include <apr_strings.h>
@@ -372,9 +370,9 @@ sendcleanup:
     {
         ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, private->r, 
                                   "process terminating with code %d",private->exit_status);
-        RIVET_MPM_BRIDGE_CALL(exit_handler,private->exit_status);
+        RIVET_MPM_BRIDGE_CALL(exit_handler,private);
         //Tcl_Exit(private->exit_status);
-        exit(private->exit_status);
+        //exit(private->exit_status);
     }
 
     /* We now reset the status to prepare the child process for another request */

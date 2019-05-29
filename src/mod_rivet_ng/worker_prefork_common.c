@@ -164,11 +164,11 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
  *
  */
 
-void Rivet_ProcessorCleanup (void *data)
+void Rivet_ProcessorCleanup (rivet_thread_private* private)
 {
-    int                     i;
-    rivet_thread_private*   private = (rivet_thread_private *) data;
     rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+    server_rec*             s;
+    server_rec*             server;
 
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
                  "Thread exiting after %d requests served (%d vhosts)", 
@@ -189,26 +189,25 @@ void Rivet_ProcessorCleanup (void *data)
      * so we always need to run this cycle at least once 
      */
 
-    i = 0;
-    do
+    server = module_globals->server;
+    for (s = server; s != NULL; s = s->next)
     {
+        int i = 0;
 
-        RivetCache_Cleanup(private,private->ext->interps[i]);
+        if ((i == 0) || rsc->separate_virtual_interps)
+        {
+            RivetCache_Cleanup(private,private->ext->interps[i]);
+            Tcl_DeleteInterp(private->ext->interps[i]->interp);
+            Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
+        }
 
         if ((i > 0) && rsc->separate_channels) 
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
 
-        Tcl_DeleteInterp(private->ext->interps[i]->interp);
+        Rivet_ReleaseRunningScripts(private->ext->interps[i]->scripts);
 
-        /* if separate_virtual_interps == 0 we are running the same interpreter
-         * instance for each vhost, thus we can jump out of this loop after 
-         * the first cycle as the only real intepreter object we have is stored
-         * in private->ext->interps[0]
-         */
+        i++;
+    } 
 
-    } while ((++i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
-
-    //Tcl_DecrRefCount(private->request_init);
-    //Tcl_DecrRefCount(private->request_cleanup);
     apr_pool_destroy(private->pool);
 }

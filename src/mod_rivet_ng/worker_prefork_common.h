@@ -34,5 +34,6 @@ typedef struct mpm_bridge_specific {
 
 int Interps_Init (rivet_thread_interp** , apr_pool_t* , server_rec* );
 rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private);
+void                  Rivet_ProcessorCleanup (rivet_thread_private* private);
 
-#endif /* */
+#endif /* __worker_prefork_common_h__ */

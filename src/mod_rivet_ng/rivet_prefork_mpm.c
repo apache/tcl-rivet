@@ -275,9 +275,9 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
  *  the thread running the Tcl script will exit 
  */
 
-int Prefork_Bridge_ExitHandler(int code)
+int Prefork_Bridge_ExitHandler(rivet_thread_private* private)
 {
-    Tcl_Exit(code);
+    Tcl_Exit(private->exit_status);
 
     /* it will never get here */
     return TCL_OK;

@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
 #include <rivet_config.h>
@@ -244,12 +242,12 @@ TCL_CMD_HEADER( Rivet_Parse )
             /* we parse and compose the script ourselves before passing it to Tcl_EvalObjEx */
 
             Tcl_IncrRefCount(outbuf);
-            Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
+            Tcl_AppendToObj(outbuf,"puts -nonewline \"", -1);
 
             /* If we are not inside a <? ?> section, add the closing ". */
             if (Rivet_Parser(outbuf, script) == 0)
             {
-                Tcl_AppendToObj(outbuf, "\"\n", 2);
+                Tcl_AppendToObj(outbuf,"\"\n", 2);
             } 
 
             Tcl_AppendToObj(outbuf,"\n",-1);
@@ -287,7 +285,7 @@ TCL_CMD_HEADER( Rivet_Parse )
     /* */
 
     cache_key = 
-        RivetCache_MakeKey( private->pool,filename,
+        RivetCache_MakeKey (private->pool,filename,
                             finfo_b.ctime,finfo_b.mtime,
                             IS_USER_CONF(private->running_conf),0);
 
@@ -1427,7 +1425,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
  *
  *      - non threaded MPMs: the child process exits for good
  *      - threaded MPMs: the child process exits after all Tcl threads
- *      are told to exit
+ *        are told to exit
  *
  *-----------------------------------------------------------------------------
  */
@@ -1435,7 +1433,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
 TCL_CMD_HEADER( Rivet_ExitCmd )
 {
     int value;
-    rivet_thread_private*   private;
+    rivet_thread_private* private;
     char* errorMessage = "page generation interrupted by exit command";
 
     if ((objc != 1) && (objc != 2)) {
@@ -1460,8 +1458,9 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
     Tcl_IncrRefCount(private->abort_code);
 
     /*
-     * mod_rivet traps call to exit and offers a chance to handle them 
-     * in the way we handle ::rivet::abort_page calls
+     * mod_rivet traps every call to ::rivet::exit to offers a chance 
+     * to the Tcl application interrupt execution much in 
+     * the same way it can be done by calling ::rivet::abort_page
      */
 
     Tcl_DictObjPut(interp,private->abort_code,

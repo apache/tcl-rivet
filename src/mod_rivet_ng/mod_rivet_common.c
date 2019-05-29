@@ -218,6 +218,22 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
 }
 
 /*
+ *  -- Rivet_ReleaseRunningScripts 
+ *
+ */
+
+void Rivet_ReleaseRunningScripts (running_scripts* scripts)
+{
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_before_script);
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_after_script);
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_error_script);
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_abort_script);
+    RIVET_SCRIPT_DISPOSE(scripts,after_every_script);
+    RIVET_SCRIPT_DISPOSE(scripts,request_processing);
+}
+
+
+/*
  *---------------------------------------------------------------------
  *
  * Rivet_PerInterpInit --

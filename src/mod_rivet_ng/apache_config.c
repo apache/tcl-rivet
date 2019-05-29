@@ -221,13 +221,14 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->after_every_script = oldrsc->after_every_script;
     //newrsc->user_scripts_updated = oldrsc->user_scripts_updated;
     //newrsc->rivet_default_error_script = oldrsc->rivet_default_error_script;
-    newrsc->default_cache_size = oldrsc->default_cache_size;
-    newrsc->upload_max = oldrsc->upload_max;
+    newrsc->default_cache_size  = oldrsc->default_cache_size;
+    newrsc->upload_max          = oldrsc->upload_max;
     newrsc->upload_files_to_var = oldrsc->upload_files_to_var;
     newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
     newrsc->export_rivet_ns = oldrsc->export_rivet_ns;
     newrsc->import_rivet_ns = oldrsc->import_rivet_ns;
     newrsc->honor_header_only_reqs = oldrsc->honor_header_only_reqs;
+    newrsc->single_thread_exit = oldrsc->single_thread_exit;
     newrsc->separate_channels = oldrsc->separate_channels;
     newrsc->server_name = oldrsc->server_name;
     newrsc->upload_dir = oldrsc->upload_dir;
@@ -237,7 +238,6 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     newrsc->idx = oldrsc->idx;
     newrsc->path = oldrsc->path;
     newrsc->mpm_bridge = oldrsc->mpm_bridge;
-    //newrsc->user_conf = oldrsc->user_conf;
     newrsc->user_scripts_status = oldrsc->user_scripts_status;
 }
 
@@ -409,6 +409,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
 
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
+    rsc->single_thread_exit = base->single_thread_exit;
     rsc->separate_channels = base->separate_channels;
     rsc->import_rivet_ns = base->import_rivet_ns;
     rsc->export_rivet_ns = base->export_rivet_ns;
@@ -468,6 +469,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->export_rivet_ns            = RIVET_NAMESPACE_EXPORT;
     rsc->import_rivet_ns            = RIVET_NAMESPACE_IMPORT;
     rsc->honor_header_only_reqs     = RIVET_HEAD_REQUESTS;
+    rsc->single_thread_exit         = 0;
     rsc->separate_channels          = RIVET_SEPARATE_CHANNELS;
     rsc->upload_dir                 = RIVET_UPLOAD_DIR;
     rsc->server_name                = NULL;
@@ -632,31 +634,33 @@ Rivet_ServerConf(cmd_parms *cmd,void *dummy,const char *var,const char *val)
         return "Rivet Error: RivetServerConf requires two arguments";
     }
 
-    if ( STREQU ( var, "CacheSize" ) ) {
+    if (STREQU (var,"CacheSize")) {
         rsc->default_cache_size = strtol( val, NULL, 10 );
-    } else if ( STREQU ( var, "UploadDirectory" ) ) {
+    } else if (STREQU (var,"UploadDirectory")) {
         rsc->upload_dir = val;
-    } else if ( STREQU ( var, "UploadMaxSize" ) ) {
-        rsc->upload_max = strtol( val, NULL, 10 );
-    } else if ( STREQU ( var, "UploadFilesToVar" ) ) {
-        Tcl_GetBoolean (NULL, val, &rsc->upload_files_to_var);
-    } else if ( STREQU ( var, "SeparateVirtualInterps" ) ) {
-        Tcl_GetBoolean (NULL, val, &rsc->separate_virtual_interps);
-    } else if ( STREQU ( var, "HonorHeaderOnlyRequests" ) ) {
-        Tcl_GetBoolean (NULL, val, &rsc->honor_header_only_reqs);
-    } else if ( STREQU ( var, "SeparateChannels" ) ) {
-        Tcl_GetBoolean (NULL, val, &rsc->separate_channels);
-    } else if ( STREQU ( var, "MpmBridge" ) ) {
+    } else if (STREQU (var,"UploadMaxSize")) {
+        rsc->upload_max = strtol(val,NULL,10);
+    } else if (STREQU (var,"UploadFilesToVar")) {
+        Tcl_GetBoolean (NULL,val,&rsc->upload_files_to_var);
+    } else if (STREQU (var,"SeparateVirtualInterps")) {
+        Tcl_GetBoolean (NULL,val,&rsc->separate_virtual_interps);
+    } else if (STREQU (var,"HonorHeaderOnlyRequests")) {
+        Tcl_GetBoolean (NULL,val,&rsc->honor_header_only_reqs);
+    } else if (STREQU (var,"SingleThreadExit")) {
+        Tcl_GetBoolean (NULL,val,&rsc->single_thread_exit);
+    } else if (STREQU (var,"SeparateChannels")) {
+        Tcl_GetBoolean (NULL,val,&rsc->separate_channels);
+    } else if (STREQU (var,"MpmBridge")) {
         rsc->mpm_bridge = val;
-    } else if ( STREQU (var, "ImportRivetNS")) {
-        Tcl_GetBoolean (NULL,val, &rsc->import_rivet_ns);
-    } else if ( STREQU (var,"ExportRivetNS")) {
-        Tcl_GetBoolean (NULL, val, &rsc->export_rivet_ns);
+    } else if (STREQU (var,"ImportRivetNS")) {
+        Tcl_GetBoolean (NULL,val,&rsc->import_rivet_ns);
+    } else if (STREQU (var,"ExportRivetNS")) {
+        Tcl_GetBoolean (NULL,val,&rsc->export_rivet_ns);
     } else {
-        string = Rivet_SetScript( cmd->pool, rsc, var, val);
+        string = Rivet_SetScript(cmd->pool,rsc,var,val);
     }
 
-    if (string != NULL) apr_table_set( rsc->rivet_server_vars, var, string );
+    if (string != NULL) apr_table_set(rsc->rivet_server_vars, var, string);
     return(NULL);
 }
 

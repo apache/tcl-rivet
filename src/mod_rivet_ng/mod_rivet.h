@@ -127,6 +127,8 @@ typedef struct _rivet_server_conf {
     int             upload_files_to_var;
     int             separate_virtual_interps;
     int             honor_header_only_reqs;
+    int             single_thread_exit;     /* Allow bridges to exit a single thread instead of
+                                             * forcing a whole process */
     int             separate_channels;      /* when true a vhosts get their private channel */
     int             export_rivet_ns;        /* export the ::rivet namespace commands        */
     int             import_rivet_ns;        /* import into the global namespace the
@@ -183,7 +185,7 @@ typedef void                    (RivetBridge_ThreadInit)    (apr_pool_t* pPool,s
 typedef int                     (RivetBridge_Request)       (request_rec*,rivet_req_ctype);
 typedef apr_status_t            (RivetBridge_Finalize)      (void*);
 typedef rivet_thread_interp*    (RivetBridge_Master_Interp) (void);
-typedef int                     (RivetBridge_Exit_Handler)  (int);
+typedef int                     (RivetBridge_Exit_Handler)  (rivet_thread_private*);
 typedef rivet_thread_interp*    (RivetBridge_Thread_Interp) (rivet_thread_private*,rivet_server_conf *,rivet_thread_interp*);
 typedef bool                    RivetBridge_InheritsInterps;
 
@@ -210,7 +212,7 @@ typedef struct _mod_rivet_globals {
 	char*				    default_handler;		/* Default request handler code             */
 	int					    default_handler_size;	/* Size of the default_handler buffer       */
     rivet_thread_interp**   server_interps;         /* server and prefork MPM interpreter       */
-    //apr_thread_mutex_t*   pool_mutex;             /* threads commmon pool mutex               */
+    /* apr_thread_mutex_t*   pool_mutex;  */        /* threads commmon pool mutex               */
     rivet_bridge_table*     bridge_jump_table;      /* Jump table to bridge specific procedures */
     mpm_bridge_status*      mpm;                    /* bridge private control structure         */
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
@@ -250,19 +252,6 @@ typedef struct _rivet_interp_globals {
 } rivet_interp_globals;
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
-
-/*
- * Petasis, 04/08/2017: I think the following is wrong, as both "functions" are
- * defined through preprocessor definitions in http_config.h. At least under
- * windows, they do not exist as functions in libhttpd.lib.
- *
-#ifdef ap_get_module_config
-#undef ap_get_module_config
-#endif
-#ifdef ap_set_module_config
-#undef ap_set_module_config
-#endif
-*/
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 #define RIVET_NEW_CONF(p)         (rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
@@ -314,6 +303,11 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
         Tcl_IncrRefCount(running_script->objscript);\
     }
 
+#define RIVET_SCRIPT_DISPOSE(running_scripts,script_name) \
+    if (running_scripts->script_name != NULL) {\
+        Tcl_DecrRefCount(running_scripts->script_name);\
+    }
+
 #define RIVET_MPM_BRIDGE_TABLE         bridge_jump_table
 #define RIVET_MPM_BRIDGE_FUNCTION(fun) module_globals->bridge_jump_table->fun
 
@@ -331,4 +325,4 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 #define RIVET_MPM_BRIDGE_COMPOSE(bridge) RIVET_DIR,"/mpm/rivet_",bridge,"_mpm.so"
 
-#endif /* MOD_RIVET_H */
+#endif /* _mod_rivet_h_ */

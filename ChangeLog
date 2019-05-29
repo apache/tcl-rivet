@@ -1,3 +1,10 @@
+2019-05-29 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/apache_config.c: Now handling the directive SingleThreadExit 
+    * src/mod_rivet_ng/[worker|lazy|prefork].c: Now handling single thread exit
+    * src/mod_rivet_ng/worker_prefork_common.c: Reviving and fixing Rivet_CleanupProcessor
+    * src/mod_rivet_ng/mod_rivet_common.c: Add function Rivet_ReleaseRunningScripts to
+    release Tcl_Obj instances of configuration scripts
+
 2019-05-24 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: Add Tcl_DecrRefCnt after
     RivetCache_StoreScript as this function itself calls

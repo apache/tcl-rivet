@@ -176,9 +176,9 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     //RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private,w->server));
     private->ext->interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
-
-    /* The worker thread can respond to a single request at a time therefore 
-       must handle and register its own Rivet channel */
+    /* The worker thread can respond to a single 
+     * request at a time therefore must handle and 
+     * register its own Rivet channel */
 
     Tcl_RegisterChannel(private->ext->interp->interp,*private->ext->interp->channel);
 
@@ -246,6 +246,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     
     ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread orderly exit");
     Lazy_RunConfScript(private,w,child_exit);
+
+    Rivet_ReleaseRunningScripts(private->ext->interp->scripts);
+
+    /* If single thread exit is enabled we delete the Tcl interp */
+
+    if (!rsc->single_thread_exit) 
+    {
+        Tcl_DeleteInterp(private->ext->interp->interp);
+    }
 
     apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
     (module_globals->mpm->vhosts[idx].threads_count)--;
@@ -476,11 +485,8 @@ apr_status_t Lazy_MPM_Finalize (void* data)
     return APR_SUCCESS;
 }
 
-int Lazy_MPM_ExitHandler(int code)
+int Lazy_MPM_ExitHandler(rivet_thread_private* private)
 {
-    rivet_thread_private*   private;
-
-    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
     /* This is not strictly necessary, because this command will 
      * eventually terminate the whole processes */
@@ -508,15 +514,20 @@ int Lazy_MPM_ExitHandler(int code)
     if (module_globals->mpm->exit_command == 0)
     {
         module_globals->mpm->exit_command = 1;
-        module_globals->mpm->exit_command_status = code;
+        module_globals->mpm->exit_command_status = private->exit_status;
     }
     apr_thread_mutex_unlock(module_globals->mpm->mutex);
 
-    /* We now tell the supervisor to terminate the Tcl worker thread pool
-     * to exit and is sequence the whole process to shutdown 
-     * by calling exit() */
- 
-    Lazy_MPM_Finalize (private->r->server);
+    if (!private->running_conf->single_thread_exit)
+    {
+        /* We now tell the supervisor to terminate the Tcl worker thread pool
+         * to exit and is sequence the whole process to shutdown 
+         * by calling exit() */
+     
+        Lazy_MPM_Finalize (private->r->server);
+
+    } 
+
     return TCL_OK;
 }
 

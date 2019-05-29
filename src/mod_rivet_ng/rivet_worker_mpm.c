@@ -319,9 +319,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     apr_thread_mutex_unlock(thread_obj->mutex);
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
-    /* We don't clean up the thread resources anymore, if the thread exits the whole process terminates
-     * As long as Tcl can't safely delete interpreters this is the way things must be done */
-    // Rivet_ProcessorCleanup(private);
+    {
+        rivet_server_conf*  rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+
+        if (rsc->single_thread_exit)
+        {
+            Rivet_ProcessorCleanup(private);
+        }
+    }
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
     *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
@@ -732,7 +737,7 @@ apr_status_t Worker_MPM_Finalize (void* data)
     apr_thread_cond_signal(module_globals->mpm->job_cond);
     apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
 
-    /* If the Function is called by the memory pool cleanup we wait
+    /* If the function is called by the memory pool cleanup we wait
      * to join the supervisor, otherwise we if the function was called
      * by Worker_MPM_Exit we skip it because this thread itself must exit
      * to allow the supervisor to exit in the shortest possible time 
@@ -792,12 +797,8 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
  *  the thread running the Tcl script will exit 
  */
 
-int Worker_MPM_ExitHandler(int code)
+int Worker_MPM_ExitHandler(rivet_thread_private* private)
 {
-    rivet_thread_private*   private;
-
-    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
-
     /* This is not strictly necessary, because this command will 
      * eventually terminate the whole processes */
 
@@ -806,12 +807,23 @@ int Worker_MPM_ExitHandler(int code)
     private->ext->keep_going = 0;
 
     module_globals->mpm->exit_command = 1;
-    module_globals->mpm->exit_command_status = code;
+    module_globals->mpm->exit_command_status = private->exit_status;
 
-    /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
-     * and is sequence the whole process to shutdown by calling exit() */
- 
-    Worker_MPM_Finalize (private->r->server);
+    if (!private->running_conf->single_thread_exit)
+    {
+
+        /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
+         * and is sequence the whole process to shutdown by calling exit() */
+     
+        Worker_MPM_Finalize (private->r->server);
+        exit(private->exit_status);
+
+    } 
+
+    /*
+     * If single thread exit is enabled we continue and let the
+     * thread exit on its own interrupting the main loop
+     */
 
     return TCL_OK;
 }
