@@ -18,12 +18,7 @@ See [LICENSE](LICENSE) for licensing terms.
 | macOS 64 (Darwin), Apache 2.4.37, Tcl/Tk 8.5 |  | | |
 
 
-## KNOWN PROBLEMS
-
- - Rivet is reported to conflict with cgi scripts on some Linux machines. Symptom of the problem is when cgi scripts hang forever and don't send contents to the client
-
 ## RIVET NAMESPACE
 
- - With the intruduction of the ::rivet namespace the command set has been moved into it and each command should now be fully qualified. Building rivet you can choose in case to place the commands on the export 
- list or even automatically import them into the global namespace. This is a deprecated option though unless you have a compatibility issue with existing legacy Rivet based code.
+ - With the intruduction of the ::rivet namespace the command set has been moved into it and each command should now be fully qualified. Building rivet you can choose in case to place the commands on the export list or even automatically import them into the global namespace. This is a deprecated option though unless you have a compatibility issue with existing legacy Rivet based code.
 
