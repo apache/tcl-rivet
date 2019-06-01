@@ -21,7 +21,8 @@
 #ifndef __mod_rivet_cache_h__
 #define __mod_rivet_cache_h__
 
-EXTERN void  RivetCache_Create  (apr_pool_t *p, rivet_thread_interp* interp_obj);
+EXTERN void  RivetCache_Create  (rivet_thread_interp* interp_obj);
+EXTERN void  RivetCache_Destroy (rivet_thread_private* private,rivet_thread_interp* rivet_interp);
 EXTERN void  RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp);
 EXTERN char* RivetCache_MakeKey (apr_pool_t* pool, char*         filename,
                                                    time_t        ctime, 

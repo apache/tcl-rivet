@@ -51,15 +51,43 @@ extern mod_rivet_globals* module_globals;
  *
  */
 
-void RivetCache_Create (apr_pool_t *p, rivet_thread_interp* interp_obj)
+void RivetCache_Create (rivet_thread_interp* interp_obj)
 {
-    interp_obj->objCacheList = 
-                apr_pcalloc(p,(signed)((interp_obj->cache_size)*sizeof(char *)));
-    interp_obj->objCache    = 
-                apr_pcalloc(p,sizeof(Tcl_HashTable));
+    interp_obj->objCacheList = apr_pcalloc(interp_obj->pool,(signed)((interp_obj->cache_size)*sizeof(char *)));
+    interp_obj->objCache = apr_pcalloc(interp_obj->pool,sizeof(Tcl_HashTable));
 
     Tcl_InitHashTable(interp_obj->objCache,TCL_STRING_KEYS);
 }
+
+/*
+ * -- RivetCache_Destroy
+ *
+ *
+ */
+
+void RivetCache_Destroy (rivet_thread_private* private,rivet_thread_interp* rivet_interp)
+{
+    int ct;
+    Tcl_HashEntry *delEntry;
+
+    /* Clean out the list. */
+    ct = rivet_interp->cache_free;
+    while (ct < rivet_interp->cache_size) {
+        /* Free the corresponding hash entry. */
+        delEntry = Tcl_FindHashEntry(rivet_interp->objCache,
+                                     rivet_interp->objCacheList[ct]);
+
+        if (delEntry != NULL) {
+            Tcl_DecrRefCount((Tcl_Obj *)Tcl_GetHashValue(delEntry));
+            Tcl_DeleteHashEntry(delEntry);
+            rivet_interp->objCacheList[ct] = NULL;
+        }
+
+        ct++;
+    }
+    apr_pool_destroy(rivet_interp->pool);
+}
+
 
 /*
  * -- RivetCache_Cleanup
@@ -99,23 +127,11 @@ void RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rive
 
         ct++;
     }
-    apr_pool_destroy(rivet_interp->pool);
+    apr_pool_clear(rivet_interp->pool);
     
-    /* let's recreate the cache list */
+    rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool,(signed)(rivet_interp->cache_size*sizeof(char *)));
+    rivet_interp->cache_free = rivet_interp->cache_size;
 
-    if (apr_pool_create(&rivet_interp->pool, private->pool) != APR_SUCCESS)
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
-                     MODNAME ": could not recreate cache private pool. Cache disabled");
-        rivet_interp->cache_free = rivet_interp->cache_size = 0;
-    }
-    else
-    {
-        rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
-                                                (signed)(rivet_interp->cache_size*sizeof(char *)));
-        rivet_interp->cache_free = rivet_interp->cache_size;
-    }
-    
 }
 
 /* 
