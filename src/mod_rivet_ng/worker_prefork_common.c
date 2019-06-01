@@ -196,7 +196,7 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
 
         if ((i == 0) || rsc->separate_virtual_interps)
         {
-            RivetCache_Cleanup(private,private->ext->interps[i]);
+            RivetCache_Destroy(private,private->ext->interps[i]);
             Tcl_DeleteInterp(private->ext->interps[i]->interp);
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
         }
@@ -208,6 +208,4 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
 
         i++;
     } 
-
-    apr_pool_destroy(private->pool);
 }

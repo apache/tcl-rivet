@@ -313,8 +313,6 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     /* URL referenced script execution and exception handling */
 
     if (Tcl_EvalObjEx(interp, private->running->request_processing,0) == TCL_ERROR) 
-    //if (Rivet_ParseExecFile (private, private->r->filename, 1) != TCL_OK)
-    //if (Rivet_ExecuteAndCheck(private,private->request_processing) == TCL_ERROR)
     {
         /* we don't report errors coming from abort_page execution */
 
@@ -323,7 +321,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
             request_rec* r = private->r;
 
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
-                         MODNAME ": Error parsing exec file '%s': %s",
+                         MODNAME ": Error evaluating exec file '%s': %s",
                          r->filename, Tcl_GetVar(interp, "errorInfo", 0));
         }
     }
@@ -335,16 +333,6 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         Rivet_ReleaseScripts(private->running);
         private->running_conf->user_scripts_status &= ~(unsigned int)USER_SCRIPTS_UPDATED;
     }
-
-    /* and finally we run the request_cleanup procedure (always set) */
-    
-    //if (Tcl_EvalObjEx(interp, private->request_cleanup, 0) == TCL_ERROR) {
-    //
-    //    ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, private->r, 
-    //                 MODNAME ": Error evaluating cleanup request: %s",
-    //                 Tcl_GetVar(interp, "errorInfo", 0));
-    //
-    //}
 
     /* We finalize the request processing by printing the headers and flushing
        the rivet channel internal buffer */
@@ -369,7 +357,7 @@ sendcleanup:
     if (private->thread_exit)
     {
         ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, private->r, 
-                                  "process terminating with code %d",private->exit_status);
+                                  "thread terminating with code %d",private->exit_status);
         RIVET_MPM_BRIDGE_CALL(exit_handler,private);
         //Tcl_Exit(private->exit_status);
         //exit(private->exit_status);

@@ -62,6 +62,7 @@ static const char* confDirectives[] =
                     "RequestHandler",
                     "ExportRivetNS",
                     "ImportRivetNS",
+                    "SingleThreadExit",
                     NULL 
 };
 
@@ -85,6 +86,7 @@ enum confIndices {
                     request_handler,
                     export_rivet_ns,
                     import_rivet_ns,
+                    single_thread_exit,
                     conf_index_terminator 
 };
 
@@ -147,6 +149,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case honor_header_only_requests: int_value = Tcl_NewIntObj(rsc->honor_header_only_reqs); break;
         case export_rivet_ns:           int_value = Tcl_NewIntObj(rsc->export_rivet_ns); break;
         case import_rivet_ns:           int_value = Tcl_NewIntObj(rsc->import_rivet_ns); break;
+        case single_thread_exit:        int_value = Tcl_NewIntObj(rsc->single_thread_exit); break;
         default: return NULL;
     }
 

@@ -203,7 +203,7 @@ static void Worker_CreateInterps (rivet_thread_private* private,rivet_thread_int
 
 }
 
-/*-- request_processor_ng
+/*-- request_processor
  *
  */
 
@@ -211,10 +211,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 {
     rivet_thread_private*   private;
     handler_private*        thread_obj;
+    apr_pool_t*             tPool;
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
 
-    private = Rivet_CreatePrivateData(apr_thread_pool_get(thd),true);
+    //tPool = apr_thread_pool_get(thd);
+    ap_assert (apr_pool_create(&tPool,apr_thread_pool_get(thd)) == APR_SUCCESS);
+
+    private = Rivet_CreatePrivateData(tPool,true);
     ap_assert(private != NULL);
 
     //private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
@@ -287,7 +291,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             continue;
         }
 
-        /* we set the status to request_processing  */
+        /* we set the status to request_processing */
 
         thread_obj->status = request_processing;
 
@@ -296,15 +300,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         apr_atomic_inc32(module_globals->mpm->running_threads_count);
 
         /* these assignements are crucial for both calling Rivet_SendContent and
-         * for telling the channel where stuff must be sent to */
+         * for telling the channel where stuff must be sent to
+         */
 
         private->ctype = thread_obj->ctype;
         private->req_cnt++;
 
         HTTP_REQUESTS_PROC(thread_obj->code = Rivet_SendContent(private,thread_obj->r));
-
         thread_obj->status = done;
-        if (private->thread_exit) thread_obj->status = child_exit;
 
         apr_thread_cond_signal(thread_obj->cond);
 
@@ -314,30 +317,38 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         }
         apr_atomic_dec32(module_globals->mpm->running_threads_count);
 
-    } while (private->ext->keep_going > 0);
+    } while (private->ext->keep_going);
 
+    thread_obj->status = child_exit;
     apr_thread_mutex_unlock(thread_obj->mutex);
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
     {
-        rivet_server_conf*  rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+        rivet_server_conf* rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
         if (rsc->single_thread_exit)
         {
-            Rivet_ProcessorCleanup(private);
+            //Rivet_ProcessorCleanup(private);
         }
     }
+
+    /* Deleting the condition variable and related mutex */
+
+    apr_thread_mutex_destroy(thread_obj->mutex);
+    apr_thread_cond_destroy(thread_obj->cond);
+
+    /* the counter of active threads has to be decremented */
+
+    apr_atomic_dec32(module_globals->mpm->threads_count);
+
+    /* Notifying the supervisor this thread is about to exit */
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
     *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
     apr_thread_cond_signal(module_globals->mpm->job_cond);
     apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
 
-    /* the counter of active threads has to be decremented */
-
-    apr_atomic_dec32(module_globals->mpm->threads_count);
-
-    /* this call triggers thread private stuff clean up by calling processor_cleanup */
+    apr_pool_destroy(tPool);
 
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
@@ -366,7 +377,7 @@ static void start_thread_pool (int nthreads)
 
         if (rv != APR_SUCCESS) 
         {
-            char    errorbuf[RIVET_MSG_BUFFER_SIZE];
+            char errorbuf[RIVET_MSG_BUFFER_SIZE];
 
             apr_strerror(rv, errorbuf,RIVET_MSG_BUFFER_SIZE);
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
@@ -437,8 +448,6 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 
     do
     {
-        apr_thread_t* p;
-      
         apr_thread_mutex_lock(mpm->job_mutex);
         while (apr_is_empty_array(mpm->exiting) && !mpm->server_shutdown)
         {
@@ -448,6 +457,8 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
         while (!apr_is_empty_array(mpm->exiting) && !mpm->server_shutdown)
         {
             int i;
+            apr_thread_t* p;
+
             p = *(apr_thread_t **)apr_array_pop(mpm->exiting);
             
             for (i = 0; (i < module_globals->mpm->max_threads) && !mpm->server_shutdown; i++)
@@ -816,7 +827,6 @@ int Worker_MPM_ExitHandler(rivet_thread_private* private)
          * and is sequence the whole process to shutdown by calling exit() */
      
         Worker_MPM_Finalize (private->r->server);
-        exit(private->exit_status);
 
     } 
 

@@ -79,7 +79,7 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
     /* An intepreter must have its own cache */
 
     if (interp_obj->cache_size) {
-        RivetCache_Create(pool,interp_obj); 
+        RivetCache_Create(interp_obj); 
     }
 
     interp_obj->pool            = source_obj->pool;
@@ -357,8 +357,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
 rivet_thread_interp* Rivet_NewVHostInterp(rivet_thread_private* private,server_rec* server)
 {
-    apr_pool_t*             pool = private->pool;
-    rivet_thread_interp*    interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
+    rivet_thread_interp*    interp_obj = apr_pcalloc(private->pool,sizeof(rivet_thread_interp));
     rivet_server_conf*      rsc;
 
     /* The cache size is global so we take it from here */
@@ -385,25 +384,27 @@ rivet_thread_interp* Rivet_NewVHostInterp(rivet_thread_private* private,server_r
         interp_obj->cache_free = interp_obj->cache_size;
     }
 
-    /* we now create memory from the cache pool as subpool of the thread private pool */
+    /* we now create memory for the cache as subpool of the thread private pool */
  
-    if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
+    if (apr_pool_create(&interp_obj->pool, private->pool) != APR_SUCCESS)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": could not initialize cache private pool");
         return NULL;
     }
 
-    // Initialize cache structures
+    ap_assert(interp_obj->pool != private->pool);
+
+    /* Initialize cache structures */
 
     if (interp_obj->cache_size) {
-        RivetCache_Create(pool,interp_obj); 
+        RivetCache_Create(interp_obj); 
     }
 
     interp_obj->channel         = NULL;
     interp_obj->flags           = 0;
-    interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
-    interp_obj->per_dir_scripts = apr_hash_make(pool); 
+    interp_obj->scripts         = (running_scripts *) apr_pcalloc(private->pool,sizeof(running_scripts));
+    interp_obj->per_dir_scripts = apr_hash_make(private->pool); 
 
     return interp_obj;
 }
@@ -507,14 +508,14 @@ Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel)
  *-----------------------------------------------------------------------------
  */
 
-rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* pPool,bool create_request_obj)
+rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* tPool,bool create_request_obj)
 {
     rivet_thread_private*   private;
 
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
     //apr_thread_mutex_lock(module_globals->pool_mutex);
-    private = apr_pcalloc (pPool,sizeof(*private));
+    private = apr_pcalloc (tPool,sizeof(*private));
     //apr_thread_mutex_unlock(module_globals->pool_mutex);
 
     /*
@@ -529,14 +530,14 @@ rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* pPool,bool create_req
     }
     */
 
-    private->pool           = pPool;
+    // ap_assert (apr_pool_create (&private->pool, NULL) == APR_SUCCESS);
+    private->pool           = tPool;
     private->req_cnt        = 0;
     private->r              = NULL;
     private->page_aborting  = 0;
     private->thread_exit    = 0;
     private->exit_status    = 0;
     private->abort_code     = NULL;
-    //private->channel        = NULL;
     private->req            = NULL;
 
     if (create_request_obj)

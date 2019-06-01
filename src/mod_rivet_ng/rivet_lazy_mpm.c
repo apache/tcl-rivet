@@ -206,6 +206,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     idx = w->conf->idx;
     apr_thread_mutex_lock(w->mutex);
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread startup completed");
     do 
     {
         module_globals->mpm->vhosts[idx].idle_threads_cnt++;
@@ -237,9 +238,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
  
         /* rescheduling itself in the array of idle threads */
        
-        apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
-        *(lazy_tcl_worker **) apr_array_push(module_globals->mpm->vhosts[idx].array) = w;
-        apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
+        if (private->ext->keep_going)
+        {
+            apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
+            *(lazy_tcl_worker **) apr_array_push(module_globals->mpm->vhosts[idx].array) = w;
+            apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
+        }
 
     } while (private->ext->keep_going);
     apr_thread_mutex_unlock(w->mutex);

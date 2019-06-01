@@ -138,9 +138,9 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_server_vars;
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
-    int             idx;                /* server record index (to be used for the interps db)      */
-    char*           path;               /* copy of the path field of a cmd_parms structure:         
-                                         * should enable us to tell if a conf record comes from a
+    int             idx;                /* server record index (to be used for the interps db)          */
+    char*           path;               /* copy of the path field of a cmd_parms structure:             *
+                                         * should enable us to tell if a conf record comes from a       *
                                          * Directory section */
     const char*     mpm_bridge;         /* MPM bridge. if not null the module will try to load the      * 
                                          * file name in this field. The string should be either a full  *
