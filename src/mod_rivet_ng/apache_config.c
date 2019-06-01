@@ -619,6 +619,7 @@ Rivet_DirConf(cmd_parms *cmd,void *vrdc,const char *var,const char *val)
  *  RivetServerConf SeparateVirtualInterps <yes|no>
  *  RivetServerConf HonorHeaderOnlyRequests <yes|no> (2008-06-20: mm)
  *  RivetServerConf MpmBridge <path-to-mpm-bridge>|<bridge-label> (2015-12-14: mm)
+ *  RivetServerConf SingleThreadExit <On|Off> (2019-05-23: mm)
  */
 
 const char *
