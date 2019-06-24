@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <http_request.h>
 #include <ap_compat.h>
@@ -219,8 +217,9 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         private->req_cnt++;
         private->ctype = w->ctype;
+        private->r = w->r;
 
-        w->ap_sts = Rivet_SendContent(private,w->r);
+        w->ap_sts = Rivet_SendContent(private);
 
         if (module_globals->mpm->server_shutdown) continue;
 
@@ -466,11 +465,8 @@ apr_status_t Lazy_MPM_Finalize (void* data)
     return APR_SUCCESS;
 }
 
-int Lazy_MPM_ExitHandler(int code)
+int Lazy_MPM_ExitHandler(rivet_thread_private* private)
 {
-    rivet_thread_private*   private;
-
-    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
     /* This is not strictly necessary, because this command will 
      * eventually terminate the whole processes */
@@ -498,9 +494,11 @@ int Lazy_MPM_ExitHandler(int code)
     if (module_globals->mpm->exit_command == 0)
     {
         module_globals->mpm->exit_command = 1;
-        module_globals->mpm->exit_command_status = code;
+        module_globals->mpm->exit_command_status = private->exit_status;
     }
     apr_thread_mutex_unlock(module_globals->mpm->mutex);
+
+    if (private->running_conf->single_thread_exit) return TCL_OK;
 
     /* We now tell the supervisor to terminate the Tcl worker thread pool
      * to exit and is sequence the whole process to shutdown 

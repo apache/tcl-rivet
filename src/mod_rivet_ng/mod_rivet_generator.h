@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 #ifndef __mod_rivet_generator_h__
 #define __mod_rivet_generator_h__
 
@@ -29,6 +27,6 @@
 extern int Rivet_CheckType (request_rec* r);
 extern int Rivet_ParseExecFile (rivet_thread_private* req, char* filename, int toplevel);
 extern int Rivet_ParseExecString (rivet_thread_private* req, Tcl_Obj* inbuf);
-extern int Rivet_SendContent (rivet_thread_private* private,request_rec* r);
+extern int Rivet_SendContent (rivet_thread_private* private);
 
 #endif

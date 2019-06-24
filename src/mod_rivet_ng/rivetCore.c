@@ -1455,7 +1455,7 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
     private->abort_code = Tcl_NewDictObj();
 
     /* The private->abort_code ref count is decremented before 
-     * request processing terminates*/
+     * request processing terminates */
 
     Tcl_IncrRefCount(private->abort_code);
 

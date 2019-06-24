@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <tcl.h>
 #include <apr_strings.h>
@@ -113,21 +111,13 @@ Rivet_ReleaseScripts (running_scripts* scripts)
 #define USE_APACHE_RSC
 
 DLLEXPORT int
-Rivet_SendContent(rivet_thread_private *private,request_rec* r)
+Rivet_SendContent(rivet_thread_private *private)
 {
     int                     errstatus;
     int                     retval;
     Tcl_Interp*             interp;
     rivet_thread_interp*    interp_obj;
     Tcl_Channel*            running_channel;
-
-#ifdef USE_APACHE_RSC
-    //rivet_server_conf    *rsc = NULL;
-#else
-    //rivet_server_conf    *rdc;
-#endif
-
-    private->r = r;
 
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
@@ -146,7 +136,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
 
     interp_obj = RIVET_PEEK_INTERP(private,private->running_conf);
     private->running = interp_obj->scripts;
-    running_channel = interp_obj->channel;
+    running_channel  = interp_obj->channel;
 
     if (private->r->per_dir_config)
     {
@@ -345,9 +335,9 @@ sendcleanup:
     {
         ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, private->r, 
                                   "process terminating with code %d",private->exit_status);
-        RIVET_MPM_BRIDGE_CALL(exit_handler,private->exit_status);
+        RIVET_MPM_BRIDGE_CALL(exit_handler,private);
         //Tcl_Exit(private->exit_status);
-        exit(private->exit_status);
+        //exit(private->exit_status);
     }
 
     /* We now reset the status to prepare the child process for another request */

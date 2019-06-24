@@ -127,8 +127,9 @@ int Prefork_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 
     private->ctype = ctype;
     private->req_cnt++;
+    private->r = r;
 
-    return Rivet_SendContent(private,r);
+    return Rivet_SendContent(private);
 }
 
 rivet_thread_interp* MPM_MasterInterp(server_rec* server)
@@ -173,11 +174,14 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
  *  the thread running the Tcl script will exit 
  */
 
-int Prefork_MPM_ExitHandler(int code)
+int Prefork_MPM_ExitHandler(rivet_thread_private* private)
 {
-    Tcl_Exit(code);
+    Tcl_Exit(private->exit_status);
 
-    /* it will never get here */
+    /* actually we'll never get here but we return
+     * the Tcl return code anyway to silence the 
+     * compilation warning
+     */
     return TCL_OK;
 }
 

@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 #ifndef __mod_rivet_h__
 #define __mod_rivet_h__
 
@@ -39,13 +37,13 @@
 
 /*
  * Petasis 16 Dec 2018: This causes the symbol to be exported also from MPMs...
-
-  APLOG_USE_MODULE(rivet);
-
-  PLEASE: do not use any of APLOG_USE_MODULE, AP_DECLARE_MODULE,
-  AP_MODULE_DECLARE_DATA in this header file!
- 
-*/
+ *
+ * APLOG_USE_MODULE(rivet);
+ *
+ *  PLEASE: do not use any of APLOG_USE_MODULE, AP_DECLARE_MODULE,
+ *  AP_MODULE_DECLARE_DATA in this header file!
+ *
+ */
 
 /* init.tcl file relative to the server root directory */
 
@@ -95,10 +93,10 @@
 
 /*
  * Petasis 10 Aug 2017: This causes the symbol to be exported also from MPMs...
-
-   module AP_MODULE_DECLARE_DATA rivet_module;
- 
-*/
+ *
+ *  module AP_MODULE_DECLARE_DATA rivet_module;
+ *
+ */
 
 typedef struct _rivet_server_conf {
 
@@ -127,6 +125,9 @@ typedef struct _rivet_server_conf {
     int             upload_files_to_var;
     int             separate_virtual_interps;
     int             honor_header_only_reqs;
+    int             single_thread_exit;     /* Allow bridges to exit a single thread instead of
+                                             * forcing a whole process */
+
     int             separate_channels;      /* when true a vhosts get their private channel */
     int             export_rivet_ns;        /* export the ::rivet namespace commands        */
     int             import_rivet_ns;        /* import into the global namespace the
@@ -136,10 +137,10 @@ typedef struct _rivet_server_conf {
     apr_table_t*    rivet_server_vars;
     apr_table_t*    rivet_dir_vars;
     apr_table_t*    rivet_user_vars;
-    int             idx;                /* server record index (to be used for the interps db)      */
-    char*           path;               /* copy of the path field of a cmd_parms structure:         
-                                         * should enable us to tell if a conf record comes from a
-                                         * Directory section */
+    int             idx;                /* server record index (to be used for the interps db)          */
+    char*           path;               /* copy of the path field of a cmd_parms structure:             *
+                                         * should enable us to tell if a conf record comes from a       *
+                                         * Directory section                                            */
     const char*     mpm_bridge;         /* MPM bridge. if not null the module will try to load the      * 
                                          * file name in this field. The string should be either a full  *
                                          * path to a file name, or a string from which a file name will *
@@ -182,7 +183,7 @@ typedef void                    (RivetBridge_ThreadInit)    (apr_pool_t* pPool,s
 typedef int                     (RivetBridge_Request)       (request_rec*,rivet_req_ctype);
 typedef apr_status_t            (RivetBridge_Finalize)      (void*);
 typedef rivet_thread_interp*    (RivetBridge_Master_Interp) (void);
-typedef int                     (RivetBridge_Exit_Handler)  (int);
+typedef int                     (RivetBridge_Exit_Handler)  (rivet_thread_private*);
 typedef rivet_thread_interp*    (RivetBridge_Thread_Interp) (rivet_thread_private*,rivet_server_conf *,rivet_thread_interp*);
 
 typedef struct _mpm_bridge_table {
@@ -311,6 +312,11 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
     } else {\
         running_script->objscript = Tcl_NewStringObj(RIVET_CR_TERM(p,rivet_conf_rec->objscript),-1);\
         Tcl_IncrRefCount(running_script->objscript);\
+    }
+
+#define RIVET_SCRIPT_DISPOSE(running_scripts,script_name) \
+    if (running_scripts->script_name != NULL) {\
+        Tcl_DecrRefCount(running_scripts->script_name);\
     }
 
 #define RIVET_MPM_BRIDGE_TABLE         bridge_jump_table

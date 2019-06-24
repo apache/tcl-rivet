@@ -21,8 +21,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <apr_strings.h>
 #include <apr_env.h>
@@ -102,8 +100,7 @@ Rivet_ReadFile (apr_pool_t* pool,char* filename,
     return 0;
 }
 
-/*
- *-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
  * Rivet_CreateTclInterp --
  *
  * Arguments:
@@ -182,6 +179,44 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
 
     return scripts;
 }
+
+/*
+ *  -- Rivet_ReleaseRunningScripts 
+ *
+ */
+
+void Rivet_ReleaseRunningScripts (running_scripts* scripts)
+{
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_before_script);
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_after_script);
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_error_script);
+    RIVET_SCRIPT_DISPOSE(scripts,rivet_abort_script);
+    RIVET_SCRIPT_DISPOSE(scripts,after_every_script);
+    RIVET_SCRIPT_DISPOSE(scripts,request_processing);
+}
+
+/*
+ * -- Rivet_ReleasePerDirScripts
+ *
+ */
+
+void Rivet_ReleasePerDirScripts(rivet_thread_interp* rivet_interp)
+{
+    apr_hash_t*         ht = rivet_interp->per_dir_scripts;
+    apr_hash_index_t*   hi;
+    Tcl_Obj*            script;
+    apr_pool_t*         p = rivet_interp->pool;
+
+    for (hi = apr_hash_first(p,ht); hi; hi = apr_hash_next(hi))
+    {
+        apr_hash_this(hi, NULL, NULL, (void*)(&script));
+        Tcl_DecrRefCount(script);
+    }
+
+    apr_hash_clear(ht);
+
+}
+
 
 /*
  *---------------------------------------------------------------------

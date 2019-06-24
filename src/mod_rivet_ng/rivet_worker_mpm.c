@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$*/
-
 #include <httpd.h>
 #include <math.h>
 #include <tcl.h>
@@ -52,7 +50,7 @@
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 
-apr_threadkey_t*        handler_thread_key;
+// apr_threadkey_t* handler_thread_key;
 
 #ifdef RIVET_NO_HAVE_ROUND
 int round(double d) { return (int)(d + 0.5); }
@@ -170,7 +168,7 @@ void Worker_Bridge_Shutdown (void)
 }
 
 /*
- * -- request_processor_ng
+ * -- request_processor
  */
 
 static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
@@ -209,13 +207,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     thread_obj = apr_pcalloc(private->pool,sizeof(handler_private));
     ap_assert(apr_thread_cond_create(&(thread_obj->cond), private->pool) == APR_SUCCESS);
     ap_assert(apr_thread_mutex_create(&(thread_obj->mutex),APR_THREAD_MUTEX_UNNESTED,private->pool) 
-                                                                          == APR_SUCCESS);
+                                                                         == APR_SUCCESS);
 
     thread_obj->status = idle;
-
     apr_thread_mutex_unlock(module_globals->mpm->job_mutex); /* unlock job initialization stage */
 
-        /* eventually we increment the number of active threads */
+    /* eventually we increment the number of active threads */
 
     apr_atomic_inc32(module_globals->mpm->threads_count);
 
@@ -255,14 +252,14 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         private->ctype = thread_obj->ctype;
         private->req_cnt++;
+        private->r = thread_obj->r;
 
-        HTTP_REQUESTS_PROC(thread_obj->code = Rivet_SendContent(private,thread_obj->r));
+        HTTP_REQUESTS_PROC(thread_obj->code = Rivet_SendContent(private));
 
         thread_obj->status = done;
-        if (private->thread_exit) thread_obj->status = child_exit;
+        // if (private->thread_exit) thread_obj->status = child_exit;
 
         apr_thread_cond_signal(thread_obj->cond);
-
         while (thread_obj->status != idle)
         {
             apr_thread_cond_wait(thread_obj->cond,thread_obj->mutex);
@@ -272,11 +269,11 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     } while (private->ext->keep_going > 0);
 
     apr_thread_mutex_unlock(thread_obj->mutex);
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,0,module_globals->server,"processor thread orderly exit");
 
-    /* We don't clean up the thread resources anymore, if the thread exits the whole process terminates
-     * As long as Tcl can't safely delete interpreters this is the way things must be done */
-    // Rivet_ProcessorCleanup(private);
+    /* We reestablish the single thread and interpreter cleanup */
+    
+    Rivet_ProcessorCleanup(private);
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
     *(apr_thread_t **) apr_array_push(module_globals->mpm->exiting) = thd;
@@ -495,7 +492,7 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     /* This is the thread key for the framework thread calling the content generation callback */
 
-    ap_assert (apr_threadkey_private_create(&handler_thread_key,NULL,pool) == APR_SUCCESS);
+    // ap_assert (apr_threadkey_private_create(&handler_thread_key,NULL,pool) == APR_SUCCESS);
 
     /* This bridge keeps an array of the ids of threads about to exit. This array is protected by
      * the mutex module_globals->job_mutex and signals through module_globals->job_cond
@@ -513,8 +510,9 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
         exit(1);
     }
 
-    /* In order to set up some workload balancing let's 
-     * query apache for some configuration parameters of the worker MPM 
+    /* In order to set up some workload balancing let's
+     * query apache some configuration parameters of
+     * the worker MPM 
      */
 
     if (ap_mpm_query(AP_MPMQ_MAX_THREADS,&module_globals->mpm->max_threads) != APR_SUCCESS)
@@ -570,8 +568,8 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
                  MODNAME ": request thread private data released");
 
     /* we have to invalidate the data pointer */
+    // apr_threadkey_private_set (NULL,handler_thread_key);
 
-    apr_threadkey_private_set (NULL,handler_thread_key);
     return APR_SUCCESS;
 }
 
@@ -732,12 +730,8 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
  *  the thread running the Tcl script will exit 
  */
 
-int Worker_MPM_ExitHandler(int code)
+int Worker_MPM_ExitHandler(rivet_thread_private* private)
 {
-    rivet_thread_private*   private;
-
-    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
-
     /* This is not strictly necessary, because this command will 
      * eventually terminate the whole processes */
 
@@ -746,11 +740,15 @@ int Worker_MPM_ExitHandler(int code)
     private->ext->keep_going = 0;
 
     module_globals->mpm->exit_command = 1;
-    module_globals->mpm->exit_command_status = code;
+    module_globals->mpm->exit_command_status = private->exit_status;
+
+    /* In case single_thread_exit we return preparing this thread to exit */
+ 
+    if (private->running_conf->single_thread_exit) return TCL_OK;
 
     /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
      * and is sequence the whole process to shutdown by calling exit() */
- 
+
     Worker_MPM_Finalize (private->r->server);
 
     return TCL_OK;
