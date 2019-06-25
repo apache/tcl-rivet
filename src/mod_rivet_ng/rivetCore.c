@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
 #include <rivet_config.h>

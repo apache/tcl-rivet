@@ -65,9 +65,9 @@
 #include "mod_rivet_generator.h"
 
 module AP_MODULE_DECLARE_DATA rivet_module;
-extern Tcl_ChannelType   RivetChan;
-DLLEXPORT apr_threadkey_t*         rivet_thread_key    = NULL;
-DLLEXPORT mod_rivet_globals*       module_globals      = NULL;
+extern Tcl_ChannelType        RivetChan;
+DLLEXPORT apr_threadkey_t*    rivet_thread_key    = NULL;
+DLLEXPORT mod_rivet_globals*  module_globals      = NULL;
 
 #define ERRORBUF_SZ         256
 #define TCL_HANDLER_FILE    RIVET_DIR"/default_request_handler.tcl"
@@ -441,7 +441,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
      * to each of them 
      */
 
-    root_server_conf = RIVET_SERVER_CONF( server->module_config );
+    root_server_conf = RIVET_SERVER_CONF(server->module_config);
     idx = 0;
     for (s = server; s != NULL; s = s->next)
     {

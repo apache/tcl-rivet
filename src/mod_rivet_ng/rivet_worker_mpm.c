@@ -136,8 +136,18 @@ void Worker_Bridge_Shutdown (void)
     apr_status_t        rv;
     apr_uint32_t        threads_to_stop;
 
+    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
+
+    module_globals->mpm->server_shutdown = 1;
+
+    /* We wake up the supervisor who is now supposed to stop 
+     * all the Tcl worker threads
+     */
+
+    apr_thread_cond_signal(module_globals->mpm->job_cond);
+    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
+
     waits = 5;
-    threads_to_stop = apr_atomic_read32(module_globals->mpm->threads_count);
     do
     {
 
@@ -154,6 +164,7 @@ void Worker_Bridge_Shutdown (void)
             apr_sleep(200000);
             continue;
         }
+
         thread_obj = (handler_private*)v;
         apr_thread_mutex_lock(thread_obj->mutex);
         thread_obj->status = init;
@@ -352,7 +363,7 @@ static void supervisor_housekeeping (void)
  * 
  * This function runs within a single thread and to the
  * start and stop of Tcl worker thread pool. It could be extended also
- * provide some basic monitoring data. 
+ * to provide some basic monitoring data. 
  *
  * As we don't delete Tcl interpreters anymore because it can lead
  * to seg faults or delays the supervisor threads doesn't restart
@@ -405,7 +416,8 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
                     /* terminated thread restart */
 
                     rv = create_worker_thread (&((apr_thread_t **)mpm->workers)[i]);
-                    if (rv != APR_SUCCESS) {
+                    if (rv != APR_SUCCESS) 
+                    {
                         char errorbuf[RIVET_MSG_BUFFER_SIZE];
 
                         /* we shouldn't ever be in the condition of not being able to start a new thread
@@ -424,15 +436,17 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
             }       
         }   
         apr_thread_mutex_unlock(mpm->job_mutex);
+
     }  while (!mpm->server_shutdown);
 
-    Worker_Bridge_Shutdown();
     
-    if (module_globals->mpm->exit_command)
-    {
+    /*
+     if (module_globals->mpm->exit_command)
+     {
         ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"Orderly child process exits.");
         exit(module_globals->mpm->exit_command_status);
     }
+    */
 
     ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"Worker bridge supervisor shuts down");
     apr_thread_exit(thd,APR_SUCCESS);
@@ -440,10 +454,10 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
     return NULL;
 }
 
-// int Worker_MPM_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
+// int Worker_Bridge_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
 
 /*
- * -- Worker_MPM_ChildInit
+ * -- Worker_Bridge_ChildInit
  *
  * Child initialization function called by the web server framework.
  * For this bridge tasks are 
@@ -454,7 +468,7 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
  * 
  */
 
-void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+void Worker_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t        rv;
     
@@ -468,7 +482,8 @@ void Worker_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
 
-    /* apr_calloc is supposed to allocate zerod memory, but we still make esplicit the initialization
+    /* apr_calloc is supposed to allocate zeroed memory,
+     * but we still make esplicit the initialization
      * of some of its fields
      */
 
@@ -574,7 +589,7 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
 }
 
 /*
- * -- Worker_MPM_Request
+ * -- Worker_Bridge_Request
  *
  * Content generation callback. Actually this function is not
  * generating directly content but instead builds a handler_private 
@@ -594,7 +609,7 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
  *   HTTP status code (see the Apache HTTP web server documentation)
  */
 
-int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
+int Worker_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
 {
     void*           v;
     apr_queue_t*    q = module_globals->mpm->queue;
@@ -651,35 +666,27 @@ int Worker_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 }
 
 /* 
- * -- Worker_MPM_Finalize
+ * -- Worker_Bridge_Finalize
  *
  *
  */
 
-apr_status_t Worker_MPM_Finalize (void* data)
+apr_status_t Worker_Bridge_Finalize (void* data)
 {
     apr_status_t  rv;
     apr_status_t  thread_status;
     server_rec* s = (server_rec*) data;
-    
-    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
-    module_globals->mpm->server_shutdown = 1;
-
-    /* We wake up the supervisor who is now supposed to stop 
-     * all the Tcl worker threads
-     */
-
-    apr_thread_cond_signal(module_globals->mpm->job_cond);
-    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
 
     /* If the Function is called by the memory pool cleanup we wait
-     * to join the supervisor, otherwise we if the function was called
-     * by Worker_MPM_Exit we skip it because this thread itself must exit
+     * to join the supervisor, otherwise if the function was called
+     * by Worker_Bridge_Exit we skip it because this thread itself must exit
      * to allow the supervisor to exit in the shortest possible time 
      */
 
     if (!module_globals->mpm->exit_command)
     {
+        Worker_Bridge_Shutdown();
+
         rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
         if (rv != APR_SUCCESS)
         {
@@ -689,6 +696,8 @@ apr_status_t Worker_MPM_Finalize (void* data)
     }
 
     // apr_threadkey_private_delete (handler_thread_key);
+    exit(module_globals->mpm->exit_command_status);
+
     return OK;
 }
 
@@ -717,7 +726,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 }
 
 /*
- * -- Worker_MPM_ExitHandler
+ * -- Worker_Bridge_ExitHandler
  *  
  *  Signals a thread to exit by setting the loop control flag to 0
  * and by returning a Tcl error with error code THREAD_EXIT_CODE
@@ -730,12 +739,15 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
  *  the thread running the Tcl script will exit 
  */
 
-int Worker_MPM_ExitHandler(rivet_thread_private* private)
+int Worker_Bridge_ExitHandler(rivet_thread_private* private)
 {
     /* This is not strictly necessary, because this command will 
-     * eventually terminate the whole processes */
+     * eventually terminate the whole processes
+     */
 
-    /* This will force the current thread to exit */
+    /* By setting this flag to 0 we let the thread exit when the
+     * request processing has completed 
+     */
 
     private->ext->keep_going = 0;
 
@@ -744,17 +756,21 @@ int Worker_MPM_ExitHandler(rivet_thread_private* private)
 
     /* In case single_thread_exit we return preparing this thread to exit */
  
-    if (private->running_conf->single_thread_exit) return TCL_OK;
+    if (!private->running_conf->single_thread_exit) 
+    {
+        /* We now tell the supervisor to terminate the Tcl worker 
+         * thread pool to exit and is sequence the whole process to
+         * shutdown by calling exit()
+         */
 
-    /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
-     * and is sequence the whole process to shutdown by calling exit() */
+        Worker_Bridge_Finalize (private->r->server);
 
-    Worker_MPM_Finalize (private->r->server);
-
+    }
+    
     return TCL_OK;
 }
 
-rivet_thread_interp* Worker_MPM_Interp (rivet_thread_private* private,
+rivet_thread_interp* Worker_Bridge_Interp (rivet_thread_private* private,
                                          rivet_server_conf*    conf,
                                          rivet_thread_interp*  interp)
 {
@@ -766,9 +782,9 @@ rivet_thread_interp* Worker_MPM_Interp (rivet_thread_private* private,
 DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
-    Worker_MPM_ChildInit,
-    Worker_MPM_Request,
-    Worker_MPM_Finalize,
-    Worker_MPM_ExitHandler,
-    Worker_MPM_Interp
+    Worker_Bridge_ChildInit,
+    Worker_Bridge_Request,
+    Worker_Bridge_Finalize,
+    Worker_Bridge_ExitHandler,
+    Worker_Bridge_Interp
 };

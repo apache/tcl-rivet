@@ -333,9 +333,10 @@ sendcleanup:
     
     if (private->thread_exit)
     {
-        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, private->r, 
-                                  "process terminating with code %d",private->exit_status);
+        ap_log_rerror(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,private->r, 
+                                "process terminating with code %d",private->exit_status);
         RIVET_MPM_BRIDGE_CALL(exit_handler,private);
+
         //Tcl_Exit(private->exit_status);
         //exit(private->exit_status);
     }

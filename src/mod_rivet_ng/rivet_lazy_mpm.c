@@ -276,14 +276,14 @@ static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
 }
 
 /*
- * -- Lazy_MPM_ChildInit
+ * -- Lazy_Bridge_ChildInit
  * 
  * child process initialization. This function prepares the process
  * data structures for virtual hosts and threads management
  *
  */
 
-void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+void Lazy_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t    rv;
     server_rec*     s;
@@ -338,7 +338,7 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->server_shutdown = 0;
 }
 
-/* -- Lazy_MPM_Request
+/* -- Lazy_Bridge_Request
  *
  * The lazy bridge HTTP request function. This function 
  * stores the request_rec pointer into the lazy_tcl_worker
@@ -347,7 +347,7 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
  * a new thread is created by calling create_worker
  */
 
-int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
+int Lazy_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
 {
     lazy_tcl_worker*    w;
     int                 ap_sts;
@@ -410,11 +410,11 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     return ap_sts;
 }
 
-/* -- Lazy_MPM_Interp: lazy bridge accessor to the interpreter database
+/* -- Lazy_Bridge_Interp: lazy bridge accessor to the interpreter database
  *
  */
 
-rivet_thread_interp* Lazy_MPM_Interp (rivet_thread_private* private,
+rivet_thread_interp* Lazy_Bridge_Interp (rivet_thread_private* private,
                                       rivet_server_conf*    conf,
                                       rivet_thread_interp*  interp)
 {
@@ -423,7 +423,7 @@ rivet_thread_interp* Lazy_MPM_Interp (rivet_thread_private* private,
     return private->ext->interp;
 }
 
-apr_status_t Lazy_MPM_Finalize (void* data)
+apr_status_t Lazy_Bridge_Finalize (void* data)
 {
     int vh;
     rivet_server_conf* conf = RIVET_SERVER_CONF(((server_rec*) data)->module_config);
@@ -465,7 +465,7 @@ apr_status_t Lazy_MPM_Finalize (void* data)
     return APR_SUCCESS;
 }
 
-int Lazy_MPM_ExitHandler(rivet_thread_private* private)
+int Lazy_Bridge_ExitHandler(rivet_thread_private* private)
 {
 
     /* This is not strictly necessary, because this command will 
@@ -504,16 +504,16 @@ int Lazy_MPM_ExitHandler(rivet_thread_private* private)
      * to exit and is sequence the whole process to shutdown 
      * by calling exit() */
  
-    Lazy_MPM_Finalize (private->r->server);
+    Lazy_Bridge_Finalize (private->r->server);
     return TCL_OK;
 }
 
 DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
-    Lazy_MPM_ChildInit,
-    Lazy_MPM_Request,
-    Lazy_MPM_Finalize,
-    Lazy_MPM_ExitHandler,
-    Lazy_MPM_Interp
+    Lazy_Bridge_ChildInit,
+    Lazy_Bridge_Request,
+    Lazy_Bridge_Finalize,
+    Lazy_Bridge_ExitHandler,
+    Lazy_Bridge_Interp
 };

@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$ */
-
 #include <apr_strings.h>
 
 #include "mod_rivet.h"
@@ -38,9 +36,9 @@ extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
 
-/* -- Prefork_MPM_Finalize */
+/* -- Prefork_Bridge_Finalize */
 
-apr_status_t Prefork_MPM_Finalize (void* data)
+apr_status_t Prefork_Bridge_Finalize (void* data)
 {
     rivet_thread_private*   private;
     server_rec* s = (server_rec*) data;
@@ -54,13 +52,12 @@ apr_status_t Prefork_MPM_Finalize (void* data)
     return OK;
 }
 
-
-/* -- Prefork_MPM_ChildInit: bridge child process initialization
+/* -- Prefork_Bridge_ChildInit: bridge child process initialization
  *
  */
 
 
-void Prefork_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+void Prefork_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
 
@@ -103,7 +100,7 @@ void Prefork_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
 }
 
 /*
- * -- Prefork_MPM_Request
+ * -- Prefork_Bridge_Request
  *
  *  The prefork implementation of this function is basically a wrapper of
  *  Rivet_SendContent. The real job is fetching the thread private data
@@ -117,7 +114,7 @@ void Prefork_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
  *   HTTP status code (see the Apache HTTP web server documentation)
  */
 
-int Prefork_MPM_Request (request_rec* r,rivet_req_ctype ctype)
+int Prefork_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
 {
     rivet_thread_private*   private;
 
@@ -162,7 +159,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
 }
 
 /*
- * -- Prefork_MPM_ExitHandler
+ * -- Prefork_Bridge_ExitHandler
  *
  *  Just calling Tcl_Exit  
  *
@@ -174,7 +171,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
  *  the thread running the Tcl script will exit 
  */
 
-int Prefork_MPM_ExitHandler(rivet_thread_private* private)
+int Prefork_Bridge_ExitHandler(rivet_thread_private* private)
 {
     Tcl_Exit(private->exit_status);
 
@@ -185,7 +182,7 @@ int Prefork_MPM_ExitHandler(rivet_thread_private* private)
     return TCL_OK;
 }
 
-rivet_thread_interp* Prefork_MPM_Interp (rivet_thread_private* private,
+rivet_thread_interp* Prefork_Bridge_Interp (rivet_thread_private* private,
                                          rivet_server_conf*    conf,
                                          rivet_thread_interp*  interp)
 {
@@ -197,10 +194,10 @@ rivet_thread_interp* Prefork_MPM_Interp (rivet_thread_private* private,
 DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
-    Prefork_MPM_ChildInit,
-    Prefork_MPM_Request,
-    Prefork_MPM_Finalize,
-    Prefork_MPM_ExitHandler,
-    Prefork_MPM_Interp
+    Prefork_Bridge_ChildInit,
+    Prefork_Bridge_Request,
+    Prefork_Bridge_Finalize,
+    Prefork_Bridge_ExitHandler,
+    Prefork_Bridge_Interp
 };
 
