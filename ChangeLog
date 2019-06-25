@@ -1,3 +1,9 @@
+2019-06-25 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivet_worker_mpm.c: Better handling of exit signal, assigning tasks
+    to functions in a more consistent way. Worker_Shutdown declared as 'static'
+    * src/mod_rivet_ng/rivet_[prefork|lazy]_mpm.c: New scheme for bridge function names 
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: Removed redundant exit command handling flags
+
 2019-05-29 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/apache_config.c: Now handling the directive SingleThreadExit 
     * src/mod_rivet_ng/[worker|lazy|prefork].c: Now handling single thread exit
@@ -29,8 +35,7 @@
 	here and there)
 
 2019-01-14 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/rivetCore.c: add experimental ::rivet::thread_id
-	command
+	* src/mod_rivet_ng/rivetCore.c: add experimental ::rivet::thread_id	command
 
 2019-01-08 Massimo Manghi <mxmanghi@apache.org>
 	* : new branch quattuor created with an initial commit that tries

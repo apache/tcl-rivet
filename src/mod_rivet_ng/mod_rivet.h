@@ -190,13 +190,13 @@ typedef rivet_thread_interp*    (RivetBridge_Thread_Interp) (rivet_thread_privat
 typedef bool                    RivetBridge_InheritsInterps;
 
 typedef struct _mpm_bridge_table {
-    RivetBridge_ServerInit    *server_init;
-    RivetBridge_ThreadInit    *thread_init;
-    RivetBridge_Request       *request_processor;
-    RivetBridge_Finalize      *child_finalize;
-    RivetBridge_Exit_Handler  *exit_handler;
-    RivetBridge_Thread_Interp *thread_interp;
-    RivetBridge_InheritsInterps inherits_interps;
+    RivetBridge_ServerInit      *server_init;
+    RivetBridge_ThreadInit      *thread_init;
+    RivetBridge_Request         *request_processor;
+    RivetBridge_Finalize        *child_finalize;
+    RivetBridge_Exit_Handler    *exit_handler;
+    RivetBridge_Thread_Interp   *thread_interp;
+    RivetBridge_InheritsInterps  inherits_interps;
 } rivet_bridge_table;
 
 /* we need also a place where to store globals with module wide scope */
@@ -247,9 +247,9 @@ typedef struct _thread_worker_private {
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
-typedef struct _rivet_interp_globals {
-    Tcl_Namespace*      rivet_ns;           /* Rivet commands namespace             */
-} rivet_interp_globals;
+//typedef struct _rivet_interp_globals {
+//    Tcl_Namespace*      rivet_ns;           /* Rivet commands namespace             */
+//} rivet_interp_globals; 
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
 

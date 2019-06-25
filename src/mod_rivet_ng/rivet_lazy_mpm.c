@@ -74,8 +74,8 @@ typedef struct vhost_iface {
 
 typedef struct mpm_bridge_status {
     apr_thread_mutex_t* mutex;
-    int                 exit_command;
-    int                 exit_command_status;
+    //int                 exit_command;
+    //int                 exit_command_status;
     int                 server_shutdown;    /* the child process is shutting down       */
     vhost*              vhosts;             /* array of vhost descriptors               */
 } mpm_bridge_status;
@@ -228,7 +228,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         w->ap_sts = Rivet_SendContent(private,w->r);
 
-        if (module_globals->mpm->server_shutdown) continue;
+        // if (module_globals->mpm->server_shutdown) continue;
 
         w->status = done;
         apr_thread_cond_signal(w->condition);
@@ -245,7 +245,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
         }
 
-    } while (private->ext->keep_going);
+    } while (private->ext->keep_going && !module_globals->mpm->server_shutdown);
     apr_thread_mutex_unlock(w->mutex);
     
     ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread orderly exit");
@@ -295,14 +295,14 @@ static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
 }
 
 /*
- * -- Lazy_MPM_ChildInit
+ * -- LazyBridge_ChildInit
  * 
  * child process initialization. This function prepares the process
  * data structures for virtual hosts and threads management
  *
  */
 
-void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t    rv;
     server_rec*     s;
@@ -361,7 +361,7 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->server_shutdown = 0;
 }
 
-/* -- Lazy_MPM_Request
+/* -- LazyBridge_Request
  *
  * The lazy bridge HTTP request function. This function 
  * stores the request_rec pointer into the lazy_tcl_worker
@@ -370,7 +370,7 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
  * a new thread is created by calling create_worker
  */
 
-int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
+int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
 {
     lazy_tcl_worker*    w;
     int                 ap_sts;
@@ -433,11 +433,11 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
     return ap_sts;
 }
 
-/* -- Lazy_MPM_Interp: lazy bridge accessor to the interpreter database
+/* -- LazyBridge_Interp: lazy bridge accessor to the interpreter database
  *
  */
 
-rivet_thread_interp* Lazy_MPM_Interp (rivet_thread_private* private,
+rivet_thread_interp* LazyBridge_Interp (rivet_thread_private* private,
                                       rivet_server_conf*    conf,
                                       rivet_thread_interp*  interp)
 {
@@ -446,11 +446,12 @@ rivet_thread_interp* Lazy_MPM_Interp (rivet_thread_private* private,
     return private->ext->interp;
 }
 
-apr_status_t Lazy_MPM_Finalize (void* data)
+apr_status_t LazyBridge_Finalize (void* data)
 {
     int vh;
     rivet_server_conf* conf = RIVET_SERVER_CONF(((server_rec*) data)->module_config);
    
+    module_globals->mpm->server_shutdown = 1;
     for (vh = 0; vh < module_globals->vhosts_count; vh++)
     {
         int try;
@@ -461,7 +462,6 @@ apr_status_t Lazy_MPM_Finalize (void* data)
         mutex = module_globals->mpm->vhosts[vh].mutex;
         array = module_globals->mpm->vhosts[vh].array;
         apr_thread_mutex_lock(mutex);
-        module_globals->mpm->server_shutdown = 1;
         try = 0;
         do {
 
@@ -485,11 +485,11 @@ apr_status_t Lazy_MPM_Finalize (void* data)
         apr_thread_mutex_unlock(mutex);
     }
 
-    apr_threadkey_private_delete (rivet_thread_key);
+    apr_threadkey_private_delete(rivet_thread_key);
     return APR_SUCCESS;
 }
 
-int Lazy_MPM_ExitHandler(rivet_thread_private* private)
+int LazyBridge_ExitHandler(rivet_thread_private* private)
 {
 
     /* This is not strictly necessary, because this command will 
@@ -512,8 +512,7 @@ int Lazy_MPM_ExitHandler(rivet_thread_private* private)
      * and calls out for a version of Tcl with which
      * we could safely call Tcl_DeleteInterp and then terminate
      * a single thread
-     */
-
+    
     apr_thread_mutex_lock(module_globals->mpm->mutex);
     if (module_globals->mpm->exit_command == 0)
     {
@@ -521,6 +520,7 @@ int Lazy_MPM_ExitHandler(rivet_thread_private* private)
         module_globals->mpm->exit_command_status = private->exit_status;
     }
     apr_thread_mutex_unlock(module_globals->mpm->mutex);
+     */
 
     if (!private->running_conf->single_thread_exit)
     {
@@ -528,7 +528,7 @@ int Lazy_MPM_ExitHandler(rivet_thread_private* private)
          * to exit and is sequence the whole process to shutdown 
          * by calling exit() */
      
-        Lazy_MPM_Finalize (private->r->server);
+        LazyBridge_Finalize(private->r->server);
 
     } 
 
@@ -538,10 +538,10 @@ int Lazy_MPM_ExitHandler(rivet_thread_private* private)
 DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
-    Lazy_MPM_ChildInit,
-    Lazy_MPM_Request,
-    Lazy_MPM_Finalize,
-    Lazy_MPM_ExitHandler,
-    Lazy_MPM_Interp,
+    LazyBridge_ChildInit,
+    LazyBridge_Request,
+    LazyBridge_Finalize,
+    LazyBridge_ExitHandler,
+    LazyBridge_Interp,
     false
 };
