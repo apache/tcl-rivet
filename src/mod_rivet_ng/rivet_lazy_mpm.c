@@ -74,8 +74,6 @@ typedef struct vhost_iface {
 
 typedef struct mpm_bridge_status {
     apr_thread_mutex_t* mutex;
-    int                 exit_command;
-    int                 exit_command_status;
     int                 server_shutdown;    /* the child process is shutting down       */
     vhost*              vhosts;             /* array of vhost descriptors               */
 } mpm_bridge_status;
@@ -221,7 +219,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
         w->ap_sts = Rivet_SendContent(private);
 
-        if (module_globals->mpm->server_shutdown) continue;
+        // if (module_globals->mpm->server_shutdown) continue;
 
         w->status = done;
         apr_thread_cond_signal(w->condition);
@@ -276,14 +274,14 @@ static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
 }
 
 /*
- * -- Lazy_Bridge_ChildInit
+ * -- LazyBridge_ChildInit
  * 
  * child process initialization. This function prepares the process
  * data structures for virtual hosts and threads management
  *
  */
 
-void Lazy_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
+void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t    rv;
     server_rec*     s;
@@ -338,7 +336,7 @@ void Lazy_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->server_shutdown = 0;
 }
 
-/* -- Lazy_Bridge_Request
+/* -- LazyBridge_Request
  *
  * The lazy bridge HTTP request function. This function 
  * stores the request_rec pointer into the lazy_tcl_worker
@@ -347,7 +345,7 @@ void Lazy_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
  * a new thread is created by calling create_worker
  */
 
-int Lazy_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
+int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
 {
     lazy_tcl_worker*    w;
     int                 ap_sts;
@@ -410,11 +408,11 @@ int Lazy_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
     return ap_sts;
 }
 
-/* -- Lazy_Bridge_Interp: lazy bridge accessor to the interpreter database
+/* -- LazyBridge_Interp: lazy bridge accessor to the interpreter database
  *
  */
 
-rivet_thread_interp* Lazy_Bridge_Interp (rivet_thread_private* private,
+rivet_thread_interp* LazyBridge_Interp (rivet_thread_private* private,
                                       rivet_server_conf*    conf,
                                       rivet_thread_interp*  interp)
 {
@@ -423,11 +421,12 @@ rivet_thread_interp* Lazy_Bridge_Interp (rivet_thread_private* private,
     return private->ext->interp;
 }
 
-apr_status_t Lazy_Bridge_Finalize (void* data)
+apr_status_t LazyBridge_Finalize (void* data)
 {
     int vh;
     rivet_server_conf* conf = RIVET_SERVER_CONF(((server_rec*) data)->module_config);
    
+    module_globals->mpm->server_shutdown = 1;
     for (vh = 0; vh < module_globals->vhosts_count; vh++)
     {
         int try;
@@ -438,7 +437,6 @@ apr_status_t Lazy_Bridge_Finalize (void* data)
         mutex = module_globals->mpm->vhosts[vh].mutex;
         array = module_globals->mpm->vhosts[vh].array;
         apr_thread_mutex_lock(mutex);
-        module_globals->mpm->server_shutdown = 1;
         try = 0;
         do {
 
@@ -465,7 +463,54 @@ apr_status_t Lazy_Bridge_Finalize (void* data)
     return APR_SUCCESS;
 }
 
-int Lazy_Bridge_ExitHandler(rivet_thread_private* private)
+int LazyBridge_ExitHandler(rivet_thread_private* private)
+{
+
+    /* This is not strictly necessary, because this command will 
+     * eventually terminate the whole processes */
+
+    /* This will force the current thread to exit */
+
+    private->ext->keep_going = 0;
+
+    /*
+     * This is the only place where exit_command and 
+     * exit_command_status are set, anywere alse these
+     * fields are only read. We lock on writing to synchronize
+     * with other threads that might try to access
+     * this info. That means that in the unlikely case
+     * of several threads calling ::rivet::exit 
+     * simultaneously the first sets the exit code.
+     * This is just terrible, it highlights the bad habit
+     * of calling 'exit' when programming with mod_rivet
+     * and calls out for a version of Tcl with which
+     * we could safely call Tcl_DeleteInterp and then terminate
+     * a single thread
+    
+    apr_thread_mutex_lock(module_globals->mpm->mutex);
+    if (module_globals->mpm->exit_command == 0)
+    {
+        module_globals->mpm->exit_command = 1;
+        module_globals->mpm->exit_command_status = private->exit_status;
+    }
+    apr_thread_mutex_unlock(module_globals->mpm->mutex);
+     */
+
+    if (!private->running_conf->single_thread_exit)
+    {
+        /* We now tell the supervisor to terminate the Tcl worker thread pool
+         * to exit and is sequence the whole process to shutdown 
+         * by calling exit() */
+     
+        LazyBridge_Finalize(private->r->server);
+
+    } 
+
+    return TCL_OK;
+}
+
+#if 0
+int LazyBridge_ExitHandler(rivet_thread_private* private)
 {
 
     /* This is not strictly necessary, because this command will 
@@ -504,16 +549,17 @@ int Lazy_Bridge_ExitHandler(rivet_thread_private* private)
      * to exit and is sequence the whole process to shutdown 
      * by calling exit() */
  
-    Lazy_Bridge_Finalize (private->r->server);
+    LazyBridge_Finalize (private->r->server);
     return TCL_OK;
 }
+#endif
 
 DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
-    Lazy_Bridge_ChildInit,
-    Lazy_Bridge_Request,
-    Lazy_Bridge_Finalize,
-    Lazy_Bridge_ExitHandler,
-    Lazy_Bridge_Interp
+    LazyBridge_ChildInit,
+    LazyBridge_Request,
+    LazyBridge_Finalize,
+    LazyBridge_ExitHandler,
+    LazyBridge_Interp
 };

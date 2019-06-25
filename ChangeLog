@@ -1,5 +1,7 @@
 2019-06-25 Massimo Manghi <mxmanghi@apache.org>
     * : Single thread exit implementation for mod_rivet 3.2
+    * src/mod_rivet_ng/rivet_[.*]_mpm.c: further simplified code by removing 
+    redundant flags. Changing function names scheme
 
 2019-05-24 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: Add Tcl_DecrRefCnt after

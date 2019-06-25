@@ -68,8 +68,6 @@ typedef struct mpm_bridge_status {
     apr_uint32_t*       running_threads_count;
     apr_queue_t*        queue;                  /* jobs queue               */
     void**              workers;                /* thread pool ids          */
-    int                 exit_command;
-    int                 exit_command_status;
     int                 max_threads;
     int                 min_spare_threads;
     int                 max_spare_threads;
@@ -127,7 +125,58 @@ enum
  * must be restared or (most likely) the child process can exit.
  *
  */
+static
+void Worker_Bridge_Shutdown (int not_to_be_waited)
+{
+    int                 waits;
+    void*               v;
+    handler_private*    thread_obj;
+    apr_status_t        rv;
+    apr_uint32_t        threads_to_stop;
 
+    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
+
+    module_globals->mpm->server_shutdown = 1;
+
+    /* We wake up the supervisor who is now supposed to stop 
+     * all the Tcl worker threads
+     */
+
+    apr_thread_cond_signal(module_globals->mpm->job_cond);
+    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
+
+    waits = 5;
+    do
+    {
+
+        rv = apr_queue_trypop(module_globals->mpm->queue,&v);
+
+        /* We wait for possible threads that are taking
+         * time to serve requests and haven't had a chance to
+         * see the signal yet
+         */
+
+        if (rv == APR_EAGAIN) 
+        {
+            waits--;
+            apr_sleep(200000);
+            continue;
+        }
+
+        thread_obj = (handler_private*)v;
+        apr_thread_mutex_lock(thread_obj->mutex);
+        thread_obj->status = init;
+        apr_thread_cond_signal(thread_obj->cond);
+        apr_thread_mutex_unlock(thread_obj->mutex);
+
+        threads_to_stop = apr_atomic_read32(module_globals->mpm->threads_count);
+
+    } while ((waits > 0) && (threads_to_stop > not_to_be_waited));
+
+    return;
+}
+
+#if 0
 void Worker_Bridge_Shutdown (void)
 {
     int                 waits;
@@ -177,6 +226,7 @@ void Worker_Bridge_Shutdown (void)
 
     return;
 }
+#endif
 
 /*
  * -- request_processor
@@ -439,22 +489,11 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 
     }  while (!mpm->server_shutdown);
 
-    
-    /*
-     if (module_globals->mpm->exit_command)
-     {
-        ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"Orderly child process exits.");
-        exit(module_globals->mpm->exit_command_status);
-    }
-    */
-
     ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,module_globals->server,"Worker bridge supervisor shuts down");
     apr_thread_exit(thd,APR_SUCCESS);
 
     return NULL;
 }
-
-// int Worker_Bridge_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s) { return OK; }
 
 /*
  * -- Worker_Bridge_ChildInit
@@ -493,7 +532,7 @@ void Worker_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->max_spare_threads  = 0;
     module_globals->mpm->workers            = NULL;
     module_globals->mpm->server_shutdown    = 0;
-    module_globals->mpm->exit_command       = 0;
+    //module_globals->mpm->exit_command     = 0;
 
     /* We keep some atomic counters that could provide basic data for a workload balancer */
 
@@ -676,30 +715,20 @@ apr_status_t Worker_Bridge_Finalize (void* data)
     apr_status_t  rv;
     apr_status_t  thread_status;
     server_rec* s = (server_rec*) data;
+    rivet_thread_private* private;
 
-    /* If the Function is called by the memory pool cleanup we wait
-     * to join the supervisor, otherwise if the function was called
-     * by Worker_Bridge_Exit we skip it because this thread itself must exit
-     * to allow the supervisor to exit in the shortest possible time 
-     */
+    RIVET_PRIVATE_DATA(rivet_thread_key,private)
+    Worker_Bridge_Shutdown(private->thread_exit);
 
-    if (!module_globals->mpm->exit_command)
+    rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
+    if (rv != APR_SUCCESS)
     {
-        Worker_Bridge_Shutdown();
-
-        rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
-        if (rv != APR_SUCCESS)
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, rv, s,
-                         MODNAME ": Error joining supervisor thread");
-        }
+        ap_log_error(APLOG_MARK,APLOG_ERR,rv,s,MODNAME": Error joining supervisor thread");
     }
-
-    // apr_threadkey_private_delete (handler_thread_key);
-    exit(module_globals->mpm->exit_command_status);
 
     return OK;
 }
+
 
 /*
  * -- MPM_MasterInterp
@@ -742,6 +771,39 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 int Worker_Bridge_ExitHandler(rivet_thread_private* private)
 {
     /* This is not strictly necessary, because this command will 
+     * eventually terminate the whole processes */
+
+    /* This will force the current thread to exit */
+
+    private->ext->keep_going = 0;
+
+    //module_globals->mpm->exit_command = 1;
+    //module_globals->mpm->exit_command_status = private->exit_status;
+
+    if (!private->running_conf->single_thread_exit)
+    {
+
+        /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
+         * and is sequence the whole process to shutdown by calling exit() */
+     
+        Worker_Bridge_Finalize (private->r->server);
+    
+        exit(private->exit_status);
+    } 
+
+    /*
+     * If single thread exit is enabled we continue and let the
+     * thread exit on its own interrupting the main loop
+     */
+
+    return TCL_OK;
+}
+
+
+#if 0
+int Worker_Bridge_ExitHandler(rivet_thread_private* private)
+{
+    /* This is not strictly necessary, because this command will 
      * eventually terminate the whole processes
      */
 
@@ -769,7 +831,7 @@ int Worker_Bridge_ExitHandler(rivet_thread_private* private)
     
     return TCL_OK;
 }
-
+#endif
 rivet_thread_interp* Worker_Bridge_Interp (rivet_thread_private* private,
                                          rivet_server_conf*    conf,
                                          rivet_thread_interp*  interp)
