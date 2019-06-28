@@ -74,6 +74,8 @@ typedef struct mpm_bridge_status {
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
 #endif
+    int                 skip_thread_on_exit;   /* To exclusively handle the *
+                                                * WorkerBridge_Shutdown     */
 } mpm_bridge_status;
 
 
@@ -86,7 +88,7 @@ typedef struct _handler_private
 {
     apr_thread_cond_t*      cond;
     apr_thread_mutex_t*     mutex;
-    request_rec*            r;              /* request rec                 */
+    request_rec*            r;                  /* request rec  */
     int                     code;
     int                     status;
     rivet_req_ctype         ctype;
@@ -103,7 +105,7 @@ enum
 };
 
 /* 
- * -- Worker_Bridge_Shutdown
+ * -- WorkerBridge_Shutdown
  *
  * Child process shutdown: no more requests are served and we
  * pop from the queue all the threads sitting for work to do. 
@@ -126,13 +128,16 @@ enum
  *
  */
 static
-void Worker_Bridge_Shutdown (int not_to_be_waited)
+void WorkerBridge_Shutdown (void)
 {
     int                 waits;
     void*               v;
     handler_private*    thread_obj;
     apr_status_t        rv;
     apr_uint32_t        threads_to_stop;
+    int                 not_to_be_waited;
+
+    not_to_be_waited = module_globals->mpm->skip_thread_on_exit;
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
 
@@ -177,7 +182,7 @@ void Worker_Bridge_Shutdown (int not_to_be_waited)
 }
 
 #if 0
-void Worker_Bridge_Shutdown (void)
+void WorkerBridge_Shutdown (void)
 {
     int                 waits;
     void*               v;
@@ -496,7 +501,7 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
 }
 
 /*
- * -- Worker_Bridge_ChildInit
+ * -- WorkerBridge_ChildInit
  *
  * Child initialization function called by the web server framework.
  * For this bridge tasks are 
@@ -507,7 +512,7 @@ static void* APR_THREAD_FUNC threaded_bridge_supervisor (apr_thread_t *thd, void
  * 
  */
 
-void Worker_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
+void WorkerBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t        rv;
     
@@ -533,6 +538,7 @@ void Worker_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->workers            = NULL;
     module_globals->mpm->server_shutdown    = 0;
     //module_globals->mpm->exit_command     = 0;
+    module_globals->mpm->skip_thread_on_exit = 0;
 
     /* We keep some atomic counters that could provide basic data for a workload balancer */
 
@@ -628,7 +634,7 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
 }
 
 /*
- * -- Worker_Bridge_Request
+ * -- WorkerBridge_Request
  *
  * Content generation callback. Actually this function is not
  * generating directly content but instead builds a handler_private 
@@ -648,7 +654,7 @@ apr_status_t Worker_RequestPrivateCleanup (void *client_data)
  *   HTTP status code (see the Apache HTTP web server documentation)
  */
 
-int Worker_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
+int WorkerBridge_Request (request_rec* r,rivet_req_ctype ctype)
 {
     void*           v;
     apr_queue_t*    q = module_globals->mpm->queue;
@@ -705,20 +711,18 @@ int Worker_Bridge_Request (request_rec* r,rivet_req_ctype ctype)
 }
 
 /* 
- * -- Worker_Bridge_Finalize
+ * -- WorkerBridge_Finalize
  *
  *
  */
 
-apr_status_t Worker_Bridge_Finalize (void* data)
+apr_status_t WorkerBridge_Finalize (void* data)
 {
     apr_status_t  rv;
     apr_status_t  thread_status;
     server_rec* s = (server_rec*) data;
-    rivet_thread_private* private;
 
-    RIVET_PRIVATE_DATA(rivet_thread_key,private)
-    Worker_Bridge_Shutdown(private->thread_exit);
+    WorkerBridge_Shutdown();
 
     rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
     if (rv != APR_SUCCESS)
@@ -755,7 +759,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 }
 
 /*
- * -- Worker_Bridge_ExitHandler
+ * -- WorkerBridge_ExitHandler
  *  
  *  Signals a thread to exit by setting the loop control flag to 0
  * and by returning a Tcl error with error code THREAD_EXIT_CODE
@@ -768,7 +772,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
  *  the thread running the Tcl script will exit 
  */
 
-int Worker_Bridge_ExitHandler(rivet_thread_private* private)
+int WorkerBridge_ExitHandler(rivet_thread_private* private)
 {
     /* This is not strictly necessary, because this command will 
      * eventually terminate the whole processes */
@@ -783,10 +787,12 @@ int Worker_Bridge_ExitHandler(rivet_thread_private* private)
     if (!private->running_conf->single_thread_exit)
     {
 
+        module_globals->mpm->skip_thread_on_exit = 1;
+
         /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
          * and is sequence the whole process to shutdown by calling exit() */
-     
-        Worker_Bridge_Finalize (private->r->server);
+
+        WorkerBridge_Finalize(private->r->server);
     
         exit(private->exit_status);
     } 
@@ -801,7 +807,7 @@ int Worker_Bridge_ExitHandler(rivet_thread_private* private)
 
 
 #if 0
-int Worker_Bridge_ExitHandler(rivet_thread_private* private)
+int WorkerBridge_ExitHandler(rivet_thread_private* private)
 {
     /* This is not strictly necessary, because this command will 
      * eventually terminate the whole processes
@@ -825,14 +831,14 @@ int Worker_Bridge_ExitHandler(rivet_thread_private* private)
          * shutdown by calling exit()
          */
 
-        Worker_Bridge_Finalize (private->r->server);
+        WorkerBridge_Finalize (private->r->server);
 
     }
     
     return TCL_OK;
 }
 #endif
-rivet_thread_interp* Worker_Bridge_Interp (rivet_thread_private* private,
+rivet_thread_interp* WorkerBridge_Interp (rivet_thread_private* private,
                                          rivet_server_conf*    conf,
                                          rivet_thread_interp*  interp)
 {
@@ -844,9 +850,9 @@ rivet_thread_interp* Worker_Bridge_Interp (rivet_thread_private* private,
 DLLEXPORT
 RIVET_MPM_BRIDGE {
     NULL,
-    Worker_Bridge_ChildInit,
-    Worker_Bridge_Request,
-    Worker_Bridge_Finalize,
-    Worker_Bridge_ExitHandler,
-    Worker_Bridge_Interp
+    WorkerBridge_ChildInit,
+    WorkerBridge_Request,
+    WorkerBridge_Finalize,
+    WorkerBridge_ExitHandler,
+    WorkerBridge_Interp
 };
