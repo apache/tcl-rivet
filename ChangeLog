@@ -1,3 +1,7 @@
+2019-06-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivet_worker_mpm.c: Removed unnecessary access to thread private data
+    in WorkerBridge_Finalize
+
 2019-06-25 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivet_worker_mpm.c: Better handling of exit signal, assigning tasks
     to functions in a more consistent way. Worker_Shutdown declared as 'static'
