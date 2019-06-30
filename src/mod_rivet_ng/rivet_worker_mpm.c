@@ -75,6 +75,8 @@ typedef struct mpm_bridge_status {
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
 #endif
+    int                 skip_thread_on_exit;   /* To exclusively handle the *
+                                                * WorkerBridge_Shutdown     */
 } mpm_bridge_status;
 
 
@@ -128,13 +130,14 @@ enum
  */
 
 static
-void Worker_Bridge_Shutdown (int not_to_be_waited)
+void Worker_Bridge_Shutdown (void)
 {
     int                 waits;
     void*               v;
     handler_private*    thread_obj;
     apr_status_t        rv;
     apr_uint32_t        threads_to_stop;
+    int                 not_to_be_waited = module_globals->mpm->skip_thread_on_exit;
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
 
@@ -600,7 +603,8 @@ void Worker_Bridge_ChildInit (apr_pool_t* pool, server_rec* server)
     module_globals->mpm->workers            = NULL;
     module_globals->mpm->server_shutdown    = 0;
     //module_globals->mpm->exit_command       = 0;
-
+    module_globals->mpm->skip_thread_on_exit = 0;
+    
     /* We keep some atomic counters that could provide basic data for a workload balancer */
 
     module_globals->mpm->threads_count = (apr_uint32_t *) apr_pcalloc(pool,sizeof(apr_uint32_t));
@@ -783,10 +787,8 @@ apr_status_t Worker_Bridge_Finalize (void* data)
     apr_status_t  rv;
     apr_status_t  thread_status;
     server_rec* s = (server_rec*) data;
-    rivet_thread_private* private;
 
-    RIVET_PRIVATE_DATA(rivet_thread_key,private)
-    Worker_Bridge_Shutdown(private->thread_exit);
+    Worker_Bridge_Shutdown();
 
     rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
     if (rv != APR_SUCCESS)
@@ -889,6 +891,7 @@ int Worker_Bridge_ExitHandler(rivet_thread_private* private)
 
     if (!private->running_conf->single_thread_exit)
     {
+        module_globals->mpm->skip_thread_on_exit = 1;
 
         /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
          * and is sequence the whole process to shutdown by calling exit() */
