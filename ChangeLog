@@ -1,3 +1,6 @@
+2019-08-05 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml: Documenting SingleThreadExit directive
+
 2019-06-30 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivet_worker_mpm.c: Removed unnecessary access to thread private data
     in WorkerBridge_Finalize
