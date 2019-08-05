@@ -1,3 +1,6 @@
+2019-08-05 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml: Documenting SingleThreadExit directive
+
 2019-06-25 Massimo Manghi <mxmanghi@apache.org>
     * : Single thread exit implementation for mod_rivet 3.2
     * src/mod_rivet_ng/rivet_[.*]_mpm.c: further simplified code by removing 
