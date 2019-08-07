@@ -1,3 +1,7 @@
+2019-07-27 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml,src/mod_rivet_ng/rivetCore.c: Add ::rivet::thread_id
+    manual page
+
 2019-06-25 Massimo Manghi <mxmanghi@apache.org>
     * : Single thread exit implementation for mod_rivet 3.2
     * src/mod_rivet_ng/rivet_[.*]_mpm.c: further simplified code by removing 

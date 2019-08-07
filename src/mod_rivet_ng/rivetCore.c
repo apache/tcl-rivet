@@ -1931,7 +1931,25 @@ TCL_CMD_HEADER( Rivet_UrlScript )
  *-----------------------------------------------------------------------------
  * Rivet_GetThreadId --
  *
+ * With a threaded bridge (worker and lazy) command [pid] on Unix systems return
+ * the same process id when called from all threads running within that process.
+ * For any debugging reason this command returns a unique thread identification
+ * that can, for instance, be matched with the thread id (tid) information 
+ * in the error log file.
  *
+ * Arguments:
+ *
+ *      None
+ *
+ * Results:
+ *
+ *      Tcl object with a string representation of the thread id
+ *
+ * Side effects:
+ *
+ *      None
+ *
+ *-----------------------------------------------------------------------------
  */
 
 #define SMALL_BUFFER_SIZE 32
