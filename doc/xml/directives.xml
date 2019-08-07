@@ -72,7 +72,8 @@
 				<tr><td>RequestHandler</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 				<tr><td>SeparateChannels</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
 				<tr><td>SeparateVirtualInterps</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
-				<tr><td>ServerInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>ServerInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr>
+				<tr><td>SingleThreadExit</td><td></td><td></td><td>X</td><td></td><td>global setting only</td></tr>
 				<tr><td>UploadDirectory</td><td></td><td>X</td><td>X</td><td>X</td><td></td></tr> 
 				<tr><td>UploadFilesToVar</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
 				<tr><td>UploadMaxSize</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
@@ -484,7 +485,29 @@
 		   			any subsequent Tcl interpreters created by fork calls as each
 		   			of them are clones of the master interpreter.
 		   		</para>
+   			</listitem>
+			</varlistentry>
 
+			<varlistentry>
+   			<term>
+   				<cmdsynopsis>
+		   			<arg choice="plain">SingleThreadExit</arg>
+		  				<group choice="req"><arg>yes</arg><arg>no</arg></group>
+   				</cmdsynopsis>
+   			</term>
+   			<listitem>
+		   		<para>
+		   			Rivet shadows the Tcl <command>exit</command> command with the
+		   			<command>::rivet::exit</command> in order to
+		   			prevent abrupt interruption of execution of a child process when
+		   			multiple thread are running. By default the worker bridge notifies
+		   			all the threads running Tcl interpreters to exit before calling Tcl_Exit.
+		   			If this option is set a single thread terminates executing any ChildExitScript 
+		   			and eventually it's replaced accordingly to
+		   			the thread management policy implemented by the bridge. 
+		   			With the prefork bridge this options reproduces the ordinary
+		   			<command>exit</command> command behavior.
+		   		</para>
    			</listitem>
 			</varlistentry>
 

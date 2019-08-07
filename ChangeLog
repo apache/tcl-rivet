@@ -1,3 +1,6 @@
+2019-08-05 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml: Documenting SingleThreadExit directive
+
 2019-07-27 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml,src/mod_rivet_ng/rivetCore.c: Add ::rivet::thread_id
     manual page

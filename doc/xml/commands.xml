@@ -353,19 +353,20 @@
 	   <refsect1>
 			<title>Description</title>
 			<para>
-		    	<command>::rivet::catch</command> wraps the core language's same command adding some
-            extra error handling needed by mod_rivet design.
-		    	The rationale for Rivet to have its own <command>::rivet::catch</command> reads as follows: 
-            within mod_rivet a script execution can be interrupted by either calling 
-		    	<command>::rivet::exit</command>(deprecated) or <command>::rivet::abort_page</command>. These commands
-            implement a simple internal exception mechanism by 
+		    	<command>::rivet::catch</command> wraps the core language <command>catch</command>
+		    	command adding some extra error handling needed by mod_rivet design.
+		    	The rationale for Rivet to have its own <command>::rivet::catch</command> reads
+		    	as follows: within mod_rivet a script execution can be interrupted by either calling 
+		    	<command>::rivet::exit</command>(deprecated) or <command>::rivet::abort_page</command>.
+		    	These commands implement a simple internal exception mechanism by 
             returning a special error code so that execution is in turn handed down to the
-            <command>AbortScript</command> and eventually to <command>AfterEveryScript</command> (if any of them is 
-            defined). Any code calling one of these commands which runs under control of the
-            <command>::catch</command> command would need to do this chore itself, checking the error info and in case 
-            throw the error again if it had been originated by one of mod_rivet's exceptions calls. 
-            This is what <command>::rivet::catch</command> does hiding the implementation
-            details provide a better and more compatibile way to handle this condition.
+            <command>AbortScript</command> and eventually to <command>AfterEveryScript</command>
+            (if any of them is defined). Any code calling one of these commands which runs under
+            control of the <command>::catch</command> command would need to do this chore itself,
+            checking the error info and in case throw the error again if it had been originated
+            by one of mod_rivet's exceptions calls. This is what <command>::rivet::catch</command>
+            does hiding the implementation details provide a better and more compatibile way to
+            handle this condition.
 			</para>
 			
 			<note>
@@ -625,8 +626,9 @@
 				Replaces Tcl's <command>exit</command> core command. <command>::rivet::exit</command>
 				interrupts execution of the current script and passes execution to AbortScript if
 				such script is set. After AbortScript has finished and request processing completed
-				the child process is forced to exit by calling Tcl_Exit producing the same final
-				effect of the core command. During an <command>AbortScript</command> execution the
+				the child process is forced to exit by eventually calling Tcl_Exit producing the same final
+				effect of the core command.
+				During an <command>AbortScript</command> execution the
 				exit condition can be detected
 				<programlisting>if {[<command>::rivet::abort_page -exiting</command>]} {
 ...handle exit condition
@@ -641,13 +643,17 @@
 			<programlisting>[::rivet::abort_code]
 &lt;== return_code <arg>code</arg> error_code exit</programlisting>
 			<para>
-				We support this command in order to have a gentle way to terminate a request processing
-				before actually exit the child process and avoid an abrupt interruption of a request that
-				might leave an application in a inconsistent state. In some cases <command>::rivet::exit</command>
-				could be the only way to exit a process and force the Apache HTTP web server to start
-				a fresh one. Moreover the core <command>exit</command> could be called from third parties
-				software and you may not be aware of it. We thus decided to trap this command and give it 
-				the most gentle behavior still preserving its basic purpose.
+				Rivet's specific implementation prevents any abrupt process termination
+				that otherwise the <command>exit</command> command would bring about deferring
+				the call to Tcl_Exit to a later stage when the request processing has finished.
+				This is always true if the mod_rivet runs the prefork bridge. The behavior with
+				the worker bridge depends on the <command>SingleThreadExit</command> configuration
+				directive. By default all the threads of a single process are requested to exit
+				before the child process exits. Starting with version &version32;
+				by setting the <command>SingleThreadExit</command> option directive 
+				calling <command>::rivet::exit</command> causes a single thread termination. 
+				Though always accepted this directive is meaningful only if used with the worker
+				or lazy bridges.
 			</para>
 			<note>
 				Nonetheless we discourage the programmer to use such command, and suggest to focus on proper
@@ -656,12 +662,12 @@
 				MaxRequests parameter in the 
 				<ulink url="https://httpd.apache.org/docs/2.4/mod/prefork.html">prefork MPM documentation</ulink>
 				or the 
-				<ulink url="http://httpd.apache.org/docs/2.0/mod/mpm_common.html#maxrequestsperchild">MaxRequestsPerChild</ulink>
+				<ulink url="http://httpd.apache.org/docs/2.4/mod/mpm_common.html#maxrequestsperchild">MaxRequestsPerChild</ulink>
 				configuration parameter
 			</note>
 		</refsect1>
 	</refentry>
-	
+
 	<refentry id="headers">
 	    <refnamediv>
 		<refname>headers</refname>
