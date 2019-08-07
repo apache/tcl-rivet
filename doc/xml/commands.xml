@@ -1556,6 +1556,27 @@ bab</programlisting>
 			</para>
 	    </refsect1>
 	</refentry>
+	<refentry id="thread_id">
+		<refnamediv>
+			<refname>thread_id</refname>
+			<refpurpose>Returns the Tcl interpreter current thread id</refpurpose>
+		</refnamediv>
+		<refsynopsisdiv>
+			<cmdsynopsis>
+				<command>::rivet::thread_id</command>
+			</cmdsynopsis>
+		</refsynopsisdiv>
+		<refsect1>
+			<title>Description</title>
+			<para>
+				<command>::rivet::try</command> wraps the core language
+				command and simply traps exceptions that might have raised
+				by <command>::rivet::abort_page</command> and
+				<command>::rivet::exit</command> to throw them again and
+				thus causing <command>AbortScript</command> to be executed.
+			</para>
+		</refsect1>
+	</refentry>
 
 	<refentry id="try">
 		<refnamediv>
