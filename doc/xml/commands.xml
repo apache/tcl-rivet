@@ -1522,11 +1522,10 @@ bab</programlisting>
        		
        		The command can fail if
        		<itemizedlist>
-       			<listitem>A <command>flush stdout</command> was called before <command>::rivet::redirect</command>
-       			thus causing the HTTP headers to be sent and preventing any possibility to 
-       			manipulate them</listitem>
-       			<listitem>The channel buffer was filled causing Tcl to
-       			flush the channel</listitem>
+       			<listitem>A <command>flush stdout</command> has already been called before
+       			<command>::rivet::redirect</command> thus causing the HTTP headers to be sent</listitem>
+       			<listitem>The channel buffer has been flushed already by calling <command>flush stdout</command>
+       			or because the Rivet channel internal buffer was full</listitem>
        		</itemizedlist>
 				The <command>stdout</command> channel, like any Tcl channels, can be manipulated
 				and if needed its internal buffer stretched.    
