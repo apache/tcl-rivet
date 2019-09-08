@@ -136,7 +136,7 @@ void Worker_Bridge_Shutdown (void)
     void*               v;
     handler_private*    thread_obj;
     apr_status_t        rv;
-    apr_uint32_t        threads_to_stop;
+    apr_uint32_t        threads_to_stop = 0;
     int                 not_to_be_waited = module_globals->mpm->skip_thread_on_exit;
 
     apr_thread_mutex_lock(module_globals->mpm->job_mutex);
