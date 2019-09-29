@@ -1562,7 +1562,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         char*    cmd_arg;
 
         Tcl_IncrRefCount(par_name);
-        cmd_arg  = Tcl_GetStringFromObj(par_name,NULL);
+        cmd_arg = Tcl_GetStringFromObj(par_name,NULL);
 
         if (STRNEQU(cmd_arg,"script"))
         {
@@ -1956,24 +1956,52 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
 TCL_CMD_HEADER( Rivet_GetThreadId )
 {
-    rivet_thread_private*   private;
     char                    buff[SMALL_BUFFER_SIZE];
     apr_os_thread_t         threadid;
     Tcl_Obj*                result_obj;
-    rivet_thread_interp*    interp_obj;
+    char*                   format_hex = "0x%8.8lx";
+    char*                   format_dec = "%ld";
+    char*                   output_format = format_hex;
+    int                     wrong_args = false;
+    //rivet_thread_interp*    interp_obj;
 
-    threadid = apr_os_thread_current();
+    // interp_obj = RIVET_PEEK_INTERP(private,private->running_conf);
+    if (objc == 2)
+    {
+        Tcl_Obj* argobj = objv[1];
+        char*    cmd_arg;
 
-    THREAD_PRIVATE_DATA(private)
+        Tcl_IncrRefCount(argobj);
+        cmd_arg = Tcl_GetStringFromObj(argobj,NULL);
+        if (STRNEQU(cmd_arg,"-hex"))
+        {
+            output_format = format_hex;
+        }
+        else if (STRNEQU(cmd_arg,"-decimal"))
+        {
+            output_format = format_dec;
+        }
+        else
+        {
+            wrong_args = true;
+        }
+        Tcl_DecrRefCount(argobj);
+    }
 
-    interp_obj = RIVET_PEEK_INTERP(private,private->running_conf);
+    if (wrong_args)
+    {
+        Tcl_WrongNumArgs(interp,1,objv,"-decimal | -hex" );
+        return TCL_ERROR;
+    }
+    else
+    {
+        threadid = apr_os_thread_current();
+        snprintf(buff,SMALL_BUFFER_SIZE,output_format,threadid);
+        result_obj = Tcl_NewStringObj(buff,strlen(buff));
 
-    threadid = apr_os_thread_current();
-    snprintf(buff,SMALL_BUFFER_SIZE,"0x%8.8lx",threadid);
-    result_obj = Tcl_NewStringObj(buff,strlen(buff));
-
-    Tcl_SetObjResult(interp_obj->interp,result_obj);
-    return TCL_OK;
+        Tcl_SetObjResult(interp,result_obj);
+        return TCL_OK;
+    }
 }
 /*
  *-----------------------------------------------------------------------------

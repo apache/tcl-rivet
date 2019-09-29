@@ -1563,16 +1563,18 @@ bab</programlisting>
 		<refsynopsisdiv>
 			<cmdsynopsis>
 				<command>::rivet::thread_id</command>
+				<arg>-decimal | -hex</arg>
 			</cmdsynopsis>
 		</refsynopsisdiv>
 		<refsect1>
 			<title>Description</title>
 			<para>
-				<command>::rivet::try</command> wraps the core language
-				command and simply traps exceptions that might have raised
-				by <command>::rivet::abort_page</command> and
-				<command>::rivet::exit</command> to throw them again and
-				thus causing <command>AbortScript</command> to be executed.
+				<command>::rivet::threadid</command> returns is either hexadecimal 
+				(default) or decimal representation the current thread id. This command
+				is useful because allows for precise identification of an execution thread
+				when Apache runs a threaded MPM. Calling the command with <arg>-decimal</arg>
+				prints the thread id in a form that makes it comparable with the <command>tid</command>
+				information printed in the error log. 
 			</para>
 		</refsect1>
 	</refentry>
