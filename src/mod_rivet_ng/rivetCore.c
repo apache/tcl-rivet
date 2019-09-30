@@ -440,8 +440,7 @@ TCL_CMD_HEADER( Rivet_Headers )
 
     if (private->req->headers_printed != 0)
     {
-        Tcl_AddObjErrorInfo(interp,
-                            "Cannot manipulate headers - already sent", -1);
+        Tcl_AddObjErrorInfo(interp,"Cannot manipulate headers - already sent", -1);
         return TCL_ERROR;
     }
 
@@ -1939,7 +1938,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
  *
  * Arguments:
  *
- *      None
+ *      Output format: -hex (default) | -decimal
  *
  * Results:
  *
@@ -1958,7 +1957,6 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
 {
     char                    buff[SMALL_BUFFER_SIZE];
     apr_os_thread_t         threadid;
-    Tcl_Obj*                result_obj;
     char*                   format_hex = "0x%8.8lx";
     char*                   format_dec = "%ld";
     char*                   output_format = format_hex;
@@ -1986,22 +1984,26 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
             wrong_args = true;
         }
         Tcl_DecrRefCount(argobj);
-    }
 
-    if (wrong_args)
+        if (wrong_args)
+        {
+            Tcl_AddObjErrorInfo(interp,"Wrong argument: it must be -decimal | -hex", -1);
+            return TCL_ERROR;
+        }
+    } 
+    else if (objc > 2)
     {
         Tcl_WrongNumArgs(interp,1,objv,"-decimal | -hex" );
         return TCL_ERROR;
     }
-    else
-    {
-        threadid = apr_os_thread_current();
-        snprintf(buff,SMALL_BUFFER_SIZE,output_format,threadid);
-        result_obj = Tcl_NewStringObj(buff,strlen(buff));
 
-        Tcl_SetObjResult(interp,result_obj);
-        return TCL_OK;
-    }
+    /* Let's get the thread id and return it in the requested format */
+
+    threadid = apr_os_thread_current();
+    snprintf(buff,SMALL_BUFFER_SIZE,output_format,threadid);
+
+    Tcl_SetObjResult(interp,Tcl_NewStringObj(buff,strlen(buff)));
+    return TCL_OK;
 }
 /*
  *-----------------------------------------------------------------------------
