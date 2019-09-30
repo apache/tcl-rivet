@@ -1,3 +1,6 @@
+2019-09-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: revised argument checking
+
 2019-09-29 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: Completed manual page for command ::rivet::thread_id
     * src/mod_rivet_ng/rivetCore.c: Rivet_GetThreadId rewritten. Now the
