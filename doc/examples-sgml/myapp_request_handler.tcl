@@ -1,13 +1,13 @@
 # -- myapp_request_handler.tcl
 #
-# This script will be read by mod_rivet at the thread initialization
-# stage and its content stored in a Tcl_Obj object. This object will
-# be evaluated calling Tcl_EvalObjExe
+# This script will be read by mod_rivet during the process/thread 
+# initialization stage and its content stored in a Tcl_Obj object. 
+# This object is evaluated internally by mod_rivet
 #
 
 ::try {
 
-    $::theApplication request_processing [::rivet::var_qs all]
+    ::theApplication request_processing [::rivet::var_qs all]
 
 } trap {RIVET ABORTPAGE} {err opts} {
 

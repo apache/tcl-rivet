@@ -11,7 +11,7 @@
             agents when the workload is requiring it. 
        </para>
        <para>
-            Apache Rivet &version2-series; supported only the
+            Apache Rivet &version2-generic; supported only the
             <ulink url="&apachedoc-prefork;">prefork</ulink>
             MPM which creates child processes as independent agents responding to network requests. 
             Starting with &version30; also the <ulink url="&apachedoc-worker;">worker</ulink> and

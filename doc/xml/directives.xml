@@ -46,9 +46,8 @@
 &lt;Directory /var/www/myrivetapp&gt;
     RivetDirConf BeforeScript &quot;source /var/www/myrivetapp/before_script.tcl&quot;
 &lt;/Directory&gt;</programlisting>
-	   
-	</section>	
-	
+	</section>
+
 	<section>
 		<title>Configuration Directives</title>
 		<table align="center" title="Configuration Directives application scopes" class="directives">
@@ -56,24 +55,35 @@
 				<td>Configuration Directives</td><td>DirConf</td><td>UserConf</td><td>ServerConf</td><td>Virtual Host</td><td>Notes</td>
 			</thead>
 			<tbody>
-				<tr><td>AbortScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
-				<tr><td>AfterScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
-				<tr><td>AfterEveryScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
-				<tr><td>BeforeScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
+				<tr><td>AbortScript</td><td>X</td><td>X</td><td>X</td><td>X</td>
+					<td>This directive is meaningful with the default request handler. In order
+					to have this triggered by calling ::rivet::abort_page or ::rivet::exit
+					any special request handler should explicitly read this script from the configuration
+					using ::rivet::inspect and evaluate it (see <xref linkend="request">request processing</xref>)</td>
+				</tr>
+				<tr><td>AfterScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td>Special request handler developers
+				should read this script from the configuration calling ::rivet::inspect and evaluate it</td></tr>
+				<tr><td>AfterEveryScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td>See notes for the AfterScript directive</td></tr>
+				<tr><td>BeforeScript</td><td>X</td><td>X</td><td>X</td><td>X</td>
+					 <td>See notes for the AfterScript directive</td></tr>
 				<tr><td>CacheSize</td><td></td><td></td><td>X</td><td></td><td></td></tr>
-				<tr><td>ChildExitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
-				<tr><td>ChildInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
-				<tr><td>ErrorScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 				
+				<tr><td>ChildExitScript</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
+				<tr><td>ChildInitScript</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
+				<tr><td>ErrorScript</td><td>X</td><td>X</td><td>X</td><td>X</td>
+					<td>Rivet provides a default error handler. In case you are developing your own request
+					handling procedure you need to call that handler yourself or develop a new.
+					See notes for the AbortScript and AfterScript directives</td></tr>
 				<tr><td>ExportRivetNS</td><td></td><td></td><td>X</td><td></td><td></td></tr>
-				<tr><td>GlobalInitScript</td><td></td><td></td><td>X</td><td></td><td>effective only when SeparateVirtualInterps is Off (default)</td></tr> 
-				<tr><td>ImportRivetNS</td><td></td><td></td><td>X</td><td></td><td></td></tr>
-				<tr><td>HonorHeaderOnlyRequests</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>GlobalInitScript</td><td></td><td></td><td>X</td><td></td>
+				    <td>effective only when SeparateVirtualInterps is Off (default)</td></tr>
+				<tr><td>ImportRivetNS</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
+				<tr><td>HonorHeaderOnlyRequests</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
 				<tr><td>MpmBridge</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
 				<tr><td>RequestHandler</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 				<tr><td>SeparateChannels</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
 				<tr><td>SeparateVirtualInterps</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
 				<tr><td>ServerInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr>
-				<tr><td>SingleThreadExit</td><td></td><td></td><td>X</td><td></td><td>global setting only</td></tr>
+				<tr><td>SingleThreadExit</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
 				<tr><td>UploadDirectory</td><td></td><td>X</td><td>X</td><td>X</td><td></td></tr> 
 				<tr><td>UploadFilesToVar</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
 				<tr><td>UploadMaxSize</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
