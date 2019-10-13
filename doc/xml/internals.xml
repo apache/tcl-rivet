@@ -69,28 +69,30 @@
 			We designed an interface between the core of mod_rivet and its MPM bridges 
 			based on a set of functions defined in the rivet_bridge_table structure. 
     	</para>
-    	<programlisting>typedef struct _mpm_bridge_table {
-    RivetBridge_ServerInit    *mpm_server_init;
-    RivetBridge_ChildInit     *mpm_child_init;
-    RivetBridge_Request       *mpm_request;
-    RivetBridge_Finalize      *mpm_finalize;
-    RivetBridge_Exit_Handler  *mpm_exit_handler;
-    RivetBridge_Thread_Interp *mpm_thread_interp;
+		<programlisting>typedef struct _mpm_bridge_table {
+    RivetBridge_ServerInit      *server_init;
+    RivetBridge_ThreadInit      *thread_init;
+    RivetBridge_Request         *request_processor;
+    RivetBridge_Finalize        *thread_finalize;
+    RivetBridge_Exit_Handler    *exit_handler;
+    RivetBridge_Thread_Interp   *thread_interp;
+    RivetBridge_InheritsInterps  inherits_interps;
 } rivet_bridge_table;</programlisting>
 		<para>
 			<itemizedlist>
 				<listitem>
-					<emphasis>mpm_server_init</emphasis>: pointer to any
+					<emphasis>server_init</emphasis>: pointer to any
 					specific server inititalization function. This field can be NULL
 					if no bridge specific initialization has to be done. The core of
 					mod_rivet runs the <command>ServerInitScript</command> before
-					calling this function.</listitem>
-					<listitem><emphasis>mpm_child_init</emphasis>: Bridge specific
+					calling this function.
+				</listitem>
+				<listitem><emphasis>thread_init</emphasis>: Bridge specific
 					child process initialization. If the pointer is assigned with
 					a non-NULL value the function is called by Rivet_ChildInit. 
 				</listitem>
 				<listitem>
-					<emphasis>mpm_request</emphasis>: This pointer must
+					<emphasis>request_processor</emphasis>: This pointer must
 					be a valid function pointer to the content generator
 					implemented by the bridge. If the pointer is not defined the Apache
 					web server will stop at start up. This condition is motivated by
@@ -107,19 +109,24 @@
 					are no threads and the bridge calls directly Rivet_SendContent
 				</listitem>
 				<listitem>
-					<emphasis>mpm_finalize</emphasis>: pointer to a finalization
+					<emphasis>thread_finalize</emphasis>: pointer to a finalization
 					function called during a child process exit. This function is registered
 					as child process memory pool cleanup function. If the pointer is NULL
 					the pool is given a default cleanup function (apr_pool_cleanup_null) 
-					defined in src/mod_rivet/mod_rivet.c. For instance the finalize function
-					in the <emphasis>worker</emphasis> MPM bridge notifies
-					a supervisor thread demanding the whole pool of threads running Tcl 
-					interpreters to orderly exit. This pointer can be NULL if the bridge 
+					defined in src/mod_rivet/mod_rivet.c. In the prefork bridge this function
+					this function will do nothing really interesting, but with the lazy and worker
+					bridges its behavior can change depending on the <command>SingleThreadExit</command>
+					directive. By default (<command>SingleThreadExit</command>: Off)
+					in the <emphasis>worker</emphasis> and the <emphasis>lazy</emphasis>MPM bridges
+					notify the whole pool of threads running Tcl 
+					interpreters to orderly exit. If <command>SingleThreadExit</command> is On
+					then a single Tcl thread terminates deleting its interpreter and I/O channel.
+					This pointer can be NULL if the bridge 
 					has no special need when a child process must exit (unlikely if you have
 					multiple threads running)
 				</listitem>
 				<listitem>
-					<emphasis>mpm_exit_handler</emphasis>: mod_rivet replaces
+					<emphasis>exit_handler</emphasis>: mod_rivet replaces
 					the core <command>exit</command> command with a new one
 					(<command>::rivet::exit</command>). This command must handle 
 					the process exit in the best possible way for the bridge and the
@@ -137,7 +144,7 @@
 					to have details on how and at what stage this callback is invoked.
 				</listitem>
 				<listitem>
-					<emphasis>mpm_thread_interp</emphasis> must be a function returning
+					<emphasis>thread_interp</emphasis> must be a function returning
 					the interpreter object (a pointer to record of type
 					<command>rivet_thread_interp</command>) associated
 					to a given configuration as stored in a <command>rivet_server_conf*</command>
