@@ -1,8 +1,8 @@
 # -- myapp_request_handler.tcl
 #
-# This script will be read by mod_rivet at the thread initialization
-# stage and its content stored in a Tcl_Obj object. This object will
-# be evaluated calling Tcl_EvalObjExe
+# This script will be read by mod_rivet during the process/thread
+# initialization stage and its content stored in a Tcl_Obj object.
+# This object is evaluated internally by mod_rivet at every request
 #
 
 ::try {
@@ -11,22 +11,21 @@
 
 } trap {RIVET ABORTPAGE} {err opts} {
 
-     set abort_code [::rivet::abort_code]
+    set abort_code [::rivet::abort_code]
 
     switch $abort_code {
-       code1 {
-           # handling abort_page with code1
-           ....
-       }
-       code2 {
-           # handling abort_page with code2
-          ....      
-       }
-       # ...
-       default {
-           # default abort handler
-       }
-   }
+        code1 {
+            # handling abort_page with code1
+            ....
+        }
+        code2 {
+            # handling abort_page with code2
+            ....      
+        }
+        default {
+            # default abort handler
+        }
+    }
 
 } trap {RIVET THREAD_EXIT} {err opts} {
     

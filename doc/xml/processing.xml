@@ -3,7 +3,7 @@
 	<section>
 		<title>Tcl Scripts Processing</title>
 		<para>
-			The mod_rivet &version2-series; modules handle an HTTP request
+			The mod_rivet &version2-generic; modules handle an HTTP request
 			by running a Tcl script or a Rivet (.rvt file) template 
 			whose path appears encoded in the URI (an alias translation or 
 			URL rewriting might occur to establish the real path). 

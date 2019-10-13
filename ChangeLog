@@ -1,3 +1,7 @@
+2019-10-13 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml: configuration directives table expanded
+    * doc/examples/
+
 2019-09-30 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: revised argument checking
 
