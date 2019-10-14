@@ -1,6 +1,4 @@
-<!-- $Id: $ -->
-
-  <section id="internals">
+<section id="internals">
     <title>Rivet Internals</title>
     <para>
       This section easily falls out of date, as new code is added, old
@@ -144,17 +142,30 @@
 					to have details on how and at what stage this callback is invoked.
 				</listitem>
 				<listitem>
+					<para>
 					<emphasis>thread_interp</emphasis> must be a function returning
 					the interpreter object (a pointer to record of type
 					<command>rivet_thread_interp</command>) associated
 					to a given configuration as stored in a <command>rivet_server_conf*</command>
 					object. This element was temporarily introduced in the 
 					<command>mpm_bridge_table</command> table and should be accessed
-					through the macro RIVET_PEEK_INTERP.
+					through the macro RIVET_PEEK_INTERP.</para>
 					<programlisting>interp_obj = RIVET_PEEK_INTERP(private,private->conf);</programlisting>
-					Every bridge implementation should have its own way to store interpreter data and manage their
+					<para>Every bridge implementation should have its own way to store interpreter data and manage their
 					status. So this macro (and associated function)	should hide from the module core function
-					the specific approach followed in a particular bridge
+					the specific approach followed in a particular bridge</para>
+					<para>The current implementation of this function is used both
+					to store and retrieve a <command>rivet_thread_interp</command> pointer in
+					the bridge internal data structures. For instance this is the function
+					of the prefork bridge</para>
+					<programlisting>rivet_thread_interp* PreforkBridge_Interp (rivet_thread_private* private,
+                                            rivet_server_conf*    conf,
+                                            rivet_thread_interp*  interp)
+{
+    if (interp != NULL) { private->ext->interps[conf->idx] = interp; }
+
+    return private->ext->interps[conf->idx];   
+}</programlisting>
 				</listitem>
 			</itemizedlist>
 		</para>
