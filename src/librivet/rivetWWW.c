@@ -95,8 +95,8 @@ TCL_CMD_HEADER( Rivet_UnescapeStringCmd )
 
     /* for all the characters in the source string */
     for (origStringP = origString, newStringP = newString;
-	        *origStringP != '\0';
-	        origStringP++) {
+                                    *origStringP != '\0';
+                                     origStringP++) {
 
         char c = *origStringP;
         char c2;
@@ -107,7 +107,7 @@ TCL_CMD_HEADER( Rivet_UnescapeStringCmd )
              continue;
         }
 
-             /* if there's a percent sign, decode the two-character
+         /* if there's a percent sign, decode the two-character
           * hex sequence that follows and copy it to the target
           * string */
         if (c == '%') {
@@ -123,14 +123,17 @@ TCL_CMD_HEADER( Rivet_UnescapeStringCmd )
                 return TCL_ERROR;
             }
 
-             *newStringP++ = (digit1 * 16 + digit2);
-             continue;
-         }
+            *newStringP++ = (digit1 * 16 + digit2);
+            continue;
+        }
 
-             /* it wasn't a plus or percent, just copy the char across */
-         *newStringP++ = c;
+        /* it wasn't a plus or percent, just copy the char across */
+
+        *newStringP++ = c;
     }
+
     /* Don't forget to null-terminate the target string */
+
     *newStringP = '\0';
 
     Tcl_SetObjResult( interp, Tcl_NewStringObj( newString, -1 ) );
