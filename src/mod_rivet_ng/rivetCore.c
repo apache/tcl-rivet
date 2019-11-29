@@ -1906,6 +1906,9 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
         if (result != TCL_OK)
         {
+            // Hash cleanup
+            RivetCache_DeleteEntry(entry);
+
             Tcl_DecrRefCount(script);
             return result;
         }
