@@ -32,5 +32,6 @@ EXTERN char* RivetCache_MakeKey (apr_pool_t* pool, char*         filename,
 EXTERN Tcl_HashEntry* RivetCache_EntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew);
 EXTERN Tcl_Obj* RivetCache_FetchScript (Tcl_HashEntry* entry);
 EXTERN int RivetCache_StoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* entry, Tcl_Obj* script);
+EXTERN void RivetCache_DeleteEntry (Tcl_HashEntry *entry);
 
 #endif /* __mod_rivet_cache_h__ */

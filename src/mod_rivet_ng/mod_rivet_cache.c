@@ -237,3 +237,25 @@ int RivetCache_StoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* ent
     }
     return 0;
 }
+
+/*
+ * -- RivetCache_DeleteEntry
+ *
+ * Cache entry delete. Removes an existing entry from a table. The memory
+ * associated with the entry itself will be freed, but the client is
+ * responsible for any cleanup associated with the entry's value, such as
+ * freeing a structure that it points to.
+ *
+ * Arguments:
+ *      Tcl_HashEntry*       entry object
+ *
+ * Results:
+ *
+ * Side Effects:
+ *
+ */
+
+void RivetCache_DeleteEntry (Tcl_HashEntry *entry)
+{
+    Tcl_DeleteHashEntry (entry);
+}
