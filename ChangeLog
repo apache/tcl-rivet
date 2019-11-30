@@ -1,3 +1,8 @@
+2019-11-29 Brice Hamon <bricehdec@apache.org>
+   * src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
+   * src/mod_rivet_ng/mod_rivet_cache.c: 
+   * src/mod_rivet_ng/rivetCore.c: fixed crash when rvt file not readable
+
 2019-05-24 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: Add Tcl_DecrRefCnt after
     RivetCache_StoreScript as this function itself calls
