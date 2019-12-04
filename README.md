@@ -17,13 +17,6 @@ See [LICENSE](LICENSE) for licensing terms.
 | Windows 64, Apache 2.4.37, Tcl/Tk 8.6.7 | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg/branch/master?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet/branch/master) <br/>fork: [![Build status](https://ci.appveyor.com/api/projects/status/69nj1qs4ia8pj87v/branch/master?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet-scuqj/branch/master) | | [![Build status](https://ci.appveyor.com/api/projects/status/3si279ye7gxl7wgg/branch/winbuild?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet/branch/winbuild) <br/>fork: [![Build status](https://ci.appveyor.com/api/projects/status/69nj1qs4ia8pj87v/branch/winbuild?svg=true)](https://ci.appveyor.com/project/petasis/tcl-rivet-scuqj/branch/winbuild) |
 | macOS 64 (Darwin), Apache 2.4.37, Tcl/Tk 8.5 |  | | |
 
-
-## KNOWN PROBLEMS
-
- - Rivet is reported to conflict with cgi scripts on some Linux machines. Symptom of the problem is when cgi scripts hang forever and don't send contents to the client
-
 ## RIVET NAMESPACE
 
- - With the intruduction of the ::rivet namespace the command set has been moved into it and each command should now be fully qualified. Building rivet you can choose in case to place the commands on the export 
- list or even automatically import them into the global namespace. This is a deprecated option though unless you have a compatibility issue with existing legacy Rivet based code.
-
+ - The Rivet command set was moved into the ::rivet namespace and each command should now be fully qualified. By default the command set (exceptions are ::rivet::try and ::rivet::catch) is placed in the namespace export list, so you can import it into the global namespace for compatibility with Rivet version < 2.0. This is a deprecated option though and it could be removed in future releases
