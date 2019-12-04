@@ -1,3 +1,7 @@
+2019-12-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: new branch uploadcmdfix with improved
+    argument checking in Rivet_Upload that was the cause of random crashes
+
 2019-11-29 Brice Hamon <bhdec@apache.org>
    * src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
    * src/mod_rivet_ng/mod_rivet_cache.c: 

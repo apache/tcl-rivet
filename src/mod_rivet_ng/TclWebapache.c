@@ -656,9 +656,9 @@ int TclWeb_PrepareUpload(char *varname, TclWebRequest *req)
 {
     req->upload = ApacheUpload_find(req->apachereq->upload, varname);
     if (req->upload == NULL) {
-	return TCL_ERROR;
+	    return TCL_ERROR;
     } else {
-	return TCL_OK;
+	    return TCL_OK;
     }
 }
 

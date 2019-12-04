@@ -1023,16 +1023,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
  *
  * Rivet_Upload --
  *
- *      Deals with file uploads (multipart/form-data) like so:
- *
- *      upload channel uploadname
- *      upload save name uploadname
- *      upload data uploadname
- *      upload exists uploadname
- *      upload size uploadname
- *      upload type uploadname
- *      upload filename uploadname
- *      upload names
+ *      Deals with file uploads (multipart/form-data):
  *
  * Results:
  *      A standard Tcl result.
@@ -1050,6 +1041,29 @@ TCL_CMD_HEADER( Rivet_Upload )
     int     subcommandindex;
 
     Tcl_Obj* result = NULL;
+
+    /* ::rivet::upload subcommands must register
+     * 
+     * - subcommand definition 
+     * - subcommand integer progressive index
+     * - subcommand required (minimum) number of arguments
+     *
+     *----+----------------------------------------+-------+
+     *    |         argv[1]    argv[2]   argv[3]   | argc  |
+     *----+----------------------------------------+-------+
+     *    |  upload channel   uploadname           |   3   |
+     *    |  upload save      uploadname filename  |   4   |
+     *    |  upload data      uploadname           |   3   |
+     *    |  upload exists    uploadname           |   3   |
+     *    |  upload size      uploadname           |   3   |
+     *    |  upload type                           |   2   |
+     *    |  upload filename  uploadname           |   3   |
+     *    |  upload tempname  uploadname           |   3   |
+     *    |  upload names                          |   2   |
+     *
+     * a subcommand first optional argument must be the name
+     * of an upload
+     */
 
     static CONST84 char *SubCommand[] = {
         "channel",
@@ -1076,45 +1090,42 @@ TCL_CMD_HEADER( Rivet_Upload )
         NAMES
     };
 
+    static CONST84 int cmds_objc[] = { 3,4,3,3,3,2,3,3,2 };
+    int expected_objc;
+
     rivet_thread_private*   private;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::upload")
     if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
-                        "channel|save|data|exists|size|type|filename|names|tempname"
-                        "|tempname|names",
+                        "channel|save|data|exists|size|type|filename|tempname|names",
                         0, &subcommandindex) == TCL_ERROR) {
         return TCL_ERROR;
     }
 
-    /* If it's any of these, we need to find a specific name. */
+    expected_objc = cmds_objc[subcommandindex];
 
-    /* Excluded case is NAMES. */
+    if (objc < expected_objc) {
+        Tcl_Obj* infoobj = Tcl_NewStringObj("Wrong argument numbers: ",-1);
 
-    if ((enum subcommand)subcommandindex == CHANNEL     ||
-        (enum subcommand)subcommandindex == SAVE        ||
-        (enum subcommand)subcommandindex == DATA        ||
-        (enum subcommand)subcommandindex == EXISTS      ||
-        (enum subcommand)subcommandindex == SIZE        ||
-        (enum subcommand)subcommandindex == TYPE        ||
-        (enum subcommand)subcommandindex == FILENAME    ||
-        (enum subcommand)subcommandindex == TEMPNAME)
-    {
+        Tcl_IncrRefCount(infoobj);
+        Tcl_AppendObjToObj(infoobj,Tcl_NewIntObj(expected_objc));
+        Tcl_AppendStringsToObj(infoobj," arguments expected");
+        Tcl_AppendObjToErrorInfo(interp, infoobj);
+        Tcl_AddErrorInfo(interp, "Wrong arguments number ");
+        Tcl_DecrRefCount(infoobj);
+
+        Tcl_WrongNumArgs(interp, objc, objv, "varname");
+        return TCL_ERROR;
+    } 
+
+    /* We check whether an upload with a given name exists */
+
+    if (objc >= 3) {
         varname = Tcl_GetString(objv[2]);
-        if ((enum subcommand)subcommandindex != EXISTS)
+        if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
         {
-            if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
-            {
-                Tcl_AddErrorInfo(interp, "Unable to find variable");
-                return TCL_ERROR;
-            }
-        }
-
-        /* If it's not the 'save' command, then it has to have an objc
-           of 3. */
-        if ((enum subcommand)subcommandindex != SAVE && objc != 3)
-        {
-            Tcl_WrongNumArgs(interp, 2, objv, "varname");
+            Tcl_AddErrorInfo(interp, "Unable to find variable");
             return TCL_ERROR;
         }
     }
