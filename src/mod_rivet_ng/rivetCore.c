@@ -1112,10 +1112,9 @@ TCL_CMD_HEADER( Rivet_Upload )
         Tcl_AppendObjToObj(infoobj,Tcl_NewIntObj(expected_objc));
         Tcl_AppendStringsToObj(infoobj," arguments expected");
         Tcl_AppendObjToErrorInfo(interp, infoobj);
-        Tcl_AddErrorInfo(interp, "Wrong arguments number ");
         Tcl_DecrRefCount(infoobj);
 
-        Tcl_WrongNumArgs(interp, objc, objv, "varname");
+        Tcl_WrongNumArgs(interp, objc, objv, "uploadname");
         return TCL_ERROR;
     } 
 
@@ -1125,7 +1124,9 @@ TCL_CMD_HEADER( Rivet_Upload )
         varname = Tcl_GetString(objv[2]);
         if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
         {
-            Tcl_AddErrorInfo(interp, "Unable to find variable");
+            Tcl_AddErrorInfo(interp, "Unable to find the upload named '");
+            Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(varname,-1));
+            Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj("'",-1));
             return TCL_ERROR;
         }
     }
