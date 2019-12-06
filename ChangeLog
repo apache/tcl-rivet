@@ -1,3 +1,6 @@
+2019-12-06 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.css: new color scheme for docbook manual
+
 2019-11-29 Brice Hamon <bhdec@apache.org>
    * src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
    * src/mod_rivet_ng/mod_rivet_cache.c: 
