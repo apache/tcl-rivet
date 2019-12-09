@@ -1,3 +1,6 @@
+2019-12-09 Massimo Manghi <mxmanghi@apache.org>
+   * VERSION: current branch new version is 3.1.2 
+
 2019-11-29 Brice Hamon <bhdec@apache.org>
    * src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
    * src/mod_rivet_ng/mod_rivet_cache.c: 
