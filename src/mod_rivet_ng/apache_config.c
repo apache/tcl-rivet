@@ -409,6 +409,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
 
     rsc->separate_virtual_interps = base->separate_virtual_interps;
     rsc->honor_header_only_reqs = base->honor_header_only_reqs;
+    rsc->upload_files_to_var = base->upload_files_to_var;
     rsc->single_thread_exit = base->single_thread_exit;
     rsc->separate_channels = base->separate_channels;
     rsc->import_rivet_ns = base->import_rivet_ns;

@@ -660,7 +660,7 @@ TCL_CMD_HEADER ( Rivet_Var )
      * 
      * This fragment of code is taken from tcl 8.6.6 (tclNamesp.c) and it's part of the
      * function implementing Tcl "namespace tail", as such it should be authoritative
-     * regarding the determination of the namespace stripped command name 
+     * regarding the stripping of the namespace from a FQ command name
      */
 
     for (p = cmd;  *p != '\0';  p++) {
@@ -1880,18 +1880,11 @@ TCL_CMD_HEADER( Rivet_UrlScript )
         script = Tcl_NewObj();
         Tcl_IncrRefCount(script);
 
-    /*
-        if (private->running->rivet_before_script) 
-        {
-            Tcl_AppendObjToObj(script,private->running->rivet_before_script);
-        }
-    */
-
-    /*
-     * We check whether we are dealing with a pure Tcl script or a Rivet template.
-     * Actually this check is done only if we are processing a toplevel file, every nested 
-     * file (files included through the 'parse' command) is treated as a template.
-     */
+        /*
+         * We check whether we are dealing with a pure Tcl script or a Rivet template.
+         * Actually this check is done only if we are processing a toplevel file, every nested
+         * file (files included through the 'parse' command) is treated as a template.
+         */
 
         if (Rivet_CheckType(private->r) == RIVET_TEMPLATE)
         {
@@ -1912,12 +1905,6 @@ TCL_CMD_HEADER( Rivet_UrlScript )
             Tcl_DecrRefCount(script);
             return result;
         }
-
-    /*
-        if (private->running->rivet_after_script) {
-            Tcl_AppendObjToObj(script,private->running->rivet_after_script);
-        }
-    */
 
         RivetCache_StoreScript(rivet_interp,entry,script);
     }
