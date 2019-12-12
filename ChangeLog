@@ -1,3 +1,7 @@
+2019-12-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
+    Rivet_MergeConfig
+
 2019-12-06 Massimo Manghi <mxmanghi@apache.org>
     * doc/rivet.css: new color scheme for docbook manual
 
