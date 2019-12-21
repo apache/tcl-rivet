@@ -1,3 +1,6 @@
+2019-12-21 Massimo Manghi <mxmanghi@apache.org>
+    * INSTALL: update install directions
+
 2019-12-12 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
     Rivet_MergeConfig
