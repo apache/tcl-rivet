@@ -1039,6 +1039,7 @@ TCL_CMD_HEADER( Rivet_Upload )
 {
     char*   varname = NULL;
     int     subcommandindex;
+    int     upload_prepared = 0;
 
     Tcl_Obj* result = NULL;
 
@@ -1048,18 +1049,19 @@ TCL_CMD_HEADER( Rivet_Upload )
      * - subcommand integer progressive index
      * - subcommand required (minimum) number of arguments
      *
-     *----+----------------------------------------+-------+
-     *    |         argv[1]    argv[2]   argv[3]   | argc  |
-     *----+----------------------------------------+-------+
-     *    |  upload channel   uploadname           |   3   |
-     *    |  upload save      uploadname filename  |   4   |
-     *    |  upload data      uploadname           |   3   |
-     *    |  upload exists    uploadname           |   3   |
-     *    |  upload size      uploadname           |   3   |
-     *    |  upload type                           |   2   |
-     *    |  upload filename  uploadname           |   3   |
-     *    |  upload tempname  uploadname           |   3   |
-     *    |  upload names                          |   2   |
+     * +----------------------------------------+-------+
+     * |         argv[1]    argv[2]   argv[3]   | argc  |
+     * +----------------------------------------+-------+
+     * |  upload channel   uploadname           |   3   |
+     * |  upload save      uploadname filename  |   4   |
+     * |  upload data      uploadname           |   3   |
+     * |  upload exists    uploadname           |   3   |
+     * |  upload size      uploadname           |   3   |
+     * |  upload type      uploadname           |   3   |
+     * |  upload filename  uploadname           |   3   |
+     * |  upload tempname  uploadname           |   3   |
+     * |  upload names                          |   2   |
+     * +----------------------------------------+-------+
      *
      * a subcommand first optional argument must be the name
      * of an upload
@@ -1090,10 +1092,10 @@ TCL_CMD_HEADER( Rivet_Upload )
         NAMES
     };
 
-    static CONST84 int cmds_objc[] = { 3,4,3,3,3,2,3,3,2 };
+    static CONST84 int cmds_objc[] = { 3,4,3,3,3,3,3,3,2 };
     int expected_objc;
 
-    rivet_thread_private*   private;
+    rivet_thread_private* private;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::upload")
@@ -1122,13 +1124,18 @@ TCL_CMD_HEADER( Rivet_Upload )
 
     if (objc >= 3) {
         varname = Tcl_GetString(objv[2]);
+
+        /* TclWeb_PrepareUpload calls ApacheUpload_find and returns
+         * TCL_OK if the named upload exists in the current request */
+
         if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
         {
             Tcl_AddErrorInfo(interp, "Unable to find the upload named '");
             Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(varname,-1));
             Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj("'",-1));
             return TCL_ERROR;
-        }
+        } 
+        upload_prepared = 1;
     }
 
     result = Tcl_NewObj();
@@ -1163,14 +1170,10 @@ TCL_CMD_HEADER( Rivet_Upload )
                 return TCL_ERROR;
             }
             break;
-        case EXISTS:
-            if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
-            {
-                Tcl_SetIntObj(result, 0);
-            } else {
-                Tcl_SetIntObj(result, 1);
-            }
+        case EXISTS: {
+            Tcl_SetIntObj(result,upload_prepared);
             break;
+        }
         case SIZE:
             TclWeb_UploadSize(result, private->req);
             break;

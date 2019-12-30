@@ -1,5 +1,26 @@
-#ifndef _APACHE_REQUEST_H
-#define _APACHE_REQUEST_H
+/* apache_request.h -- mod_rivet upload request functions */
+
+/*
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+*/
+
+#ifndef __apache_request_h__
+#define __apache_request_h__
 
 #include "httpd.h"
 #include "http_config.h"
@@ -93,11 +114,9 @@ ApacheUpload *ApacheUpload_find(ApacheUpload *upload, char *name);
 
 #define ApacheUpload_size(upload) ((upload)->size)
 
-#define ApacheUpload_info(upload, key) \
-apr_table_get((upload)->info, (key))
+#define ApacheUpload_info(upload, key) apr_table_get((upload)->info, (key))
 
-#define ApacheUpload_type(upload) \
-ApacheUpload_info((upload), "Content-Type")
+#define ApacheUpload_type(upload) ApacheUpload_info((upload), "Content-Type")
 
 #define ApacheRequest_set_post_max(req, max) ((req)->post_max = (max))
 #define ApacheRequest_set_temp_dir(req, dir) ((req)->temp_dir = (dir))
@@ -122,4 +141,4 @@ char *ApacheRequest_expires(ApacheRequest *req, char *time_str);
 #define REQ_DEBUG(a)
 #endif
 
-#endif /* _APACHE_REQUEST_H */
+#endif /* __apache_request_h__ */

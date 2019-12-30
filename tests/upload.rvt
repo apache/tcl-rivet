@@ -1,1 +1,24 @@
-<? puts "[::rivet::upload names] [::rivet::upload exists uploadtest] [::rivet::upload size uploadtest] -[::rivet::upload type uploadtest]- [::rivet::upload filename uploadtest]" ?>
+<?
+    set names_res   [catch { set up_names  [::rivet::upload names] }]
+    set exists_res  [catch { set up_exists [::rivet::upload exists uploadtest] }]
+    set size_res    [catch { set up_size   [::rivet::upload size uploadtest] }]
+    set type_res    [catch { set up_type   [::rivet::upload type uploadtest] }]
+    set filen_res   [catch { set up_filen  [::rivet::upload filename uploadtest] }]
+ 
+    if {$names_res || $exists_res || $size_res || $type_res || $filen_res } {
+        puts [join [list $names_res $exists_res $size_res $type_res $filen_res] "|"]
+    } else {
+        puts [join [list $up_names $up_exists $up_size $up_type $up_filen] "|"]
+    }
+
+
+    #if {[catch {
+    #    puts [join [list [::rivet::upload names]                \
+    #                     [::rivet::upload exists uploadtest]    \
+    #                     [::rivet::upload size uploadtest]      \
+    #                     [::rivet::upload type uploadtest]      \
+    #                     [::rivet::upload filename uploadtest]] "|"] 
+    #    } e einfo]} {
+    #    puts "Error $e: $einfo"
+    #}
+?>

@@ -16,8 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id$
-
 set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] apachetest]]
 
 puts stderr "runtests.tcl is running with auto_path: $auto_path"

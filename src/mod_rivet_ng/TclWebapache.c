@@ -19,8 +19,6 @@
     under the License.
 */
 
-/* $Id$ */
-
 /* Rivet config */
 
 #ifdef HAVE_CONFIG_H
@@ -664,20 +662,18 @@ int TclWeb_PrepareUpload(char *varname, TclWebRequest *req)
 
 int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
 {
-    *chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
+    *chan = Tcl_OpenFileChannel(req->interp, req->upload->tempname, "r", 0);
     if (chan == NULL) {
-	return TCL_ERROR;
+	    return TCL_ERROR;
     } else {
-	if (Tcl_SetChannelOption(req->interp, *chan,
-			         "-translation", "binary") == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
-	if (Tcl_SetChannelOption(req->interp, *chan,
-				 "-encoding", "binary") == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
-	Tcl_RegisterChannel (req->interp, *chan);
-	return TCL_OK;
+        if (Tcl_SetChannelOption(req->interp,*chan,"-translation","binary") == TCL_ERROR) {
+            return TCL_ERROR;
+        }
+        if (Tcl_SetChannelOption(req->interp,*chan,"-encoding","binary") == TCL_ERROR) {
+            return TCL_ERROR;
+        }
+        Tcl_RegisterChannel(req->interp, *chan);
+        return TCL_OK;
     }
 }
 
@@ -766,10 +762,10 @@ int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req)
     upload = ApacheRequest_upload(req->apachereq);
     while (upload)
     {
-	Tcl_ListObjAppendElement(
-	    req->interp, names,
-	    TclWeb_StringToUtfToObj(upload->name,req));
-	upload = upload->next;
+        Tcl_ListObjAppendElement(
+            req->interp, names,
+            TclWeb_StringToUtfToObj(upload->name,req));
+        upload = upload->next;
     }
 
     return TCL_OK;
