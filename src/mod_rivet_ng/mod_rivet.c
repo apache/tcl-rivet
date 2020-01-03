@@ -77,26 +77,26 @@ DLLEXPORT module		        rivet_module;
 #define TCL_HANDLER_FILE    RIVET_DIR"/default_request_handler.tcl"
 
 /*
-* -- Rivet_SeekMPMBridge 
+* -- Rivet_SeekMPMBridge
 *
 *  Determing the bridge name to be loaded following these steps
 *
 *  * The RIVET_MPM_BRIDGE environment variable is checked and if
-*  existing its definition is taken to be the path to the bridge 
+*  existing its definition is taken to be the path to the bridge
 *  module
 *
-*  * The configuration is checked to see if an mpm_bridge line 
+*  * The configuration is checked to see if an mpm_bridge line
 *  defined exists (as sepecified with the configuration MpmBridge
 *  directive) and if defined:
-*  
+*
 *   - the string is interpolated with RIVET_MPM_BRIDGE_COMPOSE
-*   - if the former step fails the string is 
+*   - if the former step fails the string is
 *     interpreted as a full path to a bridge module
 *
 *  * if MpmBridge was not defined the code adopt an heuristics based
-*  on the response from the call to ap_mpm_query. If 
+*  on the response from the call to ap_mpm_query. If
 *  the MPM is not threaded we load the prefork bridge
-*  
+*
 *  * If everything fails the worker bridge is loaded
 */
 
@@ -177,7 +177,7 @@ Rivet_SeekMPMBridge (apr_pool_t* pool,server_rec* server)
 * -- Rivet_CreateModuleGlobals
 *
 * module globals (mod_rivet_globals) allocation and initialization
-* 
+*
 */
 
 static mod_rivet_globals* 
@@ -220,7 +220,7 @@ Rivet_CreateModuleGlobals (apr_pool_t* pool, server_rec* server)
 /*
 * -- Rivet_Exit_Handler
 *
-* 
+*
 *
 */
 
@@ -235,7 +235,7 @@ int Rivet_Exit_Handler(int code)
 * -- Rivet_RunServerInit
 *
 *  Server initialization
-* 
+*
 */
 
 static int
@@ -277,8 +277,8 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
      * (https://wiki.apache.org/httpd/ModuleLife)
      */
 
-    /* 
-     * if the environment variable AP_PARENT_PID is set 
+    /*
+     * if the environment variable AP_PARENT_PID is set
      * we know we are in a child process of the winnt MPM
      */
     {
@@ -314,21 +314,21 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
         vhost_rsc = RIVET_SERVER_CONF(s->module_config);
 
-        if (vhost_rsc->rivet_server_init_script != NULL) 
+        if (vhost_rsc->rivet_server_init_script != NULL)
         {
             Tcl_Obj*    server_init;
 
-            /* either we want separate virtual interps or we haven't 
+            /* either we want separate virtual interps or we haven't
              * created an interpreter so far we create one
              */
 
-            if ((interp_obj == NULL) || vhost_rsc->separate_virtual_interps) 
+            if ((interp_obj == NULL) || vhost_rsc->separate_virtual_interps)
             {
                 interp_obj = Rivet_NewVHostInterp(private,s);
 
-                /* We initialize the interpreter and we won't 
+                /* We initialize the interpreter and we won't
                  * register a channel with it because
-                 * we couldn't send data to the stdout anyway 
+                 * we couldn't send data to the stdout anyway
                  */
 
                 Rivet_PerInterpInit(interp_obj,private,s,pPool);
@@ -340,8 +340,7 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
             } else {
 
-                interp_obj = 
-                    Rivet_DuplicateVHostInterp(pPool,root_interp);
+                interp_obj = Rivet_DuplicateVHostInterp(pPool,root_interp);
 
             }
 
@@ -350,13 +349,13 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
              */
 
             module_globals->server_interps[vhost_rsc->idx] = interp_obj;
-            
+
             /* we now establish the full rivet core command set for the root interpreter */
             // Rivet_InitCore (module_globals->server_interps[vhost_rsc->idx],private);
 
             /* We don't create the cache here: it would make sense only
              * for the prefork MPM. Non-fork bridges should do it
-             * themselves 
+             * themselves
              */
 
             server_init = Tcl_NewStringObj(vhost_rsc->rivet_server_init_script,-1);
@@ -367,15 +366,15 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
         }
     }
-    
+
 	/* bridge specific server init script */
-	
+
     RIVET_MPM_BRIDGE_CALL(server_init,pPool,pLog,pTemp,server);
 
     return OK;
 }
 
-/* 
+/*
  * -- Rivet_ServerInit
  *
  * Post config hook. The server initialization loads the MPM bridge
@@ -396,7 +395,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     ap_add_version_component(pPool,RIVET_PACKAGE_NAME);
 #endif
 
-	/* This function runs as post_config_hook and as such it's run twice 
+	/* This function runs as post_config_hook and as such it's run twice
      * by design. This is the recommended way to avoid a double load of
 	 * external modules.
 	 */
@@ -412,8 +411,8 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         return OK; /* This would be the first time through */
 	}	
-	
-    /* Everything revolves around this structure: module_globals. The structure 
+
+    /* Everything revolves around this structure: module_globals. The structure
      * is allocated and the MPM bridge name is established */
 
     module_globals = Rivet_CreateModuleGlobals (pPool,server);
@@ -524,7 +523,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
          * was called. We really need a separate one for each server,
          * so we go ahead and create one here, if necessary. */
 
-        if (s != server && myrsc == root_server_conf) 
+        if (s != server && myrsc == root_server_conf)
         {
             myrsc = RIVET_NEW_CONF(pChild);
             ap_set_module_config(s->module_config, &rivet_module, myrsc);
