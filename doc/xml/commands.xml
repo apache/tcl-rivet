@@ -953,38 +953,6 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
 	    </refsect1>
 	</refentry>
 
-	<refentry id="incr0">
-	    <refnamediv>
-            <refname>incr0</refname>
-            <refpurpose>increment a variable or set it to 1 if nonexistent.</refpurpose>
-	    </refnamediv>
-
-	    <refsynopsisdiv>
-            <cmdsynopsis>
-                <command>incr0</command>
-                <arg><replaceable>varname</replaceable></arg>
-                <arg><replaceable>num</replaceable></arg>
-            </cmdsynopsis>
-	    </refsynopsisdiv>
-	    <refsect1>
-            <title>Description</title>
-            <para>
-                Increment a variable
-                <option><replaceable>varname</replaceable></option> by
-                <option><replaceable>num</replaceable></option>.  If the
-                variable doesn't exist, create it instead of returning an
-                error.
-            </para>
-            <note> 
-                incr0 functionality is provided by the native <command>incr</command> in 
-                Tcl &gt;= 8.5, therefore this command is deprecated and kept as an
-                interpreter alias only for compatibility. As such <command>incr0</command> 
-                wasn't moved to the ::rivet namespace and
-                it will be removed in future versions of Rivet.
-            </note>
-	    </refsect1>
-	</refentry>
-
 	<refentry id="inspect">
 	    <refnamediv>
             <refname>inspect</refname>

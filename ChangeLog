@@ -1,3 +1,6 @@
+2020-01-19 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
+
 2019-12-12 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
     Rivet_MergeConfig
