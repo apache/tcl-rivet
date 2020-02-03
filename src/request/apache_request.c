@@ -570,9 +570,8 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
 #ifdef DEBUG
             ap_log_rerror(REQ_ERROR,"Silently dropping remaining '%ld' bytes", r->remaining);
 #endif
-	    do { } while ( ap_get_client_block(r, buff, sizeof(buff)) > 0 );
-            	
-	    return OK;
+	        do { } while ( ap_get_client_block(r, buff, sizeof(buff)) > 0 );	
+	        return OK;
         }
 
         if ((cd = apr_table_get(header, "Content-Disposition"))) {

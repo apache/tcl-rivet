@@ -50,7 +50,7 @@ typedef struct _multipart_buffer {
 } multipart_buffer;
 
 multipart_buffer*	multipart_buffer_new(char* boundary,apr_off_t length,request_rec* r);
-///*table*/apr_table_t	*multipart_buffer_headers(multipart_buffer *self);
+// /*table*/apr_table_t	*multipart_buffer_headers(multipart_buffer *self);
 size_t				multipart_buffer_read(multipart_buffer* self,char* buf,size_t bytes);
 char*				multipart_buffer_read_body(multipart_buffer *self); 
 apr_table_t*		multipart_buffer_headers(multipart_buffer *self);

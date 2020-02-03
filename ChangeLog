@@ -3,6 +3,18 @@
     * src/mod_rivet_ng/rivetCore.c: update comments to upload command
     * tests: changed upload file test
 
+2019-12-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: fixed bug in 'upload filename' that
+    caused segfaults instead of Tcl errors when called without arguments
+
+2019-12-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetCore.c: fixed bug in 'upload filename' that
+    caused segfaults instead of Tcl errors when called without arguments
+    * src/request/: Adding latest Copyright statements to files in this
+    directory
+    * tests/upload.rvt,upload.test: revised upload tests (need expansion
+    to test multiple uploads)
+
 2019-12-12 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
     Rivet_MergeConfig

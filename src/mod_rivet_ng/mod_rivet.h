@@ -227,7 +227,7 @@ typedef struct _thread_worker_private {
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
     //Tcl_Obj*          request_init;
-    Tcl_Obj*            request_cleanup;
+    //Tcl_Obj*          request_cleanup;
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */
     int                 thread_exit;        /* Thread exit code                     */

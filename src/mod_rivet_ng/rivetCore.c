@@ -1039,6 +1039,7 @@ TCL_CMD_HEADER( Rivet_Upload )
 {
     char*   varname = NULL;
     int     subcommandindex;
+    int     upload_prepared = 0;
 
     Tcl_Obj* result = NULL;
 
@@ -1123,13 +1124,18 @@ TCL_CMD_HEADER( Rivet_Upload )
 
     if (objc >= 3) {
         varname = Tcl_GetString(objv[2]);
+
+        /* TclWeb_PrepareUpload calls ApacheUpload_find and returns
+         * TCL_OK if the named upload exists in the current request */
+
         if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
         {
             Tcl_AddErrorInfo(interp, "Unable to find the upload named '");
             Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(varname,-1));
             Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj("'",-1));
             return TCL_ERROR;
-        }
+        } 
+        upload_prepared = 1;
     }
 
     result = Tcl_NewObj();
@@ -1164,14 +1170,10 @@ TCL_CMD_HEADER( Rivet_Upload )
                 return TCL_ERROR;
             }
             break;
-        case EXISTS:
-            if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
-            {
-                Tcl_SetIntObj(result, 0);
-            } else {
-                Tcl_SetIntObj(result, 1);
-            }
+        case EXISTS: {
+            Tcl_SetIntObj(result,upload_prepared);
             break;
+        }
         case SIZE:
             TclWeb_UploadSize(result, private->req);
             break;

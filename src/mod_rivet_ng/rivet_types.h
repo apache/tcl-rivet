@@ -1,5 +1,5 @@
 /* -- rivet_types.h: this file should collect all the basic types used
- * in mod_rivet and other related code
+ *    in mod_rivet and other related code
  */
 
 /*
@@ -74,7 +74,7 @@ typedef struct _ApacheRequest {
     int             (*upload_hook)(void *ptr, char *buf, int len, ApacheUpload *upload);
     void*           hook_data;
     const char*     temp_dir;
-    char*           raw_post; /* Raw post data. */
+    char*           raw_post;           /* Raw post data. */
     request_rec*    r;
     int             nargs;
 } ApacheRequest;
@@ -85,7 +85,7 @@ typedef struct TclWebRequest {
     ApacheRequest*  apachereq;
     ApacheUpload*   upload;
     int             headers_printed;	/* has the header been printed yet? */
-    int             headers_set;		/* has the header been set yet? */
+    int             headers_set;		/* has the header been set yet?     */
     int             content_sent;
     int             environment_set;	/* have we setup the environment variables? */
     char*           charset;
