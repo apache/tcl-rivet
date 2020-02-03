@@ -327,7 +327,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 		apr_pool_userdata_set((const void *)1, userdata_key,
                               apr_pool_cleanup_null, server->process->pool);
 
-        ap_log_error(APLOG_MARK,APLOG_INFO,0,server,
+        ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server,
                      "first post_config run: not initializing Tcl stuff");
 
         return OK; /* This would be the first time through */

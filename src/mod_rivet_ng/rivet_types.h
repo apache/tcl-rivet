@@ -21,10 +21,8 @@
     under the License.
  */
 
-/* $Id$ */
-
-#ifndef __RIVET_TYPES_H__
-#define __RIVET_TYPES_H__
+#ifndef __rivet_types_h__
+#define __rivet_types_h__
 
 #include <httpd.h>
 #include <tcl.h>
@@ -93,4 +91,5 @@ typedef struct TclWebRequest {
     char*           charset;
 } TclWebRequest;
 
-#endif
+#endif /* __rivet_types_h__ */
+
