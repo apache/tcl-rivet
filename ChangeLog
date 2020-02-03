@@ -1,5 +1,10 @@
+2019-12-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
+    Rivet_MergeConfig
+
 2019-12-06 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: expanded error info data in Rivet_Upload
+    * doc/rivet.css: new color scheme for docbook manual
 
 2019-12-04 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: new branch uploadcmdfix with improved
