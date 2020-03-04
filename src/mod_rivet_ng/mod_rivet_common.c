@@ -579,7 +579,7 @@ Rivet_SetupTclPanicProc (void)
  *
  *-----------------------------------------------------------------------------
  */
-void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
+void Rivet_Panic(const char* arg1, ...)
 {
     va_list                 argList;
     char*                   buf;
@@ -588,7 +588,8 @@ void Rivet_Panic TCL_VARARGS_DEF(CONST char *, arg1)
 
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
-    format = (char *) TCL_VARARGS_START(char *,arg1,argList);
+    // format = (char *) TCL_VARARGS_START(char *,arg1,argList);
+    format = (char *) (va_start(argList,arg1),arg1);
     buf    = (char *) apr_pvsprintf(private->rivet_panic_pool, format, argList);
 
     if (private->rivet_panic_request_rec != NULL) {

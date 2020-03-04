@@ -49,7 +49,7 @@ inputproc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
    Channel that we create to divert stdout to. */
 
 static int
-outputproc(ClientData instancedata, CONST84 char *buf, int toWrite, int *errorCodePtr)
+outputproc(ClientData instancedata, const char *buf, int toWrite, int *errorCodePtr)
 {
     apr_threadkey_t*        rivet_thread_key = (apr_threadkey_t*) instancedata;
     rivet_thread_private*   private;
@@ -74,7 +74,7 @@ closeproc(ClientData instancedata, Tcl_Interp *interp)
 
 static int
 setoptionproc(ClientData instancedata, Tcl_Interp *interp,
-	          CONST84 char *optionname, CONST84 char *value)
+	          const char *optionname, const char *value)
 {
     return TCL_OK;
 }

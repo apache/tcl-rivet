@@ -1,3 +1,11 @@
+2020-03-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/librivet/rivetList.c: declaring function with macro TCL_CMD_HEADER
+    * src/mod_rivet_ng/TclWebapache.c: removed svn related keyword
+    * src/mod_rivet_ng/mod_rivet_common.[c|h]: adopting standard C syntax for variable
+    * src/mod_rivet_ng/rivetChannel.c: obsolete CONST84 macro turned into standard 'const'
+    * src/parser/parserPkgInit.c: declaring function with macro TCL_CMD_HEADER
+    * src/rivet.h: Changed obsoleted CONST macro, remove svn related keyword
+
 2020-01-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
 

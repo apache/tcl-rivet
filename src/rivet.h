@@ -19,10 +19,8 @@
     under the License.
  */
 
-/* $Id$ */
-
-#ifndef _RIVET_H_
-#define _RIVET_H_
+#ifndef __rivet_h__
+#define __rivet_h__
 
 #include <tcl.h>
 #include "rivet_types.h"
@@ -58,7 +56,7 @@ static int cmd(\
     ClientData clientData,\
     Tcl_Interp *interp,\
     int objc,\
-    Tcl_Obj *CONST objv[])
+    Tcl_Obj* const objv[])
 
 #define TCL_OBJ_CMD( name, func ) \
 Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
@@ -107,6 +105,10 @@ EXTERN int Rivet_Init(Tcl_Interp *interp);
 EXTERN int Rivet_InitList(Tcl_Interp *interp);
 EXTERN int Rivet_InitCrypt(Tcl_Interp *interp);
 EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
+
+#ifndef INLINE
+#define INLINE
+#endif
 
 #endif
 

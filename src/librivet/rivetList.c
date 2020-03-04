@@ -45,12 +45,7 @@ static Tcl_ObjCmdProc Rivet_LassignArrayObjCmd;
  *       lremove ?-exact|-glob|-regexp? -all list pattern ..?pattern?..?pattern?
  *-----------------------------------------------------------------------------
  */
-static int
-Rivet_LremoveObjCmd( clientData, interp, objc, objv )
-    ClientData   clientData;
-    Tcl_Interp  *interp;
-    int          objc;
-    Tcl_Obj    *CONST objv[];
+TCL_CMD_HEADER(Rivet_LremoveObjCmd) 
 {
 #define EXACT   0
 #define GLOB    1
@@ -237,12 +232,7 @@ Rivet_ListObjAppendString (interp, targetList, string, length)
  *
  *-----------------------------------------------------------------------------
  */
-static int
-Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
-    ClientData   notUsed;
-    Tcl_Interp  *interp;
-    int          objc;
-    Tcl_Obj   *CONST objv[];
+TCL_CMD_HEADER(Rivet_CommaSplitObjCmd) 
 {
     char        *first, *next;
     char         c;
@@ -404,12 +394,7 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
  *
  *-----------------------------------------------------------------------------
  */
-static int
-Rivet_CommaJoinObjCmd (notUsed, interp, objc, objv)
-    ClientData   notUsed;
-    Tcl_Interp  *interp;
-    int          objc;
-    Tcl_Obj   *CONST objv[];
+TCL_CMD_HEADER(Rivet_CommaJoinObjCmd)
 {
     int         listObjc;
     Tcl_Obj   **listObjv;

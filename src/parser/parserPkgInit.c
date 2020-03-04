@@ -22,8 +22,6 @@
     under the License.
  */
 
-/* $Id$ */
-
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
 #include <rivet_config.h>
@@ -53,14 +51,9 @@
  *-----------------------------------------------------------------------------
  */
 
-static int
-Parse_Rivet(
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *CONST objv[])
+TCL_CMD_HEADER(Parse_Rivet)
 {
-    Tcl_Obj *outbuf;
+    Tcl_Obj* outbuf;
     int     tclcode;
 
     outbuf = Tcl_NewObj();
@@ -106,7 +99,7 @@ Parse_Rivet(
 
 static int
 Parse_RivetData(ClientData clientData, Tcl_Interp *interp,
-                int objc, Tcl_Obj *CONST objv[])
+                int objc, Tcl_Obj* const objv[])
 {
     Tcl_Obj *outbuf;
 
