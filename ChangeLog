@@ -1,3 +1,8 @@
+2020-04-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/formbroker.xml: fixed examples
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: resolved access to shared counter
+    that was causing segfaults when child process was terminated
+
 2020-01-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
 

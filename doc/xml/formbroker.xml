@@ -127,7 +127,8 @@
                         Example of form data validation (assuming ::rivet::load_response is loading the array <emphasis>response</emphasis>
                         with data taken from a form non displayed here)
                      </para>
-                     <programlisting>% set fbroker [::FormBroker create {var1 integer} {var2 unsigned} {var3 string} {var4 integer bounds {-10 100}}]
+                     <programlisting>% package require formbroker
+% set fbroker [::FormBroker create {var1 integer} {var2 unsigned} {var3 string} {var4 integer bounds {-10 100}}]
 ::FormBroker::form0
 
 % ::rivet::load_response
@@ -243,10 +244,11 @@ var1 NOT_INTEGER var2 FB_OUT_OF_BOUNDS var4 FB_OUT_OF_BOUNDS</programlisting>
                         the 'constrain' attribute forced the truncation of the string. 
                         In fact this applies also to the integer and unsigned values 
                      </para>
-<programlisting>% set fbroker [::FormBroker create {var1 integer bounds 10 constrain} \
-			            {var2 unsigned constrain} \
-			            {var3 string length 10 constrain} \
-			            {var4 integer bounds {-10 100} constrain}]
+<programlisting>% package require formbroker
+% set fbroker [::FormBroker create {var1 integer bounds 10 constrain} \
+                                   {var2 unsigned constrain} \
+                                   {var3 string length 10 constrain} \
+                                   {var4 integer bounds {-10 100} constrain}]
 ::FormBroker::form0
 % ::rivet::load_response
 % parray response
@@ -287,10 +289,11 @@ response_copy(var4) = 100</programlisting>
                         such is a way to create form default arrays to initialize forms created with
                         the <xref linkend="form_package">form</xref> package.
                      </para>
-<programlisting>set fbroker [::FormBroker create {var1 integer default 0} \
-            {var2 unsigned default 1} \
-            {var3 string} \
-            {var4 integer default 0}]
+<programlisting>
+set fbroker [::FormBroker create {var1 integer default 0} \
+                                 {var2 unsigned default 1} \
+                                 {var3 string} \
+                                 {var4 integer default 0}]
 % $fbroker response a
 % parray a
 a(var1) = 0
