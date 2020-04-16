@@ -1,3 +1,8 @@
+2020-04-16 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/mod_rivet.[c|h]: add ap_child_shutdown flag
+	* src/mod_rivet_ng/rivet_lazy_mpm.c: adding mutex protection on thread count
+    * src/mod_rivet_ng/rivet_worker_mpm.c: removed old code
+
 2020-01-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
 

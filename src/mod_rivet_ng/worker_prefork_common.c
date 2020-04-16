@@ -180,7 +180,7 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
      * the channel is released immediately by forcing the refCount to 0
      * (see Tcl source code: generic/TclIO.c). Unregistering for each interpreter
      * causes the process to segfault at least for certain Tcl versions.
-     * We unset the channel as stdout to avoid this
+     * In order to avoid the crash the channel is unset as stdout
      */
 
     Tcl_SetStdChannel(NULL,TCL_STDOUT);

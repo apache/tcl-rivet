@@ -64,7 +64,6 @@ typedef struct lazy_tcl_worker {
 /* virtual host thread queue descriptor */
 
 typedef struct vhost_iface {
-    int                 idle_threads_cnt;   /* idle threads for the virtual hosts       */
     int                 threads_count;      /* total number of running and idle threads */
     apr_thread_mutex_t* mutex;              /* mutex protecting 'array'                 */
     apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers   */
@@ -205,11 +204,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
      * do...while loop controlled by private->keep_going  */
 
     idx = w->conf->idx;
+
+    apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
+    (module_globals->mpm->vhosts[idx].threads_count)++;
+    apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
+
     apr_thread_mutex_lock(w->mutex);
     ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread startup completed");
     do 
     {
-        module_globals->mpm->vhosts[idx].idle_threads_cnt++;
         while ((w->status != init) && (w->status != thread_exit)) {
             apr_thread_cond_wait(w->condition,w->mutex);
         } 
@@ -219,7 +222,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         }
 
         w->status = processing;
-        module_globals->mpm->vhosts[idx].idle_threads_cnt--;
 
         /* Content generation */
 
@@ -243,12 +245,15 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
             *(lazy_tcl_worker **) apr_array_push(module_globals->mpm->vhosts[idx].array) = w;
             apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
+        } else {
+            apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
+            (module_globals->mpm->vhosts[idx].threads_count)--;
+            apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
         }
 
-    } while (private->ext->keep_going && !module_globals->mpm->server_shutdown);
+    } while (private->ext->keep_going);
     apr_thread_mutex_unlock(w->mutex);
     
-    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread orderly exit");
     Lazy_RunConfScript(private,w,child_exit);
 
     Rivet_ReleaseRunningScripts(private->ext->interp->scripts);
@@ -260,10 +265,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         Tcl_DeleteInterp(private->ext->interp->interp);
     }
 
-    apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
-    (module_globals->mpm->vhosts[idx].threads_count)--;
-    apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
-
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread orderly exit");
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
@@ -326,8 +328,7 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
      *
      */
 
-    rv = apr_thread_mutex_create(&module_globals->mpm->mutex,
-                                  APR_THREAD_MUTEX_UNNESTED,pool);
+    rv = apr_thread_mutex_create(&module_globals->mpm->mutex,APR_THREAD_MUTEX_UNNESTED,pool);
     ap_assert(rv == APR_SUCCESS);
 
     /* the mpm->vhosts array is created with as many entries as the number of
@@ -355,7 +356,6 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
         array = apr_array_make(pool,0,sizeof(void*));
         ap_assert(array != NULL);
         module_globals->mpm->vhosts[vh].array = array;
-        module_globals->mpm->vhosts[vh].idle_threads_cnt = 0;
         module_globals->mpm->vhosts[vh].threads_count = 0;
     }
     module_globals->mpm->server_shutdown = 0;
@@ -402,7 +402,6 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
     if (apr_is_empty_array(array))
     {
         w = create_worker(module_globals->pool,r->server);
-        (module_globals->mpm->vhosts[conf->idx].threads_count)++; 
     }
     else
     {
@@ -438,8 +437,8 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
  */
 
 rivet_thread_interp* LazyBridge_Interp (rivet_thread_private* private,
-                                      rivet_server_conf*    conf,
-                                      rivet_thread_interp*  interp)
+                                        rivet_server_conf*    conf,
+                                        rivet_thread_interp*  interp)
 {
     if (interp != NULL) { private->ext->interp = interp; }
 
@@ -448,25 +447,40 @@ rivet_thread_interp* LazyBridge_Interp (rivet_thread_private* private,
 
 apr_status_t LazyBridge_Finalize (void* data)
 {
-    int vh;
+    int idx;
+    server_rec* server = (server_rec*) data;
     rivet_server_conf* conf = RIVET_SERVER_CONF(((server_rec*) data)->module_config);
    
-    module_globals->mpm->server_shutdown = 1;
-    for (vh = 0; vh < module_globals->vhosts_count; vh++)
+    for (idx = 0; idx < module_globals->vhosts_count; idx++)
     {
         int try;
         int count;
         apr_array_header_t* array;
         apr_thread_mutex_t* mutex;
 
-        mutex = module_globals->mpm->vhosts[vh].mutex;
-        array = module_globals->mpm->vhosts[vh].array;
-        apr_thread_mutex_lock(mutex);
-        try = 0;
-        do {
+        mutex = module_globals->mpm->vhosts[idx].mutex;
+        array = module_globals->mpm->vhosts[idx].array;
 
-            count = module_globals->mpm->vhosts[vh].threads_count;
-            if (((conf->idx == vh) && (count == 1)) || (count == 0)) { break; } 
+        /* we need to lock the vhost data mutex */
+
+        apr_thread_mutex_lock(mutex);
+        count = module_globals->mpm->vhosts[idx].threads_count;
+        apr_thread_mutex_unlock(mutex);
+        try = 0;
+        while ((try++ < 3) && (count > 0)) {
+
+            ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,server,"waiting for %d thread to exit",count);
+            if ((conf->idx == idx) && (count == 1)) { break; } 
+
+            /* if ap_child_shutdown is set the child exit was triggered
+             * by the apache framework and this function is running
+             * within a framework controlled thread. We don't
+             * have to check count to see if the current thread is actually
+             * the last thread remaining in the worker thread pool
+             */
+
+            if (!module_globals->ap_child_shutdown && 
+                (conf->idx == idx) && (count == 1)) { break; } 
 
             while (!apr_is_empty_array(array)) 
             {
@@ -479,13 +493,16 @@ apr_status_t LazyBridge_Finalize (void* data)
                 apr_thread_cond_signal(w->condition);
                 apr_thread_mutex_unlock(w->mutex);
             }
-            apr_sleep(10000);
 
-        } while ((try++ < 3));
-        apr_thread_mutex_unlock(mutex);
+            apr_thread_mutex_lock(mutex);
+            count = module_globals->mpm->vhosts[idx].threads_count;
+            apr_thread_mutex_unlock(mutex);
+
+            apr_sleep(1000);
+
+        }
     }
 
-    apr_threadkey_private_delete(rivet_thread_key);
     return APR_SUCCESS;
 }
 
@@ -528,9 +545,10 @@ int LazyBridge_ExitHandler(rivet_thread_private* private)
          * to exit and is sequence the whole process to shutdown 
          * by calling exit() */
      
+        module_globals->mpm->server_shutdown = 1;
         LazyBridge_Finalize(private->r->server);
 
-    } 
+    }
 
     return TCL_OK;
 }

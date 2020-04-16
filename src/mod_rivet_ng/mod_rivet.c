@@ -475,7 +475,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
 apr_status_t Rivet_Finalize(void* data)
 {
-
+    module_globals->ap_child_shutdown = 1;
     RIVET_MPM_BRIDGE_CALL(child_finalize,data);
     apr_threadkey_private_delete (rivet_thread_key);
 

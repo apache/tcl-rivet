@@ -207,6 +207,7 @@ typedef struct _mod_rivet_globals {
     apr_pool_t*             pool;               
     char*                   rivet_mpm_bridge;       /* name of the MPM bridge                   */
     server_rec*             server;                 /* default host server_rec obj              */
+    int                     ap_child_shutdown;      /* shutdown inited by the child pool cleanup */
     int                     vhosts_count;           /* Number of configured virtual host including 
                                                      * the root server thus it's supposed to be >= 1 */
 	char*				    default_handler;		/* Default request handler code             */
