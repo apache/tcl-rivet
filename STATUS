@@ -1,35 +1,26 @@
 tcl-rivet STATUS:
-$Id$
 
 Committers:
 ==========
-David Welton
-Damon Courtney
-Andy Doerr
-Karl Lehenbauer
+Massimo Manghi
+George Petasis
+Brice Hamon
 
 Work in progress:
 ================
 
-*) Apache 2.0:
+*) Rivet 3.2:
 
-   * Waiting on apreq 2.0.
-
-   * Need a good thread strategy.
-
-*) Tcl code
-
-*) Documentation
-
-   Italian and Russian translations need updating.
+*) Rivet 'quattuor' branch (to become Rivet 4.0)
 
 *) Installation
 
+                          Min Required
 Platform                  Tcl Version  Ok?
 --------                  -----------  ---
-Debian testing/unstable   Tcl 8.4      Yes
-Redhat 7.3		  Tcl 8.4      Yes
-FreeBSD 4.8-STABLE	  Tcl 8.4      Yes
-FreeBSD 5.3               Tcl 8.4      Yes
-
-*) auto* tools work in progress.
+Debian                     Tcl 8.6     Yes
+Ubuntu                     Tcl 8.6     Yes
+CentOS		               Tcl 8.6     Yes
+Suse	                   Tcl 8.6     Yes
+FreeBSD                    Tcl 8.6     Yes
+Windows 10                 Tcl 8.6     Yes
