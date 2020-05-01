@@ -3,6 +3,14 @@
     * src/mod_rivet_ng/rivetCore.c: update comments to upload command
     * tests: changed upload file test
 
+2020-04-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/formbroker.xml: fixed examples
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: resolved access to shared counter
+    that was causing segfaults when child process was terminated
+
+2020-01-19 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
+
 2019-12-30 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetCore.c: fixed bug in 'upload filename' that
     caused segfaults instead of Tcl errors when called without arguments
