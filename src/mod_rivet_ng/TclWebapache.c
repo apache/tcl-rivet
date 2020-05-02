@@ -314,7 +314,7 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
 
     if (result->length == 0)
     {
-	return TCL_ERROR;
+	    return TCL_ERROR;
     }
 
     return TCL_OK;
@@ -334,19 +334,19 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *r
     while (i < j)
     {
 
-	if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
-		     strlen(varname) < strlen(parms[i].key) ?
-		     strlen(parms[i].key) : strlen(varname)))
-	{
-	    Tcl_ListObjAppendElement(req->interp, result,
-				     TclWeb_StringToUtfToObj(parms[i].val, req));
-	}
-	i++;
+        if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
+                 strlen(varname) < strlen(parms[i].key) ?
+                 strlen(parms[i].key) : strlen(varname)))
+        {
+            Tcl_ListObjAppendElement(req->interp, result,
+                         TclWeb_StringToUtfToObj(parms[i].val, req));
+        }
+        i++;
     }
 
     if (result == NULL)
     {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     return TCL_OK;
 }
@@ -660,45 +660,58 @@ int TclWeb_PrepareUpload(char *varname, TclWebRequest *req)
     }
 }
 
-int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req)
+int TclWeb_UploadChannel(char *varname, TclWebRequest *req)
 {
-    *chan = Tcl_OpenFileChannel(req->interp, req->upload->tempname, "r", 0);
+    Tcl_Channel chan;
+
+    chan = Tcl_OpenFileChannel(req->interp, req->upload->tempname, "r", 0);
     if (chan == NULL) {
 	    return TCL_ERROR;
     } else {
-        if (Tcl_SetChannelOption(req->interp,*chan,"-translation","binary") == TCL_ERROR) {
+        Tcl_Obj* result;
+
+        if (Tcl_SetChannelOption(req->interp,chan,"-translation","binary") == TCL_ERROR) {
             return TCL_ERROR;
         }
-        if (Tcl_SetChannelOption(req->interp,*chan,"-encoding","binary") == TCL_ERROR) {
+        if (Tcl_SetChannelOption(req->interp,chan,"-encoding","binary") == TCL_ERROR) {
             return TCL_ERROR;
         }
-        Tcl_RegisterChannel(req->interp, *chan);
+        Tcl_RegisterChannel(req->interp,chan);
+
+        result = Tcl_NewObj();        
+        Tcl_SetStringObj(result, Tcl_GetChannelName(chan), -1);
+        Tcl_SetObjResult(req->interp, result);
+        
         return TCL_OK;
     }
 }
 
-int TclWeb_UploadTempname(Tcl_Obj *tempname, TclWebRequest *req)
+int TclWeb_UploadTempname(TclWebRequest *req)
 {
-    Tcl_SetStringObj(tempname,
-		     TclWeb_StringToUtf(req->upload->tempname,
-					req), -1);
+    Tcl_Obj *tempname = Tcl_NewObj();
+
+    Tcl_SetStringObj(tempname,TclWeb_StringToUtf(req->upload->tempname,req), -1);
+    Tcl_SetObjResult(req->interp, tempname);
+
     return TCL_OK;
 }
 
 
 int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 {
-	apr_status_t	status;
+	apr_status_t status;
+
 	status = apr_file_copy(req->upload->tempname ,Tcl_GetString(filename),APR_FILE_SOURCE_PERMS,req->req->pool);
-	if ( status == 0 ) {
+	if (status == APR_SUCCESS) {
 	    return TCL_OK;
 	} else {
 		return TCL_ERROR;
 	}
 }
 
-int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
+int TclWeb_UploadData(char *varname, TclWebRequest *req)
 {
+    Tcl_Obj* result;
     rivet_server_conf *rsc = NULL;
 
     rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
@@ -706,68 +719,80 @@ int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req)
        get everything fixed and working first */
     if (rsc->upload_files_to_var)
     {
-	Tcl_Channel chan;
-	chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
-	if (chan == NULL) {
-	    return TCL_ERROR;
-	}
-	if (Tcl_SetChannelOption(req->interp, chan,
-				 "-translation", "binary") == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
-	if (Tcl_SetChannelOption(req->interp, chan,
-				 "-encoding", "binary") == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
+        Tcl_Channel chan;
+        
+        chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
+        if (chan == NULL) {
+            return TCL_ERROR;
+        }
+        if (Tcl_SetChannelOption(req->interp, chan,
+                     "-translation", "binary") == TCL_ERROR) {
+            return TCL_ERROR;
+        }
+        if (Tcl_SetChannelOption(req->interp, chan,
+                     "-encoding", "binary") == TCL_ERROR) {
+            return TCL_ERROR;
+        }
 
-	/* Put data in a variable  */
-	Tcl_ReadChars(chan, data, (int)ApacheUpload_size(req->upload), 0);
-	if (Tcl_Close(req->interp, chan) == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
+        /* Put data in a variable  */
+        result = Tcl_NewObj();
+        Tcl_ReadChars(chan, result, (int)ApacheUpload_size(req->upload), 0);
+        if (Tcl_Close(req->interp, chan) == TCL_ERROR) {
+            return TCL_ERROR;
+        }
+        
+        Tcl_SetObjResult(req->interp, result);
     } else {
-	Tcl_AppendResult(req->interp,
-			 "RivetServerConf UploadFilesToVar is not set", NULL);
-	return TCL_ERROR;
+        Tcl_AppendResult(req->interp,
+                 "RivetServerConf UploadFilesToVar is not set", NULL);
+        return TCL_ERROR;
     }
+    
     return TCL_OK;
 }
 
-int TclWeb_UploadSize(Tcl_Obj *sz, TclWebRequest *req)
+int TclWeb_UploadSize(TclWebRequest *req)
 {
-    Tcl_SetIntObj(sz, (int)ApacheUpload_size(req->upload));
+    Tcl_Obj* result = Tcl_NewObj();
+    Tcl_SetIntObj(result, (int)ApacheUpload_size(req->upload));
+    Tcl_SetObjResult(req->interp, result);
     return TCL_OK;
 }
 
-int TclWeb_UploadType(Tcl_Obj *type, TclWebRequest *req)
+int TclWeb_UploadType(TclWebRequest *req)
 {
+    Tcl_Obj *type = Tcl_NewObj();
+
     /* If there is a type, return it, if not, return blank. */
     Tcl_SetStringObj(type, ApacheUpload_type(req->upload)
 		     ? (char *)ApacheUpload_type(req->upload) : (char *)"", -1);
+
+    Tcl_SetObjResult(req->interp, type);
     return TCL_OK;
 }
 
-int TclWeb_UploadFilename(Tcl_Obj *filename, TclWebRequest *req)
+int TclWeb_UploadFilename(TclWebRequest *req)
 {
-    Tcl_SetStringObj(filename,
-		     TclWeb_StringToUtf(req->upload->filename,
-					req), -1);
+    Tcl_Obj *filename = Tcl_NewObj();
+    Tcl_SetStringObj(filename,TclWeb_StringToUtf(req->upload->filename,req), -1);
+
+    Tcl_SetObjResult(req->interp, filename);
     return TCL_OK;
 }
 
-int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req)
+int TclWeb_UploadNames(TclWebRequest *req)
 {
     ApacheUpload *upload;
+    Tcl_Obj      *names = Tcl_NewObj();
 
     upload = ApacheRequest_upload(req->apachereq);
     while (upload)
     {
-        Tcl_ListObjAppendElement(
-            req->interp, names,
-            TclWeb_StringToUtfToObj(upload->name,req));
+        Tcl_ListObjAppendElement(req->interp,names,TclWeb_StringToUtfToObj(upload->name,req));
         upload = upload->next;
     }
 
+    Tcl_SetObjResult(req->interp,names);
     return TCL_OK;
 }
 

@@ -1039,13 +1039,10 @@ TCL_CMD_HEADER( Rivet_Upload )
 {
     char*   varname = NULL;
     int     subcommandindex;
-    int     upload_prepared = 0;
-
-    Tcl_Obj* result = NULL;
 
     /* ::rivet::upload subcommands must register
-     * 
-     * - subcommand definition 
+     *
+     * - subcommand definition
      * - subcommand integer progressive index
      * - subcommand required (minimum) number of arguments
      *
@@ -1116,90 +1113,80 @@ TCL_CMD_HEADER( Rivet_Upload )
         Tcl_AppendObjToErrorInfo(interp, infoobj);
         Tcl_DecrRefCount(infoobj);
 
-        Tcl_WrongNumArgs(interp, objc, objv, "uploadname");
+        if (subcommandindex == SAVE) {
+            Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
+        } else {
+            Tcl_WrongNumArgs(interp, objc, objv, "uploadname");
+        }
         return TCL_ERROR;
-    } 
+    }
 
     /* We check whether an upload with a given name exists */
 
     if (objc >= 3) {
+        int tcl_status;
         varname = Tcl_GetString(objv[2]);
 
         /* TclWeb_PrepareUpload calls ApacheUpload_find and returns
          * TCL_OK if the named upload exists in the current request */
+        tcl_status = TclWeb_PrepareUpload(varname, private->req);
 
-        if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
+        if (subcommandindex == EXISTS) {
+            Tcl_Obj* result = NULL;
+            int upload_prepared = 0;
+
+            if (tcl_status == TCL_OK) upload_prepared = 1;
+
+            result = Tcl_NewObj();
+            Tcl_SetIntObj(result,upload_prepared);
+            Tcl_SetObjResult(interp, result);
+            return TCL_OK;
+                
+        }
+
+        if (tcl_status != TCL_OK)
         {
             Tcl_AddErrorInfo(interp, "Unable to find the upload named '");
             Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(varname,-1));
             Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj("'",-1));
             return TCL_ERROR;
-        } 
-        upload_prepared = 1;
+        }
     }
 
-    result = Tcl_NewObj();
+    /* CHANNEL  : get the upload channel name
+     * SAVE     : save data to a specified filename
+     * DATA     : get the uploaded data into a Tcl variable
+     * SIZE     : uploaded data size
+     * TYPE     : upload mimetype
+     * FILENAME : upload original filename
+     * TEMPNAME : temporary file where the upload is taking place
+     * NAMES    : list of uploads
+     *
+     * the procedure shouldn't reach for the default case
+     */
 
     switch ((enum subcommand)subcommandindex)
     {
-        case CHANNEL: {
-            Tcl_Channel chan;
-            char *channelname = NULL;
-
-            if (TclWeb_UploadChannel(varname, &chan, private->req) != TCL_OK) {
-                return TCL_ERROR;
-            }
-            channelname = (char *)Tcl_GetChannelName(chan);
-            Tcl_SetStringObj(result, channelname, -1);
-            break;
-        }
+        case CHANNEL:
+            return TclWeb_UploadChannel(varname, private->req);
         case SAVE:
-            /* save data to a specified filename  */
-            if (objc != 4) {
-                Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
-                return TCL_ERROR;
-            }
-
-            if (TclWeb_UploadSave(varname, objv[3], private->req) != TCL_OK)
-            {
-                return TCL_ERROR;
-            }
-            break;
+            return TclWeb_UploadSave(varname, objv[3], private->req);
         case DATA:
-            if (TclWeb_UploadData(varname, result, private->req) != TCL_OK) {
-                return TCL_ERROR;
-            }
-            break;
-        case EXISTS: {
-            Tcl_SetIntObj(result,upload_prepared);
-            break;
-        }
+            return TclWeb_UploadData(varname, private->req);
         case SIZE:
-            TclWeb_UploadSize(result, private->req);
-            break;
+            return TclWeb_UploadSize(private->req);
         case TYPE:
-            TclWeb_UploadType(result, private->req);
-            break;
+            return TclWeb_UploadType(private->req);
         case FILENAME:
-            TclWeb_UploadFilename(result, private->req);
-            break;
+            return TclWeb_UploadFilename(private->req);
         case TEMPNAME:
-            TclWeb_UploadTempname(result,private->req);
-            break;
+            return TclWeb_UploadTempname(private->req);
         case NAMES:
-            if (objc != 2)
-            {
-                Tcl_WrongNumArgs(interp, 1, objv, "names");
-                return TCL_ERROR;
-            }
-            TclWeb_UploadNames(result, private->req);
-            break;
+            return TclWeb_UploadNames(private->req);
         default:
-            Tcl_WrongNumArgs(interp, 1, objv,
-                             "channel|save ?name?|data|exists|size|type|filename|names|tempname");
+            Tcl_WrongNumArgs(interp, 1, objv,"Rivet internal error: inconsistent argument");
     }
-    Tcl_SetObjResult(interp, result);
-    return TCL_OK;
+    return TCL_ERROR;
 }
 
 /*
