@@ -39,3 +39,4 @@ tests/rivet/
 tests/server.conf
 tests/test.conf
 tests/uploadedjpeg.jpg
+Session.vim

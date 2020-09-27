@@ -1,3 +1,8 @@
+2020-09-27 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/formbroker/formbroker.tcl: add method form_exists to check for registration
+	of a form
+	* test/apachetest/apachetest.tcl,test/runtests.tcl: add support for testing with various MPMs and bridges 
+
 2020-02-03 Massimo Manghi <mxmanghi@apache.org>
     * src/request/: Update obsolete copyright statements
     * src/mod_rivet_ng/rivetCore.c: update comments to upload command
