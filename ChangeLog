@@ -1,7 +1,22 @@
+2020-09-27 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/formbroker/formbroker.tcl: add method form_exists to check for registration
+	of a form
+	* test/apachetest/apachetest.tcl,test/runtests.tcl: add support for testing with various MPMs and bridges 
+
+2020-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * src/request/: Update obsolete copyright statements
+    * src/mod_rivet_ng/rivetCore.c: update comments to upload command
+    * tests: changed upload file test
+
 2020-04-16 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/mod_rivet.[c|h]: add ap_child_shutdown flag
 	* src/mod_rivet_ng/rivet_lazy_mpm.c: adding mutex protection on thread count
     * src/mod_rivet_ng/rivet_worker_mpm.c: removed old code
+
+2020-04-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/formbroker.xml: fixed examples
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: resolved access to shared counter
+    that was causing segfaults when child process was terminated
 
 2020-01-19 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
