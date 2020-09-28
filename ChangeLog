@@ -1,3 +1,8 @@
+2020-09-28 Massimo Manghi <mxmangi@apache.org>
+    * src/mod_rivet_ng/TclWebapache.c: 
+    * src/mod_rivet_ng/TclWeb.c: 
+    * src/mod_rivet_ng/rivetCore.c: integrating development from uploadcmdfix
+
 2020-09-27 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/formbroker/formbroker.tcl: add method form_exists to check for registration
 	of a form
