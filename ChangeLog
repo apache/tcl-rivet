@@ -3,6 +3,14 @@
 	* src/mod_rivet_ng/rivet_[prefork|worker|lazy]_mpm.c:
 	* src/mod_rivet_ng/worker_prefork_common.c:
 	* src/mod_rivet_ng/mod_rivet_commit.c:
+	* src/mod_rivet_ng/apache_config.[c|h]: moving also rivet_server_init
+	out of the server configuration and into the module_globals
+ 
+2020-09-28 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.[c|h]:
+	* src/mod_rivet_ng/rivet_[prefork|worker|lazy]_mpm.c:
+	* src/mod_rivet_ng/worker_prefork_common.c:
+	* src/mod_rivet_ng/mod_rivet_commit.c:
 	* src/mod_rivet_ng/apache_config.[c|h]: moving real global setting out
 	of the server configuration record into the module_globals structure,
 	because their global in the first place

@@ -129,6 +129,13 @@ int PreforkBridge_Request (request_rec* r,rivet_req_ctype ctype)
     return Rivet_SendContent(private);
 }
 
+/*
+ * -- MPM_MasterInterp
+ *
+ *
+ *
+ */
+
 rivet_thread_interp* MPM_MasterInterp(server_rec* server)
 {
     rivet_thread_private*   private;

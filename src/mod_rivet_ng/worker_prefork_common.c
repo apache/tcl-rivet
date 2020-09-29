@@ -19,11 +19,12 @@
     under the License.
 */
 
-/* $Id$ */
-
 #include <httpd.h>
 #include <apr_strings.h>
+#include <ap_mpm.h>
+#include <mpm_common.h>
 #include "mod_rivet.h"
+
 /* Function prototypes are defined with EXTERN. Since we are in the same DLL,
  * no need to keep this extern... */
 #ifdef EXTERN
@@ -104,6 +105,25 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     /* we must assume the module was able to create the root interprter */ 
 
     ap_assert (root_interp != NULL);
+    
+    /* The inherited interpreter has an empty cache since evalutating a server_init_script
+     * does not require parsing templates that need to be stored in it. We need to
+     * create it
+     */
+
+    if (root_server_conf->default_cache_size > 0) {
+        root_interp->cache_size = root_server_conf->default_cache_size;
+    } else if (root_server_conf->default_cache_size < 0) {
+
+        if (ap_max_requests_per_child != 0) {
+            root_interp->cache_size = ap_max_requests_per_child / 5;
+        } else {
+            root_interp->cache_size = 50;    // Arbitrary number
+        }
+
+    }
+
+    RivetCache_Create(root_interp->pool,root_interp); 
 
     /* Using the root interpreter we evaluate the global initialization script, if any */
 
@@ -153,7 +173,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             if (module_globals->separate_virtual_interps)
             {
-                rivet_interp = Rivet_NewVHostInterp(private->pool,s);
+                rivet_interp = Rivet_NewVHostInterp(private->pool,myrsc->default_cache_size);
                 if (module_globals->separate_channels)
                 {
                     rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);

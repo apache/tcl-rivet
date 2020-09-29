@@ -164,7 +164,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     //private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
-    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,w->server));
+    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,rsc->default_cache_size));
     private->ext->interp->channel = private->channel;
 
     /* The worker thread can respond to a single request at a time therefore 
@@ -251,7 +251,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
-
 
 /*
  * -- create_worker

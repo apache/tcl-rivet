@@ -128,7 +128,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
 
     switch (parameter_i)
     {
-        case server_init_script:        string_value = rsc->rivet_server_init_script; break;
+        case server_init_script:        string_value = (char *)module_globals->rivet_server_init_script; break;
         case global_init_script:        string_value = rsc->rivet_global_init_script; break;
         case child_init_script:         string_value = rsc->rivet_child_init_script; break;
         case child_exit_script:         string_value = rsc->rivet_child_exit_script; break;

@@ -214,15 +214,15 @@ static int
 Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
 #ifdef WIN32
-	char*			   parent_pid_var = NULL;
+	char*	parent_pid_var = NULL;
 #endif
-    rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
+    //rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
 
     FILEDEBUGINFO;
 
     /* we create and initialize a master (server) interpreter */
 
-    module_globals->server_interp = Rivet_NewVHostInterp(pPool,s); /* root interpreter */
+    module_globals->server_interp = Rivet_NewVHostInterp(pPool,0); /* root interpreter */
 
     /* We initialize the interpreter and we won't register a channel with it because
      * we couldn't send data to the stdout anyway 
@@ -263,9 +263,9 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
      * will by now have their own cache
      */
 
-    if (rsc->rivet_server_init_script != NULL) {
+    if (module_globals->rivet_server_init_script != NULL) {
         Tcl_Interp* interp = module_globals->server_interp->interp;
-        Tcl_Obj*    server_init = Tcl_NewStringObj(rsc->rivet_server_init_script,-1);
+        Tcl_Obj*    server_init = Tcl_NewStringObj(module_globals->rivet_server_init_script,-1);
 
         Tcl_IncrRefCount(server_init);
 
@@ -273,12 +273,12 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
         {
             ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
                          MODNAME ": Error running ServerInitScript '%s': %s",
-                         rsc->rivet_server_init_script,
+                         module_globals->rivet_server_init_script,
                          Tcl_GetVar(interp, "errorInfo", 0));
         } else {
             ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s,
                          MODNAME ": ServerInitScript '%s' successful", 
-                         rsc->rivet_server_init_script);
+                         module_globals->rivet_server_init_script);
         }
 
         Tcl_DecrRefCount(server_init);

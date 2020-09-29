@@ -49,6 +49,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+extern DLLIMPORT module             rivet_module;
 
 // apr_threadkey_t* handler_thread_key;
 
@@ -749,10 +750,11 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 {
     rivet_thread_private*   private;
     rivet_thread_interp*    interp_obj; 
+    rivet_server_conf*      rsc = RIVET_SERVER_CONF(s->module_config);
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
-    interp_obj = Rivet_NewVHostInterp(private->pool,s);
+    interp_obj = Rivet_NewVHostInterp(private->pool,rsc->default_cache_size);
     interp_obj->channel = private->channel;
     Rivet_PerInterpInit(interp_obj, private, s, private->pool);
     return interp_obj;

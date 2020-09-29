@@ -1,19 +1,21 @@
 /* apache_config.c -- configuration functions for apache 2.x */
 
-/* Copyright 2000-2005 The Apache Software Foundation
+/*
+    Copyright 2002-2020 The Apache Tcl Team
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+        http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+ */
 
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
@@ -130,7 +132,7 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
     } else if ( STREQU( script, "AfterEveryScript" ) ) {
         c = &rsc->after_every_script;
     } else if ( STREQU( script, "ServerInitScript" ) ) {
-        c = &rsc->rivet_server_init_script;
+        c = (char **) &module_globals->rivet_server_init_script;
     } else {
         return NULL;
     }
@@ -209,7 +211,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 {
     FILEDEBUGINFO;
 
-    newrsc->rivet_server_init_script = oldrsc->rivet_server_init_script;
+    //newrsc->rivet_server_init_script = oldrsc->rivet_server_init_script;
     newrsc->rivet_global_init_script = oldrsc->rivet_global_init_script;
     newrsc->request_handler = oldrsc->request_handler;
     newrsc->rivet_before_script = oldrsc->rivet_before_script;
@@ -443,7 +445,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
 
 /* scripts obj pointers *must* be initialized to NULL */
 
-    rsc->rivet_server_init_script   = NULL;
+    //rsc->rivet_server_init_script   = NULL;
     rsc->rivet_global_init_script   = NULL;
     rsc->rivet_child_init_script    = NULL;
     rsc->rivet_child_exit_script    = NULL;
@@ -467,8 +469,8 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     rsc->export_rivet_ns            = RIVET_NAMESPACE_EXPORT;
     rsc->import_rivet_ns            = RIVET_NAMESPACE_IMPORT;
     rsc->honor_header_only_reqs     = RIVET_HEAD_REQUESTS;
-    //rsc->single_thread_exit         = 0;
-    //rsc->separate_channels          = RIVET_SEPARATE_CHANNELS;
+    //rsc->single_thread_exit       = 0;
+    //rsc->separate_channels        = RIVET_SEPARATE_CHANNELS;
     rsc->upload_dir                 = RIVET_UPLOAD_DIR;
     rsc->server_name                = NULL;
     //rsc->mpm_bridge                 = NULL;

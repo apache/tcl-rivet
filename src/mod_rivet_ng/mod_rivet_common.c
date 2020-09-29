@@ -115,7 +115,7 @@ Rivet_ReadFile (apr_pool_t* pool,char* filename,
  */
 
 static Tcl_Interp* 
-Rivet_CreateTclInterp (server_rec* s)
+Rivet_CreateTclInterp (apr_pool_t* pool)
 {
     Tcl_Interp* interp;
 
@@ -125,14 +125,14 @@ Rivet_CreateTclInterp (server_rec* s)
 
     if (interp == NULL)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+        ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool,
                      MODNAME ": Error in Tcl_CreateInterp, aborting\n");
         exit(1);
     }
 
     if (Tcl_Init(interp) == TCL_ERROR)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+        ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool,
                      MODNAME ": Error in Tcl_Init: %s, aborting\n",
                      Tcl_GetStringResult(interp));
         exit(1);
@@ -335,44 +335,39 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
   *
   */
 
-rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
+rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,int default_cache_size)
 {
     rivet_thread_interp*    interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
-    rivet_server_conf*      rsc;
-
-    /* The cache size is global so we take it from here */
-    
-    rsc = RIVET_SERVER_CONF (server->module_config);
 
     /* This calls needs the root server_rec just for logging purposes */
 
-    interp_obj->interp = Rivet_CreateTclInterp(server); 
+    interp_obj->interp = Rivet_CreateTclInterp(pool); 
+
+    /* we now create memory from the cache pool as subpool of the thread private pool */
+ 
+    if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
+    {
+        ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool, 
+                     MODNAME ": could not initialize cache private pool");
+        return NULL;
+    }
 
     /* We now read from the pointers to the cache_size and cache_free conf parameters
      * for compatibility with mod_rivet current version, but these values must become
      * integers not pointers
      */
     
-    if (rsc->default_cache_size < 0) {
+    if (default_cache_size < 0) {
         if (ap_max_requests_per_child != 0) {
             interp_obj->cache_size = ap_max_requests_per_child / 5;
         } else {
             interp_obj->cache_size = 50;    // Arbitrary number
         }
-    } else if (rsc->default_cache_size > 0) {
-        interp_obj->cache_size = rsc->default_cache_size;
+    } else if (default_cache_size > 0) {
+        interp_obj->cache_size = default_cache_size;
     }
 
     interp_obj->cache_free = interp_obj->cache_size;
-
-    /* we now create memory from the cache pool as subpool of the thread private pool */
- 
-    if (apr_pool_create(&interp_obj->pool, pool) != APR_SUCCESS)
-    {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                     MODNAME ": could not initialize cache private pool");
-        return NULL;
-    }
 
     // Initialize cache structures
 

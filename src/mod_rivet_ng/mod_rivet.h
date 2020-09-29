@@ -100,7 +100,6 @@
 
 typedef struct _rivet_server_conf {
 
-    char*       rivet_server_init_script;   /* run before children are forked  */
     char*       rivet_global_init_script;   /* run once when apache is started */
     char*       rivet_child_init_script;
     char*       rivet_child_exit_script;
@@ -197,12 +196,13 @@ typedef struct _mod_rivet_globals {
     server_rec*         server;                 /* default host server_rec obj              */
     int                 vhosts_count;           /* Number of configured virtual host including   *
                                                  * the root server thus it's supposed to be >= 1 */
-	char*				default_handler;		/* Default request handler code             */
-	int					default_handler_size;	/* Size of the default_handler buffer       */
+    char*				default_handler;		/* Default request handler code             */
+    int					default_handler_size;	/* Size of the default_handler buffer       */
     rivet_thread_interp* 
                         server_interp;          /* server and prefork MPM interpreter       */
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
     rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
+    const char*         rivet_server_init_script; /* run before children are forked         */
     const char*         mpm_bridge;             /* MPM bridge. if not null the module will  */
                                                 /* try to load the file name in this field. */
                                                 /* The string should be either a full       */
@@ -230,8 +230,6 @@ typedef struct _thread_worker_private {
     rivet_req_ctype     ctype;              /*                                      */
     request_rec*        r;                  /* current request_rec                  */
     TclWebRequest*      req;
-    //Tcl_Obj*          request_init;
-    //Tcl_Obj*          request_cleanup;
     rivet_server_conf*  running_conf;       /* running configuration                */
     running_scripts*    running;            /* (per request) running conf scripts   */
     int                 thread_exit;        /* Thread exit code                     */
