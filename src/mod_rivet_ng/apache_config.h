@@ -19,9 +19,6 @@
     under the License.
  */
 
-/* $Id$ */
-
-
 #ifndef __apache_config_h__
 #define __apache_config_h__
 
