@@ -214,7 +214,6 @@ void Rivet_ReleasePerDirScripts(rivet_thread_interp* rivet_interp)
     }
 
     apr_hash_clear(ht);
-
 }
 
 
@@ -364,9 +363,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* server)
         interp_obj->cache_size = rsc->default_cache_size;
     }
 
-    if (interp_obj->cache_size > 0) {
-        interp_obj->cache_free = interp_obj->cache_size;
-    }
+    interp_obj->cache_free = interp_obj->cache_size;
 
     /* we now create memory from the cache pool as subpool of the thread private pool */
  

@@ -36,7 +36,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
-extern DLLIMPORT module rivet_module;
+extern DLLIMPORT module             rivet_module;
 
 extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
 
@@ -151,10 +151,10 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         }
         else 
         {
-            if (root_server_conf->separate_virtual_interps)
+            if (module_globals->separate_virtual_interps)
             {
                 rivet_interp = Rivet_NewVHostInterp(private->pool,s);
-                if (myrsc->separate_channels)
+                if (module_globals->separate_channels)
                 {
                     rivet_interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
                     Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
@@ -202,7 +202,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         function = myrsc->rivet_child_init_script;
         if (function && 
-            (s == root_server || root_server_conf->separate_virtual_interps || function != parentfunction))
+            (s == root_server || module_globals->separate_virtual_interps || function != parentfunction))
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
             Tcl_Interp* interp = rivet_interp->interp;
@@ -271,7 +271,6 @@ void Rivet_ProcessorCleanup (void *data)
 {
     int                     i;
     rivet_thread_private*   private = (rivet_thread_private *) data;
-    rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
                  "Thread exiting after %d requests served (%d vhosts)", 
@@ -298,7 +297,7 @@ void Rivet_ProcessorCleanup (void *data)
 
         RivetCache_Cleanup(private,private->ext->interps[i]);
 
-        if ((i > 0) && rsc->separate_channels) 
+        if ((i > 0) && module_globals->separate_channels) 
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->channel);
 
         Tcl_DeleteInterp(private->ext->interps[i]->interp);
@@ -317,6 +316,6 @@ void Rivet_ProcessorCleanup (void *data)
          * in private->ext->interps[0]
          */
 
-    } while ((++i < module_globals->vhosts_count) && rsc->separate_virtual_interps);
+    } while ((++i < module_globals->vhosts_count) && module_globals->separate_virtual_interps);
 
 }

@@ -191,9 +191,30 @@ rivet_thread_interp* PreforkBridge_Interp (rivet_thread_private* private,
     return private->ext->interps[conf->idx];   
 }
 
+/*
+ *  -- PreforkBridge_ServerInit
+ *
+ * Bridge server wide inizialization:
+ *
+ *  We set the default value of the flag single_thread_exit 
+ *  stored in the module globals
+ *
+ */
+
+int PreforkBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTemp,server_rec* s)
+{
+    if (module_globals->single_thread_exit == SINGLE_THREAD_EXIT_UNDEF)
+    {
+        module_globals->single_thread_exit = 0;
+    }
+    return OK;
+}
+
+/* Table of bridge control functions */
+
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    NULL,
+    PreforkBridge_ServerInit,
     PreforkBridge_ChildInit,
     PreforkBridge_Request,
     PreforkBridge_Finalize,

@@ -505,11 +505,11 @@ int LazyBridge_ExitHandler(rivet_thread_private* private)
 
     private->ext->keep_going = 0;
 
-    if (!private->running_conf->single_thread_exit)
+    if (!module_globals->single_thread_exit)
     {
-        /* We now tell the supervisor to terminate the Tcl worker thread pool
-         * to exit and is sequence the whole process to shutdown 
-         * by calling exit() */
+        /* We now tell the supervisor to terminate the Tcl worker 
+         * thread pool to exit and is sequence the whole process
+         * to shutdown by calling exit() */
      
         LazyBridge_Finalize(private->r->server);
 
@@ -518,9 +518,30 @@ int LazyBridge_ExitHandler(rivet_thread_private* private)
     return TCL_OK;
 }
 
+/*
+ *  -- LazyBridge_ServerInit
+ *
+ * Bridge server wide inizialization:
+ *
+ *  We set the default value of the flag single_thread_exit 
+ *  stored in the module globals
+ *
+ */
+
+int LazyBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTemp,server_rec* s)
+{
+    if (module_globals->single_thread_exit == SINGLE_THREAD_EXIT_UNDEF)
+    {
+        module_globals->single_thread_exit = 1;
+    }
+    return OK;
+}
+
+/* Table of bridge control functions */
+
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    NULL,
+    LazyBridge_ServerInit,
     LazyBridge_ChildInit,
     LazyBridge_Request,
     LazyBridge_Finalize,

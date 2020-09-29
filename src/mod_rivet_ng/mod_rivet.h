@@ -120,31 +120,23 @@ typedef struct _rivet_server_conf {
 
     unsigned int user_scripts_status;
 
-    int             default_cache_size;
-    int             upload_max;
-    int             upload_files_to_var;
-    int             separate_virtual_interps;
-    int             honor_header_only_reqs;
-    int             single_thread_exit;     /* Allow bridges to exit a single thread instead of
-                                             * forcing a whole process */
+    int          default_cache_size;
+    int          upload_max;
+    int          upload_files_to_var;
+    int          honor_header_only_reqs;
 
-    int             separate_channels;      /* when true a vhosts get their private channel */
-    int             export_rivet_ns;        /* export the ::rivet namespace commands        */
-    int             import_rivet_ns;        /* import into the global namespace the
-                                               exported ::rivet commands                    */
-    char*           server_name;
-    const char*     upload_dir;
-    apr_table_t*    rivet_server_vars;
-    apr_table_t*    rivet_dir_vars;
-    apr_table_t*    rivet_user_vars;
-    int             idx;                /* server record index (to be used for the interps db)          */
-    char*           path;               /* copy of the path field of a cmd_parms structure:             *
-                                         * should enable us to tell if a conf record comes from a       *
-                                         * Directory section                                            */
-    const char*     mpm_bridge;         /* MPM bridge. if not null the module will try to load the      * 
-                                         * file name in this field. The string should be either a full  *
-                                         * path to a file name, or a string from which a file name will *
-                                         * be composed using the pattern 'rivet_(mpm_bridge)_mpm.so     */
+    int          export_rivet_ns;        /* export the ::rivet namespace commands        */
+    int          import_rivet_ns;        /* import into the global namespace the
+                                            exported ::rivet commands                    */
+    char*        server_name;
+    const char*  upload_dir;
+    apr_table_t* rivet_server_vars;
+    apr_table_t* rivet_dir_vars;
+    apr_table_t* rivet_user_vars;
+    int          idx;                   /* server record index (to be used for the interps db)    */
+    char*        path;                  /* copy of the path field of a cmd_parms structure:       *
+                                         * should enable us to tell if a conf record comes from a *
+                                         * Directory section                                      */
 } rivet_server_conf;
 
 #define TCL_INTERPS 1
@@ -211,7 +203,19 @@ typedef struct _mod_rivet_globals {
                         server_interp;          /* server and prefork MPM interpreter       */
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
     rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
+    const char*         mpm_bridge;             /* MPM bridge. if not null the module will  */
+                                                /* try to load the file name in this field. */
+                                                /* The string should be either a full       */
+                                                /* path to a file name, or a string from    */
+                                                /* which a file name will be composed using */
+                                                /* the pattern 'rivet_(mpm_bridge)_mpm.so   */
     mpm_bridge_status*  mpm;                    /* bridge private control structure         */
+    int                 single_thread_exit;     /* With a threaded bridge allow a single    */
+                                                /* thread to exit instead of forcing the    */
+                                                /* whole process to terminate               */
+    int                 separate_virtual_interps; 
+                                                /* Virtual host have their own interpreter  */
+    int                 separate_channels;      /* when true a vhosts get their private channel */
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
 #endif
@@ -290,6 +294,12 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 #define ABORTPAGE_CODE              "ABORTPAGE"
 #define THREAD_EXIT_CODE            "THREAD_EXIT"
+
+/* Configuration defaults */
+
+#define SINGLE_THREAD_EXIT_UNDEF   -1    /* pre config undefined value for single 
+                                            thread exit flag in the module globals
+                                            structure */
 
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
 #define MODNAME                     "mod_rivet"
