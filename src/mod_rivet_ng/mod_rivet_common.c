@@ -24,9 +24,9 @@
 #include <httpd.h>
 #include <apr_strings.h>
 #include <apr_env.h>
-#include <ap_mpm.h>
 #include <apr_file_io.h>
 #include <apr_file_info.h>
+#include <ap_mpm.h>
 
 #include "mod_rivet.h"
 #include "rivetChannel.h"
@@ -34,7 +34,6 @@
 #include "rivetParser.h"
 #include "rivet.h"
 #include "apache_config.h"
-#include <mpm_common.h>
 
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
 #ifdef RIVET_HAVE_UNISTD_H
@@ -358,11 +357,7 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,int default_cache_siz
      */
     
     if (default_cache_size < 0) {
-        if (ap_max_requests_per_child != 0) {
-            interp_obj->cache_size = ap_max_requests_per_child / 5;
-        } else {
-            interp_obj->cache_size = 50;    // Arbitrary number
-        }
+        interp_obj->cache_size = RivetCache_DefaultSize();
     } else if (default_cache_size > 0) {
         interp_obj->cache_size = default_cache_size;
     }

@@ -202,7 +202,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
 TCL_CMD_HEADER( Rivet_Parse )
 {
     rivet_thread_private*   private;
-    char*                   filename;
+    char*                   filename = 0;
     apr_status_t            stat_s;
     apr_finfo_t             finfo_b;
     char*                   cache_key;
@@ -210,7 +210,6 @@ TCL_CMD_HEADER( Rivet_Parse )
     Tcl_HashEntry*          entry  = NULL;
     Tcl_Obj*                script = NULL;
     int                     result;
-    int                     isNew;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::parse")
@@ -290,9 +289,9 @@ TCL_CMD_HEADER( Rivet_Parse )
                             IS_USER_CONF(private->running_conf),0);
 
     rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
-    entry = RivetCache_EntryLookup (rivet_interp,cache_key,&isNew);
+    entry = RivetCache_EntryLookup (rivet_interp,cache_key);
 
-    if (isNew)
+    if (entry == NULL)
     {
         script = Tcl_NewObj();
         Tcl_IncrRefCount(script);
@@ -301,16 +300,37 @@ TCL_CMD_HEADER( Rivet_Parse )
         if (result != TCL_OK)
         {
             Tcl_AddErrorInfo(interp,apr_pstrcat(private->pool,"Could not read file ",filename,NULL));
+            Tcl_DecrRefCount(script);
             return result;
         }
-        
-        RivetCache_StoreScript(rivet_interp,entry,script);
+
+        if (rivet_interp->cache_free > 0)
+        {
+            int isNew;
+            Tcl_HashEntry* entry;
+
+            entry = RivetCache_CreateEntry (rivet_interp,cache_key,&isNew);
+            ap_assert(isNew == 1);
+            RivetCache_StoreScript(rivet_interp,entry,script);
+        }
+        else if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
+        {
+            rivet_interp->flags |= RIVET_CACHE_FULL;
+            ap_log_error (APLOG_MARK, APLOG_NOTICE, APR_EGENERAL, private->r->server,"%s %s (%s),",
+                                                                  "Rivet cache full when parsing ",
+                                                                  private->r->filename,
+                                                                  private->r->server->server_hostname);
+        }
+
+        result = Tcl_EvalObjEx(interp,script,0);
         Tcl_DecrRefCount(script);
+        return result;
+               
     } else {
         script = RivetCache_FetchScript(entry);
+        return Tcl_EvalObjEx(interp,script,0); 
     }
 
-    return Tcl_EvalObjEx(interp,script,0); 
 }
 
 /*
@@ -1859,7 +1879,6 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     unsigned int         user_conf; 
     time_t               ctime;
     time_t               mtime;
-    int                  isNew;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::url_script")
@@ -1871,8 +1890,8 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     mtime = private->r->finfo.mtime;
     cache_key = RivetCache_MakeKey(private->pool,private->r->filename,ctime,mtime,user_conf,1);
 
-    entry = RivetCache_EntryLookup (rivet_interp,cache_key,&isNew);
-    if (isNew)
+    entry = RivetCache_EntryLookup (rivet_interp,cache_key);
+    if (entry == NULL)
     {
         Tcl_Interp*     interp;
         
@@ -1880,7 +1899,6 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
         script = Tcl_NewObj();
         Tcl_IncrRefCount(script);
-
         /*
          * We check whether we are dealing with a pure Tcl script or a Rivet template.
          * Actually this check is done only if we are processing a toplevel file, every nested
@@ -1898,23 +1916,41 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
         }
 
-        if (result != TCL_OK)
+        if (result == TCL_OK)
         {
-            // Hash cleanup
-            RivetCache_DeleteEntry(entry);
+            /* let's check the cache for free entries */
 
-            Tcl_DecrRefCount(script);
-            return result;
+            if (rivet_interp->cache_free > 0)
+            {
+                int isNew;
+                Tcl_HashEntry* entry;
+
+                entry = RivetCache_CreateEntry (rivet_interp,cache_key,&isNew);
+    
+                /* Sanity check: we are here for this reason */
+
+                ap_assert(isNew == 1);
+            
+                /* we proceed storing the script in the cache */
+
+                RivetCache_StoreScript(rivet_interp,entry,script);
+            }
+            else if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
+            {
+                rivet_interp->flags |= RIVET_CACHE_FULL;
+                ap_log_error (APLOG_MARK, APLOG_NOTICE, APR_EGENERAL,private->r->server,"%s %s (%s),",
+                                                                      "Rivet cache full when serving ",
+                                                                      private->r->filename,
+                                                                      private->r->server->server_hostname);
+            }
         }
+        Tcl_SetObjResult(rivet_interp->interp, script);
+        Tcl_DecrRefCount(script);
 
-        RivetCache_StoreScript(rivet_interp,entry,script);
-    }
-    else
-    {
-        script = RivetCache_FetchScript(entry);
+    } else {
+        Tcl_SetObjResult(rivet_interp->interp,RivetCache_FetchScript(entry));
     }
 
-    Tcl_SetObjResult(rivet_interp->interp, script);
     return TCL_OK;
 }
 
@@ -1997,6 +2033,62 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
     Tcl_SetObjResult(interp,Tcl_NewStringObj(buff,strlen(buff)));
     return TCL_OK;
 }
+
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_DumpCache --
+ *
+ *      Dumping in a list the cache content. For debugging purposes.
+ *      This command will be placed within conditional compilation and
+ *      documented within the 'Rivet Internals' section of the manual
+ *
+ * Results:
+ *      
+ *      a Tcl list of the keys in the interpreter cache
+ *
+ * Side Effects:
+ *
+ *      none
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_CacheContent )
+{
+    Tcl_Obj*                entry_list;
+    rivet_thread_private*   private;
+    rivet_thread_interp*    rivet_interp;
+    int                     ep;
+    THREAD_PRIVATE_DATA(private)
+    CHECK_REQUEST_REC(private,"::rivet::cache_content")
+
+    rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
+    interp = rivet_interp->interp;
+    
+    entry_list = Tcl_NewObj();
+    Tcl_IncrRefCount(entry_list);
+
+    ep = rivet_interp->cache_size - 1;
+    
+    while ((ep >= 0) && (rivet_interp->objCacheList[ep]))
+    {
+        int tcl_status;
+
+        tcl_status = Tcl_ListObjAppendElement(interp,entry_list,Tcl_NewStringObj(rivet_interp->objCacheList[ep],-1));
+
+        if (tcl_status != TCL_OK) {
+            return tcl_status;
+        }
+
+        ep--;
+    }
+    Tcl_SetObjResult(interp,entry_list);
+    Tcl_DecrRefCount(entry_list);
+    return TCL_OK;
+}
+
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -2040,6 +2132,12 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("exit",Rivet_ExitCmd,private);
     RIVET_OBJ_CMD ("url_script",Rivet_UrlScript,private);
     RIVET_OBJ_CMD ("thread_id",Rivet_GetThreadId,private);
+    
+    /* dump_cache: To be put within conditional compilation
+     * and not to be exported 
+     */
+
+    RIVET_OBJ_CMD ("cache_content",Rivet_CacheContent,private);
 
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
@@ -2048,7 +2146,7 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     /*
      * we don't need to check the virtual host server conf
      * stored in 'private' in order to determine if we are
-     * export the command names, as this flag is meaningful
+     * exporting the command set, as this flag is meaningful
      * at the global level
      */
     server_conf = RIVET_SERVER_CONF(module_globals->server->module_config);

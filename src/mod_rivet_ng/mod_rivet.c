@@ -216,7 +216,6 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 #ifdef WIN32
 	char*	parent_pid_var = NULL;
 #endif
-    //rivet_server_conf* rsc = RIVET_SERVER_CONF( s->module_config );
 
     FILEDEBUGINFO;
 
@@ -249,7 +248,7 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 	if (parent_pid_var != NULL)
 	{
 		ap_log_perror(APLOG_MARK,APLOG_INFO,0,pPool,
-					"AP_PARENT_PID found: not running the Tcl server script in winnt MPM child process");
+				"AP_PARENT_PID found: not running the Tcl server script in winnt MPM child process");
 		return OK;
 	} else {
 		ap_log_perror(APLOG_MARK,APLOG_INFO,0,pPool,
@@ -264,7 +263,7 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
      */
 
     if (module_globals->rivet_server_init_script != NULL) {
-        Tcl_Interp* interp = module_globals->server_interp->interp;
+        Tcl_Interp* interp      = module_globals->server_interp->interp;
         Tcl_Obj*    server_init = Tcl_NewStringObj(module_globals->rivet_server_init_script,-1);
 
         Tcl_IncrRefCount(server_init);
@@ -276,7 +275,7 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
                          module_globals->rivet_server_init_script,
                          Tcl_GetVar(interp, "errorInfo", 0));
         } else {
-            ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, s,
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, s,
                          MODNAME ": ServerInitScript '%s' successful", 
                          module_globals->rivet_server_init_script);
         }
@@ -433,7 +432,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     if (module_globals == NULL)
     {
-        module_globals = Rivet_CreateModuleGlobals (pChild);
+        module_globals = Rivet_CreateModuleGlobals(pChild);
         module_globals->rivet_mpm_bridge = Rivet_SeekMPMBridge(pChild);
         module_globals->server = server;
     }
@@ -455,7 +454,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     {
         rivet_server_conf*  myrsc;
 
-        myrsc = RIVET_SERVER_CONF( s->module_config );
+        myrsc = RIVET_SERVER_CONF(s->module_config);
 
         /* We only have a different rivet_server_conf if MergeConfig
          * was called. We really need a separate one for each server,

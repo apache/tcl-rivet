@@ -24,6 +24,7 @@
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
+#include "mod_rivet_cache.h"
 #include "httpd.h"
 #include "rivetChannel.h"
 #include "apache_config.h"
@@ -33,6 +34,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+extern module    rivet_module;
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
 
@@ -59,6 +61,7 @@ apr_status_t PreforkBridge_Finalize (void* data)
 
 void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
+    rivet_server_conf*      rsc = RIVET_SERVER_CONF (module_globals->server->module_config);
     rivet_thread_private*   private;
 
     ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pool) == APR_SUCCESS);
@@ -79,6 +82,20 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 
     Rivet_InitCore (module_globals->server_interp->interp,private);
 
+    /* The root interpreter is created without a rivet cache (that wouldn't make sense
+     * in that context. We create the cache now */
+
+    module_globals->server_interp->cache_size = rsc->default_cache_size;
+    if (module_globals->server_interp->cache_size > 0) {
+        module_globals->server_interp->cache_size = RivetCache_DefaultSize();
+    }
+    module_globals->server_interp->cache_free = module_globals->server_interp->cache_size;
+
+    RivetCache_Create(module_globals->pool,module_globals->server_interp); 
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,server,"root interpreter cache size: %d (free: %d)",
+                                                            module_globals->server_interp->cache_size,
+                                                            module_globals->server_interp->cache_free);
+
 #ifdef RIVET_NAMESPACE_IMPORT
     {
         char* tcl_import_cmd = "namespace eval :: { namespace import -force ::rivet::* }\n";
@@ -91,10 +108,9 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
      * We proceed creating the vhost interpreters database
      */
 
-    if (Rivet_VirtualHostsInterps (private) == NULL)
+    if (Rivet_VirtualHostsInterps(private) == NULL)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                     MODNAME ": Tcl Interpreters creation fails");
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, MODNAME ": Tcl Interpreters creation fails");
         exit(1);
     }
 }
@@ -203,16 +219,24 @@ rivet_thread_interp* PreforkBridge_Interp (rivet_thread_private* private,
  *
  * Bridge server wide inizialization:
  *
- *  We set the default value of the flag single_thread_exit 
- *  stored in the module globals
- *
  */
 
 int PreforkBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTemp,server_rec* s)
 {
+    /* Whether single_thread_exit is 1 or 0 doesn't make any difference for
+     * the prefork bridge, we set the default value anyway in case it hadn't been
+     * set already in the configuration */
+
     if (module_globals->single_thread_exit == SINGLE_THREAD_EXIT_UNDEF)
     {
         module_globals->single_thread_exit = 0;
+    }
+
+    /* The root interpreter is created without a rivet cache (that wouldn't make sense
+     * in that context. We create the cache now */
+
+    if (module_globals->server_interp->cache_size) {
+        RivetCache_Create(pPool,module_globals->server_interp); 
     }
     return OK;
 }

@@ -114,13 +114,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     if (root_server_conf->default_cache_size > 0) {
         root_interp->cache_size = root_server_conf->default_cache_size;
     } else if (root_server_conf->default_cache_size < 0) {
-
-        if (ap_max_requests_per_child != 0) {
-            root_interp->cache_size = ap_max_requests_per_child / 5;
-        } else {
-            root_interp->cache_size = 50;    // Arbitrary number
-        }
-
+        root_interp->cache_size = RivetCache_DefaultSize();
     }
 
     RivetCache_Create(root_interp->pool,root_interp); 
