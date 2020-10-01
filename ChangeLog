@@ -1,7 +1,29 @@
+2020-10-01 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/rivet_prefork_mpm.c: Fixed trivial bug in checking the
+	rivet cache size
+	* configure.ac: add macro to define preprocessor symbol	RIVET_DEBUG_CODE
+
+2020-09-29 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.[c|h]:
+	* src/mod_rivet_ng/rivet_[prefork|worker|lazy]_mpm.c:
+	* src/mod_rivet_ng/worker_prefork_common.c:
+	* src/mod_rivet_ng/mod_rivet_commit.c:
+	* src/mod_rivet_ng/apache_config.[c|h]: moving also rivet_server_init
+	out of the server configuration and into the module_globals
+
 2020-09-28 Massimo Manghi <mxmangi@apache.org>
-    * src/mod_rivet_ng/TclWebapache.c: 
-    * src/mod_rivet_ng/TclWeb.c: 
-    * src/mod_rivet_ng/rivetCore.c: integrating development from uploadcmdfix
+	* src/mod_rivet_ng/TclWebapache.c: 
+	* src/mod_rivet_ng/TclWeb.c: 
+	* src/mod_rivet_ng/rivetCore.c: integrating development from uploadcmdfix
+	* src/mod_rivet_ng/mod_rivet.[c|h]:
+	* src/mod_rivet_ng/rivet_[prefork|worker|lazy]_mpm.c:
+	* src/mod_rivet_ng/worker_prefork_common.c:
+	* src/mod_rivet_ng/mod_rivet_commit.c:
+	* src/mod_rivet_ng/apache_config.[c|h]: moving real global setting out
+	of the server configuration record into the module_globals structure,
+	because their global in the first place
+	* doc/xml/directives.xml: extended revision of the directive
+	scope documentation
 
 2020-09-27 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/formbroker/formbroker.tcl: add method form_exists to check for registration

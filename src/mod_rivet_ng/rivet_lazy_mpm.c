@@ -34,9 +34,9 @@
 #include "rivetChannel.h"
 #include "apache_config.h"
 
-DLLIMPORT mod_rivet_globals* module_globals;
-DLLIMPORT apr_threadkey_t*   rivet_thread_key;
-module rivet_module;
+extern DLLIMPORT mod_rivet_globals*   module_globals;
+extern DLLIMPORT apr_threadkey_t*     rivet_thread_key;
+extern DLLIMPORT module rivet_module;
 
 enum
 {
@@ -58,7 +58,7 @@ typedef struct lazy_tcl_worker {
     request_rec*        r;
     int                 ctype;
     int                 ap_sts;
-    rivet_server_conf*  conf;               /* rivet_server_conf* record            */
+    rivet_server_conf*  conf;               /* rivet_server_conf* record                */
 } lazy_tcl_worker;
 
 /* virtual host thread queue descriptor */
@@ -73,8 +73,6 @@ typedef struct vhost_iface {
 
 typedef struct mpm_bridge_status {
     apr_thread_mutex_t* mutex;
-    //int                 exit_command;
-    //int                 exit_command_status;
     int                 server_shutdown;    /* the child process is shutting down       */
     vhost*              vhosts;             /* array of vhost descriptors               */
 } mpm_bridge_status;
@@ -157,12 +155,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     /* Rivet_ExecutionThreadInit creates and returns the thread private data. */
 
-    private = Rivet_CreatePrivateData(apr_thread_pool_get(thd),true);
-    ap_assert(private != NULL);
-
-    //private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-
-    Rivet_SetupTclPanicProc();
+    private = Rivet_ExecutionThreadInit();
 
     /* A bridge creates and stores in private->ext its own thread private
      * data. The lazy bridge is no exception. We just need a flag controlling 
@@ -171,7 +164,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
 
-    private->ext->interp = Rivet_NewVHostInterp(private,w->server);
+    private->ext->interp = Rivet_NewVHostInterp(private,rsc->default_cache_size);
     //RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private,w->server));
     private->ext->interp->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
@@ -260,7 +253,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     /* If single thread exit is enabled we delete the Tcl interp */
 
-    if (!rsc->single_thread_exit) 
+    if (!module_globals->single_thread_exit) 
     {
         Tcl_DeleteInterp(private->ext->interp->interp);
     }
@@ -283,7 +276,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
 static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
 {
-    lazy_tcl_worker*    w;
+    lazy_tcl_worker* w;
 
     w = apr_pcalloc(pool,sizeof(lazy_tcl_worker));
 
@@ -409,7 +402,9 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
     }
 
     apr_thread_mutex_unlock(mutex);
-    
+
+    /* Locking the thread descriptor structure mutex */    
+
     apr_thread_mutex_lock(w->mutex);
     w->r        = r;
     w->ctype    = ctype;
@@ -437,20 +432,28 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
  */
 
 rivet_thread_interp* LazyBridge_Interp (rivet_thread_private* private,
-                                        rivet_server_conf*    conf,
-                                        rivet_thread_interp*  interp)
+                                      rivet_server_conf*    conf,
+                                      rivet_thread_interp*  interp)
 {
     if (interp != NULL) { private->ext->interp = interp; }
 
     return private->ext->interp;
 }
 
+/*
+ * -- LazyBridge_Finalize
+ *
+ * Bridge thread and resources shutdown
+ *
+ */
+
 apr_status_t LazyBridge_Finalize (void* data)
 {
     int idx;
     server_rec* server = (server_rec*) data;
-    rivet_server_conf* conf = RIVET_SERVER_CONF(((server_rec*) data)->module_config);
+    rivet_server_conf* conf = RIVET_SERVER_CONF(server->module_config);
    
+    module_globals->mpm->server_shutdown = 1;
     for (idx = 0; idx < module_globals->vhosts_count; idx++)
     {
         int try;
@@ -516,50 +519,46 @@ int LazyBridge_ExitHandler(rivet_thread_private* private)
 
     private->ext->keep_going = 0;
 
-    /*
-     * This is the only place where exit_command and 
-     * exit_command_status are set, anywere alse these
-     * fields are only read. We lock on writing to synchronize
-     * with other threads that might try to access
-     * this info. That means that in the unlikely case
-     * of several threads calling ::rivet::exit 
-     * simultaneously the first sets the exit code.
-     * This is just terrible, it highlights the bad habit
-     * of calling 'exit' when programming with mod_rivet
-     * and calls out for a version of Tcl with which
-     * we could safely call Tcl_DeleteInterp and then terminate
-     * a single thread
-    
-    apr_thread_mutex_lock(module_globals->mpm->mutex);
-    if (module_globals->mpm->exit_command == 0)
+    if (!module_globals->single_thread_exit)
     {
-        module_globals->mpm->exit_command = 1;
-        module_globals->mpm->exit_command_status = private->exit_status;
-    }
-    apr_thread_mutex_unlock(module_globals->mpm->mutex);
-     */
-
-    if (!private->running_conf->single_thread_exit)
-    {
-        /* We now tell the supervisor to terminate the Tcl worker thread pool
-         * to exit and is sequence the whole process to shutdown 
-         * by calling exit() */
+        /* We now tell the supervisor to terminate the Tcl worker 
+         * thread pool to exit and is sequence the whole process
+         * to shutdown by calling exit() */
      
-        module_globals->mpm->server_shutdown = 1;
         LazyBridge_Finalize(private->r->server);
 
-    }
+    } 
 
     return TCL_OK;
 }
 
+/*
+ *  -- LazyBridge_ServerInit
+ *
+ * Bridge server wide inizialization:
+ *
+ *  We set the default value of the flag single_thread_exit 
+ *  stored in the module globals
+ *
+ */
+
+int LazyBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTemp,server_rec* s)
+{
+    if (module_globals->single_thread_exit == SINGLE_THREAD_EXIT_UNDEF)
+    {
+        module_globals->single_thread_exit = 1;
+    }
+    return OK;
+}
+
+/* Table of bridge control functions */
+
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    NULL,
+    LazyBridge_ServerInit,
     LazyBridge_ChildInit,
     LazyBridge_Request,
     LazyBridge_Finalize,
     LazyBridge_ExitHandler,
-    LazyBridge_Interp,
-    false
+    LazyBridge_Interp
 };

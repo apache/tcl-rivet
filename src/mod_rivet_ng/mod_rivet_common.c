@@ -24,10 +24,9 @@
 #include <httpd.h>
 #include <apr_strings.h>
 #include <apr_env.h>
-#include <ap_mpm.h>
 #include <apr_file_io.h>
 #include <apr_file_info.h>
-#include <mpm_common.h>
+#include <ap_mpm.h>
 
 #include "mod_rivet.h"
 #include "rivetChannel.h"
@@ -35,7 +34,6 @@
 #include "rivetParser.h"
 #include "rivet.h"
 #include "apache_config.h"
-
 
 /* as long as we need to emulate ap_chdir_file we need to include unistd.h */
 #ifdef RIVET_HAVE_UNISTD_H
@@ -130,8 +128,7 @@ Rivet_ReadFile (apr_pool_t* pool,char* filename,char** buffer,int* nbytes)
     return 0;
 }
 
-/*
- *-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
  * Rivet_CreateTclInterp --
  *
  * Arguments:
@@ -146,7 +143,7 @@ Rivet_ReadFile (apr_pool_t* pool,char* filename,char** buffer,int* nbytes)
  */
 
 static Tcl_Interp* 
-Rivet_CreateTclInterp (server_rec* s)
+Rivet_CreateTclInterp (apr_pool_t* pool)
 {
     Tcl_Interp* interp;
 
@@ -156,14 +153,14 @@ Rivet_CreateTclInterp (server_rec* s)
 
     if (interp == NULL)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+        ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool,
                      MODNAME ": Error in Tcl_CreateInterp, aborting\n");
         exit(1);
     }
 
     if (Tcl_Init(interp) == TCL_ERROR)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
+        ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool,
                      MODNAME ": Error in Tcl_Init: %s, aborting\n",
                      Tcl_GetStringResult(interp));
         exit(1);
@@ -194,20 +191,14 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
     {
 		char* request_handler;
 		int	  handler_size;
-
-		//ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
-        //             MODNAME ": reading request handler %s",rivet_conf->request_handler);
-
+			
 		ap_assert(Rivet_ReadFile(pool,rivet_conf->request_handler,
 		                        &request_handler,&handler_size) == 0);
 
-        scripts->request_processing = Tcl_NewStringObj(request_handler,handler_size);
+        scripts->request_processing = 
+				 Tcl_NewStringObj(request_handler,handler_size);
 
     } else {
-
-		//ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_EGENERAL, module_globals->server, 
-        //             MODNAME ": reading default request handler %s",module_globals->default_handler);
-
         scripts->request_processing = 
 				 Tcl_NewStringObj(module_globals->default_handler,
                                   module_globals->default_handler_size);
@@ -230,6 +221,27 @@ void Rivet_ReleaseRunningScripts (running_scripts* scripts)
     RIVET_SCRIPT_DISPOSE(scripts,rivet_abort_script);
     RIVET_SCRIPT_DISPOSE(scripts,after_every_script);
     RIVET_SCRIPT_DISPOSE(scripts,request_processing);
+}
+
+/*
+ * -- Rivet_ReleasePerDirScripts
+ *
+ */
+
+void Rivet_ReleasePerDirScripts(rivet_thread_interp* rivet_interp)
+{
+    apr_hash_t*         ht = rivet_interp->per_dir_scripts;
+    apr_hash_index_t*   hi;
+    Tcl_Obj*            script;
+    apr_pool_t*         p = rivet_interp->pool;
+
+    for (hi = apr_hash_first(p,ht); hi; hi = apr_hash_next(hi))
+    {
+        apr_hash_this(hi, NULL, NULL, (void*)(&script));
+        Tcl_DecrRefCount(script);
+    }
+
+    apr_hash_clear(ht);
 }
 
 
@@ -355,53 +367,39 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
   *
   */
 
-rivet_thread_interp* Rivet_NewVHostInterp(rivet_thread_private* private,server_rec* server)
+rivet_thread_interp* Rivet_NewVHostInterp (rivet_thread_private* private,int default_cache_size)
 {
     rivet_thread_interp*    interp_obj = apr_pcalloc(private->pool,sizeof(rivet_thread_interp));
-    rivet_server_conf*      rsc;
-
-    /* The cache size is global so we take it from here */
-    
-    rsc = RIVET_SERVER_CONF (server->module_config);
+    apr_status_t            apr_sts;
 
     /* This calls needs the root server_rec just for logging purposes */
 
-    interp_obj->interp = Rivet_CreateTclInterp(server); 
+    interp_obj->interp = Rivet_CreateTclInterp(private->pool); 
+
+    /* we now create memory from the cache pool as subpool of the thread private pool */
     
-    /* We establish the cache size */
-
-    if (rsc->default_cache_size < 0) {
-        if (ap_max_requests_per_child != 0) {
-            interp_obj->cache_size = ap_max_requests_per_child / 5;
-        } else {
-            interp_obj->cache_size = 50;    // Arbitrary number
-        }
-    } else if (rsc->default_cache_size > 0) {
-        interp_obj->cache_size = rsc->default_cache_size;
-    }
-
-    if (interp_obj->cache_size > 0) {
-        interp_obj->cache_free = interp_obj->cache_size;
-    }
-
-    /* we now create memory for the cache as subpool of the thread private pool */
- 
-    if (apr_pool_create(&interp_obj->pool, private->pool) != APR_SUCCESS)
+    apr_sts = apr_pool_create(&interp_obj->pool, private->pool);
+    if (apr_sts != APR_SUCCESS)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+        ap_log_perror(APLOG_MARK, APLOG_ERR, apr_sts, private->pool, 
                      MODNAME ": could not initialize cache private pool");
         return NULL;
     }
 
-    ap_assert(interp_obj->pool != private->pool);
+    if (default_cache_size < 0) {
+        interp_obj->cache_size = RivetCache_DefaultSize();
+    } else if (default_cache_size > 0) {
+        interp_obj->cache_size = default_cache_size;
+    }
 
-    /* Initialize cache structures */
+    interp_obj->cache_free = interp_obj->cache_size;
+
+    // Initialize cache structures
 
     if (interp_obj->cache_size) {
         RivetCache_Create(interp_obj); 
     }
 
-    interp_obj->channel         = NULL;
     interp_obj->flags           = 0;
     interp_obj->scripts         = (running_scripts *) apr_pcalloc(private->pool,sizeof(running_scripts));
     interp_obj->per_dir_scripts = apr_hash_make(private->pool); 
@@ -415,11 +413,11 @@ rivet_thread_interp* Rivet_NewVHostInterp(rivet_thread_private* private,server_r
  *
  * -- Rivet_CreateRivetChannel
  *
- * Creates a channel 
+ * Creates a channel and registers with to the interpreter
  *
  *  Arguments:
  *
- *     - apr_pool_t* pPool: a pointer to an APR memory pool
+ *     - apr_pool_t*        pPool: a pointer to an APR memory pool
  *
  *  Returned value:
  *
@@ -449,12 +447,10 @@ Rivet_CreateRivetChannel(apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key)
      * programmer does a "flush stdout" or the page is completed.
      */
 
-    Tcl_SetChannelBufferSize (*outchannel,TCL_MAX_CHANNEL_BUFFER_SIZE);
+    Tcl_SetChannelBufferSize (*outchannel, TCL_MAX_CHANNEL_BUFFER_SIZE);
 
     return outchannel;
 }
-
-
 
 /*-----------------------------------------------------------------------------
  *

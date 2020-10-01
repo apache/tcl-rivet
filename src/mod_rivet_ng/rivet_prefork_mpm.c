@@ -17,14 +17,16 @@
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
-*/
+ */
 
 #include <apr_strings.h>
 
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
+#include "mod_rivet_cache.h"
 #include "httpd.h"
+#include "rivetChannel.h"
 #include "apache_config.h"
 #include "rivet.h"
 #include "rivetCore.h"
@@ -35,6 +37,13 @@ extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 module           rivet_module;
 
 extern TclWebRequest* TclWeb_NewRequestObject (apr_pool_t *p);
+
+/*
+ *  -- PreforkBridge_ServerInit
+ *
+ * Bridge server wide inizialization:
+ *
+ */
 
 int PreforkBridge_ServerInit (apr_pool_t *pPool, 
                                apr_pool_t *pLog,
@@ -55,8 +64,24 @@ int PreforkBridge_ServerInit (apr_pool_t *pPool,
 
     if (server_interps[server_idx] == NULL)
     {
-        server_interps[server_idx] = Rivet_NewVHostInterp(private,server);
+        server_interps[server_idx] = Rivet_NewVHostInterp(private,rsc->default_cache_size);
         Rivet_PerInterpInit(server_interps[server_idx],private,server,pPool);
+    }
+
+    /* Whether single_thread_exit is 1 or 0 doesn't make any difference for
+     * the prefork bridge, we set the default value anyway in case it hadn't been
+     * set already in the configuration */
+
+    if (module_globals->single_thread_exit == SINGLE_THREAD_EXIT_UNDEF)
+    {
+        module_globals->single_thread_exit = 0;
+    }
+
+    /* The root interpreter is created without a rivet cache (that wouldn't make sense
+     * in that context. We create the cache now */
+
+    if (module_globals->server_interps[server_idx]->cache_size) {
+        RivetCache_Create(module_globals->server_interps[server_idx]); 
     }
 
    /*
@@ -80,13 +105,13 @@ int PreforkBridge_ServerInit (apr_pool_t *pPool,
 
         if (server_interps[idx] == NULL)
         {
-            if (rsc->separate_virtual_interps == 0)
+            if (module_globals->separate_virtual_interps == 0)
             {
                 server_interps[idx] = server_interps[server_idx];
             }
             else
             {
-                server_interps[idx] = Rivet_NewVHostInterp(private,s);
+                server_interps[idx] = Rivet_NewVHostInterp(private,rsc->default_cache_size);
                 Rivet_PerInterpInit(server_interps[idx],private,s,pPool);
             }
         }
@@ -279,18 +304,23 @@ int PreforkBridge_ExitHandler(rivet_thread_private* private)
 {
     Tcl_Exit(private->exit_status);
 
-    /* it will never get here */
+    /* actually we'll never get here but we return
+     * the Tcl return code anyway to silence the 
+     * compilation warning
+     */
     return TCL_OK;
 }
 
 rivet_thread_interp* PreforkBridge_Interp (rivet_thread_private* private,
-                                            rivet_server_conf*    conf,
-                                            rivet_thread_interp*  interp)
+                                         rivet_server_conf*    conf,
+                                         rivet_thread_interp*  interp)
 {
     if (interp != NULL) { private->ext->interps[conf->idx] = interp; }
 
     return private->ext->interps[conf->idx];   
 }
+
+/* Table of bridge control functions */
 
 DLLEXPORT
 RIVET_MPM_BRIDGE {

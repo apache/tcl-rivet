@@ -86,8 +86,8 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
         interp_obj = private->ext->interps[rsc->idx];
 
         if ((s != root_server) &&
-            root_server_conf->separate_channels && 
-            root_server_conf->separate_virtual_interps)
+            module_globals->separate_channels && 
+            module_globals->separate_virtual_interps)
         {
             channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
         } 
@@ -114,7 +114,7 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
 
         function = rsc->rivet_child_init_script;
         if (function && 
-            (s == root_server || root_server_conf->separate_virtual_interps || function != parentfunction))
+            (s == root_server || module_globals->separate_virtual_interps || function != parentfunction))
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
             Tcl_Interp* interp = interp_obj->interp;
@@ -166,7 +166,7 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
 
 void Rivet_ProcessorCleanup (rivet_thread_private* private)
 {
-    rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+    //rivet_server_conf*      rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
     server_rec*             s;
     server_rec*             server;
 
@@ -194,14 +194,14 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
     {
         int i = 0;
 
-        if ((i == 0) || rsc->separate_virtual_interps)
+        if ((i == 0) || module_globals->separate_virtual_interps)
         {
             RivetCache_Destroy(private,private->ext->interps[i]);
             Tcl_DeleteInterp(private->ext->interps[i]->interp);
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
         }
 
-        if ((i > 0) && rsc->separate_channels) 
+        if ((i > 0) && module_globals->separate_channels) 
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
 
         Rivet_ReleaseRunningScripts(private->ext->interps[i]->scripts);
@@ -209,3 +209,4 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
         i++;
     } 
 }
+

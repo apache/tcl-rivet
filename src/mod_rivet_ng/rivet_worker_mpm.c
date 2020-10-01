@@ -240,10 +240,10 @@ static void Worker_CreateInterps (rivet_thread_private* private,rivet_thread_int
         
         server_conf = RIVET_SERVER_CONF(s->module_config);
 
-        if ((s == server) || (server_conf->separate_virtual_interps))
+        if ((s == server) || (module_globals->separate_virtual_interps))
         {
 
-            interp_obj = Rivet_NewVHostInterp(private,s);
+            interp_obj = Rivet_NewVHostInterp(private,server_conf->default_cache_size);
             Rivet_PerInterpInit(interp_obj,private,s,private->pool);
             if (s == server) { root_interp = interp_obj; }
 
@@ -381,9 +381,9 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
     {
-        rivet_server_conf* rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+        //rivet_server_conf* rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
-        if (rsc->single_thread_exit)
+        if (module_globals->single_thread_exit)
         {
             //Rivet_ProcessorCleanup(private);
         }
@@ -826,7 +826,7 @@ int Worker_Bridge_ExitHandler(rivet_thread_private* private)
     //module_globals->mpm->exit_command = 1;
     //module_globals->mpm->exit_command_status = private->exit_status;
 
-    if (!private->running_conf->single_thread_exit)
+    if (!module_globals->single_thread_exit)
     {
         module_globals->mpm->skip_thread_on_exit = 1;
 

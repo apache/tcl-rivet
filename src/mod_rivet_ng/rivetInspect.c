@@ -21,8 +21,6 @@
    limitations under the License.
 */
 
-/* $Id: */
-
 #include <tcl.h>
 #include <string.h>
 #include <apr_errno.h>
@@ -86,9 +84,10 @@ enum confIndices {
                     request_handler,
                     export_rivet_ns,
                     import_rivet_ns,
-                    single_thread_exit,
                     conf_index_terminator 
 };
+
+extern mod_rivet_globals* module_globals;
 
 /* 
  * -- Rivet_ReadConfParameter
@@ -141,15 +140,14 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case abort_script:              string_value = rsc->rivet_abort_script; break;
         case error_script:              string_value = rsc->rivet_error_script; break;
         case upload_directory:          string_value = (char *)rsc->upload_dir; break;
-        case mpm_bridge:                string_value = (char *)rsc->mpm_bridge; break;
+        case mpm_bridge:                string_value = (char *)module_globals->mpm_bridge; break;
         case upload_max:                int_value = Tcl_NewIntObj(rsc->upload_max); break;
         case upload_files_to_var:       int_value = Tcl_NewIntObj(rsc->upload_files_to_var); break;
-        case separate_virtual_interps:  int_value = Tcl_NewIntObj(rsc->separate_virtual_interps); break;
-        case separate_channels:         int_value = Tcl_NewIntObj(rsc->separate_channels); break;
+        case separate_virtual_interps:  int_value = Tcl_NewIntObj(module_globals->separate_virtual_interps); break;
+        case separate_channels:         int_value = Tcl_NewIntObj(module_globals->separate_channels); break;
         case honor_header_only_requests: int_value = Tcl_NewIntObj(rsc->honor_header_only_reqs); break;
         case export_rivet_ns:           int_value = Tcl_NewIntObj(rsc->export_rivet_ns); break;
         case import_rivet_ns:           int_value = Tcl_NewIntObj(rsc->import_rivet_ns); break;
-        case single_thread_exit:        int_value = Tcl_NewIntObj(rsc->single_thread_exit); break;
         default: return NULL;
     }
 

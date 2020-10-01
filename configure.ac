@@ -6,8 +6,6 @@ dnl
 dnl You need at least autoconf 2.59
 dnl
 #
-# RCS: @(#) $Id$
-
 #-----------------------------------------------------------------------
 # Sample configure.in for Tcl Extensions.  The only places you should
 # need to modify this file are marked by the string __CHANGE__
@@ -573,7 +571,6 @@ AC_DEFUN([RIVET_TCL_LIB],[
     AC_MSG_RESULT([$with_rivet_target_dir])
 ])
 
-
 # DISPLAY_RIVET_VERSION
 #
 # --enable-version-display=[yes|no] (default: no)
@@ -697,6 +694,30 @@ AC_DEFUN([HTTP_REQUESTS_MUTEX],[
         AC_DEFINE(SERIALIZE_HTTP_REQUESTS,1,[requests will be serialized])
     else
         AC_MSG_RESULT([no, HTTP requests will not be serialized])
+    fi
+])
+
+# -- RIVET_DEBUG_BUILD
+#
+# Defining a symbol for conditional inclusion of code for debugging purposes
+#
+# Default: no
+#
+
+AC_DEFUN([BUILD_DEBUG_CODE],[
+    AC_ARG_ENABLE(
+        rivet_debug_build,
+        [  --enable-rivet-debug-build Includes optional debugging code],
+        [ rivet_debug_build=$enable_rivet_debug_build ],
+        [ rivet_debug_build="no" ]
+    )
+
+    AC_MSG_CHECKING([if we are building mod_rivet for debugging])
+    if test "$rivet_debug_build" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(DEBUG_BUILD,1,[we are building mod_rivet with optional code])
+    else
+        AC_MSG_RESULT([no, ordinary build])
     fi
 ])
 
@@ -836,6 +857,7 @@ RIVET_CORE_CMDS
 RIVET_CHANNEL
 SINGLE_WORKER_TCL_THREAD
 HTTP_REQUESTS_MUTEX
+BUILD_DEBUG_CODE
 AC_HEADER_STDBOOL
 
 # Let's separate the point version from the major and minor version

@@ -116,7 +116,7 @@ EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
     interp_obj = interps[rsc->idx]; \
     for (s = server; s != NULL; s = s->next) { \
         aFunction (s, interp_obj); \
-        if (rsc->separate_virtual_interps == 0) { break; } \
+        if (module_globals->separate_virtual_interps == 0) { break; } \
     } \
 }
 
@@ -130,7 +130,7 @@ EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
     interp_obj = interps[rsc->idx]; \
     for (s = server; s != NULL; s = s->next) { \
         aFunction (s, interp_obj, __VA_ARGS__ ); \
-        if (rsc->separate_virtual_interps == 0) { break; } \
+        if (module_globals->separate_virtual_interps == 0) { break; } \
     } \
 }
 

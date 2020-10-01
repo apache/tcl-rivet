@@ -18,9 +18,8 @@
     under the License.
 */
 
-/* $Id: */
-
 #include <apr_strings.h>
+#include <mpm_common.h>
 
 #include "mod_rivet.h"
 
@@ -33,6 +32,23 @@
 #include "mod_rivet_cache.h"
 
 extern mod_rivet_globals* module_globals;
+
+
+/*
+ * -- RivetCache_DefaultSize
+ *
+ * Basic determination of a default size for the Rivet cache
+ *
+ */
+
+int RivetCache_DefaultSize (void)
+{
+    if (ap_max_requests_per_child != 0) {
+        return  (ap_max_requests_per_child / 5);
+    } else {
+        return 50;
+    }
+}
 
 /*
  * -- RivetCache_Create 
@@ -127,11 +143,23 @@ void RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rive
 
         ct++;
     }
-    apr_pool_clear(rivet_interp->pool);
+    apr_pool_destroy(rivet_interp->pool);
     
-    rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool,(signed)(rivet_interp->cache_size*sizeof(char *)));
-    rivet_interp->cache_free = rivet_interp->cache_size;
+    /* let's recreate the cache list */
 
+    if (apr_pool_create(&rivet_interp->pool, private->pool) != APR_SUCCESS)
+    {
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+                     MODNAME ": could not recreate cache private pool. Cache disabled");
+        rivet_interp->cache_free = rivet_interp->cache_size = 0;
+    }
+    else
+    {
+        rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
+                                                (signed)(rivet_interp->cache_size*sizeof(char *)));
+        rivet_interp->cache_free = rivet_interp->cache_size;
+    }
+    
 }
 
 /* 
@@ -160,12 +188,38 @@ char* RivetCache_MakeKey (apr_pool_t*   pool,
 /*
  * -- RivetCache_EntryLookup
  *
- * Cache entry lookiup. A hash table lookup key is created and an entry
+ * Cache entry lookup. A hash table lookup key is created and an entry
  * searched in the cache. If an entry is not found the function returns NULL
  *
  * Arguments:
- *      char*                hashKey    - key to the cache
- *      rivet_thread_interp* interp_obj - interpreter object
+ *      rivet_thread_interp* rivet_interp - interpreter object
+ *      char*                hashKey      - key to the cache entry
+ *
+ * Results:
+ *      Tcl_HashEntry*       entry object - NULL if the entry for hashKey is not
+ *                                          existing
+ *
+ * Side Effects:
+ *
+ */
+
+Tcl_HashEntry* RivetCache_EntryLookup (rivet_thread_interp* rivet_interp,char* hashKey)
+{
+    return Tcl_FindHashEntry(rivet_interp->objCache, hashKey);
+}
+
+/*
+ * -- RivetCache_CreateEntry
+ *
+ * Cache entry lookup. A hash table lookup key is created and an entry
+ * searched in the cache. If an entry is not found the function returns NULL
+ *
+ * Arguments:
+ *      rivet_thread_interp* rivet_interp - interpreter object
+ *      char*                hashKey      - key to the cache entry
+ *      int*                 isNew        - pointer to an integer. If the
+ *                                          entry create didn't exists isNew
+ *                                          is set to 1
  *
  * Results:
  *      Tcl_HashEntry*       entry object
@@ -174,13 +228,9 @@ char* RivetCache_MakeKey (apr_pool_t*   pool,
  *
  */
 
-Tcl_HashEntry* RivetCache_EntryLookup (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew)
+Tcl_HashEntry* RivetCache_CreateEntry (rivet_thread_interp* rivet_interp,char* hashKey,int* isNew)
 {
-    Tcl_HashEntry*  entry = NULL;
-
-    entry = Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, isNew);
-    return entry;
-
+    return Tcl_CreateHashEntry(rivet_interp->objCache, hashKey, isNew);
 }
 
 /*
