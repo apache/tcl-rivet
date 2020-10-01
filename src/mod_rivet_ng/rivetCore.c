@@ -2034,10 +2034,11 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
     return TCL_OK;
 }
 
+#ifdef RIVET_DEBUG_BUILD
 /*
  *-----------------------------------------------------------------------------
  *
- * Rivet_DumpCache --
+ * Rivet_CacheContent --
  *
  *      Dumping in a list the cache content. For debugging purposes.
  *      This command will be placed within conditional compilation and
@@ -2088,6 +2089,7 @@ TCL_CMD_HEADER( Rivet_CacheContent )
     return TCL_OK;
 }
 
+#endif /* RIVET_DEBUG_BUILD */
 
 /*
  *-----------------------------------------------------------------------------
@@ -2133,12 +2135,10 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("url_script",Rivet_UrlScript,private);
     RIVET_OBJ_CMD ("thread_id",Rivet_GetThreadId,private);
     
-    /* dump_cache: To be put within conditional compilation
-     * and not to be exported 
-     */
-
+#ifdef RIVET_DEBUG_BUILD
+    /* code compiled conditionally for debugging */
     RIVET_OBJ_CMD ("cache_content",Rivet_CacheContent,private);
-
+#endif
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
 #endif
