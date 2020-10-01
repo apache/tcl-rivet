@@ -86,15 +86,15 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
      * in that context. We create the cache now */
 
     module_globals->server_interp->cache_size = rsc->default_cache_size;
-    if (module_globals->server_interp->cache_size > 0) {
+    if (module_globals->server_interp->cache_size < 0) {
         module_globals->server_interp->cache_size = RivetCache_DefaultSize();
     }
     module_globals->server_interp->cache_free = module_globals->server_interp->cache_size;
-
-    RivetCache_Create(module_globals->pool,module_globals->server_interp); 
     ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,server,"root interpreter cache size: %d (free: %d)",
                                                             module_globals->server_interp->cache_size,
                                                             module_globals->server_interp->cache_free);
+
+    RivetCache_Create(module_globals->pool,module_globals->server_interp); 
 
 #ifdef RIVET_NAMESPACE_IMPORT
     {
