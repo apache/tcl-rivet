@@ -73,60 +73,86 @@ DLLEXPORT mod_rivet_globals*  module_globals      = NULL;
 #define TCL_HANDLER_FILE    RIVET_DIR"/default_request_handler.tcl"
 
 /*
- * -- Rivet_SeekMPMBridge 
+ * -- Rivet_SeekMPMBridge
  *
+ * MPM name determination. The function returns a filename to 
+ * an MPM bridge module. The module name is determined in 4 steps
+ *
+ *  - The environment variable RIVET_MPM_BRIDGE is checked. I the
+ *    variable exists its value is returned as the path to the bridge module
+ *    If the module doesn't exist the server exits with an error
+ *  - The global configuration is checked. If module_globals->mpm_bridge is
+ *    not NULL its value is taken as the bridge name as given by means of 
+ *    the server configuration directive RivetMpmBridge. 
+ *    The value is interpolated with the macro RIVET_MPM_BRIDGE_COMPOSE
+ *    to compose the full path (e.g. 'lazy' -> RIVET_DIR'/mpm/rivet_lazy_mpm.so')
+ *    to the bridge module. 
+ *  - If the interpolated file name doesn't not exist the mpm_bridge string is
+ *    checked as a full path to the MPM bridge. If not existing the server exits
+ *  - An heuristics criterion based on the MPM module features returned by
+ *    mpm_bridge_query is evaluated.
  *
  */
 
 static char*
 Rivet_SeekMPMBridge (apr_pool_t* pool)
 {
-    char*   mpm_prefork_bridge = "rivet_prefork_mpm.so";
-    char*   mpm_worker_bridge  = "rivet_worker_mpm.so";
-    char*   mpm_bridge_path;
-    int     ap_mpm_result;
-    //rivet_server_conf* rsc = RIVET_SERVER_CONF( server->module_config );
+    char*           mpm_prefork_bridge = "rivet_prefork_mpm.so";
+    char*           mpm_worker_bridge  = "rivet_worker_mpm.so";
+    char*           mpm_bridge_path;
+    int             ap_mpm_result;
+    apr_status_t    apr_ret;
+    apr_finfo_t finfo;
 
     /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
        what bridge custom implementation we want be loaded */
 
     if (apr_env_get (&mpm_bridge_path,"RIVET_MPM_BRIDGE",pool) == APR_SUCCESS)
     {
+        if (apr_ret = apr_stat(&finfo,mpm_bridge_path,APR_FINFO_MIN,pool) != APR_SUCCESS)
+        {
+            ap_log_perror(APLOG_MARK,APLOG_ERR,apr_ret,pool, 
+                         MODNAME ": MPM bridge %s not found", module_globals->mpm_bridge); 
+            exit(1);   
+        }
         return mpm_bridge_path;
+        
     }
 
     /* we now look into the configuration record */
 
     if (module_globals->mpm_bridge != NULL)
     {
-        apr_finfo_t finfo;
         char*       proposed_bridge;
 
         proposed_bridge = apr_pstrcat(pool,RIVET_MPM_BRIDGE_COMPOSE(module_globals->mpm_bridge),NULL);
         if (apr_stat(&finfo,proposed_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
         {
             mpm_bridge_path = proposed_bridge;
-        } 
-        else if (apr_stat(&finfo,module_globals->mpm_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
+        }
+        else if ((apr_ret = apr_stat(&finfo,module_globals->mpm_bridge,APR_FINFO_MIN,pool)) == APR_SUCCESS)
         {
             mpm_bridge_path = apr_pstrdup(pool,module_globals->mpm_bridge);
         }
         else
-        {   
-            ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool, 
-                         MODNAME ": MPM bridge %s not found", module_globals->mpm_bridge); 
+        {
+            ap_log_perror(APLOG_MARK,APLOG_ERR,apr_ret,pool,
+                                     MODNAME ": MPM bridge %s (%s) not found",module_globals->mpm_bridge,
+                                                                              proposed_bridge); 
             exit(1);   
         }
 
     } else {
 
-        /* Let's query the Rivet-MPM bridge */
+        /* MPM bridge determination heuristics */
+
+        /* Let's query the Apache server about the current MPM threaded capabilities */
 
         if (ap_mpm_query(AP_MPMQ_IS_THREADED,&ap_mpm_result) == APR_SUCCESS)
         {
             if (ap_mpm_result == AP_MPMQ_NOT_SUPPORTED)
             {
-                /* we are forced to load the prefork MPM bridge */
+                /* Since the MPM is not threaded we assume we can load the prefork bridge */
 
                 mpm_bridge_path = apr_pstrdup(pool,mpm_prefork_bridge);
             }
@@ -151,13 +177,13 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
     return mpm_bridge_path;
 }
 
-/* 
+/*
  * -- Rivet_CreateModuleGlobals
  *
  * module globals (mod_rivet_globals) allocation and initialization.
- * As of 3.2 the procedure fills the structure fields that can be set
+ * As of 3.2 the procedure initialized the fields that can be set
  * during the pre_config stage of the server initialization
- * 
+ *
  */
 
 static mod_rivet_globals* 
@@ -207,7 +233,8 @@ int Rivet_Exit_Handler(int code)
 /* 
  * -- Rivet_RunServerInit
  *
- * 
+ *  Prepare the execution of any Rivet server initialization script
+ *
  */
 
 static int
@@ -376,7 +403,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     {
         char errorbuf[ERRORBUF_SZ];
 
-        /* If we don't find the mpm handler module we give up and exit */
+        /* If we can't load the mpm handler module we give up and exit */
 
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME " Error loading MPM manager: %s", 
@@ -427,7 +454,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     /* We can rely on the existence of module_globals only we are
      * running the prefork MPM, otherwise the pointer is NULL and
-     * the structure need to be filled
+     * the structure has to be filled with data
      */
 
     if (module_globals == NULL)

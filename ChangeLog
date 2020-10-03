@@ -1,3 +1,6 @@
+2020-10-03 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c: Documenting the Rivet_SeekMPMBridge function
+
 2020-10-01 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivet_prefork_mpm.c: Fixed trivial bug in checking the
 	rivet cache size
@@ -18,9 +21,8 @@
 	* src/mod_rivet_ng/mod_rivet_commit.c:
 	* src/mod_rivet_ng/apache_config.[c|h]: moving real global setting out
 	of the server configuration record into the module_globals structure,
-	because their global in the first place
-	* doc/xml/directives.xml: extended revision of the directive
-	scope documentation
+	because they're global in the first place
+	* doc/xml/directives.xml: extended revision of the directive scope documentation
 
 2020-09-27 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/formbroker/formbroker.tcl: add method form_exists to check for registration
