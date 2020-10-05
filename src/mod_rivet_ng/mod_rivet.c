@@ -109,7 +109,7 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
 
     if (apr_env_get (&mpm_bridge_path,"RIVET_MPM_BRIDGE",pool) == APR_SUCCESS)
     {
-        if (apr_ret = apr_stat(&finfo,mpm_bridge_path,APR_FINFO_MIN,pool) != APR_SUCCESS)
+        if ((apr_ret = apr_stat(&finfo,mpm_bridge_path,APR_FINFO_MIN,pool)) != APR_SUCCESS)
         {
             ap_log_perror(APLOG_MARK,APLOG_ERR,apr_ret,pool, 
                          MODNAME ": MPM bridge %s not found", module_globals->mpm_bridge); 

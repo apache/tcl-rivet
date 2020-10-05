@@ -1,3 +1,6 @@
+2020-10-04 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c: forcing variable assignment in condition
+
 2020-10-03 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c: Documenting the Rivet_SeekMPMBridge function
 
