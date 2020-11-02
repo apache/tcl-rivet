@@ -22,7 +22,7 @@ set httpd_args   {}
 puts stderr "runtests.tcl is running with auto_path: $auto_path"
 
 proc runtests_usage {} {
-    puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver?"
+    puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver? ?-mpm <MPM module>? ?-bridge <MPM Bridge>?"
     exit 1
 }
 
