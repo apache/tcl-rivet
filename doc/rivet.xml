@@ -39,6 +39,7 @@
     <!ENTITY fullversion           "3.2.0" >
     <!ENTITY version2-series	     "2.0,2.1,2.2,2.3,2.4" >
     <!ENTITY version2-generic	     "2.x" >
+    <!ENTITY version3-generic      "3.x" >
     <!ENTITY version30		        "3.0" >
     <!ENTITY version31		        "3.1" >
     <!ENTITY version32             "3.2" >

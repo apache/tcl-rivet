@@ -1,3 +1,6 @@
+2020-11-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/directives.xml: SingleThreadExit entry re-elaborated
+
 2020-10-04 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c: forcing variable assignment in condition
 

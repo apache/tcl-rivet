@@ -529,10 +529,10 @@
 		   			an improperly developed Tcl extension which might cause a child process to crash when
 		   			calling Tcl_DeleteInterp.
 					</para>
-					<para>
+					<note>
 						The default is <command>No</command> for the prefork bridge (loaded by default if the server
 						runs the prefork MPM) and <command>true</command> for the worker and lazy bridges
-		   		</para>
+					</note>
    			</listitem>
 			</varlistentry>
 

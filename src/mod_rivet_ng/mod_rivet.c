@@ -87,7 +87,7 @@ DLLEXPORT mod_rivet_globals*  module_globals      = NULL;
  *    The value is interpolated with the macro RIVET_MPM_BRIDGE_COMPOSE
  *    to compose the full path (e.g. 'lazy' -> RIVET_DIR'/mpm/rivet_lazy_mpm.so')
  *    to the bridge module. 
- *  - If the interpolated file name doesn't not exist the mpm_bridge string is
+ *  - If the interpolated file name doesn't exist the mpm_bridge string is
  *    checked as a full path to the MPM bridge. If not existing the server exits
  *  - An heuristics criterion based on the MPM module features returned by
  *    mpm_bridge_query is evaluated.
