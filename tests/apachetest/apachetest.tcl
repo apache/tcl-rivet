@@ -1,6 +1,6 @@
 # apachetest.tcl -- Tcl-based Apache test suite
 
-# Copyright 2001-2005 The Apache Software Foundation
+# Copyright 2001-2020 The Apache Tcl Team / The Apache Software Foundation
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# $Id$
 
 # This test suite provides a means to create configuration files, and
 # start apache with user-specified options.  All it needs to run is
@@ -43,16 +41,16 @@ proc kill {signal pid} {
     after 100
     set i 100
     while {1} {
-	catch {exec ps -p $pid} out
-	if {[regexp $pid $out]} {
-	    incr i 250
-	    after 250
-	} else {
-	    break
-	}
+        catch {exec ps -p $pid} out
+        if {[regexp $pid $out]} {
+            incr i 250
+            after 250
+        } else {
+            break
+        }
     }
     if {$i > 100} {
-	puts "Waiting [expr {$i/1000.0}] seconds until process was killed"
+        puts "Waiting [expr {$i/1000.0}] seconds until process was killed"
     }
 }
 
@@ -71,8 +69,7 @@ namespace eval apachetest {
 	} 
 	variable httpd_version  $::httpd_version
     # this file should be in the same directory this script is.
-    variable templatefile [file join [file dirname [info script]] \
-			       template.conf.2.tcl]
+    variable templatefile [file join [file dirname [info script]] template.conf.2.tcl]
 }
 
 # apachetest::need_modules --
@@ -94,7 +91,7 @@ namespace eval apachetest {
 proc apachetest::need_modules { modlist } {
     variable module_assoc
     foreach module_pair $modlist {
-	set module_assoc([lindex $module_pair 0]) [lindex $module_pair 1]
+        set module_assoc([lindex $module_pair 0]) [lindex $module_pair 1]
     }
 }
 
@@ -190,12 +187,12 @@ proc apachetest::startserver { args } {
 # getbinname - get the name of the apache binary, and check to make
 # sure it's ok.  The user should supply this parameter.
 
-proc apachetest::getbinname { argv } {
+proc apachetest::getbinname { bname } {
     variable binname
 
-    set binname [lindex $argv 0]
+    set binname $bname
     if { $binname == "" || ! [file executable $binname] } {
-	    error "Please supply the full name and path of the Apache executable on the command line."
+	    error "Invalid executable '$binname', please supply the full name and path of the Apache executable on the command line."
     }
     return $binname
 }
@@ -207,9 +204,15 @@ proc apachetest::getbinname { argv } {
 proc apachetest::getcompiledin { binname } {
     variable module_assoc
 
-    set bin [open [list | "$binname" -l] r]
-    set compiledin [read $bin]
-    close $bin
+    if {[catch {
+        set bin [open [list | "$binname" -l] r]
+        set compiledin [read $bin]
+        close $bin} e einfo]} {
+            puts "error: $e"
+            puts "error info: $einfo"
+
+            error "caught error in apachetest::getcompledin"
+    }
     set modlist [split $compiledin]
     set compiledin [list]
     set mod_so_present 0
@@ -234,16 +237,17 @@ proc apachetest::getcompiledin { binname } {
 proc apachetest::gethttpdconf { binname } {
     set bin [open [list | $binname -V] r]
     set options [read $bin]
-    close $bin
+    catch {close $bin}
     regexp {SERVER_CONFIG_FILE="(.*?)"} "$options" match filename
 
-    if { ! [file exists $filename] } {
+    if {![file exists $filename]} {
 
-# see if we can find something by combining HTTP_ROOT + SERVER_CONFIG_FILE
+        # see if we can find something by combining
+        # HTTP_ROOT + SERVER_CONFIG_FILE
 
         regexp {HTTPD_ROOT="(.*?)"} "$options" match httpdroot
         set completename [file join $httpdroot $filename]
-        if { ! [file exists $completename] } {
+        if {![file exists $completename]} {
             error "neither '$filename' or '$completename' exists"
         }
         return $completename
@@ -376,13 +380,15 @@ proc apachetest::determinemodules { binname } {
     }
     set needed [lsort $needed]
 
+    puts "needed: $needed"
+
     set needtoget [list]
     foreach mod $needed {
         if { [lsearch $compiledin $mod] == -1 } {
             lappend needtoget $mod
         }
     }
-    if { $needtoget == "" } {
+    if {$needtoget == ""} {
         return ""
     } else {
         return [getloadmodules $conffile $needtoget]
@@ -403,7 +409,7 @@ proc apachetest::determinemodules { binname } {
 # Results:
 #	None.
 
-proc apachetest::makeconf { outfile {extra ""} } {
+proc apachetest::makeconf { outfile bridge {extra ""} } {
     variable binname
     variable templatefile
     set CWD [pwd]
@@ -423,8 +429,18 @@ proc apachetest::makeconf { outfile {extra ""} } {
     puts "reading template from $templatefile"
     set fl [open [file join . $templatefile] r]
     set template [read $fl]
-    append template $extra
     close $fl
+
+# configure a specific bridge if -bridge passed as argument
+
+    if {$bridge == "default"} {
+        set bridge_conf "# Default bridge"
+    } else {
+        set bridge_conf "RivetServerConf MpmBridge $bridge"
+    }
+    set extra [string map [list BRIDGE $bridge_conf] $extra]
+
+    append template $extra
 
     puts $template
 

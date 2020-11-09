@@ -49,6 +49,7 @@
 
 extern DLLIMPORT mod_rivet_globals* module_globals;
 extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
+extern DLLIMPORT module             rivet_module;
 
 // apr_threadkey_t* handler_thread_key;
 
@@ -749,10 +750,11 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* s)
 {
     rivet_thread_private*   private;
     rivet_thread_interp*    interp_obj; 
+    rivet_server_conf*      rsc = RIVET_SERVER_CONF(s->module_config);
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
-    interp_obj = Rivet_NewVHostInterp(private->pool,s);
+    interp_obj = Rivet_NewVHostInterp(private->pool,rsc->default_cache_size);
     interp_obj->channel = private->channel;
     Rivet_PerInterpInit(interp_obj, private, s, private->pool);
     return interp_obj;
@@ -784,7 +786,7 @@ int WorkerBridge_ExitHandler(rivet_thread_private* private)
     //module_globals->mpm->exit_command = 1;
     //module_globals->mpm->exit_command_status = private->exit_status;
 
-    if (!private->running_conf->single_thread_exit)
+    if (!module_globals->single_thread_exit)
     {
 
         module_globals->mpm->skip_thread_on_exit = 1;
@@ -847,9 +849,30 @@ rivet_thread_interp* WorkerBridge_Interp (rivet_thread_private* private,
     return private->ext->interps[conf->idx];   
 }
 
+/*
+ *  -- WorkerBridge_ServerInit
+ *
+ * Bridge server wide inizialization:
+ *
+ *  We set the default value of the flag single_thread_exit 
+ *  stored in the module globals
+ *
+ */
+
+int WorkerBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTemp,server_rec* s)
+{
+    if (module_globals->single_thread_exit == SINGLE_THREAD_EXIT_UNDEF)
+    {
+        module_globals->single_thread_exit = 1;
+    }
+    return OK;
+}
+
+/* Table of bridge control functions */
+
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    NULL,
+    WorkerBridge_ServerInit,
     WorkerBridge_ChildInit,
     WorkerBridge_Request,
     WorkerBridge_Finalize,

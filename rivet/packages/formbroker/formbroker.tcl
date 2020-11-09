@@ -788,6 +788,12 @@ namespace eval FormBroker {
         return [namespace current]::$form_name 
     }
 
+    proc form_exists {form_cmd} {
+        variable form_definitions
+
+        return [dict exists $form_definitions [namespace tail $form_cmd]]
+    }
+
     proc creategc {varname args} {
         set formv [uplevel [list set $varname [::FormBroker::create {*}$args]]]
         uplevel [list trace add variable $varname unset \
@@ -800,4 +806,4 @@ namespace eval FormBroker {
     namespace ensemble create
 }
 
-package provide formbroker 1.0
+package provide formbroker 1.0.1

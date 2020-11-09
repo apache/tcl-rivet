@@ -1,4 +1,3 @@
-# $Id$
 
 set testfilename1 upload.rvt
 
@@ -11,13 +10,12 @@ set testfilename1 upload.rvt
 
     set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n--${bound}--"
 
-    set page [::http::geturl "${urlbase}$testfilename1" \
-		  -type "multipart/form-data; boundary=$bound" -query $outputData]
+    set page [::http::geturl "${urlbase}$testfilename1" -type "multipart/form-data; boundary=$bound" -query $outputData]
 
     set ret [string trim [::http::data $page]]
     ::http::cleanup $page
     set ret
-} {uploadtest 1 42747 -- AngeloFish.jpg}
+} {uploadtest|1|42747||AngeloFish.jpg}
 
 set testfilename1 uploadsave.rvt
 

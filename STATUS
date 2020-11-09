@@ -20,7 +20,7 @@ Platform                  Tcl Version  Ok?
 --------                  -----------  ---
 Debian                     Tcl 8.6     Yes
 Ubuntu                     Tcl 8.6     Yes
-CentOS		                 Tcl 8.6     Yes
-Suse	                     Tcl 8.6     Yes
+CentOS		               Tcl 8.6     Yes
+Suse	                   Tcl 8.6     Yes
 FreeBSD                    Tcl 8.6     Yes
 Windows 10                 Tcl 8.6     Yes

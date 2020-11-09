@@ -61,31 +61,35 @@
 					any special request handler should explicitly read this script from the configuration
 					using ::rivet::inspect and evaluate it (see <xref linkend="request">request processing</xref>)</td>
 				</tr>
-				<tr><td>AfterScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td>Special request handler developers
-				should read this script from the configuration calling ::rivet::inspect and evaluate it</td></tr>
+				<tr><td>AfterScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td>Special request handler scripts
+				should read it from the configuration calling ::rivet::inspect and evaluate it</td></tr>
 				<tr><td>AfterEveryScript</td><td>X</td><td>X</td><td>X</td><td>X</td><td>See notes for the AfterScript directive</td></tr>
 				<tr><td>BeforeScript</td><td>X</td><td>X</td><td>X</td><td>X</td>
 					 <td>See notes for the AfterScript directive</td></tr>
-				<tr><td>CacheSize</td><td></td><td></td><td>X</td><td></td><td></td></tr>
+				<tr><td>CacheSize</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 				<tr><td>ChildExitScript</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 				<tr><td>ChildInitScript</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 				<tr><td>ErrorScript</td><td>X</td><td>X</td><td>X</td><td>X</td>
-					<td>Rivet provides a default error handler. In case you are developing your own request
-					handling procedure you need to call that handler yourself or develop a new.
-					See notes for the AbortScript and AfterScript directives</td></tr>
-				<tr><td>ExportRivetNS</td><td></td><td></td><td>X</td><td></td><td></td></tr>
+					<td>Rivet provides a default error handler. In case you are writing your own request
+					handling procedure you need to call this error handler yourself or develop your
+					application specific error handler to be integrated into the RequestHandler script.
+					See also the notes for the AbortScript and AfterScript directives</td></tr>
+				<tr><td>ExportRivetNS</td><td></td><td></td><td>X</td><td>X</td><td>It can be set in a virtual host
+				configuration if SeparateVirtualInterps is On, otherwise this directive can be safely used at the global level only</td></tr>
 				<tr><td>GlobalInitScript</td><td></td><td></td><td>X</td><td></td>
 				    <td>effective only when SeparateVirtualInterps is Off (default)</td></tr>
-				<tr><td>ImportRivetNS</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
-				<tr><td>HonorHeaderOnlyRequests</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
-				<tr><td>MpmBridge</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
+				<tr><td>ImportRivetNS</td><td></td><td></td><td>X</td><td>X</td><td>It can be set in a virtual host
+				configuration if SeparateVirtualInterps is On, otherwise this directive can be safely used at the global level only</td></tr>
+				<tr><td>HonorHeaderOnlyRequests</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
+				<tr><td>MpmBridge</td><td></td><td></td><td>X</td><td></td><td>global only</td></tr>
 				<tr><td>RequestHandler</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
-				<tr><td>SeparateChannels</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
-				<tr><td>SeparateVirtualInterps</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr> 
-				<tr><td>ServerInitScript</td><td></td><td></td><td>X</td><td></td><td></td></tr>
-				<tr><td>SingleThreadExit</td><td></td><td></td><td>X</td><td></td><td>global setting</td></tr>
-				<tr><td>UploadDirectory</td><td></td><td>X</td><td>X</td><td>X</td><td></td></tr> 
-				<tr><td>UploadFilesToVar</td><td></td><td></td><td>X</td><td></td><td></td></tr> 
+				<tr><td>SeparateChannels</td><td></td><td></td><td>X</td><td></td><td>global only (DEPRECATED: will be
+				replaced in future versions of Rivet)</td></tr> 
+				<tr><td>SeparateVirtualInterps</td><td></td><td></td><td>X</td><td></td><td>global only</td></tr> 
+				<tr><td>ServerInitScript</td><td></td><td></td><td>X</td><td></td><td>global only</td></tr>
+				<tr><td>SingleThreadExit</td><td></td><td></td><td>X</td><td></td><td>global only</td></tr>
+				<tr><td>UploadDirectory</td><td>X</td><td>X</td><td>X</td><td>X</td><td></td></tr> 
+				<tr><td>UploadFilesToVar</td><td></td><td></td><td>X</td><td>X</td><td></td></tr> 
 				<tr><td>UploadMaxSize</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 			</tbody>
 		</table>
@@ -292,8 +296,8 @@
 	    		<listitem>
 					<para>
 						Rivet commands are created within the ::rivet namespace. Setting
-						this option you tell mod_rivet to place the whole command set on
-						the export list of namespace, enabling your scripts to import
+						this option mod_rivet places the whole command set on
+						the export list of the ::rivet namespace, enabling your scripts to import
 						them in a different namespace.
 					</para>
 					<para>This option is, by nature, only available at the global level</para>
@@ -318,7 +322,7 @@
 					  response. If the real header has to be examined (e.g. 
 					  for debugging) you can turn this options on. 
 					</para>
-					<para>This option is, by nature, only available at the global level</para>
+					<para>This option is only available at the global level</para>
 	      	</listitem>
 	    	</varlistentry>
 
@@ -335,17 +339,14 @@
 	    		<listitem>
 					<para>
 						Rivet commands are created within the ::rivet namespace. Setting
-						this option you tell mod_rivet to place the whole command set on
-						the export list of namespace (implicitly forcing also ExportRivetNS)
-						and then importing the commands on the namespace export list into the 
-						global namespace
+						this option mod_rivet is told to place the whole command set on
+						the export list of the ::rivet namespace (implicitly forcing also ExportRivetNS)
+						and then importing the commands into the global namespace
 					</para>
-					
 					<note>
 						This option is provided only for compatibility with existing code that assumes
-						mod_rivet commands to reside in the global namespace. It's utterly discouraged to
-						use it and it could be removed in future versions of Rivet
-						This option is, by nature, only available at the global level
+						mod_rivet commands to reside in the global namespace it could be removed in
+						future versions of Rivet. This option is only available at the global level
 					</note>
 	      	</listitem>
 	    	</varlistentry>
@@ -360,17 +361,18 @@
 	      	<listitem>
 					<para>
 						This global only option tells mod_rivet which MPM bridge has
-						to be loaded. The string argument is interpreted
-						first as a name of an MPM bridge and it's interpolated in the
-						string
+						to be loaded. The module attempt to interpolate the argument value
 						<programlisting>bridge = apr_pstrcat(pool,RIVET_DIR,"/mpm/rivet_",rsc->mpm_bridge,"_mpm.so",NULL);</programlisting>
 						Where RIVET_DIR is the location of the rivet libraries whose definition
-						is controlled by the configuration argument <term>--with-rivet-target-dir=DIR</term>.
+						is controlled by the configure switch <command>--with-rivet-target-dir=DIR</command>.
 						For example 
 						<programlisting>RivetServerConf MpmBridge lazy</programlisting> will cause the
-						rivet_lazy_mpm.so library module to be loaded. If such library does not exists
-						mod_rivet tries to check if such definition is the fully qualified path to 
-						such MPM bridge. If this fails the module causes the web server to stop with an error.
+						rivet_lazy_mpm.so library module to be loaded.
+					</para>
+					<para>
+						If such library does not exists mod_rivet tries to check if such definition is actually
+						the fully qualified path to such MPM bridge. If this fails the module causes the web server to stop
+						with an error.
 					</para>
 				</listitem>
 	    	</varlistentry>
@@ -507,17 +509,30 @@
    			</term>
    			<listitem>
 		   		<para>
-		   			Rivet shadows the Tcl <command>exit</command> command with the
-		   			<command>::rivet::exit</command> in order to
-		   			prevent abrupt interruption of execution of a child process when
-		   			multiple thread are running. By default the worker bridge notifies
-		   			all the threads running Tcl interpreters to exit before calling Tcl_Exit.
-		   			If this option is set a single thread terminates executing any ChildExitScript 
-		   			and eventually it's replaced accordingly to
-		   			the thread management policy implemented by the bridge. 
-		   			With the prefork bridge this options reproduces the ordinary
-		   			<command>exit</command> command behavior.
-		   		</para>
+						The Tcl <command>exit</command> command has a simple implementation that
+						eventually calls Tcl_Exit (which in turn calls stdlib's exit) that forces
+						the immediate deletion of all threads in a process. This behavior would be
+		   			unacceptable with the worker MPM and worker bridge which are fundamentally
+		   			threaded. 
+		   			Therefore Rivet shadows the Tcl <command>exit</command> command with
+		   			<command>::rivet::exit</command> which calls a designated function in
+		   			the running bridge. The prefork bridge simply prepares the child process
+		   			to terminate, whereas the worker bridge is behavior controlled by this option.
+		   			<orderedlist>
+		   				<listitem>If SingleThreadExit is set (default) each thread behaves
+		   				individually and terminates after running the ChildExitScript and deleting 
+		   				its Tcl interpreters</listitem>
+		   				<listitem>If SingleThreadExit is <command>No</command> the worker bridge notifies all threads
+		   				to exit and then calls Tcl_Exit</listitem>
+		   			</orderedlist>
+		   			The latter option might be useful in cases where an application is using
+		   			an improperly developed Tcl extension which might cause a child process to crash when
+		   			calling Tcl_DeleteInterp.
+					</para>
+					<note>
+						The default is <command>No</command> for the prefork bridge (loaded by default if the server
+						runs the prefork MPM) and <command>true</command> for the worker and lazy bridges
+					</note>
    			</listitem>
 			</varlistentry>
 

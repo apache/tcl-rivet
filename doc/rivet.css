@@ -31,7 +31,7 @@ PRE.PROGRAMLISTING
         font-family: monospace;
         white-space: pre;
         width:  95%;
-        background-color: #f7e9c6;
+        background-color: #e8ecf2;
         border: solid;
         color:  #000000;
         border-color: #a3b1bc;
@@ -83,8 +83,8 @@ H2
 {       
         COLOR: #ffffff ;
         font-style: italic;
-        border: solid 3px #e8a34b;
-        background-color: #593c27;
+        border: solid 3px #1d252b;
+        background-color: #a3b1bc;
         PADDING: 0.5em;
 }
 
@@ -139,7 +139,7 @@ DIV.VARIABLELIST {
         font-weight: bold;
         margin-top: 10px;
         color: #ffffff ;
-        background-color: #f7e9c6;
+        background-color: #e8ecf2;
         border: solid 1px #a3b1bc;
         padding: 1px
 }
@@ -154,15 +154,15 @@ P {
         font-size: 12px;
 }
 
-/*/*/
-
+/* 
 A{
     color: maroon;
 }
 
-a:visited {
+A:visited {
     color: darkgreen;
 }
+*/
 
 BODY P {
 
@@ -272,7 +272,7 @@ P.C2 {
 
 DIV.NAVFOOTER {
         color: #000000;
-        background-color: #f7e9c6;
+        background-color: #e8ecf2;
         padding: 5px;
         margin-top: 10px;
         width: 100%;
@@ -281,7 +281,7 @@ DIV.NAVFOOTER {
 
 DIV.NUKEFOOTER {
         color: #000000;
-        background-color: #f7e9c6;
+        background-color: #e8ecf2;
         padding: 5px;
         margin-top: 10px;
         width: 100%;
@@ -290,7 +290,7 @@ DIV.NUKEFOOTER {
 
 DIV.NAVHEADER {
         color: #000000;
-        background-color: #f7e9c6;
+        background-color: #e8ecf2;
         padding: 5px;
         margin-bottom: 10px;
         width: 100%;
@@ -306,7 +306,7 @@ DIV.EXAMPLE,DIV.TOC {
         padding-left: 10px;
         padding-right: 10px;
         color: #000000;
-        background-color: #f7e9c6;
+        background-color: #e8ecf2;
 }
 DIV.EXAMPLE {
         border: thin dotted #22AA22;
@@ -323,8 +323,8 @@ UL  {
      /*    list-style: url("images/tux-bullet.png") disc; */
     }
 
-table.namespaces {
-	border-collapse: collapse;
+.namespaces {
+	border: 1px solid black;
 }
 
 .namespaces td {
@@ -333,14 +333,11 @@ table.namespaces {
 }
 
 .namespaces thead {
-    background-color:   #5e3c27;
-    color:              white;
-    font-size:          1em;
-    text-decoration:    none;
+	background-color: #aaf;
 }
 
 .namespaces tr.init {
-	background-color: #bb8766;	
+	background-color: #e88;	
 }
 
 .namespaces tr.childinit {
@@ -348,7 +345,7 @@ table.namespaces {
 }
 
 .namespaces tr.processing {
-	background-color: #bb8766;	
+	background-color: #e88;	
 }
 	
 .namespaces tr.childexit {
@@ -358,10 +355,8 @@ table.namespaces {
 table.directives {
 	border-collapse: collapse;
 }
-
 .directives thead {
-    background-color:   #5e3c27;
-    color:              white;
+    background-color:   #bbf;
     font-size:          1em;
     text-decoration:    none;
 }
@@ -371,30 +366,29 @@ table.directives {
 }
 
 .directives tbody tr > :first-child {
-    background-color:   #bb8766;
-    color:              white;
+    background-color:   #eee;
     padding-left:       2em;
     padding-right:      2em;
     text-align:         left;
 }
 
 .directives tbody tr > :last-child {
-   text-decoration:    	none;
-   font-weight: 		normal;
-   font-size: 			small;
-   border-left:			1px solid black;
-   text-align:         	left;
+   text-decoration:    	    none;
+   font-weight: 			normal;
+	font-size: 				small;
+	border-left:			1px solid black;
+	text-align:         	left;
 }
 
 .directives tbody tr td {
    text-align:          center;
    text-decoration:     none;
    font-weight: 		normal;
-   padding-left:		1em;
-   padding-right: 		1em;
-   padding-bottom: 	    4px;
-   padding-top: 		4px;
-   border-bottom:		1px solid black;
+	padding-left:		1em;
+	padding-right: 		1em;
+	padding-bottom: 	4px;
+	padding-top: 		4px;
+	border-bottom:		1px solid black;
 }
 
 .note td {

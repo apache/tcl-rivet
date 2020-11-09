@@ -58,13 +58,12 @@ typedef struct lazy_tcl_worker {
     request_rec*        r;
     int                 ctype;
     int                 ap_sts;
-    rivet_server_conf*  conf;               /* rivet_server_conf* record            */
+    rivet_server_conf*  conf;               /* rivet_server_conf* record                */
 } lazy_tcl_worker;
 
 /* virtual host thread queue descriptor */
 
 typedef struct vhost_iface {
-    int                 idle_threads_cnt;   /* idle threads for the virtual hosts       */
     int                 threads_count;      /* total number of running and idle threads */
     apr_thread_mutex_t* mutex;              /* mutex protecting 'array'                 */
     apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers   */
@@ -165,7 +164,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = 1;
     //private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
-    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,w->server));
+    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,rsc->default_cache_size));
     private->ext->interp->channel = private->channel;
 
     /* The worker thread can respond to a single request at a time therefore 
@@ -192,14 +191,21 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     Lazy_RunConfScript(private,w,child_init);
 
+    idx = w->conf->idx;
+
+    /* After the thread has run the configuration script we 
+       increment the threads counter */
+
+    apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
+    (module_globals->mpm->vhosts[idx].threads_count)++;
+    apr_thread_mutex_unlock(module_globals->mpm->vhosts[idx].mutex);
+
     /* The thread is now set up to serve request within the the 
      * do...while loop controlled by private->keep_going  */
 
-    idx = w->conf->idx;
     apr_thread_mutex_lock(w->mutex);
     do 
     {
-        module_globals->mpm->vhosts[idx].idle_threads_cnt++;
         while ((w->status != init) && (w->status != thread_exit)) {
             apr_thread_cond_wait(w->condition,w->mutex);
         } 
@@ -209,7 +215,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         }
 
         w->status = processing;
-        module_globals->mpm->vhosts[idx].idle_threads_cnt--;
 
         /* Content generation */
 
@@ -236,8 +241,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     } while (private->ext->keep_going);
     apr_thread_mutex_unlock(w->mutex);
     
-    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread orderly exit");
     Lazy_RunConfScript(private,w,child_exit);
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w->server,"processor thread orderly exit");
 
     apr_thread_mutex_lock(module_globals->mpm->vhosts[idx].mutex);
     (module_globals->mpm->vhosts[idx].threads_count)--;
@@ -246,7 +251,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     apr_thread_exit(thd,APR_SUCCESS);
     return NULL;
 }
-
 
 /*
  * -- create_worker
@@ -260,7 +264,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
 static lazy_tcl_worker* create_worker (apr_pool_t* pool,server_rec* server)
 {
-    lazy_tcl_worker*    w;
+    lazy_tcl_worker* w;
 
     w = apr_pcalloc(pool,sizeof(lazy_tcl_worker));
 
@@ -319,19 +323,18 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
      
     for (s = root_server; s != NULL; s = s->next)
     {
-        int                 vh;
+        int                 idx;
         apr_array_header_t* array;
         rivet_server_conf*  rsc = RIVET_SERVER_CONF(s->module_config);
 
-        vh = rsc->idx;
-        rv = apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,
+        idx = rsc->idx;
+        rv  = apr_thread_mutex_create(&module_globals->mpm->vhosts[idx].mutex,
                                       APR_THREAD_MUTEX_UNNESTED,pool);
         ap_assert(rv == APR_SUCCESS);
         array = apr_array_make(pool,0,sizeof(void*));
         ap_assert(array != NULL);
-        module_globals->mpm->vhosts[vh].array = array;
-        module_globals->mpm->vhosts[vh].idle_threads_cnt = 0;
-        module_globals->mpm->vhosts[vh].threads_count = 0;
+        module_globals->mpm->vhosts[idx].array = array;
+        module_globals->mpm->vhosts[idx].threads_count = 0;
     }
     module_globals->mpm->server_shutdown = 0;
 }
@@ -377,7 +380,7 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
     if (apr_is_empty_array(array))
     {
         w = create_worker(module_globals->pool,r->server);
-        (module_globals->mpm->vhosts[conf->idx].threads_count)++; 
+        //(module_globals->mpm->vhosts[conf->idx].threads_count)++; 
     }
     else
     {
@@ -385,7 +388,9 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
     }
 
     apr_thread_mutex_unlock(mutex);
-    
+
+    /* Locking the thread descriptor structure mutex */    
+
     apr_thread_mutex_lock(w->mutex);
     w->r        = r;
     w->ctype    = ctype;
@@ -421,27 +426,42 @@ rivet_thread_interp* LazyBridge_Interp (rivet_thread_private* private,
     return private->ext->interp;
 }
 
+/*
+ * -- LazyBridge_Finalize
+ *
+ * Bridge thread and resources shutdown
+ *
+ */
+
 apr_status_t LazyBridge_Finalize (void* data)
 {
-    int vh;
-    rivet_server_conf* conf = RIVET_SERVER_CONF(((server_rec*) data)->module_config);
+    int idx;
+    server_rec* server = (server_rec*) data;
+    rivet_server_conf* conf = RIVET_SERVER_CONF(server->module_config);
    
     module_globals->mpm->server_shutdown = 1;
-    for (vh = 0; vh < module_globals->vhosts_count; vh++)
+    for (idx = 0; idx < module_globals->vhosts_count; idx++)
     {
         int try;
         int count;
         apr_array_header_t* array;
         apr_thread_mutex_t* mutex;
 
-        mutex = module_globals->mpm->vhosts[vh].mutex;
-        array = module_globals->mpm->vhosts[vh].array;
-        apr_thread_mutex_lock(mutex);
-        try = 0;
-        do {
+        mutex = module_globals->mpm->vhosts[idx].mutex;
+        array = module_globals->mpm->vhosts[idx].array;
 
-            count = module_globals->mpm->vhosts[vh].threads_count;
-            if (((conf->idx == vh) && (count == 1)) || (count == 0)) { break; } 
+        /* we need to lock the vhost data mutex */
+
+        apr_thread_mutex_lock(mutex);
+
+        count = module_globals->mpm->vhosts[idx].threads_count;
+        apr_thread_mutex_unlock(mutex);
+        try = 0;
+
+        while ((try++ < 3) && (count > 0)) 
+        {
+            ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,server,"waiting for %d thread to exit",count);
+            if ((conf->idx == idx) && (count == 1)) { break; } 
 
             while (!apr_is_empty_array(array)) 
             {
@@ -449,19 +469,30 @@ apr_status_t LazyBridge_Finalize (void* data)
 
                 w = *(lazy_tcl_worker**) apr_array_pop(array); 
                 apr_thread_mutex_lock(w->mutex);
-                w->r        = NULL;
-                w->status   = thread_exit;
+                w->r      = NULL;
+                w->status = thread_exit;
                 apr_thread_cond_signal(w->condition);
                 apr_thread_mutex_unlock(w->mutex);
             }
-            apr_sleep(10000);
+            
+            apr_thread_mutex_lock(mutex);
+            count = module_globals->mpm->vhosts[idx].threads_count;
+            apr_thread_mutex_unlock(mutex);
 
-        } while ((try++ < 3));
-        apr_thread_mutex_unlock(mutex);
+            apr_sleep(1000);
+        }
     }
 
     return APR_SUCCESS;
 }
+
+/*
+ * -- LazyBridge_ExitHandler
+ *
+ *
+ *
+ */
+
 
 int LazyBridge_ExitHandler(rivet_thread_private* private)
 {
@@ -473,34 +504,11 @@ int LazyBridge_ExitHandler(rivet_thread_private* private)
 
     private->ext->keep_going = 0;
 
-    /*
-     * This is the only place where exit_command and 
-     * exit_command_status are set, anywere alse these
-     * fields are only read. We lock on writing to synchronize
-     * with other threads that might try to access
-     * this info. That means that in the unlikely case
-     * of several threads calling ::rivet::exit 
-     * simultaneously the first sets the exit code.
-     * This is just terrible, it highlights the bad habit
-     * of calling 'exit' when programming with mod_rivet
-     * and calls out for a version of Tcl with which
-     * we could safely call Tcl_DeleteInterp and then terminate
-     * a single thread
-    
-    apr_thread_mutex_lock(module_globals->mpm->mutex);
-    if (module_globals->mpm->exit_command == 0)
+    if (!module_globals->single_thread_exit)
     {
-        module_globals->mpm->exit_command = 1;
-        module_globals->mpm->exit_command_status = private->exit_status;
-    }
-    apr_thread_mutex_unlock(module_globals->mpm->mutex);
-     */
-
-    if (!private->running_conf->single_thread_exit)
-    {
-        /* We now tell the supervisor to terminate the Tcl worker thread pool
-         * to exit and is sequence the whole process to shutdown 
-         * by calling exit() */
+        /* We now tell the supervisor to terminate the Tcl worker 
+         * thread pool to exit and is sequence the whole process
+         * to shutdown by calling exit() */
      
         LazyBridge_Finalize(private->r->server);
 
@@ -509,54 +517,30 @@ int LazyBridge_ExitHandler(rivet_thread_private* private)
     return TCL_OK;
 }
 
-#if 0
-int LazyBridge_ExitHandler(rivet_thread_private* private)
+/*
+ *  -- LazyBridge_ServerInit
+ *
+ * Bridge server wide inizialization:
+ *
+ *  We set the default value of the flag single_thread_exit 
+ *  stored in the module globals
+ *
+ */
+
+int LazyBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTemp,server_rec* s)
 {
-
-    /* This is not strictly necessary, because this command will 
-     * eventually terminate the whole processes */
-
-    /* This will force the current thread to exit */
-
-    private->ext->keep_going = 0;
-
-    /*
-     * This is the only place where exit_command and 
-     * exit_command_status are set, anywere alse these
-     * fields are only read. We lock on writing to synchronize
-     * with other threads that might try to access
-     * this info. That means that in the unlikely case
-     * of several threads calling ::rivet::exit 
-     * simultaneously the first sets the exit code.
-     * This is just terrible, it highlights the bad habit
-     * of calling 'exit' when programming with mod_rivet
-     * and calls out for a version of Tcl with which
-     * we could safely call Tcl_DeleteInterp and then terminate
-     * a single thread
-     */
-
-    apr_thread_mutex_lock(module_globals->mpm->mutex);
-    if (module_globals->mpm->exit_command == 0)
+    if (module_globals->single_thread_exit == SINGLE_THREAD_EXIT_UNDEF)
     {
-        module_globals->mpm->exit_command = 1;
-        module_globals->mpm->exit_command_status = private->exit_status;
+        module_globals->single_thread_exit = 1;
     }
-    apr_thread_mutex_unlock(module_globals->mpm->mutex);
-
-    if (private->running_conf->single_thread_exit) return TCL_OK;
-
-    /* We now tell the supervisor to terminate the Tcl worker thread pool
-     * to exit and is sequence the whole process to shutdown 
-     * by calling exit() */
- 
-    LazyBridge_Finalize (private->r->server);
-    return TCL_OK;
+    return OK;
 }
-#endif
+
+/* Table of bridge control functions */
 
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    NULL,
+    LazyBridge_ServerInit,
     LazyBridge_ChildInit,
     LazyBridge_Request,
     LazyBridge_Finalize,

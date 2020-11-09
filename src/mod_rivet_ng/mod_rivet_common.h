@@ -26,7 +26,7 @@ EXTERN running_scripts* Rivet_RunningScripts (apr_pool_t* pool,running_scripts* 
 EXTERN void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,rivet_thread_private* private, server_rec *s, apr_pool_t *p);
 EXTERN void Rivet_ReleaseRunningScripts (running_scripts* scripts);
 EXTERN void Rivet_CreateCache (apr_pool_t *p, rivet_thread_interp* interp_obj);
-EXTERN rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,server_rec* s);
+EXTERN rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,int cache_size);
 EXTERN void Rivet_ProcessorCleanup (void *data);
 EXTERN int Rivet_chdir_file (const char *file);
 EXTERN void Rivet_CleanupRequest(request_rec *r);
