@@ -1537,12 +1537,12 @@ bab</programlisting>
 		<refsect1>
 			<title>Description</title>
 			<para>
-				<command>::rivet::threadid</command> returns is either hexadecimal 
-				(default) or decimal representation the current thread id. This command
-				is useful because allows for precise identification of an execution thread
-				when Apache runs a threaded MPM. Calling the command with <arg>-decimal</arg>
-				prints the thread id in a form that makes it comparable with the <command>tid</command>
-				information printed in the error log. 
+				<command>::rivet::threadid</command> either returns the hexadecimal 
+				(default) or the decimal representation of the current thread id. This command
+				is useful for precise identification of an execution thread
+				when Apache runs a threaded MPM. When called with the <arg>-decimal</arg> switch the
+				command prints the thread id can be compared with the <command>tid</command>
+				information printed in the Apache error log.
 			</para>
 		</refsect1>
 	</refentry>
