@@ -1,6 +1,13 @@
+2021-03-07 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: bumped version as 3.2.1
+    * src/mod_rivet_ng/mod_rivet.c: more linear determination of the bridge name
+    * rivet/packages/formbroker.tcl: introduced key maxlength
+
 2020-11-19 Massimo Manghi <mxmanghi@apache.org>
-	* rivet/rivet/packages/dio/dio.tcl,dio_Mysql.tcl: adding support for
+	* rivet/packages/dio/dio.tcl,dio_Mysql.tcl: adding support for
 	connector specific client arguments
+	* rivet/packages/form/form22.tcl: New from 2.2 package can be
+	configured to return HTML code instead of printing it to stdout
 
 2020-11-02 Massimo Manghi <mxmanghi@apache.org>
 	* doc/xml/directives.xml: SingleThreadExit entry re-elaborated

@@ -157,7 +157,7 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
     rivet_thread_private*   private;
     int                     tcl_status;
 
-    RIVET_PRIVATE_DATA_NOT_NULL (rivet_thread_key, private);
+    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key, private);
 
     module_globals->server_interp->channel = private->channel;
 
@@ -176,7 +176,6 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
     {
         ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
                      MODNAME ": Tcl interpreter random number generation reseeding failed");
-        
     }
     return module_globals->server_interp;
 }

@@ -1604,7 +1604,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
             Tcl_DecrRefCount(cmd);
 
-        } 
+        }
         else if (STRNEQU(cmd_arg,"-all"))
         {
             Tcl_Obj* dictObj;
@@ -1801,9 +1801,11 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
         break;
     }
 
-    /* if we are serving a page, we know our server, 
-     * else send null for server
+    /* if we are serving a page, we infer our server
+     * from the request record, otherwise we use the
+     * root server name stored in the module_globals
      */
+
     serverRec = ((private == NULL) || (private->r == NULL)) ? module_globals->server : private->r->server;
 
     ap_log_error (APLOG_MARK, apLogLevel, 0, serverRec, "%s", message);

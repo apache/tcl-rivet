@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$ */
-
 #ifndef _RIVET_H_
 #define _RIVET_H_
 

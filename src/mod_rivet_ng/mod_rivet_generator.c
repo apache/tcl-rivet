@@ -132,6 +132,12 @@ Rivet_SendContent(rivet_thread_private *private)
 
     private->running_conf = RIVET_SERVER_CONF (private->r->server->module_config);
 
+    #ifdef RIVET_DEBUG_BUILD
+        ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,private->r->server,
+                                MODNAME ": serving '%s' (%d)",private->r->server->server_hostname,
+                                                              private->running_conf->idx);
+    #endif
+
     /* the interp index in the private data can not be changed by a config merge */
 
     interp_obj = RIVET_PEEK_INTERP(private,private->running_conf);
@@ -287,7 +293,7 @@ Rivet_SendContent(rivet_thread_private *private)
         RivetCache_Cleanup(private,interp_obj);
     }
 
-    /* URL referenced script execution and exception handling */
+    /* Rivet's master request script execution and exception handling */
 
     if (Tcl_EvalObjEx(interp, private->running->request_processing,0) == TCL_ERROR) 
     {
