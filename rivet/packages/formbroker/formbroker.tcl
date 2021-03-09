@@ -1,7 +1,7 @@
 # -- formbroker.tcl
 # 
-# Form validation and sanitation tool. Kindly donated by
-# Karl Lehenbauer (Flightaware.com)
+# Form validation and sanitation tool. Developed starting from
+# code initially donated by Karl Lehenbauer (Flightaware.com)
 #
 # Copyright 2017 The Rivet Team
 #
@@ -25,7 +25,7 @@
 namespace eval FormBroker {
     variable form_definitions   [dict create]
     variable form_list          [dict create]
-    variable string_quote       force_quote
+    variable string_quoting     force_quote
     variable form_count         0
     #
     # response_security_error - issue an error with errorCode
@@ -104,7 +104,7 @@ namespace eval FormBroker {
         force_sanitize_response_strings response {*}$args
 
         foreach var $args {
-            set response($var) [$string_quote $response($var)]
+            set response($var) [$string_quoting $response($var)]
         }
 
     }
@@ -122,7 +122,7 @@ namespace eval FormBroker {
         require_response_vars response {*}$args
 
         foreach var $args {
-            set response($var) [$string_quote $response($var)]
+            set response($var) [$string_quoting $response($var)]
         }
 
     }
@@ -303,19 +303,19 @@ namespace eval FormBroker {
 
         set value [dict get $variable_d var] 
         if {[dict get $variable_d force_quote] || $force_quote_var} {
-            set value  [$string_quote $value]
+            set value  [$string_quoting $value]
         }
         return $valid
     }
 
-    # -- constrain_bounds
+    # -- bounds_consistency
     #
     # During the form creation stage this method is called
     # to correct possible inconsistencies with a field bounds 
     # definition
     #
 
-    proc constrain_bounds {field_type _bounds} {
+    proc bounds_consistency {field_type _bounds} {
         upvar $_bounds bounds
 
         switch $field_type {
@@ -457,10 +457,10 @@ namespace eval FormBroker {
     proc validate { form_name args } {
         variable form_definitions
         variable form_list
-        variable string_quote
+        variable string_quoting
 
         set force_quote_vars 0
-        set arguments        $args
+        set arguments $args
         if {[llength $arguments] == 0} { 
             error "missing required arguments" 
         } elseif {[llength $arguments] > 3} {
@@ -531,7 +531,7 @@ namespace eval FormBroker {
 
                 if {[dict get $variable_d force_quote] || $force_quote_vars} {
 
-                    set response_a($var)  [$string_quote [dict get $variable_d var]]
+                    set response_a($var)  [$string_quoting [dict get $variable_d var]]
 
                 }
             }
@@ -570,7 +570,7 @@ namespace eval FormBroker {
                     set response($var_name) $var
                 } elseif {[info exists default]} {
                     set response($var_name) $default
-                } 
+                }
 
             }
 
@@ -594,7 +594,7 @@ namespace eval FormBroker {
     # -- destroy
     #
     # this method is designed to be called
-    # by an 'trace unset' event on the variable
+    # by a 'trace unset' event on the variable
     # keeping the form description object. 
     #
 
@@ -629,7 +629,7 @@ namespace eval FormBroker {
         variable form_definitions
         variable form_list
         variable form_count
-        variable string_quote
+        variable string_quoting
 
         set form_name "form${form_count}"
         incr form_count
@@ -637,10 +637,10 @@ namespace eval FormBroker {
         catch { namespace delete $form_name }
         namespace eval $form_name {
 
-            foreach cmd { validate failing      \
-                          form_definition       \
-                          result validate_var   \
-                          destroy validation_error \
+            foreach cmd { validate failing          \
+                          form_definition           \
+                          result validate_var       \
+                          destroy validation_error  \
                           response reset } {
                 lappend cmdmap $cmd [list [namespace parent] $cmd [namespace tail [namespace current]]]
             }
@@ -656,7 +656,7 @@ namespace eval FormBroker {
                                                           form_validation FB_OK  \
                                                           failing         {}     \
                                                           default         ""     \
-                                                          quoting         $string_quote]
+                                                          quoting         $string_quoting]
 
         while {[llength $args]} {
 
@@ -671,7 +671,7 @@ namespace eval FormBroker {
                         error [list RIVET INVALID_QUOTING_PROC \
                                           "Non existing quoting proc '$quoting'"]
                     }
-                    set string_quote $quoting
+                    set string_quoting $quoting
                 }
                 continue
 
@@ -734,16 +734,15 @@ namespace eval FormBroker {
 
                 while {[llength $e] > 0} {
                     set e [::lassign $e field_spec]
-                    
                     switch $field_spec {
                         check_routine -
                         validator {
                             set e [::lassign $e validator]
                         }
-                        length -
+                        maxlength -
                         bounds {
                             set e [::lassign $e bounds]
-                            constrain_bounds $field_type bounds
+                            bounds_consistency $field_type bounds
                         }
                         default {
                             set e [::lassign $e default]
@@ -788,10 +787,16 @@ namespace eval FormBroker {
         return [namespace current]::$form_name 
     }
 
-    proc form_exists {form_cmd} {
+    # -- form_exists
+    #
+    # check the existence of the form named 'form_name' in the form broker
+    # database. The check is done by simply checking one of dictionaries that
+    # keep the internal database of form definitions
+
+    proc form_exists {form_command_name} {
         variable form_definitions
 
-        return [dict exists $form_definitions [namespace tail $form_cmd]]
+        return [dict exists $form_definitions [namespace tail $form_command_name]]
     }
 
     proc creategc {varname args} {
