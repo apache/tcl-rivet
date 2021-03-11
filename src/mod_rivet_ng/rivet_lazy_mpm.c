@@ -95,6 +95,31 @@ enum {
 
 #define MOD_RIVET_QUEUE_SIZE 100
 
+/*
+ * -- Rivet_ExecutionThreadInit 
+ *
+ * We keep here the basic initilization each execution thread should undergo
+ *
+ *  - create the thread private data
+ *  - set up the Panic procedure
+ */
+
+static rivet_thread_private* Rivet_ExecutionThreadInit (apr_thread_t *thd)
+{
+    rivet_thread_private* private;
+    apr_pool_t*           tPool;
+
+    apr_thread_mutex_lock(module_globals->mpm->mutex);
+    ap_assert (apr_pool_create(&tPool,apr_thread_pool_get(thd)) == APR_SUCCESS);
+    apr_thread_mutex_unlock(module_globals->mpm->mutex);
+
+    private = Rivet_CreatePrivateData(tPool,true);
+    ap_assert(private != NULL);
+    Rivet_SetupTclPanicProc();
+
+    return private;
+}
+
 static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w,int init)
 {
     Tcl_Obj*    tcl_conf_script; 
@@ -155,7 +180,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     /* Rivet_ExecutionThreadInit creates and returns the thread private data. */
 
-    private = Rivet_ExecutionThreadInit();
+    private = Rivet_ExecutionThreadInit(thd);
 
     /* A bridge creates and stores in private->ext its own thread private
      * data. The lazy bridge is no exception. We just need a flag controlling 
@@ -309,8 +334,9 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 
     module_globals->mpm = apr_pcalloc(pool,sizeof(mpm_bridge_status));
 
-    /* This mutex is only used to consistently carry out these 
-     * two tasks
+    /* This mutex is only used to consistently carry out modifications
+     * on the module_globals structure that may result in inconsitent
+     * status due to concurrent access. 
      *
      *  - set the exit status of a child process (hopefully will be 
      *    unnecessary when Tcl is able again of calling 
@@ -318,6 +344,7 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
      *  - control the server_shutdown flag. Actually this is
      *    not entirely needed because once set this flag 
      *    is never reset to 0
+     *  - create thread specific pools of memory
      *
      */
 
@@ -343,8 +370,7 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
         rivet_server_conf*  rsc = RIVET_SERVER_CONF(s->module_config);
 
         vh = rsc->idx;
-        rv = apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,
-                                      APR_THREAD_MUTEX_UNNESTED,pool);
+        rv = apr_thread_mutex_create(&module_globals->mpm->vhosts[vh].mutex,APR_THREAD_MUTEX_UNNESTED,pool);
         ap_assert(rv == APR_SUCCESS);
         array = apr_array_make(pool,0,sizeof(void*));
         ap_assert(array != NULL);
@@ -431,9 +457,9 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
  *
  */
 
-rivet_thread_interp* LazyBridge_Interp (rivet_thread_private* private,
-                                      rivet_server_conf*    conf,
-                                      rivet_thread_interp*  interp)
+rivet_thread_interp* LazyBridge_Interp (rivet_thread_private*   private,
+                                      rivet_server_conf*        conf,
+                                      rivet_thread_interp*      interp)
 {
     if (interp != NULL) { private->ext->interp = interp; }
 

@@ -35,7 +35,7 @@ EXTERN void                 Rivet_InitServerVariables (Tcl_Interp *interp, apr_p
 EXTERN void                 Rivet_Panic TCL_VARARGS_DEF (CONST char *, arg1);
 EXTERN Tcl_Channel*         Rivet_CreateRivetChannel (apr_pool_t* pPool, apr_threadkey_t* rivet_thread_key);
 EXTERN rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* pool, bool create_request_obj);
-EXTERN rivet_thread_private* Rivet_ExecutionThreadInit (void);
+// EXTERN rivet_thread_private* Rivet_ExecutionThreadInit (void);
 EXTERN rivet_thread_private* Rivet_SetupTclPanicProc (void);
 EXTERN void                 Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel);
 EXTERN int                  Rivet_ReadFile (apr_pool_t* pool,char* filename,char** buffer,int* nbytes);

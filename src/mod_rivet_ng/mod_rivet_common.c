@@ -491,11 +491,10 @@ Rivet_ReleaseRivetChannel (Tcl_Interp* interp, Tcl_Channel* channel)
  *  Arguments:
  * 
  *    - apr_pool_t* pPool:   parent thread memory pool
- *    - bool create_req_obj: the field req (ApacheTcl_Req *) has to be allocate
- *                           a thread private data structure created during server
- *                           initialization doesn't need to process any HTTP request
- *                           That mean the fork based bridge need to allocate it 
- *                           themselves
+ *    - bool create_req_obj: the field req (ApacheTcl_Req *) has to be allocated.
+ *                           Thread private data structures created during server
+ *                           initialization don't need to process any HTTP request
+ *                           Prefork based bridges need to allocate it themselves 
  *
  *  Returned value:
  * 
@@ -544,27 +543,6 @@ rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* tPool,bool create_req
     apr_threadkey_private_set (private,rivet_thread_key);
     return private;
 }
-
-/*
- * -- Rivet_ExecutionThreadInit 
- *
- * We keep here the basic initilization each execution thread should undergo
- *
- *  - create the thread private data
- *  - create a Tcl channel
- *  - set up the Panic procedure
- */
-/*
-rivet_thread_private* Rivet_ExecutionThreadInit (void)
-{
-    rivet_thread_private* private = Rivet_CreatePrivateData();
-    ap_assert(private != NULL);
-    private->channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-    Rivet_SetupTclPanicProc();
-
-    return private;
-}
-*/
 
 /*
  *-----------------------------------------------------------------------------

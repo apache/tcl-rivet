@@ -41,7 +41,7 @@ extern DLLIMPORT module             rivet_module;
 
 /* -- Rivet_SetupInterps
  *
- * The server_rec chain is walked through and server configurations is read to
+ * The server_rec chain is walked through and server configurations are read to
  * set up the thread private configuration and interpreters database
  *
  *  Arguments:

@@ -1,3 +1,7 @@
+2021-03-11 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetInspect.c: add SingleThreadExit introspection
+    * src7mod_rivet_ng/rivet_lazy_mpm.c: fixed lazy bridge that did not build anymore
+
 2020-10-01 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivet_prefork_mpm.c: Fixed trivial bug in checking the
 	rivet cache size
