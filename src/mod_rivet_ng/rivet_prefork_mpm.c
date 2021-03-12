@@ -161,8 +161,6 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
     rivet_thread_private*   private;
     rivet_server_conf*      root_server_conf; 
 	rivet_thread_interp**   server_interps = module_globals->server_interps;
-    //Tcl_Channel*          channel;
-    //server_rec*           s;
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
 
@@ -172,8 +170,7 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
 
-    /* 
-     * Prefork bridge has inherited the parent process pool but we have 
+    /* Prefork bridge has inherited the parent process pool but we have 
      * to initialize ourselves the request descriptor obj 
      */
 

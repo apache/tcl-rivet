@@ -59,11 +59,11 @@ static int cmd(\
     Tcl_Obj *CONST objv[])
 
 #define TCL_OBJ_CMD( name, func ) \
-Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
-		      name,                     /* Function name in Tcl */\
-		      func,                     /* C function name */\
-		      NULL,                     /* Client Data */\
-		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
+Tcl_CreateObjCommand (interp,         /* Tcl interpreter */\
+		              name,           /* Function name in Tcl */\
+		              func,           /* C function name */\
+		              NULL,           /* Client Data */\
+		              (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
 
  /* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace. Commands
   * are exported from the RIVET_NS (::rivet) namespace in the init.tcl 

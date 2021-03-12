@@ -507,7 +507,7 @@ rivet_thread_private* Rivet_CreatePrivateData (apr_pool_t* tPool,bool create_req
 {
     rivet_thread_private*   private;
 
-    ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
+    //ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
     //apr_thread_mutex_lock(module_globals->pool_mutex);
     private = apr_pcalloc (tPool,sizeof(*private));

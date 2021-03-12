@@ -1,3 +1,7 @@
+2021-03-12 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/mod_rivet.c: Rivet_SeekMPMBridge aligned with new implementation
+    made for 3.2.0. Removed call to Tcl_InitNotifier
+
 2021-03-11 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetInspect.c: add SingleThreadExit introspection
     * src7mod_rivet_ng/rivet_lazy_mpm.c: fixed lazy bridge that did not build anymore
