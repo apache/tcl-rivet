@@ -34,58 +34,71 @@
 #include "http_main.h"
 #include "util_script.h"
 #include "http_config.h"
+#include "http_log.h"
 
 #include "mod_rivet.h"
+
+static const char* loglevel_defs[] =
+{
+    "emerg",
+    "alert",
+    "crit",
+    "err",
+    "warning",
+    "notice",
+    "info",
+    "debug",
+};
 
 /* These arrays must be kept aligned. confDirectives must be NULL terminated */
 
 static const char* confDirectives[] = 
 { 
-                    "ServerInitScript", 
-                    "GlobalInitScript",
-                    "ChildInitScript",
-                    "ChildExitScript",
-                    "BeforeScript",
-                    "AfterScript",
-                    "AfterEveryScript",
-                    "AbortScript",
-                    "ErrorScript",
-                    "UploadMaxSize",
-                    "UploadDirectory",
-                    "UploadFilesToVar",
-                    "SeparateVirtualInterps",
-                    "SeparateChannels",
-                    "HonorHeaderOnlyRequests",
-                    "MpmBridge",
-                    "RequestHandler",
-                    "ExportRivetNS",
-                    "ImportRivetNS",
-                    "SingleThreadExit",
-                    NULL 
+    "ServerInitScript", 
+    "GlobalInitScript",
+    "ChildInitScript",
+    "ChildExitScript",
+    "BeforeScript",
+    "AfterScript",
+    "AfterEveryScript",
+    "AbortScript",
+    "ErrorScript",
+    "UploadMaxSize",
+    "UploadDirectory",
+    "UploadFilesToVar",
+    "SeparateVirtualInterps",
+    "SeparateChannels",
+    "HonorHeaderOnlyRequests",
+    "MpmBridge",
+    "RequestHandler",
+    "ExportRivetNS",
+    "ImportRivetNS",
+    "SingleThreadExit",
+    NULL 
 };
 
 enum confIndices {
-                    server_init_script,
-                    global_init_script,
-                    child_init_script,
-                    child_exit_script,
-                    before_script,
-                    after_script,
-                    after_every_script,
-                    abort_script,
-                    error_script,
-                    upload_max,
-                    upload_directory,
-                    upload_files_to_var,
-                    separate_virtual_interps,
-                    separate_channels,
-                    honor_header_only_requests,
-                    mpm_bridge,
-                    request_handler,
-                    export_rivet_ns,
-                    import_rivet_ns,
-                    single_thread_exit,
-                    conf_index_terminator 
+    server_init_script,
+    global_init_script,
+    child_init_script,
+    child_exit_script,
+    before_script,
+    after_script,
+    after_every_script,
+    abort_script,
+    error_script,
+    upload_max,
+    upload_directory,
+    upload_files_to_var,
+    separate_virtual_interps,
+    separate_channels,
+    honor_header_only_requests,
+    mpm_bridge,
+    request_handler,
+    export_rivet_ns,
+    import_rivet_ns,
+    single_thread_exit,
+    conf_index_terminator 
 };
 
 extern mod_rivet_globals* module_globals;
@@ -153,12 +166,13 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         default: return NULL;
     }
 
-    /* this case is a bit convoluted and needs a more linear coding. 
-     * Basically: if the function hasn't returned (default branch in the 'switch' selector)
-     * that means the arguent was valid. Since any integer parameter would produce a valid Tcl_Obj
-     * pointer if both the int_value and string_value pointers are NULL that means the value
-     * was a NULL pointer to a string value. We therefore return an empty string 
+    /*
+     * In the configuration record any integer valued parameter has a defined integer default, whereas
+     * string parameters have NULL as default. If we got here but both the these pointers are NULL
+     * it means a valid string valued configuration parameter was inspected but since it's NULL we
+     * return an empty string
      */
+
 
     if ((string_value == NULL) && (int_value == NULL))
     {
@@ -204,8 +218,6 @@ Rivet_ReadConfTable (Tcl_Interp*   interp,
     int                 nelts,i;
     int                 tcl_status  = TCL_OK;
     Tcl_Obj*            keyval_list = Tcl_NewObj();
-
-    //Tcl_IncrRefCount(keyval_list);
 
     arr   = (apr_array_header_t*) apr_table_elts( table );
     elts  = (apr_table_entry_t *) arr->elts;
@@ -402,52 +414,27 @@ Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s )
 
     field_value = Tcl_NewStringObj(s->server_hostname,-1);
     field_name  = Tcl_NewStringObj("hostname",-1);
-    Tcl_IncrRefCount(field_value);
-    Tcl_IncrRefCount(field_name);
-
     Tcl_DictObjPut(interp,dictObj,field_name,field_value);
-
-    Tcl_DecrRefCount(field_value);
-    Tcl_DecrRefCount(field_name);
 
     field_value = Tcl_NewStringObj(s->error_fname,-1);
     field_name  = Tcl_NewStringObj("errorlog",-1);
-    Tcl_IncrRefCount(field_value);
-    Tcl_IncrRefCount(field_name);
-
     Tcl_DictObjPut(interp,dictObj,field_name,field_value);
-
-    Tcl_DecrRefCount(field_value);
-    Tcl_DecrRefCount(field_name);
 
     field_value = Tcl_NewStringObj(s->server_admin,-1);
     field_name  = Tcl_NewStringObj("admin",-1);
-    Tcl_IncrRefCount(field_value);
-    Tcl_IncrRefCount(field_name);
-
     Tcl_DictObjPut(interp,dictObj,field_name,field_value);
-
-    Tcl_DecrRefCount(field_value);
-    Tcl_DecrRefCount(field_name);
 
     field_value = Tcl_NewStringObj(s->path,-1);
     field_name  = Tcl_NewStringObj("server_path",-1);
-    Tcl_IncrRefCount(field_value);
-    Tcl_IncrRefCount(field_name);
-
     Tcl_DictObjPut(interp,dictObj,field_name,field_value);
-
-    Tcl_DecrRefCount(field_value);
-    Tcl_DecrRefCount(field_name);
 
     field_value = Tcl_NewIntObj(s->is_virtual);
     field_name  = Tcl_NewStringObj("virtual",-1);
-    Tcl_IncrRefCount(field_value);
-    Tcl_IncrRefCount(field_name);
-
     Tcl_DictObjPut(interp,dictObj,field_name,field_value);
 
-    Tcl_DecrRefCount(field_value);
-    Tcl_DecrRefCount(field_name);
+    field_value = Tcl_NewStringObj(loglevel_defs[s->log.level],-1);
+    field_name  = Tcl_NewStringObj("loglevel",-1);
+    Tcl_DictObjPut(interp,dictObj,field_name,field_value);
+
     return dictObj;
 }

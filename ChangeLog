@@ -1,6 +1,15 @@
+2021-04-13 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivetInspect.c: add server current loglevel. Removed
+    unneeded ref count management in the server array construction
+
 2021-03-12 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/mod_rivet.c: Rivet_SeekMPMBridge aligned with new implementation
     made for 3.2.0. Removed call to Tcl_InitNotifier
+
+2021-03-07 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: bumped version as 3.2.1
+    * src/mod_rivet_ng/mod_rivet.c: more linear determination of the bridge name
+    * rivet/packages/formbroker.tcl: introduced key maxlength
 
 2021-03-11 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetInspect.c: add SingleThreadExit introspection
