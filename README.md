@@ -19,4 +19,4 @@ See [LICENSE](LICENSE) for licensing terms.
 
 ## RIVET NAMESPACE
 
- - The Rivet command set was moved into the ::rivet namespace and each command should now be fully qualified. By default the command set (exceptions are ::rivet::try and ::rivet::catch) is placed in the namespace export list, so you can import it into the global namespace for compatibility with Rivet version < 2.0. This is a deprecated option though and it could be removed in future releases
+ - The Rivet command set was moved into the ::rivet namespace and each command should now be fully qualified. By default the command set (exceptions are ::rivet::try and ::rivet::catch) is placed in the namespace export list, so you can import it into the global namespace for compatibility with Rivet version < 2.0. This is a deprecated option though and it could be removed in future releases.
