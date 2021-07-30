@@ -19,7 +19,6 @@
 # different implementation in various backends for specific
 # functionalities
 #
-# $Id$
 
 package require Itcl
 

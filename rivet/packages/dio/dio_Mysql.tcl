@@ -17,8 +17,7 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-# $Id$
-
+package require DIO
 package provide dio_Mysql 0.4
 
 namespace eval DIO {
@@ -26,9 +25,9 @@ namespace eval DIO {
         inherit Database
 
         constructor {args} {eval configure $args} {
-            if {       [catch {package require Mysqltcl}]   \
-                    && [catch {package require mysqltcl}]   \
-                    && [catch {package require mysql}] } {
+            if {   [catch {package require Mysqltcl}]   \
+                && [catch {package require mysqltcl}]   \
+                && [catch {package require mysql}]} {
                 return -code error "No MySQL Tcl package available"
             }
 

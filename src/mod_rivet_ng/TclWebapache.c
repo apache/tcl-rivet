@@ -701,10 +701,22 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 {
 	apr_status_t status;
 
-	status = apr_file_copy(req->upload->tempname ,Tcl_GetString(filename),APR_FILE_SOURCE_PERMS,req->req->pool);
+	status = apr_file_copy(req->upload->tempname,Tcl_GetString(filename),APR_FILE_SOURCE_PERMS,req->req->pool);
 	if (status == APR_SUCCESS) {
 	    return TCL_OK;
 	} else {
+
+        /* apr_strerror docs don't require a specific buffer size, we're just guessing it */
+
+        char  error_msg[1024];
+        char* tcl_error_msg;
+        apr_strerror(status,error_msg,1024);
+
+        tcl_error_msg = apr_psprintf(req->req->pool,"Error copying upload '%s' to '%s' (%s)", req->upload->tempname,
+                                                                                              Tcl_GetString(filename),
+                                                                                              error_msg);
+
+        Tcl_AddErrorInfo(req->interp,tcl_error_msg);
 		return TCL_ERROR;
 	}
 }
@@ -723,14 +735,31 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
         
         chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
         if (chan == NULL) {
+            char* tcl_error_msg;
+            int error_number = Tcl_GetErrno();
+
+            Tcl_AddErrorInfo(req->interp,"Error opening channel to uploaded data");
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+                                                        Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
+            Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
         }
-        if (Tcl_SetChannelOption(req->interp, chan,
-                     "-translation", "binary") == TCL_ERROR) {
+        if (Tcl_SetChannelOption(req->interp, chan, "-translation", "binary") == TCL_ERROR) {
+            char* tcl_error_msg;
+            int error_number = Tcl_GetErrno();
+
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+                                                        Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
+            Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
         }
-        if (Tcl_SetChannelOption(req->interp, chan,
-                     "-encoding", "binary") == TCL_ERROR) {
+        if (Tcl_SetChannelOption(req->interp, chan, "-encoding", "binary") == TCL_ERROR) {
+            char* tcl_error_msg;
+            int error_number = Tcl_GetErrno();
+
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+                                                        Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
+            Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
         }
 

@@ -1,3 +1,8 @@
+2021-07-30 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/TclWebapache.c: integrating the current scant Tcl error info 
+    returned by the various ::rivet::upload subcommands
+    * rivet/packages/dio/: Removing references to subversion's tags
+
 2021-04-13 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetInspect.c: add server current loglevel. Removed
     unneeded ref count management in the server array construction

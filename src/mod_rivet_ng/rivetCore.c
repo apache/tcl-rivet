@@ -101,7 +101,6 @@ Rivet_NoRequestRec (Tcl_Interp* interp, Tcl_Obj* command)
     Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(" outside a request processing",-1));
 }
 
-
 /*
  *-----------------------------------------------------------------------------
  *
@@ -1181,8 +1180,6 @@ TCL_CMD_HEADER( Rivet_Upload )
      * FILENAME : upload original filename
      * TEMPNAME : temporary file where the upload is taking place
      * NAMES    : list of uploads
-     *
-     * the procedure shouldn't reach for the default case
      */
 
     switch ((enum subcommand)subcommandindex)
