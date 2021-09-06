@@ -7,9 +7,9 @@ CREATE TABLE rivet_session (
 );
 CREATE TABLE rivet_session_cache (
     session_id      varchar(128)    default NULL PRIMARY KEY ON CONFLICT FAIL,
-    package_        varchar(64)     default NULL,
-    key_            varchar(128)    default NULL,
-    data            varchar(255)    default NULL,
+    package_        varchar(128)     default NULL,
+    key_            varchar(256)    default NULL,
+    data            varchar(4096)    default NULL,
 
 --  KEY rivet_session_cache_idx (session_id),
     CONSTRAINT session_cleanup FOREIGN KEY (session_id) REFERENCES rivet_session(session_id) ON DELETE CASCADE

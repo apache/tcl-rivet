@@ -1,3 +1,6 @@
+2021-09-06 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/session/session-create-*.sql: making cache fields larger
+
 2021-07-30 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/TclWebapache.c: integrating the current scant Tcl error info 
     returned by the various ::rivet::upload subcommands
@@ -15,7 +18,7 @@
 2020-11-19 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio.tcl,dio_Mysql.tcl: adding support for
 	connector specific client arguments
-	* rivet/packages/form/form22.tcl: New from 2.2 package can be
+	* rivet/packages/form/form22.tcl: New form 2.2 package can be
 	configured to return HTML code instead of printing it to stdout
 
 2020-11-02 Massimo Manghi <mxmanghi@apache.org>
