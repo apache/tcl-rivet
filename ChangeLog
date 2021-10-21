@@ -1,19 +1,26 @@
+2021-10-20 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/Tclwebapache.c: new environment variable handling. 
+	Command ::rivet::env doesn't necessarily trigger the whole enviroment load
+	into request_rec, it tries to resolve a variable incrementally. Need
+	to recommend the usage of ::rivet::env instead of ::rivet::load_env
+	* tests/env.rvt: adding new tests to environment variable resolution
+
 2021-09-06 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/session/session-create-*.sql: making cache fields larger
+	* rivet/packages/session/session-create-*.sql: making cache fields larger
 
 2021-07-30 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/TclWebapache.c: integrating the current scant Tcl error info 
-    returned by the various ::rivet::upload subcommands
-    * rivet/packages/dio/: Removing references to subversion's tags
+	* src/mod_rivet_ng/TclWebapache.c: integrating the current scant Tcl error info 
+	returned by the various ::rivet::upload subcommands
+	* rivet/packages/dio/: Removing references to subversion's tags
 
 2021-04-13 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetInspect.c: add server current loglevel. Removed
-    unneeded ref count management in the server array construction
+	* src/mod_rivet_ng/rivetInspect.c: add server current loglevel. Removed
+	unneeded ref count management in the server array construction
 
 2021-03-07 Massimo Manghi <mxmanghi@apache.org>
-    * VERSION: bumped version as 3.2.1
-    * src/mod_rivet_ng/mod_rivet.c: more linear determination of the bridge name
-    * rivet/packages/formbroker.tcl: introduced key maxlength
+	* VERSION: bumped version as 3.2.1
+	* src/mod_rivet_ng/mod_rivet.c: more linear determination of the bridge name
+	* rivet/packages/formbroker.tcl: introduced key maxlength
 
 2020-11-19 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio.tcl,dio_Mysql.tcl: adding support for

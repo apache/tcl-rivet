@@ -539,7 +539,7 @@
 			    for any special (with respect to SGML, and hence HTML) characters
 			    from the specified string, and returns the result.  
 			    For example, the right angle bracket is escaped to the corrected
-	            ampersand gt symbol.
+	          ampersand gt symbol.
 			</para>
 	   </refsect1>
 	</refentry>

@@ -1,4 +1,4 @@
-# \$Id\$
+
 # Minimal config file for testing
 
 # Parsed by makeconf.tcl
