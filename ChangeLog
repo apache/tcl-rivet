@@ -1,3 +1,7 @@
+2021-10-25 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/Tclwebapache.c: extended comments
+	* src/rivet.h: new macro MINSTRLEN
+
 2021-10-20 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/Tclwebapache.c: new environment variable handling. 
 	Command ::rivet::env doesn't necessarily trigger the whole enviroment load

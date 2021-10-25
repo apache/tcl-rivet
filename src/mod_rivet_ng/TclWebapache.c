@@ -42,9 +42,9 @@
 extern module rivet_module;
 extern mod_rivet_globals* module_globals;
 
-/* It's kind of an overkill, but we define macros for handling the
- * flags that control and reduce the overhead when loading the 
- * environment variables */
+/* It's kind of an overkill: we define macros for handling the
+ * flags that control the handling of the three environment variables
+ * classes (common, CGI and include variables). */
 
 #define ENV_COMMON_VARS_M    1
 #define ENV_CGI_VARS_M       2
@@ -119,11 +119,13 @@ TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp)
 
     /*
      * if strlen(req->content_type) > strlen([RIVET|TCL]_FILE_CTYPE)
-     * a charset parameters might be there 
+     * a charset parameters might be in the configuration like
+     *
+     * AddType 'application/x-httpd-rivet;charset=utf-8' rvt
      */
 
     if (((private->ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
-         ((private->ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
+        ((private->ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
         
         char* charset;
 
@@ -457,7 +459,7 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
 }
 
 /* These 2 array must be aligned and a one-to-one correspondence preserved 
- * The enum include_vars_idx must be terminated by 'inval_env_var'
+ * The enum include_vars_idx must be terminated by 'invalid_env_var'
  */
 
 static const char* include_env_vars[] =
@@ -620,7 +622,7 @@ TclWeb_InitEnvVars (rivet_thread_private* private)
 static char*
 TclWeb_GetEnvIncludeVar (rivet_thread_private* private,char* key)
 {
-    int    idx;
+    int idx;
 
     for (idx = 0;idx < invalid_env_var; idx++)
     {

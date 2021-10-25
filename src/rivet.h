@@ -33,6 +33,7 @@ typedef int rivet_req_ctype;
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_rivet */
 
+#define MINSTRLEN(s1,s2) strlen(s1) < strlen(s2) ? strlen(s1) : strlen(s2)
 #define STREQU(s1,s2)  (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 #define STRNEQU(s1,s2) (s1[0] == s2[0] && strncmp(s1, s2, strlen(s2)) == 0)
 #define RIVET_NS                "::rivet"
