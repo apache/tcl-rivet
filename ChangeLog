@@ -1,3 +1,18 @@
+2021-10-25 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/Tclwebapache.c: extended comments
+	* src/rivet.h: new macro MINSTRLEN
+
+2021-10-20 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/Tclwebapache.c: new environment variable handling. 
+	  Command ::rivet::env doesn't necessarily trigger the whole enviroment load
+	  into request_rec, it tries to resolve a variable incrementally. Need
+	  to recommend the usage of ::rivet::env instead of ::rivet::load_env
+	* tests/env.rvt: adding new tests to environment variable resolution
+
+2021-09-06 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/session/session-create-*.sql: making cache fields larger
+	* rivet/packages/session/session-create-*.sql: making cache fields larger
+
 2021-04-13 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/rivetInspect.c: add server current loglevel. Removed
     unneeded ref count management in the server array construction

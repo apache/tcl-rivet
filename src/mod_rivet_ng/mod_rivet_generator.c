@@ -174,7 +174,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
                 scripts = Rivet_RunningScripts (private->pool,scripts,newconfig);
 
                 apr_hash_set (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path),scripts);
-               
+
                 private->running = scripts;
             }
         }

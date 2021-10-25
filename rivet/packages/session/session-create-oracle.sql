@@ -4,10 +4,10 @@
 --  Arnulf 
 --
 CREATE TABLE rivet_session
-    (ip_address                     VARCHAR2(23) DEFAULT NULL,
+    (ip_address                    VARCHAR2(23) DEFAULT NULL,
     session_start_time             DATE DEFAULT NULL,
     session_update_time            DATE DEFAULT NULL,
-    session_id                     VARCHAR2(50) NOT NULL
+    session_id                     VARCHAR2(64) NOT NULL
     )
 /
 
@@ -16,10 +16,10 @@ ALTER TABLE rivet_session ADD PRIMARY KEY (session_id)
 /
 
 CREATE TABLE rivet_session_cache
-    (session_id                     VARCHAR2(50) DEFAULT NULL,
-    package_                       VARCHAR2(100) DEFAULT NULL,
-    key_                           VARCHAR2(50) DEFAULT NULL,
-    data                           VARCHAR2(255) DEFAULT NULL
+    (session_id                    VARCHAR2(128) DEFAULT NULL,
+    package_                       VARCHAR2(128) DEFAULT NULL,
+    key_                           VARCHAR2(256) DEFAULT NULL,
+    data                           VARCHAR2(4096) DEFAULT NULL
   )
 /
 
