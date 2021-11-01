@@ -509,12 +509,12 @@
 	   <refsect1>
 			<title>Description</title>
 			<para>
-			    If just one environmental variable is needed <command>::rivet::env</command>
-			    returns the variable value or an empty string if the environment
+			    <command>::rivet::env</command> resolves a single environment
+			    variable and returns its value or an empty string if the environment
 			    variable name in the argument is not defined.
-			    This command has some performance advantages with respect to
-			    <command>::rivet::load_env</command> since it avoids the
-			    loading of the whole set of environment and header variables.
+			    This command is the recommended way to resolve an environment
+			    variable leaving <command>::rivet::load_env</command> to debugging
+			    and development operations.
 			</para>
 	   </refsect1>
 	</refentry>

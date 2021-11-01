@@ -1,3 +1,7 @@
+2021-11-01 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/Tclwebapache.c: expanded comments to newly
+	introduced functions
+
 2021-10-25 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/Tclwebapache.c: extended comments
 	* src/rivet.h: new macro MINSTRLEN
@@ -93,37 +97,37 @@
 	to test multiple uploads)
 
 2019-12-12 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
-    Rivet_MergeConfig
+	* src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
+	Rivet_MergeConfig
 
 2019-12-06 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetCore.c: expanded error info data in Rivet_Upload
-    * doc/rivet.css: new color scheme for docbook manual
+	* src/mod_rivet_ng/rivetCore.c: expanded error info data in Rivet_Upload
+	* doc/rivet.css: new color scheme for docbook manual
 
 2019-12-04 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetCore.c: new branch uploadcmdfix with improved
-    argument checking in Rivet_Upload that was the cause of random crashes
+	* src/mod_rivet_ng/rivetCore.c: new branch uploadcmdfix with improved
+	argument checking in Rivet_Upload that was the cause of random crashes
 
 2019-11-29 Brice Hamon <bhdec@apache.org>
-   * src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
-   * src/mod_rivet_ng/mod_rivet_cache.c: 
-   * src/mod_rivet_ng/rivetCore.c: fixed crash when rvt file not readable
+	* src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
+	* src/mod_rivet_ng/mod_rivet_cache.c: 
+	* src/mod_rivet_ng/rivetCore.c: fixed crash when rvt file not readable
 
 2019-10-13 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/directives.xml: configuration directives table expanded
-    * doc/examples/
+	* doc/xml/directives.xml: configuration directives table expanded
+	* doc/examples/
 
 2019-09-30 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetCore.c: revised argument checking
+	* src/mod_rivet_ng/rivetCore.c: revised argument checking
 
 2019-09-29 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/commands.xml: Completed manual page for command ::rivet::thread_id
-    * src/mod_rivet_ng/rivetCore.c: Rivet_GetThreadId rewritten. Now the
-    command accepts an optional argument to select decimal or hexadecimal (default)
-    output 
+	* doc/xml/commands.xml: Completed manual page for command ::rivet::thread_id
+	* src/mod_rivet_ng/rivetCore.c: Rivet_GetThreadId rewritten. Now the
+	command accepts an optional argument to select decimal or hexadecimal (default)
+	output 
 
 2019-08-05 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/directives.xml: Documenting SingleThreadExit directive
+	* doc/xml/directives.xml: Documenting SingleThreadExit directive
 
 2019-07-27 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml,src/mod_rivet_ng/rivetCore.c: Add ::rivet::thread_id
