@@ -53,7 +53,7 @@ extern mod_rivet_globals* module_globals;
 #define ENV_COMMON_VARS(env) env |= ENV_COMMON_VARS_M;
 #define ENV_CGI_VARS(env)    env |= ENV_CGI_VARS_M;
 #define ENV_VARS(env)        env |= ENV_VARS_M;
-
+#define ENV_LOADED(env)      env |= ENV_COMMON_VARS_M | ENV_CGI_VARS_M | ENV_VARS_M;
 #define ENV_IS_LOADED(env)          (env == (ENV_COMMON_VARS_M | ENV_CGI_VARS_M | ENV_VARS_M))
 #define ENV_COMMON_VARS_LOADED(env) (env & ENV_COMMON_VARS_M) != 0
 #define ENV_CGI_VARS_LOADED(env)    (env & ENV_CGI_VARS_M) != 0
@@ -459,7 +459,13 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
 }
 
 /* These 2 array must be aligned and a one-to-one correspondence preserved 
- * The enum include_vars_idx must be terminated by 'invalid_env_var'
+ * The enum include_vars_idx *must* be terminated by 'invalid_env_var'
+ * Adding a new env variable requires 
+ *    + the name of the variable be listed in include_env_vars
+ *    + a new value in the enumerator include_vars_idx must be added in the 
+ *      corresponding position of the variable names array
+ *    + the switch construct in function TclWeb_SelectEnvIncludeVar must
+ *      be expanded to handle the new case identified by the new enumerator value
  */
 
 static const char* include_env_vars[] =
@@ -473,6 +479,27 @@ enum include_vars_idx {
     query_string_unescaped,user_name,rivet_cache_free,rivet_cache_size,
     invalid_env_var
 };
+
+/*  -- TclWeb_SelectEnvIncludeVar 
+ *
+ *  Depending on the value idx of the enumerator a method is selected
+ *  to return a string of a specific environment variable methods
+ *  Adding new environment variables need new cases of the switch 
+ *  construct to be added, provided the data can be obtained from
+ *  the rivet_thread_private structure
+ *
+ *   Arguments:
+ *
+ *      + rivet_thread_private* private: pointer to a thread private data structure
+ *      + int idx: an integer value listed in the enumerator include_vars_idx
+ *
+ *   Results:
+ *
+ *      A character string pointer to the value of the environment variable or
+ *      NULL if the enumerator value idx was invalid or resolving the environment
+ *      variable was impossible
+ * 
+ */
 
 static char*
 TclWeb_SelectEnvIncludeVar (rivet_thread_private* private,int idx)
@@ -591,12 +618,10 @@ TclWeb_InitEnvVars (rivet_thread_private* private)
     if (!ENV_CGI_VARS_LOADED(req->environment_set))
     {
         ap_add_cgi_vars(req->req);
-        ENV_CGI_VARS(req->environment_set);
     }
     if (!ENV_COMMON_VARS_LOADED(req->environment_set))
     {
         ap_add_common_vars(req->req);
-        ENV_COMMON_VARS(req->environment_set)
     }
 
     /* Loading into 'table' the include vars */
@@ -614,10 +639,23 @@ TclWeb_InitEnvVars (rivet_thread_private* private)
         {
             apr_table_set(table,include_env_vars[idx],TclWeb_SelectEnvIncludeVar(private,idx));
         }
-        ENV_VARS(req->environment_set)
     }
 
+    ENV_LOADED(req->environment_set)
 }
+
+/* -- TclWeb_GetEnvIncludeVar
+ *
+ *  the environment variable named in key is searched among the include
+ *  variables and then resolved by calling TclWeb_SelectEnvIncludeVar
+ *
+ *  Result:
+ *
+ *    a character string pointer to the environment variable value or
+ *    NULL if the environment variable name in invalid or the variable
+ *    could not be resolved
+ *      
+ */
 
 static char*
 TclWeb_GetEnvIncludeVar (rivet_thread_private* private,char* key)
@@ -912,6 +950,31 @@ int TclWeb_UploadNames(TclWebRequest *req)
     return TCL_OK;
 }
 
+/*
+ * -- TclWeb_GetEnvVar
+ *
+ * basically is the core of the ::rivet::env rivet command. The argument to
+ * the command is stored in 'key' and the function starts a search in various
+ * tables following the following order
+ *
+ *  + though undocumented in the manual the first table checked is HTTP
+ *    headers table. ::rivet::env is actually like ::rivet::headers but for
+ *    the *request_rec->headers_in table
+ *  + the common CGI variables table is checked
+ *  + the CGI 1.1 headers table is checked
+ *  + the include variables list is checked calling TclWeb_GetEnvIncludeVar
+ *
+ *  Arguments:
+ *
+ *   - key: a string with the environment variable name
+ *
+ *  Results:
+ *
+ *    - a string pointer to the string with the variable translation or
+ *    NULL if the environment variable is not found
+ *
+ */
+
 char *
 TclWeb_GetEnvVar(rivet_thread_private* private,char *key)
 {
@@ -942,6 +1005,12 @@ TclWeb_GetEnvVar(rivet_thread_private* private,char *key)
     }
     val = (char *)apr_table_get(req->req->subprocess_env,key);
     if (val) { return val; }
+
+    /* If everything failed we assumed the variable is one of
+     * the 'include variables' and we try to resolve it calling
+     * TclWeb_GetEnvIncludeVar, which returns NULL if the variable
+     * is undefined */
+
     return TclWeb_GetEnvIncludeVar(private,key);
 }
 

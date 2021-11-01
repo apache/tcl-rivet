@@ -1,3 +1,7 @@
+2021-11-01 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/Tclwebapache.c: expanded comments to newly
+	introduced functions
+
 2021-10-25 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/Tclwebapache.c: extended comments
 	* src/rivet.h: new macro MINSTRLEN
@@ -11,24 +15,23 @@
 
 2021-09-06 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/session/session-create-*.sql: making cache fields larger
-	* rivet/packages/session/session-create-*.sql: making cache fields larger
 
 2021-04-13 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetInspect.c: add server current loglevel. Removed
-    unneeded ref count management in the server array construction
+	* src/mod_rivet_ng/rivetInspect.c: add server current loglevel. Removed
+	unneeded ref count management in the server array construction
 
 2021-03-12 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/mod_rivet.c: Rivet_SeekMPMBridge aligned with new implementation
-    made for 3.2.0. Removed call to Tcl_InitNotifier
+	* src/mod_rivet_ng/mod_rivet.c: Rivet_SeekMPMBridge aligned with new implementation
+	made for 3.2.0. Removed call to Tcl_InitNotifier
 
 2021-03-07 Massimo Manghi <mxmanghi@apache.org>
-    * VERSION: bumped version as 3.2.1
-    * src/mod_rivet_ng/mod_rivet.c: more linear determination of the bridge name
-    * rivet/packages/formbroker.tcl: introduced key maxlength
+	* VERSION: bumped version as 3.2.1
+	* src/mod_rivet_ng/mod_rivet.c: more linear determination of the bridge name
+	* rivet/packages/formbroker.tcl: introduced key maxlength
 
 2021-03-11 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetInspect.c: add SingleThreadExit introspection
-    * src7mod_rivet_ng/rivet_lazy_mpm.c: fixed lazy bridge that did not build anymore
+	* src/mod_rivet_ng/rivetInspect.c: add SingleThreadExit introspection
+	* src7mod_rivet_ng/rivet_lazy_mpm.c: fixed lazy bridge that did not build anymore
 
 2020-10-01 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivet_prefork_mpm.c: Fixed trivial bug in checking the
@@ -63,67 +66,73 @@
 	* test/apachetest/apachetest.tcl,test/runtests.tcl: add support for testing with various MPMs and bridges 
 
 2020-02-03 Massimo Manghi <mxmanghi@apache.org>
-    * src/request/: Update obsolete copyright statements
-    * src/mod_rivet_ng/rivetCore.c: update comments to upload command
-    * tests: changed upload file test
+	* src/request/: Update obsolete copyright statements
+	* src/mod_rivet_ng/rivetCore.c: update comments to upload command
+	* tests: changed upload file test
 
 2020-04-16 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/mod_rivet.[c|h]: add ap_child_shutdown flag
+	* src/mod_rivet_ng/mod_rivet.[c|h]: add ap_child_shutdown flag
 	* src/mod_rivet_ng/rivet_lazy_mpm.c: adding mutex protection on thread count
-    * src/mod_rivet_ng/rivet_worker_mpm.c: removed old code
+	* src/mod_rivet_ng/rivet_worker_mpm.c: removed old code
 
 2020-04-02 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/formbroker.xml: fixed examples
-    * src/mod_rivet_ng/rivet_lazy_mpm.c: resolved access to shared counter
-    that was causing segfaults when child process was terminated
+	* doc/xml/formbroker.xml: fixed examples
+	* src/mod_rivet_ng/rivet_lazy_mpm.c: resolved access to shared counter
+	that was causing segfaults when child process was terminated
 
 2020-01-19 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
+	* doc/xml/commands.xml: remove entry for command incr0 (dropped in 3.0)
 
 2019-12-21 Massimo Manghi <mxmanghi@apache.org>
-    * INSTALL: update install directions
+	* INSTALL: update install directions
 
 2019-12-12 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
-    Rivet_MergeConfig
+	* src/mod_rivet_ng/apache_config.c: copying also upload_files_to_var in
+	Rivet_MergeConfig
 
 2019-12-06 Massimo Manghi <mxmanghi@apache.org>
-    * doc/rivet.css: new color scheme for docbook manual
+	* doc/rivet.css: new color scheme for docbook manual
+	* src/mod_rivet_ng/rivetCore.c: expanded error info data in Rivet_Upload
+	* doc/rivet.css: new color scheme for docbook manual
+
+2019-12-04 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/rivetCore.c: new branch uploadcmdfix with improved
+	argument checking in Rivet_Upload that was the cause of random crashes
 
 2019-11-29 Brice Hamon <bhdec@apache.org>
-   * src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
-   * src/mod_rivet_ng/mod_rivet_cache.c: 
-   * src/mod_rivet_ng/rivetCore.c: fixed crash when rvt file not readable
+	* src/mod_rivet_ng/mod_rivet_cache.h: added RivetCache_DeleteEntry
+	* src/mod_rivet_ng/mod_rivet_cache.c: 
+	* src/mod_rivet_ng/rivetCore.c: fixed crash when rvt file not readable
 
 2019-10-13 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/directives.xml: configuration directives table expanded
-    * doc/xml/internals.xml: documenting the changes in the bridge API
+	* doc/xml/internals.xml: documenting the changes in the bridge API
+	* doc/xml/directives.xml: configuration directives table expanded
+	* doc/examples/
 
 2019-09-30 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetCore.c: revised argument checking
+	* src/mod_rivet_ng/rivetCore.c: revised argument checking
 
 2019-09-29 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/commands.xml: Completed manual page for command ::rivet::thread_id
-    * src/mod_rivet_ng/rivetCore.c: Rivet_GetThreadId rewritten. Now the
-    command accepts an optional argument to select decimal or hexadecimal (default)
-    output 
+	* doc/xml/commands.xml: Completed manual page for command ::rivet::thread_id
+	* src/mod_rivet_ng/rivetCore.c: Rivet_GetThreadId rewritten. Now the
+	command accepts an optional argument to select decimal or hexadecimal (default)
+	output 
 
 2019-08-05 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/directives.xml: Documenting SingleThreadExit directive
+	* doc/xml/directives.xml: Documenting SingleThreadExit directive
 
 2019-07-27 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/commands.xml,src/mod_rivet_ng/rivetCore.c: Add ::rivet::thread_id
-    manual page
+	* doc/xml/commands.xml,src/mod_rivet_ng/rivetCore.c: Add ::rivet::thread_id manual page
 
 2019-06-30 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivet_worker_mpm.c: Removed unnecessary access to thread private data
-    in WorkerBridge_Finalize
+	* src/mod_rivet_ng/rivet_worker_mpm.c: Removed unnecessary access to thread private data
+	in WorkerBridge_Finalize
 
 2019-06-25 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivet_worker_mpm.c: Better handling of exit signal, assigning tasks
-    to functions in a more consistent way. Worker_Shutdown declared as 'static'
-    * src/mod_rivet_ng/rivet_[prefork|lazy]_mpm.c: New scheme for bridge function names 
-    * src/mod_rivet_ng/rivet_lazy_mpm.c: Removed redundant exit command handling flags
+	* src/mod_rivet_ng/rivet_worker_mpm.c: Better handling of exit signal, assigning tasks
+	to functions in a more consistent way. Worker_Shutdown declared as 'static'
+	* src/mod_rivet_ng/rivet_[prefork|lazy]_mpm.c: New scheme for bridge function names 
+	* src/mod_rivet_ng/rivet_lazy_mpm.c: Removed redundant exit command handling flags
 
 2019-05-29 Massimo Manghi <mxmanghi@apache.org>
     * src/mod_rivet_ng/apache_config.c: Now handling the directive SingleThreadExit 
