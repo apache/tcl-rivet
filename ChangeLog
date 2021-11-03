@@ -1,3 +1,8 @@
+2021-11-03 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/TclWebapache.c: removed unnecessary call to TclWeb_InitEnvVars
+	when loading input headers
+	* tests/env.test: cleaning up http tokens resources
+
 2021-11-01 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/Tclwebapache.c: expanded comments to newly
 	introduced functions

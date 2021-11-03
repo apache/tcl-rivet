@@ -458,12 +458,14 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
     return TCL_OK;
 }
 
+/* Environment variables. Include variables handling */
+
 /* These 2 array must be aligned and a one-to-one correspondence preserved 
  * The enum include_vars_idx *must* be terminated by 'invalid_env_var'
  * Adding a new env variable requires 
  *    + the name of the variable be listed in include_env_vars
  *    + a new value in the enumerator include_vars_idx must be added in the 
- *      corresponding position of the variable names array
+ *      position corresponding of the variable names array
  *    + the switch construct in function TclWeb_SelectEnvIncludeVar must
  *      be expanded to handle the new case identified by the new enumerator value
  */
@@ -607,12 +609,8 @@ static void
 TclWeb_InitEnvVars (rivet_thread_private* private)
 {
     TclWebRequest *req = private->req;
-    apr_table_t   *table;  
-    int            idx;
 
     if (ENV_IS_LOADED(req->environment_set)) return;
-
-    table = req->req->subprocess_env;
 
     /* Retrieve cgi variables. */
     if (!ENV_CGI_VARS_LOADED(req->environment_set))
@@ -624,17 +622,20 @@ TclWeb_InitEnvVars (rivet_thread_private* private)
         ap_add_common_vars(req->req);
     }
 
-    /* Loading into 'table' the include vars */
+    /* Loading into 'req->req->subprocess_env' the include vars */
 
-    /* actually this is not necessary. ENV_VARS is modified only here therefore
-     * if it's set this function has been called already
-     * and it should have returned at the beginning of the execution. I keep
-     * it for clarity and uniformity with the CGI variables and in case
-     * the incremental environment control is extended
+    /* actually this check is not necessary. ENV_VARS_M is set only here therefore
+     * if it's set this function has been called already and it should have returned
+     * at the beginning of ies execution. I keep it for clarity and uniformity with the
+     * CGI variables and in case the incremental environment handling is extended
      */
 
     if (!ENV_VARS_LOADED(req->environment_set))
     {
+        apr_table_t   *table;  
+        int            idx;
+
+        table = req->req->subprocess_env;
         for (idx = 0;idx < invalid_env_var;idx++)
         {
             apr_table_set(table,include_env_vars[idx],TclWeb_SelectEnvIncludeVar(private,idx));
@@ -732,7 +733,8 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar,rivet_thread_private* private)
 
     req = private->req;
 
-    TclWeb_InitEnvVars(private);
+    // I actually don't see why we need to load the whole environment here
+    //TclWeb_InitEnvVars(private);
 
     Tcl_IncrRefCount(headersvar);
     /* Transfer client request headers to TCL request namespace. */
@@ -748,7 +750,7 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar,rivet_thread_private* private)
         Tcl_IncrRefCount(key);
         Tcl_IncrRefCount(val);
 
-            /* See comment in TclWeb_GetEnvVars concerning Bug 48963*/
+            /* See comment in TclWeb_GetEnvVars concerning Bug #48963*/
 
         Tcl_ObjSetVar2(req->interp, headersvar, key, val, 0);
         Tcl_DecrRefCount(key);
