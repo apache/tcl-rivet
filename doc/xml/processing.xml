@@ -5,8 +5,8 @@
 		<para>
 			Until &version2-generic; versions Rivet handled requests
 			following the vision that inspired the original design
-			which was summarized in the definition <q>Web programming
-			like in PHP, but with Tcl</q>. HTTP requests triggered the
+			which was summarized in the definition <quote>Web programming
+			like in PHP, but with Tcl</quote>. HTTP requests triggered the
 			execution of Tcl scripts or a Rivet (.rvt file) templates
 			whose path is encoded in the URI (an alias translation or
 			URL rewriting might occur to establish the real path). 
