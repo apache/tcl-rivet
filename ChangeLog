@@ -1,3 +1,6 @@
+2021-11-04 Massimo Manghi <mxmanghi@apache.org>
+	* doc/xml/installation.xml: documenting new configure switch --enable-rivet-debug-build
+
 2021-11-03 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/TclWebapache.c: removed unnecessary call to TclWeb_InitEnvVars
 	when loading input headers
