@@ -46,12 +46,12 @@
     </para>
     
     <programlisting>RIVET_MPM_BRIDGE {
-    NULL,
-    Lazy_MPM_ChildInit,
-    Lazy_MPM_Request,
-    Lazy_MPM_Finalize,
-    Lazy_MPM_ExitHandler,
-    Lazy_MPM_Interp
+    LazyBridge_ServerInit,
+    LazyBridge_ChildInit,
+    LazyBridge_Request,
+    LazyBridge_Finalize,
+    LazyBridge_ExitHandler,
+    LazyBridge_Interp
 };</programlisting>
 
 	<para>
@@ -62,10 +62,9 @@
 		The lazy bridge keeps an array of virtual host descriptor pointers
 		each of them referencing an instance of the following structure.
 	</para>
-	<programlisting>/* virtual host descriptor */
+	<programlisting>/* virtual host thread queue descriptor */
 
 typedef struct vhost_iface {
-    int                 idle_threads_cnt;   /* idle threads for the virtual hosts       */
     int                 threads_count;      /* total number of running and idle threads */
     apr_thread_mutex_t* mutex;              /* mutex protecting 'array'                 */
     apr_array_header_t* array;              /* LIFO array of lazy_tcl_worker pointers   */
@@ -84,6 +83,22 @@ typedef struct mpm_bridge_status {
     int                 server_shutdown;    /* the child process is shutting down  */
     vhost*              vhosts;             /* array of vhost descriptors          */
 } mpm_bridge_status;</programlisting>
+
+	<para>
+		The lazy bridge also extends the thread private data structure with the
+		data concerning the Tcl intepreter, its configuration and 
+	</para>
+
+	<programlisting>/* lazy bridge thread private data extension */
+
+typedef struct mpm_bridge_specific {
+    rivet_thread_interp*  interp;           /* thread Tcl interpreter object        */
+    int                   keep_going;       /* thread loop controlling variable     */
+                                            /* the request_rec and TclWebRequest    *
+                                             * are copied here to be passed to a    *
+                                             * channel                              */
+} mpm_bridge_specific;</programlisting>
+
 	<para>
 		By design the bridge must create exactly one instance of <command>mpm_bridge_status</command>
 		and store its pointer in <command>module_globals->mpm</command>.
@@ -93,14 +108,14 @@ typedef struct mpm_bridge_status {
 		function
 	</para>
 	<programlisting>/*
- * -- Lazy_MPM_ChildInit
+ * -- LazyBridge_ChildInit
  * 
  * child process initialization. This function prepares the process
  * data structures for virtual hosts and threads management
  *
  */
 
-void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
+void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     apr_status_t    rv;
     server_rec*     s;
@@ -138,19 +153,18 @@ void Lazy_MPM_ChildInit (apr_pool_t* pool, server_rec* server)
      
     for (s = root_server; s != NULL; s = s-&gt;next)
     {
-        int                 vh;
+        int                 idx;
         apr_array_header_t* array;
         rivet_server_conf*  rsc = RIVET_SERVER_CONF(s-&gt;module_config);
 
-        vh = rsc-&gt;idx;
-        rv = apr_thread_mutex_create(&amp;module_globals-&gt;mpm-&gt;vhosts[vh].mutex,
+        idx = rsc-&gt;idx;
+        rv  = apr_thread_mutex_create(&amp;module_globals-&gt;mpm-&gt;vhosts[idx].mutex,
                                       APR_THREAD_MUTEX_UNNESTED,pool);
         ap_assert(rv == APR_SUCCESS);
         array = apr_array_make(pool,0,sizeof(void*));
         ap_assert(array != NULL);
-        module_globals-&gt;mpm-&gt;vhosts[vh].array = array;
-        module_globals-&gt;mpm-&gt;vhosts[vh].idle_threads_cnt = 0;
-        module_globals-&gt;mpm-&gt;vhosts[vh].threads_count = 0;
+        module_globals-&gt;mpm-&gt;vhosts[idx].array = array;
+        module_globals-&gt;mpm-&gt;vhosts[idx].threads_count = 0;
     }
     module_globals-&gt;mpm-&gt;server_shutdown = 0;
 }</programlisting>
@@ -219,8 +233,7 @@ typedef struct lazy_tcl_worker {
     request_rec*        r;
     int                 ctype;
     int                 ap_sts;
-    int                 nreqs;
-    rivet_server_conf*  conf;               /* rivet_server_conf* record   */
+    rivet_server_conf*  conf;               /* rivet_server_conf* record                */
 } lazy_tcl_worker;</programlisting>
 	<para>
 		The server field is assigned with the virtual host server record. Whereas the <command>conf</command>
@@ -321,7 +334,7 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
  * The lazy bridge worker thread. This thread prepares its control data and 
  * will serve requests addressed to a given virtual host. Virtual host server
  * data are stored in the lazy_tcl_worker structure stored in the generic 
- * pointer argument &apos;data&apos;
+ * pointer argument 'data'
  * 
  */
 
@@ -346,11 +359,12 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     private-&gt;ext = apr_pcalloc(private-&gt;pool,sizeof(mpm_bridge_specific));
     private-&gt;ext-&gt;keep_going = 1;
-    private-&gt;ext-&gt;interp = Rivet_NewVHostInterp(private-&gt;pool,w-&gt;server);
+    //private-&gt;ext-&gt;interp = Rivet_NewVHostInterp(private-&gt;pool,w-&gt;server);
+    RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private-&gt;pool,rsc-&gt;default_cache_size));
     private-&gt;ext-&gt;interp-&gt;channel = private-&gt;channel;
 
     /* The worker thread can respond to a single request at a time therefore 
-     * must handle and register its own Rivet channel */
+       must handle and register its own Rivet channel */
 
     Tcl_RegisterChannel(private-&gt;ext-&gt;interp-&gt;interp,*private-&gt;channel);
 
@@ -365,22 +379,29 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     Rivet_PerInterpInit(private-&gt;ext-&gt;interp,private,w-&gt;server,private-&gt;pool);
     
     /* The child initialization is fired. Beware of the terminologic 
-     * trap: we inherited from prefork only modules the term &apos;child&apos;
-     * meaning &apos;child process&apos;. In this case the child init actually
+     * trap: we inherited from fork capable systems the term 'child'
+     * meaning 'child process'. In this case the child init actually
      * is a worker thread initialization, because in a threaded module
      * this is the agent playing the same role a child process plays
      * with the prefork bridge */
 
     Lazy_RunConfScript(private,w,child_init);
 
+    idx = w-&gt;conf-&gt;idx;
+
+    /* After the thread has run the configuration script we 
+       increment the threads counter */
+
+    apr_thread_mutex_lock(module_globals-&gt;mpm-&gt;vhosts[idx].mutex);
+    (module_globals-&gt;mpm-&gt;vhosts[idx].threads_count)++;
+    apr_thread_mutex_unlock(module_globals-&gt;mpm-&gt;vhosts[idx].mutex);
+
     /* The thread is now set up to serve request within the the 
      * do...while loop controlled by private-&gt;keep_going  */
 
-    idx = w-&gt;conf-&gt;idx;
     apr_thread_mutex_lock(w-&gt;mutex);
     do 
     {
-        module_globals-&gt;mpm-&gt;vhosts[idx].idle_threads_cnt++;
         while ((w-&gt;status != init) &amp;&amp; (w-&gt;status != thread_exit)) {
             apr_thread_cond_wait(w-&gt;condition,w-&gt;mutex);
         } 
@@ -390,16 +411,16 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         }
 
         w-&gt;status = processing;
-        module_globals-&gt;mpm-&gt;vhosts[idx].idle_threads_cnt--;
 
         /* Content generation */
 
         private-&gt;req_cnt++;
         private-&gt;ctype = w-&gt;ctype;
+        private-&gt;r = w-&gt;r;
 
-        w-&gt;ap_sts = Rivet_SendContent(private,w-&gt;r);
+        w-&gt;ap_sts = Rivet_SendContent(private);
 
-        if (module_globals-&gt;mpm-&gt;server_shutdown) continue;
+        // if (module_globals-&gt;mpm-&gt;server_shutdown) continue;
 
         w-&gt;status = done;
         apr_thread_cond_signal(w-&gt;condition);
@@ -416,8 +437,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     } while (private-&gt;ext-&gt;keep_going);
     apr_thread_mutex_unlock(w-&gt;mutex);
     
-    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w-&gt;server,&quot;processor thread orderly exit&quot;);
     Lazy_RunConfScript(private,w,child_exit);
+    ap_log_error(APLOG_MARK,APLOG_DEBUG,APR_SUCCESS,w-&gt;server,"processor thread orderly exit");
 
     apr_thread_mutex_lock(module_globals-&gt;mpm-&gt;vhosts[idx].mutex);
     (module_globals-&gt;mpm-&gt;vhosts[idx].threads_count)--;
