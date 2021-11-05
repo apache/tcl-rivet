@@ -1,3 +1,6 @@
+2021-11-05 Massimo Manghi <mxmanghi@apache.org>
+	* doc/xml/lazybridge.xml: update examples with latest modifications done to the lazy bridge
+
 2021-11-04 Massimo Manghi <mxmanghi@apache.org>
 	* doc/xml/installation.xml: documenting new configure switch --enable-rivet-debug-build
 
@@ -7,11 +10,11 @@
 	* tests/env.test: cleaning up http tokens resources
 
 2021-11-01 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/Tclwebapache.c: expanded comments to newly
+	* src/mod_rivet_ng/TclWebapache.c: expanded comments to newly
 	introduced functions
 
 2021-10-25 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/Tclwebapache.c: extended comments
+	* src/mod_rivet_ng/TclWebapache.c: extended comments
 	* src/rivet.h: new macro MINSTRLEN
 
 2021-10-20 Massimo Manghi <mxmanghi@apache.org>
