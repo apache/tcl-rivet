@@ -1,3 +1,8 @@
+2021-11-06 Massimo Manghi <mxmanghi@apache.org>
+	* configure.ac: remove duplicated call of macro AM_AUTOMAKE_INIT. Add macro AC_CONFIG_SRCDIR
+	* rivet/packages/form*.tcl: Update copyright lines, removed old svn symbols
+	* doc/xml/form.xml: documenting new switch -emit 
+
 2021-11-05 Massimo Manghi <mxmanghi@apache.org>
 	* doc/xml/lazybridge.xml: update examples with latest modifications done to the lazy bridge
 
