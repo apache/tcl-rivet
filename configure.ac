@@ -29,7 +29,6 @@ TEA_INIT([3.9])
 CONFIGURE_CMD="$0 $*"
 
 AC_CONFIG_AUX_DIR(tclconfig)
-AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -55,6 +54,14 @@ AX_PREFIX_CONFIG_H([rivet_config.h],[rivet])
 #
 AC_DISABLE_STATIC
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+
+# establishing a landmark in the directory hierarchy as per 
+# autotools design. This is what AC_CONFIG_SRCDIR is meant to do
+# I arbitrarily choose src/rivet.h as landmark, moving this file
+# to a different directory or deleting it implies this line has to
+# change
+
+AC_CONFIG_SRCDIR([src/rivet.h])
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
