@@ -1,3 +1,6 @@
+2021-11-13 Massimo Manghi <mxmanghi@apache.org>
+	* Changelog: release as Rivet 3.2.1
+
 2021-11-06 Massimo Manghi <mxmanghi@apache.org>
 	* configure.ac: remove duplicated call of macro AM_AUTOMAKE_INIT. Add macro AC_CONFIG_SRCDIR
 	* rivet/packages/form*.tcl: Update copyright lines, removed old svn symbols
