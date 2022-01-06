@@ -87,12 +87,12 @@ TEA_PREFIX
 TEA_SETUP_COMPILER
 
 #
-# For automake to be happy, we also need AC_PROG_LIBTOOL
+# For automake to be happy, we also need LT_INIT
 #
 # the LIBTOOL_DEPS macro sets up for automatic updating of the
 # libtool script if it becomes out of date, as per libtool docs
 #
-AC_PROG_LIBTOOL
+LT_INIT
 AC_SUBST(LIBTOOL_DEPS)
 
 #-----------------------------------------------------------------------

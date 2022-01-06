@@ -1,3 +1,14 @@
+2022-01-06 Massimo Manghi <mxmanghi@apache.org>
+	* configure.ac: changing obsolete macro AC_PROG_LIBTOOL into LT_INIT
+
+2021-11-06 Massimo Manghi <mxmanghi@apache.org>
+	* configure.ac: remove duplicated call of macro AM_INIT_AUTOMAKE. Add macro AC_CONFIG_SRCDIR
+	* rivet/packages/form*.tcl: Update copyright lines, removed old svn symbols
+	* doc/xml/form.xml: documenting new switch -emit 
+
+2021-11-05 Massimo Manghi <mxmanghi@apache.org>
+	* doc/xml/lazybridge.xml: update examples with latest modifications done to the lazy bridge
+
 2021-11-04 Massimo Manghi <mxmanghi@apache.org>
 	* doc/xml/installation.xml: documenting new configure switch --enable-rivet-debug-build
 
