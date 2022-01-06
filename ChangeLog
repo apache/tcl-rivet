@@ -18,11 +18,11 @@
 	* tests/env.test: cleaning up http tokens resources
 
 2021-11-01 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/Tclwebapache.c: expanded comments to newly
+	* src/mod_rivet_ng/TclWebapache.c: expanded comments to newly
 	introduced functions
 
 2021-10-25 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/Tclwebapache.c: extended comments
+	* src/mod_rivet_ng/TclWebapache.c: extended comments
 	* src/rivet.h: new macro MINSTRLEN
 
 2021-10-20 Massimo Manghi <mxmanghi@apache.org>
