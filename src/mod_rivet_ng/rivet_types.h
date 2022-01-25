@@ -87,7 +87,7 @@ typedef struct TclWebRequest {
     int             headers_printed;	/* has the header been printed yet? */
     int             headers_set;		/* has the header been set yet?     */
     int             content_sent;
-    int             environment_set;	/* have we setup the environment variables? */
+    unsigned int    environment_set;	/* have we setup the environment variables? */
     char*           charset;
 } TclWebRequest;
 

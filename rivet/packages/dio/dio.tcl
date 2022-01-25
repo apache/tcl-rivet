@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id$
-
 catch {package require Tclx}
 package require Itcl
 ##set auto_path [linsert $auto_path 0 [file dirname [info script]]]
@@ -617,8 +615,8 @@ proc handle {interface args} {
     method exec    {args} {}
     method nextkey {args} {}
     method lastkey {args} {}
-    method now {} {}
-
+    method now     {}     {}
+    method last_inserted_rec {} {}
     ##
     ## Functions to get and set public variables.
     ##
@@ -647,6 +645,12 @@ proc handle {interface args} {
     public variable pass        ""
     public variable host        ""
     public variable port        ""
+
+    protected method handle_client_arguments {cargs} { }
+
+    public variable clientargs  "" {
+        handle_client_arguments $clientargs
+    }
 
     public variable keyfield    "" {
         if {[llength $keyfield] > 1 && $autokey} {

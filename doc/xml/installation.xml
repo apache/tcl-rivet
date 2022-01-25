@@ -240,7 +240,17 @@ tar -xvf rivet-&fullversion;.tar.gz</programlisting>
 			      	</para>
 			    	</listitem>
 				</varlistentry>
-				
+
+				<varlistentry>				
+					<term>--enable-rivet-debug-build</term>
+					<listitem>
+						<para>
+							Enable definition of the preprocessor symbol RIVET_DEBUG_BUILD. This is used to
+							conditionally include code into the build for development and debugging purposes
+						</para>
+					</listitem>
+				</varlistentry>
+
 				<varlistentry>
 					<term>--enable-virtual-interps-separation</term>
 					<listitem>

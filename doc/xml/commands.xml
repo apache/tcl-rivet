@@ -460,61 +460,63 @@
 	</refentry>
 
 	<refentry id="debug">
-	    <refnamediv>
-		<refname>debug</refname>
-		<refpurpose>
-		    A command to print strings, arrays
-		    and the values of variables as specified by the arguments.
-		</refpurpose>
-	    </refnamediv>
-	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>::rivet::debug</command>
-		    <arg choice="plain">-subst</arg><arg>&lt;on|off&gt;</arg>
-		    <arg choice="plain">-separator</arg><arg>&lt;string&gt;</arg>
-		    <arg choice="plain">-option</arg><arg><replaceable>&lt;value&gt;</replaceable></arg>
-		    <arg choice="plain">-option</arg><arg><replaceable>&lt;value&gt;</replaceable></arg>
-		    <arg choice="plain">...</arg>
-		</cmdsynopsis>
-	    </refsynopsisdiv>	
+	   <refnamediv>
+			<refname>debug</refname>
+			<refpurpose>
+			    A command to print strings, arrays
+			    and the values of variables as specified by the arguments.
+			</refpurpose>
+	   </refnamediv>
+	   <refsynopsisdiv>
+			<cmdsynopsis>
+			    <command>::rivet::debug</command>
+			    <arg choice="plain">-subst</arg><arg>&lt;on|off&gt;</arg>
+			    <arg choice="plain">-separator</arg><arg>&lt;string&gt;</arg>
+			    <arg choice="plain">-option</arg><arg><replaceable>&lt;value&gt;</replaceable></arg>
+			    <arg choice="plain">-option</arg><arg><replaceable>&lt;value&gt;</replaceable></arg>
+			    <arg choice="plain">...</arg>
+			</cmdsynopsis>
+	   </refsynopsisdiv>	
 	
-	    <refsect1>
-		<title>Description</title>
-		<para>
-		    A command to make debugging more convenient print strings, arrays
-		    and the values of variables as specified by the arguments.
-		</para>
-		<para>
-		    Also allows the setting of an array called debug which will pick up
-		    options for all debug commands.
-		</para>
-	    </refsect1>
+	   <refsect1>
+			<title>Description</title>
+			<para>
+			    A command to make debugging more convenient print strings, arrays
+			    and the values of variables as specified by the arguments.
+			</para>
+			<para>
+			    Also allows the setting of an array called debug which will pick up
+			    options for all debug commands.
+			</para>
+	   </refsect1>
 	</refentry>
 
-
 	<refentry id="env">
-	    <refnamediv>
-		<refname>env</refname> 
-		<refpurpose>
-		    Loads a single "environmental variable" into a Tcl variable.
-		</refpurpose>
-	    </refnamediv>
+	   <refnamediv>
+			<refname>env</refname> 
+			<refpurpose>
+			    Returns the value a single "environmental variable".
+			</refpurpose>
+	   </refnamediv>
 
-	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>::rivet::env</command>
-		    <arg><replaceable>varName</replaceable></arg>
-		</cmdsynopsis>
-	    </refsynopsisdiv>
+	   <refsynopsisdiv>
+			<cmdsynopsis>
+			    <command>::rivet::env</command>
+			    <arg><replaceable>environment_variable_name</replaceable></arg>
+			</cmdsynopsis>
+	   </refsynopsisdiv>
 
-	    <refsect1>
-		<title>Description</title>
-		<para>
-		    If it is only necessary to load one environmental variable,
-		    this command may be used to avoid the overhead of loading
-		    and storing the entire array.
-		</para>
-	    </refsect1>
+	   <refsect1>
+			<title>Description</title>
+			<para>
+			    <command>::rivet::env</command> resolves a single environment
+			    variable and returns its value or an empty string if the environment
+			    variable name in the argument is not defined.
+			    This command is the recommended way to resolve an environment
+			    variable leaving <command>::rivet::load_env</command> to debugging
+			    and development operations.
+			</para>
+	   </refsect1>
 	</refentry>
 
 	<refentry id="escape_sgml_chars">
@@ -530,19 +532,16 @@
 		</cmdsynopsis>
 	    </refsynopsisdiv>
 
-	    <refsect1>
-		<title>Description</title>
-		<para>
-		    Scans through each character in the specified string looking
-		    for any special (with respect to SGML, and hence HTML) characters
-		    from the specified string, and returns the result.  
-		    For example, the right angle bracket is escaped to the corrected
-            ampersand gt symbol.
-		</para>
-		<!--note> 
-		    You must require the <command>rivetlib</command> package in order to gain access to this command
-		</note -->
-	    </refsect1>
+	   <refsect1>
+			<title>Description</title>
+			<para>
+			    Scans through each character in the specified string looking
+			    for any special (with respect to SGML, and hence HTML) characters
+			    from the specified string, and returns the result.  
+			    For example, the right angle bracket is escaped to the corrected
+	          ampersand gt symbol.
+			</para>
+	   </refsect1>
 	</refentry>
 
 	<refentry id="escape_shell_command">
@@ -1537,12 +1536,12 @@ bab</programlisting>
 		<refsect1>
 			<title>Description</title>
 			<para>
-				<command>::rivet::threadid</command> returns is either hexadecimal 
-				(default) or decimal representation the current thread id. This command
-				is useful because allows for precise identification of an execution thread
-				when Apache runs a threaded MPM. Calling the command with <arg>-decimal</arg>
-				prints the thread id in a form that makes it comparable with the <command>tid</command>
-				information printed in the error log. 
+				<command>::rivet::threadid</command> either returns the hexadecimal 
+				(default) or the decimal representation of the current thread id. This command
+				is useful for precise identification of an execution thread
+				when Apache runs a threaded MPM. When called with the <arg>-decimal</arg> switch the
+				command prints the thread id can be compared with the <command>tid</command>
+				information printed in the Apache error log.
 			</para>
 		</refsect1>
 	</refentry>

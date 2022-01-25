@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id$
-
+package require DIO
 package provide dio_Sqlite 0.1
 
 namespace eval DIO {
@@ -26,8 +25,8 @@ namespace eval DIO {
     ::itcl::class Sqlite {
         inherit Database
 
-        private variable dbcmd          ""
-	public  variable interface	"Sqlite"
+        private variable dbcmd      ""
+	    public  variable interface	"Sqlite"
 
         constructor {args} {eval configure $args} {
             if {[catch {package require sqlite}] && \

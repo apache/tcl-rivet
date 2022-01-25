@@ -42,7 +42,7 @@
 		</refsynopsisdiv>
 		<refsect1>
 			<para>
-	                        creates and returns a new Tcl command named <option><replaceable>form_name</replaceable></option>.
+				creates and returns a new Tcl command named <option><replaceable>form_name</replaceable></option>.
 			</para>
 			<refsect2>
 				<title>Options</title>
@@ -87,8 +87,22 @@
 								<command>load_response</command> command of Rivet when default 
 								values come from another form.
 							</para>
-						</listitem>	  		
+						</listitem>
 	  				</varlistentry>
+	  				<varlistentry>
+						<listitem>
+							<cmdsynopsis>
+								<arg choice="plain">-emit</arg>
+								<arg choice="opt"><replaceable>true(default)|false</replaceable></arg>
+							</cmdsynopsis>
+							<para>
+								a Tcl accepted representation of a Boolean value. Change a form object
+								instance behavior so that methods generating HTML form entries return
+								to the caller their output as string instead of directly sending it to stdout
+							</para>
+						</listitem>
+	  				</varlistentry>
+
 	  				<varlistentry>
 						<listitem>
 							<cmdsynopsis>

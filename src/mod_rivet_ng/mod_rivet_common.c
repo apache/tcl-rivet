@@ -140,12 +140,11 @@ Rivet_CreateTclInterp (apr_pool_t* pool)
     return interp;
 }
 
-/*---------------------------------------------------------------------
+/*
  * -- Rivet_RunningScripts
  *
  *
  *
- *---------------------------------------------------------------------
  */
 
 running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,

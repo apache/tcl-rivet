@@ -17,18 +17,17 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-# $Id$
-
-package provide dio_Mysql 0.3
+package require DIO
+package provide dio_Mysql 0.4
 
 namespace eval DIO {
     ::itcl::class Mysql {
         inherit Database
 
         constructor {args} {eval configure $args} {
-            if {       [catch {package require Mysqltcl}]   \
-                    && [catch {package require mysqltcl}]   \
-                    && [catch {package require mysql}   ] } {
+            if {   [catch {package require Mysqltcl}]   \
+                && [catch {package require mysqltcl}]   \
+                && [catch {package require mysql}]} {
                 return -code error "No MySQL Tcl package available"
             }
 
@@ -53,6 +52,14 @@ namespace eval DIO {
             if {![::rivet::lempty $pass]} { lappend command -password $pass }
             if {![::rivet::lempty $port]} { lappend command -port $port }
             if {![::rivet::lempty $host]} { lappend command -host $host }
+            #if {![::rivet::lempty $encoding]} { lappend command -encoding $encoding }
+
+            if {$clientargs != ""} {
+                set command [lappend command {*}$clientargs]
+            }
+
+            #puts stderr "evaluating $command"
+
             if {[catch $command error]} { return -code error $error }
 
             set conn $error
@@ -195,6 +202,29 @@ namespace eval DIO {
         public variable db "" {
             if {[info exists conn] && [mysqlping $conn]} {
                 mysqluse $conn $db
+            }
+        }
+
+        protected method handle_client_arguments {cargs} { 
+
+            # we assign only the accepted options
+
+            set clientargs {}
+
+            foreach {a v} $cargs {
+
+                if {($a == "-encoding") || \
+                    ($a == "-localfiles") || \
+                    ($a == "-ssl") || \
+                    ($a == "-sslkey") || \
+                    ($a == "-sslcert") || \
+                    ($a == "-sslca") || \
+                    ($a == "-sslcapath") || \
+                    ($a == "-sslcipher") || \
+                    ($a == "-socket")} {
+                    lappend clientargs $a $v
+                }
+
             }
         }
 

@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id$
-
+package require DIO
 package provide dio_Postgresql 0.1
 
 namespace eval DIO {

@@ -101,7 +101,6 @@ Rivet_NoRequestRec (Tcl_Interp* interp, Tcl_Obj* command)
     Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(" outside a request processing",-1));
 }
 
-
 /*
  *-----------------------------------------------------------------------------
  *
@@ -670,9 +669,9 @@ TCL_CMD_HEADER ( Rivet_Var )
                          "|number|all)");
         return TCL_ERROR;
     }
-    cmd = Tcl_GetString(objv[0]);
+    cmd     = Tcl_GetString(objv[0]);
     command = Tcl_GetString(objv[1]);
-    result = Tcl_NewObj();
+    result  = Tcl_NewObj();
 
     /* determine if var_qs, var_post or var was called */
 
@@ -1181,8 +1180,6 @@ TCL_CMD_HEADER( Rivet_Upload )
      * FILENAME : upload original filename
      * TEMPNAME : temporary file where the upload is taking place
      * NAMES    : list of uploads
-     *
-     * the procedure shouldn't reach for the default case
      */
 
     switch ((enum subcommand)subcommandindex)
@@ -1417,9 +1414,9 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
         return TCL_ERROR;
     }
 
-    key = Tcl_GetStringFromObj( objv[1], NULL );
+    key = Tcl_GetStringFromObj (objv[1],NULL);
 
-    val = TclWeb_GetEnvVar( private, key );
+    val = TclWeb_GetEnvVar (private,key);
 
     Tcl_SetObjResult(interp, Tcl_NewStringObj( val, -1 ) );
     return TCL_OK;
@@ -1604,7 +1601,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
             Tcl_DecrRefCount(cmd);
 
-        } 
+        }
         else if (STRNEQU(cmd_arg,"-all"))
         {
             Tcl_Obj* dictObj;
@@ -1801,9 +1798,11 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
         break;
     }
 
-    /* if we are serving a page, we know our server, 
-     * else send null for server
+    /* if we are serving a page, we infer our server
+     * from the request record, otherwise we use the
+     * root server name stored in the module_globals
      */
+
     serverRec = ((private == NULL) || (private->r == NULL)) ? module_globals->server : private->r->server;
 
     ap_log_error (APLOG_MARK, apLogLevel, 0, serverRec, "%s", message);

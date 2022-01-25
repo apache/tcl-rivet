@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id$
-
 package require Tcl  8.6
 package require Itcl
 
@@ -61,7 +59,7 @@ proc handle {interface args} {
 }
 
     ::itcl::body Aida::build_select_query {args} {
-        return [$sqlobj build_select_query {*}$args]
+        return [$sql build_select_query {*}$args]
     }
 
 

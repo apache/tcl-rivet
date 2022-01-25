@@ -1,7 +1,6 @@
 #
 # Session - Itcl object for web session management for Rivet
 #
-# $Id$
 #
 
 # Copyright 2004 The Apache Software Foundation
@@ -476,7 +475,7 @@ package require Itcl
     }
 
     #
-    # is_new_sesion - return a 1 if it's a new session, else a zero if there
+    # is_new_session - return a 1 if it's a new session, else a zero if there
     # were one or more prior pages creating and/or using this session ID
     #
     method is_new_session {} {

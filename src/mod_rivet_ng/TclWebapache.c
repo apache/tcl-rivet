@@ -41,15 +41,29 @@
 
 extern module rivet_module;
 extern mod_rivet_globals* module_globals;
-#define TCLWEBPOOL req->req->pool
 
-#define BUFSZ 4096
+/* It's kind of an overkill: we define macros for handling the
+ * flags that control the handling of the three environment variables
+ * classes (common, CGI and include variables). */
+
+#define ENV_COMMON_VARS_M    1
+#define ENV_CGI_VARS_M       2
+#define ENV_VARS_M           4
+#define ENV_VARS_RESET(env)  env = 0;
+#define ENV_COMMON_VARS(env) env |= ENV_COMMON_VARS_M;
+#define ENV_CGI_VARS(env)    env |= ENV_CGI_VARS_M;
+#define ENV_VARS(env)        env |= ENV_VARS_M;
+#define ENV_LOADED(env)      env |= ENV_COMMON_VARS_M | ENV_CGI_VARS_M | ENV_VARS_M;
+#define ENV_IS_LOADED(env)          (env == (ENV_COMMON_VARS_M | ENV_CGI_VARS_M | ENV_VARS_M))
+#define ENV_COMMON_VARS_LOADED(env) (env & ENV_COMMON_VARS_M) != 0
+#define ENV_CGI_VARS_LOADED(env)    (env & ENV_CGI_VARS_M) != 0
+#define ENV_VARS_LOADED(env)        (env & ENV_VARS_M) != 0
 
 /* This is used below to determine what part of the parmsarray to parse. */
 
-#define PARMSARRAY_COORDINATES i = 0; j = parmsarray->nelts; \
-if (source == VAR_SRC_QUERYSTRING) { j = req->apachereq->nargs; } \
-else if (source == VAR_SRC_POST) { i = req->apachereq->nargs; }
+#define PARMSARRAY_COORDINATES(i,j,parray,nargs) i = 0; j = parray->nelts; \
+if (source == VAR_SRC_QUERYSTRING) { j = nargs; } \
+else if (source == VAR_SRC_POST) { i = nargs; }
 
 /* 
  * -- TclWeb_NewRequestObject
@@ -67,12 +81,11 @@ TclWeb_NewRequestObject (apr_pool_t *p)
     req->apachereq          = ApacheRequest_new(p);
     req->headers_printed    = 0;
     req->headers_set        = 0;
-    req->environment_set    = 0;
+    ENV_VARS_RESET(req->environment_set)
     req->charset            = NULL;  /* we will test against NULL to check if a charset *
                                       * was specified in the conf                       */
     return req;
 }
-
 
 /*
  * -- TclWeb_InitRequest
@@ -101,16 +114,18 @@ TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp)
     req->apachereq          = ApacheRequest_init(req->apachereq,r);
     req->headers_printed    = 0;
     req->headers_set        = 0;
-    req->environment_set    = 0;
+    ENV_VARS_RESET(req->environment_set)
     req->charset            = NULL;
 
     /*
      * if strlen(req->content_type) > strlen([RIVET|TCL]_FILE_CTYPE)
-     * a charset parameters might be there 
+     * a charset parameters might be in the configuration like
+     *
+     * AddType 'application/x-httpd-rivet;charset=utf-8' rvt
      */
 
     if (((private->ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
-         ((private->ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
+        ((private->ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
         
         char* charset;
 
@@ -156,8 +171,6 @@ TclWeb_SetHeaderType(char *header, TclWebRequest *req)
     if (req->headers_set)
         return TCL_ERROR;
 
-//    req->req->content_type = (char *) apr_pstrdup(req->req->pool, header);
-
     ap_set_content_type(req->req,apr_pstrdup(req->req->pool, header));
     req->headers_set = 1;
     return TCL_OK;
@@ -187,7 +200,6 @@ TclWeb_PrintHeaders(TclWebRequest *req)
      */
     
     TclWeb_SendHeaders(req);
-    /* ap_send_http_header(req->req); */
 
     req->headers_printed = 1;
     return TCL_OK;
@@ -207,7 +219,7 @@ TclWeb_PrintError(CONST84 char *errstr, int htmlflag, TclWebRequest *req)
     {
         if (htmlflag != 1)
         {
-            ap_rputs(ap_escape_html(TCLWEBPOOL, errstr), req->req);
+            ap_rputs(ap_escape_html(req->req->pool,errstr),req->req);
         } else {
             ap_rputs(errstr, req->req);
         }
@@ -270,65 +282,66 @@ INLINE int
 TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 {
     Tcl_SetStringObj(result,
-                ap_construct_url(TCLWEBPOOL,filename,req->req),-1);
+                ap_construct_url(req->req->pool,filename,req->req),-1);
     return TCL_OK;
 }
 
 int
 TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
 {
-    int i, j;
-    apr_array_header_t *parmsarray = (apr_array_header_t *)
-        apr_table_elts(req->apachereq->parms);
-    apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
+    int i,j;
+    apr_array_header_t *parmsarray = (apr_array_header_t *)apr_table_elts(req->apachereq->parms);
+    apr_table_entry_t  *parms = (apr_table_entry_t *)parmsarray->elts;
     int flag = 0;
 
-    PARMSARRAY_COORDINATES;
+    PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     /* This isn't real efficient - move to hash table later on... */
     while (i < j)
     {
         char *parmkey = TclWeb_StringToUtf(parms[i].key, req);
-        if (!strncmp(varname, parmkey,
+        if (!strncmp(varname,parmkey,
                     strlen(varname) < strlen(parmkey) ?
                     strlen(parmkey) : strlen(varname)))
         {
+
             /* The following makes sure that we get one string,
                with no sub lists. */
+
             if (flag == 0)
             {
+
                 flag = 1;
-                Tcl_SetStringObj(result,
-                        TclWeb_StringToUtf(parms[i].val, req), -1);
+                Tcl_SetStringObj (result,TclWeb_StringToUtf(parms[i].val,req),-1);
+
             } else {
+
                 Tcl_Obj *tmpobj;
                 Tcl_Obj *tmpobjv[2];
                 tmpobjv[0] = result;
-                tmpobjv[1] = TclWeb_StringToUtfToObj(parms[i].val, req);
-                tmpobj = Tcl_ConcatObj(2, tmpobjv);
-                Tcl_SetStringObj(result, Tcl_GetString(tmpobj), -1);
+                tmpobjv[1] = TclWeb_StringToUtfToObj (parms[i].val,req);
+                tmpobj = Tcl_ConcatObj (2,tmpobjv);
+                Tcl_SetStringObj (result,Tcl_GetString(tmpobj),-1);
+
             }
+
         }
         i++;
     }
 
-    if (result->length == 0)
-    {
-	    return TCL_ERROR;
-    }
+    if (result->length == 0) { return TCL_ERROR; }
 
     return TCL_OK;
 }
 
 int
-TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
-{
+TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *req) {
     int i, j;
     apr_array_header_t *parmsarray = (apr_array_header_t *)
         apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
-    PARMSARRAY_COORDINATES;
+    PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     /* This isn't real efficient - move to hash table later on. */
     while (i < j)
@@ -359,20 +372,20 @@ TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req)
         apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
-    PARMSARRAY_COORDINATES;
+    PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     while (i < j)
     {
-	Tcl_ListObjAppendElement(req->interp, result,
-				 TclWeb_StringToUtfToObj(parms[i].key, req));
-	Tcl_ListObjAppendElement(req->interp, result,
-				 TclWeb_StringToUtfToObj(parms[i].val, req));
-	i++;
+        Tcl_ListObjAppendElement(req->interp,result,
+                     TclWeb_StringToUtfToObj(parms[i].key,req));
+        Tcl_ListObjAppendElement(req->interp,result,
+                     TclWeb_StringToUtfToObj(parms[i].val,req));
+        i++;
     }
 
     if (result == NULL)
     {
-	return TCL_ERROR;
+	    return TCL_ERROR;
     }
     return TCL_OK;
 }
@@ -385,18 +398,18 @@ TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req)
         apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
-    PARMSARRAY_COORDINATES;
+    PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     while (i < j)
     {
-	Tcl_ListObjAppendElement(req->interp, result,
-				 TclWeb_StringToUtfToObj(parms[i].key, req));
-	i++;
+        Tcl_ListObjAppendElement(req->interp, result,
+                     TclWeb_StringToUtfToObj(parms[i].key, req));
+        i++;
     }
 
     if (result == NULL)
     {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     return TCL_OK;
@@ -410,7 +423,7 @@ TclWeb_VarExists(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
         apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
-    PARMSARRAY_COORDINATES;
+    PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     /* This isn't real efficient - move to hash table later on. */
     while (i < j)
@@ -445,79 +458,220 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
     return TCL_OK;
 }
 
-/*
- * Load the Apache environment and CGI variables into the request.  If we
- * have already done so, we don't need to do it again.
+/* Environment variables. Include variables handling */
+
+/* These 2 array must be aligned and a one-to-one correspondence preserved 
+ * The enum include_vars_idx *must* be terminated by 'invalid_env_var'
+ * Adding a new env variable requires 
+ *    + the name of the variable be listed in include_env_vars
+ *    + a new value in the enumerator include_vars_idx must be added in the 
+ *      position corresponding of the variable names array
+ *    + the switch construct in function TclWeb_SelectEnvIncludeVar must
+ *      be expanded to handle the new case identified by the new enumerator value
  */
+
+static const char* include_env_vars[] =
+{
+    "DATE_LOCAL","DATE_GMT","LAST_MODIFIED","DOCUMENT_URI","DOCUMENT_PATH_INFO","DOCUMENT_NAME",
+    "QUERY_STRING_UNESCAPED","USER_NAME","RIVET_CACHE_FREE","RIVET_CACHE_SIZE",
+    NULL
+};
+enum include_vars_idx {
+    date_local=0,date_gmt,last_modified,document_uri,document_path_info,document_name,
+    query_string_unescaped,user_name,rivet_cache_free,rivet_cache_size,
+    invalid_env_var
+};
+
+/*  -- TclWeb_SelectEnvIncludeVar 
+ *
+ *  Depending on the value idx of the enumerator a method is selected
+ *  to return a string of a specific environment variable methods
+ *  Adding new environment variables need new cases of the switch 
+ *  construct to be added, provided the data can be obtained from
+ *  the rivet_thread_private structure
+ *
+ *   Arguments:
+ *
+ *      + rivet_thread_private* private: pointer to a thread private data structure
+ *      + int idx: an integer value listed in the enumerator include_vars_idx
+ *
+ *   Results:
+ *
+ *      A character string pointer to the value of the environment variable or
+ *      NULL if the enumerator value idx was invalid or resolving the environment
+ *      variable was impossible
+ * 
+ */
+
+static char*
+TclWeb_SelectEnvIncludeVar (rivet_thread_private* private,int idx)
+{
+    switch (idx)
+    {
+        case date_local: 
+        {
+            apr_pool_t* pool = private->req->req->pool;
+            apr_time_t date = private->req->req->request_time;
+
+            return ap_ht_time(pool,date,DEFAULT_TIME_FORMAT,0); 
+        }
+        case date_gmt:
+        {
+            apr_pool_t* pool = private->req->req->pool;
+            apr_time_t date = private->req->req->request_time;
+
+            return ap_ht_time(pool,date,DEFAULT_TIME_FORMAT,1);
+        }
+        case last_modified:
+        {
+            apr_pool_t* pool = private->req->req->pool;
+
+            return ap_ht_time(pool,private->req->req->finfo.mtime,DEFAULT_TIME_FORMAT,1);
+        }
+        case document_uri:
+        {
+            return private->req->req->uri;
+        }
+        case document_path_info:
+        {
+            return private->req->req->path_info;
+        }
+        case document_name:
+        {
+            char *t;
+
+            if ((t = strrchr(private->req->req->filename,'/'))) {
+                return ++t;
+            } else {
+                return private->req->req->uri;
+            }
+        }
+        case query_string_unescaped:
+        {
+            if (private->req->req->args) {
+                apr_pool_t* pool = private->req->req->pool;
+                char *arg_copy = (char*) apr_pstrdup(pool,private->req->req->args);
+
+                ap_unescape_url(arg_copy);
+                return ap_escape_shell_cmd(pool,arg_copy);
+            } else {
+                return NULL;
+            }
+
+        }
+        case user_name:
+        {
+#ifndef WIN32
+            struct passwd *pw = (struct passwd *) getpwuid(private->req->req->finfo.user);
+            if (pw) {
+                //apr_table_set( table, "USER_NAME",
+                //        apr_pstrdup( pool, pw->pw_name ) );
+                return pw->pw_name;
+            } else {
+                apr_pool_t* pool = private->req->req->pool;
+                return (char*) apr_psprintf(pool,"user#%lu",(unsigned long)private->req->req->finfo.user);
+            }
+#else
+            return NULL;
+#endif
+        }
+        case rivet_cache_free:
+        {
+            apr_pool_t* pool = private->req->req->pool;
+            return (char*) apr_psprintf (pool, "%d",(RIVET_PEEK_INTERP(private,private->running_conf))->cache_free);
+        }
+        case rivet_cache_size:
+        {
+            apr_pool_t* pool = private->req->req->pool;
+            return (char*) apr_psprintf (pool, "%d",(RIVET_PEEK_INTERP(private,private->running_conf))->cache_size);
+        }
+    }
+    return NULL;
+}
+
+/*
+ * -- TclWeb_InitEnvVars
+ * 
+ * Load the CGI and environment variables into the request_rec environment structure
+ * Variables belong to 3 cathegories 
+ *
+ *   + common variables (ap_add_common_vars)
+ *   + CGI variables (ad_cgi_vars)
+ *   + a miscellaneous set of variables 
+ *     listed in the array include_env_vars
+ *
+ * Each cathegory is controlled by flags in order to reduce the overhead of getting them
+ * into request_rec in case previous call to ::rivet::env could have already forced them
+ * into request_rec
+ */
+
 static void
 TclWeb_InitEnvVars (rivet_thread_private* private)
 {
-    //rivet_server_conf *rsc;
-    char *timefmt = DEFAULT_TIME_FORMAT;
-    char *t;
-    apr_time_t date;
-#ifndef WIN32
-    struct passwd *pw;
-#endif /* ndef WIN32 */
-    TclWebRequest *req;
-    apr_table_t *table;  
+    TclWebRequest *req = private->req;
 
-    req = private->req;
-    table = req->req->subprocess_env;
-    date = req->req->request_time;
-
-    if( req->environment_set ) return;
-
-    //rsc = RIVET_SERVER_CONF( req->req->server->module_config );
+    if (ENV_IS_LOADED(req->environment_set)) return;
 
     /* Retrieve cgi variables. */
-    ap_add_cgi_vars( req->req );
-    ap_add_common_vars( req->req );
-
-    /* These were the "include vars"  */
-
-    apr_table_set( table, "DATE_LOCAL",
-            ap_ht_time( TCLWEBPOOL, date, timefmt, 0 ) );
-    apr_table_set( table, "DATE_GMT",
-            ap_ht_time( TCLWEBPOOL, date, timefmt, 1 ) );
-    apr_table_set( table, "LAST_MODIFIED",
-            ap_ht_time( TCLWEBPOOL, req->req->finfo.mtime, timefmt, 1 ) );
-    apr_table_set( table, "DOCUMENT_URI", req->req->uri );
-    apr_table_set( table, "DOCUMENT_PATH_INFO", req->req->path_info );
-
-    if ((t = strrchr(req->req->filename, '/'))) {
-        apr_table_set( table, "DOCUMENT_NAME", ++t );
-    } else {
-        apr_table_set( table, "DOCUMENT_NAME", req->req->uri );
+    if (!ENV_CGI_VARS_LOADED(req->environment_set))
+    {
+        ap_add_cgi_vars(req->req);
+    }
+    if (!ENV_COMMON_VARS_LOADED(req->environment_set))
+    {
+        ap_add_common_vars(req->req);
     }
 
-    if( req->req->args ) {
-        char *arg_copy = (char*) apr_pstrdup(TCLWEBPOOL, req->req->args);
-        ap_unescape_url(arg_copy);
-        apr_table_set( table, "QUERY_STRING_UNESCAPED",
-                ap_escape_shell_cmd( TCLWEBPOOL, arg_copy ) );
+    /* Loading into 'req->req->subprocess_env' the include vars */
+
+    /* actually this check is not necessary. ENV_VARS_M is set only here therefore
+     * if it's set this function has been called already and it should have returned
+     * at the beginning of ies execution. I keep it for clarity and uniformity with the
+     * CGI variables and in case the incremental environment handling is extended
+     */
+
+    if (!ENV_VARS_LOADED(req->environment_set))
+    {
+        apr_table_t   *table;  
+        int            idx;
+
+        table = req->req->subprocess_env;
+        for (idx = 0;idx < invalid_env_var;idx++)
+        {
+            apr_table_set(table,include_env_vars[idx],TclWeb_SelectEnvIncludeVar(private,idx));
+        }
     }
 
-#ifndef WIN32
-    pw = (struct passwd *) getpwuid(req->req->finfo.user);
-    if( pw ) {
-        //apr_table_set( table, "USER_NAME",
-        //        apr_pstrdup( TCLWEBPOOL, pw->pw_name ) );
-    } else {
-        apr_table_set( table, "USER_NAME",
-                (char*) apr_psprintf( TCLWEBPOOL, "user#%lu",
-                    (unsigned long)req->req->finfo.user ) );
+    ENV_LOADED(req->environment_set)
+}
+
+/* -- TclWeb_GetEnvIncludeVar
+ *
+ *  the environment variable named in key is searched among the include
+ *  variables and then resolved by calling TclWeb_SelectEnvIncludeVar
+ *
+ *  Result:
+ *
+ *    a character string pointer to the environment variable value or
+ *    NULL if the environment variable name in invalid or the variable
+ *    could not be resolved
+ *      
+ */
+
+static char*
+TclWeb_GetEnvIncludeVar (rivet_thread_private* private,char* key)
+{
+    int idx;
+
+    for (idx = 0;idx < invalid_env_var; idx++)
+    {
+        const char* include_var_p = include_env_vars[idx];
+        if (strncmp(key,include_var_p,strlen(key) < strlen(include_var_p) ? strlen(key) : strlen(include_var_p)) == 0)
+        {
+            return TclWeb_SelectEnvIncludeVar(private,idx);
+        }
     }
-#endif
-
-    /* Here we create some variables with Rivet internal information. */
-
-    apr_table_set (table, "RIVET_CACHE_FREE",
-            (char*) apr_psprintf (TCLWEBPOOL, "%d",(RIVET_PEEK_INTERP(private,private->running_conf))->cache_free));
-    apr_table_set (table, "RIVET_CACHE_SIZE",
-            (char*) apr_psprintf (TCLWEBPOOL, "%d",(RIVET_PEEK_INTERP(private,private->running_conf))->cache_size));
-
-    req->environment_set = 1;
+    return NULL;
 }
 
 int
@@ -579,7 +733,8 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar,rivet_thread_private* private)
 
     req = private->req;
 
-    TclWeb_InitEnvVars(private);
+    // I actually don't see why we need to load the whole environment here
+    //TclWeb_InitEnvVars(private);
 
     Tcl_IncrRefCount(headersvar);
     /* Transfer client request headers to TCL request namespace. */
@@ -595,7 +750,7 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar,rivet_thread_private* private)
         Tcl_IncrRefCount(key);
         Tcl_IncrRefCount(val);
 
-            /* See comment in TclWeb_GetEnvVars concerning Bug 48963*/
+            /* See comment in TclWeb_GetEnvVars concerning Bug #48963*/
 
         Tcl_ObjSetVar2(req->interp, headersvar, key, val, 0);
         Tcl_DecrRefCount(key);
@@ -610,21 +765,21 @@ TclWeb_GetHeaderVars(Tcl_Obj *headersvar,rivet_thread_private* private)
 INLINE int
 TclWeb_Base64Encode(char *out, char *in, TclWebRequest *req)
 {
-    out = ap_pbase64encode(TCLWEBPOOL, in);
+    out = ap_pbase64encode(req->req->pool, in);
     return TCL_OK;
 }
 
 INLINE int
 TclWeb_Base64Decode(char *out, char *in, TclWebRequest *req)
 {
-    out = ap_pbase64decode(TCLWEBPOOL, in);
+    out = ap_pbase64decode(req->req->pool, in);
     return TCL_OK;
 }
 
 INLINE int
 TclWeb_EscapeShellCommand(char *out, char *in, TclWebRequest *req)
 {
-    out = ap_escape_shell_cmd(TCLWEBPOOL, in);
+    out = ap_escape_shell_cmd(req->req->pool, in);
     return TCL_OK;
 }
 
@@ -639,7 +794,7 @@ char *TclWeb_StringToUtf(char *in, TclWebRequest *req)
     Tcl_DString dstr;
     Tcl_DStringInit(&dstr);
     Tcl_ExternalToUtfDString(NULL, in, (signed)strlen(in), &dstr);
-    tmp = (char*) apr_pstrdup(TCLWEBPOOL, Tcl_DStringValue(&dstr));
+    tmp = (char*) apr_pstrdup(req->req->pool, Tcl_DStringValue(&dstr));
     Tcl_DStringFree(&dstr);
     return tmp;
 }
@@ -678,7 +833,7 @@ int TclWeb_UploadChannel(char *varname, TclWebRequest *req)
         }
         Tcl_RegisterChannel(req->interp,chan);
 
-        result = Tcl_NewObj();        
+        result = Tcl_NewObj();
         Tcl_SetStringObj(result, Tcl_GetChannelName(chan), -1);
         Tcl_SetObjResult(req->interp, result);
         
@@ -701,10 +856,22 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 {
 	apr_status_t status;
 
-	status = apr_file_copy(req->upload->tempname ,Tcl_GetString(filename),APR_FILE_SOURCE_PERMS,req->req->pool);
+	status = apr_file_copy(req->upload->tempname,Tcl_GetString(filename),APR_FILE_SOURCE_PERMS,req->req->pool);
 	if (status == APR_SUCCESS) {
 	    return TCL_OK;
 	} else {
+
+        /* apr_strerror docs don't require a specific buffer size, we're just guessing it */
+
+        char  error_msg[1024];
+        char* tcl_error_msg;
+        apr_strerror(status,error_msg,1024);
+
+        tcl_error_msg = apr_psprintf(req->req->pool,"Error copying upload '%s' to '%s' (%s)", req->upload->tempname,
+                                                                                              Tcl_GetString(filename),
+                                                                                              error_msg);
+
+        Tcl_AddErrorInfo(req->interp,tcl_error_msg);
 		return TCL_ERROR;
 	}
 }
@@ -723,14 +890,31 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
         
         chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
         if (chan == NULL) {
+            char* tcl_error_msg;
+            int error_number = Tcl_GetErrno();
+
+            Tcl_AddErrorInfo(req->interp,"Error opening channel to uploaded data");
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+                                                        Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
+            Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
         }
-        if (Tcl_SetChannelOption(req->interp, chan,
-                     "-translation", "binary") == TCL_ERROR) {
+        if (Tcl_SetChannelOption(req->interp, chan, "-translation", "binary") == TCL_ERROR) {
+            char* tcl_error_msg;
+            int error_number = Tcl_GetErrno();
+
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+                                                        Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
+            Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
         }
-        if (Tcl_SetChannelOption(req->interp, chan,
-                     "-encoding", "binary") == TCL_ERROR) {
+        if (Tcl_SetChannelOption(req->interp, chan, "-encoding", "binary") == TCL_ERROR) {
+            char* tcl_error_msg;
+            int error_number = Tcl_GetErrno();
+
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+                                                        Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
+            Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
         }
 
@@ -796,27 +980,72 @@ int TclWeb_UploadNames(TclWebRequest *req)
     return TCL_OK;
 }
 
+/*
+ * -- TclWeb_GetEnvVar
+ *
+ * basically is the core of the ::rivet::env rivet command. The argument to
+ * the command is stored in 'key' and the function starts a search in various
+ * tables following the following order
+ *
+ *  + though undocumented in the manual the first table checked is HTTP
+ *    headers table. ::rivet::env is actually like ::rivet::headers but for
+ *    the *request_rec->headers_in table
+ *  + the common CGI variables table is checked
+ *  + the CGI 1.1 headers table is checked
+ *  + the include variables list is checked calling TclWeb_GetEnvIncludeVar
+ *
+ *  Arguments:
+ *
+ *   - key: a string with the environment variable name
+ *
+ *  Results:
+ *
+ *    - a string pointer to the string with the variable translation or
+ *    NULL if the environment variable is not found
+ *
+ */
+
 char *
 TclWeb_GetEnvVar(rivet_thread_private* private,char *key)
 {
     char *val;
-    TclWebRequest *req;
-
-    req = private->req;
-    TclWeb_InitEnvVars(private);
+    TclWebRequest *req = private->req;
 
     /* Check to see if it's a header variable first. */
-    val = (char *)apr_table_get( req->req->headers_in, key );
+    val = (char *)apr_table_get (req->req->headers_in,key);
+    if (val) { return val; }
 
-    if( !val ) {
-        val = (char *)apr_table_get( req->req->subprocess_env, key );
+    /* We incrementally prepare subprocess_env */
+    /* CGI common vars first */
+
+    if (!ENV_COMMON_VARS_LOADED(req->environment_set))
+    {
+        ap_add_common_vars(req->req);
+        ENV_COMMON_VARS(req->environment_set)
     }
+    val = (char *)apr_table_get(req->req->subprocess_env,key);
+    if (val) { return val; }
 
-    return val;
+    /* CGI HTTP 1.1 vars */
+
+    if (!ENV_CGI_VARS_LOADED(req->environment_set))
+    {
+        ap_add_cgi_vars(req->req);
+        ENV_CGI_VARS(req->environment_set)
+    }
+    val = (char *)apr_table_get(req->req->subprocess_env,key);
+    if (val) { return val; }
+
+    /* If everything failed we assumed the variable is one of
+     * the 'include variables' and we try to resolve it calling
+     * TclWeb_GetEnvIncludeVar, which returns NULL if the variable
+     * is undefined */
+
+    return TclWeb_GetEnvIncludeVar(private,key);
 }
 
 char *
-TclWeb_GetVirtualFile( TclWebRequest *req, char *virtualname )
+TclWeb_GetVirtualFile(TclWebRequest *req, char *virtualname)
 {
     request_rec *apreq;
     char *filename = NULL;

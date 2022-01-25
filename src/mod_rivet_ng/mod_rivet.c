@@ -97,12 +97,10 @@ DLLEXPORT mod_rivet_globals*  module_globals      = NULL;
 static char*
 Rivet_SeekMPMBridge (apr_pool_t* pool)
 {
-    char*           mpm_prefork_bridge = "rivet_prefork_mpm.so";
-    char*           mpm_worker_bridge  = "rivet_worker_mpm.so";
     char*           mpm_bridge_path;
     int             ap_mpm_result;
     apr_status_t    apr_ret;
-    apr_finfo_t finfo;
+    apr_finfo_t     finfo;
 
     /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
        what bridge custom implementation we want be loaded */
@@ -112,20 +110,19 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
         if ((apr_ret = apr_stat(&finfo,mpm_bridge_path,APR_FINFO_MIN,pool)) != APR_SUCCESS)
         {
             ap_log_perror(APLOG_MARK,APLOG_ERR,apr_ret,pool, 
-                         MODNAME ": MPM bridge %s not found", module_globals->mpm_bridge); 
+                          MODNAME ": MPM bridge %s not found", module_globals->mpm_bridge); 
             exit(1);   
         }
         return mpm_bridge_path;
-        
     }
 
     /* we now look into the configuration record */
 
     if (module_globals->mpm_bridge != NULL)
     {
-        char*       proposed_bridge;
+        char* proposed_bridge;
 
-        proposed_bridge = apr_pstrcat(pool,RIVET_MPM_BRIDGE_COMPOSE(module_globals->mpm_bridge),NULL);
+        proposed_bridge = apr_pstrcat(pool,RIVET_DIR,RIVET_MPM_BRIDGE_COMPOSE(module_globals->mpm_bridge),NULL);
         if (apr_stat(&finfo,proposed_bridge,APR_FINFO_MIN,pool) == APR_SUCCESS)
         {
             mpm_bridge_path = proposed_bridge;
@@ -154,11 +151,11 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
             {
                 /* Since the MPM is not threaded we assume we can load the prefork bridge */
 
-                mpm_bridge_path = apr_pstrdup(pool,mpm_prefork_bridge);
+                mpm_bridge_path = apr_pstrcat(pool,RIVET_MPM_BRIDGE_COMPOSE("prefork"),NULL);
             }
             else
             {
-                mpm_bridge_path = apr_pstrdup(pool,mpm_worker_bridge);
+                mpm_bridge_path = apr_pstrcat(pool,RIVET_MPM_BRIDGE_COMPOSE("worker"),NULL);
             }
         }
         else
@@ -169,9 +166,9 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
              * give a default to the MPM bridge anyway
              */
 
-            mpm_bridge_path = apr_pstrdup(pool,mpm_worker_bridge);
+            mpm_bridge_path = apr_pstrcat(pool,RIVET_MPM_BRIDGE_COMPOSE("worker"),NULL);
         }
-        mpm_bridge_path = apr_pstrcat(pool,RIVET_DIR,"/mpm/",mpm_bridge_path,NULL);
+        mpm_bridge_path = apr_pstrcat(pool,RIVET_DIR,mpm_bridge_path,NULL);
 
     }
     return mpm_bridge_path;
@@ -371,15 +368,15 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     if (apr_dso_load(&dso_handle,module_globals->rivet_mpm_bridge,pPool) == APR_SUCCESS)
     {
         apr_status_t            rv;
-        apr_dso_handle_sym_t    func = NULL;
+        apr_dso_handle_sym_t    bjt = NULL;
 
         ap_log_perror(APLOG_MARK,APLOG_DEBUG,APR_EGENERAL,pTemp,
                      "MPM bridge loaded: %s",module_globals->rivet_mpm_bridge);
 
-        rv = apr_dso_sym(&func,dso_handle,"bridge_jump_table");
+        rv = apr_dso_sym(&bjt,dso_handle,"bridge_jump_table");
         if (rv == APR_SUCCESS)
         {
-            module_globals->bridge_jump_table = (rivet_bridge_table*) func;
+            module_globals->bridge_jump_table = (rivet_bridge_table*) bjt;
         }
         else
         {
@@ -489,8 +486,8 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
         if (s != server && myrsc == root_server_conf) {
             myrsc = RIVET_NEW_CONF(pChild);
-            ap_set_module_config(s->module_config, &rivet_module, myrsc);
-            Rivet_CopyConfig( root_server_conf, myrsc );
+            ap_set_module_config(s->module_config,&rivet_module,myrsc);
+            Rivet_CopyConfig(root_server_conf,myrsc);
         }
 
         myrsc->idx = idx++;
@@ -501,7 +498,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     RIVET_MPM_BRIDGE_CALL(thread_init,pChild,server);
 
-    apr_pool_cleanup_register (pChild,server,Rivet_Finalize,Rivet_Finalize);
+    apr_pool_cleanup_register(pChild,server,Rivet_Finalize,Rivet_Finalize);
 }
 
 
