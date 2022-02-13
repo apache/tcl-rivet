@@ -742,7 +742,7 @@ TCL_CMD_HEADER ( Rivet_Var )
 
         if (TclWeb_GetVarAsList(result, key, source, private->req) != TCL_OK)
         {
-            result = Tcl_NewStringObj("", -1);
+            Tcl_SetStringObj(result,"",-1);
         }
     } else if(!strcmp(command, "names")) {
         if (objc != 2)
@@ -753,7 +753,7 @@ TCL_CMD_HEADER ( Rivet_Var )
 
         if (TclWeb_GetVarNames(result, source, private->req) != TCL_OK)
         {
-            result = Tcl_NewStringObj("", -1);
+            Tcl_SetStringObj(result,"", -1);
         }
     } else if(!strcmp(command, "number")) {
         if (objc != 2)
@@ -769,14 +769,15 @@ TCL_CMD_HEADER ( Rivet_Var )
             Tcl_WrongNumArgs(interp, 2, objv, NULL);
             return TCL_ERROR;
         }
+
         if (TclWeb_GetAllVars(result, source, private->req) != TCL_OK)
         {
-            result = Tcl_NewStringObj("", -1);
+            Tcl_SetStringObj(result,"", -1);
         }
     } else {
         /* bad command  */
-        Tcl_AppendResult(interp, "bad option: must be one of ",
-                         "'get, list, names, number, all'", NULL);
+        Tcl_AppendResult(interp,"bad option: must be one of ",
+                                "'get, list, names, number, all'", NULL);
         return TCL_ERROR;
     }
     Tcl_SetObjResult(interp, result);
