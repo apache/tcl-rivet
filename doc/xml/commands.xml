@@ -1935,9 +1935,9 @@ bab</programlisting>
 							is returned.
 			    		</para>
 			</listitem>
-		    </varlistentry>
+		   </varlistentry>
 		    
-		    <varlistentry>
+		   <varlistentry>
 			<term>
 			    <cmdsynopsis>
 				<command>::rivet::var</command>
@@ -1981,38 +1981,41 @@ form_request end</programlisting>
 				exists, 0 if it doesn't.
 			    </para>
 			</listitem>
-		    </varlistentry>
+		   </varlistentry>
 		
-		    <varlistentry>
+		   <varlistentry>
+				<term>
+					<cmdsynopsis>
+						<command>::rivet::var</command>
+						<arg choice="plain">number</arg>
+				   </cmdsynopsis>
+				</term>
+				<listitem>
+				  <para>
+					 Returns the number of variables.
+				  </para>
+				</listitem>
+		   </varlistentry>
+
+		   <varlistentry>
 			<term>
 			    <cmdsynopsis>
-				<command>::rivet::var</command>
-				<arg choice="plain">number</arg>
+					<command>::rivet::var</command>
+					<arg choice="plain">all</arg>
+					<arg><replaceable><optional>default_values</optional></replaceable></arg>
 			    </cmdsynopsis>
 			</term>
 			<listitem>
 			    <para>
-				Returns the number of variables.
+					Return a list of variable names and values. This is a flat list of key value pairs and
+					as such can be intepreted as the representation of a single level dictionary. An optional
+					argument is interpreted as a dictionary of default values
 			    </para>
 			</listitem>
-		    </varlistentry>
-		
-		    <varlistentry>
-			<term>
-			    <cmdsynopsis>
-				<command>::rivet::var</command>
-				<arg choice="plain">all</arg>
-			    </cmdsynopsis>
-			</term>
-			<listitem>
-			    <para>
-				Return a list of variable names and values.
-			    </para>
-			</listitem>
-		    </varlistentry>
+		   </varlistentry>
 		</variablelist>
 		<para>See <xref linkend="variable_access"/>.</para>
-	    </refsect1>
+	   </refsect1>
 	</refentry>
 
 	<refentry id="wrap">

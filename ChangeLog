@@ -1,3 +1,9 @@
+2022-02-13 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/rivetCore.c: fixed possible memory leak in Rivet_Var. A Tcl_Obj
+	was created to return empty strings replacing an already existing Tcl_Obj losing
+	track of it
+	* VERSION: bumping version number as 3.2.2
+
 2022-01-06 Massimo Manghi <mxmanghi@apache.org>
 	* configure.ac: changing obsolete macro AC_PROG_LIBTOOL into LT_INIT
 
@@ -154,20 +160,20 @@
 	* src/mod_rivet_ng/rivet_lazy_mpm.c: Removed redundant exit command handling flags
 
 2019-05-29 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/apache_config.c: Now handling the directive SingleThreadExit 
-    * src/mod_rivet_ng/[worker|lazy|prefork].c: Now handling single thread exit
-    * src/mod_rivet_ng/worker_prefork_common.c: Reviving and fixing Rivet_CleanupProcessor
-    * src/mod_rivet_ng/mod_rivet_common.c: Add function Rivet_ReleaseRunningScripts to
-    release Tcl_Obj instances of configuration scripts
+	* src/mod_rivet_ng/apache_config.c: Now handling the directive SingleThreadExit 
+	* src/mod_rivet_ng/[worker|lazy|prefork].c: Now handling single thread exit
+	* src/mod_rivet_ng/worker_prefork_common.c: Reviving and fixing Rivet_CleanupProcessor
+	* src/mod_rivet_ng/mod_rivet_common.c: Add function Rivet_ReleaseRunningScripts to
+	release Tcl_Obj instances of configuration scripts
 
 2019-05-24 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/rivetCore.c: Add Tcl_DecrRefCnt after
-    RivetCache_StoreScript as this function itself calls
-    Tcl_IncrRefCnt to preserve the Tcl_Obj with the script code
-    
+	* src/mod_rivet_ng/rivetCore.c: Add Tcl_DecrRefCnt after
+	RivetCache_StoreScript as this function itself calls
+	Tcl_IncrRefCnt to preserve the Tcl_Obj with the script code
+
 2019-04-16 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/: also the worker and lazy bridge transitioned to 
-    the new interpreter model
+	* src/mod_rivet_ng/: also the worker and lazy bridge transitioned to 
+	the new interpreter model
 
 2019-04-13 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/commands.xml: Correct wrong header in ::rivet::http_accept code example
