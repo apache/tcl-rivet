@@ -764,7 +764,8 @@ TCL_CMD_HEADER ( Rivet_Var )
 
         TclWeb_VarNumber(result, source, private->req);
     } else if(!strcmp(command, "all")) {
-        if (objc != 2)
+
+        if (objc < 2)
         {
             Tcl_WrongNumArgs(interp, 2, objv, NULL);
             return TCL_ERROR;
@@ -774,6 +775,52 @@ TCL_CMD_HEADER ( Rivet_Var )
         {
             Tcl_SetStringObj(result,"", -1);
         }
+        else
+        {
+            if (objc >= 3)
+            {
+                /* We interpret the extra argument as a dictionary of default values */
+                /* Since 'result' as created by TclWeb_GetAllVars is a flat list of key-value
+                   pairs we assume it to be itself a dictionary */
+
+                Tcl_DictSearch search;
+                Tcl_Obj *key, *value;
+                int done;
+                Tcl_Obj *valuePtr = NULL;
+
+                /* we loop through the dictionary using the code
+                 * fragment shown in the manual page for Tcl_NewDictObj
+                 */
+                if (Tcl_DictObjFirst(interp,objv[2],&search,&key,&value,&done) != TCL_OK) {
+
+                    /* If the object passed as optional argument is a valid dictionary it
+                     * shouldn't never get here
+                     */
+
+                    Tcl_SetStringObj(result,"invalid_dictionary_value",-1);
+
+                    /* We use the result Tcl_Obj to assign an error code. This should also release the object memory */
+
+                    Tcl_SetObjErrorCode(interp,result);
+                    Tcl_AddObjErrorInfo(interp,"Impossible to interpret the default values argument as a dictionary value",-1);
+
+                    return TCL_ERROR;
+                }
+
+                for (; !done ; Tcl_DictObjNext(&search, &key, &value, &done)) 
+                {
+                    if (Tcl_DictObjGet(interp,result,key,&valuePtr) == TCL_OK) 
+                    {
+                        if (valuePtr == NULL)
+                        {
+                            Tcl_DictObjPut(interp,result,key,value);
+                        }
+                    }
+                }
+                Tcl_DictObjDone(&search);
+            }
+        }
+
     } else {
         /* bad command  */
         Tcl_AppendResult(interp,"bad option: must be one of ",
