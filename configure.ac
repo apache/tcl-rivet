@@ -6,8 +6,6 @@ dnl
 dnl You need at least autoconf 2.59
 dnl
 #
-# RCS: @(#) $Id$
-
 #-----------------------------------------------------------------------
 # Sample configure.in for Tcl Extensions.  The only places you should
 # need to modify this file are marked by the string __CHANGE__
@@ -31,7 +29,6 @@ TEA_INIT([3.9])
 CONFIGURE_CMD="$0 $*"
 
 AC_CONFIG_AUX_DIR(tclconfig)
-AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -57,6 +54,14 @@ AX_PREFIX_CONFIG_H([rivet_config.h],[rivet])
 #
 AC_DISABLE_STATIC
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+
+# establishing a landmark in the directory hierarchy as per 
+# autotools design. This is what AC_CONFIG_SRCDIR is meant to do
+# I arbitrarily choose src/rivet.h as landmark, moving this file
+# to a different directory or deleting it implies this line has to
+# change
+
+AC_CONFIG_SRCDIR([src/rivet.h])
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
@@ -89,12 +94,12 @@ TEA_PREFIX
 TEA_SETUP_COMPILER
 
 #
-# For automake to be happy, we also need AC_PROG_LIBTOOL
+# For automake to be happy, we also need LT_INIT
 #
 # the LIBTOOL_DEPS macro sets up for automatic updating of the
 # libtool script if it becomes out of date, as per libtool docs
 #
-AC_PROG_LIBTOOL
+LT_INIT
 AC_SUBST(LIBTOOL_DEPS)
 
 #-----------------------------------------------------------------------
@@ -573,7 +578,6 @@ AC_DEFUN([RIVET_TCL_LIB],[
     AC_MSG_RESULT([$with_rivet_target_dir])
 ])
 
-
 # DISPLAY_RIVET_VERSION
 #
 # --enable-version-display=[yes|no] (default: no)
@@ -697,6 +701,30 @@ AC_DEFUN([HTTP_REQUESTS_MUTEX],[
         AC_DEFINE(SERIALIZE_HTTP_REQUESTS,1,[requests will be serialized])
     else
         AC_MSG_RESULT([no, HTTP requests will not be serialized])
+    fi
+])
+
+# -- RIVET_DEBUG_BUILD
+#
+# Defining a symbol for conditional inclusion of code for debugging purposes
+#
+# Default: no
+#
+
+AC_DEFUN([BUILD_DEBUG_CODE],[
+    AC_ARG_ENABLE(
+        rivet_debug_build,
+        [  --enable-rivet-debug-build Includes optional debugging code],
+        [ rivet_debug_build=$enable_rivet_debug_build ],
+        [ rivet_debug_build="no" ]
+    )
+
+    AC_MSG_CHECKING([if we are building mod_rivet for debugging])
+    if test "$rivet_debug_build" = "yes"; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(DEBUG_BUILD,1,[we are building mod_rivet with optional code])
+    else
+        AC_MSG_RESULT([no, ordinary build])
     fi
 ])
 
@@ -836,6 +864,7 @@ RIVET_CORE_CMDS
 RIVET_CHANNEL
 SINGLE_WORKER_TCL_THREAD
 HTTP_REQUESTS_MUTEX
+BUILD_DEBUG_CODE
 AC_HEADER_STDBOOL
 
 # Let's separate the point version from the major and minor version

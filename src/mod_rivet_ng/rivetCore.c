@@ -202,7 +202,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
 TCL_CMD_HEADER( Rivet_Parse )
 {
     rivet_thread_private*   private;
-    char*                   filename;
+    char*                   filename = 0;
     apr_status_t            stat_s;
     apr_finfo_t             finfo_b;
     char*                   cache_key;
@@ -210,7 +210,6 @@ TCL_CMD_HEADER( Rivet_Parse )
     Tcl_HashEntry*          entry  = NULL;
     Tcl_Obj*                script = NULL;
     int                     result;
-    int                     isNew;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::parse")
@@ -242,12 +241,12 @@ TCL_CMD_HEADER( Rivet_Parse )
             /* we parse and compose the script ourselves before passing it to Tcl_EvalObjEx */
 
             Tcl_IncrRefCount(outbuf);
-            Tcl_AppendToObj(outbuf,"puts -nonewline \"", -1);
+            Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
 
             /* If we are not inside a <? ?> section, add the closing ". */
             if (Rivet_Parser(outbuf, script) == 0)
             {
-                Tcl_AppendToObj(outbuf,"\"\n", 2);
+                Tcl_AppendToObj(outbuf, "\"\n", 2);
             } 
 
             Tcl_AppendToObj(outbuf,"\n",-1);
@@ -285,14 +284,14 @@ TCL_CMD_HEADER( Rivet_Parse )
     /* */
 
     cache_key = 
-        RivetCache_MakeKey (private->pool,filename,
+        RivetCache_MakeKey( private->pool,filename,
                             finfo_b.ctime,finfo_b.mtime,
                             IS_USER_CONF(private->running_conf),0);
 
     rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
-    entry = RivetCache_EntryLookup (rivet_interp,cache_key,&isNew);
+    entry = RivetCache_EntryLookup (rivet_interp,cache_key);
 
-    if (isNew)
+    if (entry == NULL)
     {
         script = Tcl_NewObj();
         Tcl_IncrRefCount(script);
@@ -301,16 +300,37 @@ TCL_CMD_HEADER( Rivet_Parse )
         if (result != TCL_OK)
         {
             Tcl_AddErrorInfo(interp,apr_pstrcat(private->pool,"Could not read file ",filename,NULL));
+            Tcl_DecrRefCount(script);
             return result;
         }
-        
-        RivetCache_StoreScript(rivet_interp,entry,script);
+
+        if (rivet_interp->cache_free > 0)
+        {
+            int isNew;
+            Tcl_HashEntry* entry;
+
+            entry = RivetCache_CreateEntry (rivet_interp,cache_key,&isNew);
+            ap_assert(isNew == 1);
+            RivetCache_StoreScript(rivet_interp,entry,script);
+        }
+        else if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
+        {
+            rivet_interp->flags |= RIVET_CACHE_FULL;
+            ap_log_error (APLOG_MARK, APLOG_NOTICE, APR_EGENERAL, private->r->server,"%s %s (%s),",
+                                                                  "Rivet cache full when parsing ",
+                                                                  private->r->filename,
+                                                                  private->r->server->server_hostname);
+        }
+
+        result = Tcl_EvalObjEx(interp,script,0);
         Tcl_DecrRefCount(script);
+        return result;
+               
     } else {
         script = RivetCache_FetchScript(entry);
+        return Tcl_EvalObjEx(interp,script,0); 
     }
 
-    return Tcl_EvalObjEx(interp,script,0); 
 }
 
 /*
@@ -650,9 +670,9 @@ TCL_CMD_HEADER ( Rivet_Var )
                          "|number|all)");
         return TCL_ERROR;
     }
-    cmd = Tcl_GetString(objv[0]);
+    cmd     = Tcl_GetString(objv[0]);
     command = Tcl_GetString(objv[1]);
-    result = Tcl_NewObj();
+    result  = Tcl_NewObj();
 
     /* determine if var_qs, var_post or var was called */
 
@@ -723,7 +743,7 @@ TCL_CMD_HEADER ( Rivet_Var )
 
         if (TclWeb_GetVarAsList(result, key, source, private->req) != TCL_OK)
         {
-            result = Tcl_NewStringObj("", -1);
+            Tcl_SetStringObj(result,"",-1);
         }
     } else if(!strcmp(command, "names")) {
         if (objc != 2)
@@ -734,7 +754,7 @@ TCL_CMD_HEADER ( Rivet_Var )
 
         if (TclWeb_GetVarNames(result, source, private->req) != TCL_OK)
         {
-            result = Tcl_NewStringObj("", -1);
+            Tcl_SetStringObj(result,"", -1);
         }
     } else if(!strcmp(command, "number")) {
         if (objc != 2)
@@ -745,19 +765,67 @@ TCL_CMD_HEADER ( Rivet_Var )
 
         TclWeb_VarNumber(result, source, private->req);
     } else if(!strcmp(command, "all")) {
-        if (objc != 2)
+
+        if (objc < 2)
         {
             Tcl_WrongNumArgs(interp, 2, objv, NULL);
             return TCL_ERROR;
         }
+
         if (TclWeb_GetAllVars(result, source, private->req) != TCL_OK)
         {
-            result = Tcl_NewStringObj("", -1);
+            Tcl_SetStringObj(result,"", -1);
         }
+        else
+        {
+            if (objc >= 3)
+            {
+                /* We interpret the extra argument as a dictionary of default values */
+                /* Since 'result' as created by TclWeb_GetAllVars is a flat list of key-value
+                   pairs we assume it to be itself a dictionary */
+
+                Tcl_DictSearch search;
+                Tcl_Obj *key, *value;
+                int done;
+                Tcl_Obj *valuePtr = NULL;
+
+                /* we loop through the dictionary using the code
+                 * fragment shown in the manual page for Tcl_NewDictObj
+                 */
+                if (Tcl_DictObjFirst(interp,objv[2],&search,&key,&value,&done) != TCL_OK) {
+
+                    /* If the object passed as optional argument is a valid dictionary it
+                     * shouldn't never get here
+                     */
+
+                    Tcl_SetStringObj(result,"invalid_dictionary_value",-1);
+
+                    /* We use the result Tcl_Obj to assign an error code. This should also release the object memory */
+
+                    Tcl_SetObjErrorCode(interp,result);
+                    Tcl_AddObjErrorInfo(interp,"Impossible to interpret the default values argument as a dictionary value",-1);
+
+                    return TCL_ERROR;
+                }
+
+                for (; !done ; Tcl_DictObjNext(&search, &key, &value, &done)) 
+                {
+                    if (Tcl_DictObjGet(interp,result,key,&valuePtr) == TCL_OK) 
+                    {
+                        if (valuePtr == NULL)
+                        {
+                            Tcl_DictObjPut(interp,result,key,value);
+                        }
+                    }
+                }
+                Tcl_DictObjDone(&search);
+            }
+        }
+
     } else {
         /* bad command  */
-        Tcl_AppendResult(interp, "bad option: must be one of ",
-                         "'get, list, names, number, all'", NULL);
+        Tcl_AppendResult(interp,"bad option: must be one of ",
+                                "'get, list, names, number, all'", NULL);
         return TCL_ERROR;
     }
     Tcl_SetObjResult(interp, result);
@@ -1023,16 +1091,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
  *
  * Rivet_Upload --
  *
- *      Deals with file uploads (multipart/form-data) like so:
- *
- *      upload channel uploadname
- *      upload save name uploadname
- *      upload data uploadname
- *      upload exists uploadname
- *      upload size uploadname
- *      upload type uploadname
- *      upload filename uploadname
- *      upload names
+ *      Deals with file uploads (multipart/form-data):
  *
  * Results:
  *      A standard Tcl result.
@@ -1049,7 +1108,29 @@ TCL_CMD_HEADER( Rivet_Upload )
     char*   varname = NULL;
     int     subcommandindex;
 
-    Tcl_Obj* result = NULL;
+    /* ::rivet::upload subcommands must register
+     *
+     * - subcommand definition
+     * - subcommand integer progressive index
+     * - subcommand required (minimum) number of arguments
+     *
+     * +----------------------------------------+-------+
+     * |         argv[1]    argv[2]   argv[3]   | argc  |
+     * +----------------------------------------+-------+
+     * |  upload channel   uploadname           |   3   |
+     * |  upload save      uploadname filename  |   4   |
+     * |  upload data      uploadname           |   3   |
+     * |  upload exists    uploadname           |   3   |
+     * |  upload size      uploadname           |   3   |
+     * |  upload type      uploadname           |   3   |
+     * |  upload filename  uploadname           |   3   |
+     * |  upload tempname  uploadname           |   3   |
+     * |  upload names                          |   2   |
+     * +----------------------------------------+-------+
+     *
+     * a subcommand first optional argument must be the name
+     * of an upload
+     */
 
     static CONST84 char *SubCommand[] = {
         "channel",
@@ -1076,115 +1157,104 @@ TCL_CMD_HEADER( Rivet_Upload )
         NAMES
     };
 
-    rivet_thread_private*   private;
+    static CONST84 int cmds_objc[] = { 3,4,3,3,3,3,3,3,2 };
+    int expected_objc;
+
+    rivet_thread_private* private;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::upload")
     if (Tcl_GetIndexFromObj(interp, objv[1], SubCommand,
-                        "channel|save|data|exists|size|type|filename|names|tempname"
-                        "|tempname|names",
+                        "channel|save|data|exists|size|type|filename|tempname|names",
                         0, &subcommandindex) == TCL_ERROR) {
         return TCL_ERROR;
     }
 
-    /* If it's any of these, we need to find a specific name. */
+    expected_objc = cmds_objc[subcommandindex];
 
-    /* Excluded case is NAMES. */
+    if (objc != expected_objc) {
+        Tcl_Obj* infoobj = Tcl_NewStringObj("Wrong argument numbers: ",-1);
 
-    if ((enum subcommand)subcommandindex == CHANNEL     ||
-        (enum subcommand)subcommandindex == SAVE        ||
-        (enum subcommand)subcommandindex == DATA        ||
-        (enum subcommand)subcommandindex == EXISTS      ||
-        (enum subcommand)subcommandindex == SIZE        ||
-        (enum subcommand)subcommandindex == TYPE        ||
-        (enum subcommand)subcommandindex == FILENAME    ||
-        (enum subcommand)subcommandindex == TEMPNAME)
-    {
+        Tcl_IncrRefCount(infoobj);
+        Tcl_AppendObjToObj(infoobj,Tcl_NewIntObj(expected_objc));
+        Tcl_AppendStringsToObj(infoobj," arguments expected");
+        Tcl_AppendObjToErrorInfo(interp, infoobj);
+        Tcl_DecrRefCount(infoobj);
+
+        if (subcommandindex == SAVE) {
+            Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
+        } else {
+            Tcl_WrongNumArgs(interp, objc, objv, "uploadname");
+        }
+        return TCL_ERROR;
+    }
+
+    /* We check whether an upload with a given name exists */
+
+    if (objc >= 3) {
+        int tcl_status;
         varname = Tcl_GetString(objv[2]);
-        if ((enum subcommand)subcommandindex != EXISTS)
-        {
-            if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
-            {
-                Tcl_AddErrorInfo(interp, "Unable to find variable");
-                return TCL_ERROR;
-            }
+
+        /* TclWeb_PrepareUpload calls ApacheUpload_find and returns
+         * TCL_OK if the named upload exists in the current request */
+        tcl_status = TclWeb_PrepareUpload(varname, private->req);
+
+        if (subcommandindex == EXISTS) {
+            Tcl_Obj* result = NULL;
+            int upload_prepared = 0;
+
+            if (tcl_status == TCL_OK) upload_prepared = 1;
+
+            result = Tcl_NewObj();
+            Tcl_SetIntObj(result,upload_prepared);
+            Tcl_SetObjResult(interp, result);
+            return TCL_OK;
+                
         }
 
-        /* If it's not the 'save' command, then it has to have an objc
-           of 3. */
-        if ((enum subcommand)subcommandindex != SAVE && objc != 3)
+        if (tcl_status != TCL_OK)
         {
-            Tcl_WrongNumArgs(interp, 2, objv, "varname");
+            Tcl_AddErrorInfo(interp, "Unable to find the upload named '");
+            Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj(varname,-1));
+            Tcl_AppendObjToErrorInfo(interp,Tcl_NewStringObj("'",-1));
             return TCL_ERROR;
         }
     }
 
-    result = Tcl_NewObj();
+    /* CHANNEL  : get the upload channel name
+     * SAVE     : save data to a specified filename
+     * DATA     : get the uploaded data into a Tcl variable
+     * SIZE     : uploaded data size
+     * TYPE     : upload mimetype
+     * FILENAME : upload original filename
+     * TEMPNAME : temporary file where the upload is taking place
+     * NAMES    : list of uploads
+     *
+     * the procedure shouldn't reach for the default case
+     */
 
     switch ((enum subcommand)subcommandindex)
     {
-        case CHANNEL: {
-            Tcl_Channel chan;
-            char *channelname = NULL;
-
-            if (TclWeb_UploadChannel(varname, &chan, private->req) != TCL_OK) {
-                return TCL_ERROR;
-            }
-            channelname = (char *)Tcl_GetChannelName(chan);
-            Tcl_SetStringObj(result, channelname, -1);
-            break;
-        }
+        case CHANNEL:
+            return TclWeb_UploadChannel(varname, private->req);
         case SAVE:
-            /* save data to a specified filename  */
-            if (objc != 4) {
-                Tcl_WrongNumArgs(interp, 2, objv, "uploadname filename");
-                return TCL_ERROR;
-            }
-
-            if (TclWeb_UploadSave(varname, objv[3], private->req) != TCL_OK)
-            {
-                return TCL_ERROR;
-            }
-            break;
+            return TclWeb_UploadSave(varname, objv[3], private->req);
         case DATA:
-            if (TclWeb_UploadData(varname, result, private->req) != TCL_OK) {
-                return TCL_ERROR;
-            }
-            break;
-        case EXISTS:
-            if (TclWeb_PrepareUpload(varname, private->req) != TCL_OK)
-            {
-                Tcl_SetIntObj(result, 0);
-            } else {
-                Tcl_SetIntObj(result, 1);
-            }
-            break;
+            return TclWeb_UploadData(varname, private->req);
         case SIZE:
-            TclWeb_UploadSize(result, private->req);
-            break;
+            return TclWeb_UploadSize(private->req);
         case TYPE:
-            TclWeb_UploadType(result, private->req);
-            break;
+            return TclWeb_UploadType(private->req);
         case FILENAME:
-            TclWeb_UploadFilename(result, private->req);
-            break;
+            return TclWeb_UploadFilename(private->req);
         case TEMPNAME:
-            TclWeb_UploadTempname(result,private->req);
-            break;
+            return TclWeb_UploadTempname(private->req);
         case NAMES:
-            if (objc != 2)
-            {
-                Tcl_WrongNumArgs(interp, 1, objv, "names");
-                return TCL_ERROR;
-            }
-            TclWeb_UploadNames(result, private->req);
-            break;
+            return TclWeb_UploadNames(private->req);
         default:
-            Tcl_WrongNumArgs(interp, 1, objv,
-                             "channel|save ?name?|data|exists|size|type|filename|names|tempname");
+            Tcl_WrongNumArgs(interp, 1, objv,"Rivet internal error: inconsistent argument");
     }
-    Tcl_SetObjResult(interp, result);
-    return TCL_OK;
+    return TCL_ERROR;
 }
 
 /*
@@ -1395,9 +1465,9 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
         return TCL_ERROR;
     }
 
-    key = Tcl_GetStringFromObj( objv[1], NULL );
+    key = Tcl_GetStringFromObj (objv[1],NULL);
 
-    val = TclWeb_GetEnvVar( private, key );
+    val = TclWeb_GetEnvVar (private,key);
 
     Tcl_SetObjResult(interp, Tcl_NewStringObj( val, -1 ) );
     return TCL_OK;
@@ -1424,7 +1494,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
  *
  *      - non threaded MPMs: the child process exits for good
  *      - threaded MPMs: the child process exits after all Tcl threads
- *        are told to exit
+ *      are told to exit
  *
  *-----------------------------------------------------------------------------
  */
@@ -1432,7 +1502,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
 TCL_CMD_HEADER( Rivet_ExitCmd )
 {
     int value;
-    rivet_thread_private* private;
+    rivet_thread_private*   private;
     char* errorMessage = "page generation interrupted by exit command";
 
     if ((objc != 1) && (objc != 2)) {
@@ -1858,7 +1928,6 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     unsigned int         user_conf; 
     time_t               ctime;
     time_t               mtime;
-    int                  isNew;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::url_script")
@@ -1870,8 +1939,8 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     mtime = private->r->finfo.mtime;
     cache_key = RivetCache_MakeKey(private->pool,private->r->filename,ctime,mtime,user_conf,1);
 
-    entry = RivetCache_EntryLookup (rivet_interp,cache_key,&isNew);
-    if (isNew)
+    entry = RivetCache_EntryLookup (rivet_interp,cache_key);
+    if (entry == NULL)
     {
         Tcl_Interp*     interp;
         
@@ -1879,7 +1948,6 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
         script = Tcl_NewObj();
         Tcl_IncrRefCount(script);
-
         /*
          * We check whether we are dealing with a pure Tcl script or a Rivet template.
          * Actually this check is done only if we are processing a toplevel file, every nested
@@ -1897,23 +1965,41 @@ TCL_CMD_HEADER( Rivet_UrlScript )
 
         }
 
-        if (result != TCL_OK)
+        if (result == TCL_OK)
         {
-            // Hash cleanup
-            RivetCache_DeleteEntry(entry);
+            /* let's check the cache for free entries */
 
-            Tcl_DecrRefCount(script);
-            return result;
+            if (rivet_interp->cache_free > 0)
+            {
+                int isNew;
+                Tcl_HashEntry* entry;
+
+                entry = RivetCache_CreateEntry (rivet_interp,cache_key,&isNew);
+    
+                /* Sanity check: we are here for this reason */
+
+                ap_assert(isNew == 1);
+            
+                /* we proceed storing the script in the cache */
+
+                RivetCache_StoreScript(rivet_interp,entry,script);
+            }
+            else if ((rivet_interp->flags & RIVET_CACHE_FULL) == 0)
+            {
+                rivet_interp->flags |= RIVET_CACHE_FULL;
+                ap_log_error (APLOG_MARK, APLOG_NOTICE, APR_EGENERAL,private->r->server,"%s %s (%s),",
+                                                                      "Rivet cache full when serving ",
+                                                                      private->r->filename,
+                                                                      private->r->server->server_hostname);
+            }
         }
+        Tcl_SetObjResult(rivet_interp->interp, script);
+        Tcl_DecrRefCount(script);
 
-        RivetCache_StoreScript(rivet_interp,entry,script);
-    }
-    else
-    {
-        script = RivetCache_FetchScript(entry);
+    } else {
+        Tcl_SetObjResult(rivet_interp->interp,RivetCache_FetchScript(entry));
     }
 
-    Tcl_SetObjResult(rivet_interp->interp, script);
     return TCL_OK;
 }
 
@@ -1996,6 +2082,64 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
     Tcl_SetObjResult(interp,Tcl_NewStringObj(buff,strlen(buff)));
     return TCL_OK;
 }
+
+#ifdef RIVET_DEBUG_BUILD
+/*
+ *-----------------------------------------------------------------------------
+ *
+ * Rivet_CacheContent --
+ *
+ *      Dumping in a list the cache content. For debugging purposes.
+ *      This command will be placed within conditional compilation and
+ *      documented within the 'Rivet Internals' section of the manual
+ *
+ * Results:
+ *      
+ *      a Tcl list of the keys in the interpreter cache
+ *
+ * Side Effects:
+ *
+ *      none
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER( Rivet_CacheContent )
+{
+    Tcl_Obj*                entry_list;
+    rivet_thread_private*   private;
+    rivet_thread_interp*    rivet_interp;
+    int                     ep;
+    THREAD_PRIVATE_DATA(private)
+    CHECK_REQUEST_REC(private,"::rivet::cache_content")
+
+    rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
+    interp = rivet_interp->interp;
+    
+    entry_list = Tcl_NewObj();
+    Tcl_IncrRefCount(entry_list);
+
+    ep = rivet_interp->cache_size - 1;
+    
+    while ((ep >= 0) && (rivet_interp->objCacheList[ep]))
+    {
+        int tcl_status;
+
+        tcl_status = Tcl_ListObjAppendElement(interp,entry_list,Tcl_NewStringObj(rivet_interp->objCacheList[ep],-1));
+
+        if (tcl_status != TCL_OK) {
+            return tcl_status;
+        }
+
+        ep--;
+    }
+    Tcl_SetObjResult(interp,entry_list);
+    Tcl_DecrRefCount(entry_list);
+    return TCL_OK;
+}
+
+#endif /* RIVET_DEBUG_BUILD */
+
 /*
  *-----------------------------------------------------------------------------
  *
@@ -2040,7 +2184,11 @@ Rivet_InitCore(rivet_thread_interp* interp_obj,rivet_thread_private* private)
     RIVET_OBJ_CMD ("exit",Rivet_ExitCmd,private);
     RIVET_OBJ_CMD ("url_script",Rivet_UrlScript,private);
     RIVET_OBJ_CMD ("thread_id",Rivet_GetThreadId,private);
-
+    
+#ifdef RIVET_DEBUG_BUILD
+    /* code compiled conditionally for debugging */
+    RIVET_OBJ_CMD ("cache_content",Rivet_CacheContent,private);
+#endif
 #ifdef TESTPANIC
     RIVET_OBJ_CMD ("testpanic",TestpanicCmd,private);
 #endif

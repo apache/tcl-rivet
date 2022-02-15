@@ -1,4 +1,7 @@
-# $Id$
+# -- headers.test
+#
+# testing ::rivet::load_headers command
+#
 
 set testfilename1 headers.rvt
 

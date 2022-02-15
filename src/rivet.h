@@ -33,6 +33,7 @@ typedef int rivet_req_ctype;
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_rivet */
 
+#define MINSTRLEN(s1,s2) strlen(s1) < strlen(s2) ? strlen(s1) : strlen(s2)
 #define STREQU(s1,s2)  (s1[0] == s2[0] && strcmp(s1, s2) == 0)
 #define STRNEQU(s1,s2) (s1[0] == s2[0] && strncmp(s1, s2, strlen(s2)) == 0)
 #define RIVET_NS                "::rivet"
@@ -59,11 +60,11 @@ static int cmd(\
     Tcl_Obj *CONST objv[])
 
 #define TCL_OBJ_CMD( name, func ) \
-Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
-		      name,                     /* Function name in Tcl */\
-		      func,                     /* C function name */\
-		      NULL,                     /* Client Data */\
-		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
+Tcl_CreateObjCommand (interp,         /* Tcl interpreter */\
+		              name,           /* Function name in Tcl */\
+		              func,           /* C function name */\
+		              NULL,           /* Client Data */\
+		              (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
 
  /* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace. Commands
   * are exported from the RIVET_NS (::rivet) namespace in the init.tcl 
@@ -116,7 +117,7 @@ EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
     interp_obj = interps[rsc->idx]; \
     for (s = server; s != NULL; s = s->next) { \
         aFunction (s, interp_obj); \
-        if (rsc->separate_virtual_interps == 0) { break; } \
+        if (module_globals->separate_virtual_interps == 0) { break; } \
     } \
 }
 
@@ -130,7 +131,7 @@ EXTERN int Rivet_InitWWW(Tcl_Interp *interp);
     interp_obj = interps[rsc->idx]; \
     for (s = server; s != NULL; s = s->next) { \
         aFunction (s, interp_obj, __VA_ARGS__ ); \
-        if (rsc->separate_virtual_interps == 0) { break; } \
+        if (module_globals->separate_virtual_interps == 0) { break; } \
     } \
 }
 

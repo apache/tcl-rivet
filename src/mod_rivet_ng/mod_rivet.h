@@ -35,17 +35,15 @@
 #include <rivet_config.h>
 #endif
 
-#include "rivet_types.h"
-
 /*
  * Petasis 16 Dec 2018: This causes the symbol to be exported also from MPMs...
-
-  APLOG_USE_MODULE(rivet);
-
-  PLEASE: do not use any of APLOG_USE_MODULE, AP_DECLARE_MODULE,
-  AP_MODULE_DECLARE_DATA in this header file!
- 
-*/
+ *
+ * APLOG_USE_MODULE(rivet);
+ *
+ *  PLEASE: do not use any of APLOG_USE_MODULE, AP_DECLARE_MODULE,
+ *  AP_MODULE_DECLARE_DATA in this header file!
+ *
+ */
 
 /* init.tcl file relative to the server root directory */
 
@@ -116,36 +114,29 @@ typedef struct _rivet_server_conf {
     char*       rivet_before_script;        /* script run before each page      */
     char*       rivet_after_script;         /*            after                 */
 
-    /* ------------------------------------------------------------------------ */
+    /* --------------------------------------------------------------------------- */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
-    unsigned int    user_scripts_status;
+    unsigned int user_scripts_status;
 
-    int             default_cache_size;
-    int             upload_max;
-    int             upload_files_to_var;
-    int             separate_virtual_interps;
-    int             honor_header_only_reqs;
-    int             single_thread_exit;     /* Allow bridges to exit a single thread instead of
-                                             * forcing a whole process */
-    int             separate_channels;      /* when true a vhosts get their private channel */
-    int             export_rivet_ns;        /* export the ::rivet namespace commands        */
-    int             import_rivet_ns;        /* import into the global namespace the
-                                               exported ::rivet commands                    */
-    char*           server_name;
-    const char*     upload_dir;
-    apr_table_t*    rivet_server_vars;
-    apr_table_t*    rivet_dir_vars;
-    apr_table_t*    rivet_user_vars;
-    int             idx;                /* server record index (to be used for the interps db)          */
-    char*           path;               /* copy of the path field of a cmd_parms structure:             *
-                                         * should enable us to tell if a conf record comes from a       *
-                                         * Directory section */
-    const char*     mpm_bridge;         /* MPM bridge. if not null the module will try to load the      * 
-                                         * file name in this field. The string should be either a full  *
-                                         * path to a file name, or a string from which a file name will *
-                                         * be composed using the pattern 'rivet_(mpm_bridge)_mpm.so     */
+    int          default_cache_size;
+    int          upload_max;
+    int          upload_files_to_var;
+    int          honor_header_only_reqs;
+
+    int          export_rivet_ns;        /* export the ::rivet namespace commands        */
+    int          import_rivet_ns;        /* import into the global namespace the
+                                            exported ::rivet commands                    */
+    char*        server_name;
+    const char*  upload_dir;
+    apr_table_t* rivet_server_vars;
+    apr_table_t* rivet_dir_vars;
+    apr_table_t* rivet_user_vars;
+    int          idx;                   /* server record index (to be used for the interps db)    */
+    char*        path;                  /* copy of the path field of a cmd_parms structure:       *
+                                         * should enable us to tell if a conf record comes from a *
+                                         * Directory section                                      */
 } rivet_server_conf;
 
 #define TCL_INTERPS 1
@@ -204,19 +195,32 @@ typedef struct _mpm_bridge_table {
 typedef struct mpm_bridge_status mpm_bridge_status;
 
 typedef struct _mod_rivet_globals {
-    apr_pool_t*             pool;               
-    char*                   rivet_mpm_bridge;       /* name of the MPM bridge                   */
-    server_rec*             server;                 /* default host server_rec obj              */
-    int                     vhosts_count;           /* Number of configured virtual host including 
-                                                     * the root server thus it's supposed to be >= 1 */
-	char*				    default_handler;		/* Default request handler code             */
-	int					    default_handler_size;	/* Size of the default_handler buffer       */
-    rivet_thread_interp**   server_interps;         /* server and prefork MPM interpreter       */
-    /* apr_thread_mutex_t*   pool_mutex;  */        /* threads commmon pool mutex               */
-    rivet_bridge_table*     bridge_jump_table;      /* Jump table to bridge specific procedures */
-    mpm_bridge_status*      mpm;                    /* bridge private control structure         */
+    apr_pool_t*         pool;               
+    char*               rivet_mpm_bridge;       /* name of the MPM bridge                   */
+    server_rec*         server;                 /* default host server_rec obj              */
+    int                 ap_child_shutdown;      /* shutdown inited by the child pool cleanup */
+    int                 vhosts_count;           /* Number of configured virtual host including   *
+                                                 * the root server thus it's supposed to be >= 1 */
+    char*               default_handler;		/* Default request handler code             */
+    int                 default_handler_size;	/* Size of the default_handler buffer       */
+    rivet_thread_interp** server_interps;       /* server and prefork MPM interpreter       */
+    apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
+    rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
+    const char*         mpm_bridge;             /* MPM bridge. if not null the module will  */
+                                                /* try to load the file name in this field. */
+                                                /* The string should be either a full       */
+                                                /* path to a file name, or a string from    */
+                                                /* which a file name will be composed using */
+                                                /* the pattern 'rivet_(mpm_bridge)_mpm.so   */
+    mpm_bridge_status*  mpm;                    /* bridge private control structure         */
+    int                 single_thread_exit;     /* With a threaded bridge allow a single    */
+                                                /* thread to exit instead of forcing the    */
+                                                /* whole process to terminate               */
+    int                 separate_virtual_interps; 
+                                                /* Virtual host have their own interpreter  */
+    int                 separate_channels;      /* when true a vhosts get their private channel */
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
-    apr_thread_mutex_t*     req_mutex;
+    apr_thread_mutex_t* req_mutex;
 #endif
 } mod_rivet_globals;
 
@@ -247,11 +251,24 @@ typedef struct _thread_worker_private {
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
 
-//typedef struct _rivet_interp_globals {
-//    Tcl_Namespace*      rivet_ns;           /* Rivet commands namespace             */
-//} rivet_interp_globals; 
+typedef struct _rivet_interp_globals {
+    Tcl_Namespace*      rivet_ns;           /* Rivet commands namespace             */
+} rivet_interp_globals;
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);
+
+/*
+ * Petasis, 04/08/2017: I think the following is wrong, as both "functions" are
+ * defined through preprocessor definitions in http_config.h. At least under
+ * windows, they do not exist as functions in libhttpd.lib.
+ *
+#ifdef ap_get_module_config
+#undef ap_get_module_config
+#endif
+#ifdef ap_set_module_config
+#undef ap_set_module_config
+#endif
+*/
 
 #define RIVET_SERVER_CONF(module) (rivet_server_conf *)ap_get_module_config(module, &rivet_module)
 #define RIVET_NEW_CONF(p)         (rivet_server_conf *)apr_pcalloc(p, sizeof(rivet_server_conf))
@@ -279,6 +296,12 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 #define ABORTPAGE_CODE              "ABORTPAGE"
 #define THREAD_EXIT_CODE            "THREAD_EXIT"
+
+/* Configuration defaults */
+
+#define SINGLE_THREAD_EXIT_UNDEF   -1    /* pre config undefined value for single 
+                                            thread exit flag in the module globals
+                                            structure */
 
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
 #define MODNAME                     "mod_rivet"
@@ -323,6 +346,6 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 #define RIVET_MPM_BRIDGE rivet_bridge_table bridge_jump_table =
 
-#define RIVET_MPM_BRIDGE_COMPOSE(bridge) RIVET_DIR,"/mpm/rivet_",bridge,"_mpm.so"
+#define RIVET_MPM_BRIDGE_COMPOSE(bridge) "/mpm/rivet_",bridge,"_mpm.so"
 
 #endif /* _mod_rivet_h_ */

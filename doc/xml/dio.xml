@@ -864,14 +864,30 @@
 		<varlistentry>
 		  <listitem>
 		    <cmdsynopsis>
+		      <arg choice="plain">-dict</arg>
+		    </cmdsynopsis>
+		    <para>
+		      Set <option><replaceable>varName</replaceable></option>
+		      to a list containing ordinary key-value pairs of fields
+		      and values from the current row. This form is naturally
+		      intepreted as dictionary where each key corresponds
+		      to a column.
+		   </para>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <listitem>
+		    <cmdsynopsis>
 		      <arg choice="plain">-keyvalue</arg>
 		    </cmdsynopsis>
 		    <para>
 		      Set
 		      <option><replaceable>varName</replaceable></option>
 		      to a list containing key-value pairs of fields
-		      and values from the current row. (-field value
-		      -field value)
+		      and values from the current row (-field value
+		      -field value). This form is handy to build query
+		      arguments for the <command>search</command> method 
+		      of a DIO object
 		    </para>
 		  </listitem>
 		</varlistentry>

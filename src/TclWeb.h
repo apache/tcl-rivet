@@ -158,17 +158,17 @@ int TclWeb_PrepareUpload(char *varname, TclWebRequest *req);
  *
  * TclWeb_UploadChannel --
  *
- * Takes the address of a Tcl_Channel and uses it to create a channel
- * pointing to the upload data.
+ * It opens a new channel and sets its translation and encoding as binary
+ * The channel name is retuned as result in the interpreter pointed by req->interp
  *
  * Results:
  *
- * 'chan' points to a FileChannel containing the uploaded data.
+ * Makes the channel name available to the script level
  *
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_UploadChannel(char *varname, Tcl_Channel *chan, TclWebRequest *req);
+int TclWeb_UploadChannel(char *varname, TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------
@@ -187,68 +187,71 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req);
  *
  * TclWeb_UploadData --
  *
- * Fills in the 'data' Tcl_Obj with the uploaded data.
+ * Returns the uploaded data to the Tcl script level.
+ * 
+ * If the config parameter upload_files_to_var is not set the procedure
+ * returs an error
  *
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_UploadData(char *varname, Tcl_Obj *data, TclWebRequest *req);
+int TclWeb_UploadData(char *varname, TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------
  *
  * TclWeb_UploadSize --
  *
- * Stores, in 'sz' the size of the data uploaded.
+ * Returns the size of the data uploaded.
  *
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_UploadSize(Tcl_Obj *sz, TclWebRequest *req);
+int TclWeb_UploadSize(TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------
  *
  * TclWeb_UploadType --
  *
- * Stores, in 'type' the mime type of the file uploaded.
+ * Returns the mime type of the file uploaded.
  *
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_UploadType(Tcl_Obj *type, TclWebRequest *req);
+int TclWeb_UploadType(TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------
  *
  * TclWeb_UploadFilename --
  *
- * Get the original filename of the uploaded data, on the client side.
+ * Returns the original filename of the uploaded data, on the client side.
  *
  * Results:
  *
- * Stores the filename in 'filename'.
+ * Returns the filename to the script level
  *
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_UploadFilename(Tcl_Obj *filename, TclWebRequest *req);
+int TclWeb_UploadFilename(TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------
  *
  * TclWeb_UploadTempname --
  *
- * Get the name of the temp file the uploaded data was stored in.
+ * Returns the name of the temp file the uploaded data was stored in.
  *
  * Results:
  *
- * Stores the temp name in 'tempname'.
+ * the 'tempname' is returned to the script level
  *
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_UploadTempname(Tcl_Obj *tempname, TclWebRequest *req);
+int TclWeb_UploadTempname(TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------
@@ -264,7 +267,7 @@ int TclWeb_UploadTempname(Tcl_Obj *tempname, TclWebRequest *req);
  *-----------------------------------------------------------------------------
  */
 
-int TclWeb_UploadNames(Tcl_Obj *names, TclWebRequest *req);
+int TclWeb_UploadNames(TclWebRequest *req);
 
 int TclWeb_Escape(char *out, char *in, int len, void *var);
 

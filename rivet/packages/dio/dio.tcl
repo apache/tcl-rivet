@@ -617,7 +617,7 @@ proc handle {interface args} {
     method exec    {args} {}
     method nextkey {args} {}
     method lastkey {args} {}
-    method now {} {}
+    method now     {}     {}
 
     ##
     ## Functions to get and set public variables.
@@ -647,6 +647,12 @@ proc handle {interface args} {
     public variable pass        ""
     public variable host        ""
     public variable port        ""
+
+    protected method handle_client_arguments {cargs} { }
+
+    public variable clientargs  "" {
+        handle_client_arguments $clientargs
+    }
 
     public variable keyfield    "" {
         if {[llength $keyfield] > 1 && $autokey} {

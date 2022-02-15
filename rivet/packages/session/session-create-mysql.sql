@@ -18,9 +18,9 @@ create table rivet_session (
 DROP TABLE IF EXISTS `rivet_session_cache`;
 create table rivet_session_cache(
     session_id      varchar(128)    default NULL,
-    package_        varchar(64)     default NULL,
-    key_            varchar(128)    default NULL,
-    data            varchar(255)    default NULL,
+    package_        varchar(128)    default NULL,
+    key_            varchar(256)    default NULL,
+    data            varchar(4096)   default NULL,
 
     UNIQUE KEY riv_sess_cache_ix( session_id, package_, key_ ),
     KEY rivet_session_cache_idx (session_id),

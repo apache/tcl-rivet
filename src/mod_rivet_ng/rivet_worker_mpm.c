@@ -240,10 +240,10 @@ static void Worker_CreateInterps (rivet_thread_private* private,rivet_thread_int
         
         server_conf = RIVET_SERVER_CONF(s->module_config);
 
-        if ((s == server) || (server_conf->separate_virtual_interps))
+        if ((s == server) || (module_globals->separate_virtual_interps))
         {
 
-            interp_obj = Rivet_NewVHostInterp(private,s);
+            interp_obj = Rivet_NewVHostInterp(private,server_conf->default_cache_size);
             Rivet_PerInterpInit(interp_obj,private,s,private->pool);
             if (s == server) { root_interp = interp_obj; }
 
@@ -381,9 +381,9 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, "processor thread orderly exit");
 
     {
-        rivet_server_conf* rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
+        //rivet_server_conf* rsc = RIVET_SERVER_CONF(module_globals->server->module_config);
 
-        if (rsc->single_thread_exit)
+        if (module_globals->single_thread_exit)
         {
             //Rivet_ProcessorCleanup(private);
         }
@@ -799,69 +799,6 @@ apr_status_t Worker_Bridge_Finalize (void* data)
     return OK;
 }
 
-#if 0
-apr_status_t Worker_Bridge_Finalize (void* data)
-{
-    apr_status_t  rv;
-    apr_status_t  thread_status;
-    server_rec* s = (server_rec*) data;
-    
-    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
-    module_globals->mpm->server_shutdown = 1;
-
-    /* We wake up the supervisor who is now supposed to stop 
-     * all the Tcl worker threads
-     */
-
-    apr_thread_cond_signal(module_globals->mpm->job_cond);
-    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
-
-    /* If the function is called by the memory pool cleanup we wait
-     * to join the supervisor, otherwise we if the function was called
-     * by Worker_Bridge_Exit we skip it because this thread itself must exit
-     * to allow the supervisor to exit in the shortest possible time 
-     */
-
-    if (!module_globals->mpm->exit_command)
-    {
-        rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
-        if (rv != APR_SUCCESS)
-        {
-            ap_log_error(APLOG_MARK, APLOG_ERR, rv, s,
-                         MODNAME ": Error joining supervisor thread");
-        }
-    }
-
-    apr_threadkey_private_delete (rivet_thread_key);
-    return OK;
-}
-#endif
-
-/*
- * -- MPM_MasterInterp
- *
- *  Arguments:
- *
- *      server_rec* server: a server_rec pointer
- *
- *  Results:
- *
- */
-#if 0
-rivet_thread_interp* MPM_MasterInterp(server_rec* s)
-{
-    rivet_thread_private*   private;
-    rivet_thread_interp*    interp_obj; 
-
-    RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
-
-    interp_obj = Rivet_NewVHostInterp(private,s);
-    interp_obj->channel = private->channel;
-    Rivet_PerInterpInit(interp_obj, private, s, private->pool);
-    return interp_obj;
-}
-#endif
-
 /*
  * -- Worker_Bridge_ExitHandler
  *  
@@ -889,7 +826,7 @@ int Worker_Bridge_ExitHandler(rivet_thread_private* private)
     //module_globals->mpm->exit_command = 1;
     //module_globals->mpm->exit_command_status = private->exit_status;
 
-    if (!private->running_conf->single_thread_exit)
+    if (!module_globals->single_thread_exit)
     {
         module_globals->mpm->skip_thread_on_exit = 1;
 
