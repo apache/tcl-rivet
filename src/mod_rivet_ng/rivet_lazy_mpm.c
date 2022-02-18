@@ -28,6 +28,7 @@
 #include <apr_strings.h>
 #include <apr_atomic.h>
 
+#include "rivet_types.h"
 #include "mod_rivet.h"
 #include "mod_rivet_common.h"
 #include "mod_rivet_generator.h"
@@ -81,7 +82,7 @@ typedef struct mpm_bridge_status {
 
 typedef struct mpm_bridge_specific {
     rivet_thread_interp*  interp;           /* thread Tcl interpreter object        */
-    int                   keep_going;       /* thread loop controlling variable     */
+    bool                  keep_going;       /* thread loop controlling variable     */
                                             /* the request_rec and TclWebRequest    *
                                              * are copied here to be passed to a    *
                                              * channel                              */
@@ -162,7 +163,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
      * the execution and an intepreter control structure */
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
-    private->ext->keep_going = 1;
+    private->ext->keep_going = true;
     //private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
     RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,rsc->default_cache_size));
     private->ext->interp->channel = private->channel;
@@ -210,7 +211,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
             apr_thread_cond_wait(w->condition,w->mutex);
         } 
         if (w->status == thread_exit) {
-            private->ext->keep_going = 0;
+            private->ext->keep_going = false;
             continue;
         }
 
@@ -502,16 +503,15 @@ int LazyBridge_ExitHandler(rivet_thread_private* private)
 
     /* This will force the current thread to exit */
 
-    private->ext->keep_going = 0;
+    private->ext->keep_going = false;
 
     if (!module_globals->single_thread_exit)
     {
         /* We now tell the supervisor to terminate the Tcl worker 
-         * thread pool to exit and is sequence the whole process
-         * to shutdown by calling exit() */
+         * thread pool so that we can safely shutdown the process
+         * by calling exit() */
      
         LazyBridge_Finalize(private->r->server);
-
     } 
 
     return TCL_OK;

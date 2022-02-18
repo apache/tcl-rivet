@@ -78,7 +78,7 @@ DLLEXPORT mod_rivet_globals*  module_globals      = NULL;
  * MPM name determination. The function returns a filename to 
  * an MPM bridge module. The module name is determined in 4 steps
  *
- *  - The environment variable RIVET_MPM_BRIDGE is checked. I the
+ *  - The environment variable RIVET_MPM_BRIDGE is checked. If the
  *    variable exists its value is returned as the path to the bridge module
  *    If the module doesn't exist the server exits with an error
  *  - The global configuration is checked. If module_globals->mpm_bridge is
@@ -461,8 +461,8 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
         module_globals->server = server;
     }
 
-    /* This mutex should protect the process wide pool from concurrent access by 
-     * different threads
+    /*
+     * the mutex to protect the process wide pool is created here
      */
 
     apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);

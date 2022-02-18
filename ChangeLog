@@ -1,3 +1,23 @@
+2022-02-18 Massimo Manghi <mxmanghi@apache.org>
+	* src/TclWeb.h: Add copyright notice, remove SVN id keyword
+	* rivet/rivet-tcl/xml.tcl: correct wrong comment showing command xml arguments
+	* src/mod_rivet_ng/rivet_lazy_mpm.c: adopting boolean values defined in bool.h
+	* src/mod_rivet_ng/mod_rivet.[c|h]: expand comments, fix typo
+	* rivet/packages/form/form22.tcl: Using ::rivet::xml instead of the class method argstring
+
+2022-02-14 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/rivetCore.c: New feature of the '::rivet::var all' commands.
+	An extra optional argument is interpreted as a dictionary of default values 
+	* tclconfig/tcl.m4,tclconfig/install-sh: install latest version from Tclconfig repository
+	* doc/xml/commands.xml: update page manual for ::rivet::var
+
+2022-02-13 Massimo Manghi <mxmanghi@apache.org>
+	* VERSION: bumping version number as 3.2.2
+	* src/mod_rivet_ng/rivetCore.c: fixed possible memory leak in Rivet_Var. A Tcl_Obj
+	was created to return empty strings replacing an already existing Tcl_Obj losing
+	track of it. 	
+	* tclconfig/tcl.m4,tclconfig/install-sh: install latest version from Tclconfig repository
+
 2022-01-06 Massimo Manghi <mxmanghi@apache.org>
 	* configure.ac: changing obsolete macro AC_PROG_LIBTOOL into LT_INIT
 

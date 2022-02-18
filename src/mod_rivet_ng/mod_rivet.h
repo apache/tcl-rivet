@@ -27,6 +27,7 @@
 #include <apr_thread_proc.h>
 #include <apr_thread_cond.h>
 #include <tcl.h>
+#include "rivet_types.h"
 #include "rivet.h"
 #include "apache_request.h"
 
@@ -213,9 +214,10 @@ typedef struct _mod_rivet_globals {
     int                 single_thread_exit;     /* With a threaded bridge allow a single    */
                                                 /* thread to exit instead of forcing the    */
                                                 /* whole process to terminate               */
-    int                 separate_virtual_interps; 
+    int                 separate_virtual_interps;
                                                 /* Virtual host have their own interpreter  */
-    int                 separate_channels;      /* when true a vhosts get their private channel */
+    int                 separate_channels;      /* when true each virtual hosts gets a
+                                                   private channel */
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
     apr_thread_mutex_t* req_mutex;
 #endif
@@ -235,14 +237,14 @@ typedef struct _thread_worker_private {
     int                 thread_exit;        /* Thread exit code                     */
     int                 exit_status;        /* status code to be passed to exit()   */
     int                 page_aborting;      /* abort_page flag                      */
-    Tcl_Obj*            abort_code;         /* To be reset by before request        *
+    Tcl_Obj*            abort_code;         /* To be reset before request           *
                                              * processing completes                 */
     Tcl_Obj*            default_error_script; /* mod_rivet default error handler    */
     request_rec*        rivet_panic_request_rec;
     apr_pool_t*         rivet_panic_pool;
     server_rec*         rivet_panic_server_rec;
 
-    mpm_bridge_specific* ext;               /* bridge specific extension            */
+    mpm_bridge_specific* ext;               /* bridge specific private thread data  */
 } rivet_thread_private;
 
 /* eventually we will transfer 'global' variables in here and 'de-globalize' them */
