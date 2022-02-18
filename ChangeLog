@@ -1,3 +1,10 @@
+2022-02-18 Massimo Manghi <mxmanghi@apache.org>
+	* src/TclWeb.h: Add copyright notice, remove SVN id keyword
+	* rivet/rivet-tcl/xml.tcl: correct wrong comment showing command xml arguments
+	* src/mod_rivet_ng/rivet_lazy_mpm.c: adopting boolean values defined in bool.h
+	* src/mod_rivet_ng/mod_rivet.[c|h]: expand comments, fix typo
+	* rivet/packages/form/form22.tcl: Using ::rivet::xml instead of the class method argstring
+
 2022-02-14 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivetCore.c: New feature of the '::rivet::var all' commands.
 	An extra optional argument is interpreted as a dictionary of default values 

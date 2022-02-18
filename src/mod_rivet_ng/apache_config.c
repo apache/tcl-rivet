@@ -165,7 +165,7 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
  */
 
 rivet_server_conf *
-Rivet_GetConf( request_rec *r )
+Rivet_GetConf(request_rec *r)
 {
     rivet_server_conf *rsc = RIVET_SERVER_CONF( r->server->module_config );
     void *dconf = r->per_dir_config;
@@ -207,7 +207,7 @@ Rivet_GetConf( request_rec *r )
  *
  */
 void
-Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
+Rivet_CopyConfig(rivet_server_conf *oldrsc, rivet_server_conf *newrsc)
 {
     FILEDEBUGINFO;
 

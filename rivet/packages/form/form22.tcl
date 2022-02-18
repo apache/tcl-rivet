@@ -116,11 +116,17 @@ package provide form 2.2
     #
     protected method argstring {arrayName} {
         upvar 1 $arrayName data
-        set string ""
+        set key_value_string ""
+
+        # representing the string a plain list and then
+        # joining its elements saves a blanc character.
+        # Just a tiny gain, but this method is called
+        # every time a form HTML element is produced
+
         foreach arg [lsort [array names data]] {
-            append string " $arg=\"$data($arg)\""
+            lappend key_value_string "$arg=\"$data($arg)\""
         }
-        return $string
+        return [join $key_value_string]
     }
 
     #
@@ -305,13 +311,14 @@ package provide form 2.2
         }
         
         # generate the field definition
-        set string "<input type=\"$type\" name=\"$name\" [argstring data] />"
+        #set html_string "<input type=\"$type\" name=\"$name\" [argstring data] />"
+        set html_string [::rivet::xml [list input type $type name $name {*}[array get data]]]
         if {[info exists label]} {
-            append string $label
+            append html_string $label
         }
 
         # ...and emit it
-        $this emit_html $string
+        $this emit_html $html_string
 
     }
 
@@ -587,7 +594,7 @@ package provide form 2.2
         } elseif {[default_exists $name]} {
 			set value [default_value_get $name]
 		}
-        $this emit_html "<textarea name=\"$name\" [argstring data]>$value</textarea>"
+        $this emit_html [::rivet::xml $value [list textarea name $name {*}[array get data]]]
     }
 
     private method emit_html {html_fragment} {
