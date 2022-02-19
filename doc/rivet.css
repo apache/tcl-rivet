@@ -340,7 +340,7 @@ table.namespaces {
 }
 
 .namespaces tr.init {
-	background-color: #bb8766;	
+	background-color: #bb8766;
 }
 
 .namespaces tr.childinit {
@@ -348,7 +348,7 @@ table.namespaces {
 }
 
 .namespaces tr.processing {
-	background-color: #bb8766;	
+	background-color: #bb8766;
 }
 	
 .namespaces tr.childexit {

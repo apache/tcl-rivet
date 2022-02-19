@@ -794,16 +794,15 @@ TCL_CMD_HEADER ( Rivet_Var )
                  */
                 if (Tcl_DictObjFirst(interp,objv[2],&search,&key,&value,&done) != TCL_OK) {
 
-                    /* If the object passed as optional argument is a valid dictionary it
-                     * shouldn't never get here
-                     */
+                    /* If the object passed as optional argument is
+                     * a valid dictionary we shouldn't get here */
 
                     Tcl_SetStringObj(result,"invalid_dictionary_value",-1);
 
                     /* We use the result Tcl_Obj to assign an error code. This should also release the object memory */
 
                     Tcl_SetObjErrorCode(interp,result);
-                    Tcl_AddObjErrorInfo(interp,"Impossible to interpret the default values argument as a dictionary value",-1);
+                    Tcl_AddObjErrorInfo(interp,"Impossible to interpret the optional defaults argument as a dictionary value",-1);
 
                     return TCL_ERROR;
                 }
@@ -823,13 +822,14 @@ TCL_CMD_HEADER ( Rivet_Var )
         }
 
     } else {
+
         /* bad command  */
         Tcl_AppendResult(interp,"bad option: must be one of ",
                                 "'get, list, names, number, all'", NULL);
         return TCL_ERROR;
+
     }
     Tcl_SetObjResult(interp, result);
-
     return TCL_OK;
 }
 

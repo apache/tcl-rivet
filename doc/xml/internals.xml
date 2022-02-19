@@ -138,7 +138,7 @@
 					the <emphasis>worker</emphasis> MPM bridge the finalize function
 					is called after the current thread itself is set up for termination.
 					See function Rivet_ExitCmd in
-					<ulink url="https://svn.apache.org/repos/asf/tcl/rivet/trunk/src/mod_rivet_ng/rivetCore.c">rivetCore.c</ulink>
+					<ulink url="https://gitbox.apache.org/repos/asf?p=tcl-rivet.git;a=blob;f=src/mod_rivet_ng/rivetCore.c">rivetCore.c</ulink>
 					to have details on how and at what stage this callback is invoked.
 				</listitem>
 				<listitem>
