@@ -1,3 +1,9 @@
+2022-02-19 Massimo Manghi <mxmanghi@apache.org>
+	* tclconfig/tcl.m4: patched tcl.m4 distributed by core.tcl.tk as it doesn't work
+	  with Makefile.am files in nested directories. Patch submitted upstream 
+	* tclconfig/: commit several autoconf generated scripts
+	* m4/: add new files automatically copied by autoconf
+
 2022-02-18 Massimo Manghi <mxmanghi@apache.org>
 	* src/TclWeb.h: Add copyright notice, remove SVN id keyword
 	* rivet/rivet-tcl/xml.tcl: correct wrong comment showing command xml arguments
