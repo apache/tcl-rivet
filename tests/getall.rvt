@@ -1,0 +1,20 @@
+<?
+set nvars [::rivet::var_qs number]
+if {$nvars > 0} {
+    set arguments [::rivet::var_qs all]
+} else {
+    set arguments [::rivet::var_qs all [dict create a 1 b 2 c 3 d 4]]
+}
+
+# being a flat list of key-value pair we assume it
+# to be interpreted as a dictionary
+set vnames [dict keys $arguments]
+
+# in order to have a result in a definite order
+set result [lmap k [lsort $vnames] { list $k [dict get $arguments $k] }] 
+
+# two nested join on the list in order to have a flat list
+
+puts -nonewline "\[::rivet::var_qs all\] = [join [join $result] |]"
+
+?>
