@@ -281,8 +281,7 @@ TclWeb_SetStatus(int status, TclWebRequest *req)
 INLINE int
 TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 {
-    Tcl_SetStringObj(result,
-                ap_construct_url(req->req->pool,filename,req->req),-1);
+    Tcl_SetStringObj(result,ap_construct_url(req->req->pool,filename,req->req),-1);
     return TCL_OK;
 }
 
@@ -329,7 +328,16 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
         i++;
     }
 
-    if (result->length == 0) { return TCL_ERROR; }
+    /*
+     * We are assuming that checking result->length is a sane way to
+     * establish the Tcl object representation character lenght but it
+     * would obviously be more appropriate to call Tcl_GetCharLength(result)
+     */
+
+    if (result->length == 0) {
+        Tcl_AddErrorInfo(req->interp,apr_psprintf(req->req->pool,"Variable '%s' not found",varname));
+        return TCL_ERROR;
+    }
 
     return TCL_OK;
 }
@@ -346,70 +354,63 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *r
     /* This isn't real efficient - move to hash table later on. */
     while (i < j)
     {
+        int tclcode;
 
         if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
                  strlen(varname) < strlen(parms[i].key) ?
                  strlen(parms[i].key) : strlen(varname)))
         {
-            Tcl_ListObjAppendElement(req->interp, result,
-                         TclWeb_StringToUtfToObj(parms[i].val, req));
+            tclcode = Tcl_ListObjAppendElement(req->interp,result,
+                                               TclWeb_StringToUtfToObj(parms[i].val, req));
+            if (tclcode != TCL_OK) { return tclcode; }
         }
         i++;
     }
 
-    if (result == NULL)
-    {
-        return TCL_ERROR;
-    }
     return TCL_OK;
 }
 
 int
 TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req)
 {
-    int i, j;
-    apr_array_header_t *parmsarray = (apr_array_header_t *)
-        apr_table_elts(req->apachereq->parms);
+    int i,j;
+    apr_array_header_t *parmsarray = (apr_array_header_t *) apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
     PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     while (i < j)
     {
-        Tcl_ListObjAppendElement(req->interp,result,
-                     TclWeb_StringToUtfToObj(parms[i].key,req));
-        Tcl_ListObjAppendElement(req->interp,result,
-                     TclWeb_StringToUtfToObj(parms[i].val,req));
+        int tclcode;
+        tclcode = Tcl_ListObjAppendElement(req->interp,result,
+                       TclWeb_StringToUtfToObj(parms[i].key,req));
+        if (tclcode != TCL_OK) { return tclcode; }
+        tclcode = Tcl_ListObjAppendElement(req->interp,result,
+                       TclWeb_StringToUtfToObj(parms[i].val,req));
+        if (tclcode != TCL_OK) { return tclcode; }
+
         i++;
     }
 
-    if (result == NULL)
-    {
-	    return TCL_ERROR;
-    }
     return TCL_OK;
 }
 
 int
 TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req)
 {
-    int i, j;
-    apr_array_header_t *parmsarray = (apr_array_header_t *)
-        apr_table_elts(req->apachereq->parms);
+    int i,j;
+    apr_array_header_t *parmsarray = (apr_array_header_t *) apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
     PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     while (i < j)
     {
-        Tcl_ListObjAppendElement(req->interp, result,
-                     TclWeb_StringToUtfToObj(parms[i].key, req));
+        int tclcode;
+        tclcode= Tcl_ListObjAppendElement(req->interp, result,
+                                          TclWeb_StringToUtfToObj(parms[i].key, req));
+        if (tclcode != TCL_OK) { return tclcode; }
         i++;
-    }
-
-    if (result == NULL)
-    {
-        return TCL_ERROR;
     }
 
     return TCL_OK;
@@ -465,7 +466,7 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
  * Adding a new env variable requires 
  *    + the name of the variable be listed in include_env_vars
  *    + a new value in the enumerator include_vars_idx must be added in the 
- *      position corresponding of the variable names array
+ *      corresponding position
  *    + the switch construct in function TclWeb_SelectEnvIncludeVar must
  *      be expanded to handle the new case identified by the new enumerator value
  */
@@ -861,7 +862,7 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 	    return TCL_OK;
 	} else {
 
-        /* apr_strerror docs don't require a specific buffer size, we're just guessing it */
+        /* apr_strerror docs don't tell anything about a demanded buffer size, we're just adopting a reasonable guess */
 
         char  error_msg[1024];
         char* tcl_error_msg;
@@ -881,7 +882,7 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
     Tcl_Obj* result;
     rivet_server_conf *rsc = NULL;
 
-    rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
+    rsc = RIVET_SERVER_CONF( req->req->server->module_config );
     /* This sucks - we should use the hook, but I want to
        get everything fixed and working first */
     if (rsc->upload_files_to_var)
