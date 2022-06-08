@@ -272,7 +272,7 @@ Rivet_SendContent(rivet_thread_private *private)
         goto sendcleanup;
     }
 
-    if (private->r->header_only && !private->running_conf->honor_header_only_reqs)
+    if (private->r->header_only && !private->running_conf->honor_head_requests)
     {
         TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, private->req);
         TclWeb_PrintHeaders(private->req);

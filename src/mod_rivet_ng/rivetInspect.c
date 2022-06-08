@@ -91,7 +91,7 @@ enum confIndices {
     upload_files_to_var,
     separate_virtual_interps,
     separate_channels,
-    honor_header_only_requests,
+    honor_head_requests,
     mpm_bridge,
     request_handler,
     export_rivet_ns,
@@ -157,7 +157,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case upload_files_to_var:       int_value = Tcl_NewIntObj(rsc->upload_files_to_var); break;
         case separate_virtual_interps:  int_value = Tcl_NewIntObj(module_globals->separate_virtual_interps); break;
         case separate_channels:         int_value = Tcl_NewIntObj(module_globals->separate_channels); break;
-        case honor_header_only_requests: int_value = Tcl_NewIntObj(rsc->honor_header_only_reqs); break;
+        case honor_head_requests:       int_value = Tcl_NewIntObj(rsc->honor_head_requests); break;
         case export_rivet_ns:           int_value = Tcl_NewIntObj(rsc->export_rivet_ns); break;
         case import_rivet_ns:           int_value = Tcl_NewIntObj(rsc->import_rivet_ns); break;
         default: return NULL;
