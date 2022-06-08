@@ -80,7 +80,7 @@
 				    <td>effective only when SeparateVirtualInterps is Off (default)</td></tr>
 				<tr><td>ImportRivetNS</td><td></td><td></td><td>X</td><td>X</td><td>It can be set in a virtual host
 				configuration if SeparateVirtualInterps is On, otherwise this directive can be safely used at the global level only</td></tr>
-				<tr><td>HonorHeadRequests</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
+				<tr><td>HonorHeadRequests</td><td></td><td></td><td>X</td><td>X</td>Replaces HonorHeaderOnlyReqs, which is still supported but DEPRECATED<td></td></tr>
 				<tr><td>MpmBridge</td><td></td><td></td><td>X</td><td></td><td>global only</td></tr>
 				<tr><td>RequestHandler</td><td></td><td></td><td>X</td><td>X</td><td></td></tr>
 				<tr><td>SeparateChannels</td><td></td><td></td><td>X</td><td></td><td>global only (DEPRECATED: will be
