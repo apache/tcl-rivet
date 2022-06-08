@@ -123,7 +123,7 @@ typedef struct _rivet_server_conf {
     int          default_cache_size;
     int          upload_max;
     int          upload_files_to_var;
-    int          honor_header_only_reqs;
+    int          honor_head_requests;
 
     int          export_rivet_ns;        /* export the ::rivet namespace commands        */
     int          import_rivet_ns;        /* import into the global namespace the

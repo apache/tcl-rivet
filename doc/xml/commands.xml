@@ -1004,7 +1004,7 @@ keyvalue_map(args) = 1 2 3 4 5</programlisting>
     "UploadDirectory",
     "UploadFilesToVar",
     "SeparateVirtualInterps",
-    "HonorHeaderOnlyRequests"</programlisting>
+    "HonorHeadRequests"</programlisting>
 				</listitem> 
 			
 		    	<listitem>

@@ -1,3 +1,8 @@
+2022-05-31 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/*.c: Directive HonorHeaderOnlyReqs renamed as
+	HonorHeadRequests, which sounds more consistent with the common parlance 
+	regarding HTTP
+
 2022-03-01 Massimo Manghi <mxmanghi@apache.org>
 	* tests/getall.rvt: add new test for the 2 forms of [::rivet::var_qs all]
 

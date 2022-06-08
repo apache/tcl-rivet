@@ -226,7 +226,7 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
     //newrsc->separate_virtual_interps = oldrsc->separate_virtual_interps;
     newrsc->export_rivet_ns = oldrsc->export_rivet_ns;
     newrsc->import_rivet_ns = oldrsc->import_rivet_ns;
-    newrsc->honor_header_only_reqs = oldrsc->honor_header_only_reqs;
+    newrsc->honor_head_requests = oldrsc->honor_head_requests;
     //newrsc->single_thread_exit = oldrsc->single_thread_exit;
     //newrsc->separate_channels = oldrsc->separate_channels;
     newrsc->server_name = oldrsc->server_name;
@@ -407,7 +407,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     RIVET_CONF_SELECT(rsc,base,overrides,default_cache_size);
 
     //rsc->separate_virtual_interps = base->separate_virtual_interps;
-    rsc->honor_header_only_reqs = base->honor_header_only_reqs;
+    rsc->honor_head_requests = base->honor_head_requests;
     rsc->upload_files_to_var = base->upload_files_to_var;
     //rsc->single_thread_exit = base->single_thread_exit;
     //rsc->separate_channels = base->separate_channels;
@@ -645,8 +645,10 @@ Rivet_ServerConf(cmd_parms *cmd,void *dummy,const char *var,const char *val)
         Tcl_GetBoolean (NULL,val,&rsc->upload_files_to_var);
     } else if (STREQU (var,"SeparateVirtualInterps")) {
         Tcl_GetBoolean (NULL,val,&module_globals->separate_virtual_interps);
-    } else if (STREQU (var,"HonorHeaderOnlyRequests")) {
-        Tcl_GetBoolean (NULL,val,&rsc->honor_header_only_reqs);
+    } else if (STREQU (var,"HonorHeaderOnlyRequests")) { // DEPRECATED form for HonorHeadRequest
+        Tcl_GetBoolean (NULL,val,&rsc->honor_head_requests);
+    } else if (STREQU (var,"HonorHeadRequests")) {
+        Tcl_GetBoolean (NULL,val,&rsc->honor_head_requests);
     } else if (STREQU (var,"SingleThreadExit")) {
         Tcl_GetBoolean (NULL,val,&module_globals->single_thread_exit);
     } else if (STREQU (var,"SeparateChannels")) {
