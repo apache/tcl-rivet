@@ -288,7 +288,7 @@ Rivet_SendContent(rivet_thread_private *private)
        that concern us. FIXME */
 
     if (USER_CONF_UPDATED(private->running_conf) && (interp_obj->cache_size != 0) && 
-                                                    (interp_obj->cache_free < interp_obj->cache_size)) 
+                                                    (interp_obj->cache_free < interp_obj->cache_size))
     {
         RivetCache_Cleanup(private,interp_obj);
     }
