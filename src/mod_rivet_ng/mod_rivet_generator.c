@@ -332,9 +332,9 @@ sendcleanup:
     /* Request processing final stage */
 
     /* A new big catch is the handling of exit commands that are treated
-     * as ::rivet::abort_page. After the AbortScript has been evaluated
-     * the exit condition is checked and in case the exit handler
-     * of the bridge module is called before terminating the whole process
+     * as exception thrown by ::rivet::abort_page. After the AbortScript
+     * has been evaluated the exit condition is checked and the bridge
+     * exit handler is called upon.
      */
     
     if (private->thread_exit)
