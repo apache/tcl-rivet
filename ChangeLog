@@ -1,3 +1,9 @@
+2022-06-10 Massimo Manghi <mxmanghi@apache.org>
+	* doc/xml/directives.xml: moved misplaced text in table
+	* configure.ac: Changed default for HonorHeadRequests to 'yes'
+	* src/mod_rivet_ng/mod_rivet_generator.c: rephrased comment documenting
+	the exit handler behavior
+
 2022-05-31 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/*.c: Directive HonorHeaderOnlyReqs renamed as
 	HonorHeadRequests, which sounds more consistent with the common parlance 
@@ -49,8 +55,7 @@
 	* tests/env.test: cleaning up http tokens resources
 
 2021-11-01 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/TclWebapache.c: expanded comments to newly
-	introduced functions
+	* src/mod_rivet_ng/TclWebapache.c: expanded comments to newly introduced functions
 
 2021-10-25 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/TclWebapache.c: extended comments
