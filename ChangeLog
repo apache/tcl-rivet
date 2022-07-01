@@ -1,3 +1,6 @@
+2022-06-21 Massimo Manghi <mxmanghi@apache.org>
+	* Changelog: release rivet 3.2.2
+
 2022-06-10 Massimo Manghi <mxmanghi@apache.org>
 	* doc/xml/directives.xml: moved misplaced text in table
 	* configure.ac: Changed default for HonorHeadRequests to 'yes'
