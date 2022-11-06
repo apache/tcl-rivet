@@ -59,7 +59,7 @@
 
 /* Configuration options  */
 
-/* 
+/*
    If you do not have a threaded Tcl, you can define this to 0.  This
    has the effect of running Tcl Init code in the main parent init
    handler, instead of in child init handlers.
@@ -192,14 +192,14 @@ typedef struct _mpm_bridge_table {
 typedef struct mpm_bridge_status mpm_bridge_status;
 
 typedef struct _mod_rivet_globals {
-    apr_pool_t*         pool;               
+    apr_pool_t*         pool;
     char*               rivet_mpm_bridge;       /* name of the MPM bridge                   */
     server_rec*         server;                 /* default host server_rec obj              */
     int                 vhosts_count;           /* Number of configured virtual host including   *
                                                  * the root server thus it's supposed to be >= 1 */
     char*				default_handler;		/* Default request handler code             */
     int					default_handler_size;	/* Size of the default_handler buffer       */
-    rivet_thread_interp* 
+    rivet_thread_interp*
                         server_interp;          /* server and prefork MPM interpreter       */
     apr_thread_mutex_t* pool_mutex;             /* threads commmon pool mutex               */
     rivet_bridge_table* bridge_jump_table;      /* Jump table to bridge specific procedures */
@@ -297,17 +297,17 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 /* Configuration defaults */
 
-#define SINGLE_THREAD_EXIT_UNDEF   -1    /* pre config undefined value for single 
+#define SINGLE_THREAD_EXIT_UNDEF   -1    /* pre config undefined value for single
                                             thread exit flag in the module globals
                                             structure */
 
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
 #define MODNAME                     "mod_rivet"
 
-/* 
- * RIVET_CONF_SELECT: 
+/*
+ * RIVET_CONF_SELECT:
  *
- * This macro avoids unnecessary verbosity of repetitive code in functions 
+ * This macro avoids unnecessary verbosity of repetitive code in functions
  * overlaying and merging configuration records
  */
 

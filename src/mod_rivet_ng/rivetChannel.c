@@ -53,7 +53,7 @@ outputproc(ClientData instancedata, CONST84 char *buf, int toWrite, int *errorCo
 {
     apr_threadkey_t*        rivet_thread_key = (apr_threadkey_t*) instancedata;
     rivet_thread_private*   private;
-    
+
     apr_threadkey_private_get ((void **)&private,rivet_thread_key);
 
     TclWeb_PrintHeaders(private->req);

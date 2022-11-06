@@ -24,7 +24,7 @@
 #ifndef __worker_prefork_common_h__
 #define __worker_prefork_common_h__
 
-/* Thread specific data common to the worker and prefork bridges 
+/* Thread specific data common to the worker and prefork bridges
  * Actually the prefork bridge won't use the keep_going flag, but
  * they share the same interpreters array
  */

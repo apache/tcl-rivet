@@ -25,7 +25,7 @@ EXTERN int   RivetCache_DefaultSize (void);
 EXTERN void  RivetCache_Create  (apr_pool_t *p, rivet_thread_interp* interp_obj);
 EXTERN void  RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp);
 EXTERN char* RivetCache_MakeKey (apr_pool_t* pool, char*         filename,
-                                                   time_t        ctime, 
+                                                   time_t        ctime,
                                                    time_t        mtime,
                                                    unsigned int  user_conf,
                                                    int           toplevel);

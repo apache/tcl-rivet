@@ -47,7 +47,7 @@ extern rivet_thread_interp* MPM_MasterInterp(server_rec* s);
  *
  */
 
-static rivet_thread_interp* 
+static rivet_thread_interp*
 Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
 {
     rivet_thread_interp* interp_obj = apr_pcalloc(pool,sizeof(rivet_thread_interp));
@@ -60,17 +60,17 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
     /* An intepreter must have its own cache */
 
     if (interp_obj->cache_size) {
-        RivetCache_Create(pool,interp_obj); 
+        RivetCache_Create(pool,interp_obj);
     }
 
     interp_obj->pool            = source_obj->pool;
     interp_obj->scripts         = (running_scripts *) apr_pcalloc(pool,sizeof(running_scripts));
-    interp_obj->per_dir_scripts = apr_hash_make(pool); 
+    interp_obj->per_dir_scripts = apr_hash_make(pool);
     interp_obj->flags           = source_obj->flags;
     return interp_obj;
 }
 
-/* -- Rivet_VirtualHostsInterps 
+/* -- Rivet_VirtualHostsInterps
  *
  * The server_rec chain is walked through and server configurations is read to
  * set up the thread private configuration and interpreters database
@@ -82,11 +82,11 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
  *  Returned value:
  *
  *     a new rivet_thread_private object
- * 
+ *
  *  Side effects:
  *
  *     GlobalInitScript and ChildInitScript are run at this stage
- *     
+ *
  */
 
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
@@ -94,7 +94,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     server_rec*         s;
     server_rec*         root_server = module_globals->server;
     rivet_server_conf*  root_server_conf;
-    rivet_server_conf*  myrsc; 
+    rivet_server_conf*  myrsc;
     rivet_thread_interp* root_interp;
     void*               parentfunction;     /* this is topmost initialization script */
     void*               function;
@@ -102,10 +102,10 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
     root_interp = MPM_MasterInterp(module_globals->server);
 
-    /* we must assume the module was able to create the root interprter */ 
+    /* we must assume the module was able to create the root interprter */
 
     ap_assert (root_interp != NULL);
-    
+
     /* The inherited interpreter has an empty cache since evalutating a server_init_script
      * does not require parsing templates that need to be stored in it. We need to
      * create it
@@ -117,11 +117,11 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         root_interp->cache_size = RivetCache_DefaultSize();
     }
 
-    RivetCache_Create(root_interp->pool,root_interp); 
+    RivetCache_Create(root_interp->pool,root_interp);
 
     /* Using the root interpreter we evaluate the global initialization script, if any */
 
-    if (root_server_conf->rivet_global_init_script != NULL) 
+    if (root_server_conf->rivet_global_init_script != NULL)
     {
         Tcl_Obj* global_tcl_script;
 
@@ -129,12 +129,12 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         Tcl_IncrRefCount(global_tcl_script);
         if (Tcl_EvalObjEx(root_interp->interp, global_tcl_script, 0) != TCL_OK)
         {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server,
                          MODNAME ": Error running GlobalInitScript '%s': %s",
                          root_server_conf->rivet_global_init_script,
                          Tcl_GetVar(root_interp->interp, "errorInfo", 0));
         } else {
-            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
+            ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server,
                          MODNAME ": GlobalInitScript '%s' successful",
                          root_server_conf->rivet_global_init_script);
         }
@@ -154,7 +154,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         /* by default we assign the root_interpreter as
          * interpreter of the virtual host. In case of separate
          * virtual interpreters we create new ones for each
-         * virtual host 
+         * virtual host
          */
 
         rivet_interp = root_interp;
@@ -163,7 +163,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         {
             Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
         }
-        else 
+        else
         {
             if (module_globals->separate_virtual_interps)
             {
@@ -189,7 +189,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         rivet_interp->scripts = Rivet_RunningScripts (private->pool,rivet_interp->scripts,myrsc);
 
         //private->ext->interps[myrsc->idx] = rivet_interp;
-        
+
         RIVET_POKE_INTERP(private,myrsc,rivet_interp);
 
         /* Basic Rivet packages and libraries are loaded here */
@@ -215,7 +215,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         /* when configured a child init script gets evaluated */
 
         function = myrsc->rivet_child_init_script;
-        if (function && 
+        if (function &&
             (s == root_server || module_globals->separate_virtual_interps || function != parentfunction))
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
@@ -225,7 +225,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             Tcl_IncrRefCount(tcl_child_init);
             Tcl_Preserve (interp);
 
-            /* There is a lot of passing pointers around among various structures. 
+            /* There is a lot of passing pointers around among various structures.
              * We should understand if this is all that necessary.
              * Here we assign the server_rec pointer to the interpreter which
              * is wrong, because without separate interpreters it doens't make
@@ -235,17 +235,17 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
             /* before we run a script we have to store the pointer to the
              * running configuration in the thread private data. The design has
              * to improve and running a script must have everything sanely
-             * prepared TODO 
-             */ 
+             * prepared TODO
+             */
 
             private->running_conf = myrsc;
 
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              errmsg, function);
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
             }
             Tcl_Release (interp);
@@ -259,7 +259,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 /*
  * -- Rivet_ProcessorCleanup
  *
- * Thread private data cleanup. This function was meant to be 
+ * Thread private data cleanup. This function was meant to be
  * called by the worker and prefork MPM bridges to release resources
  * owned by thread private data and pointed in the array of rivet_thread_interp
  * objects. It has to be called just before an agent, either thread or
@@ -268,7 +268,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
  *
  *  Arguments:
  *
- *      data:   pointer to a rivet_thread_private data structure. 
+ *      data:   pointer to a rivet_thread_private data structure.
  *
  *  Returned value:
  *
@@ -286,11 +286,11 @@ void Rivet_ProcessorCleanup (void *data)
     int                     i;
     rivet_thread_private*   private = (rivet_thread_private *) data;
 
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
-                 "Thread exiting after %d requests served (%d vhosts)", 
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server,
+                 "Thread exiting after %d requests served (%d vhosts)",
                                         private->req_cnt,module_globals->vhosts_count);
 
-    /* We are about to delete the interpreters and release the thread channel. 
+    /* We are about to delete the interpreters and release the thread channel.
      * Rivet channel is set as stdout channel of Tcl and as such is treated
      * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
      * the channel is released immediately by forcing the refCount to 0
@@ -302,7 +302,7 @@ void Rivet_ProcessorCleanup (void *data)
     Tcl_SetStdChannel(NULL,TCL_STDOUT);
 
     /* there must be always a root interpreter in the slot 0 of private->interps,
-     * so we always need to run this cycle at least once 
+     * so we always need to run this cycle at least once
      */
 
     i = 0;
@@ -311,7 +311,7 @@ void Rivet_ProcessorCleanup (void *data)
 
         RivetCache_Cleanup(private,private->ext->interps[i]);
 
-        if ((i > 0) && module_globals->separate_channels) 
+        if ((i > 0) && module_globals->separate_channels)
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->channel);
 
         Tcl_DeleteInterp(private->ext->interps[i]->interp);
@@ -325,7 +325,7 @@ void Rivet_ProcessorCleanup (void *data)
         Rivet_ReleasePerDirScripts(private->ext->interps[i]);
 
         /* if separate_virtual_interps == 0 we are running the same interpreter
-         * instance for each vhost, thus we can jump out of this loop after 
+         * instance for each vhost, thus we can jump out of this loop after
          * the first cycle as the only real intepreter object we have is stored
          * in private->ext->interps[0]
          */

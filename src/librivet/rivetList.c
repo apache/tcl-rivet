@@ -277,7 +277,7 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
         c = *next;
 
     /* if we've got a quote at this point, it is at the start
-     * of a field, scan to the closing quote, make that a field, 
+     * of a field, scan to the closing quote, make that a field,
      * and update */
 
         if (c == '"') {
@@ -290,7 +290,7 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
                 if (c == '\0') goto format_error;
 
                     /*
-             * If we get a double quote, first see if it's a pair of double 
+             * If we get a double quote, first see if it's a pair of double
              * quotes, i.e. a quoted quote, and handle that.
              */
                 if (c == '"') {
@@ -309,7 +309,7 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
                         next++;
                         continue;
                     }
-                /* It's a solo double-quote, not a pair of double-quotes, 
+                /* It's a solo double-quote, not a pair of double-quotes,
                  * so terminate the element
                  * at the current quote (the closing quote).
                  */
@@ -322,7 +322,7 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
                     ++next;
                     c = *next;
 
-                /* 
+                /*
                  * if we get end-of-line here, it's fine... and we're done
                  */
 
@@ -336,7 +336,7 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
                       format_error:
                         Tcl_ResetResult (interp);
                         Tcl_AppendResult (interp,
-                                  "format error in string: \"", 
+                                  "format error in string: \"",
                                    first, "\"", (char *) NULL);
                         return TCL_ERROR;
                     }
@@ -362,7 +362,7 @@ Rivet_CommaSplitObjCmd (notUsed, interp, objc, objv)
             c = *next;
 
             /* If we reach end of the string, append the last element
-             * and return to our caller. 
+             * and return to our caller.
              */
 
             if (c == '\0') {
@@ -427,9 +427,9 @@ Rivet_CommaJoinObjCmd (notUsed, interp, objc, objv)
 
     resultPtr = Tcl_GetObjResult (interp);
 
-    if (Tcl_ListObjGetElements  (interp, 
-                 objv[1], 
-                 &listObjc, 
+    if (Tcl_ListObjGetElements  (interp,
+                 objv[1],
+                 &listObjc,
                  &listObjv) != TCL_OK) {
         return TCL_ERROR;
     }
@@ -547,7 +547,7 @@ TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
 extern Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp);
 #endif
 
-int 
+int
 Rivet_InitList( Tcl_Interp *interp)
 {
     RIVET_OBJ_CMD("lremove",Rivet_LremoveObjCmd,NULL);

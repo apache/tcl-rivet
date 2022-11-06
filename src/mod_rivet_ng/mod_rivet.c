@@ -75,18 +75,18 @@ DLLEXPORT mod_rivet_globals*  module_globals      = NULL;
 /*
  * -- Rivet_SeekMPMBridge
  *
- * MPM name determination. The function returns a filename to 
+ * MPM name determination. The function returns a filename to
  * an MPM bridge module. The module name is determined in 4 steps
  *
  *  - The environment variable RIVET_MPM_BRIDGE is checked. If the
  *    variable exists its value is returned as the path to the bridge module
  *    If the module doesn't exist the server exits with an error
  *  - The global configuration is checked. If module_globals->mpm_bridge is
- *    not NULL its value is taken as the bridge name as given by means of 
- *    the server configuration directive RivetMpmBridge. 
+ *    not NULL its value is taken as the bridge name as given by means of
+ *    the server configuration directive RivetMpmBridge.
  *    The value is interpolated with the macro RIVET_MPM_BRIDGE_COMPOSE
  *    to compose the full path (e.g. 'lazy' -> RIVET_DIR'/mpm/rivet_lazy_mpm.so')
- *    to the bridge module. 
+ *    to the bridge module.
  *  - If the interpolated file name doesn't exist the mpm_bridge string is
  *    checked as a full path to the MPM bridge. If not existing the server exits
  *  - An heuristics criterion based on the MPM module features returned by
@@ -102,16 +102,16 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
     apr_status_t    apr_ret;
     apr_finfo_t     finfo;
 
-    /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet 
+    /* With the env variable RIVET_MPM_BRIDGE we have the chance to tell mod_rivet
        what bridge custom implementation we want be loaded */
 
     if (apr_env_get (&mpm_bridge_path,"RIVET_MPM_BRIDGE",pool) == APR_SUCCESS)
     {
         if ((apr_ret = apr_stat(&finfo,mpm_bridge_path,APR_FINFO_MIN,pool)) != APR_SUCCESS)
         {
-            ap_log_perror(APLOG_MARK,APLOG_ERR,apr_ret,pool, 
-                          MODNAME ": MPM bridge %s not found", module_globals->mpm_bridge); 
-            exit(1);   
+            ap_log_perror(APLOG_MARK,APLOG_ERR,apr_ret,pool,
+                          MODNAME ": MPM bridge %s not found", module_globals->mpm_bridge);
+            exit(1);
         }
         return mpm_bridge_path;
     }
@@ -135,8 +135,8 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
         {
             ap_log_perror(APLOG_MARK,APLOG_ERR,apr_ret,pool,
                                      MODNAME ": MPM bridge %s (%s) not found",module_globals->mpm_bridge,
-                                                                              proposed_bridge); 
-            exit(1);   
+                                                                              proposed_bridge);
+            exit(1);
         }
 
     } else {
@@ -183,16 +183,16 @@ Rivet_SeekMPMBridge (apr_pool_t* pool)
  *
  */
 
-static mod_rivet_globals* 
+static mod_rivet_globals*
 Rivet_CreateModuleGlobals (apr_pool_t* pool)
 {
     mod_rivet_globals*  mod_rivet_g;
-   
+
     mod_rivet_g = apr_pcalloc(pool,sizeof(mod_rivet_globals));
     mod_rivet_g->single_thread_exit       = SINGLE_THREAD_EXIT_UNDEF;
     mod_rivet_g->separate_virtual_interps = RIVET_SEPARATE_VIRTUAL_INTERPS;
     mod_rivet_g->separate_channels        = RIVET_SEPARATE_CHANNELS;
-    if (apr_pool_create(&mod_rivet_g->pool, NULL) != APR_SUCCESS) 
+    if (apr_pool_create(&mod_rivet_g->pool, NULL) != APR_SUCCESS)
     {
         ap_log_perror(APLOG_MARK,APLOG_ERR,APR_EGENERAL,pool,
                       MODNAME ": could not initialize rivet module global pool");
@@ -205,7 +205,7 @@ Rivet_CreateModuleGlobals (apr_pool_t* pool)
                             &mod_rivet_g->default_handler,
                             &mod_rivet_g->default_handler_size) > 0)
     {
-        ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool, 
+        ap_log_perror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, pool,
                      MODNAME ": could not read rivet default handler");
         exit(1);
     }
@@ -216,7 +216,7 @@ Rivet_CreateModuleGlobals (apr_pool_t* pool)
 /*
  * -- Rivet_Exit_Handler
  *
- * 
+ *
  *
  */
 
@@ -227,7 +227,7 @@ int Rivet_Exit_Handler(int code)
     return TCL_OK;		/* Better not ever reach this! */
 }
 
-/* 
+/*
  * -- Rivet_RunServerInit
  *
  *  Prepare the execution of any Rivet server initialization script
@@ -248,23 +248,23 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
     module_globals->server_interp = Rivet_NewVHostInterp(pPool,0); /* root interpreter */
 
     /* We initialize the interpreter and we won't register a channel with it because
-     * we couldn't send data to the stdout anyway 
+     * we couldn't send data to the stdout anyway
 	 */
 
     Rivet_PerInterpInit(module_globals->server_interp,NULL,s,pPool);
 
 	/* This code conditionally compiled when we are building for the
-	 * Windows family of OS. The winnt MPM runs the post_config 
+	 * Windows family of OS. The winnt MPM runs the post_config
 	 * hooks after it has spawned a child process but we don't want
 	 * to run the Tcl server initialization script again. We
 	 * detect we are in a child process by checking
-	 * the environment variable AP_PARENT_PID 
+	 * the environment variable AP_PARENT_PID
 	 * (https://wiki.apache.org/httpd/ModuleLife)
 	 */
 	
 	#ifdef WIN32
 	
-	/* if the environment variable AP_PARENT_PID is set 
+	/* if the environment variable AP_PARENT_PID is set
      * we know we are in a child process of the winnt MPM
      */
 	
@@ -294,13 +294,13 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 
         if (Tcl_EvalObjEx(interp, server_init, 0) != TCL_OK)
         {
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s, 
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, s,
                          MODNAME ": Error running ServerInitScript '%s': %s",
                          module_globals->rivet_server_init_script,
                          Tcl_GetVar(interp, "errorInfo", 0));
         } else {
             ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, s,
-                         MODNAME ": ServerInitScript '%s' successful", 
+                         MODNAME ": ServerInitScript '%s' successful",
                          module_globals->rivet_server_init_script);
         }
 
@@ -335,7 +335,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 #endif
 
 	/* This function runs as post_config_hook
-	 * and as such it's run twice by design. 
+	 * and as such it's run twice by design.
 	 * This is the recommended way to avoid a double load of
 	 * external modules.
 	 */
@@ -382,10 +382,10 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         {
             char errorbuf[ERRORBUF_SZ];
 
-            ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                          MODNAME ": Error loading symbol bridge_jump_table: %s", 
+            ap_log_error (APLOG_MARK, APLOG_ERR, APR_EGENERAL, server,
+                          MODNAME ": Error loading symbol bridge_jump_table: %s",
                           apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
-            exit(1);   
+            exit(1);
         }
 
         /* we require only request_processor and thread_interp to be defined */
@@ -402,8 +402,8 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
         /* If we can't load the mpm handler module we give up and exit */
 
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
-                     MODNAME " Error loading MPM manager: %s", 
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server,
+                     MODNAME " Error loading MPM manager: %s",
                      apr_dso_error(dso_handle,errorbuf,ERRORBUF_SZ));
         exit(1);
     }
@@ -437,12 +437,12 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 
     ap_assert (apr_threadkey_private_create (&rivet_thread_key, NULL, pChild) == APR_SUCCESS);
 
-    /* This code is run once per child process. The forking 
-     * of a child process doesn't preserve the thread where the Tcl 
-     * notifier runs. The Notifier should have been restarted by one the 
+    /* This code is run once per child process. The forking
+     * of a child process doesn't preserve the thread where the Tcl
+     * notifier runs. The Notifier should have been restarted by one the
      * pthread_atfork callbacks (setup in Tcl >= 8.5.14 and Tcl >= 8.6.1). In
      * case pthread_atfork is not supported we unconditionally call Tcl_InitNotifier
-     * hoping for the best (Bug #55153)      
+     * hoping for the best (Bug #55153)
      */
 
 #if !defined(HAVE_PTHREAD_ATFORK)
@@ -468,8 +468,8 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
 
     /* Once we have established a pool with the same lifetime of the child process we
-     * process all the configured server records assigning an integer as unique key 
-     * to each of them 
+     * process all the configured server records assigning an integer as unique key
+     * to each of them
      */
 
     root_server_conf = RIVET_SERVER_CONF(server->module_config);
@@ -502,9 +502,9 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
 }
 
 
-static int Rivet_Handler (request_rec *r)    
+static int Rivet_Handler (request_rec *r)
 {
-    rivet_req_ctype ctype = Rivet_CheckType(r);  
+    rivet_req_ctype ctype = Rivet_CheckType(r);
     if (ctype == CTYPE_NOT_HANDLED) {
         return DECLINED;
     }
@@ -523,7 +523,7 @@ static int Rivet_InitGlobals (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *p
 /*
  * -- rivet_register_hooks: mod_rivet basic setup.
  *
- * 
+ *
  */
 
 static void rivet_register_hooks(apr_pool_t *p)
@@ -549,9 +549,9 @@ const command_rec rivet_cmds[] =
 
 /* Dispatch list for API hooks */
 
-module AP_MODULE_DECLARE_DATA rivet_module = 
+module AP_MODULE_DECLARE_DATA rivet_module =
 {
-    STANDARD20_MODULE_STUFF, 
+    STANDARD20_MODULE_STUFF,
     Rivet_CreateDirConfig,  /* create per-dir config structures    */
     Rivet_MergeDirConfig,   /* merge  per-dir config structures    */
     Rivet_CreateConfig,     /* create per-server config structures */
