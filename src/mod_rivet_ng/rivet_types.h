@@ -29,7 +29,7 @@
 
 /* Definition suggested in
  *
- * https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/Particular-Headers.html 
+ * https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/Particular-Headers.html
  *
  * in order to have a portable definition of the 'bool' data type
  */

@@ -403,7 +403,7 @@ int ApacheRequest___parse(ApacheRequest *req)
         req->nargs = ((apr_array_header_t *)req->parms)->nelts;
     }
 
-    if ((r->method_number == M_POST) && ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH)) 
+    if ((r->method_number == M_POST) && ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH))
     {
         //
         //ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
@@ -430,7 +430,7 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
     /*
         const char *type;
     	type = apr_table_get(r->headers_in, "Content-Type");
-    
+
     	if (!strncaseEQ(type, DEFAULT_ENCTYPE, DEFAULT_ENCTYPE_LENGTH) &&
     	    !strncaseEQ(type, TEXT_XML_ENCTYPE, TEXT_XML_ENCTYPE_LENGTH)) {
     	    return DECLINED;
@@ -476,14 +476,14 @@ apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
     request_rec *r = req->r;
     apr_file_t *fp = NULL;
     char *name = NULL;
-    char *file = NULL ; 
+    char *file = NULL ;
     const char *tempdir;
     apr_status_t rv;
 	
     tempdir = req->temp_dir;
 /*	file = (char *)apr_palloc(r->pool,sizeof(apr_time_t)); */
     file = apr_psprintf(r->pool,"%u.XXXXXX", (unsigned int)r->request_time);
-    rv = apr_temp_dir_get(&tempdir,r->pool); 
+    rv = apr_temp_dir_get(&tempdir,r->pool);
     if (rv != APR_SUCCESS)  {
 	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "No temp dir!");
 	return NULL;
@@ -494,7 +494,7 @@ apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
 	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "File path error!");
 	return NULL;
     }
-    
+
     rv = apr_file_mktemp(&fp,name,0,r->pool);
     if (rv != APR_SUCCESS) {
 	char* errorBuffer = (char*) apr_palloc(r->pool,256);
@@ -623,10 +623,10 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
 
             /* mozilla empty-file (missing CRLF) hack */
             fill_buffer(mbuff);
-            if( strEQN(mbuff->buf_begin, mbuff->boundary, 
+            if( strEQN(mbuff->buf_begin, mbuff->boundary,
                         strlen(mbuff->boundary)) ) {
                 r->remaining -= 2;
-                continue; 
+                continue;
             }
 
             while ((blen = multipart_buffer_read(mbuff, buff, sizeof(buff)))) {
@@ -634,7 +634,7 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
 				status = apr_file_write(upload->fp,buff,&bytes_to_write);
 				
 				if (status != 0) {
-					apr_strerror(status,error,1024); 
+					apr_strerror(status,error,1024);
                     return HTTP_INTERNAL_SERVER_ERROR;
 				}
                 upload->size += blen;

@@ -77,7 +77,7 @@ extern apr_threadkey_t*  rivet_thread_key;
 /*
  * -- Rivet_NoRequestRec
  *
- * Adds standard error information to the interpreter. This procedure makes 
+ * Adds standard error information to the interpreter. This procedure makes
  * sense only when called by C functions implementing Tcl commands that
  * are meaningful only if a valid requiest_rec object is defined. These
  * procedures must return TCL_ERROR right away after Rivet_NoRequestRecord
@@ -158,9 +158,9 @@ TCL_CMD_HEADER( Rivet_MakeURL )
 
             if (script_name_l > 0)
             {
-                // script name may have the form a directory path (and mod_rewrite 
+                // script name may have the form a directory path (and mod_rewrite
                 // could have mapped it to a .tcl or .rvt script)
-                
+
                 if (script_name[script_name_l-1] == '/')
                 {
                     url_target_name = apr_pstrcat(private->req->req->pool,script_name,url_target_name,NULL);
@@ -177,7 +177,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
         }
     }
 
-    result = Tcl_NewObj();   
+    result = Tcl_NewObj();
     TclWeb_MakeURL(result, url_target_name, private->req);
     Tcl_SetObjResult(interp, result);
 
@@ -248,7 +248,7 @@ TCL_CMD_HEADER( Rivet_Parse )
             if (Rivet_Parser(outbuf, script) == 0)
             {
                 Tcl_AppendToObj(outbuf, "\"\n", 2);
-            } 
+            }
 
             Tcl_AppendToObj(outbuf,"\n",-1);
 
@@ -258,7 +258,7 @@ TCL_CMD_HEADER( Rivet_Parse )
             return res;
             //return Rivet_ParseExecString(private, objv[2]);
 
-        } else { 
+        } else {
 
             Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename | -string template_string" );
             return TCL_ERROR;
@@ -284,7 +284,7 @@ TCL_CMD_HEADER( Rivet_Parse )
 
     /* */
 
-    cache_key = 
+    cache_key =
         RivetCache_MakeKey( private->pool,filename,
                             finfo_b.ctime,finfo_b.mtime,
                             IS_USER_CONF(private->running_conf),0);
@@ -326,10 +326,10 @@ TCL_CMD_HEADER( Rivet_Parse )
         result = Tcl_EvalObjEx(interp,script,0);
         Tcl_DecrRefCount(script);
         return result;
-               
+
     } else {
         script = RivetCache_FetchScript(entry);
-        return Tcl_EvalObjEx(interp,script,0); 
+        return Tcl_EvalObjEx(interp,script,0);
     }
 
 }
@@ -487,7 +487,7 @@ TCL_CMD_HEADER( Rivet_Headers )
             return TCL_ERROR;
         }
 
-        header_value = TclWeb_OutputHeaderGet(Tcl_GetString(objv[2]),private->req); 
+        header_value = TclWeb_OutputHeaderGet(Tcl_GetString(objv[2]),private->req);
 
         Tcl_SetObjResult(interp,Tcl_NewStringObj(header_value ? header_value : "",-1));
     }
@@ -656,7 +656,7 @@ TCL_CMD_HEADER ( Rivet_LoadHeaders )
 TCL_CMD_HEADER ( Rivet_Var )
 {
     rivet_thread_private*   private;
-    const char*             cmd; 
+    const char*             cmd;
     char*                   command;
     Tcl_Obj*                result = NULL;
     int                     source;
@@ -678,7 +678,7 @@ TCL_CMD_HEADER ( Rivet_Var )
     /* determine if var_qs, var_post or var was called */
 
     /* first of all we have to skip the namespace string at the beginning of the command:
-     * 
+     *
      * This fragment of code is taken from tcl 8.6.6 (tclNamesp.c) and it's part of the
      * function implementing Tcl "namespace tail", as such it should be authoritative
      * regarding the stripping of the namespace from a FQ command name
@@ -687,7 +687,7 @@ TCL_CMD_HEADER ( Rivet_Var )
     for (p = cmd;  *p != '\0';  p++) {
 	    /* empty body */
     }
-    
+
     while (--p > cmd) {
         if ((*p == ':') && (*(p-1) == ':')) {
             p++;			/* Just after the last "::" */
@@ -808,9 +808,9 @@ TCL_CMD_HEADER ( Rivet_Var )
                     return TCL_ERROR;
                 }
 
-                for (; !done ; Tcl_DictObjNext(&search, &key, &value, &done)) 
+                for (; !done ; Tcl_DictObjNext(&search, &key, &value, &done))
                 {
-                    if (Tcl_DictObjGet(interp,result,key,&valuePtr) == TCL_OK) 
+                    if (Tcl_DictObjGet(interp,result,key,&valuePtr) == TCL_OK)
                     {
                         if (valuePtr == NULL)
                         {
@@ -1210,7 +1210,7 @@ TCL_CMD_HEADER( Rivet_Upload )
             Tcl_SetIntObj(result,upload_prepared);
             Tcl_SetObjResult(interp, result);
             return TCL_OK;
-                
+
         }
 
         if (tcl_status != TCL_OK)
@@ -1361,7 +1361,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
     if (objc == 2)
     {
         char* cmd_arg = Tcl_GetStringFromObj(objv[1],NULL);
-        
+
         if (strcmp(cmd_arg,"-aborting") == 0)
         {
             Tcl_SetObjResult (interp,Tcl_NewBooleanObj(private->page_aborting));
@@ -1373,12 +1373,12 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
             Tcl_SetObjResult (interp,Tcl_NewBooleanObj(private->thread_exit));
             return TCL_OK;
         }
- 
-    /* 
+
+    /*
      * we assume abort_code to be null, as abort_page shouldn't run twice while
-     * processing the same request 
+     * processing the same request
      */
-       
+
         if (private->abort_code == NULL)
         {
             private->abort_code = objv[1];
@@ -1386,7 +1386,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
         }
     }
 
-    /* 
+    /*
      * If page_aborting is true then this is the second call to abort_page
      * processing the same request: we ignore it and return a normal
      * completion code
@@ -1399,7 +1399,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
 
     /* this is the first (and supposedly unique) abort_page call during this request */
 
-    /* we eleveta the page_aborting flag to the actual flag controlling the page abort execution. 
+    /* we eleveta the page_aborting flag to the actual flag controlling the page abort execution.
      * We still return the RIVET and ABORTPAGE_CODE, but internally
      * its page_aborting that will drive the code execution after abort_page
      */
@@ -1413,9 +1413,9 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
 
 /*
  *-----------------------------------------------------------------------------
- * Rivet_AbortCodeCmd -- 
+ * Rivet_AbortCodeCmd --
  *
- * Returns the abort code stored internally by passing a user defined parameter 
+ * Returns the abort code stored internally by passing a user defined parameter
  * to the command 'abort_page'.
  *
  *
@@ -1424,7 +1424,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
 TCL_CMD_HEADER( Rivet_AbortCodeCmd )
 {
     rivet_thread_private*   private;
-    
+
     THREAD_PRIVATE_DATA(private)
 
     if (private->abort_code != NULL)
@@ -1457,7 +1457,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
     char*                   key;
     char*                   val;
     rivet_thread_private*   private;
-    
+
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::env")
 
@@ -1483,14 +1483,14 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
  *      as 'worker') the procedure should cause a thread to exit, not the
  *      whole process with all its threads. In this case the procedure
  *      returns an TCL_ERROR code that has to be handled in mod_rivet so that
- *      the error is ignored and the request procedure interrupted. 
- *      For a non threaded MPM (such as 'prefork') the single child process 
- *      exits thus reproducing an ordinary 'exit' command. 
+ *      the error is ignored and the request procedure interrupted.
+ *      For a non threaded MPM (such as 'prefork') the single child process
+ *      exits thus reproducing an ordinary 'exit' command.
  *
  * Result:
  *
- *      TCL_ERROR 
- * 
+ *      TCL_ERROR
+ *
  * Side Effects:
  *
  *      - non threaded MPMs: the child process exits for good
@@ -1522,14 +1522,14 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
     private->page_aborting = 1;
     private->abort_code = Tcl_NewDictObj();
 
-    /* The private->abort_code ref count is decremented before 
+    /* The private->abort_code ref count is decremented before
      * request processing terminates*/
 
     Tcl_IncrRefCount(private->abort_code);
 
     /*
-     * mod_rivet traps every call to ::rivet::exit to offers a chance 
-     * to the Tcl application interrupt execution much in 
+     * mod_rivet traps every call to ::rivet::exit to offers a chance
+     * to the Tcl application interrupt execution much in
      * the same way it can be done by calling ::rivet::abort_page
      */
 
@@ -1594,7 +1594,7 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
  *
  * Rivet_Inspect --
  *
- *      Rivet configuration introspection. Command '::rivet::inspect' 
+ *      Rivet configuration introspection. Command '::rivet::inspect'
  *      returns a dictionary of configuration data:
  *
  * Results:
@@ -1606,7 +1606,7 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
 TCL_CMD_HEADER( Rivet_InspectCmd )
 {
     rivet_thread_private*   private;
-    rivet_server_conf*      rsc; 
+    rivet_server_conf*      rsc;
     int                     status = TCL_OK;
 
     THREAD_PRIVATE_DATA(private)
@@ -1616,7 +1616,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
         Tcl_Obj* dictObj;
 
         CHECK_REQUEST_REC(private,"::rivet::inspect")
-        rsc = Rivet_GetConf(private->r); 
+        rsc = Rivet_GetConf(private->r);
         dictObj = Rivet_BuildConfDictionary(interp,rsc);
         if (dictObj != NULL) {
             Tcl_IncrRefCount(dictObj);
@@ -1650,20 +1650,20 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
 
             cmd = Tcl_NewStringObj("info script",-1);
 
-            Tcl_IncrRefCount(cmd); 
+            Tcl_IncrRefCount(cmd);
             status = Tcl_EvalObjEx(interp,cmd,TCL_EVAL_DIRECT);
             Tcl_DecrRefCount(cmd);
 
-        } 
+        }
         else if (STRNEQU(cmd_arg,"-all"))
         {
             Tcl_Obj* dictObj;
-            
+
             CHECK_REQUEST_REC(private,"::rivet::inspect -all")
-            rsc = Rivet_GetConf(private->r); 
+            rsc = Rivet_GetConf(private->r);
             dictObj = Rivet_CurrentConfDict(interp,rsc);
             Tcl_IncrRefCount(dictObj);
-            Tcl_SetObjResult(interp,dictObj);            
+            Tcl_SetObjResult(interp,dictObj);
             Tcl_DecrRefCount(dictObj);
 
         }
@@ -1677,7 +1677,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
             } else {
 
                 if (private->r == NULL) {
-                    srec = module_globals->server; 
+                    srec = module_globals->server;
                 } else {
                     srec = private->r->server;
                 }
@@ -1688,14 +1688,14 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
 
             dictObj = Rivet_CurrentServerRec(interp,srec);
             Tcl_IncrRefCount(dictObj);
-            Tcl_SetObjResult(interp,dictObj);            
+            Tcl_SetObjResult(interp,dictObj);
             Tcl_DecrRefCount(dictObj);
 
         }
         else if (STRNEQU(cmd_arg,"exit"))
         {
             Tcl_Obj* exit_flag;
-            
+
             CHECK_REQUEST_REC(private,"::rivet::inspect")
             /* thread exit status flag */
             exit_flag = Tcl_NewIntObj(private->thread_exit);
@@ -1716,7 +1716,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
                 if (private->r == NULL) {
                     rsc = private->running_conf;
                 } else {
-                    rsc = Rivet_GetConf(private->r); 
+                    rsc = Rivet_GetConf(private->r);
                 }
 
             }
@@ -1743,7 +1743,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
 
         Tcl_DecrRefCount(par_name);
     }
-    else 
+    else
     {
         Tcl_WrongNumArgs( interp, 1, objv, "?server | dir | user? ?parameter name?" );
         status = TCL_ERROR;
@@ -1851,7 +1851,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
         break;
     }
 
-    /* if we are serving a page, we know our server, 
+    /* if we are serving a page, we know our server,
      * else send null for server
      */
     serverRec = ((private == NULL) || (private->r == NULL)) ? module_globals->server : private->r->server;
@@ -1870,7 +1870,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
  *      Calls the panic routine.
  *
  * Results:
- *      Always returns TCL_OK. 
+ *      Always returns TCL_OK.
  *
  * Side effects:
  *      May exit application.
@@ -1926,7 +1926,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     Tcl_HashEntry*       entry  = NULL;
     Tcl_Obj*             script = NULL;
     int                  result;
-    unsigned int         user_conf; 
+    unsigned int         user_conf;
     time_t               ctime;
     time_t               mtime;
 
@@ -1944,7 +1944,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
     if (entry == NULL)
     {
         Tcl_Interp*     interp;
-        
+
         interp = rivet_interp->interp;
 
         script = Tcl_NewObj();
@@ -1976,11 +1976,11 @@ TCL_CMD_HEADER( Rivet_UrlScript )
                 Tcl_HashEntry* entry;
 
                 entry = RivetCache_CreateEntry (rivet_interp,cache_key,&isNew);
-    
+
                 /* Sanity check: we are here for this reason */
 
                 ap_assert(isNew == 1);
-            
+
                 /* we proceed storing the script in the cache */
 
                 RivetCache_StoreScript(rivet_interp,entry,script);
@@ -2011,7 +2011,7 @@ TCL_CMD_HEADER( Rivet_UrlScript )
  * With a threaded bridge (worker and lazy) command [pid] on Unix systems return
  * the same process id when called from all threads running within that process.
  * For any debugging reason this command returns a unique thread identification
- * that can, for instance, be matched with the thread id (tid) information 
+ * that can, for instance, be matched with the thread id (tid) information
  * in the error log file.
  *
  * Arguments:
@@ -2068,7 +2068,7 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
             Tcl_AddObjErrorInfo(interp,"Wrong argument: it must be -decimal | -hex", -1);
             return TCL_ERROR;
         }
-    } 
+    }
     else if (objc > 2)
     {
         Tcl_WrongNumArgs(interp,1,objv,"-decimal | -hex" );
@@ -2095,7 +2095,7 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
  *      documented within the 'Rivet Internals' section of the manual
  *
  * Results:
- *      
+ *
  *      a Tcl list of the keys in the interpreter cache
  *
  * Side Effects:
@@ -2116,12 +2116,12 @@ TCL_CMD_HEADER( Rivet_CacheContent )
 
     rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
     interp = rivet_interp->interp;
-    
+
     entry_list = Tcl_NewObj();
     Tcl_IncrRefCount(entry_list);
 
     ep = rivet_interp->cache_size - 1;
-    
+
     while ((ep >= 0) && (rivet_interp->objCacheList[ep]))
     {
         int tcl_status;
@@ -2161,7 +2161,7 @@ DLLEXPORT int
 Rivet_InitCore(rivet_thread_interp* interp_obj,rivet_thread_private* private)
 {
     Tcl_Interp*         interp = interp_obj->interp;
-    rivet_server_conf*  server_conf; 
+    rivet_server_conf*  server_conf;
 
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,private);
     RIVET_OBJ_CMD ("headers",Rivet_Headers,private);
@@ -2185,7 +2185,7 @@ Rivet_InitCore(rivet_thread_interp* interp_obj,rivet_thread_private* private)
     RIVET_OBJ_CMD ("exit",Rivet_ExitCmd,private);
     RIVET_OBJ_CMD ("url_script",Rivet_UrlScript,private);
     RIVET_OBJ_CMD ("thread_id",Rivet_GetThreadId,private);
-    
+
 #ifdef RIVET_DEBUG_BUILD
     /* code compiled conditionally for debugging */
     RIVET_OBJ_CMD ("cache_content",Rivet_CacheContent,private);

@@ -1,3 +1,6 @@
+2022-11-29 Massimo Manghi <mxmanghi@apache.org>
+	* src/: thoroughly removed trailing spaces from C code
+
 2022-06-10 Massimo Manghi <mxmanghi@apache.org>
 	* doc/xml/directives.xml: moved misplaced text in table
 	* configure.ac: Changed default for HonorHeadRequests to 'yes'

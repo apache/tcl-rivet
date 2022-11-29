@@ -1,6 +1,6 @@
 /* apache_config.c -- configuration functions for apache 2.x */
 
-/* 
+/*
    Copyright 2002-2020 The Apache Tcl Team
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,17 +52,17 @@ extern mod_rivet_globals* module_globals;
  *  - string_value: a string to be assigned to the Tcl_Obj
  *
  * Results:
- *  
+ *
  *  - Pointer to a Tcl_Obj containing the parameter value.
  *
  */
 
 #if 0
-static Tcl_Obj* 
+static Tcl_Obj*
 Rivet_AssignStringToConf (Tcl_Obj** objPnt, const char* string_value)
 {
     Tcl_Obj *objarg = NULL;
-    
+
     if (*objPnt == NULL)
     {
         objarg = Tcl_NewStringObj(string_value,-1);
@@ -81,7 +81,7 @@ static char*
 Rivet_AppendStringToConf (char* p,const char* string,apr_pool_t *pool)
 {
 
-    if (p == NULL) { 
+    if (p == NULL) {
         p = apr_pstrdup(pool,string);
     } else {
         p = apr_pstrcat(pool,p,"\n",string,NULL);
@@ -101,7 +101,7 @@ Rivet_AppendStringToConf (char* p,const char* string,apr_pool_t *pool)
  *
  * Results:
  *
- *  Returns a Tcl_Obj* pointing to the string representation of 
+ *  Returns a Tcl_Obj* pointing to the string representation of
  *  the current value for the directive.
  *
  */
@@ -135,14 +135,14 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
     } else {
         return NULL;
     }
-   
+
     *c = Rivet_AppendStringToConf(*c,string,pool);
 
     return *c;
 
 }
 
-/* 
+/*
  * -- Rivet_GetConf
  *
  * Rivet_GetConf fetches the confguration from the server record
@@ -155,8 +155,8 @@ Rivet_SetScript (apr_pool_t *pool, rivet_server_conf *rsc, const char *script, c
  *
  * Results:
  *
- *  - rivet_server_conf* rsc: the server merged configuration 
- * 
+ *  - rivet_server_conf* rsc: the server merged configuration
+ *
  * Side Effects:
  *
  *  None.
@@ -170,7 +170,7 @@ Rivet_GetConf( request_rec *r )
     void *dconf = r->per_dir_config;
     rivet_server_conf *newconfig = NULL;
     rivet_server_conf *rdc;
-     
+
     FILEDEBUGINFO;
 
     /* If there is no per dir config, just return the server config */
@@ -178,13 +178,13 @@ Rivet_GetConf( request_rec *r )
         return rsc;
     }
 
-    /* things might become tedious when there are scripts set 
+    /* things might become tedious when there are scripts set
        in a <Directory ...>...</Directory> stanza. Especially
        since we are calling this function at every single request.
-       We compute the new configuration merging the per-dir conf 
+       We compute the new configuration merging the per-dir conf
        with the server configuration and then we return it. */
 
-    rdc       = RIVET_SERVER_CONF ( dconf ); 
+    rdc       = RIVET_SERVER_CONF ( dconf );
     newconfig = RIVET_NEW_CONF ( r->pool );
 
     Rivet_CopyConfig( rsc, newconfig );
@@ -242,12 +242,12 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
 
 /*
  * -- Rivet_MergeDirConfigVars
- * 
+ *
  * Merging of base configuration with per directory configuration
  * is done checking each field in the configuration record. If
  * a more specific (per directory) conf variable is defined then
- * it supersedes the base record variable 
- * 
+ * it supersedes the base record variable
+ *
  * Arguments:
  *
  *  - apr_pool_t* t: pointer to an APR memory pool
@@ -257,8 +257,8 @@ Rivet_CopyConfig( rivet_server_conf *oldrsc, rivet_server_conf *newrsc )
  *  - rivet_server_conf* add:
  *
  * Results:
- * 
- *  configuration record are merge in place 
+ *
+ *  configuration record are merge in place
  *
  * Side Effects:
  *
@@ -304,11 +304,11 @@ Rivet_MergeDirConfigVars(apr_pool_t *p, rivet_server_conf *new,
  * -- Rivet_CreateDirConfig
  *
  * Apache HTTP server framework calls this function to
- * have a pointer to newly initialized directory specific 
- * configuration record. 
+ * have a pointer to newly initialized directory specific
+ * configuration record.
  *
  * Arguments:
- * 
+ *
  *  - apr_pool_t*: pointer to an APR memory pool
  *  - char*: string pointer to the directory name
  *
@@ -340,11 +340,11 @@ Rivet_CreateDirConfig(apr_pool_t *p, char *dir)
  * Arguments:
  *
  *  - apr_pool_t* p: pointer to an APR memory pool
- *  - void* basev, addv: pointers to configuration records to be 
+ *  - void* basev, addv: pointers to configuration records to be
  *    merged
- * 
+ *
  * Results:
- * 
+ *
  *  - void*: pointer to the resulting configuration
  */
 
@@ -416,7 +416,7 @@ Rivet_MergeConfig(apr_pool_t *p, void *basev, void *overridesv)
     //rsc->mpm_bridge = base->mpm_bridge;
     rsc->upload_max = base->upload_max;
     rsc->upload_dir = base->upload_dir;
-    
+
 
     RIVET_CONF_SELECT(rsc,base,overrides,upload_dir)
     RIVET_CONF_SELECT(rsc,base,overrides,rivet_server_vars)
@@ -468,7 +468,7 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
     //rsc->separate_virtual_interps   = RIVET_SEPARATE_VIRTUAL_INTERPS;
     rsc->export_rivet_ns            = RIVET_NAMESPACE_EXPORT;
     rsc->import_rivet_ns            = RIVET_NAMESPACE_IMPORT;
-    rsc->honor_header_only_reqs     = RIVET_HEAD_REQUESTS;
+    rsc->honor_head_requests        = RIVET_HEAD_REQUESTS;
     //rsc->single_thread_exit         = 0;
     //rsc->separate_channels          = RIVET_SEPARATE_CHANNELS;
     rsc->upload_dir                 = RIVET_UPLOAD_DIR;
@@ -495,9 +495,9 @@ Rivet_CreateConfig(apr_pool_t *p, server_rec *s )
  */
 
 const char *
-Rivet_UserConf( cmd_parms *cmd, 
-                void *vrdc, 
-                const char *var, 
+Rivet_UserConf( cmd_parms *cmd,
+                void *vrdc,
+                const char *var,
                 const char *val )
 {
     rivet_server_conf *rdc = (rivet_server_conf *)vrdc;
@@ -517,14 +517,14 @@ Rivet_UserConf( cmd_parms *cmd,
 
     rdc->user_scripts_status |= (USER_SCRIPTS_UPDATED | USER_SCRIPTS_CONF);
 
-    if (STREQU(var,"BeforeScript")      || 
-        STREQU(var,"AfterScript")       || 
+    if (STREQU(var,"BeforeScript")      ||
+        STREQU(var,"AfterScript")       ||
         STREQU(var,"AbortScript")       ||
         STREQU(var,"AfterEveryScript")  ||
         STREQU(var,"UploadDirectory")   ||
         STREQU(var,"ErrorScript"))
     {
-        apr_table_set( rdc->rivet_user_vars, var, 
+        apr_table_set( rdc->rivet_user_vars, var,
                         Rivet_SetScript( cmd->pool, rdc, var, val));
     }
     else if (STREQU(var,"Debug")        ||
@@ -536,7 +536,7 @@ Rivet_UserConf( cmd_parms *cmd,
     }
     else
     {
-        return apr_pstrcat(cmd->pool, "Rivet configuration error: '",var, 
+        return apr_pstrcat(cmd->pool, "Rivet configuration error: '",var,
                                       "' not valid for RivetUserConf", NULL);
     }
 
@@ -569,14 +569,14 @@ Rivet_DirConf(cmd_parms *cmd,void *vrdc,const char *var,const char *val)
         return "Rivet Error: RivetDirConf requires two arguments";
     }
 
-    if(STREQU(var, "UploadDirectory")) 
+    if(STREQU(var, "UploadDirectory"))
     {
         rdc->upload_dir = val;
-    } 
-    else 
+    }
+    else
     {
-        if (STREQU(var,"BeforeScript")      || 
-            STREQU(var,"AfterScript")       || 
+        if (STREQU(var,"BeforeScript")      ||
+            STREQU(var,"AfterScript")       ||
             STREQU(var,"AbortScript")       ||
             STREQU(var,"AfterEveryScript")  ||
             STREQU(var,"ErrorScript"))
@@ -585,7 +585,7 @@ Rivet_DirConf(cmd_parms *cmd,void *vrdc,const char *var,const char *val)
         }
         else
         {
-            return apr_pstrcat(cmd->pool, "Rivet configuration error: '",var, 
+            return apr_pstrcat(cmd->pool, "Rivet configuration error: '",var,
                                           "' not valid in <Directory> sections", NULL);
         }
     }

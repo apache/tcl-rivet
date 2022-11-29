@@ -61,7 +61,7 @@ extern Sfio_t*  _stdopen _ARG_((int, const char*)); /*1999*/
 
 #ifdef  __cplusplus
  extern "C" {
-#endif 
+#endif
 
 ApacheRequest*  ApacheRequest_new(apr_pool_t *);
 ApacheRequest*  ApacheRequest_init(ApacheRequest* req, request_rec *r);
@@ -76,7 +76,7 @@ apr_array_header_t *ApacheRequest_params(ApacheRequest *req, const char *key);
 char *ApacheRequest_params_as_string(ApacheRequest *req, const char *key);
 int ApacheRequest___parse(ApacheRequest *req);
 #define ApacheRequest_parse(req) \
-    ((req)->status = (req)->parsed ? (req)->status : ApacheRequest___parse(req)) 
+    ((req)->status = (req)->parsed ? (req)->status : ApacheRequest___parse(req))
 apr_table_t *ApacheRequest_query_params(ApacheRequest *req, apr_pool_t *p);
 apr_table_t *ApacheRequest_post_params(ApacheRequest *req, apr_pool_t *p);
 apr_table_t *ApacheRequest_query_params(ApacheRequest *req, apr_pool_t *p);

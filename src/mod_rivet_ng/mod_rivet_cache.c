@@ -51,12 +51,12 @@ int RivetCache_DefaultSize (void)
 }
 
 /*
- * -- RivetCache_Create 
+ * -- RivetCache_Create
  *
  * Creates a per interpreter script cach
  *
  * Arguments:
- *     apr_pool_t *p - APR memory pool pointer, 
+ *     apr_pool_t *p - APR memory pool pointer,
  *     rivet_thread_interp* interp_obj - interpreter object
  *
  *
@@ -144,25 +144,25 @@ void RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rive
         ct++;
     }
     apr_pool_destroy(rivet_interp->pool);
-    
+
     /* let's recreate the cache list */
 
     if (apr_pool_create(&rivet_interp->pool, private->pool) != APR_SUCCESS)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server, 
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, module_globals->server,
                      MODNAME ": could not recreate cache private pool. Cache disabled");
         rivet_interp->cache_free = rivet_interp->cache_size = 0;
     }
     else
     {
-        rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool, 
+        rivet_interp->objCacheList = apr_pcalloc (rivet_interp->pool,
                                                 (signed)(rivet_interp->cache_size*sizeof(char *)));
         rivet_interp->cache_free = rivet_interp->cache_size;
     }
-    
+
 }
 
-/* 
+/*
  * -- Rivet_MakeCacheKey
  *
  * Arguments:
@@ -176,7 +176,7 @@ void RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rive
 
 char* RivetCache_MakeKey (apr_pool_t*   pool,
                           char*         filename,
-                          time_t        ctime, 
+                          time_t        ctime,
                           time_t        mtime,
                           unsigned int  user_conf,
                           int           toplevel)
@@ -253,7 +253,7 @@ Tcl_Obj* RivetCache_FetchScript (Tcl_HashEntry* entry)
     return (Tcl_Obj *)Tcl_GetHashValue(entry);
 }
 
-/* -- RivetCache_StoreScript 
+/* -- RivetCache_StoreScript
  *
  */
 
@@ -265,14 +265,14 @@ int RivetCache_StoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* ent
             char* hashKey = (char *) Tcl_GetHashKey (rivet_interp->objCache,entry);
 
             /* Tcl_SetHashValue is a macro that simply stuffs the value pointer in an array
-             * We need to incr the reference count of outbuf because we want it to outlive 
+             * We need to incr the reference count of outbuf because we want it to outlive
              * this function and be kept as long as the cache is preserved
              */
 
             Tcl_IncrRefCount (script);
             Tcl_SetHashValue (entry,(ClientData)script);
 
-            rivet_interp->objCacheList[--rivet_interp->cache_free] = 
+            rivet_interp->objCacheList[--rivet_interp->cache_free] =
                 (char*) apr_pcalloc (rivet_interp->pool,(strlen(hashKey)+1)*sizeof(char));
             strcpy(rivet_interp->objCacheList[rivet_interp->cache_free], hashKey);
 

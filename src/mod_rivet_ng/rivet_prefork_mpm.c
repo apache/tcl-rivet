@@ -45,7 +45,7 @@ extern TclWebRequest* TclWeb_NewRequestObject (apr_pool_t *p);
  *
  */
 
-int PreforkBridge_ServerInit (apr_pool_t *pPool, 
+int PreforkBridge_ServerInit (apr_pool_t *pPool,
                                apr_pool_t *pLog,
                                apr_pool_t *pTemp, server_rec *server)
 {
@@ -81,7 +81,7 @@ int PreforkBridge_ServerInit (apr_pool_t *pPool,
      * in that context. We create the cache now */
 
     if (module_globals->server_interps[server_idx]->cache_size) {
-        RivetCache_Create(module_globals->server_interps[server_idx]); 
+        RivetCache_Create(module_globals->server_interps[server_idx]);
     }
 
    /*
@@ -98,7 +98,7 @@ int PreforkBridge_ServerInit (apr_pool_t *pPool,
         rsc = RIVET_SERVER_CONF(s->module_config);
         idx = rsc->idx;
 
-        /* 
+        /*
          * travelling the servers records. We create a new interpreter
          * if not created by Rivet_ServerInit
          */
@@ -116,7 +116,7 @@ int PreforkBridge_ServerInit (apr_pool_t *pPool,
             }
         }
     }
-    
+
     return OK;
 }
 
@@ -148,7 +148,7 @@ static void Prefork_ReseedRNG(server_rec* server,rivet_thread_interp* interp_obj
     tcl_status = Tcl_Eval(interp_obj->interp,"expr {srand([clock clicks] + [pid])}");
     if (tcl_status != TCL_OK)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server,
                      MODNAME ": Tcl interpreter random number generation reseeding failed");
     }
 
@@ -159,7 +159,7 @@ static void Prefork_ReseedRNG(server_rec* server,rivet_thread_interp* interp_obj
 void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 {
     rivet_thread_private*   private;
-    rivet_server_conf*      root_server_conf; 
+    rivet_server_conf*      root_server_conf;
 	rivet_thread_interp**   server_interps = module_globals->server_interps;
 
     RIVET_PRIVATE_DATA_NOT_NULL(rivet_thread_key,private)
@@ -170,23 +170,23 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
 
-    /* Prefork bridge has inherited the parent process pool but we have 
-     * to initialize ourselves the request descriptor obj 
+    /* Prefork bridge has inherited the parent process pool but we have
+     * to initialize ourselves the request descriptor obj
      */
 
     private->req = TclWeb_NewRequestObject(private->pool);
 
-    /* The prefork MPM just needs to keep a pointer 
+    /* The prefork MPM just needs to keep a pointer
      * to the interpreters array in module_globals->server_interps
      */
 
-    private->ext->interps = module_globals->server_interps; 
+    private->ext->interps = module_globals->server_interps;
 
     /* reseeding the RNG for each interpreter when a new child process is created */
 
     RIVET_FOREACH_SERVER(server,server_interps,Prefork_ReseedRNG)
 
-	if (root_server_conf->rivet_global_init_script != NULL) 
+	if (root_server_conf->rivet_global_init_script != NULL)
     {
         Tcl_Obj* global_tcl_script;
 
@@ -199,7 +199,7 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
     }
 
     /* This step is not needed anymore, we rely on the initialization that took
-     * place with the server initialization 
+     * place with the server initialization
      */
 
     /* we now establish the full rivet core command set for the root interpreter */
@@ -210,7 +210,7 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 
     RIVET_FOREACH_SERVER(server,server_interps,Rivet_ImportNamespace)
 
-#endif 
+#endif
 
     /*
      * We proceed creating the whole virtual host interpreters array
@@ -218,7 +218,7 @@ void PreforkBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 
     if (Rivet_SetupInterps(private) == NULL)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server,
                      MODNAME ": Tcl Interpreters creation fails");
         exit(1);
     }
@@ -269,16 +269,16 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
      * of the process, math engine status included. This fact implies
      * the random number generator has the same seed and every
      * child process for which SeparateVirtualInterps would generate
-     * the same random number sequence. We therefore reseed the RNG 
+     * the same random number sequence. We therefore reseed the RNG
      * calling a Tcl script fragment
      */
 
     tcl_status = Tcl_Eval(module_globals->server_interps[0]->interp,"expr {srand([clock clicks] + [pid])}");
     if (tcl_status != TCL_OK)
     {
-        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server, 
+        ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, server,
                      MODNAME ": Tcl interpreter random number generation reseeding failed");
-        
+
     }
     return module_globals->server_interps[0];
 }
@@ -287,14 +287,14 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
 /*
  * -- PreforkBridge_ExitHandler
  *
- *  Just calling Tcl_Exit  
+ *  Just calling Tcl_Exit
  *
  *  Arguments:
  *      int code
  *
  * Side Effects:
  *
- *  the thread running the Tcl script will exit 
+ *  the thread running the Tcl script will exit
  */
 
 int PreforkBridge_ExitHandler(rivet_thread_private* private)
@@ -302,7 +302,7 @@ int PreforkBridge_ExitHandler(rivet_thread_private* private)
     Tcl_Exit(private->exit_status);
 
     /* actually we'll never get here but we return
-     * the Tcl return code anyway to silence the 
+     * the Tcl return code anyway to silence the
      * compilation warning
      */
     return TCL_OK;
@@ -314,7 +314,7 @@ rivet_thread_interp* PreforkBridge_Interp (rivet_thread_private* private,
 {
     if (interp != NULL) { private->ext->interps[conf->idx] = interp; }
 
-    return private->ext->interps[conf->idx];   
+    return private->ext->interps[conf->idx];
 }
 
 /* Table of bridge control functions */

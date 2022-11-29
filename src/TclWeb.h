@@ -188,7 +188,7 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req);
  * TclWeb_UploadData --
  *
  * Returns the uploaded data to the Tcl script level.
- * 
+ *
  * If the config parameter upload_files_to_var is not set the procedure
  * returs an error
  *

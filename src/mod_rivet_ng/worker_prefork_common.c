@@ -51,11 +51,11 @@ extern DLLIMPORT module             rivet_module;
  *  Returned value:
  *
  *     a new rivet_thread_private object
- * 
+ *
  *  Side effects:
  *
  *     GlobalInitScript and ChildInitScript are run at this stage
- *     
+ *
  */
 
 rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
@@ -71,7 +71,7 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
     channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
 
     /* The intepreters were created by the server init script, we now create its Rivet channel
-     * We assume the server_rec stored in the module globals can be used to retrieve the 
+     * We assume the server_rec stored in the module globals can be used to retrieve the
      * reference to the root interpreter configuration and to the rivet global script
      */
 
@@ -79,18 +79,18 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
 
     for (s = root_server; s != NULL; s = s->next)
     {
-        rivet_server_conf*      rsc; 
-        rivet_thread_interp*    interp_obj; 
-        
+        rivet_server_conf*      rsc;
+        rivet_thread_interp*    interp_obj;
+
         rsc = RIVET_SERVER_CONF(s->module_config);
         interp_obj = private->ext->interps[rsc->idx];
 
         if ((s != root_server) &&
-            module_globals->separate_channels && 
+            module_globals->separate_channels &&
             module_globals->separate_virtual_interps)
         {
             channel = Rivet_CreateRivetChannel(private->pool,rivet_thread_key);
-        } 
+        }
 
         interp_obj->channel = channel;
         Tcl_RegisterChannel(interp_obj->interp,*channel);
@@ -113,7 +113,7 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
         /* when configured a child init script gets evaluated */
 
         function = rsc->rivet_child_init_script;
-        if (function && 
+        if (function &&
             (s == root_server || module_globals->separate_virtual_interps || function != parentfunction))
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
@@ -127,9 +127,9 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
 
             if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
                 ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, errmsg, function);
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server, 
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
                              "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
             }
             Tcl_Release (interp);
@@ -142,7 +142,7 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
 /*
  * -- Rivet_ProcessorCleanup
  *
- * Thread private data cleanup. This function was meant to be 
+ * Thread private data cleanup. This function was meant to be
  * called by the worker and prefork MPM bridges to release resources
  * owned by thread private data and pointed in the array of rivet_thread_interp
  * objects. It has to be called just before an agent, either thread or
@@ -151,7 +151,7 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
  *
  *  Arguments:
  *
- *      data:   pointer to a rivet_thread_private data structure. 
+ *      data:   pointer to a rivet_thread_private data structure.
  *
  *  Returned value:
  *
@@ -170,11 +170,11 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
     server_rec*             s;
     server_rec*             server;
 
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server, 
-                 "Thread exiting after %d requests served (%d vhosts)", 
+    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server,
+                 "Thread exiting after %d requests served (%d vhosts)",
                                         private->req_cnt,module_globals->vhosts_count);
 
-    /* We are about to delete the interpreters and release the thread channel. 
+    /* We are about to delete the interpreters and release the thread channel.
      * Rivet channel is set as stdout channel of Tcl and as such is treated
      * by Tcl_UnregisterChannel is a special way. When its refCount reaches 1
      * the channel is released immediately by forcing the refCount to 0
@@ -186,7 +186,7 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
     Tcl_SetStdChannel(NULL,TCL_STDOUT);
 
     /* there must be always a root interpreter in the slot 0 of private->interps,
-     * so we always need to run this cycle at least once 
+     * so we always need to run this cycle at least once
      */
 
     server = module_globals->server;
@@ -201,12 +201,12 @@ void Rivet_ProcessorCleanup (rivet_thread_private* private)
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
         }
 
-        if ((i > 0) && module_globals->separate_channels) 
+        if ((i > 0) && module_globals->separate_channels)
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->ext->interps[i]->channel);
 
         Rivet_ReleaseRunningScripts(private->ext->interps[i]->scripts);
 
         i++;
-    } 
+    }
 }
 

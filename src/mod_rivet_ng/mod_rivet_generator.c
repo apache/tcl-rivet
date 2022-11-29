@@ -43,7 +43,7 @@ extern apr_threadkey_t*   rivet_thread_key;
 extern module rivet_module;
 
 
-/* 
+/*
  * -- Rivet_CheckType (request_rec *r)
  *
  * Utility function internally used to determine which type
@@ -52,7 +52,7 @@ extern module rivet_module;
  * the test returns an integer (RIVET_TEMPLATE) for rvt templates
  * or RIVET_TCLFILE for Tcl scripts
  *
- * Argument: 
+ * Argument:
  *
  *    request_rec*: pointer to the current request record
  *
@@ -78,14 +78,14 @@ Rivet_CheckType (request_rec *req)
             ctype = RIVET_TCLFILE;
         }
     }
-    return ctype; 
+    return ctype;
 }
 
 /*
  * -- Rivet_ReleaseScript
  *
  *
- * 
+ *
  *
  *
  */
@@ -130,8 +130,8 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     /* Set the global request req to know what we are dealing with in
      * case we have to call the PanicProc. */
 
-    /* TODO: we can't place a pointer to the request rec here, if Tcl_Panic 
-       gets called in general it won't have this pointer which has to be 
+    /* TODO: we can't place a pointer to the request rec here, if Tcl_Panic
+       gets called in general it won't have this pointer which has to be
        thread private */
 
     private->rivet_panic_request_rec = private->r;
@@ -150,19 +150,19 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     {
         rivet_server_conf* rdc = NULL;
 
-        rdc = RIVET_SERVER_CONF(private->r->per_dir_config); 
+        rdc = RIVET_SERVER_CONF(private->r->per_dir_config);
 
         if ((rdc != NULL) && (rdc->path))
         {
             /* Let's check if a scripts object is already stored in the per-dir hash table */
 
-            private->running = 
+            private->running =
                 (running_scripts *) apr_hash_get (interp_obj->per_dir_scripts,rdc->path,strlen(rdc->path));
 
             if (private->running == NULL)
             {
                 rivet_server_conf*  newconfig   = NULL;
-                running_scripts*    scripts     = 
+                running_scripts*    scripts     =
                             (running_scripts *) apr_pcalloc (private->pool,sizeof(running_scripts));
 
                 newconfig = RIVET_NEW_CONF(private->r->pool);
@@ -214,9 +214,9 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     private->r->allowed |= (1 << M_POST);
     private->r->allowed |= (1 << M_PUT);
     private->r->allowed |= (1 << M_DELETE);
-    if (private->r->method_number != M_GET   && 
-        private->r->method_number != M_POST  && 
-        private->r->method_number != M_PUT   && 
+    if (private->r->method_number != M_GET   &&
+        private->r->method_number != M_POST  &&
+        private->r->method_number != M_PUT   &&
         private->r->method_number != M_DELETE) {
 
         retval = DECLINED;
@@ -228,7 +228,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
     {
         request_rec* r = private->r;
 
-        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, 
+        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL,
                      private->r->server,
                      MODNAME ": File does not exist: %s",
                      (r->path_info ? (char*)apr_pstrcat(r->pool, r->filename, r->path_info, NULL) : r->filename));
@@ -241,7 +241,7 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         goto sendcleanup;
     }
 
-    /* 
+    /*
      * This one is the big catch when it comes to moving towards
      * Apache 2.0, or one of them, at least.
      */
@@ -253,8 +253,8 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
         /* something went wrong doing chdir into r->filename, we are not specific
          * at this. We simply emit an internal server error and print a log message
          */
-        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server, 
-                     MODNAME ": Error accessing %s, could not chdir into directory", 
+        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, APR_EGENERAL, r->server,
+                     MODNAME ": Error accessing %s, could not chdir into directory",
                      r->filename);
 
         retval = HTTP_INTERNAL_SERVER_ERROR;
@@ -304,23 +304,23 @@ Rivet_SendContent(rivet_thread_private *private,request_rec* r)
        doing caching on the modification time of the .htaccess files
        that concern us. FIXME */
 
-    if (USER_CONF_UPDATED(private->running_conf) && (interp_obj->cache_size != 0) && 
-                                                    (interp_obj->cache_free < interp_obj->cache_size)) 
+    if (USER_CONF_UPDATED(private->running_conf) && (interp_obj->cache_size != 0) &&
+                                                    (interp_obj->cache_free < interp_obj->cache_size))
     {
         RivetCache_Cleanup(private,interp_obj);
     }
 
     /* URL referenced script execution and exception handling */
 
-    if (Tcl_EvalObjEx(interp, private->running->request_processing,0) == TCL_ERROR) 
+    if (Tcl_EvalObjEx(interp, private->running->request_processing,0) == TCL_ERROR)
     {
         /* we don't report errors coming from abort_page execution */
 
-        if (!private->page_aborting) 
+        if (!private->page_aborting)
         {
             request_rec* r = private->r;
 
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server, 
+            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r->server,
                          MODNAME ": Error evaluating exec file '%s': %s",
                          r->filename, Tcl_GetVar(interp, "errorInfo", 0));
         }
@@ -353,10 +353,10 @@ sendcleanup:
      * has been evaluated the exit condition is checked and the bridge
      * exit handler is called upon.
      */
-    
+
     if (private->thread_exit)
     {
-        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, private->r, 
+        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, private->r,
                                   "thread terminating with code %d",private->exit_status);
         RIVET_MPM_BRIDGE_CALL(exit_handler,private);
         //Tcl_Exit(private->exit_status);

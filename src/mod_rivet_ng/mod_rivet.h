@@ -58,7 +58,7 @@
 
 /* Configuration options  */
 
-/* 
+/*
    If you do not have a threaded Tcl, you can define this to 0.  This
    has the effect of running Tcl Init code in the main parent init
    handler, instead of in child init handlers.
@@ -95,7 +95,7 @@
  * Petasis 10 Aug 2017: This causes the symbol to be exported also from MPMs...
 
    module AP_MODULE_DECLARE_DATA rivet_module;
- 
+
 */
 
 typedef struct _rivet_server_conf {
@@ -195,7 +195,7 @@ typedef struct _mpm_bridge_table {
 typedef struct mpm_bridge_status mpm_bridge_status;
 
 typedef struct _mod_rivet_globals {
-    apr_pool_t*         pool;               
+    apr_pool_t*         pool;
     char*               rivet_mpm_bridge;       /* name of the MPM bridge                   */
     server_rec*         server;                 /* default host server_rec obj              */
     int                 ap_child_shutdown;      /* shutdown inited by the child pool cleanup */
@@ -216,7 +216,7 @@ typedef struct _mod_rivet_globals {
     int                 single_thread_exit;     /* With a threaded bridge allow a single    */
                                                 /* thread to exit instead of forcing the    */
                                                 /* whole process to terminate               */
-    int                 separate_virtual_interps; 
+    int                 separate_virtual_interps;
                                                 /* Virtual host have their own interpreter  */
     int                 separate_channels;      /* when true a vhosts get their private channel */
 #ifdef RIVET_SERIALIZE_HTTP_REQUESTS
@@ -299,17 +299,17 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 /* Configuration defaults */
 
-#define SINGLE_THREAD_EXIT_UNDEF   -1    /* pre config undefined value for single 
+#define SINGLE_THREAD_EXIT_UNDEF   -1    /* pre config undefined value for single
                                             thread exit flag in the module globals
                                             structure */
 
 #define TCL_MAX_CHANNEL_BUFFER_SIZE (1024*1024)
 #define MODNAME                     "mod_rivet"
 
-/* 
- * RIVET_CONF_SELECT: 
+/*
+ * RIVET_CONF_SELECT:
  *
- * This macro avoids unnecessary verbosity of repetitive code in functions 
+ * This macro avoids unnecessary verbosity of repetitive code in functions
  * overlaying and merging configuration records
  */
 
