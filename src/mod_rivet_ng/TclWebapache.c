@@ -207,7 +207,7 @@ TclWeb_PrintHeaders(TclWebRequest *req)
 
 /* Print nice HTML formatted errors */
 int
-TclWeb_PrintError(CONST84 char *errstr, int htmlflag, TclWebRequest *req)
+TclWeb_PrintError(CONST86 char *errstr, int htmlflag, TclWebRequest *req)
 {
     TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
     TclWeb_PrintHeaders(req);

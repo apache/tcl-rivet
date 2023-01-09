@@ -887,7 +887,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
     apr_table_t *table = NULL;
     int subcommandindex;
 
-    static CONST84 char *SubCommand[] = {
+    static CONST86 char *SubCommand[] = {
         "get",
         "set",
         "exists",
@@ -908,7 +908,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
         SUB_CLEAR
     };
 
-    static CONST84 char *tableNames[] = {
+    static CONST86 char *tableNames[] = {
         "notes",
         "headers_in",
         "headers_out",
@@ -1133,7 +1133,7 @@ TCL_CMD_HEADER( Rivet_Upload )
      * of an upload
      */
 
-    static CONST84 char *SubCommand[] = {
+    static CONST86 char *SubCommand[] = {
         "channel",
         "save",
         "data",
@@ -1158,7 +1158,7 @@ TCL_CMD_HEADER( Rivet_Upload )
         NAMES
     };
 
-    static CONST84 int cmds_objc[] = { 3,4,3,3,3,3,3,3,2 };
+    static CONST86 int cmds_objc[] = { 3,4,3,3,3,3,3,3,2 };
     int expected_objc;
 
     rivet_thread_private* private;
@@ -1778,7 +1778,7 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
     int loglevelindex;
     int  apLogLevel = 0;
 
-    static CONST84 char *logLevel[] = {
+    static CONST86 char *logLevel[] = {
         "emerg",
         "alert",
         "crit",

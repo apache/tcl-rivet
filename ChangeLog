@@ -1,3 +1,7 @@
+2023-01-09 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/TclWebaapache.c: replaced CONST84 with CONST86 which is supported by Tcl 8.7
+	* src/mod_rivet_ng/rivet[Channel|Core].c: 
+
 2022-11-29 Massimo Manghi <mxmanghi@apache.org>
 	* src/: thoroughly removed trailing spaces from C code
 
