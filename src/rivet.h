@@ -45,7 +45,7 @@ typedef int rivet_req_ctype;
 
 #define RIVET_PRIVATE_DATA(thread_key,private_p) \
         ap_assert (apr_threadkey_private_get ((void **)&private_p,thread_key) == APR_SUCCESS);
-    
+
 #define RIVET_PRIVATE_DATA_NOT_NULL(thread_key,private_p) \
         RIVET_PRIVATE_DATA(thread_key,private_p) \
         ap_assert (private_p != NULL);
@@ -67,12 +67,12 @@ Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
 		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */)
 
  /* RIVET_OBJ_CMD creates a command in the RIVET_NS namespace. Commands
-  * are exported from the RIVET_NS (::rivet) namespace in the init.tcl 
+  * are exported from the RIVET_NS (::rivet) namespace in the init.tcl
   * script accordingly to configuration switches passed to ./configure
   * (see configure.ac)
   */
 
- /* We now pass the thread private data to the 
+ /* We now pass the thread private data to the
   * Tcl command's ClientData
   */
 
@@ -81,16 +81,16 @@ Tcl_CreateObjCommand( interp,           /* Tcl interpreter */\
 		      RIVET_NS "::" name,       /* Function name in Tcl */\
 		      func,                     /* C function name */\
 		      private_p,                /* Client Data */\
-		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */); 
+		      (Tcl_CmdDeleteProc *)NULL /* Tcl Delete Prov */);
 
 
 #define RIVET_EXPORT_CMD(interp,ns,cmdname) Tcl_Export(interp,ns,cmdname,0);
 
-/* 
+/*
  * Pointer in r is checked and in case Rivet_NoRequestRec is
  * called returning TCL_ERROR. This macro is used (and often
  * is the first code like) in commands that must ascertain
- * the request_rec object pointer in globals is valid 
+ * the request_rec object pointer in globals is valid
  * (when a request processing ends it's set to NULL)
  */
 

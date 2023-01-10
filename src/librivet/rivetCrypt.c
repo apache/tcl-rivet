@@ -184,7 +184,7 @@ Rivet_InitCrypt( Tcl_Interp *interp)
 
         RIVET_EXPORT_CMD(interp,rivet_ns,"encrypt");
         RIVET_EXPORT_CMD(interp,rivet_ns,"decrypt");
-        RIVET_EXPORT_CMD(interp,rivet_ns,"crypt");        
+        RIVET_EXPORT_CMD(interp,rivet_ns,"crypt");
     }
 #endif
     return TCL_OK;

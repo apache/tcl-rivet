@@ -65,7 +65,7 @@ extern mod_rivet_globals* module_globals;
 if (source == VAR_SRC_QUERYSTRING) { j = nargs; } \
 else if (source == VAR_SRC_POST) { i = nargs; }
 
-/* 
+/*
  * -- TclWeb_NewRequestObject
  *
  *
@@ -98,7 +98,7 @@ TclWeb_NewRequestObject (apr_pool_t *p)
  *  TclWebRequest* req:     a pointer to a TclWebRequest object to be intialized
  *  Tcl_Interp*    interp:  current Tcl_Interp object serving the request
  *  void*          arg:     generic pointer. Current implementation passes the
- *                          request_rec object pointer 
+ *                          request_rec object pointer
  *
  */
 
@@ -126,11 +126,11 @@ TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp)
 
     if (((private->ctype==RIVET_TEMPLATE) && (content_type_len > strlen(RIVET_TEMPLATE_CTYPE))) || \
         ((private->ctype==RIVET_TCLFILE) && (content_type_len > strlen(RIVET_TCLFILE_CTYPE)))) {
-        
+
         char* charset;
 
         /* we parse the content type: we are after a 'charset' parameter definition */
-        
+
         charset = strstr(r->content_type,"charset");
         if (charset != NULL) {
             charset = apr_pstrdup(r->pool,charset);
@@ -149,7 +149,7 @@ INLINE int
 TclWeb_SendHeaders(TclWebRequest *req)
 {
     //TODO: fix ap_send_http_header
-    
+
     ap_send_http_header(req->req);
 
     return TCL_OK;
@@ -167,7 +167,7 @@ TclWeb_StopSending(TclWebRequest *req)
 int
 TclWeb_SetHeaderType(char *header, TclWebRequest *req)
 {
-    
+
     if (req->headers_set)
         return TCL_ERROR;
 
@@ -193,12 +193,12 @@ TclWeb_PrintHeaders(TclWebRequest *req)
     {
         TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
     }
-    
+
     /*
      * seems that ap_send_http_header is redefined to ; in Apache2.2
      * ap_send_http_header(req->req);
      */
-    
+
     TclWeb_SendHeaders(req);
 
     req->headers_printed = 1;
@@ -207,7 +207,7 @@ TclWeb_PrintHeaders(TclWebRequest *req)
 
 /* Print nice HTML formatted errors */
 int
-TclWeb_PrintError(CONST84 char *errstr, int htmlflag, TclWebRequest *req)
+TclWeb_PrintError(CONST86 char *errstr, int htmlflag, TclWebRequest *req)
 {
     TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
     TclWeb_PrintHeaders(req);
@@ -245,11 +245,11 @@ TclWeb_HeaderSet(char *header, char *val, TclWebRequest *req)
  *    headers
  *  - it returns nothing since it's a wrapper around an APR call
  *    that doesn't return anything
- * 
- *  -- TclWeb_OutputHeaderGet: reads from the output headers and 
+ *
+ *  -- TclWeb_OutputHeaderGet: reads from the output headers and
  *  returns the value associated to a key. If the key is not
  *  existing it returns NULL
- *  
+ *
  */
 
 INLINE void
@@ -281,8 +281,7 @@ TclWeb_SetStatus(int status, TclWebRequest *req)
 INLINE int
 TclWeb_MakeURL(Tcl_Obj *result, char *filename, TclWebRequest *req)
 {
-    Tcl_SetStringObj(result,
-                ap_construct_url(req->req->pool,filename,req->req),-1);
+    Tcl_SetStringObj(result,ap_construct_url(req->req->pool,filename,req->req),-1);
     return TCL_OK;
 }
 
@@ -329,7 +328,16 @@ TclWeb_GetVar(Tcl_Obj *result, char *varname, int source, TclWebRequest *req)
         i++;
     }
 
-    if (result->length == 0) { return TCL_ERROR; }
+    /*
+     * We are assuming that checking result->length is a sane way to
+     * establish the Tcl object representation character lenght but it
+     * would obviously be more appropriate to call Tcl_GetCharLength(result)
+     */
+
+    if (result->length == 0) {
+        Tcl_AddErrorInfo(req->interp,apr_psprintf(req->req->pool,"Variable '%s' not found",varname));
+        return TCL_ERROR;
+    }
 
     return TCL_OK;
 }
@@ -346,70 +354,63 @@ TclWeb_GetVarAsList(Tcl_Obj *result, char *varname, int source, TclWebRequest *r
     /* This isn't real efficient - move to hash table later on. */
     while (i < j)
     {
+        int tclcode;
 
         if (!strncmp(varname, TclWeb_StringToUtf(parms[i].key, req),
                  strlen(varname) < strlen(parms[i].key) ?
                  strlen(parms[i].key) : strlen(varname)))
         {
-            Tcl_ListObjAppendElement(req->interp, result,
-                         TclWeb_StringToUtfToObj(parms[i].val, req));
+            tclcode = Tcl_ListObjAppendElement(req->interp,result,
+                                               TclWeb_StringToUtfToObj(parms[i].val, req));
+            if (tclcode != TCL_OK) { return tclcode; }
         }
         i++;
     }
 
-    if (result == NULL)
-    {
-        return TCL_ERROR;
-    }
     return TCL_OK;
 }
 
 int
 TclWeb_GetAllVars(Tcl_Obj *result, int source, TclWebRequest *req)
 {
-    int i, j;
-    apr_array_header_t *parmsarray = (apr_array_header_t *)
-        apr_table_elts(req->apachereq->parms);
+    int i,j;
+    apr_array_header_t *parmsarray = (apr_array_header_t *) apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
     PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     while (i < j)
     {
-        Tcl_ListObjAppendElement(req->interp,result,
-                     TclWeb_StringToUtfToObj(parms[i].key,req));
-        Tcl_ListObjAppendElement(req->interp,result,
-                     TclWeb_StringToUtfToObj(parms[i].val,req));
+        int tclcode;
+        tclcode = Tcl_ListObjAppendElement(req->interp,result,
+                       TclWeb_StringToUtfToObj(parms[i].key,req));
+        if (tclcode != TCL_OK) { return tclcode; }
+        tclcode = Tcl_ListObjAppendElement(req->interp,result,
+                       TclWeb_StringToUtfToObj(parms[i].val,req));
+        if (tclcode != TCL_OK) { return tclcode; }
+
         i++;
     }
 
-    if (result == NULL)
-    {
-	    return TCL_ERROR;
-    }
     return TCL_OK;
 }
 
 int
 TclWeb_GetVarNames(Tcl_Obj *result, int source, TclWebRequest *req)
 {
-    int i, j;
-    apr_array_header_t *parmsarray = (apr_array_header_t *)
-        apr_table_elts(req->apachereq->parms);
+    int i,j;
+    apr_array_header_t *parmsarray = (apr_array_header_t *) apr_table_elts(req->apachereq->parms);
     apr_table_entry_t *parms = (apr_table_entry_t *)parmsarray->elts;
 
     PARMSARRAY_COORDINATES(i,j,parmsarray,req->apachereq->nargs)
 
     while (i < j)
     {
-        Tcl_ListObjAppendElement(req->interp, result,
-                     TclWeb_StringToUtfToObj(parms[i].key, req));
+        int tclcode;
+        tclcode= Tcl_ListObjAppendElement(req->interp, result,
+                                          TclWeb_StringToUtfToObj(parms[i].key, req));
+        if (tclcode != TCL_OK) { return tclcode; }
         i++;
-    }
-
-    if (result == NULL)
-    {
-        return TCL_ERROR;
     }
 
     return TCL_OK;
@@ -460,12 +461,12 @@ TclWeb_VarNumber(Tcl_Obj *result, int source, TclWebRequest *req)
 
 /* Environment variables. Include variables handling */
 
-/* These 2 array must be aligned and a one-to-one correspondence preserved 
+/* These 2 array must be aligned and a one-to-one correspondence preserved
  * The enum include_vars_idx *must* be terminated by 'invalid_env_var'
- * Adding a new env variable requires 
+ * Adding a new env variable requires
  *    + the name of the variable be listed in include_env_vars
- *    + a new value in the enumerator include_vars_idx must be added in the 
- *      position corresponding of the variable names array
+ *    + a new value in the enumerator include_vars_idx must be added in the
+ *      corresponding position
  *    + the switch construct in function TclWeb_SelectEnvIncludeVar must
  *      be expanded to handle the new case identified by the new enumerator value
  */
@@ -482,11 +483,11 @@ enum include_vars_idx {
     invalid_env_var
 };
 
-/*  -- TclWeb_SelectEnvIncludeVar 
+/*  -- TclWeb_SelectEnvIncludeVar
  *
  *  Depending on the value idx of the enumerator a method is selected
  *  to return a string of a specific environment variable methods
- *  Adding new environment variables need new cases of the switch 
+ *  Adding new environment variables need new cases of the switch
  *  construct to be added, provided the data can be obtained from
  *  the rivet_thread_private structure
  *
@@ -500,7 +501,7 @@ enum include_vars_idx {
  *      A character string pointer to the value of the environment variable or
  *      NULL if the enumerator value idx was invalid or resolving the environment
  *      variable was impossible
- * 
+ *
  */
 
 static char*
@@ -508,12 +509,12 @@ TclWeb_SelectEnvIncludeVar (rivet_thread_private* private,int idx)
 {
     switch (idx)
     {
-        case date_local: 
+        case date_local:
         {
             apr_pool_t* pool = private->req->req->pool;
             apr_time_t date = private->req->req->request_time;
 
-            return ap_ht_time(pool,date,DEFAULT_TIME_FORMAT,0); 
+            return ap_ht_time(pool,date,DEFAULT_TIME_FORMAT,0);
         }
         case date_gmt:
         {
@@ -591,13 +592,13 @@ TclWeb_SelectEnvIncludeVar (rivet_thread_private* private,int idx)
 
 /*
  * -- TclWeb_InitEnvVars
- * 
+ *
  * Load the CGI and environment variables into the request_rec environment structure
- * Variables belong to 3 cathegories 
+ * Variables belong to 3 cathegories
  *
  *   + common variables (ap_add_common_vars)
  *   + CGI variables (ad_cgi_vars)
- *   + a miscellaneous set of variables 
+ *   + a miscellaneous set of variables
  *     listed in the array include_env_vars
  *
  * Each cathegory is controlled by flags in order to reduce the overhead of getting them
@@ -632,7 +633,7 @@ TclWeb_InitEnvVars (rivet_thread_private* private)
 
     if (!ENV_VARS_LOADED(req->environment_set))
     {
-        apr_table_t   *table;  
+        apr_table_t   *table;
         int            idx;
 
         table = req->req->subprocess_env;
@@ -655,7 +656,7 @@ TclWeb_InitEnvVars (rivet_thread_private* private)
  *    a character string pointer to the environment variable value or
  *    NULL if the environment variable name in invalid or the variable
  *    could not be resolved
- *      
+ *
  */
 
 static char*
@@ -708,7 +709,7 @@ TclWeb_GetEnvVars(Tcl_Obj *envvar,rivet_thread_private* private)
          * Default behavior (creation in the ::request namespace)
          * is now more consistently constrained by fully qualifying
          * the default array names (see rivetCore.c). This should fix
-         * Bug #48963 
+         * Bug #48963
          */
 
         Tcl_ObjSetVar2(req->interp, envvar, key, val, 0);
@@ -836,7 +837,7 @@ int TclWeb_UploadChannel(char *varname, TclWebRequest *req)
         result = Tcl_NewObj();
         Tcl_SetStringObj(result, Tcl_GetChannelName(chan), -1);
         Tcl_SetObjResult(req->interp, result);
-        
+
         return TCL_OK;
     }
 }
@@ -861,7 +862,7 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req)
 	    return TCL_OK;
 	} else {
 
-        /* apr_strerror docs don't require a specific buffer size, we're just guessing it */
+        /* apr_strerror docs don't tell anything about a demanded buffer size, we're just adopting a reasonable guess */
 
         char  error_msg[1024];
         char* tcl_error_msg;
@@ -881,20 +882,20 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
     Tcl_Obj* result;
     rivet_server_conf *rsc = NULL;
 
-    rsc  = RIVET_SERVER_CONF( req->req->server->module_config );
+    rsc = RIVET_SERVER_CONF( req->req->server->module_config );
     /* This sucks - we should use the hook, but I want to
        get everything fixed and working first */
     if (rsc->upload_files_to_var)
     {
         Tcl_Channel chan;
-        
+
         chan = Tcl_OpenFileChannel (req->interp, req->upload->tempname, "r", 0);
         if (chan == NULL) {
             char* tcl_error_msg;
             int error_number = Tcl_GetErrno();
 
             Tcl_AddErrorInfo(req->interp,"Error opening channel to uploaded data");
-            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s",
                                                         Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
             Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
@@ -903,7 +904,7 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
             char* tcl_error_msg;
             int error_number = Tcl_GetErrno();
 
-            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s",
                                                         Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
             Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
@@ -912,7 +913,7 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
             char* tcl_error_msg;
             int error_number = Tcl_GetErrno();
 
-            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s", 
+            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s",
                                                         Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
             Tcl_AddErrorInfo(req->interp,tcl_error_msg);
             return TCL_ERROR;
@@ -924,14 +925,14 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
         if (Tcl_Close(req->interp, chan) == TCL_ERROR) {
             return TCL_ERROR;
         }
-        
+
         Tcl_SetObjResult(req->interp, result);
     } else {
         Tcl_AppendResult(req->interp,
                  "RivetServerConf UploadFilesToVar is not set", NULL);
         return TCL_ERROR;
     }
-    
+
     return TCL_OK;
 }
 

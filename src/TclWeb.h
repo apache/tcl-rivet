@@ -29,11 +29,6 @@
  * 	Common API layer.
  */
 
-/* Tcl 8.4 migration. */
-#ifndef CONST84
-#   define CONST84
-#endif
-
 /* Error wrappers  */
 #define ER1 "<hr><p><code><pre>\n"
 #define ER2 "</pre></code><hr>\n"
@@ -76,7 +71,7 @@ int TclWeb_SetHeaderType(char *header, TclWebRequest *req);
 
 int TclWeb_PrintHeaders(TclWebRequest *req);
 
-int TclWeb_PrintError(CONST84 char *errstr, int htmlflag, TclWebRequest *req);
+int TclWeb_PrintError(CONST86 char *errstr, int htmlflag, TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------
@@ -185,7 +180,7 @@ int TclWeb_UploadSave(char *varname, Tcl_Obj *filename, TclWebRequest *req);
  * TclWeb_UploadData --
  *
  * Returns the uploaded data to the Tcl script level.
- * 
+ *
  * If the config parameter upload_files_to_var is not set the procedure
  * returs an error
  *

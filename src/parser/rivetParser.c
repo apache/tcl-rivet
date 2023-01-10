@@ -87,9 +87,9 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
 #if RIVET_CORE == mod_rivet_ng
 /*
  *-----------------------------------------------------------------------------
- * Rivet_GetRivetFileNG -- 
+ * Rivet_GetRivetFileNG --
  *
- * The mod_rivet_ng core doesn't assume the parsed script to be 
+ * The mod_rivet_ng core doesn't assume the parsed script to be
  * enclosed in the ::request namespace. The whole ::request lifecycle is
  * devolved to the Rivet::request_handling procedure
  *
@@ -104,7 +104,7 @@ Rivet_GetRivetFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
     Tcl_Channel rivetfile;
 
     /*
-     * we call Tcl to read this file but the caveat exposed in 
+     * we call Tcl to read this file but the caveat exposed in
      * in Rivet_GetRivetFile still holds true (TODO)
      */
 

@@ -639,7 +639,7 @@ AC_DEFUN([HONOR_HEAD_REQUESTS],[
     head_requests,
     [  --enable-head-requests Returns real headers in response to a HEAD request],
     [ honor_head_requests=$enable_head_requests ],
-    [ honor_head_requests="no"]
+    [ honor_head_requests="yes"]
     )
 
     AC_MSG_CHECKING([if Rivet has to honor HEAD requests])

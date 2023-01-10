@@ -40,7 +40,7 @@
  *  pointer is stored in the interpreter's associated data (pointing to a
  *  rivet_interp_globals structure) if the interpreter is passed by mod_rivet.
  *  Otherwise a new ::rivet namespace is created and its Tcl_Namespace
- *  pointer is returned 
+ *  pointer is returned
  *
  * Parameters:
  *
@@ -55,13 +55,13 @@
 
 #if RIVET_NAMESPACE_EXPORT == 1
 
-Tcl_Namespace* 
+Tcl_Namespace*
 Rivet_GetNamespace( Tcl_Interp* interp)
 {
     Tcl_Namespace *rivet_ns;
 
     rivet_ns = Tcl_FindNamespace(interp,RIVET_NS,NULL,TCL_GLOBAL_ONLY);
-    if (rivet_ns == NULL) 
+    if (rivet_ns == NULL)
     {
         rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                         (Tcl_NamespaceDeleteProc *)NULL);
@@ -88,10 +88,10 @@ Rivetlib_Init( Tcl_Interp *interp )
 {
 
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) {
 #else
-	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
-#endif    
+	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) {
+#endif
 	    return TCL_ERROR;
     }
 
@@ -120,10 +120,10 @@ Rivetlib_SafeInit( Tcl_Interp *interp )
 {
 
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) { 
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) {
 #else
-	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) { 
-#endif    
+	if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) {
+#endif
 	    return TCL_ERROR;
     }
 

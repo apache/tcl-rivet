@@ -1,4 +1,4 @@
-/* -- mod_rivet_common.h Declariations for common utility functions */ 
+/* -- mod_rivet_common.h Declariations for common utility functions */
 
 /*
     Licensed to the Apache Software Foundation (ASF) under one

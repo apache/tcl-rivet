@@ -364,7 +364,7 @@ TCL_CMD_HEADER( Rivet_EscapeShellCommandCmd )
 extern Tcl_Namespace* Rivet_GetNamespace( Tcl_Interp* interp);
 #endif
 
-int 
+int
 Rivet_InitWWW( Tcl_Interp *interp)
 {
     RIVET_OBJ_CMD ("unescape_string",Rivet_UnescapeStringCmd,NULL);

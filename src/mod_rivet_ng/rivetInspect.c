@@ -52,9 +52,9 @@ static const char* loglevel_defs[] =
 
 /* These arrays must be kept aligned. confDirectives must be NULL terminated */
 
-static const char* confDirectives[] = 
-{ 
-    "ServerInitScript", 
+static const char* confDirectives[] =
+{
+    "ServerInitScript",
     "GlobalInitScript",
     "ChildInitScript",
     "ChildExitScript",
@@ -73,7 +73,7 @@ static const char* confDirectives[] =
     "RequestHandler",
     "ExportRivetNS",
     "ImportRivetNS",
-    NULL 
+    NULL
 };
 
 enum confIndices {
@@ -91,23 +91,23 @@ enum confIndices {
     upload_files_to_var,
     separate_virtual_interps,
     separate_channels,
-    honor_header_only_requests,
+    honor_head_requests,
     mpm_bridge,
     request_handler,
     export_rivet_ns,
     import_rivet_ns,
-    conf_index_terminator 
+    conf_index_terminator
 };
 
 extern mod_rivet_globals* module_globals;
 
-/* 
+/*
  * -- Rivet_ReadConfParameter
  *
- * This procedure reads a single field named par_name from 
+ * This procedure reads a single field named par_name from
  * rivet_server_conf structure and returns a Tcl_Obj pointer
  * containing the field value. See confDirectives for a list
- * of possible names. If the procedure is queried for a non  
+ * of possible names. If the procedure is queried for a non
  * existing field a NULL is returned.
  *
  *  Arguments:
@@ -131,7 +131,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
                           Tcl_Obj*           par_name)
 {
     int         parameter_i;
-    Tcl_Obj*    int_value       = NULL;    
+    Tcl_Obj*    int_value       = NULL;
     char*       string_value    = NULL;
 
     if (Tcl_GetIndexFromObj(interp, par_name, confDirectives,
@@ -157,7 +157,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         case upload_files_to_var:       int_value = Tcl_NewIntObj(rsc->upload_files_to_var); break;
         case separate_virtual_interps:  int_value = Tcl_NewIntObj(module_globals->separate_virtual_interps); break;
         case separate_channels:         int_value = Tcl_NewIntObj(module_globals->separate_channels); break;
-        case honor_header_only_requests: int_value = Tcl_NewIntObj(rsc->honor_header_only_reqs); break;
+        case honor_head_requests:       int_value = Tcl_NewIntObj(rsc->honor_head_requests); break;
         case export_rivet_ns:           int_value = Tcl_NewIntObj(rsc->export_rivet_ns); break;
         case import_rivet_ns:           int_value = Tcl_NewIntObj(rsc->import_rivet_ns); break;
         default: return NULL;
@@ -180,7 +180,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
         /* otherwise if string_value is defined we return it as Tcl_Obj*/
 
         return Tcl_NewStringObj(string_value,-1);
-    } 
+    }
     else
     {
         /* there is no other possible case: int_value must be returned */
@@ -190,11 +190,11 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
 
 }
 
-/* 
- * Rivet_ReadConfTable: 
- * 
+/*
+ * Rivet_ReadConfTable:
+ *
  * This procedure builds a key-value list from an apr table
- * It's called by Rivet_BuildConfDictionary to read theRivet 
+ * It's called by Rivet_BuildConfDictionary to read theRivet
  * configuration tables but it can work for every apr table
  *
  * Arguments:
@@ -204,7 +204,7 @@ Rivet_ReadConfParameter ( Tcl_Interp*        interp,
  *
  */
 
-static Tcl_Obj* 
+static Tcl_Obj*
 Rivet_ReadConfTable (Tcl_Interp*   interp,
                      apr_table_t*  table)
 {
@@ -231,7 +231,7 @@ Rivet_ReadConfTable (Tcl_Interp*   interp,
 
         tcl_status = Tcl_ListObjAppendElement (interp,keyval_list,key);
         if (tcl_status == TCL_ERROR)
-        {   
+        {
             Tcl_DecrRefCount(keyval_list);
             Tcl_DecrRefCount(key);
             Tcl_DecrRefCount(val);
@@ -257,9 +257,9 @@ Rivet_ReadConfTable (Tcl_Interp*   interp,
 
 /*
  * -- Rivet_BuildConfDictionary
- * 
+ *
  * Parameters set in the configuration files are collected in three
- * APR tables by Rivet_ServerConf,Rivet_DirConf and Rivet_UserConf. 
+ * APR tables by Rivet_ServerConf,Rivet_DirConf and Rivet_UserConf.
  *
  * Arguments:
  *
@@ -270,7 +270,7 @@ Rivet_ReadConfTable (Tcl_Interp*   interp,
  * Returned value:
  *
  *  - Tcl dictionary storing the dir/user/server configuration. The
- *    dictionary refCount is incremented 
+ *    dictionary refCount is incremented
  *
  */
 
@@ -283,7 +283,7 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
     int          it;
     Tcl_Obj*     conf_dict = Tcl_NewObj();
 
-    static const char* section_names[] = 
+    static const char* section_names[] =
     {
         "dir",
         "user",
@@ -313,7 +313,7 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
             Tcl_Obj** objArrayPnt;
             int       objArrayCnt;
             Tcl_Obj*  val;
-            
+
             Tcl_IncrRefCount(keyval_list);
 
             key_list[0] = Tcl_NewStringObj(section_names[it],-1);
@@ -347,7 +347,7 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
 
 
 /*
- * Rivet_CurrentConfDict 
+ * Rivet_CurrentConfDict
  *
  * This function is called by Rivet_InspectCmd which implements command
  * '::rivet::inspect -all'. The function returns a dictionary where every
@@ -363,14 +363,14 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
  *
  * - a Tcl_Obj* pointer to a dictionary. The function is guaranteed to
  *  return a Tcl_Obj pointer
- *   
+ *
  */
 
 Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
                                  rivet_server_conf*    rivet_conf)
 {
     Tcl_Obj* dictObj = Tcl_NewObj();
-    Tcl_Obj* par_name; 
+    Tcl_Obj* par_name;
     const char** p;
 
     for (p = confDirectives; (*p) != NULL; p++)
@@ -396,19 +396,19 @@ Tcl_Obj* Rivet_CurrentConfDict ( Tcl_Interp*           interp,
 /*
  * -- Rivet_CurrentServerRec
  *
- * ::rivet::inspect provides also some basic access to 
+ * ::rivet::inspect provides also some basic access to
  * fields of the server_rec object.
  *
- * 
+ *
  */
 
-Tcl_Obj* 
+Tcl_Obj*
 Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s )
 {
-    Tcl_Obj* dictObj; 
+    Tcl_Obj* dictObj;
     Tcl_Obj* field_name;
     Tcl_Obj* field_value;
-    
+
     dictObj = Tcl_NewObj();
 
     field_value = Tcl_NewStringObj(s->server_hostname,-1);

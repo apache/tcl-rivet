@@ -88,7 +88,7 @@ int fill_buffer(multipart_buffer *self)
     /* read the required number of bytes */
     if(bytes_to_read > 0) {
 	char *buf = self->buffer + self->bytes_in_buffer;
-    
+
 	actual_read = ap_get_client_block(self->r, buf, bytes_to_read);
 
 	/* update the buffer length */
@@ -225,8 +225,8 @@ apr_table_t *multipart_buffer_headers(multipart_buffer *self)
 
 	if(value) {
 	    *value = 0;
-	    do { 
-	    	value++; 
+	    do {
+	    	value++;
 	    } while (apr_isspace(*value));
 
 #ifdef DEBUG
