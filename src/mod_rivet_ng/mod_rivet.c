@@ -324,7 +324,7 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
             Tcl_Obj*    server_init;
 
             /* either we want separate virtual interps or we haven't
-             * created an interpreter so far we create one
+             * created an interpreter so far, thus we create one
              */
 
             if ((interp_obj == NULL) || module_globals->separate_virtual_interps)
@@ -514,9 +514,9 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     //Tcl_InitNotifier();
 #endif
 
-    /* We can rely on the existence of module_globals only we are
+    /* We can rely on the existence of module_globals only when we are
      * running the prefork MPM, otherwise the pointer is NULL and
-     * the structure need to be filled
+     * the structure needs to be filled
      */
 
     if (module_globals == NULL)
@@ -533,8 +533,7 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     apr_thread_mutex_create(&module_globals->pool_mutex, APR_THREAD_MUTEX_UNNESTED, pChild);
 
     /* Once we have established a pool with the same lifetime of the child process we
-     * process all the configured server records assigning an integer as unique key
-     * to each of them
+     * process all the configured server records assigning to each record a unique integer key
      */
 
     root_server_conf = RIVET_SERVER_CONF(server->module_config);
