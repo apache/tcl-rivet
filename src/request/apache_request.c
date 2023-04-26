@@ -37,7 +37,7 @@ static void req_plustospace(char *str)
 }
 
 static int
-util_read(ApacheRequest *req, const char **rbuf)
+util_read(ApacheRequest *req, const char **rbuf, int *rlen)
 {
     request_rec *r = req->r;
     int rc = OK;
@@ -61,6 +61,7 @@ util_read(ApacheRequest *req, const char **rbuf)
         }
 
         *rbuf = apr_pcalloc(r->pool, length + 1);
+	*rlen = length;
 
         while ((len_read =
                     ap_get_client_block(r, buff, sizeof(buff))) > 0) {
@@ -215,6 +216,7 @@ ApacheRequest *ApacheRequest_new(apr_pool_t *pool)
     req->hook_data      = NULL;
     req->temp_dir       = NULL;
     req->raw_post       = NULL;
+    req->raw_length     = 0;
     req->parsed         = 0;
     req->r              = NULL;
     req->nargs          = 0;
@@ -234,6 +236,7 @@ ApacheRequest *ApacheRequest_init(ApacheRequest* req, request_rec *r)
     req->hook_data      = NULL;
     req->temp_dir       = NULL;
     req->raw_post       = NULL;
+    req->raw_length     = 0;
     req->parsed         = 0;
     req->r              = r;
     req->nargs          = 0;
@@ -432,6 +435,7 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
 
     if (r->method_number == M_POST || r->method_number == M_PUT || r->method_number == M_DELETE) {
     	const char *data = NULL;
+	int length = 0;
 
     /*
         const char *type;
@@ -443,12 +447,13 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
     	}
     */
 
-    	if ((rc = util_read(req, &data)) != OK) {
+    	if ((rc = util_read(req, &data, &length)) != OK) {
     	    return rc;
     	}
 
     	if (data) {
     	    req->raw_post = (char*) data; /* Give people a way of getting at the raw data. */
+    	    req->raw_length = length;
     	    split_to_parms(req, data);
     	}
     }
@@ -738,3 +743,9 @@ char *ApacheRequest_expires(ApacheRequest *req, char *time_str)
     return ApacheUtil_expires(req->r->pool, time_str, EXPIRES_HTTP);
 }
 
+char *ApacheRequest_get_raw_post(ApacheRequest *req, int *len)
+{
+    if (len)
+	*len = req->raw_length;
+    return req->raw_post;
+}
