@@ -1063,7 +1063,7 @@ TclWeb_GetVirtualFile(TclWebRequest *req, char *virtualname)
  */
 
 char *
-TclWeb_GetRawPost ( TclWebRequest *req )
+TclWeb_GetRawPost ( TclWebRequest *req, int *len )
 {
-    return ApacheRequest_get_raw_post(req->apachereq);
+    return ApacheRequest_get_raw_post(req->apachereq, len);
 }

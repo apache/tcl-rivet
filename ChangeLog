@@ -1,3 +1,12 @@
+2023-04-11 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/TclWebapache.c:
+	* src/mod_rivet_ng/rivetCore.c:
+	* src/mod_rivet_ng/rivet_types.h:
+	* src/request/apache_request.c:
+	* src/request/apache_request.h: handling length of data in POST requests. It
+	fixes ::rivet::raw_post when the POSTed data don't have variable sections (patch
+	provided by Scott Pitcher <scotty@svptechnicalservices.com.au>)
+
 2023-01-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/TclWeb.h: also this include file had a CONST84 specifier that needed to
 	be converted as CONST86
