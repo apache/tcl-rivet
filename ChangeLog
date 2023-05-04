@@ -1,3 +1,12 @@
+2023-05-14 Massimo Manghi <mxmanghi@apache.org>
+	* tests/rivet.test: more contributions provided by Scott Pitcher <scotty@svptechnicalservices.com.au>)
+	* tests/apachetest/apachetest.tcl: More improvements to the test script. Now
+	handling also Apache directive IncludeOptional and enabling execution control 
+	through environment variables
+	* tests/post.rvt:
+	* tests/post.test: add a test for ::rivet::raw_post
+
+	* 
 2023-04-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/TclWebapache.c:
 	* src/mod_rivet_ng/rivetCore.c:
