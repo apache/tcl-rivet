@@ -30,19 +30,23 @@ set urlbase "http://localhost:8081/"
 
 # Use this to start and stop the server:
 
-set TestList {rivetlib.test shorthand.test headers.test \
-              cookies.test get.test post.test tclfile.test \
-              env.test hello.test include.test binary.test \
-              parse.test upload.test makeurl.test commands.test}
+if {[info exists ::env(TestList)]} {
+    set TestList $::env(TestList)
+} else {
+    set TestList {rivetlib.test shorthand.test headers.test \
+		cookies.test get.test post.test tclfile.test \
+		env.test hello.test include.test binary.test \
+		parse.test upload.test makeurl.test commands.test}
+}
 
 # Test stanzas are created by giving the test a name and a
 # description. The code is then executed, and the results compared
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
-set testgroup1 1
-set testgroup2 1
-set testgroup3 1
+set testgroup1 [expr [info exists ::env(testgroup1)] ? $::env(testgroup1) : 1]
+set testgroup2 [expr [info exists ::env(testgroup2)] ? $::env(testgroup2) : 1]
+set testgroup3 [expr [info exists ::env(testgroup3)] ? $::env(testgroup3) : 1]
 
 # Run all tests against one server process.
 

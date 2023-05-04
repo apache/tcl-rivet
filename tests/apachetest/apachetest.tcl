@@ -70,6 +70,12 @@ namespace eval apachetest {
 	variable httpd_version  $::httpd_version
     # this file should be in the same directory this script is.
     variable templatefile [file join [file dirname [info script]] template.conf.2.tcl]
+
+    variable httpd_root
+    set httpd_root ""
+    variable server_config_file
+    set server_config_file ""
+
 }
 
 # apachetest::need_modules --
@@ -271,17 +277,21 @@ proc apachetest::gethttpdconf { binname } {
 #	Text of configuration files.
 
 proc apachetest::getallincludes { conffile } {
+    variable httpd_root
     if [file exists $conffile] {
-	    set fl [open $conffile r]
-	    set data [read $fl]
-	    close $fl
+	set fl [open $conffile r]
+	set data [read $fl]
+	close $fl
 
-	    set newdata {}
-	    foreach line [split $data \n] {
-		# Look for Include lines.
-            if { [regexp -line {^[^\#]*Include +(.*)} $line match file] } {
+	set newdata {}
+	foreach line [split $data \n] {
+	    # Look for Include lines.
+            if { [regexp -line {^[^\#]*Include(?:|Optional) +(.*)} $line match file]} {
                 puts "including files from $file"
                 set file [string trim $file]
+                if {[string index $file 0] != "/"} {
+		    set file [file join $httpd_root $file]
+                }
 
                 # Include directives accept as argument a file, a directory
                 # or a glob-style file matching pattern. Patterns usually match
@@ -338,11 +348,15 @@ proc apachetest::getallincludes { conffile } {
 
 
 proc apachetest::getloadmodules { conffile needtoget } {
+    variable httpd_root
     puts "checking $conffile "
     set confdata [getallincludes $conffile]
     set loadline [list]
     regexp -line {^[^#]*(ServerRoot[\s]?[\"]?)([^\"]+)()([\"]?)} $confdata \
-    match sub1 server_root_path sub2 
+	match sub1 server_root_path sub2
+    if {![info exists server_root_path]} {
+	set server_root_path $httpd_root
+    }
     foreach mod $needtoget {
 
     	# Look for LoadModule lines.
@@ -371,9 +385,14 @@ proc apachetest::getloadmodules { conffile needtoget } {
 # Compare what's compiled in with what we need.
 
 proc apachetest::determinemodules { binname } {
+    variable server_config_file
+    variable httpd_root
     variable module_assoc
+
     set compiledin [lsort [getcompiledin $binname]]
     set conffile [gethttpdconf $binname]
+    set server_config_file $conffile
+    set httpd_root [file dirname $conffile]
 
     foreach {n k} [array get module_assoc] {
         lappend needed $k

@@ -1,5 +1,5 @@
 <?
-
+::rivet::load_env env
 if { [ ::rivet::var number ] > 0 } {
     # get/post variables 1.1
     if { [ ::rivet::var exists foobar ] } {
@@ -16,6 +16,9 @@ if { [ ::rivet::var number ] > 0 } {
     if { [::rivet::var exists lstvar2] } {
         puts "\[::rivet::var list lstvar2\] = [::rivet::var list lstvar2]\n"
     }
-}
 
+} elseif {[string match "POST" $env(REQUEST_METHOD)]} {
+    # Return the raw body encoded as ascii
+    puts -nonewline "\[::rivet::raw_post\] = [binary encode hex [::rivet::raw_post]]"
+}
 ?>
