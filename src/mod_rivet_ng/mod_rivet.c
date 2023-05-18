@@ -289,15 +289,19 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
     {
         char* parent_pid_var = NULL;
 
+        /* if the environment variable AP_PARENT_PID is set
+         * we know we are in a child process of the winnt MPM
+         */
+        
         apr_env_get(&parent_pid_var,"AP_PARENT_PID",pTemp);
         if (parent_pid_var != NULL)
         {
-            ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server,
-                        "AP_PARENT_PID found: not running the Tcl server script in winnt MPM child process");
+            ap_log_perror(APLOG_MARK,APLOG_INFO,0,pPool,
+                    "AP_PARENT_PID found: not running the Tcl server script in winnt MPM child process");
             return OK;
         } else {
-            ap_log_error(APLOG_MARK,APLOG_DEBUG,0,server,
-                        "AP_PARENT_PID undefined, we proceed with server initialization");
+            ap_log_perror(APLOG_MARK,APLOG_INFO,0,pPool,
+                     "AP_PARENT_PID undefined, we proceed with server initialization");
         }
     }
 

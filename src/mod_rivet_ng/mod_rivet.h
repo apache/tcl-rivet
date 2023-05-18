@@ -253,6 +253,7 @@ typedef struct _thread_worker_private {
 
 typedef struct _rivet_interp_globals {
     Tcl_Namespace*      rivet_ns;           /* Rivet commands namespace             */
+    server_rec*         server;             /* Virtual host server rec              */
 } rivet_interp_globals;
 
 rivet_server_conf *Rivet_GetConf(request_rec *r);

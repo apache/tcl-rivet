@@ -1770,7 +1770,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_LogErrorCmd )
+TCL_CMD_HEADER(Rivet_LogErrorCmd)
 {
     char *message = NULL;
 
@@ -1855,9 +1855,17 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
     /* if we are serving a page, we know our server,
      * else send null for server
      */
-    serverRec = ((private == NULL) || (private->r == NULL)) ? module_globals->server : private->r->server;
 
-    ap_log_error (APLOG_MARK, apLogLevel, 0, serverRec, "%s", message);
+    if ((private == NULL) || (private->r == NULL))
+    {
+        rivet_interp_globals* globals = Tcl_GetAssocData(interp, "rivet", NULL);
+        serverRec = globals->server;
+    }
+    else
+    {
+        serverRec = private->r->server;
+    }
+    ap_log_error (APLOG_MARK,apLogLevel,0,serverRec,"%s",message);
     return TCL_OK;
 }
 

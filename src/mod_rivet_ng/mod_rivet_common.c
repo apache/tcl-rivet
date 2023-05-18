@@ -250,7 +250,7 @@ void Rivet_ReleasePerDirScripts(rivet_thread_interp* rivet_interp)
  *
  * Rivet_PerInterpInit --
  *
- *  Do the initialization that needs to happen to every interpreter.
+ *  Do the interpreter environment creation and initialization.
  *
  * Results:
  *  None.
@@ -283,11 +283,11 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
     //Tcl_SetAssocData (interp,"rivet",NULL,globals);
 
     /*
-     * the ::rivet namespace is the only information still stored
-     * in the interpreter global data
+     * we store in the globals some information relevant to
+     * the embedded interpreter work
      */
 
-    /* Rivet commands namespace is created */
+    /* the ::rivet namespace is created */
 
     interp_obj->rivet_ns =
         Tcl_CreateNamespace (interp,RIVET_NS,private,(Tcl_NamespaceDeleteProc *)NULL);
