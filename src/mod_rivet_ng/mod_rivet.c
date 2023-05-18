@@ -238,7 +238,7 @@ static int
 Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
 #ifdef WIN32
-	char*	parent_pid_var = NULL;
+	char* parent_pid_var = NULL;
 #endif
 
     FILEDEBUGINFO;
@@ -262,8 +262,8 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 	 * (https://wiki.apache.org/httpd/ModuleLife)
 	 */
 	
-	#ifdef WIN32
-	
+#ifdef WIN32
+
 	/* if the environment variable AP_PARENT_PID is set
      * we know we are in a child process of the winnt MPM
      */
@@ -278,8 +278,8 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 		ap_log_perror(APLOG_MARK,APLOG_INFO,0,pPool,
 				 "AP_PARENT_PID undefined, we proceed with server initialization");
 	}
-	
-	#endif
+
+#endif
 	
     /* We don't create the cache here: it would make sense for prefork MPM
      * but threaded MPM bridges have their pool of threads. Each of them
@@ -449,9 +449,9 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     Tcl_InitNotifier();
 #endif
 
-    /* We can rely on the existence of module_globals only we are
+    /* We can rely on the existence of module_globals only when
      * running the prefork MPM, otherwise the pointer is NULL and
-     * the structure has to be filled with data
+     * the structure has to be allocated and filled with data
      */
 
     if (module_globals == NULL)

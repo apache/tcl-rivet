@@ -1766,7 +1766,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_LogErrorCmd )
+TCL_CMD_HEADER(Rivet_LogErrorCmd)
 {
     char *message = NULL;
 
@@ -1853,9 +1853,16 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
      * root server name stored in the module_globals
      */
 
-    serverRec = ((private == NULL) || (private->r == NULL)) ? module_globals->server : private->r->server;
-
-    ap_log_error (APLOG_MARK, apLogLevel, 0, serverRec, "%s", message);
+    if ((private == NULL) || (private->r == NULL))
+    {
+        rivet_interp_globals* globals = Tcl_GetAssocData(interp, "rivet", NULL);
+        serverRec = globals->server;
+    }
+    else
+    {
+        serverRec = private->r->server;
+    }
+    ap_log_error (APLOG_MARK,apLogLevel,0,serverRec,"%s",message);
     return TCL_OK;
 }
 
@@ -2159,7 +2166,7 @@ TCL_CMD_HEADER( Rivet_CacheContent )
 DLLEXPORT int
 Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 {
-    rivet_server_conf*      server_conf;
+    rivet_server_conf* server_conf;
 
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,private);
     RIVET_OBJ_CMD ("headers",Rivet_Headers,private);
