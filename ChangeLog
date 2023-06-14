@@ -5,7 +5,16 @@
 	* rivet/rivet-tcl/parray.tcl: ::rivet::parray now accepting alternative way to
 	return output.
 
-2023-05-14 Massimo Manghi <mxmanghi@apache.org>
+2023-05-18 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c:
+	* src/mod_rivet_ng/mod_rivet.h:
+	* src/mod_rivet_ng/mod_rivet_common.c:
+	* src/mod_rivet_ng/rivetCore.c:
+	* src/mod_rivet_ng/worker_prefork_common.c: now storing the server record in the intepreter globals
+	to be used by Rivet_LogErrorCmd instead of module_globals->server when threads private data are
+	not available (like when ChildInitScript is executed)
+
+2023-05-04 Massimo Manghi <mxmanghi@apache.org>
 	* tests/rivet.test: more contributions provided by Scott Pitcher <scotty@svptechnicalservices.com.au>)
 	* tests/apachetest/apachetest.tcl: More improvements to the test script. Now
 	handling also Apache directive IncludeOptional and enabling execution control 
@@ -13,7 +22,6 @@
 	* tests/post.rvt:
 	* tests/post.test: add a test for ::rivet::raw_post
 
-	* 
 2023-04-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/TclWebapache.c:
 	* src/mod_rivet_ng/rivetCore.c:
@@ -268,8 +276,7 @@
 	into their correct macro definitions
 
 2019-01-14 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/rivetCore.c: add experimental ::rivet::thread_id
-   command
+	* src/mod_rivet_ng/rivetCore.c: add experimental ::rivet::thread_id command
 
 2019-01-05 Massimo Manghi <mxmanghi@apache.org>
 	* doc/: merging from 3.1 fixes to various broken docbook elements
