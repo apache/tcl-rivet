@@ -235,8 +235,8 @@ proc ::Rivet::tcl_commands_export_list {tclpath} {
         variable auto_index
         array set auto_index {}
 
-        # the auto_index in ${tclpath}/tclIndex is loaded
-        # this array is used to fetch a list of Rivet commands
+        # The auto_index in ${tclpath}/tclIndex is loaded.
+        # This array is used to fetch a list of Rivet commands
         # implemented in Rivet
 
         set dir $tclpath

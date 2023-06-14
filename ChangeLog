@@ -1,3 +1,10 @@
+2023-06-14 Massimo Manghi <mxmanghi@apache.org>
+	* tests/channel.test: indenting code for improved readability
+	* src/mod_rivet_ng/mod_rivet.c,mod_rivet_generator.c: Removed unused code that
+	ha been commented out long ago
+	* rivet/rivet-tcl/parray.tcl: ::rivet::parray now accepting alternative way to
+	return output.
+
 2023-05-14 Massimo Manghi <mxmanghi@apache.org>
 	* tests/rivet.test: more contributions provided by Scott Pitcher <scotty@svptechnicalservices.com.au>)
 	* tests/apachetest/apachetest.tcl: More improvements to the test script. Now
