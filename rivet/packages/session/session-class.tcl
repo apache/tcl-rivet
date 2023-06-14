@@ -346,20 +346,17 @@ package require Itcl
     }
 
     #
-    # stash -
+    # stash - given a packagename and a key-value dictionary of data
+    # the procedure calls method store to data into the cache table using
+    # the dictionary keys as column _key value
     #
     #
 
     method stash {packageName keyvalue_d} {
-
         dict for {key value} $keyvalue_d {
-
             $this store $packageName $key $value
-
         }
-
     }
-
 
     #
     # load - given a package names returns a dictionary storing the key - value pairs for this session

@@ -389,6 +389,9 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
  * Post config hook. The server initialization loads the MPM bridge
  * and runs the Tcl server initialization script
  *
+ * The module globals structure is allocated and initialized by
+ * the pre-config hook procedure (Rivet_InitGlobals)
+ *
  */
 
 static int
@@ -421,13 +424,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         return OK; /* This would be the first time through */
 	}
 	
-    /* Everything revolves around this structure: module_globals */
-
-    /* the module global structure is allocated and the MPM bridge name established */
-
-    // module_globals = Rivet_CreateModuleGlobals (pPool,server);
-
-    /* We can proceed initializing the globals with information stored in the module configuration */
+    /* We determine the Rivet Bridge and we store its pointer in the module globals */
 
     module_globals->rivet_mpm_bridge = Rivet_SeekMPMBridge(pPool);
     module_globals->server           = server;
