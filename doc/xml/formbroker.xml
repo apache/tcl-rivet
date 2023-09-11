@@ -313,6 +313,51 @@ a(var4) = 0</programlisting>
             </variablelist>
         </refsect1>
         <refsect1>
+        		<title>Validator Error codes</title>
+        		<para>
+        			Variable type validators returned specific code
+        			<itemizedlist>
+        				<listitem><emphasis>string</emphasis>:
+        					<itemizedlist>
+        						<listitem><emphasis>FB_EMPTY_STRING</emphasis> if
+        						the variable descriptor has the 'nonempty' flag set and the
+        						trimmed string is empty</listitem>
+        						<listitem><emphasis>FB_STRING_TOO_LONG</emphasis> if the string
+        						length exceeds the max string length set with the maxlength option.
+        						This error is not returned if maxlength was not set</listitem>
+        					</itemizedlist>
+        				</listitem>
+        				<listitem><emphasis>integer</emphasis>:
+        					<itemizedlist>
+        						<listitem><emphasis>FB_OUT_OF_BOUNDS</emphasis> if
+        						bounds were assigned to the variable but it's value lies outside of them.
+        						This error is not returned if bounds were not set or the
+        						variable was defined with the flag <emphasis>constrain</emphasis>
+        						which forces its value to be the closest boundary value</listitem>
+        					</itemizedlist>
+        				</listitem>
+        				<listitem>
+        					<emphasis>unsigned</emphasis>:
+       					<itemizedlist>
+        						<listitem><emphasis>FB_OUT_OF_BOUNDS</emphasis> the variable
+        						value is either negative or outside the bounds assigned to the
+        						variable descriptor. The error is not returned if the
+        						variable was defined with the flag <emphasis>constrain</emphasis>
+        						which forces its value to be the closest boundary value</listitem>
+        						or set to zero if the value was negative
+        					</itemizedlist>
+						</listitem>	
+        				<listitem>
+        					<emphasis>email</emphasis>:
+       					<itemizedlist>
+        						<listitem><emphasis>FB_INVALID_EMAIL</emphasis> the variable is
+        						an invalid email address representation</listitem>
+        					</itemizedlist>
+						</listitem>	
+        			</itemizedlist>
+        		</para>
+        </refsect1>
+        <refsect1>
             <title>Writing a custom variable validator</title>
             <para>
             	The form broker is by no means restricted to work only with its native

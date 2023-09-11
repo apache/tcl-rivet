@@ -128,6 +128,18 @@ namespace eval FormBroker {
     }
     
     # -- base validators
+    #
+    # 
+
+    # -- validate_string
+    #
+    # returned error codes
+    #
+    #   - FB_EMPTY_STRING: error condition ignored if
+    #   variable descriptor has the 'noempty' flag set
+    #   - FB_STRING_TOO_LONG: error condition ignored if
+    #   variable descriptor has the 'constrain' flag set
+    #
     
     proc validate_string {_var_d} {
         upvar $_var_d var_d
@@ -158,6 +170,15 @@ namespace eval FormBroker {
     #
     # If needed the variable is constrained within the bounds.
     # 
+    # Returned error codes:
+    #
+    #   - FB_OUT_OF_BOUNDS: the integer value lies outside the 
+    #   bounds set in the variable descriptor. Ths error condition
+    #   ignored if the 'constrain' flag is set and the bounded
+    #   variable value is returned instead
+    #   - NOT_INTEGER: the variable value is not an integer
+    #   as checked by the [string is integer <variable value>]
+    #   command
 
     proc validate_integer {_var_d} {
         upvar $_var_d var_d
@@ -199,27 +220,40 @@ namespace eval FormBroker {
         return $valid
     }
 
+    # -- validate_unsigned
+    #
+    # see validate_integer
+    # 
+    # Returned error code:
+    #
+    #   - NOT_INTEGER: the variable value is not an integer
+    #   as checked by the [string is integer <variable value>]
+    #   command
+    #   - FB_OUT_OF_BOUNDS: the value is negative or out of
+    #   the bounds set in the descriptor
+    #   
+
     proc validate_unsigned {_var_d} {
         upvar $_var_d var_d
 
+        set valid FB_OK
         dict with var_d {
             if {![string is integer $var]} {
                 return NOT_INTEGER
             }
+
             if {[llength $bounds] == 2} {
                 ::lassign $bounds min_v max_v
+
                 if {$constrain} {
                     set var [expr min($var,$max_v)]
                     set var [expr max($var,$min_v)]
                     set valid FB_OK
                 } elseif {($var > $max_v) || ($var < $min_v)} {
                     set valid FB_OUT_OF_BOUNDS
-                } else {
-                    set valid FB_OK
-                }
+                } 
 
-            } elseif {([llength $bounds] == 1) && \
-                      ($bounds > 0)} {
+            } elseif {([llength $bounds] == 1) && ($bounds > 0)} {
                 
                 if {$constrain} {
                     set var [expr max(0,$var)]
@@ -227,9 +261,7 @@ namespace eval FormBroker {
                     set valid FB_OK
                 } elseif {($var > $bounds) || ($var < 0)} {
                     set valid FB_OUT_OF_BOUNDS
-                } else {
-                    set valid FB_OK
-                }
+                } 
 
             } else {
 
@@ -238,14 +270,17 @@ namespace eval FormBroker {
                     set valid FB_OK
                 } elseif {$var < 0} {
                     set valid FB_OUT_OF_BOUNDS
-                } else {
-                    set valid FB_OK
-                }
+                } 
 
             }
         }
         return $valid
     }
+
+    # -- validate_email
+    #
+    # Returned error code: FB_INVALID_EMAIL
+    #
 
     proc validate_email {_var_d} {
         upvar $_var_d var_d
@@ -259,14 +294,18 @@ namespace eval FormBroker {
         }
     }
 
+    # -- validate_boolean
+    #
+    # checks in the variable descriptor whether the variable
+    # representation is a valid boolean representation
+    #
+    # Returned error code: FB_INVALID_BOOLEAN
+
     proc validate_boolean {_var_d} {
         upvar $_var_d var_d
 
         dict with var_d {
             if {[string is boolean $var]} {
-                if {$constrain} {
-                    set var [string is true $var]
-                }
                 return FB_OK
             } else {
                 return FB_INVALID_BOOLEAN
@@ -344,6 +383,7 @@ namespace eval FormBroker {
                     if {$l2 < 0} { set l2 0 }
 
                     set bounds [list [expr min($l1,$l2)] [expr max($l1,$l2)]]
+
                 } else {
                     set bounds 0
                 }
