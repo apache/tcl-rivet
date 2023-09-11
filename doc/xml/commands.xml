@@ -865,7 +865,7 @@
                 value in which every content preference is matched to its
                 precedence value
             </para>
-            <programlisting>load_headers
+            <programlisting>::rivet::load_headers
 set language_precedence [::rivet::http_accept $headers(Accept-Language)]
 foreach lan [dict keys $language_precedence] {
                 puts "$lan -> [dict get $language_precedence $lan]"
