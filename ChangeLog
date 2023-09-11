@@ -1,3 +1,7 @@
+2023-09-12 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/formbroker/formbroker.tcl: expanded comments
+	* doc/xml/formbroker.xml: documenting variable type validators error codes
+
 2023-06-14 Massimo Manghi <mxmanghi@apache.org>
 	* tests/channel.test: indenting code for improved readability
 	* src/mod_rivet_ng/mod_rivet.c,mod_rivet_generator.c: Removed unused code that
