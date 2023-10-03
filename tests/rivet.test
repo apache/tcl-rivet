@@ -44,9 +44,12 @@ if {[info exists ::env(TestList)]} {
 # with the desired result, which is placed after the block of code.
 # See man tcltest for more information.
 
-set testgroup1 [expr [info exists ::env(testgroup1)] ? $::env(testgroup1) : 1]
-set testgroup2 [expr [info exists ::env(testgroup2)] ? $::env(testgroup2) : 1]
-set testgroup3 [expr [info exists ::env(testgroup3)] ? $::env(testgroup3) : 1]
+foreach tgroup {1 2 3} {
+    set testgroup${tgroup} 1
+    if {[info exists ::env(testgroup${tgroup})]} {
+        set testgroup${tgroup} $::env(testgroup${tgroup})
+    }
+}
 
 # Run all tests against one server process.
 

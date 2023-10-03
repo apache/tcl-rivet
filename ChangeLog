@@ -1,3 +1,6 @@
+2023-10-03 Massimo Manghi <mxmanghi@apache.org>
+	* tests/rivet.tcl: fixed regression bug in the controlling environment variables
+
 2023-09-12 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/formbroker/formbroker.tcl: expanded comments
 	* doc/xml/formbroker.xml: documenting variable type validators error codes
@@ -5,7 +8,7 @@
 2023-06-14 Massimo Manghi <mxmanghi@apache.org>
 	* tests/channel.test: indenting code for improved readability
 	* src/mod_rivet_ng/mod_rivet.c,mod_rivet_generator.c: Removed unused code that
-	ha been commented out long ago
+	has been commented out long ago
 	* rivet/rivet-tcl/parray.tcl: ::rivet::parray now accepting alternative way to
 	return output.
 
@@ -36,7 +39,7 @@
 	provided by Scott Pitcher <scotty@svptechnicalservices.com.au>)
 
 2023-01-11 Massimo Manghi <mxmanghi@apache.org>
-	* src/TclWeb.h: also this include file had a CONST84 specifier that needed to
+	* src/TclWeb.h: also this headers file had a CONST84 specifier that needed to
 	be converted as CONST86
 
 2023-01-09 Massimo Manghi <mxmanghi@apache.org>

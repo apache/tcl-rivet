@@ -28,8 +28,8 @@ namespace eval ::rivet {
             set nameString [format "%s(%s)" $arrayName [::rivet::escape_sgml_chars $name]]
             lappend html_text [format "%-*s = %s" $maxl $nameString [::rivet::escape_sgml_chars $array($name)]]
         }
+        eval [list {*}$outputcmd [join [list <pre> [join $html_text "\n"] </pre>] "\n"]]
 
-        eval $outputcmd [list <pre>[join $html_text "\n"]</pre>]
     }
 
 }
