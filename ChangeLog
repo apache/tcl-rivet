@@ -1,6 +1,7 @@
-2023-01-10 Massimo Manghi <mxmanghi@apache.org>
-	* src/mod_rivet_ng/mod_rivet.c: fixing some
- comments
+2023-01-11 Massimo Manghi <mxmanghi@apache.org>
+	* src/TclWeb.h: also this include file had a CONST84 specifier that needed to
+	be converted as CONST86
+
 2023-01-09 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/TclWebaapache.c: replaced CONST84 with CONST86 which is supported by Tcl 8.7
 	* src/mod_rivet_ng/rivet[Channel|Core].c: 
