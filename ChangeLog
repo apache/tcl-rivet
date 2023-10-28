@@ -1,3 +1,6 @@
+2023-10-28 Massimo Manghi <mxmanghi@apache.org>
+	* .appveyor.yml: Fix Windows compiler download URL
+
 2023-10-03 Massimo Manghi <mxmanghi@apache.org>
 	* tests/rivet.tcl: fixed regression bug in the controlling environment variables
 
