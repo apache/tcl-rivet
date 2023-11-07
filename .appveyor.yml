@@ -39,8 +39,8 @@ install:
   - cmd: set TK_WISH=%cd%\IronTcl\bin\wish86t.exe
   # Install Apache
   - cmd: set APACHE_VERSION="2.4.58"
-  - cmd: set APACHE_COMPILER="VC17"
-  - cmd: appveyor DownloadFile https://home.apache.org/~steffenal/%APACHE_COMPILER%/binaries/httpd-%APACHE_VERSION%-%APACHE_DOWNLOAD_PLATFORM%-%APACHE_COMPILER%.zip
+  - cmd: set APACHE_COMPILER="VS17"
+  - cmd: appveyor DownloadFile https://www.apachelounge.com/download/%APACHE_COMPILER%/binaries/httpd-%APACHE_VERSION%-%APACHE_DOWNLOAD_PLATFORM%-%APACHE_COMPILER%.zip
   - cmd: cmake -E tar xf httpd-%APACHE_VERSION%-%APACHE_DOWNLOAD_PLATFORM%-%APACHE_COMPILER%.zip
   - cmd: set APACHE_ROOT=%cd%\Apache24
   # Generate solution...
