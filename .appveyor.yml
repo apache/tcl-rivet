@@ -28,8 +28,8 @@ install:
   - cmd: if %platform%==x64 set DOWNLOAD_PLATFORM=amd64
   - cmd: if %platform%==x86 set APACHE_DOWNLOAD_PLATFORM=win32
   - cmd: if %platform%==x64 set APACHE_DOWNLOAD_PLATFORM=win64
-  - cmd: if %platform%==x86 set CMAKE_GENERATOR="Visual Studio 17"
-  - cmd: if %platform%==x64 set CMAKE_GENERATOR="Visual Studio 17 Win64"
+  - cmd: if %platform%==x86 set CMAKE_GENERATOR="Visual Studio 15"
+  - cmd: if %platform%==x64 set CMAKE_GENERATOR="Visual Studio 15 Win64"
   - cmd: set IRONTCL_VERSION="8.6.7"
   - cmd: appveyor DownloadFile https://www.irontcl.com/downloads/irontcl-%DOWNLOAD_PLATFORM%-%IRONTCL_VERSION%.zip
   - cmd: cmake -E tar xf irontcl-%DOWNLOAD_PLATFORM%-%IRONTCL_VERSION%.zip
