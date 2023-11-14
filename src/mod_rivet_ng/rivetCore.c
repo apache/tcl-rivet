@@ -63,7 +63,7 @@
 #define COOKIES_ARRAY_NAME "cookies"
 
 extern module rivet_module;
-extern char* TclWeb_GetRawPost (TclWebRequest *req);
+extern char* TclWeb_GetRawPost (TclWebRequest *req, int *len);
 extern mod_rivet_globals* module_globals;
 extern apr_threadkey_t*  rivet_thread_key;
 
@@ -1274,18 +1274,19 @@ TCL_CMD_HEADER( Rivet_Upload )
 TCL_CMD_HEADER ( Rivet_RawPost )
 {
     char*                   data;
+    int                     length;
     Tcl_Obj*                retval;
     rivet_thread_private*   private;
 
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::raw_post")
 
-    data = TclWeb_GetRawPost(private->req);
+    data = TclWeb_GetRawPost(private->req, &length);
 
     if (!data) {
         data = "";
     }
-    retval = Tcl_NewStringObj(data, -1);
+    retval = Tcl_NewByteArrayObj((const unsigned char *)data, length);
     Tcl_SetObjResult(interp, retval);
     return TCL_OK;
 }
@@ -1765,7 +1766,7 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_LogErrorCmd )
+TCL_CMD_HEADER(Rivet_LogErrorCmd)
 {
     char *message = NULL;
 
@@ -1852,9 +1853,16 @@ TCL_CMD_HEADER( Rivet_LogErrorCmd )
      * root server name stored in the module_globals
      */
 
-    serverRec = ((private == NULL) || (private->r == NULL)) ? module_globals->server : private->r->server;
-
-    ap_log_error (APLOG_MARK, apLogLevel, 0, serverRec, "%s", message);
+    if ((private == NULL) || (private->r == NULL))
+    {
+        rivet_interp_globals* globals = Tcl_GetAssocData(interp, "rivet", NULL);
+        serverRec = globals->server;
+    }
+    else
+    {
+        serverRec = private->r->server;
+    }
+    ap_log_error (APLOG_MARK,apLogLevel,0,serverRec,"%s",message);
     return TCL_OK;
 }
 
@@ -2158,7 +2166,7 @@ TCL_CMD_HEADER( Rivet_CacheContent )
 DLLEXPORT int
 Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
 {
-    rivet_server_conf*      server_conf;
+    rivet_server_conf* server_conf;
 
     RIVET_OBJ_CMD ("makeurl",Rivet_MakeURL,private);
     RIVET_OBJ_CMD ("headers",Rivet_Headers,private);

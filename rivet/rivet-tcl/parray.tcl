@@ -7,13 +7,11 @@
 ##    arrayName - Name of the array to display.
 ##    pattern   - A wildcard pattern of variables within the array to display.
 ##
-## $Id$
-##
 ###
 
 namespace eval ::rivet {
 
-    proc parray {arrayName {pattern *}} {
+    proc parray {arrayName {pattern *} {outputcmd "puts stdout"}} {
         upvar 1 $arrayName array
         if {![array exists array]} {
             return -code error "\"$arrayName\" isn't an array"
@@ -24,14 +22,14 @@ namespace eval ::rivet {
                 set maxl [string length $name]
             }
         }
-        puts stdout "<PRE><B>$arrayName</B>"
+        set html_text [list "<b>$arrayName</b>"]
         set maxl [expr {$maxl + [string length $arrayName] + 2}]
         foreach name [lsort [array names array $pattern]] {
-            set nameString [format %s(%s) $arrayName [::rivet::escape_sgml_chars $name]]
-            puts stdout [format "%-*s = %s" $maxl $nameString [::rivet::escape_sgml_chars $array($name)]]
+            set nameString [format "%s(%s)" $arrayName [::rivet::escape_sgml_chars $name]]
+            lappend html_text [format "%-*s = %s" $maxl $nameString [::rivet::escape_sgml_chars $array($name)]]
         }
-        puts stdout "</PRE>"
+        eval [list {*}$outputcmd [join [list <pre> [join $html_text "\n"] </pre>] "\n"]]
+
     }
 
-    namespace export parray
 }

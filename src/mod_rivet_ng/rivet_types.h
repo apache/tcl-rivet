@@ -75,6 +75,7 @@ typedef struct _ApacheRequest {
     void*           hook_data;
     const char*     temp_dir;
     char*           raw_post;           /* Raw post data. */
+    int             raw_length;
     request_rec*    r;
     int             nargs;
 } ApacheRequest;

@@ -121,7 +121,7 @@ ApacheUpload *ApacheUpload_find(ApacheUpload *upload, char *name);
 #define ApacheRequest_set_post_max(req, max) ((req)->post_max = (max))
 #define ApacheRequest_set_temp_dir(req, dir) ((req)->temp_dir = (dir))
 
-#define ApacheRequest_get_raw_post(req) ((req)->raw_post)
+char *ApacheRequest_get_raw_post(ApacheRequest *req, int *len);
 
 char *ApacheUtil_expires(apr_pool_t *p, char *time_str, int type);
 #define EXPIRES_HTTP   1

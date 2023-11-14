@@ -60,3 +60,12 @@ var_post = postarg1 val1 postarg2 val2}
     set match [::http::data $page]
     set match
 } {OK}
+
+::tcltest::test postvariables-6.1 {::rivet::raw_post} {
+    set payload "\x00\x00\x00\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39"
+    set page [::http::geturl "${urlbase}post.rvt" \
+			    -query $payload \
+			    -type application/octet-stream]
+    regexp -line {^\[::rivet::raw_post\] = 00000030313233343536373839$} [ ::http::data $page ] match
+    set match
+} {[::rivet::raw_post] = 00000030313233343536373839}

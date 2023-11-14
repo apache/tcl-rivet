@@ -1,5 +1,51 @@
+2023-11-12 Massimo Manghi <mxmanghi@apache.org>
+	* .appveyor.yml: Attemping to fix Visual Studio generator version
+
+2023-10-28 Massimo Manghi <mxmanghi@apache.org>
+	* .appveyor.yml: Fix Windows compiler download URL
+
+2023-10-03 Massimo Manghi <mxmanghi@apache.org>
+	* tests/rivet.tcl: fixed regression bug in the controlling environment variables
+
+2023-09-12 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/formbroker/formbroker.tcl: expanded comments
+	* doc/xml/formbroker.xml: documenting variable type validators error codes
+
+2023-06-14 Massimo Manghi <mxmanghi@apache.org>
+	* tests/channel.test: indenting code for improved readability
+	* src/mod_rivet_ng/mod_rivet.c,mod_rivet_generator.c: Removed unused code that
+	has been commented out long ago
+	* rivet/rivet-tcl/parray.tcl: ::rivet::parray now accepting alternative way to
+	return output.
+
+2023-05-18 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet.c:
+	* src/mod_rivet_ng/mod_rivet.h:
+	* src/mod_rivet_ng/mod_rivet_common.c:
+	* src/mod_rivet_ng/rivetCore.c:
+	* src/mod_rivet_ng/worker_prefork_common.c: now storing the server record in the intepreter globals
+	to be used by Rivet_LogErrorCmd instead of module_globals->server when threads private data are
+	not available (like when ChildInitScript is executed)
+
+2023-05-04 Massimo Manghi <mxmanghi@apache.org>
+	* tests/rivet.test: more contributions provided by Scott Pitcher <scotty@svptechnicalservices.com.au>)
+	* tests/apachetest/apachetest.tcl: More improvements to the test script. Now
+	handling also Apache directive IncludeOptional and enabling execution control 
+	through environment variables
+	* tests/post.rvt:
+	* tests/post.test: add a test for ::rivet::raw_post
+
+2023-04-11 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/TclWebapache.c:
+	* src/mod_rivet_ng/rivetCore.c:
+	* src/mod_rivet_ng/rivet_types.h:
+	* src/request/apache_request.c:
+	* src/request/apache_request.h: handling length of data in POST requests. It
+	fixes ::rivet::raw_post when the POSTed data don't have variable sections (patch
+	provided by Scott Pitcher <scotty@svptechnicalservices.com.au>)
+
 2023-01-11 Massimo Manghi <mxmanghi@apache.org>
-	* src/TclWeb.h: also this include file had a CONST84 specifier that needed to
+	* src/TclWeb.h: also this headers file had a CONST84 specifier that needed to
 	be converted as CONST86
 
 2023-01-09 Massimo Manghi <mxmanghi@apache.org>

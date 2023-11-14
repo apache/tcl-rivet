@@ -72,7 +72,7 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
 
 /* -- Rivet_VirtualHostsInterps
  *
- * The server_rec chain is walked through and server configurations is read to
+ * The server_rec chain is walked through and server configurations are read to
  * set up the thread private configuration and interpreters database
  *
  *  Arguments:
@@ -91,7 +91,7 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
 
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 {
-    server_rec*         s;
+    server_rec*         vhost_server;
     server_rec*         root_server = module_globals->server;
     rivet_server_conf*  root_server_conf;
     rivet_server_conf*  myrsc;
@@ -145,11 +145,11 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
     parentfunction = root_server_conf->rivet_child_init_script;
 
-    for (s = root_server; s != NULL; s = s->next)
+    for (vhost_server = root_server; vhost_server != NULL; vhost_server = vhost_server->next)
     {
-        rivet_thread_interp*   rivet_interp;
+        rivet_thread_interp*  rivet_interp;
 
-        myrsc = RIVET_SERVER_CONF(s->module_config);
+        myrsc = RIVET_SERVER_CONF(vhost_server->module_config);
 
         /* by default we assign the root_interpreter as
          * interpreter of the virtual host. In case of separate
@@ -159,7 +159,7 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
         rivet_interp = root_interp;
 
-        if (s == root_server)
+        if (vhost_server == root_server)
         {
             Tcl_RegisterChannel(rivet_interp->interp,*rivet_interp->channel);
         }
@@ -187,16 +187,13 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
         /* interpreter base running scripts definition and initialization */
 
         rivet_interp->scripts = Rivet_RunningScripts (private->pool,rivet_interp->scripts,myrsc);
-
-        //private->ext->interps[myrsc->idx] = rivet_interp;
-
         RIVET_POKE_INTERP(private,myrsc,rivet_interp);
 
         /* Basic Rivet packages and libraries are loaded here */
 
         if ((rivet_interp->flags & RIVET_INTERP_INITIALIZED) == 0)
         {
-            Rivet_PerInterpInit(rivet_interp, private, s, private->pool);
+            Rivet_PerInterpInit(rivet_interp,private,vhost_server,private->pool);
         }
 
         /* It seems that allocating from a shared APR memory pool is not thread safe,
@@ -209,21 +206,21 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
          */
 
         apr_thread_mutex_lock(module_globals->pool_mutex);
-        myrsc->server_name = (char*) apr_pstrdup (private->pool, s->server_hostname);
+        myrsc->server_name = (char*) apr_pstrdup (private->pool,vhost_server->server_hostname);
         apr_thread_mutex_unlock(module_globals->pool_mutex);
 
         /* when configured a child init script gets evaluated */
 
         function = myrsc->rivet_child_init_script;
         if (function &&
-            (s == root_server || module_globals->separate_virtual_interps || function != parentfunction))
+            (vhost_server == root_server || module_globals->separate_virtual_interps || function != parentfunction))
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
-            Tcl_Interp* interp = rivet_interp->interp;
             Tcl_Obj*    tcl_child_init = Tcl_NewStringObj(function,-1);
+            rivet_interp_globals* globals = NULL;
 
             Tcl_IncrRefCount(tcl_child_init);
-            Tcl_Preserve (interp);
+            Tcl_Preserve (rivet_interp->interp);
 
             /* There is a lot of passing pointers around among various structures.
              * We should understand if this is all that necessary.
@@ -238,17 +235,24 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
              * prepared TODO
              */
 
+            globals = Tcl_GetAssocData(rivet_interp->interp, "rivet", NULL);
+
+            /*
+             * The current server record is stored to enable ::rivet::apache_log_error and
+             * other commands to log error messages in the virtual host's designated log file
+             */
+
+            globals->server = vhost_server;
             private->running_conf = myrsc;
 
-            if (Tcl_EvalObjEx(interp,tcl_child_init, 0) != TCL_OK) {
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
-                             errmsg, function);
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
-                             "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
-                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, root_server,
-                             "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
+            if (Tcl_EvalObjEx(rivet_interp->interp,tcl_child_init, 0) != TCL_OK) {
+                ap_log_error(APLOG_MARK, APLOG_ERR,APR_EGENERAL,vhost_server,errmsg, function);
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,vhost_server,
+                             "errorCode: %s", Tcl_GetVar(rivet_interp->interp, "errorCode", 0));
+                ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,vhost_server,
+                             "errorInfo: %s", Tcl_GetVar(rivet_interp->interp, "errorInfo", 0));
             }
-            Tcl_Release (interp);
+            Tcl_Release (rivet_interp->interp);
             Tcl_DecrRefCount(tcl_child_init);
         }
     }

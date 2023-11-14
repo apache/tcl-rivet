@@ -238,7 +238,7 @@ static int
 Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server_rec *s)
 {
 #ifdef WIN32
-	char*	parent_pid_var = NULL;
+	char* parent_pid_var = NULL;
 #endif
 
     FILEDEBUGINFO;
@@ -262,8 +262,8 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 	 * (https://wiki.apache.org/httpd/ModuleLife)
 	 */
 	
-	#ifdef WIN32
-	
+#ifdef WIN32
+
 	/* if the environment variable AP_PARENT_PID is set
      * we know we are in a child process of the winnt MPM
      */
@@ -278,8 +278,8 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
 		ap_log_perror(APLOG_MARK,APLOG_INFO,0,pPool,
 				 "AP_PARENT_PID undefined, we proceed with server initialization");
 	}
-	
-	#endif
+
+#endif
 	
     /* We don't create the cache here: it would make sense for prefork MPM
      * but threaded MPM bridges have their pool of threads. Each of them
@@ -319,6 +319,9 @@ Rivet_RunServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, ser
  * Post config hook. The server initialization loads the MPM bridge
  * and runs the Tcl server initialization script
  *
+ * The module globals structure is allocated and initialized by
+ * the pre-config hook procedure (Rivet_InitGlobals)
+ *
  */
 
 static int
@@ -334,10 +337,8 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
     ap_add_version_component(pPool,RIVET_PACKAGE_NAME);
 #endif
 
-	/* This function runs as post_config_hook
-	 * and as such it's run twice by design.
-	 * This is the recommended way to avoid a double load of
-	 * external modules.
+	/* This function runs as post_config_hook and as such it's run twice by design.
+	 * This is the recommended way to avoid a double load of external modules.
 	 */
 
 	apr_pool_userdata_get(&userdata, userdata_key, server->process->pool);
@@ -352,13 +353,7 @@ Rivet_ServerInit (apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
         return OK; /* This would be the first time through */
 	}
 	
-    /* Everything revolves around this structure: module_globals */
-
-    /* the module global structure is allocated and the MPM bridge name established */
-
-    // module_globals = Rivet_CreateModuleGlobals (pPool,server);
-
-    /* We can proceed initializing the globals with information stored in the module configuration */
+    /* We determine the Rivet Bridge and we store its pointer in the module globals */
 
     module_globals->rivet_mpm_bridge = Rivet_SeekMPMBridge(pPool);
     module_globals->server           = server;
@@ -449,9 +444,9 @@ static void Rivet_ChildInit (apr_pool_t *pChild, server_rec *server)
     Tcl_InitNotifier();
 #endif
 
-    /* We can rely on the existence of module_globals only we are
+    /* We can rely on the existence of module_globals only when
      * running the prefork MPM, otherwise the pointer is NULL and
-     * the structure has to be filled with data
+     * the structure has to be allocated and filled with data
      */
 
     if (module_globals == NULL)

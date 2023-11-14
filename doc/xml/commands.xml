@@ -865,7 +865,7 @@
                 value in which every content preference is matched to its
                 precedence value
             </para>
-            <programlisting>load_headers
+            <programlisting>::rivet::load_headers
 set language_precedence [::rivet::http_accept $headers(Accept-Language)]
 foreach lan [dict keys $language_precedence] {
                 puts "$lan -> [dict get $language_precedence $lan]"
@@ -1394,7 +1394,8 @@ bab</programlisting>
 		<cmdsynopsis>
 		    <command>::rivet::parray</command>
 		    <arg><replaceable>arrayName</replaceable></arg>
-		    <arg><replaceable><optional>pattern</optional></replaceable></arg>
+		    <arg><replaceable><optional>pattern [*]</optional></replaceable></arg>
+		    <arg><replaceable><optional>command [puts stdout]</optional></replaceable></arg>
 		</cmdsynopsis>
 	    </refsynopsisdiv>
 
@@ -1404,7 +1405,10 @@ bab</programlisting>
 		    An html version of the standard Tcl
 		    <command>parray</command> command.  Displays the entire
 		    contents of an array in a sorted, nicely-formatted way.
-		    Mostly used for debugging purposes.
+		    Mostly used for debugging purposes. Rivet's <command>parray</command>
+		    accepts 2 optional parameters: an array name selection pattern (like the
+		    pattern accepted by Tcl's [array names &lt;array&gt; -glob &lt;pattern&gt;]) and
+		    an output command (default: 'puts stdout').
 		</para>
 	    </refsect1>
 	</refentry>
