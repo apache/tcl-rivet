@@ -35,12 +35,11 @@
 #include <tcl.h>
 #include <errno.h>
 
-//#include "apache_request.h"
 #include "mod_rivet.h"
 #include "TclWeb.h"
 
 static int
-inputproc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
+RivetChan_InputProc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
 {
     return EINVAL;
 }
@@ -49,7 +48,7 @@ inputproc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
    Channel that we create to divert stdout to. */
 
 static int
-outputproc(ClientData instancedata, CONST86 char *buf, int toWrite, int *errorCodePtr)
+RivetChan_OutputProc(ClientData instancedata, const char *buf, int toWrite, int *errorCodePtr)
 {
     apr_threadkey_t*        rivet_thread_key = (apr_threadkey_t*) instancedata;
     rivet_thread_private*   private;
@@ -67,43 +66,50 @@ outputproc(ClientData instancedata, CONST86 char *buf, int toWrite, int *errorCo
 }
 
 static int
-closeproc(ClientData instancedata, Tcl_Interp *interp)
+RivetChan_CloseProc(ClientData instancedata, Tcl_Interp *interp)
 {
     return 0;
 }
 
 static int
-setoptionproc(ClientData instancedata, Tcl_Interp *interp,
-	          CONST86 char *optionname, CONST86 char *value)
+RivetChan_Close2Proc(ClientData instancedata, Tcl_Interp *interp, int flags)
+{
+    return 0;
+}
+
+
+static int
+RivetChan_SetOptionProc(ClientData instancedata,Tcl_Interp *interp,
+	      const char *optionname,const char *value)
 {
     return TCL_OK;
 }
 
 static void
-watchproc(ClientData instancedata, int mask)
+RivetChan_WatchProc(ClientData instancedata, int mask)
 {
     /* not much to do here */
     return;
 }
 
 static int
-gethandleproc(ClientData instancedata, int direction, ClientData *handlePtr)
+RivetChan_GetHandleProc(ClientData instancedata, int direction, ClientData *handlePtr)
 {
     return TCL_ERROR;
 }
 
 Tcl_ChannelType RivetChan = {
     "apache_channel",           /* typeName */
-    TCL_CHANNEL_VERSION_4,      /* channel type version */
-    closeproc,                  /* close proc */
-    inputproc,                  /* input proc */
-    outputproc,                 /* output proc */
+    TCL_CHANNEL_VERSION_5,      /* channel type version */
+    RivetChan_CloseProc,        /* close proc */
+    RivetChan_InputProc,        /* input proc */
+    RivetChan_OutputProc,       /* output proc */
     NULL,                       /* seek proc - can be null */
-    setoptionproc,              /* set option proc - can be null */
+    RivetChan_SetOptionProc,    /* set option proc - can be null */
     NULL,                       /* get option proc - can be null */
-    watchproc,                  /* watch proc */
-    gethandleproc,              /* get handle proc */
-    NULL,                       /* close 2 proc - can be null */
+    RivetChan_WatchProc,        /* watch proc */
+    RivetChan_GetHandleProc,    /* get handle proc */
+    RivetChan_Close2Proc,       /* close 2 proc - can be null */
     NULL,                       /* block mode proc - can be null */
     NULL,                       /* flush proc - can be null */
     NULL,                       /* handler proc - can be null */
@@ -111,4 +117,3 @@ Tcl_ChannelType RivetChan = {
     NULL,                       /* thread action proc - can be null */
     NULL                        /* truncate proc */
 };
-

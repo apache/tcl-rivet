@@ -311,7 +311,7 @@ Tcl_Obj* Rivet_BuildConfDictionary ( Tcl_Interp*           interp,
         {
             int       i;
             Tcl_Obj** objArrayPnt;
-            int       objArrayCnt;
+            Tcl_Size  objArrayCnt;
             Tcl_Obj*  val;
 
             Tcl_IncrRefCount(keyval_list);

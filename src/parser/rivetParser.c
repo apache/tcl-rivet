@@ -242,7 +242,7 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
     int endseqlen 	= 	(int) strlen(END_TAG);
     int startseqlen = 	(int) strlen(START_TAG);
     int inside = 0, p = 0, check_echo = 0;
-    int inLen = 0;
+    Tcl_Size inLen = 0;
 
     next = Tcl_GetStringFromObj(inbuf, &inLen);
 

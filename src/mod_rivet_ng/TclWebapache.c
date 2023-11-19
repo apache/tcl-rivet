@@ -207,7 +207,7 @@ TclWeb_PrintHeaders(TclWebRequest *req)
 
 /* Print nice HTML formatted errors */
 int
-TclWeb_PrintError(CONST86 char *errstr, int htmlflag, TclWebRequest *req)
+TclWeb_PrintError(const char *errstr, int htmlflag, TclWebRequest *req)
 {
     TclWeb_SetHeaderType(DEFAULT_HEADER_TYPE, req);
     TclWeb_PrintHeaders(req);
@@ -788,14 +788,20 @@ TclWeb_EscapeShellCommand(char *out, char *in, TclWebRequest *req)
 
 /* These API's are a bit different, because it's so much more
  * practical. */
+#if 0
+#undef Tcl_ExternalToUtfDString
+#define Tcl_ExternalToUtfDString(encoding, src, len, ds) \
+	(Tcl_ExternalToUtfDStringEx(NULL,(encoding),(src),(len), \
+	TCL_ENCODING_PROFILE_TCL8, (ds), NULL))
+#endif
 
-char *TclWeb_StringToUtf(char *in, TclWebRequest *req)
+char *TclWeb_StringToUtf (char *in,TclWebRequest *req)
 {
     char *tmp;
     Tcl_DString dstr;
-    Tcl_DStringInit(&dstr);
-    Tcl_ExternalToUtfDString(NULL, in, (signed)strlen(in), &dstr);
-    tmp = (char*) apr_pstrdup(req->req->pool, Tcl_DStringValue(&dstr));
+
+    Tcl_DStringInit(&dstr);    
+    tmp = (char*) apr_pstrdup(req->req->pool,Tcl_ExternalToUtfDString(NULL,in,(signed)strlen(in),&dstr));
     Tcl_DStringFree(&dstr);
     return tmp;
 }
@@ -820,7 +826,7 @@ int TclWeb_UploadChannel(char *varname, TclWebRequest *req)
 {
     Tcl_Channel chan;
 
-    chan = Tcl_OpenFileChannel(req->interp, req->upload->tempname, "r", 0);
+    chan = Tcl_OpenFileChannel(req->interp,req->upload->tempname,"r",0);
     if (chan == NULL) {
 	    return TCL_ERROR;
     } else {

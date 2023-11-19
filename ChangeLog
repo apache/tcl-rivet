@@ -1,3 +1,6 @@
+2023-11-19 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/*.c: changing code to comply with the Tcl 9.0 new requirements
+
 2023-11-12 Massimo Manghi <mxmanghi@apache.org>
 	* .appveyor.yml: Attemping to fix Visual Studio generator version
 

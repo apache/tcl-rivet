@@ -71,7 +71,7 @@ int TclWeb_SetHeaderType(char *header, TclWebRequest *req);
 
 int TclWeb_PrintHeaders(TclWebRequest *req);
 
-int TclWeb_PrintError(CONST86 char *errstr, int htmlflag, TclWebRequest *req);
+int TclWeb_PrintError(const char *errstr, int htmlflag, TclWebRequest *req);
 
 /*
  *-----------------------------------------------------------------------------

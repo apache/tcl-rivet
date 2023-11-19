@@ -71,20 +71,20 @@ TCL_CMD_HEADER( Rivet_EncryptCmd )
 {
     char *data, *key;
     char *resultBuffer;
-    int dataLen;
+    Tcl_Size dataLen;
     int keyIndex;
 
     if( objc < 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "data key" );
+        Tcl_WrongNumArgs(interp,1,objv,"data key");
         return TCL_ERROR;
     }
 
-    data = Tcl_GetStringFromObj( objv[1], &dataLen );
+    data = Tcl_GetStringFromObj(objv[1],&dataLen);
 
-    resultBuffer = (char *)Tcl_Alloc( (unsigned)dataLen + 1 );
-    strcpy ( resultBuffer, data );
+    resultBuffer = (char *)Tcl_Alloc((unsigned)dataLen + 1);
+    strcpy (resultBuffer, data);
 
-    for( keyIndex = 2; keyIndex < objc; keyIndex++ )
+    for (keyIndex = 2;keyIndex < objc;keyIndex++)
     {
         key = Tcl_GetStringFromObj( objv[keyIndex], NULL );
         Rivet_Crypt( resultBuffer, key, 0L, MODE_ENCRYPT );
@@ -99,15 +99,15 @@ TCL_CMD_HEADER( Rivet_DecryptCmd )
 {
     char *data, *key;
     char *resultBuffer;
-    int dataLen;
+    Tcl_Size dataLen;
     int keyIndex;
 
     if( objc < 3 ) {
-    Tcl_WrongNumArgs( interp, 1, objv, "data key" );
-        return TCL_ERROR;
+		Tcl_WrongNumArgs( interp, 1, objv, "data key" );
+		return TCL_ERROR;
     }
 
-    data = Tcl_GetStringFromObj( objv[1], &dataLen );
+    data = Tcl_GetStringFromObj(objv[1],&dataLen);
 
     resultBuffer = (char *)Tcl_Alloc( (unsigned)dataLen + 1 );
     strcpy ( resultBuffer, data );

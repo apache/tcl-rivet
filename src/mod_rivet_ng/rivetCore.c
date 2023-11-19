@@ -123,7 +123,6 @@ TCL_CMD_HEADER( Rivet_MakeURL )
     rivet_thread_private*   private;
     Tcl_Obj*                result  = NULL;
     char*                   url_target_name;
-    int                     target_length;
 
     if (objc > 2)
     {
@@ -139,6 +138,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
     }
     else
     {
+    	Tcl_Size target_length;
         url_target_name = Tcl_GetStringFromObj(objv[1],&target_length);
 
         // we check the first character for a '/' (absolute path)
@@ -222,17 +222,17 @@ TCL_CMD_HEADER( Rivet_Parse )
 
     if( objc == 2 ) {
 
-        filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
+        filename = Tcl_GetStringFromObj(objv[1],(Tcl_Size *)NULL);
 
     } else {
 
-        if (STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual")) {
+        if (STREQU(Tcl_GetStringFromObj(objv[1],(Tcl_Size *)NULL),"-virtual")) {
 
         /* */
 
-            filename = TclWeb_GetVirtualFile(private->req,Tcl_GetStringFromObj(objv[2],(int *)NULL));
+            filename = TclWeb_GetVirtualFile(private->req,Tcl_GetStringFromObj(objv[2],(Tcl_Size *)NULL));
 
-        } else if ( STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-string")) {
+        } else if (STREQU(Tcl_GetStringFromObj(objv[1],(Tcl_Size *)NULL),"-string")) {
 
             int      res;
             Tcl_Obj* script = objv[2];
@@ -259,7 +259,7 @@ TCL_CMD_HEADER( Rivet_Parse )
 
         } else {
 
-            Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename | -string template_string" );
+            Tcl_WrongNumArgs(interp,1,objv,"?-virtual? filename | -string template_string");
             return TCL_ERROR;
 
         }
@@ -350,7 +350,7 @@ TCL_CMD_HEADER( Rivet_Parse )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_Include )
+TCL_CMD_HEADER(Rivet_Include)
 {
     rivet_thread_private*   private;
     int                     sz;
@@ -361,7 +361,7 @@ TCL_CMD_HEADER( Rivet_Include )
     Tcl_DString             transoptions;
     Tcl_DString             encoptions;
 
-    if( objc < 2 || objc > 3 )
+    if ((objc < 2) || (objc > 3))
     {
         Tcl_WrongNumArgs(interp, 1, objv, "?-virtual? filename");
         return TCL_ERROR;
@@ -370,16 +370,16 @@ TCL_CMD_HEADER( Rivet_Include )
     THREAD_PRIVATE_DATA(private)
     CHECK_REQUEST_REC(private,"::rivet::include")
 
-    if( objc == 2 ) {
-        filename = Tcl_GetStringFromObj( objv[1], (int *)NULL );
+    if (objc == 2) {
+        filename = Tcl_GetStringFromObj(objv[1],(Tcl_Size *)NULL);
     } else {
-        if( !STREQU( Tcl_GetStringFromObj(objv[1], (int *)NULL), "-virtual") ) {
+        if( !STREQU(Tcl_GetStringFromObj(objv[1],(Tcl_Size *)NULL), "-virtual") ) {
             Tcl_WrongNumArgs( interp, 1, objv, "?-virtual? filename" );
             return TCL_ERROR;
         }
 
         CHECK_REQUEST_REC(private,"::rivet::include -virtual")
-        filename = TclWeb_GetVirtualFile(private->req,Tcl_GetStringFromObj(objv[2], (int *)NULL) );
+        filename = TclWeb_GetVirtualFile(private->req,Tcl_GetStringFromObj(objv[2],(Tcl_Size *)NULL));
     }
 
     fd = Tcl_OpenFileChannel(interp, filename, "r", 0664);
@@ -405,7 +405,7 @@ TCL_CMD_HEADER( Rivet_Include )
      * previous settings. */
     Tcl_DStringInit(&transoptions);
     Tcl_DStringInit(&encoptions);
-    tclstdout = Tcl_GetChannel(interp, "stdout", NULL);
+    tclstdout = Tcl_GetChannel(interp,"stdout",NULL);
     Tcl_GetChannelOption(interp, tclstdout, "-translation", &transoptions);
     Tcl_GetChannelOption(interp, tclstdout, "-encoding", &encoptions);
     Tcl_SetChannelOption(interp, tclstdout, "-translation", "binary");
@@ -448,7 +448,7 @@ TCL_CMD_HEADER( Rivet_Headers )
         return TCL_ERROR;
     }
 
-    opt = Tcl_GetStringFromObj(objv[1], NULL);
+    opt = Tcl_GetStringFromObj(objv[1],(Tcl_Size *)NULL);
 
     /* Basic introspection returning the value of the headers_printed flag */
 
@@ -471,8 +471,7 @@ TCL_CMD_HEADER( Rivet_Headers )
             Tcl_WrongNumArgs(interp, 2, objv, "new-url");
             return TCL_ERROR;
         }
-        apr_table_set(private->r->headers_out, "Location",
-                     Tcl_GetStringFromObj (objv[2], (int *)NULL));
+        apr_table_set(private->r->headers_out,"Location",Tcl_GetStringFromObj(objv[2],(Tcl_Size *)NULL));
         TclWeb_SetStatus(301, private->req);
         return TCL_OK;
     }
@@ -886,7 +885,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
     apr_table_t *table = NULL;
     int subcommandindex;
 
-    static CONST86 char *SubCommand[] = {
+    static const char *SubCommand[] = {
         "get",
         "set",
         "exists",
@@ -907,7 +906,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
         SUB_CLEAR
     };
 
-    static CONST86 char *tableNames[] = {
+    static const char *tableNames[] = {
         "notes",
         "headers_in",
         "headers_out",
@@ -1015,7 +1014,7 @@ TCL_CMD_HEADER( Rivet_ApacheTable )
             char *value;
 
             if (objc == 4) {
-                int listObjc;
+                Tcl_Size  listObjc;
                 Tcl_Obj **listObjv;
 
                 if (Tcl_ListObjGetElements (interp, objv[3], &listObjc, &listObjv) == TCL_ERROR) {
@@ -1132,7 +1131,7 @@ TCL_CMD_HEADER( Rivet_Upload )
      * of an upload
      */
 
-    static CONST86 char *SubCommand[] = {
+    static const char *SubCommand[] = {
         "channel",
         "save",
         "data",
@@ -1157,7 +1156,7 @@ TCL_CMD_HEADER( Rivet_Upload )
         NAMES
     };
 
-    static CONST86 int cmds_objc[] = { 3,4,3,3,3,3,3,3,2 };
+    static const int cmds_objc[] = { 3,4,3,3,3,3,3,3,2 };
     int expected_objc;
 
     rivet_thread_private* private;
@@ -1775,7 +1774,7 @@ TCL_CMD_HEADER(Rivet_LogErrorCmd)
     int loglevelindex;
     int  apLogLevel = 0;
 
-    static CONST86 char *logLevel[] = {
+    static const char *logLevel[] = {
         "emerg",
         "alert",
         "crit",
@@ -1889,9 +1888,9 @@ TestpanicCmd(dummy, interp, argc, argv)
     ClientData dummy;                   /* Not used. */
     Tcl_Interp *interp;                 /* Current interpreter. */
     int argc;                           /* Number of arguments. */
-    CONST char **argv;                  /* Argument strings. */
+    const char **argv;                  /* Argument strings. */
 {
-    CONST char *argString;
+    const char *argString;
 
     /*
      *  Put the arguments into a var args structure
@@ -1899,7 +1898,7 @@ TestpanicCmd(dummy, interp, argc, argv)
      */
 
     argString = Tcl_Merge(argc-1, argv+1);
-    panic("%s",argString);
+    Tcl_Panic("%s",argString);
     ckfree((char *)argString);
 
     return TCL_OK;
@@ -2054,7 +2053,7 @@ TCL_CMD_HEADER( Rivet_GetThreadId )
         char*    cmd_arg;
 
         Tcl_IncrRefCount(argobj);
-        cmd_arg = Tcl_GetStringFromObj(argobj,NULL);
+        cmd_arg = Tcl_GetStringFromObj(argobj,(Tcl_Size *)NULL);
         if (STRNEQU(cmd_arg,"-hex"))
         {
             output_format = format_hex;

@@ -81,8 +81,8 @@ Rivet_HexToDigit(int c) {
  */
 TCL_CMD_HEADER( Rivet_UnescapeStringCmd )
 {
-    char *origString, *newString, *origStringP, *newStringP;
-    int  origLength;
+    char     *origString, *newString, *origStringP, *newStringP;
+    Tcl_Size  origLength;
     int digit1, digit2;
 
     if ( objc != 2 ) {
@@ -90,7 +90,7 @@ TCL_CMD_HEADER( Rivet_UnescapeStringCmd )
         return TCL_ERROR;
     }
 
-    origString = Tcl_GetStringFromObj( objv[1], &origLength );
+    origString = Tcl_GetStringFromObj(objv[1],&origLength);
     newString = Tcl_Alloc( (unsigned)origLength + 1);
 
     /* for all the characters in the source string */
@@ -176,8 +176,8 @@ Rivet_DigitToHex(int c) {
  */
 TCL_CMD_HEADER( Rivet_EscapeStringCmd )
 {
-    char *origString, *newString, *origStringP, *newStringP;
-    int origLength;
+    char    *origString, *newString, *origStringP, *newStringP;
+    Tcl_Size origLength;
 
     if ( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "string" );
@@ -229,15 +229,15 @@ TCL_CMD_HEADER( Rivet_EscapeStringCmd )
  */
 TCL_CMD_HEADER( Rivet_EscapeSgmlCharsCmd )
 {
-    char *origString, *newString, *origStringP, *newStringP;
-    int origLength;
+    char    *origString, *newString, *origStringP, *newStringP;
+    Tcl_Size origLength;
 
     if( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "string" );
         return TCL_ERROR;
     }
 
-    origString = Tcl_GetStringFromObj( objv[1], &origLength );
+    origString = Tcl_GetStringFromObj(objv[1],&origLength);
 
     /* If they sent us an empty string, we're done */
     if (origLength == 0) return TCL_OK;
@@ -313,15 +313,15 @@ TCL_CMD_HEADER( Rivet_EscapeSgmlCharsCmd )
  */
 TCL_CMD_HEADER( Rivet_EscapeShellCommandCmd )
 {
-    char *origString, *newString, *origStringP, *newStringP, *checkP;
-    int  origLength;
+    char     *origString, *newString, *origStringP, *newStringP, *checkP;
+    Tcl_Size  origLength;
 
     if( objc != 2) {
         Tcl_WrongNumArgs( interp, 1, objv, "string" );
         return TCL_ERROR;
     }
 
-    origString = Tcl_GetStringFromObj( objv[1], &origLength );
+    origString = Tcl_GetStringFromObj(objv[1],&origLength);
 
     newString = Tcl_Alloc( (unsigned)origLength * 2 + 1 );
 

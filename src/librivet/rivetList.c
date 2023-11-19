@@ -50,10 +50,11 @@ TCL_CMD_HEADER(Rivet_LremoveObjCmd)
 #define EXACT   0
 #define GLOB    1
 #define REGEXP  2
-    int listObjc, i, j, match, mode, patternLen, valueLen;
+    int i, j, match, mode;
     int list, all, done, append;
     char *modeStr, *pattern, *value;
     Tcl_Obj **listObjv, *matchedListPtr = NULL;
+    Tcl_Size listObjc;
 
     if( objc < 3 ) {
         Tcl_WrongNumArgs( interp, 1, objv,
@@ -108,6 +109,8 @@ TCL_CMD_HEADER(Rivet_LremoveObjCmd)
     done = 0;
     for(i = 0; i < listObjc; i++)
     {
+		Tcl_Size valueLen;
+
         match = 0;
         value = Tcl_GetStringFromObj(listObjv[i], &valueLen);
 
@@ -126,6 +129,8 @@ TCL_CMD_HEADER(Rivet_LremoveObjCmd)
         append = list + 1;
         for( j = list + 1; j < objc; ++j )
         {
+			Tcl_Size  patternLen;
+
             pattern = Tcl_GetStringFromObj(objv[j], &patternLen);
             if( (mode != EXACT) && (strlen(pattern) != (size_t)patternLen) ) {
                 goto binData;
@@ -234,21 +239,21 @@ Rivet_ListObjAppendString (interp, targetList, string, length)
  */
 TCL_CMD_HEADER(Rivet_CommaSplitObjCmd) 
 {
-    char        *first, *next;
+    char        *first,*next;
     char         c;
-    int          stringLength;
+    Tcl_Size     stringLength;
     Tcl_Obj     *resultList;
 
     /* ??? need a way to set this */
     /* true if two quotes ("") in the body of a field maps to one (") */
-    int          quotequoteQuotesQuote = 1;
+    int quotequoteQuotesQuote = 1;
 
     /* true if quotes within strings not followed by a comma are allowed */
-    int          quotePairsWithinStrings = 1;
+    int quotePairsWithinStrings = 1;
 
     if( objc != 2 ) {
-    Tcl_WrongNumArgs( interp, 1, objv, "string" );
-    return TCL_ERROR;
+		Tcl_WrongNumArgs( interp, 1, objv, "string" );
+		return TCL_ERROR;
     }
 
     /* get access to a textual representation of the object */
@@ -396,13 +401,13 @@ TCL_CMD_HEADER(Rivet_CommaSplitObjCmd)
  */
 TCL_CMD_HEADER(Rivet_CommaJoinObjCmd)
 {
-    int         listObjc;
+    Tcl_Size    listObjc;
     Tcl_Obj   **listObjv;
     int         listIdx, didField;
     Tcl_Obj    *resultPtr;
     char       *walkPtr;
     char       *strPtr;
-    int         stringLength;
+    Tcl_Size    stringLength;
 
     if( objc != 2 ) {
     Tcl_WrongNumArgs( interp, 1, objv,
@@ -473,19 +478,22 @@ TCL_CMD_HEADER(Rivet_CommaJoinObjCmd)
  */
 TCL_CMD_HEADER( Rivet_LassignArrayObjCmd )
 {
-    int     listObjc, listIdx, idx;
+    int      listIdx,idx;
+	Tcl_Size listObjc;
     Tcl_Obj **listObjv;
     Tcl_Obj *varValue;
 
-    if( objc < 4 ) {
-    Tcl_WrongNumArgs( interp, 1, objv,
-            "list arrayName elementName ?elementName..?");
-        return TCL_ERROR;
+    if (objc < 4) {
+		Tcl_WrongNumArgs( interp, 1, objv,
+				"list arrayName elementName ?elementName..?");
+		return TCL_ERROR;
     }
 
-    if( Tcl_ListObjGetElements(interp, objv[1],
+    if (Tcl_ListObjGetElements(interp, objv[1],
                                &listObjc, &listObjv) != TCL_OK)
+	{
         return TCL_ERROR;
+	}
 
     for (idx = 3, listIdx = 0; idx < objc; idx++, listIdx++) {
     varValue = (listIdx < listObjc) ?
