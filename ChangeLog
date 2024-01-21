@@ -1,3 +1,6 @@
+2024-01-05 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: bumped version number as 3.2.4
+
 2023-11-12 Massimo Manghi <mxmanghi@apache.org>
 	* .appveyor.yml: Attemping to fix Visual Studio generator version
 
@@ -16,7 +19,7 @@
 	* src/mod_rivet_ng/mod_rivet.c,mod_rivet_generator.c: Removed unused code that
 	has been commented out long ago
 	* rivet/rivet-tcl/parray.tcl: ::rivet::parray now accepting alternative way to
-	return output.
+	return data or generate output.
 
 2023-05-18 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c:

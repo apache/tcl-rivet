@@ -357,7 +357,7 @@
 		    	command adding some extra error handling needed by mod_rivet design.
 		    	The rationale for Rivet to have its own <command>::rivet::catch</command> reads
 		    	as follows: within mod_rivet a script execution can be interrupted by either calling 
-		    	<command>::rivet::exit</command>(deprecated) or <command>::rivet::abort_page</command>.
+		    	<command>::rivet::exit</command> (not recommended) or <command>::rivet::abort_page</command>.
 		    	These commands implement a simple internal exception mechanism by 
             returning a special error code so that execution is in turn handed down to the
             <command>AbortScript</command> and eventually to <command>AfterEveryScript</command>
@@ -365,7 +365,7 @@
             control of the <command>::catch</command> command would need to do this chore itself,
             checking the error info and in case throw the error again if it had been originated
             by one of mod_rivet's exceptions calls. This is what <command>::rivet::catch</command>
-            does hiding the implementation details provide a better and more compatibile way to
+            does by hiding the implementation details and providing a better and more compatibile way to
             handle this condition.
 			</para>
 			
