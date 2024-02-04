@@ -1,8 +1,6 @@
 Test Suite for Rivet
 ====================
 
-$Id$
-
 These tests are intended to automate the testing of core Rivet
 features.  They are not complete at this point, and work on them would
 be welcome.
@@ -21,7 +19,7 @@ be compiled into Apache for this to work.
 
 For example:
 
-./runtest.tcl /usr/sbin/apache
+./runtest.tcl /usr/sbin/apache -mpm prefork
 
 Where to put tests/which files are which:
 ----------------------------------------

@@ -107,26 +107,41 @@ static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w
         case child_global: function = w->conf->rivet_global_init_script;
                            break;
         case child_init: function = w->conf->rivet_child_init_script;
-                           break;
+                         break;
         case child_exit: function = w->conf->rivet_child_exit_script;
     }
 
     if (function)
     {
+        rivet_interp_globals* globals = NULL;
         tcl_conf_script = Tcl_NewStringObj(function,-1);
         Tcl_IncrRefCount(tcl_conf_script);
+
+        /* before we run a script we have to store the pointer to the
+         * running configuration in the thread private data. The design has
+         * to improve and running a script must have everything sanely
+         * prepared TODO
+         */
+
+        globals = Tcl_GetAssocData(interp,"rivet",NULL);
+
+        /*
+         * The current server record is stored to enable ::rivet::apache_log_error and
+         * other commands to log error messages in the virtual host's designated log file
+         */
+
+        globals->server = w->server;
 
         if (Tcl_EvalObjEx(interp,tcl_conf_script, 0) != TCL_OK)
         {
             char*       errmsg = "rivet_lazy_mpm.so: Error in configuration script: %s";
             server_rec* root_server = module_globals->server;
 
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,root_server,
-                         errmsg, function);
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,root_server,
-                         "errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
-            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL,root_server,
-                         "errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
+            ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,errmsg,function);
+            ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,
+                         "errorCode: %s",Tcl_GetVar(interp,"errorCode",0));
+            ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,
+                         "errorInfo: %s",Tcl_GetVar(interp,"errorInfo",0));
         }
 
         Tcl_DecrRefCount(tcl_conf_script);
@@ -183,7 +198,7 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     Rivet_PerInterpInit(private->ext->interp,private,w->server,private->pool);
 
-    /* The child initialization is fired. Beware of the terminologic
+    /* The child initialization is fired. Beware the terminological
      * trap: we inherited from fork capable systems the term 'child'
      * meaning 'child process'. In this case the child init actually
      * is a worker thread initialization, because in a threaded module
