@@ -67,6 +67,71 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
     return interp_obj;
 }
 
+/* -- Rivet_RunChildExitScripts 
+ *
+ *
+ */
+
+void Rivet_RunChildScripts (rivet_thread_private* private,bool init)
+{
+    server_rec*             vhost_server;
+    server_rec*             root_server;
+    rivet_server_conf*      root_server_conf;
+    void*                   parentfunction;     /* this is topmost initialization script */
+    void*                   function;
+
+    root_server = module_globals->server;
+    root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
+
+    parentfunction = (init ? root_server_conf->rivet_child_init_script : root_server_conf->rivet_child_exit_script);
+    for (vhost_server = root_server; vhost_server != NULL; vhost_server = vhost_server->next)
+    {
+        rivet_thread_interp*  rivet_interp;
+        rivet_server_conf*    myrsc;
+        rivet_interp_globals* globals = NULL;
+
+        myrsc = RIVET_SERVER_CONF(vhost_server->module_config);
+        rivet_interp = RIVET_PEEK_INTERP(private,myrsc);
+        function = (init ? myrsc->rivet_child_init_script : myrsc->rivet_child_exit_script);
+        if (function &&
+            (vhost_server == root_server || module_globals->separate_virtual_interps || function != parentfunction))
+        {
+            char*       errmsg = MODNAME ": Error in Child init script: %s";
+            Tcl_Obj*    tcl_script_obj = Tcl_NewStringObj(function,-1);
+
+            Tcl_IncrRefCount(tcl_script_obj);
+            Tcl_Preserve (rivet_interp->interp);
+
+            /* before we run a script we have to store the pointer to the
+             * running configuration in the thread private data. The design has
+             * to improve and running a script must have everything sanely
+             * prepared TODO
+             */
+
+            globals = Tcl_GetAssocData(rivet_interp->interp, "rivet", NULL);
+
+            /*
+             * The current server record is stored to enable ::rivet::apache_log_error and
+             * other commands to log error messages in the virtual host's designated log file
+             */
+
+            globals->server = vhost_server;
+            private->running_conf = myrsc;
+
+            if (Tcl_EvalObjEx(rivet_interp->interp,tcl_script_obj,0) != TCL_OK) {
+                ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,vhost_server,errmsg, function);
+                ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,vhost_server,
+                             "errorCode: %s", Tcl_GetVar(rivet_interp->interp,"errorCode",0));
+                ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,vhost_server,
+                             "errorInfo: %s", Tcl_GetVar(rivet_interp->interp,"errorInfo",0));
+            }
+            Tcl_Release (rivet_interp->interp);
+            Tcl_DecrRefCount(tcl_script_obj);
+
+        }
+    }
+}
+
 /* -- Rivet_VirtualHostsInterps
  *
  * The server_rec chain is walked through and server configurations are read to
@@ -104,6 +169,8 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
      */
 
     parentfunction = root_server_conf->rivet_child_init_script;
+
+    /* then we proceed assigning/creating the interpreters for each virtual host */
 
     for (vhost_server = root_server; vhost_server != NULL; vhost_server = vhost_server->next)
     {
@@ -195,6 +262,9 @@ rivet_thread_private* Rivet_SetupInterps (rivet_thread_private* private)
             Tcl_DecrRefCount(tcl_child_init);
         }
     }
+
+    /* the child init scripts get evaluated */
+    Rivet_RunChildScripts(private,true);
     return private;
 }
 

@@ -1,3 +1,16 @@
+<<<<<<< HEAD
+=======
+2024-02-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/rivet_prefork_mpm.c:
+    * src/mod_rivet_ng/rivet_worker_mpm.c:
+    * src/mod_rivet_ng/worker_prefork_common.c: now calling the
+    new function Rivet_RunChildScripts to execute
+    both rivet_child_init_script and rivet_child_exit_script
+
+2024-01-05 Massimo Manghi <mxmanghi@apache.org>
+    * VERSION: bumped version number as 3.2.4
+
+>>>>>>> 1bdb883 (now calling Rivet_RunChildScripts to execute also rivet_child_exit_script)
 2023-11-12 Massimo Manghi <mxmanghi@apache.org>
 	* .appveyor.yml: Attemping to fix Visual Studio generator version
 
