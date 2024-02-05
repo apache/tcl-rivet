@@ -138,10 +138,8 @@ static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w
             server_rec* root_server = module_globals->server;
 
             ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,errmsg,function);
-            ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,
-                         "errorCode: %s",Tcl_GetVar(interp,"errorCode",0));
-            ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,
-                         "errorInfo: %s",Tcl_GetVar(interp,"errorInfo",0));
+            ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,"errorCode: %s", Tcl_GetVar(interp, "errorCode", 0));
+            ap_log_error(APLOG_MARK,APLOG_ERR,APR_EGENERAL,root_server,"errorInfo: %s", Tcl_GetVar(interp, "errorInfo", 0));
         }
 
         Tcl_DecrRefCount(tcl_conf_script);
@@ -151,10 +149,10 @@ static void Lazy_RunConfScript (rivet_thread_private* private,lazy_tcl_worker* w
 /*
  * -- request_processor
  *
- * The lazy bridge worker thread. This thread prepares its control data and
- * will serve requests addressed to a given virtual host. Virtual host server
- * data are stored in the lazy_tcl_worker structure stored in the generic
- * pointer argument 'data'
+ * The lazy bridge worker thread. This thread initializes its control data and
+ * prepares to serve requests addressed to the virtual host which is meant to work
+ * as a content generator. Virtual host server data are stored in the
+ * lazy_tcl_worker structure stored in the generic pointer argument 'data'
  *
  */
 
@@ -384,8 +382,9 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
      * be avoided at any costs when programming with mod_rivet
      */
 
-    if (module_globals->mpm->server_shutdown == 1) {
-        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_EGENERAL, r,
+    if (module_globals->mpm->server_shutdown == 1)
+    {
+        ap_log_rerror(APLOG_MARK,APLOG_ERR,APR_EGENERAL,r,
                       MODNAME ": http request aborted during child process shutdown");
         apr_thread_mutex_unlock(mutex);
         return HTTP_INTERNAL_SERVER_ERROR;
@@ -508,7 +507,6 @@ apr_status_t LazyBridge_Finalize (void* data)
  *
  *
  */
-
 
 int LazyBridge_ExitHandler(rivet_thread_private* private)
 {
