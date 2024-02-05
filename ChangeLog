@@ -1,4 +1,5 @@
 2024-02-04 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml: new version 3.2.4
     * src/mod_rivet_ng/rivet_prefork_mpm.c:
     * src/mod_rivet_ng/rivet_worker_mpm.c:
     * src/mod_rivet_ng/worker_prefork_common.c: now calling the
