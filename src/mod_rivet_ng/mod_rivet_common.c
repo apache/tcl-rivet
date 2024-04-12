@@ -246,7 +246,13 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
     /* Set up interpreter associated data */
 
     globals = ckalloc(sizeof(rivet_interp_globals));
-    Tcl_SetAssocData (interp,"rivet",NULL,globals);
+
+    /*
+     * we assign a default server_rec value into the globals
+     * even though some mpm bridge may override it
+     */
+
+    globals->server = s;
 
     /*
      * we store in the globals some information relevant to
@@ -257,6 +263,10 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 
     globals->rivet_ns = Tcl_CreateNamespace (interp,RIVET_NS,NULL,
                                             (Tcl_NamespaceDeleteProc *)NULL);
+
+    /* this is interp specific global data */
+
+    Tcl_SetAssocData (interp,"rivet",NULL,globals);
 
     /* We put in front the auto_path list the path to the directory where
      * init.tcl is located (provides package Rivet, previously RivetTcl)
