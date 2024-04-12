@@ -277,11 +277,6 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
     ap_assert (interp != (Tcl_Interp *)NULL);
     Tcl_Preserve (interp);
 
-    /* Set up interpreter associated data */
-
-    //globals = ckalloc(sizeof(rivet_interp_globals));
-    //Tcl_SetAssocData (interp,"rivet",NULL,globals);
-
     /*
      * we store in the globals some information relevant to
      * the embedded interpreter work
