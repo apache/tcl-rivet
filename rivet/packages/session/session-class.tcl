@@ -105,7 +105,7 @@ package require Itcl
     constructor {args} {
 	eval configure $args
     	$dioObject registerSpecialField $sessionTable session_update_time NOW
-	    $dioObject registerSpecialField $sessionTable session_start_time NOW
+	$dioObject registerSpecialField $sessionTable session_start_time NOW
     }
 
     method status {args} {
@@ -168,7 +168,7 @@ package require Itcl
 	append del_cmd [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS]
 	append del_cmd " - [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
 	append del_cmd " > $gcMaxLifetime"
-	debug "do_garbage_collection: > $del_cmd  <"
+	debug "do_garbage_collection: > $del_cmd <"
 	set result [$dioObject exec $del_cmd]
 	$result destroy
     }
