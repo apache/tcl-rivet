@@ -19,8 +19,6 @@
     under the License.
  */
 
-/* $Id$ */
-
 #ifndef __worker_prefork_common_h__
 #define __worker_prefork_common_h__
 

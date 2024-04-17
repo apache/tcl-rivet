@@ -172,7 +172,7 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 	<section>
 	 <title>Handling Tcl's exit core command</title> 
 	<para>
-		Most of the fields in the <command>mpm_bridge_status</command> are meant to deal 
+		Most fields in the <command>mpm_bridge_status</command> are meant to deal
 		with the child exit process. Rivet supersedes the Tcl core's exit function
 		with a <command>::rivet::exit</command> function and it does so in order to curb the effects
 		of the core function that would force a child process to immediately exit. 
@@ -192,8 +192,8 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 		programming. We cannot stress this point enough. If your application must bail out
 		for some reason focus your attention on the design to find the most appropriate
 		route to exit and whenever possible avoid 
-		calling <command>exit</command> at all (which basically wraps a
-		C call to Tcl_Exit). Anyway the Rivet implementation partially transforms
+		calling <command>exit</command> (which basically wraps a
+		C call to Tcl_Exit) at all. Anyway the Rivet implementation partially transforms
 		<command>exit</command> in a sort of special <command>::rivet::abort_page</command>
 		implementation whose eventual action is to call the <command>Tcl_Exit</command>
 		library call. See the <command><xref linkend="exit">::rivet::exit</xref></command>
@@ -202,10 +202,9 @@ void LazyBridge_ChildInit (apr_pool_t* pool, server_rec* server)
 	<para>
 		Both the worker bridge and lazy bridge 
 		implementations of <command>mpm_exit_handler</command> call the function pointed 
-		by <command>mpm_finalize</command> which also the function called by the framework 
-		when the web server shuts down.
-		See these functions' code for further details, they are very easy to 
-		read and understand
+		by <command>mpm_finalize</command> which is also the function called by the framework
+		when the web server shuts down. See these functions' code for further details,
+		they are very easy to read and understand
 	</para>
 	</section>
 	<section>
@@ -233,10 +232,10 @@ typedef struct lazy_tcl_worker {
     request_rec*        r;
     int                 ctype;
     int                 ap_sts;
-    rivet_server_conf*  conf;               /* rivet_server_conf* record                */
+    rivet_server_conf*  conf;               /* rivet_server_conf* record */
 } lazy_tcl_worker;</programlisting>
 	<para>
-		The server field is assigned with the virtual host server record. Whereas the <command>conf</command>
+		The server field is initialized with the virtual host server record. Whereas the <command>conf</command>
 		field keeps the pointer to a run time computed <command>rivet_server_conf</command>. This structure
 		may change from request to request because the request configuration changes when the URL may refer 
 		to directory specific configuration in <command>&lt;Directory ...&gt;...&lt;/Directory&gt;</command> 
@@ -331,10 +330,10 @@ int Lazy_MPM_Request (request_rec* r,rivet_req_ctype ctype)
 	<programlisting>/*
  * -- request_processor
  *
- * The lazy bridge worker thread. This thread prepares its control data and 
- * will serve requests addressed to a given virtual host. Virtual host server
- * data are stored in the lazy_tcl_worker structure stored in the generic 
- * pointer argument 'data'
+ * The lazy bridge worker thread. This thread initialized its control data and 
+ * prepares to serve requests addressed to the virtual host which is meant to work
+ * as a content generator. Virtual host server data are stored in the 
+ * lazy_tcl_worker structure stored in the generic pointer argument 'data'
  * 
  */
 

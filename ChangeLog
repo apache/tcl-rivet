@@ -1,5 +1,25 @@
+2024-04-12 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet_common.c: Determining the server_rec also
+	for ServerInitScripts.
+	* doc/rivet.xml: update version number
+
+2024-02-18 Massimo Manghi <mxmanghi@apache.org>
+	* doc/xml/commands.xml: fixed misspelled command ::rivet::thread_id
+	* VERSION: new version 3.2.5
+
+2024-02-04 Massimo Manghi <mxmanghi@apache.org>
+	* doc/rivet.xml: new version 3.2.4
+	* src/mod_rivet_ng/rivet_prefork_mpm.c:
+	* src/mod_rivet_ng/rivet_worker_mpm.c:
+	* src/mod_rivet_ng/worker_prefork_common.c: now calling the
+	new function Rivet_RunChildScripts to execute
+	both rivet_child_init_script and rivet_child_exit_script
+
+2024-01-05 Massimo Manghi <mxmanghi@apache.org>
+	* VERSION: bumped version number as 3.2.4
+
 2023-11-19 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/*.c: changing code to comply with the Tcl 9.0 new requirements
+	* src/mod_rivet_ng/*.c: changing code to comply with the Tcl 9.0 new requirements
 
 2023-11-12 Massimo Manghi <mxmanghi@apache.org>
 	* .appveyor.yml: Attemping to fix Visual Studio generator version
@@ -19,7 +39,7 @@
 	* src/mod_rivet_ng/mod_rivet.c,mod_rivet_generator.c: Removed unused code that
 	has been commented out long ago
 	* rivet/rivet-tcl/parray.tcl: ::rivet::parray now accepting alternative way to
-	return output.
+	return data or generate output.
 
 2023-05-18 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet.c:

@@ -58,6 +58,7 @@ int round(double d) { return (int)(d + 0.5); }
 #endif /* RIVET_NO_HAVE_ROUND */
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
+void Rivet_RunChildScripts (rivet_thread_private* private,bool init);
 
 typedef struct mpm_bridge_status {
     apr_thread_t*       supervisor;
@@ -182,58 +183,6 @@ void WorkerBridge_Shutdown (void)
     return;
 }
 
-#if 0
-void WorkerBridge_Shutdown (void)
-{
-    int                 waits;
-    void*               v;
-    handler_private*    thread_obj;
-    apr_status_t        rv;
-    apr_uint32_t        threads_to_stop;
-
-    apr_thread_mutex_lock(module_globals->mpm->job_mutex);
-
-    module_globals->mpm->server_shutdown = 1;
-
-    /* We wake up the supervisor who is now supposed to stop
-     * all the Tcl worker threads
-     */
-
-    apr_thread_cond_signal(module_globals->mpm->job_cond);
-    apr_thread_mutex_unlock(module_globals->mpm->job_mutex);
-
-    waits = 5;
-    do
-    {
-
-        rv = apr_queue_trypop(module_globals->mpm->queue,&v);
-
-        /* We wait for possible threads that are taking
-         * time to serve requests and haven't had a chance to
-         * see the signal
-         */
-
-        if (rv == APR_EAGAIN)
-        {
-            waits--;
-            apr_sleep(200000);
-            continue;
-        }
-
-        thread_obj = (handler_private*)v;
-        apr_thread_mutex_lock(thread_obj->mutex);
-        thread_obj->status = init;
-        apr_thread_cond_signal(thread_obj->cond);
-        apr_thread_mutex_unlock(thread_obj->mutex);
-
-        threads_to_stop = apr_atomic_read32(module_globals->mpm->threads_count);
-
-    } while ((waits > 0) && (threads_to_stop > 0));
-
-    return;
-}
-#endif
-
 /*
  * -- request_processor
  */
@@ -335,6 +284,8 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     } while (private->ext->keep_going > 0);
 
+    Rivet_RunChildScripts(private,false);
+
     apr_thread_mutex_unlock(thread_obj->mutex);
     ap_log_error(APLOG_MARK,APLOG_DEBUG,0,module_globals->server,"processor thread orderly exit");
 
@@ -388,37 +339,10 @@ static void start_thread_pool (int nthreads)
     }
 }
 
-/* -- supervisor_chores
- *
- */
-
-#if 0
-static void supervisor_housekeeping (void)
-{
-    int         nruns = module_globals->num_load_samples;
-    double      devtn;
-    double      count;
-
-    if (nruns == 60)
-    {
-        nruns = 0;
-        module_globals->average_working_threads = 0;
-    }
-
-    ++nruns;
-    count = (int) apr_atomic_read32(module_globals->running_threads_count);
-
-    devtn = ((double)count - module_globals->average_working_threads);
-    module_globals->average_working_threads += devtn / (double)nruns;
-    module_globals->num_load_samples = nruns;
-}
-#endif
-
-
 /* -- threaded_bridge_supervisor
  *
- * This function runs within a single thread and to the
- * start and stop of Tcl worker thread pool. It could be extended also
+ * This function runs within a single thread abd manages the
+ * Tcl worker thread pool. It could be extended also
  * to provide some basic monitoring data.
  *
  * As we don't delete Tcl interpreters anymore because it can lead
@@ -728,7 +652,8 @@ apr_status_t WorkerBridge_Finalize (void* data)
     rv = apr_thread_join (&thread_status,module_globals->mpm->supervisor);
     if (rv != APR_SUCCESS)
     {
-        ap_log_error(APLOG_MARK,APLOG_ERR,rv,s,MODNAME": Error joining supervisor thread");
+        ap_log_error(APLOG_MARK,APLOG_ERR,rv,s,
+                     MODNAME": Error joining worker bridge supervisor thread");
     }
 
     return OK;
@@ -783,16 +708,11 @@ int WorkerBridge_ExitHandler(rivet_thread_private* private)
 
     private->ext->keep_going = 0;
 
-    //module_globals->mpm->exit_command = 1;
-    //module_globals->mpm->exit_command_status = private->exit_status;
-
     if (!module_globals->single_thread_exit)
     {
-
         module_globals->mpm->skip_thread_on_exit = 1;
 
-        /* We now tell the supervisor to terminate the Tcl worker thread pool to exit
-         * and is sequence the whole process to shutdown by calling exit() */
+        /* We now tell the supervisor to terminate the Tcl worker thread pool */
 
         WorkerBridge_Finalize(private->r->server);
 
@@ -807,39 +727,25 @@ int WorkerBridge_ExitHandler(rivet_thread_private* private)
     return TCL_OK;
 }
 
+/*
+ * -- WorkerBridge_Interp
+ * 
+ * Either returns the rivet_thread_interp object that's going
+ * to run the script or stores in the bridge data the interpreter
+ * associated to a specific rivet_server_conf record
+ *
+ * Arguments:  - rivet_thread_private* private: thread private data
+ *             - rivet_server_conf*    conf: virtual host configuration
+ *             - rivet_thread_interp*  interp: If not  NULL stores the interpreter
+ *                                     in the bridge data.
+ * Returned value: rivet_thread_interp*
+ *                                     In any case the function returns
+ *                                     the rivet_thread_interp
+ *                                     object associated with the virtual host
+ *                                     configuration
+ *
+ */
 
-#if 0
-int WorkerBridge_ExitHandler(rivet_thread_private* private)
-{
-    /* This is not strictly necessary, because this command will
-     * eventually terminate the whole processes
-     */
-
-    /* By setting this flag to 0 we let the thread exit when the
-     * request processing has completed
-     */
-
-    private->ext->keep_going = 0;
-
-    module_globals->mpm->exit_command = 1;
-    module_globals->mpm->exit_command_status = private->exit_status;
-
-    /* In case single_thread_exit we return preparing this thread to exit */
-
-    if (!private->running_conf->single_thread_exit)
-    {
-        /* We now tell the supervisor to terminate the Tcl worker
-         * thread pool to exit and is sequence the whole process to
-         * shutdown by calling exit()
-         */
-
-        WorkerBridge_Finalize (private->r->server);
-
-    }
-
-    return TCL_OK;
-}
-#endif
 rivet_thread_interp* WorkerBridge_Interp (rivet_thread_private* private,
                                          rivet_server_conf*    conf,
                                          rivet_thread_interp*  interp)

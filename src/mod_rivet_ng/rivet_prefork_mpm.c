@@ -37,6 +37,7 @@ extern DLLIMPORT apr_threadkey_t*   rivet_thread_key;
 extern module    rivet_module;
 
 rivet_thread_private*   Rivet_VirtualHostsInterps (rivet_thread_private* private);
+void Rivet_RunChildScripts (rivet_thread_private* private,bool init);
 
 /* -- PreforkBridge_Finalize */
 
@@ -195,6 +196,9 @@ rivet_thread_interp* MPM_MasterInterp(server_rec* server)
 
 int PreforkBridge_ExitHandler(rivet_thread_private* private)
 {
+
+    Rivet_RunChildScripts(private,false);
+
     Tcl_Exit(private->exit_status);
 
     /* actually we'll never get here but we return

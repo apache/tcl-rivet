@@ -1756,8 +1756,8 @@ TCL_CMD_HEADER( Rivet_InspectCmd )
  *
  *      log_error priority message
  *
- *        priority can be one of "emerg", "alert", "crit", "err",
- *            "warning", "notice", "info", "debug"
+ *        priority can be one of "emerg","alert","crit","err",
+ *                               "warning","notice","info","debug"
  *
  * Results:
  *      A message is logged to the Apache error log.
@@ -1772,7 +1772,7 @@ TCL_CMD_HEADER(Rivet_LogErrorCmd)
     server_rec *serverRec;
 
     int loglevelindex;
-    int  apLogLevel = 0;
+    int apLogLevel = 0;
 
     static const char *logLevel[] = {
         "emerg",
