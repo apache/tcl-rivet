@@ -25,7 +25,7 @@ namespace eval ncgi {
 #	None.
 
 proc ::ncgi::parse {} {
-    load_env ::env
+    ::rivet::load_env ::env
 }
 
 # ::ncgi::value --
@@ -43,10 +43,10 @@ proc ::ncgi::parse {} {
 #	The value of the specified variable, or {} if it is empty.
 
 proc ::ncgi::value {key {default {}}} {
-    if { [var exists $key] } {
-	return [var get $key]
+    if { [::rivet::var exists $key] } {
+        return [::rivet::var get $key]
     } else {
-	return $default
+        return $default
     }
 }
 
@@ -73,25 +73,25 @@ proc ::ncgi::encode {string} {
 
 proc ::ncgi::importFile {cmd var {filename {}}} {
     switch -exact -- $cmd {
-	-server {
-	    if { $filename == {} } {
-		set filename [::fileutil::tempfile ncgi]
-	    }
-	    upload save $var $filename
-	    return $filename
-	}
-	-client {
-	    return [upload filename $var]
-	}
-	-type {
-	    return [upload type]
-	}
-	-data {
-	    return [upload data $var]
-	}
-	default {
-	    error "Unknown subcommand to ncgi::import_file: $cmd"
-	}
+        -server {
+            if { $filename == {} } {
+                set filename [::fileutil::tempfile ncgi]
+            }
+            ::rivet::upload save $var $filename
+            return $filename
+        }
+        -client {
+            return [::rivet::upload filename $var]
+        }
+        -type {
+            return [::rivet::upload type]
+        }
+        -data {
+            return [::rivet::upload data $var]
+        }
+        default {
+            error "Unknown subcommand to ncgi::import_file: $cmd"
+        }
     }
 }
 
@@ -110,7 +110,7 @@ proc ::ncgi::importFile {cmd var {filename {}}} {
 #	1 or 0.
 
 proc ::ncgi::empty {name} {
-    expr {! [var exists $name]}
+    expr {![::rivet::var exists $name]}
 }
 
 # ::ncgi::::redirect --
@@ -127,5 +127,5 @@ proc ::ncgi::empty {name} {
 #	None.
 
 proc ::ncgi::::redirect {uri} {
-    headers redirect $uri
+    ::rivet::headers redirect $uri
 }
