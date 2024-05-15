@@ -1,4 +1,6 @@
-# Copyright 2024 Massimo Manghi <mxmanghi@apache.org>
+# tdbc.tcl -- connector for tdbc, the Tcl database abstraction layer
+#
+# Copyright 2024 The Apache Software Foundation
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +17,8 @@
 
 
 package require DIO
-package provide dio::tdbc 0.1
+package require tdbc
+package provide dio_Tdbc 0.2
 
 namespace eval DIO {
     ::itcl::class Tdbc {
@@ -28,7 +31,7 @@ namespace eval DIO {
                                               -readonly     \
                                               -timeout]
 
-        constructor {interface_name args} {eval configure $args} {
+        constructor {interface_name args} {eval configure {*}$args} {
             set connector_n 0
             set connector   ""
 
@@ -81,7 +84,7 @@ namespace eval DIO {
 
             # tdbc doesn't like ';' at the end of a SQL statement
 
-            if {[::string index end $sql] == ";"} {set sql [::string range 0 end-1 $sql]}
+            if {[::string index $sql end] == ";"} {set sql [::string range 0 end-1 $sql]}
             set is_select [regexp -nocase {^\(*\s*select\s+} $sql]
 
             set sql_st [$connector prepare $sql]
@@ -93,7 +96,16 @@ namespace eval DIO {
             if {[catch {set tdbc_result [$sql_st execute]} errorinfo]} {
                 return [$this result TDBC -error 1 -errorinfo $errorinfo -isselect false]
             } else {
-                set result_obj [$this result -resultid $tdbc_result -isselect $is_select -fields [$tdbc_result columns]] 
+
+                # we must store also the TDBC SQL statement as it owns
+                # the TDBC results set represented by tdbc_result. Closing
+                # a tdbc::statement closes also any active tdbc::resultset
+                # owned by it
+
+                set result_obj [$this result TDBC -resultid   $tdbc_result  \
+                                                  -statement  $sql_st       \
+                                                  -isselect   $is_select    \
+                                                  -fields     [::list [$tdbc_result columns]]] 
             }
         }
 
@@ -103,26 +115,41 @@ namespace eval DIO {
     ::itcl::class TDBCResult {
         inherit Result
         public variable     isselect false
+        public variable     statement
 
         private variable    rowid
         private variable    cached_rows
         private variable    columns
 
         constructor {args} { 
-            eval configure $args
+            eval configure  $args
             set cached_rows {}
             set columns     {}
             set rowid       0
+            set statement   ""
         }
         destructor {}
 
+        public method destroy {} {
+            if {$statement != ""} { $statement close }
+
+            Result::destroy
+        }
+
+        public method current_row {} {return $rowid}
+        public method cached_results {} {return $cached_rows}
+
         public method nextrow {} {
             if {[llength $cached_rows] == 0} {
-                set row [$resultid nextrow]
+                if {[$resultid nextrow -as lists row]} {
+                    incr rowid
+                } else {
+                    set row ""
+                }
             } else {
                 set row [lindex $cached_rows $rowid]
+                incr rowid
             }
-            incr rowid
             return $row
         }
 

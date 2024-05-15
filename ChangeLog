@@ -1,7 +1,10 @@
+2024-05-15 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/tdbc.tcl,dio.tcl: add early support for tdbc database interface
+
 2024-05-11 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/aida/aida.tcl,sql.tcl: experimental files moved from packages/dio
-    * rivet/packages/rivet_ncgi/rivet_ncgi.tcl: fully qualifying rivet commands
-    * Makefile.am: Remove svn Id: 
+	* rivet/packages/aida/aida.tcl,sql.tcl: experimental files moved from packages/dio
+	* rivet/packages/rivet_ncgi/rivet_ncgi.tcl: fully qualifying rivet commands
+	* Makefile.am: Remove svn Id: 
 
 2024-04-12 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet_common.c: Determining the server_rec also
