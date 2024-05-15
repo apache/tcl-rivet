@@ -70,11 +70,11 @@ proc handle {interface args} {
     #
     protected method build_select_query {args} {
 
-        set bool AND
-        set first 1
-        set req ""
+        set bool    AND
+        set first   1
+        set req     ""
         set myTable $table
-        set what "*"
+        set what    "*"
 
         # for each argument passed us...
         # (we go by integers because we mess with the index based on

@@ -96,9 +96,9 @@ namespace eval DIO {
                 return $obj
             }
             if {[catch {mysqlcol $conn -current name} fields]} { set fields "" }
-            set obj [result Mysql   -resultid   $conn               \
-                                    -numrows    [::list $error]     \
-                                    -fields     [::list $fields]]
+            set obj [result Mysql -resultid   $conn               \
+                                  -numrows    [::list $error]     \
+                                  -fields     [::list $fields]]
             return $obj
         }
 
@@ -205,7 +205,7 @@ namespace eval DIO {
             }
         }
 
-        protected method handle_client_arguments {cargs} { 
+        protected method handle_client_arguments {cargs} {
 
             # we assign only the accepted options
 
@@ -245,7 +245,7 @@ namespace eval DIO {
         }
 
         method nextrow {} {
-            return [mysqlnext $resultid]
+            return [mysqlnext $resultid -as lists]
         }
         
     } ; ## ::itcl::class MysqlResult

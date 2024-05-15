@@ -88,8 +88,8 @@ namespace eval DIO {
 	    set my_fields $fields
 	    set fields [::list]
 	    foreach field $my_fields {
-		set field [::string tolower $field]
-		lappend fields $field
+            set field [::string tolower $field]
+            lappend fields $field
 	    }
 	    set error [::oramsg $_cur rows]
 	    set res_cmd "result"
@@ -98,7 +98,7 @@ namespace eval DIO {
 	    lappend res_cmd -fetch_first_row $is_select
 	    set obj [eval $res_cmd]
 	    if {!$is_select} {
-		::oraclose $_cur
+            ::oraclose $_cur
 	    }
 	    return $obj
 	}
@@ -175,7 +175,7 @@ namespace eval DIO {
 
 	public variable db "" {
 	    if {[info exists conn]} {
-		mysqluse $conn $db
+		    mysqluse $conn $db
 	    }
 	}
 
