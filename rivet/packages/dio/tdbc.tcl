@@ -121,8 +121,6 @@ namespace eval DIO {
         public variable     cached_rows
         public variable     columns
 
-        private variable    rownum
-
         constructor {args} { 
             eval configure  $args
             set cached_rows {}
@@ -148,7 +146,7 @@ namespace eval DIO {
                     return ""
                 }
             } else {
-                set row [lindex $cached_rows $rowid]
+                set cached_rows [lassign $cached_rows row]
             }
             incr rowid
             return $row
@@ -162,11 +160,9 @@ namespace eval DIO {
                 # from the whole set of results
 
                 if {[llength $cached_rows] == 0} {
-                    set rownum $rowid
                     set cached_rows [$resultid allrows -as lists -columnsvariable columns]
-                    set rowid 0
                 }
-                return [expr [llength $cached_rows] + $rownum]
+                return [expr [llength $cached_rows] + $rowid]
             } else {
                 return [$resultid rowcount]
             }
