@@ -84,7 +84,7 @@ namespace eval DIO {
 
             # tdbc doesn't like ';' at the end of a SQL statement
 
-            if {[::string index $sql end] == ";"} {set sql [::string range 0 end-1 $sql]}
+            if {[::string index $sql end] == ";"} {set sql [::string range $sql 0 end-1]}
             set is_select [regexp -nocase {^\(*\s*select\s+} $sql]
 
             set sql_st [$connector prepare $sql]
@@ -117,15 +117,18 @@ namespace eval DIO {
         public variable     isselect false
         public variable     statement
 
-        private variable    rowid
-        private variable    cached_rows
-        private variable    columns
+        public variable     rowid
+        public variable     cached_rows
+        public variable     columns
+
+        private variable    rownum
 
         constructor {args} { 
             eval configure  $args
             set cached_rows {}
             set columns     {}
             set rowid       0
+            set rownum      0
             set statement   ""
         }
         destructor {}
@@ -141,15 +144,13 @@ namespace eval DIO {
 
         public method nextrow {} {
             if {[llength $cached_rows] == 0} {
-                if {[$resultid nextrow -as lists row]} {
-                    incr rowid
-                } else {
-                    set row ""
+                if {![$resultid nextrow -as lists row]} {
+                    return ""
                 }
             } else {
                 set row [lindex $cached_rows $rowid]
-                incr rowid
             }
+            incr rowid
             return $row
         }
 
@@ -160,14 +161,16 @@ namespace eval DIO {
                 # the number of columns for a select so must determine it
                 # from the whole set of results
 
-                set cached_rows [$resultid allrows -as lists -columnsvariable columns]
-                return [llength $cached_rows]
+                if {[llength $cached_rows] == 0} {
+                    set rownum $rowid
+                    set cached_rows [$resultid allrows -as lists -columnsvariable columns]
+                    set rowid 0
+                }
+                return [expr [llength $cached_rows] + $rownum]
             } else {
                 return [$resultid rowcount]
             }
         }
 
     }
-
-
 }
