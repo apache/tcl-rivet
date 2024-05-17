@@ -108,8 +108,6 @@ namespace eval DIO {
                                                   -fields     [::list [$tdbc_result columns]]] 
             }
         }
-
-
     }
 
     ::itcl::class TDBCResult {
