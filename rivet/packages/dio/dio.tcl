@@ -59,9 +59,8 @@ proc handle {interface args} {
     # quote - given a string, return the same string with any single
     #  quote characters preceded by a backslash
     #
-    method quote {string} {
-        regsub -all {'} $string {\'} string
-        return $string
+    method quote {a_string} {
+        return [DIO::formatters::quote $a_string]
     }
 
     #
@@ -603,16 +602,14 @@ proc handle {interface args} {
 
     # 
 
-    public method select_special_field {table_name field_name} {
-        if {[dict exists $special_fields $table_name $field_name]} {
-            return [dict get $special_fields $table_name $field_name]
-        } else {
-            return ""
-        }
+    protected method set_field_formatter {formatter_class} {
+        $special_field_formatter destroy
+
+        set special_field_formatter [$formatter_class ::DIO::formatters::#auto]
     }
 
-    public method build_special_field {table_name field_name val} {
-        return [$special_field_formatter build $table_name $field_name $val]
+    public method build_special_field {table_name field_name val {convert_to {}}} {
+        return [$special_field_formatter build $table_name $field_name $val $convert_to]
     }
 
     public method register_special_field {table_name field_name type} {
@@ -625,7 +622,7 @@ proc handle {interface args} {
         $this register_special_field $table_name $field_name $type
     }
 
-    public method makeDBFieldValue {table_name field_name val} {
+    public method makeDBFieldValue {table_name field_name val {convert_to {}}} {
         return [$this build_special_field $table_name $field_name $val]
     }
 
@@ -655,7 +652,7 @@ proc handle {interface args} {
     method host {{string ""}} { return [configure_variable host $string] }
     method port {{string ""}} { return [configure_variable port $string] }
 
-    private variable special_fields_formatter [FieldFormatter #auto]
+    private variable special_fields_formatter [::DIO::formatters::RootFormatter #auto]
 
     public variable interface   ""
     public variable errorinfo   ""
@@ -892,31 +889,6 @@ proc handle {interface args} {
     protected variable cacheArray
 
 } ; ## ::itcl::class Result
-
-# FieldFormatter
-#
-# we devolve the role of special field formatter to this
-# class. By design this is more sensible with respect to
-# the current approach of having such method in subclasses
-# because it allows to reuse the functionality of this
-# class in other DBMS connector. 
-
-# this class must be subclassed for each database type
-
-::itcl::class FieldFormatter {
-
-    private variable special_fields [dict create]
-
-    public method register {table_name field_name ftype} {
-        dict set special_fields $table_name $field_name $ftype
-    }
-
-    public method build {table_name field_name val} {
-        return "'[quote $val]'"
-    }
-
-} ; ## ::itcl::class FieldFormatter
-
 
 } ; ## namespace eval DIO
 
