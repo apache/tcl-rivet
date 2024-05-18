@@ -15,7 +15,7 @@
 # limitations under the License.
 
 package require DIO
-package provide dio_Postgresql 0.1
+package provide dio_Postgresql 0.2
 
 namespace eval DIO {
     ::itcl::class Postgresql {
@@ -101,60 +101,56 @@ namespace eval DIO {
         return $conn
     }
 
-    method makeDBFieldValue {table_name field_name val {convert_to {}}} {
-        if {[info exists specialFields(${table_name}@${field_name})]} {
-            switch $specialFields(${table_name}@${field_name}) {
-                DATE {
-                    set secs [clock scan $val]
-                    set my_val [clock format $secs -format {%Y-%m-%d}]
-                    return "'$my_val'"
-                }
-                DATETIME {
-                    set secs [clock scan $val]
-                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                    return "'$my_val'"
-                }
-                NOW {
-                    switch $convert_to {
+    method build_special_field {table_name field_name val {convert_to {}}} {
+        switch [$this select_special_field $table_name $field_name] {
+            DATE {
+                set secs [clock scan $val]
+                set my_val [clock format $secs -format {%Y-%m-%d}]
+                return "'$my_val'"
+            }
+            DATETIME {
+                set secs [clock scan $val]
+                set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                return "'$my_val'"
+            }
+            NOW {
+                switch $convert_to {
 
-                        # we try to be coherent with the original purpose of this method whose
-                        # goal is to provide to the programmer a uniform way to handle timestamps. 
-                        # E.g.: Package session expects this case to return a timestamp in seconds
-                        # so that differences with timestamps returned by [clock seconds]
-                        # can be done and session expirations are computed consistently.
-                        # (Bug #53703)
+                    # we try to be coherent with the original purpose of this method whose
+                    # goal is to provide to the programmer a uniform way to handle timestamps. 
+                    # E.g.: Package session expects this case to return a timestamp in seconds
+                    # so that differences with timestamps returned by [clock seconds]
+                    # can be done and session expirations are computed consistently.
+                    # (Bug #53703)
 
-                        SECS {
-                            if {[::string compare $val "now"] == 0} {
-#                   set secs    [clock seconds]
-#                   set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
-#                   return  $my_val
-                                return [clock seconds]
-                            } else {
-                                return  "extract(epoch from $field_name)"
-                            }
-                        }
-                        default {
-                            if {[::string compare $val, "now"] == 0} {
-                                set secs [clock seconds]
-                            } else {
-                                set secs [clock scan $val]
-                            }
-
-                            # this is kind of going back and forth from the same 
-                            # format,
-
-                            return "'[clock format $secs -format {%Y-%m-%d %T}]'"
+                    SECS {
+                        if {[::string compare $val "now"] == 0} {
+#                           set secs    [clock seconds]
+#                           set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+#                           return  $my_val
+                            return [clock seconds]
+                        } else {
+                            return  "extract(epoch from $field_name)"
                         }
                     }
-                }
-                default {
-                    # no special code for that type!!
-                    return [pg_quote $val]
+                    default {
+                        if {[::string compare $val, "now"] == 0} {
+                            set secs [clock seconds]
+                        } else {
+                            set secs [clock scan $val]
+                        }
+
+                        # this is kind of going back and forth from the same 
+                        # format,
+
+                        return "'[clock format $secs -format {%Y-%m-%d %T}]'"
+                    }
                 }
             }
-        } else {
+            default {
+                # no special code for that type!!
                 return [pg_quote $val]
+            }
         }
     }
 

@@ -29,7 +29,7 @@ proc handle {interface args} {
     }
     uplevel \#0 package require dio_$interface
 
-    puts "obj: $obj args: $args"
+    #puts "obj: $obj args: $args"
 
     return [uplevel \#0 ::DIO::$interface $obj $args]
 }
@@ -601,12 +601,32 @@ proc handle {interface args} {
         return [string "select count(*) from $myTable"]
     }
 
-    method makeDBFieldValue {table_name field_name val} {
-        return "'[quote $val]'"
+    # 
+
+    public method select_special_field {table_name field_name} {
+        if {[dict exists $special_fields $table_name $field_name]} {
+            return [dict get $special_fields $table_name $field_name]
+        } else {
+            return ""
+        }
     }
 
-    method registerSpecialField {table_name field_name type} {
-        set specialFields(${table_name}@${field_name}) $type
+    public method build_special_field {table_name field_name val} {
+        return [$special_field_formatter build $table_name $field_name $val]
+    }
+
+    public method register_special_field {table_name field_name type} {
+        $special_fields_formatter register $table_name $field_name $type
+    }
+
+    # method kept for compatibility
+
+    public method registerSpecialField {table_name field_name type} {
+        $this register_special_field $table_name $field_name $type
+    }
+
+    public method makeDBFieldValue {table_name field_name val} {
+        return [$this build_special_field $table_name $field_name $val]
     }
 
     ##
@@ -635,7 +655,7 @@ proc handle {interface args} {
     method host {{string ""}} { return [configure_variable host $string] }
     method port {{string ""}} { return [configure_variable port $string] }
 
-    protected variable specialFields
+    private variable special_fields_formatter [FieldFormatter #auto]
 
     public variable interface   ""
     public variable errorinfo   ""
@@ -873,6 +893,31 @@ proc handle {interface args} {
 
 } ; ## ::itcl::class Result
 
+# FieldFormatter
+#
+# we devolve the role of special field formatter to this
+# class. By design this is more sensible with respect to
+# the current approach of having such method in subclasses
+# because it allows to reuse the functionality of this
+# class in other DBMS connector. 
+
+# this class must be subclassed for each database type
+
+::itcl::class FieldFormatter {
+
+    private variable special_fields [dict create]
+
+    public method register {table_name field_name ftype} {
+        dict set special_fields $table_name $field_name $ftype
+    }
+
+    public method build {table_name field_name val} {
+        return "'[quote $val]'"
+    }
+
+} ; ## ::itcl::class FieldFormatter
+
+
 } ; ## namespace eval DIO
 
-package provide DIO 1.1
+package provide DIO 1.2

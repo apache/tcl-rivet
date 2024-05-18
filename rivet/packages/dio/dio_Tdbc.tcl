@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-
 package require DIO
 package require tdbc
 package provide dio_Tdbc 0.2
@@ -58,7 +57,7 @@ namespace eval DIO {
 
             if {$clientargs != ""} { lappend connector_cmd {*}$clientargs }
 
-            puts "evaluating $connector_cmd"
+            #puts "evaluating $connector_cmd"
 
             set connector [eval $connector_cmd]
             incr connector_n

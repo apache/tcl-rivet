@@ -14,9 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id: dio_Oracle.tcl 265421 2004-10-29 20:17:54Z karl $
-
-package provide dio_Oracle 0.1
+package provide dio_Oracle 0.3
 
 namespace eval DIO {
     ::itcl::class Oracle {
@@ -24,16 +22,16 @@ namespace eval DIO {
 
 	constructor {args} {eval configure $args} {
 	    if {[catch {package require Oratcl}]} {
-            return -code error "No Oracle Tcl package available"
+                return -code error "No Oracle Tcl package available"
 	    }
 
 	    eval configure $args
 
 	    if {[::rivet::lempty $db]} {
-            if {[::rivet::lempty $user]} {
-                set user $::env(USER)
-            }
-            set db $user
+                if {[::rivet::lempty $user]} {
+                    set user $::env(USER)
+                }
+                set db $user
 	    }
 	}
 
@@ -71,25 +69,25 @@ namespace eval DIO {
 	    set cmd ::orasql
 	    set is_select 0
 	    if {[::string tolower [lindex $req 0]] == "select"} {
-            set cmd ::orasql
-            set is_select 1
+                set cmd ::orasql
+                set is_select 1
 	    }
 	    set errorinfo ""
 #puts "ORA:$is_select:$req:<br>"
 	    if {[catch {$cmd $_cur $req} error]} {
 #puts "ORA:error:$error:<br>"
-            set errorinfo $error
-            catch {::oraclose $_cur}
-            set obj [result $interface -error 1 -errorinfo [::list $error]]
-            return $obj
+                set errorinfo $error
+                catch {::oraclose $_cur}
+                set obj [result $interface -error 1 -errorinfo [::list $error]]
+                return $obj
 	    }
 	    if {[catch {::oracols $_cur name} fields]} { set fields "" }
 	    ::oracommit $conn
 	    set my_fields $fields
 	    set fields [::list]
 	    foreach field $my_fields {
-            set field [::string tolower $field]
-            lappend fields $field
+                set field [::string tolower $field]
+                lappend fields $field
 	    }
 	    set error [::oramsg $_cur rows]
 	    set res_cmd "result"
@@ -98,7 +96,7 @@ namespace eval DIO {
 	    lappend res_cmd -fetch_first_row $is_select
 	    set obj [eval $res_cmd]
 	    if {!$is_select} {
-            ::oraclose $_cur
+                ::oraclose $_cur
 	    }
 	    return $obj
 	}
@@ -127,55 +125,51 @@ namespace eval DIO {
 	    return $conn
 	}
 
-	method makeDBFieldValue {table_name field_name val {convert_to {}}} {
-		if {[info exists specialFields(${table_name}@${field_name})]} {
-			switch $specialFields(${table_name}@${field_name}) {
-			DATE {
-			  	set secs [clock scan $val]
-				set my_val [clock format $secs -format {%Y-%m-%d}]
-				return "to_date('$my_val', 'YYYY-MM-DD')"
-			}
-			DATETIME {
-			  	set secs [clock scan $val]
-				set my_val [clock format $secs -format {%Y-%m-%d %T}]
-				return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
-			}
-			NOW {
-			    switch $convert_to {
-				SECS {
-				    if {[::string compare $val "now"] == 0} {
-					set secs [clock seconds]
-				    	set my_val [clock format $secs -format {%Y%m%d%H%M%S}]
-					return $my_val
-				    } else {
-                                        return "($field_name - to_date('1970-01-01')) * 86400"
-				    	#return "to_char($field_name, 'YYYYMMDDHH24MISS')"
-				    }
-				}
-				default {
-				    if {[::string compare $val "now"] == 0} {
-					set secs [clock seconds]
-				    } else {
-					set secs [clock scan $val]
-				    }
-				    set my_val [clock format $secs -format {%Y-%m-%d %T}]
-				    return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
-				}
-			    }
-			}
-			default {
-			  	# no special cod for that type!!
-				return "'[quote $val]'"
-			  }
-			}
-		} else {
-			return "'[quote $val]'"
-		}
+	method build_special_field {table_name field_name val {convert_to {}}} {
+            switch [$this select_special_field $table_name $field_name] {
+                DATE {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d}]
+                    return "to_date('$my_val', 'YYYY-MM-DD')"
+                }
+                DATETIME {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                    return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
+                }
+                NOW {
+                    switch $convert_to {
+                        SECS {
+                            if {[::string compare $val "now"] == 0} {
+                                set secs [clock seconds]
+                                set my_val [clock format $secs -format {%Y%m%d%H%M%S}]
+                                return $my_val
+                            } else {
+                                return "($field_name - to_date('1970-01-01')) * 86400"
+                                #return "to_char($field_name, 'YYYYMMDDHH24MISS')"
+                            }
+                        }
+                        default {
+                            if {[::string compare $val "now"] == 0} {
+                                set secs [clock seconds]
+                            } else {
+                                set secs [clock scan $val]
+                            }
+                            set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                            return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
+                        }
+                    }
+                }
+                default {
+                    # no special cod for that type!!
+                    return "'[quote $val]'"
+                }
+            }
 	}
 
 	public variable db "" {
 	    if {[info exists conn]} {
-		    mysqluse $conn $db
+	        mysqluse $conn $db
 	    }
 	}
 

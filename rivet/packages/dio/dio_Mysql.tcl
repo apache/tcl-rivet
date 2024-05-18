@@ -125,22 +125,20 @@ namespace eval DIO {
             return $conn
         }
 
-        method makeDBFieldValue {table_name field_name val {convert_to {}}} {
+        method build_special_field {table_name field_name val {convert_to {}}} {
 
-            if {[info exists specialFields(${table_name}@${field_name})]} {
-                switch $specialFields(${table_name}@${field_name}) {
-
-                    DATE {
-                        set secs [clock scan $val]
-                        set my_val [clock format $secs -format {%Y-%m-%d}]
-                        return "DATE_FORMAT('$my_val','%Y-%m-%d')"
-                    }
-                    DATETIME {
-                        set secs [clock scan $val]
-                        set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                        return "DATE_FORMAT('$my_val','%Y-%m-%d %T')"
-                    }
-                    NOW {
+            switch [$this select_special_field $table_name $field_name] {
+                DATE {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d}]
+                    return "DATE_FORMAT('$my_val','%Y-%m-%d')"
+                }
+                DATETIME {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                    return "DATE_FORMAT('$my_val','%Y-%m-%d %T')"
+                }
+                NOW {
 
 		    # we try to be coherent with the original purpose of this method whose
 		    # goal is endow the class with a uniform way to handle timestamps. 
@@ -149,52 +147,48 @@ namespace eval DIO {
 		    # can be done and session expirations are computed consistently.
 		    # (Bug #53703)
 
-                        switch $convert_to {
+                    switch $convert_to {
 
-                            SECS {
-                                if {[::string compare $val "now"] == 0} {
+                        SECS {
+                            if {[::string compare $val "now"] == 0} {
 
-#                                   set     secs    [clock seconds]
-#                                   set     my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
-#                                   return  $my_val
+#                               set     secs    [clock seconds]
+#                               set     my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+#                               return  $my_val
 
-                                    return [clock seconds]
+                                return [clock seconds]
 
-                                } else {
-                                    return  "UNIX_TIMESTAMP($field_name)"
-                                }
-                            }
-                            default {
-
-                                if {[::string compare $val, "now"] == 0} {
-                                    set secs [clock seconds]
-                                } else {
-                                    set secs [clock scan $val]
-                                }
-
-                                # this is kind of going back and forth from the same 
-                                # format,
-
-                                #set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                                return "FROM_UNIXTIME('$secs')"
+                            } else {
+                                return  "UNIX_TIMESTAMP($field_name)"
                             }
                         }
-                    }
-                    NULL {
-                        if {[::string toupper $val] == "NULL"} {
-                            return $val
-                        } else {
-                            return "'[quote $val]'"
+                        default {
+
+                            if {[::string compare $val, "now"] == 0} {
+                                set secs [clock seconds]
+                            } else {
+                                set secs [clock scan $val]
+                            }
+
+                            # this is kind of going back and forth from the same 
+                            # format,
+
+                            #set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                            return "FROM_UNIXTIME('$secs')"
                         }
                     }
-                    default {
-                        # no special code for that type!!
+                }
+                NULL {
+                    if {[::string toupper $val] == "NULL"} {
+                        return $val
+                    } else {
                         return "'[quote $val]'"
                     }
                 }
-
-            } else {
-                return "'[quote $val]'"
+                default {
+                    # no special code for that type!!
+                    return "'[quote $val]'"
+                }
             }
 
         }

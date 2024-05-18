@@ -15,7 +15,7 @@
 # limitations under the License.
 
 package require DIO
-package provide dio_Sqlite 0.1
+package provide dio_Sqlite 0.2
 
 namespace eval DIO {
     variable sqlite_seq -1
@@ -109,63 +109,58 @@ namespace eval DIO {
             return $string
         }
 
-        method makeDBFieldValue {table_name field_name val {convert_to {}}} {
-            if {[info exists specialFields(${table_name}@${field_name})]} {
-                switch $specialFields(${table_name}@${field_name}) {
-                    DATE {
-                        set secs [clock scan $val]
-                        set my_val [clock format $secs -format {%Y-%m-%d}]
-                        return "date('$my_val')"
-                    }
-                    DATETIME {
-                        set secs [clock scan $val]
-                        set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                        return "datetime('$my_val')"
-                    }
-                    NOW {
-                        switch $convert_to {
+        method buil_special_field {table_name field_name val {convert_to {}}} {
+            switch [$this select_special_field $table_name $field_name] {
+                DATE {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d}]
+                    return "date('$my_val')"
+                }
+                DATETIME {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                    return "datetime('$my_val')"
+                }
+                NOW {
+                    switch $convert_to {
 
-                            # we try to be coherent with the original purpose of this method whose
-                            # goal is to provide to the programmer a uniform way to handle timestamps. 
-                            # E.g.: Package session expects this case to return a timestamp in seconds
-                            # so that differences with timestamps returned by [clock seconds]
-                            # can be done and session expirations are computed consistently.
-                            # (Bug #53703)
+                    # we try to be coherent with the original purpose of this method whose
+                    # goal is to provide to the programmer a uniform way to handle timestamps. 
+                    # E.g.: Package session expects this case to return a timestamp in seconds
+                    # so that differences with timestamps returned by [clock seconds]
+                    # can be done and session expirations are computed consistently.
+                    # (Bug #53703)
 
-                            SECS {
-                                if {[::string compare $val "now"] == 0} {
+                        SECS {
+                            if {[::string compare $val "now"] == 0} {
 #                                   set secs    [clock seconds]
 #                                   set my_val  [clock format $secs -format "%Y%m%d%H%M%S"]
-                                    return      [clock seconds]
-                                } else {
+                                return      [clock seconds]
+                            } else {
 
-                                    # the numbers of seconds must be returned as 'utc' to
-                                    # be compared with values returned by [clock seconds]
+                                # the numbers of seconds must be returned as 'utc' to
+                                # be compared with values returned by [clock seconds]
 
-                                    return  "strftime('%s',$field_name,'utc')"
-                                }
-                            }
-                            default {
-                                if {[::string compare $val, "now"] == 0} {
-                                    set secs [clock seconds]
-                                } else {
-                                    set secs [clock scan $val]
-                                }
-                                set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                                return "datetime('$my_val')"
+                                return  "strftime('%s',$field_name,'utc')"
                             }
                         }
-                    }
-                    default {
-                        # no special code for that type!!
-                        return "'[quote $val]'"
+                        default {
+                            if {[::string compare $val, "now"] == 0} {
+                                set secs [clock seconds]
+                            } else {
+                                set secs [clock scan $val]
+                            }
+                            set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                            return "datetime('$my_val')"
+                        }
                     }
                 }
-            } else {
-                return "'[quote $val]'"
+                default {
+                    # no special code for that type!!
+                    return "'[quote $val]'"
+                }
             }
         }
-
     }
 
     catch { ::itcl::delete class SqliteResult }
