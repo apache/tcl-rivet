@@ -25,6 +25,7 @@ namespace eval DIO {
         package require Pgtcl
         set_conn_defaults
         eval configure $args
+        $this set_field_formatter ::DIO::formatters::Postgresql
     }
 
     destructor {

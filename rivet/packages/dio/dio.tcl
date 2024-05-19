@@ -600,11 +600,8 @@ proc handle {interface args} {
         return [string "select count(*) from $myTable"]
     }
 
-    # 
-
     protected method set_field_formatter {formatter_class} {
         $special_field_formatter destroy
-
         set special_field_formatter [$formatter_class ::DIO::formatters::#auto]
     }
 

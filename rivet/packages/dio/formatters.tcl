@@ -17,15 +17,6 @@
 
 namespace eval DIO::formatters {
 
-    #
-    # quote - given a string, return the same string with any single
-    #  quote characters preceded by a backslash
-    #
-    proc quote {a_string} {
-        regsub -all {'} $a_string {\'} a_string
-        return $a_string
-    }
-
     # ::itcl::class FieldFormatter
     #
     # we devolve the role of special field formatter to this
@@ -40,6 +31,10 @@ namespace eval DIO::formatters {
 
         private variable special_fields [dict create]
 
+        public proc quote {a_string} {
+            regsub -all {'} $a_string {\'} a_string
+            return $a_string
+        }
 
         public method register {table_name field_name ftype} {
             dict set special_fields $table_name $field_name $ftype
@@ -50,9 +45,9 @@ namespace eval DIO::formatters {
                 set field_type [dict get $special_fields $table_name $field_name]
 
                 if {[catch {
-                    set field_value [$this $field_type $table_name $field_name $val $convert_to]
+                    set field_value [$this $field_type $field_name $val $convert_to]
                 } e einfo]} {
-                    return "'[quote $val]'"
+                    set field_value "'[quote $val]'"
                 }
 
                 return $field_value
@@ -66,19 +61,19 @@ namespace eval DIO::formatters {
     ::itcl::class Mysql {
         inherit RootFormatter
 
-        public method DATE {table_name field_name val convert_to} {
+        public method DATE {field_name val convert_to} {
             set secs [clock scan $val]
             set my_val [clock format $secs -format {%Y-%m-%d}]
             return "DATE_FORMAT('$my_val','%Y-%m-%d')"
         }
 
-        public method DATETIME {table_name field_name val convert_to} {
+        public method DATETIME {field_name val convert_to} {
             set secs [clock scan $val]
             set my_val [clock format $secs -format {%Y-%m-%d %T}]
             return "DATE_FORMAT('$my_val','%Y-%m-%d %T')"
         }
 
-        public method NOW {table_name field_name val convert_to} {
+        public method NOW {field_name val convert_to} {
 
 		    # we try to be coherent with the original purpose of this method whose
 		    # goal is endow the class with a uniform way to handle timestamps. 
@@ -118,7 +113,7 @@ namespace eval DIO::formatters {
             }
         }
 
-        public method NULL {table_name field_name val convert_to} {
+        public method NULL {field_name val convert_to} {
             if {[::string toupper $val] == "NULL"} {
                 return $val
             } else {
@@ -128,9 +123,153 @@ namespace eval DIO::formatters {
 
     }
 
+    ::itcl::class Sqlite {
+        inherit RootFormatter
 
+        #
+        # quote - given a string, return the same string with any single
+        #  quote characters preceded by a backslash
+        #
+        method quote {a_string} {
+            regsub -all {'} $a_string {''} a_string
+            return $a_string
+        }
 
+        public method DATE {field_name val convert_to} {
+            set secs [clock scan $val]
+            set my_val [clock format $secs -format {%Y-%m-%d}]
+            return "date('$my_val')"
+        }
+        public method DATETIME {field_name val convert_to} {
+            set secs [clock scan $val]
+            set my_val [clock format $secs -format {%Y-%m-%d %T}]
+            return "datetime('$my_val')"
+        }
 
-} ; ## namespace eval DIO
+        public method NOW {field_name val convert_to} {
+            switch $convert_to {
+
+            # we try to be coherent with the original purpose of this method whose
+            # goal is to provide to the programmer a uniform way to handle timestamps. 
+            # E.g.: Package session expects this case to return a timestamp in seconds
+            # so that differences with timestamps returned by [clock seconds]
+            # can be done and session expirations are computed consistently.
+            # (Bug #53703)
+
+                SECS {
+                    if {[::string compare $val "now"] == 0} {
+#                                   set secs    [clock seconds]
+#                                   set my_val  [clock format $secs -format "%Y%m%d%H%M%S"]
+                        return [clock seconds]
+                    } else {
+
+                        # the numbers of seconds must be returned as 'utc' to
+                        # be compared with values returned by [clock seconds]
+
+                        return "strftime('%s',$field_name,'utc')"
+                    }
+                }
+                default {
+                    if {[::string compare $val, "now"] == 0} {
+                        set secs [clock seconds]
+                    } else {
+                        set secs [clock scan $val]
+                    }
+                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                    return "datetime('$my_val')"
+                }
+            }
+        }
+    }
+
+    ::itcl::class Postgresql {
+        inherit RootFormatter
+
+        public method DATE {field_name val convert_to} {
+            set secs [clock scan $val]
+            set my_val [clock format $secs -format {%Y-%m-%d}]
+            return "'$my_val'"
+        }
+        public method DATETIME {field_name val convert_to} {
+            set secs [clock scan $val]
+            set my_val [clock format $secs -format {%Y-%m-%d %T}]
+            return "'$my_val'"
+        }
+        public method NOW {field_name val convert_to} {
+            switch $convert_to {
+
+                # we try to be coherent with the original purpose of this method whose
+                # goal is to provide to the programmer a uniform way to handle timestamps. 
+                # E.g.: Package session expects this case to return a timestamp in seconds
+                # so that differences with timestamps returned by [clock seconds]
+                # can be done and session expirations are computed consistently.
+                # (Bug #53703)
+
+                SECS {
+                    if {[::string compare $val "now"] == 0} {
+#                           set secs    [clock seconds]
+#                           set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+#                           return  $my_val
+                        return [clock seconds]
+                    } else {
+                        return  "extract(epoch from $field_name)"
+                    }
+                }
+                default {
+                    if {[::string compare $val, "now"] == 0} {
+                        set secs [clock seconds]
+                    } else {
+                        set secs [clock scan $val]
+                    }
+
+                    # this is kind of going back and forth from the same 
+                    # format,
+
+                    return "'[clock format $secs -format {%Y-%m-%d %T}]'"
+                }
+            }
+        }
+    }
+
+    ::itcl::class Oracle {
+        inherit RootFormatter
+
+        public method DATE {field_name val convert_to} {
+                set secs [clock scan $val]
+                set my_val [clock format $secs -format {%Y-%m-%d}]
+                return "to_date('$my_val', 'YYYY-MM-DD')"
+        }
+        public method DATETIME {field_name val convert_to} {
+                set secs [clock scan $val]
+                set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
+        }
+        
+        public method NOW {field_name val convert_to} {
+            switch $convert_to {
+                SECS {
+                    if {[::string compare $val "now"] == 0} {
+                        set secs [clock seconds]
+                        set my_val [clock format $secs -format {%Y%m%d%H%M%S}]
+                        return $my_val
+                    } else {
+                        return "($field_name - to_date('1970-01-01')) * 86400"
+                        #return "to_char($field_name, 'YYYYMMDDHH24MISS')"
+                    }
+                }
+                default {
+                    if {[::string compare $val "now"] == 0} {
+                        set secs [clock seconds]
+                    } else {
+                        set secs [clock scan $val]
+                    }
+                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                    return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
+                }
+            }
+        }
+    }
+
+}; ## namespace eval DIO
 
 package provide dio::formatters 1.0

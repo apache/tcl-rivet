@@ -18,218 +18,178 @@ package provide dio_Oracle 0.3
 
 namespace eval DIO {
     ::itcl::class Oracle {
-	inherit Database
+        inherit Database
 
-	constructor {args} {eval configure $args} {
-	    if {[catch {package require Oratcl}]} {
-                return -code error "No Oracle Tcl package available"
-	    }
+        constructor {args} {eval configure $args} {
+            if {[catch {package require Oratcl}]} {
+                    return -code error "No Oracle Tcl package available"
+            }
 
-	    eval configure $args
+            eval configure $args
 
-	    if {[::rivet::lempty $db]} {
-                if {[::rivet::lempty $user]} {
+            if {[::rivet::lempty $db]} {
+                if {[::rivet::lempty $user]} {:b
                     set user $::env(USER)
                 }
                 set db $user
-	    }
-	}
+            }
 
-	destructor {
-	    close
-	}
+            $this set_field_formatter ::DIO::formatters::Oracle
+        }
 
-	method open {} {
-	    set command "::oralogon"
+        destructor {
+            close
+        }
 
-	    if {![::rivet::lempty $user]} { append command " $user" }
-	    if {![::rivet::lempty $pass]} { append command "/$pass" }
-	    if {![::rivet::lempty $host]} { append command "@$host" }
-	    if {![::rivet::lempty $port]} { append command -port $port }
+        method open {} {
+            set command "::oralogon"
 
-	    if {[catch $command error]} { return -code error $error }
+            if {![::rivet::lempty $user]} { append command " $user" }
+            if {![::rivet::lempty $pass]} { append command "/$pass" }
+            if {![::rivet::lempty $host]} { append command "@$host" }
+            if {![::rivet::lempty $port]} { append command -port $port }
 
-	    set conn $error
+            if {[catch $command error]} { return -code error $error }
 
-	    if {![::rivet::lempty $db]} { 
-	    	# ??? mysqluse $conn $db 
-	    }
-	}
+            set conn $error
 
-	method close {} {
-	    if {![info exists conn]} { return }
-	    catch {::oraclose $conn}
-	    unset conn
-	}
+            if {![::rivet::lempty $db]} { 
+                # ??? mysqluse $conn $db 
+            }
+        }
 
-	method exec {req} {
-	    if {![info exists conn]} { open }
+        method close {} {
+            if {![info exists conn]} { return }
+            catch {::oraclose $conn}
+            unset conn
+        }
 
-	    set _cur [::oraopen $conn]
-	    set cmd ::orasql
-	    set is_select 0
-	    if {[::string tolower [lindex $req 0]] == "select"} {
+        method exec {req} {
+            if {![info exists conn]} { open }
+
+            set _cur [::oraopen $conn]
+            set cmd ::orasql
+            set is_select 0
+            if {[::string tolower [lindex $req 0]] == "select"} {
                 set cmd ::orasql
                 set is_select 1
-	    }
-	    set errorinfo ""
-#puts "ORA:$is_select:$req:<br>"
-	    if {[catch {$cmd $_cur $req} error]} {
-#puts "ORA:error:$error:<br>"
+            }
+            set errorinfo ""
+    #puts "ORA:$is_select:$req:<br>"
+            if {[catch {$cmd $_cur $req} error]} {
+    #puts "ORA:error:$error:<br>"
                 set errorinfo $error
                 catch {::oraclose $_cur}
                 set obj [result $interface -error 1 -errorinfo [::list $error]]
                 return $obj
-	    }
-	    if {[catch {::oracols $_cur name} fields]} { set fields "" }
-	    ::oracommit $conn
-	    set my_fields $fields
-	    set fields [::list]
-	    foreach field $my_fields {
+            }
+            if {[catch {::oracols $_cur name} fields]} { set fields "" }
+            ::oracommit $conn
+            set my_fields $fields
+            set fields [::list]
+            foreach field $my_fields {
                 set field [::string tolower $field]
                 lappend fields $field
-	    }
-	    set error [::oramsg $_cur rows]
-	    set res_cmd "result"
-	    lappend res_cmd $interface -resultid $_cur 
-	    lappend res_cmd -numrows [::list $error] -fields [::list $fields]
-	    lappend res_cmd -fetch_first_row $is_select
-	    set obj [eval $res_cmd]
-	    if {!$is_select} {
-                ::oraclose $_cur
-	    }
-	    return $obj
-	}
-
-	method lastkey {} {
-	    if {![info exists conn]} { return }
-	    return [mysqlinsertid $conn]
-	}
-
-	method quote {string} {
-	    regsub -all {'} $string {\'} string
-	    return $string
-	}
-
-	method sql_limit_syntax {limit {offset ""}} {
-	    # temporary
-	    return ""
-	    if {[::rivet::lempty $offset]} {
-		return " LIMIT $limit"
-	    }
-	    return " LIMIT [expr $offset - 1],$limit"
-	}
-
-	method handle {} {
-	    if {![info exists conn]} { open }
-	    return $conn
-	}
-
-	method build_special_field {table_name field_name val {convert_to {}}} {
-            switch [$this select_special_field $table_name $field_name] {
-                DATE {
-                    set secs [clock scan $val]
-                    set my_val [clock format $secs -format {%Y-%m-%d}]
-                    return "to_date('$my_val', 'YYYY-MM-DD')"
-                }
-                DATETIME {
-                    set secs [clock scan $val]
-                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                    return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
-                }
-                NOW {
-                    switch $convert_to {
-                        SECS {
-                            if {[::string compare $val "now"] == 0} {
-                                set secs [clock seconds]
-                                set my_val [clock format $secs -format {%Y%m%d%H%M%S}]
-                                return $my_val
-                            } else {
-                                return "($field_name - to_date('1970-01-01')) * 86400"
-                                #return "to_char($field_name, 'YYYYMMDDHH24MISS')"
-                            }
-                        }
-                        default {
-                            if {[::string compare $val "now"] == 0} {
-                                set secs [clock seconds]
-                            } else {
-                                set secs [clock scan $val]
-                            }
-                            set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                            return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
-                        }
-                    }
-                }
-                default {
-                    # no special cod for that type!!
-                    return "'[quote $val]'"
-                }
             }
-	}
+            set error [::oramsg $_cur rows]
+            set res_cmd "result"
+            lappend res_cmd $interface -resultid $_cur 
+            lappend res_cmd -numrows [::list $error] -fields [::list $fields]
+            lappend res_cmd -fetch_first_row $is_select
+            set obj [eval $res_cmd]
+            if {!$is_select} {
+                ::oraclose $_cur
+            }
+            return $obj
+        }
 
-	public variable db "" {
-	    if {[info exists conn]} {
-	        mysqluse $conn $db
-	    }
-	}
+        method lastkey {} {
+            if {![info exists conn]} { return }
+            return [mysqlinsertid $conn]
+        }
 
-	public variable interface	"Oracle"
-	private variable conn
-	private variable _cur
+        method quote {string} {
+            regsub -all {'} $string {\'} string
+            return $string
+        }
+
+        method sql_limit_syntax {limit {offset ""}} {
+            # temporary
+            return ""
+            if {[::rivet::lempty $offset]} {
+                return " LIMIT $limit"
+            }
+            return " LIMIT [expr $offset - 1],$limit"
+        }
+
+        method handle {} {
+            if {![info exists conn]} { open }
+            return $conn
+        }
+
+        public variable db "" {
+            if {[info exists conn]} {
+                mysqluse $conn $db
+            }
+        }
+
+        public variable interface	"Oracle"
+        private variable conn
+        private variable _cur
 
     } ; ## ::itcl::class Mysql
 
     ::itcl::class OracleResult {
-	inherit Result
+        inherit Result
 
-	public variable fetch_first_row 0
-	private variable _data ""
-	private variable _have_first_row 0
+        public variable fetch_first_row 0
+        private variable _data ""
+        private variable _have_first_row 0
 
-	constructor {args} {
-	    eval configure $args
-	    if {$fetch_first_row} {
-		if {[llength [nextrow]] == 0} {
-			set _have_first_row 0
-			numrows 0
-		} else {
-			set _have_first_row 1
-			numrows 1
-		}
-	    }
-	    set fetch_first_row 0
-	}
+        constructor {args} {
+            eval configure $args
+            if {$fetch_first_row} {
+                if {[llength [nextrow]] == 0} {
+                    set _have_first_row 0
+                    numrows 0
+                } else {
+                    set _have_first_row 1
+                    numrows 1
+                }
+            }
+            set fetch_first_row 0
+        }
 
-	destructor {
-		if {[string length $resultid] > 0} {
-			catch {::oraclose $resultid}
-		}
-	}
+        destructor {
+            if {[string length $resultid] > 0} {
+                catch {::oraclose $resultid}
+            }
+        }
 
-	method nextrow {} {
-	    if {[string length $resultid] == 0} {
-		return [::list]
-	    }
-	    if {$_have_first_row} {
-		set _have_first_row 0
-		return $_data
-	    }
-	    set ret [::orafetch $resultid -datavariable _data]
-	    switch $ret {
-	    0 {
-		return $_data
-	      }
-	    1403 {
-		::oraclose $resultid
-		set resultid ""
-		return [::list]
-	      }
-	    default {
-		# FIXME!! have to handle error here !!
-		return [::list]
-	      }
-	    }
-	}
+        method nextrow {} {
+            if {[string length $resultid] == 0} {
+                return [::list]
+            }
+            if {$_have_first_row} {
+                set _have_first_row 0
+                return $_data
+            }
+            set ret [::orafetch $resultid -datavariable _data]
+            switch $ret {
+                0 {
+                    return $_data
+                }
+                1403 {
+                    ::oraclose $resultid
+                    set resultid ""
+                    return [::list]
+                }
+                default {
+                    # FIXME!! have to handle error here !!
+                    return [::list]
+                }
+            }
+        }
     } ; ## ::itcl::class OracleResult
 
 }

@@ -39,6 +39,8 @@ namespace eval DIO {
             set interface "tdbc::[::string tolower $interface_name]"
 
             package require ${interface}
+
+            $this set_field_formatter ::DIO::formatters::${interface_name}
         }
 
         destructor { }
