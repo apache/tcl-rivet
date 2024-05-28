@@ -207,9 +207,9 @@ namespace eval DIO::formatters {
 
                 SECS {
                     if {[::string compare $val "now"] == 0} {
-#                           set secs    [clock seconds]
-#                           set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
-#                           return  $my_val
+#                       set secs    [clock seconds]
+#                       set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+#                       return  $my_val
                         return [clock seconds]
                     } else {
                         return  "extract(epoch from $field_name)"
@@ -237,12 +237,12 @@ namespace eval DIO::formatters {
         public method DATE {field_name val convert_to} {
                 set secs [clock scan $val]
                 set my_val [clock format $secs -format {%Y-%m-%d}]
-                return "to_date('$my_val', 'YYYY-MM-DD')"
+                return "to_date('$my_val','YYYY-MM-DD')"
         }
         public method DATETIME {field_name val convert_to} {
                 set secs [clock scan $val]
                 set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                return "to_date('$my_val', 'YYYY-MM-DD HH24:MI:SS')"
+                return "to_date('$my_val','YYYY-MM-DD HH24:MI:SS')"
         }
         
         public method NOW {field_name val convert_to} {
