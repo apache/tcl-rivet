@@ -24,7 +24,7 @@ namespace eval DIO {
     ::itcl::class Mysql {
         inherit Database
 
-        constructor {args} {eval configure $args} {
+        constructor {args} {eval configure -interface Mysql $args} {
             if {   [catch {package require Mysqltcl}]   \
                 && [catch {package require mysqltcl}]   \
                 && [catch {package require mysql}]} {
@@ -40,7 +40,7 @@ namespace eval DIO {
                 set db $user
             }
 
-            $this set_field_formatter ::DIO::formatters::Mysql
+            #$this set_field_formatter ::DIO::formatters::Mysql
 
         }
 
@@ -157,7 +157,7 @@ namespace eval DIO {
             }
         }
 
-        public  variable interface "Mysql"
+        #public  variable interface "Mysql"
         private variable conn
 
     } ; ## ::itcl::class Mysql

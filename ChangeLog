@@ -1,10 +1,13 @@
+2024-08-22 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio: further development for supporting tdbc based connectors
+
 2024-05-19 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/dio/formatters.tcl: add formatters class to
-    provide common special fields formatting for both Tdbc based
-    and legacy connectors
-    * rivet/packages/dio/dio_*.tcl: removed special fields formatting
-    code and endowing these classes with special field formatter
-    object instances
+	* rivet/packages/dio/formatters.tcl: add formatters class to
+	provide common special fields formatting for both Tdbc based
+	and legacy connectors
+	* rivet/packages/dio/dio_*.tcl: removed special fields formatting
+	code and endowing these classes with special field formatter
+	object instances
 
 2024-05-15 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/tdbc.tcl,dio.tcl: add early support for tdbc database interface

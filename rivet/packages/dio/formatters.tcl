@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-namespace eval DIO::formatters {
+namespace eval ::DIO::formatters {
 
     # ::itcl::class FieldFormatter
     #
@@ -25,7 +25,7 @@ namespace eval DIO::formatters {
     # because it allows to reuse the functionality of this
     # class in other DBMS connector. 
 
-    # this class must be subclassed for each database type
+    # this class must be subclassed for each dbms or SQL dialect
 
     ::itcl::class RootFormatter {
 
@@ -150,7 +150,7 @@ namespace eval DIO::formatters {
             switch $convert_to {
 
             # we try to be coherent with the original purpose of this method whose
-            # goal is to provide to the programmer a uniform way to handle timestamps. 
+            # goal is to provide a uniform way to handle timestamps. 
             # E.g.: Package session expects this case to return a timestamp in seconds
             # so that differences with timestamps returned by [clock seconds]
             # can be done and session expirations are computed consistently.
@@ -158,8 +158,8 @@ namespace eval DIO::formatters {
 
                 SECS {
                     if {[::string compare $val "now"] == 0} {
-#                                   set secs    [clock seconds]
-#                                   set my_val  [clock format $secs -format "%Y%m%d%H%M%S"]
+#                       set secs    [clock seconds]
+#                       set my_val  [clock format $secs -format "%Y%m%d%H%M%S"]
                         return [clock seconds]
                     } else {
 
@@ -199,7 +199,7 @@ namespace eval DIO::formatters {
             switch $convert_to {
 
                 # we try to be coherent with the original purpose of this method whose
-                # goal is to provide to the programmer a uniform way to handle timestamps. 
+                # goal is to provide a uniform way to handle timestamps. 
                 # E.g.: Package session expects this case to return a timestamp in seconds
                 # so that differences with timestamps returned by [clock seconds]
                 # can be done and session expirations are computed consistently.

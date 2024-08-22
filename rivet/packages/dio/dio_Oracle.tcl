@@ -20,7 +20,7 @@ namespace eval DIO {
     ::itcl::class Oracle {
         inherit Database
 
-        constructor {args} {eval configure $args} {
+        constructor {args} {eval configure -interface Oracle $args} {
             if {[catch {package require Oratcl}]} {
                     return -code error "No Oracle Tcl package available"
             }
@@ -34,7 +34,7 @@ namespace eval DIO {
                 set db $user
             }
 
-            $this set_field_formatter ::DIO::formatters::Oracle
+            #$this set_field_formatter ::DIO::formatters::Oracle
         }
 
         destructor {
@@ -133,7 +133,7 @@ namespace eval DIO {
             }
         }
 
-        public variable interface	"Oracle"
+        #public variable interface	"Oracle"
         private variable conn
         private variable _cur
 

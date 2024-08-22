@@ -16,12 +16,22 @@
 
 catch {package require Tclx}
 package require Itcl
+package require dio::formatters
+
 ##set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
 namespace eval ::DIO {
 
 proc handle {interface args} {
     set obj \#auto
+    set tdbc_driver ""
+    if {($interface == "Tdbc") && ([llength $args] > 0)} {
+        set tdbc_driver [lindex $args 0]
+        set args [lreplace $args 0 0]
+    }
+
+    #puts "interface: $interface ($tdbc_driver)"
+
     set first [lindex $args 0]
     if {![::rivet::lempty $first] && [string index $first 0] != "-"} {
         set obj  [lindex $args 0]
@@ -29,9 +39,16 @@ proc handle {interface args} {
     }
     uplevel \#0 package require dio_$interface
 
-    #puts "obj: $obj args: $args"
+    #puts "tdbc: '$tdbc_driver' obj: '$obj' args 3: '$args'"
 
-    return [uplevel \#0 ::DIO::$interface $obj $args]
+    if {$tdbc_driver == ""} {
+
+        # old connectors based on traditional dbms drivers
+
+        return [uplevel \#0 ::DIO::$interface $obj $args]
+    } else {
+        return [uplevel \#0 ::DIO::$interface $obj $tdbc_driver {*}$args]
+    }
 }
 
 ##
@@ -39,7 +56,11 @@ proc handle {interface args} {
 ##
 ::itcl::class Database {
     constructor {args} {
+        puts "args: '$args'"
         eval configure $args
+        puts "interface: $interface"
+
+        set special_fields_formatter [::DIO::formatters::${interface} ::DIO::formatters::#auto]
     }
 
     destructor {
@@ -601,12 +622,12 @@ proc handle {interface args} {
     }
 
     protected method set_field_formatter {formatter_class} {
-        $special_field_formatter destroy
-        set special_field_formatter [$formatter_class ::DIO::formatters::#auto]
+        $special_fields_formatter destroy
+        set special_fields_formatter [$formatter_class ::DIO::formatters::#auto]
     }
 
     public method build_special_field {table_name field_name val {convert_to {}}} {
-        return [$special_field_formatter build $table_name $field_name $val $convert_to]
+        return [$special_fields_formatter build $table_name $field_name $val $convert_to]
     }
 
     public method register_special_field {table_name field_name type} {
@@ -649,7 +670,8 @@ proc handle {interface args} {
     method host {{string ""}} { return [configure_variable host $string] }
     method port {{string ""}} { return [configure_variable port $string] }
 
-    private variable special_fields_formatter [::DIO::formatters::RootFormatter #auto]
+    public variable special_fields_formatter \
+                    [::DIO::formatters::RootFormatter ::DIO::formatters::#auto]
 
     public variable interface   ""
     public variable errorinfo   ""

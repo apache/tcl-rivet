@@ -21,11 +21,11 @@ namespace eval DIO {
     ::itcl::class Postgresql {
     inherit Database
 
-    constructor {args} {eval configure $args} {
+    constructor {args} {eval configure -interface Postgresql $args} {
         package require Pgtcl
         set_conn_defaults
         eval configure $args
-        $this set_field_formatter ::DIO::formatters::Postgresql
+        #$this set_field_formatter ::DIO::formatters::Postgresql
     }
 
     destructor {
@@ -164,7 +164,7 @@ namespace eval DIO {
         }
     }
 
-    public variable interface   "Postgresql"
+    #public variable interface   "Postgresql"
     private variable conn
 
     } ; ## ::itcl::class Postgresql

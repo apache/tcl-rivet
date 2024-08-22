@@ -1,13 +1,13 @@
 # tdbc.tcl -- connector for tdbc, the Tcl database abstraction layer
 #
 # Copyright 2024 The Apache Software Foundation
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # 
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,22 +25,28 @@ namespace eval DIO {
 
         private variable connector_n
         private variable connector
+        private variable tdbc_connector
         private variable tdbc_arguments [list -encoding     \
                                               -isolation    \
                                               -readonly     \
                                               -timeout]
 
-        constructor {interface_name args} {eval configure {*}$args} {
+        constructor {interface_name args} {eval configure -interface $interface_name $args} {
             set connector_n 0
             set connector   ""
 
             # I should check this one: we only accept connector
-            # interfaces that map into tdbc's
-            set interface "tdbc::[::string tolower $interface_name]"
+            # interfaces that map into one of tdbc's supported drivers
+            #puts "tdbc interface: $interface_name"
 
-            package require ${interface}
+            set connector_name [::string tolower $interface_name]
+            if {$connector_name == "oracle"} {
+                set connector_name "odbc"
+            }
 
-            $this set_field_formatter ::DIO::formatters::${interface_name}
+            set tdbc_connector "tdbc::${interface_name}"
+
+            uplevel #0 package require ${tdbc_connector}
         }
 
         destructor { }
@@ -50,12 +56,12 @@ namespace eval DIO {
         }
 
         public method open {}  {
-            set connector_cmd "${interface}::connection create $interface#$connector_n"
-            if {$user != ""} { lappend connector_cmd -user $user }
-            if {$db   != ""} { lappend connector_cmd -db   $db }
-            if {$pass != ""} { lappend connector_cmd -password $pass }
-            if {$port != ""} { lappend connector_cmd -port $port }
-            if {$host != ""} { lappend connector_cmd -host $host }
+            set connector_cmd "${tdbc_connector}::connection create ${tdbc_connector}#$connector_n"
+            if {$user != ""} { lappend connector_cmd -user      $user }
+            if {$db   != ""} { lappend connector_cmd -db        $db }
+            if {$pass != ""} { lappend connector_cmd -password  $pass }
+            if {$port != ""} { lappend connector_cmd -port      $port }
+            if {$host != ""} { lappend connector_cmd -host      $host }
 
             if {$clientargs != ""} { lappend connector_cmd {*}$clientargs }
 
@@ -88,14 +94,14 @@ namespace eval DIO {
             if {[::string index $sql end] == ";"} {set sql [::string range $sql 0 end-1]}
             set is_select [regexp -nocase {^\(*\s*select\s+} $sql]
 
-            set sql_st [$connector prepare $sql]
+            set tdbc_statement [$connector prepare $sql]
 
             # errorinfo is a public variable of the
             # parent class Database. Not a good
             # object design practice
 
-            if {[catch {set tdbc_result [$sql_st execute]} errorinfo]} {
-                return [$this result TDBC -error 1 -errorinfo $errorinfo -isselect false]
+            if {[catch {set tdbc_result [$tdbc_statement execute]} errorinfo]} {
+                set result_obj [$this result TDBC -error 1 -errorinfo $errorinfo -isselect false]
             } else {
 
                 # we must store also the TDBC SQL statement as it owns
@@ -103,11 +109,13 @@ namespace eval DIO {
                 # a tdbc::statement closes also any active tdbc::resultset
                 # owned by it
 
-                set result_obj [$this result TDBC -resultid   $tdbc_result  \
-                                                  -statement  $sql_st       \
-                                                  -isselect   $is_select    \
+                set result_obj [$this result TDBC -resultid   $tdbc_result      \
+                                                  -statement  $tdbc_statement   \
+                                                  -isselect   $is_select        \
                                                   -fields     [::list [$tdbc_result columns]]] 
             }
+
+            return $result_obj
         }
     }
 

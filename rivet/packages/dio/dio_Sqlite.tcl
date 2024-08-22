@@ -26,16 +26,16 @@ namespace eval DIO {
         inherit Database
 
         private variable dbcmd      ""
-	    public  variable interface	"Sqlite"
+	    #public  variable interface	"Sqlite"
 
-        constructor {args} {eval configure $args} {
+        constructor {args} {eval configure -interface Sqlite $args} {
             if {[catch {package require sqlite}] && \
                 [catch {package require sqlite3}]} {
 
                 return -code error "No Sqlite Tcl package available"
             }
             eval configure $args
-            $this set_field_formatter ::DIO::formatters::Sqlite
+            #$this set_field_formatter ::DIO::formatters::Sqlite
         }
 
         destructor {
