@@ -44,7 +44,7 @@ namespace eval DIO {
                 set connector_name "odbc"
             }
 
-            set tdbc_connector "tdbc::${interface_name}"
+            set tdbc_connector "tdbc::${connector_name}"
 
             uplevel #0 package require ${tdbc_connector}
         }
@@ -101,7 +101,7 @@ namespace eval DIO {
             # object design practice
 
             if {[catch {set tdbc_result [$tdbc_statement execute]} errorinfo]} {
-                set result_obj [$this result TDBC -error 1 -errorinfo $errorinfo -isselect false]
+                set result_obj [$this result TDBC -error 1 -errorinfo [::list $errorinfo] -isselect false]
             } else {
 
                 # we must store also the TDBC SQL statement as it owns

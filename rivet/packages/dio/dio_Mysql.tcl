@@ -174,7 +174,7 @@ namespace eval DIO {
         }
 
         method nextrow {} {
-            return [mysqlnext $resultid -as lists]
+            return [mysqlnext $resultid]
         }
         
     } ; ## ::itcl::class MysqlResult
