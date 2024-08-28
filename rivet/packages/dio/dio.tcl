@@ -56,10 +56,7 @@ proc handle {interface args} {
 ##
 ::itcl::class Database {
     constructor {args} {
-        puts "args: '$args'"
         eval configure $args
-        puts "interface: $interface"
-
         set special_fields_formatter [::DIO::formatters::${interface} ::DIO::formatters::#auto]
     }
 
