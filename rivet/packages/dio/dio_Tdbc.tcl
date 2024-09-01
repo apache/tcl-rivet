@@ -42,6 +42,8 @@ namespace eval DIO {
             set connector_name [::string tolower $interface_name]
             if {$connector_name == "oracle"} {
                 set connector_name "odbc"
+            } elseif {$connector_name == "postgresql"} {
+                set connector_name "postgres"
             }
 
             set tdbc_connector "tdbc::${connector_name}"

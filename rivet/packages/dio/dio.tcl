@@ -23,7 +23,7 @@ package require dio::formatters
 namespace eval ::DIO {
 
 proc handle {interface args} {
-    set obj \#auto
+    set obj ::DIO::#auto
     set tdbc_driver ""
     if {($interface == "Tdbc") && ([llength $args] > 0)} {
         set tdbc_driver [lindex $args 0]
