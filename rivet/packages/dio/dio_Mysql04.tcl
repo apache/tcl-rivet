@@ -17,14 +17,14 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-package require DIO 1.2
-package provide dio_Mysql 0.5
+package require -exact DIO 1.1
+package provide dio_Mysql 0.4
 
 namespace eval DIO {
     ::itcl::class Mysql {
         inherit Database
 
-        constructor {args} {eval configure -interface Mysql $args} {
+        constructor {args} {eval configure $args} {
             if {   [catch {package require Mysqltcl}]   \
                 && [catch {package require mysqltcl}]   \
                 && [catch {package require mysql}]} {
@@ -39,7 +39,6 @@ namespace eval DIO {
                 }
                 set db $user
             }
-
         }
 
         destructor {
@@ -97,9 +96,9 @@ namespace eval DIO {
                 return $obj
             }
             if {[catch {mysqlcol $conn -current name} fields]} { set fields "" }
-            set obj [result Mysql -resultid   $conn               \
-                                  -numrows    [::list $error]     \
-                                  -fields     [::list $fields]]
+            set obj [result Mysql   -resultid   $conn               \
+                                    -numrows    [::list $error]     \
+                                    -fields     [::list $fields]]
             return $obj
         }
 
@@ -126,13 +125,87 @@ namespace eval DIO {
             return $conn
         }
 
+        method makeDBFieldValue {table_name field_name val {convert_to {}}} {
+
+            if {[info exists specialFields(${table_name}@${field_name})]} {
+                switch $specialFields(${table_name}@${field_name}) {
+
+                    DATE {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d}]
+                        return "DATE_FORMAT('$my_val','%Y-%m-%d')"
+                    }
+                    DATETIME {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                        return "DATE_FORMAT('$my_val','%Y-%m-%d %T')"
+                    }
+                    NOW {
+
+		    # we try to be coherent with the original purpose of this method whose
+		    # goal is endow the class with a uniform way to handle timestamps. 
+		    # E.g.: Package session expects this case to return a timestamp in seconds
+		    # so that differences with timestamps returned by [clock seconds]
+		    # can be done and session expirations are computed consistently.
+		    # (Bug #53703)
+
+                        switch $convert_to {
+
+                            SECS {
+                                if {[::string compare $val "now"] == 0} {
+
+#                                   set     secs    [clock seconds]
+#                                   set     my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+#                                   return  $my_val
+
+                                    return [clock seconds]
+
+                                } else {
+                                    return  "UNIX_TIMESTAMP($field_name)"
+                                }
+                            }
+                            default {
+
+                                if {[::string compare $val, "now"] == 0} {
+                                    set secs [clock seconds]
+                                } else {
+                                    set secs [clock scan $val]
+                                }
+
+                                # this is kind of going back and forth from the same 
+                                # format,
+
+                                #set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                                return "FROM_UNIXTIME('$secs')"
+                            }
+                        }
+                    }
+                    NULL {
+                        if {[::string toupper $val] == "NULL"} {
+                            return $val
+                        } else {
+                            return "'[quote $val]'"
+                        }
+                    }
+                    default {
+                        # no special code for that type!!
+                        return "'[quote $val]'"
+                    }
+                }
+
+            } else {
+                return "'[quote $val]'"
+            }
+
+        }
+
         public variable db "" {
             if {[info exists conn] && [mysqlping $conn]} {
                 mysqluse $conn $db
             }
         }
 
-        protected method handle_client_arguments {cargs} {
+        protected method handle_client_arguments {cargs} { 
 
             # we assign only the accepted options
 
@@ -155,7 +228,7 @@ namespace eval DIO {
             }
         }
 
-        #public  variable interface "Mysql"
+        public  variable interface "Mysql"
         private variable conn
 
     } ; ## ::itcl::class Mysql

@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 
-package require DIO
 package require tdbc
+package require DIO 1.2
 package provide dio_Tdbc 0.2
 
 namespace eval DIO {

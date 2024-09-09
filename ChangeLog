@@ -1,3 +1,8 @@
+2024-09-09 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio: merging branch tdbc with DIO 1.2 and new dio connectors
+	using class Formatter descendands to print special fields and introducing new dio_Tdbc.tcl
+	connector, a portmanteau class switching among tdbc connectors
+
 2024-08-23 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Mysql.c,dio_Tdbc.c: fixed wrong argument list construction
 	and wrong argument to legacy mysqltcl connector

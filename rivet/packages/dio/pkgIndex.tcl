@@ -8,11 +8,15 @@
 # script is sourced, the variable $dir must contain the
 # full path name of this file's directory.
 
-package ifneeded DIO            1.2 [list source [file join $dir dio.tcl]]
-package ifneeded DIODisplay     1.0 [list source [file join $dir diodisplay.tcl]]
-package ifneeded dio_Mysql      0.4 [list source [file join $dir dio_Mysql.tcl]]
-package ifneeded dio_Oracle     0.3 [list source [file join $dir dio_Oracle.tcl]]
-package ifneeded dio_Postgresql 0.2 [list source [file join $dir dio_Postgresql.tcl]]
-package ifneeded dio_Sqlite     0.2 [list source [file join $dir dio_Sqlite.tcl]]
-package ifneeded dio_Tdbc       0.2 [list source [file join $dir dio_Tdbc.tcl]]
+package ifneeded DIO 1.1 [list source [file join $dir dio11.tcl]]
+package ifneeded DIO 1.2 [list source [file join $dir dio.tcl]]
+package ifneeded DIODisplay 1.0 [list source [file join $dir diodisplay.tcl]]
 package ifneeded dio::formatters 1.0 [list source [file join $dir formatters.tcl]]
+package ifneeded dio_Mysql 0.4 [list source [file join $dir dio_Mysql.tcl]]\n[list source [file join $dir dio_Mysql04.tcl]]
+package ifneeded dio_Oracle 0.1 [list source [file join $dir dio_Oracle01.tcl]]
+package ifneeded dio_Oracle 0.3 [list source [file join $dir dio_Oracle.tcl]]
+package ifneeded dio_Postgresql 0.1 [list source [file join $dir dio_Postgresql01.tcl]]
+package ifneeded dio_Postgresql 0.2 [list source [file join $dir dio_Postgresql.tcl]]
+package ifneeded dio_Sqlite 0.1 [list source [file join $dir dio_Sqlite01.tcl]]
+package ifneeded dio_Sqlite 0.2 [list source [file join $dir dio_Sqlite.tcl]]
+package ifneeded dio_Tdbc 0.2 [list source [file join $dir dio_Tdbc.tcl]]

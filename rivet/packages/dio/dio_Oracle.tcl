@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package require DIO 1.2
 package provide dio_Oracle 0.3
 
 namespace eval DIO {
@@ -33,8 +34,6 @@ namespace eval DIO {
                 }
                 set db $user
             }
-
-            #$this set_field_formatter ::DIO::formatters::Oracle
         }
 
         destructor {
