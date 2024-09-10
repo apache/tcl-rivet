@@ -17,8 +17,8 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-package require DIO 1.2
-package provide dio_Mysql 0.5
+package require DIO       1.2
+package provide dio_Mysql 1.2
 
 namespace eval DIO {
     ::itcl::class Mysql {
