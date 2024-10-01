@@ -1,3 +1,31 @@
+2024-09-09 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio: merging branch tdbc with DIO 1.2 and new dio connectors
+	using class Formatter descendands to print special fields and introducing new dio_Tdbc.tcl
+	connector, a portmanteau class switching among tdbc connectors
+
+2024-08-23 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Mysql.c,dio_Tdbc.c: fixed wrong argument list construction
+	and wrong argument to legacy mysqltcl connector
+
+2024-08-22 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio: further development for supporting tdbc based connectors
+
+2024-05-19 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/formatters.tcl: add formatters class to
+	provide common special fields formatting for both Tdbc based
+	and legacy connectors
+	* rivet/packages/dio/dio_*.tcl: removed special fields formatting
+	code and endowing these classes with special field formatter
+	object instances
+
+2024-05-15 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/tdbc.tcl,dio.tcl: add early support for tdbc database interface
+
+2024-05-11 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/aida/aida.tcl,sql.tcl: experimental files moved from packages/dio
+	* rivet/packages/rivet_ncgi/rivet_ncgi.tcl: fully qualifying rivet commands
+	* Makefile.am: Remove svn Id: 
+
 2024-04-12 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet_common.c: Determining the server_rec also
 	for ServerInitScripts.

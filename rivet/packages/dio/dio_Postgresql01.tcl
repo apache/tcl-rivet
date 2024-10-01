@@ -1,32 +1,27 @@
 # dio_Postgresql.tcl -- Postgres backend.
 
-# Copyright 2002-2024 The Apache Software Foundation
+# Copyright 2002-2004 The Apache Software Foundation
 
-#    Licensed to the Apache Software Foundation (ASF) under one
-#    or more contributor license agreements.  See the NOTICE file
-#    distributed with this work for additional information
-#    regarding copyright ownership.  The ASF licenses this file
-#    to you under the Apache License, Version 2.0 (the
-#    "License"); you may not use this file except in compliance
-#    with the License.  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing,
-#    software distributed under the License is distributed on an
-#    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-#    KIND, either express or implied. See the License for the
-#    specific language governing permissions and limitations
-#    under the License.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 
-package require DIO            1.2
-package provide dio_Postgresql 1.2
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+package require -exact DIO 1.1
+package provide dio_Postgresql 0.1
 
 namespace eval DIO {
     ::itcl::class Postgresql {
     inherit Database
 
-    constructor {args} {eval configure -interface Postgresql $args} {
+    constructor {args} {eval configure $args} {
         package require Pgtcl
         set_conn_defaults
         eval configure $args
@@ -106,56 +101,60 @@ namespace eval DIO {
         return $conn
     }
 
-    method build_special_field {table_name field_name val {convert_to {}}} {
-        switch [$this select_special_field $table_name $field_name] {
-            DATE {
-                set secs [clock scan $val]
-                set my_val [clock format $secs -format {%Y-%m-%d}]
-                return "'$my_val'"
-            }
-            DATETIME {
-                set secs [clock scan $val]
-                set my_val [clock format $secs -format {%Y-%m-%d %T}]
-                return "'$my_val'"
-            }
-            NOW {
-                switch $convert_to {
+    method makeDBFieldValue {table_name field_name val {convert_to {}}} {
+        if {[info exists specialFields(${table_name}@${field_name})]} {
+            switch $specialFields(${table_name}@${field_name}) {
+                DATE {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d}]
+                    return "'$my_val'"
+                }
+                DATETIME {
+                    set secs [clock scan $val]
+                    set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                    return "'$my_val'"
+                }
+                NOW {
+                    switch $convert_to {
 
-                    # we try to be coherent with the original purpose of this method whose
-                    # goal is to provide to the programmer a uniform way to handle timestamps. 
-                    # E.g.: Package session expects this case to return a timestamp in seconds
-                    # so that differences with timestamps returned by [clock seconds]
-                    # can be done and session expirations are computed consistently.
-                    # (Bug #53703)
+                        # we try to be coherent with the original purpose of this method whose
+                        # goal is to provide to the programmer a uniform way to handle timestamps. 
+                        # E.g.: Package session expects this case to return a timestamp in seconds
+                        # so that differences with timestamps returned by [clock seconds]
+                        # can be done and session expirations are computed consistently.
+                        # (Bug #53703)
 
-                    SECS {
-                        if {[::string compare $val "now"] == 0} {
-#                           set secs    [clock seconds]
-#                           set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
-#                           return  $my_val
-                            return [clock seconds]
-                        } else {
-                            return  "extract(epoch from $field_name)"
+                        SECS {
+                            if {[::string compare $val "now"] == 0} {
+#                   set secs    [clock seconds]
+#                   set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
+#                   return  $my_val
+                                return [clock seconds]
+                            } else {
+                                return  "extract(epoch from $field_name)"
+                            }
                         }
-                    }
-                    default {
-                        if {[::string compare $val, "now"] == 0} {
-                            set secs [clock seconds]
-                        } else {
-                            set secs [clock scan $val]
+                        default {
+                            if {[::string compare $val, "now"] == 0} {
+                                set secs [clock seconds]
+                            } else {
+                                set secs [clock scan $val]
+                            }
+
+                            # this is kind of going back and forth from the same 
+                            # format,
+
+                            return "'[clock format $secs -format {%Y-%m-%d %T}]'"
                         }
-
-                        # this is kind of going back and forth from the same 
-                        # format,
-
-                        return "'[clock format $secs -format {%Y-%m-%d %T}]'"
                     }
                 }
+                default {
+                    # no special code for that type!!
+                    return [pg_quote $val]
+                }
             }
-            default {
-                # no special code for that type!!
+        } else {
                 return [pg_quote $val]
-            }
         }
     }
 
@@ -168,7 +167,7 @@ namespace eval DIO {
         }
     }
 
-    #public variable interface   "Postgresql"
+    public variable interface   "Postgresql"
     private variable conn
 
     } ; ## ::itcl::class Postgresql

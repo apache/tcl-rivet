@@ -1,13 +1,13 @@
 # dio.tcl -- implements a database abstraction layer.
 
 # Copyright 2002-2004 The Apache Software Foundation
-#
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+
 #       http://www.apache.org/licenses/LICENSE-2.0
-#
+
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,39 +16,19 @@
 
 catch {package require Tclx}
 package require Itcl
-package require dio::formatters
-
 ##set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
 namespace eval ::DIO {
 
 proc handle {interface args} {
-    set obj ::DIO::#auto
-    set tdbc_driver ""
-    if {($interface == "Tdbc") && ([llength $args] > 0)} {
-        set tdbc_driver [lindex $args 0]
-        set args [lreplace $args 0 0]
-    }
-
-    #puts "interface: $interface ($tdbc_driver)"
-
+    set obj \#auto
     set first [lindex $args 0]
     if {![::rivet::lempty $first] && [string index $first 0] != "-"} {
         set obj  [lindex $args 0]
         set args [lreplace $args 0 0]
     }
     uplevel \#0 package require dio_$interface
-
-    #puts "tdbc: '$tdbc_driver' obj: '$obj' args 3: '$args'"
-
-    if {$tdbc_driver == ""} {
-
-        # old connectors based on traditional dbms drivers
-
-        return [uplevel \#0 ::DIO::$interface $obj $args]
-    } else {
-        return [uplevel \#0 ::DIO::$interface $obj $tdbc_driver {*}$args]
-    }
+    return [uplevel \#0 ::DIO::$interface $obj $args]
 }
 
 ##
@@ -57,7 +37,6 @@ proc handle {interface args} {
 ::itcl::class Database {
     constructor {args} {
         eval configure $args
-        set special_fields_formatter [::DIO::formatters::${interface} ::DIO::formatters::#auto]
     }
 
     destructor {
@@ -77,8 +56,9 @@ proc handle {interface args} {
     # quote - given a string, return the same string with any single
     #  quote characters preceded by a backslash
     #
-    method quote {a_string} {
-        return [DIO::formatters::quote $a_string]
+    method quote {string} {
+        regsub -all {'} $string {\'} string
+        return $string
     }
 
     #
@@ -90,11 +70,11 @@ proc handle {interface args} {
     #
     protected method build_select_query {args} {
 
-        set bool    AND
-        set first   1
-        set req     ""
+        set bool AND
+        set first 1
+        set req ""
         set myTable $table
-        set what    "*"
+        set what "*"
 
         # for each argument passed us...
         # (we go by integers because we mess with the index based on
@@ -618,27 +598,12 @@ proc handle {interface args} {
         return [string "select count(*) from $myTable"]
     }
 
-    protected method set_field_formatter {formatter_class} {
-        $special_fields_formatter destroy
-        set special_fields_formatter [$formatter_class ::DIO::formatters::#auto]
+    method makeDBFieldValue {table_name field_name val} {
+        return "'[quote $val]'"
     }
 
-    public method build_special_field {table_name field_name val {convert_to {}}} {
-        return [$special_fields_formatter build $table_name $field_name $val $convert_to]
-    }
-
-    public method register_special_field {table_name field_name type} {
-        $special_fields_formatter register $table_name $field_name $type
-    }
-
-    # method kept for compatibility
-
-    public method registerSpecialField {table_name field_name type} {
-        $this register_special_field $table_name $field_name $type
-    }
-
-    public method makeDBFieldValue {table_name field_name val {convert_to {}}} {
-        return [$this build_special_field $table_name $field_name $val]
+    method registerSpecialField {table_name field_name type} {
+        set specialFields(${table_name}@${field_name}) $type
     }
 
     ##
@@ -667,8 +632,7 @@ proc handle {interface args} {
     method host {{string ""}} { return [configure_variable host $string] }
     method port {{string ""}} { return [configure_variable port $string] }
 
-    public variable special_fields_formatter \
-                    [::DIO::formatters::RootFormatter ::DIO::formatters::#auto]
+    protected variable specialFields
 
     public variable interface   ""
     public variable errorinfo   ""
@@ -908,4 +872,4 @@ proc handle {interface args} {
 
 } ; ## namespace eval DIO
 
-package provide DIO 1.2
+package provide DIO 1.1

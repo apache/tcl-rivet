@@ -103,16 +103,16 @@ package require Itcl
     public variable debugMode 1
 
     constructor {args} {
-	eval configure $args
+	    eval configure $args
     	$dioObject registerSpecialField $sessionTable session_update_time NOW
-	$dioObject registerSpecialField $sessionTable session_start_time NOW
+	    $dioObject registerSpecialField $sessionTable session_start_time NOW
     }
 
     method status {args} {
-	if {$args == ""} {
-	    return $status
-	}
-	set status $args
+        if {$args == ""} {
+            return $status
+        }
+        set status $args
     }
 
     # get_entropy_bytes - read entropyLength bytes from a random data

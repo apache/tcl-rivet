@@ -1,26 +1,21 @@
 # dio_Sqlite.tcl -- DIO interface for sqlite
 
-# Copyright 2002-2024 The Apache Software Foundation
+# Copyright 2004 The Apache Software Foundation
 
-#    Licensed to the Apache Software Foundation (ASF) under one
-#    or more contributor license agreements.  See the NOTICE file
-#    distributed with this work for additional information
-#    regarding copyright ownership.  The ASF licenses this file
-#    to you under the Apache License, Version 2.0 (the
-#    "License"); you may not use this file except in compliance
-#    with the License.  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing,
-#    software distributed under the License is distributed on an
-#    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-#    KIND, either express or implied. See the License for the
-#    specific language governing permissions and limitations
-#    under the License.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 
-package require DIO         1.2
-package provide dio_Sqlite  1.2
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+package require -exact DIO 1.1
+package provide dio_Sqlite 0.1
 
 namespace eval DIO {
     variable sqlite_seq -1
@@ -31,9 +26,9 @@ namespace eval DIO {
         inherit Database
 
         private variable dbcmd      ""
-	    #public  variable interface	"Sqlite"
+	    public  variable interface	"Sqlite"
 
-        constructor {args} {eval configure -interface Sqlite $args} {
+        constructor {args} {eval configure $args} {
             if {[catch {package require sqlite}] && \
                 [catch {package require sqlite3}]} {
 
@@ -109,9 +104,66 @@ namespace eval DIO {
         # quote - given a string, return the same string with any single
         #  quote characters preceded by a backslash
         #
-        method quote {a_string} {
-            regsub -all {'} $a_string {''} a_string
-            return $a_string
+        method quote {string} {
+            regsub -all {'} $string {''} string
+            return $string
+        }
+
+        method makeDBFieldValue {table_name field_name val {convert_to {}}} {
+            if {[info exists specialFields(${table_name}@${field_name})]} {
+                switch $specialFields(${table_name}@${field_name}) {
+                    DATE {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d}]
+                        return "date('$my_val')"
+                    }
+                    DATETIME {
+                        set secs [clock scan $val]
+                        set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                        return "datetime('$my_val')"
+                    }
+                    NOW {
+                        switch $convert_to {
+
+                            # we try to be coherent with the original purpose of this method whose
+                            # goal is to provide to the programmer a uniform way to handle timestamps. 
+                            # E.g.: Package session expects this case to return a timestamp in seconds
+                            # so that differences with timestamps returned by [clock seconds]
+                            # can be done and session expirations are computed consistently.
+                            # (Bug #53703)
+
+                            SECS {
+                                if {[::string compare $val "now"] == 0} {
+#                                   set secs    [clock seconds]
+#                                   set my_val  [clock format $secs -format "%Y%m%d%H%M%S"]
+                                    return      [clock seconds]
+                                } else {
+
+                                    # the numbers of seconds must be returned as 'utc' to
+                                    # be compared with values returned by [clock seconds]
+
+                                    return  "strftime('%s',$field_name,'utc')"
+                                }
+                            }
+                            default {
+                                if {[::string compare $val, "now"] == 0} {
+                                    set secs [clock seconds]
+                                } else {
+                                    set secs [clock scan $val]
+                                }
+                                set my_val [clock format $secs -format {%Y-%m-%d %T}]
+                                return "datetime('$my_val')"
+                            }
+                        }
+                    }
+                    default {
+                        # no special code for that type!!
+                        return "'[quote $val]'"
+                    }
+                }
+            } else {
+                return "'[quote $val]'"
+            }
         }
 
     }

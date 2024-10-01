@@ -1,13 +1,13 @@
 # sql.tcl -- SQL code generator
 
-# Copyright 2002-2004 The Apache Software Foundation
-
+# Copyright 2024 The Apache Tcl Team
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-
-#       http://www.apache.org/licenses/LICENSE-2.0
-
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,14 +37,17 @@ namespace eval ::Aida {
         public variable what
         public variable table
 
-        constructor { backend } {
+        constructor {backend} {
 
         }
 
         private method where_clause {where_arguments}
 
         public method build_select_query {table row_d}
-        public method quote {field_value}
+        public method escape_quotes {field_value}
+
+        # DEPRECATED. Kept for compatibility, but it might go away
+        public method quote {field_value} { return [$this escape_quotes $field_value] }
 
         protected method field_value {table_name field_name val} {
             return "'[quote $val]'"
@@ -149,10 +152,10 @@ namespace eval ::Aida {
 
 
     #
-    # quote - given a string, return the same string with any single
-    #  quote characters preceded by a backslash
+    # escape_quotes - given a string, return the same string with any single
+    #                 quote characters preceded by a backslash
     #
-    ::itcl::body Sql::quote {field_value} {
+    ::itcl::body Sql::escape_quotes {field_value} {
         regsub -all {'} $field_value {\'} field_value
         return $field_value
     }
