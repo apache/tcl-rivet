@@ -1,3 +1,6 @@
+2024-02-02 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/dio.xml: Documenting the support of Tdbc series of DBMS connectors
+
 2024-09-09 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio: merging branch tdbc with DIO 1.2 and new dio connectors
 	using class Formatter descendands to print special fields and introducing new dio_Tdbc.tcl
