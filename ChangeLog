@@ -1,3 +1,6 @@
+2024-02-03 Massimo Manghi <mxmanghi@apache.org>
+    * doc/xml/lazybridge.xml: escaping some character that needed their corresponding SGML/HTML entities
+
 2024-02-02 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/dio.xml: Documenting the support of Tdbc series of DBMS connectors
     * doc/xml/lazybridge.xml: update with latest version of code
