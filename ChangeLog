@@ -1,5 +1,7 @@
 2024-02-02 Massimo Manghi <mxmanghi@apache.org>
     * doc/xml/dio.xml: Documenting the support of Tdbc series of DBMS connectors
+    * doc/xml/lazybridge.xml: update with latest version of code
+    * src/mod_rivet_ng/rivet_lazy_mpm.c: cleaned code removing lines that had been commented out
 
 2024-09-09 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio: merging branch tdbc with DIO 1.2 and new dio connectors

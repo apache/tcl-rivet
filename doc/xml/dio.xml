@@ -18,6 +18,8 @@
 		    <arg><replaceable>option</replaceable></arg>
 		    <arg>...</arg>
 		  </group>
+		</cmdsynopsis>
+		<cmdsynopsis>
 		  <command>::DIO::handle Tdbc</command>
 		  <arg choice="plain"><replaceable>interface</replaceable></arg>
 		  <arg choice="opt"><replaceable>objectName</replaceable></arg>
@@ -48,14 +50,15 @@
       <option>Oracle</option> and <option>Sqlite</option>.
       Start with version 1.2 DIO supports also the  <ulink url="https://https://core.tcl-lang.org/tdbc">TDBC</ulink>
       interface through the <option>Tdbc</option> interfaces.
-      In this form the command requires a further argument for the
-      TDBC supported DBMS driver <option>mysql</option>,
+      In this form the command requires a further argument for one of the
+      TDBC supported DBMS driver <option>mysql</option>. TDBC drivers are:
+      <option>mysql</option> (supports also MariaDB),
       <option>odbc</option> (provides also support for <option>Oracle</option>), 
       <option>postgresql</option> and <option>sqlite</option>
 	</para>
 	<para>
 	  If <option><replaceable>objectName</replaceable></option> is
-	  specified, DIO creates an object of that name.  If there is
+	  specified, DIO creates an object of that name. If there is
 	  no <option><replaceable>objectName</replaceable></option>
 	  given, DIO will automatically generate a unique object ID
 	</para>
