@@ -1,10 +1,11 @@
-2024-02-03 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/lazybridge.xml: escaping some character that needed their corresponding SGML/HTML entities
-
-2024-02-02 Massimo Manghi <mxmanghi@apache.org>
-    * doc/xml/dio.xml: Documenting the support of Tdbc series of DBMS connectors
-    * doc/xml/lazybridge.xml: update with latest version of code
-    * src/mod_rivet_ng/rivet_lazy_mpm.c: cleaned code removing lines that had been commented out
+2024-11-26 Massimo Manghi <mxmanghi@apache.org>
+	* ChangeLog: reordered log entries that some past merge had misplaced
+	* VERSION: new version 3.2.7
+	* src/mod_rivet_ng/mod_rivet.h: Removed macro THREADED_TCL since unused and since Tcl
+	  is now only threaded
+	* src/mod_rivet_ng/mod_rivet_cache.[h|c]: Introducing macro RIVET_CACHE_SIZE_MINIMUM.
+	This is the absolute minimum for the rivet cache size also when the estimated size based
+	on the ap_max_requests_per_child value drops below it
 
 2024-09-09 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio: merging branch tdbc with DIO 1.2 and new dio connectors
@@ -50,6 +51,14 @@
 	* src/mod_rivet_ng/worker_prefork_common.c: now calling the
 	new function Rivet_RunChildScripts to execute
 	both rivet_child_init_script and rivet_child_exit_script
+
+2024-02-03 Massimo Manghi <mxmanghi@apache.org>
+	* doc/xml/lazybridge.xml: escaping some character that needed their corresponding SGML/HTML entities
+
+2024-02-02 Massimo Manghi <mxmanghi@apache.org>
+	* doc/xml/dio.xml: Documenting the support of Tdbc series of DBMS connectors
+	* doc/xml/lazybridge.xml: update with latest version of code
+	* src/mod_rivet_ng/rivet_lazy_mpm.c: cleaned code removing lines that had been commented out
 
 2024-01-05 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: bumped version number as 3.2.4

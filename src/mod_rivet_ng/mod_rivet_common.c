@@ -635,7 +635,7 @@ void Rivet_CleanupRequest( request_rec *r )
  *
  * Setup an array in each interpreter to tell us things about Apache.
  * This saves us from having to do any real call to load an entire
- * environment.  This routine only gets called once, when the child process
+ * environment. This routine only gets called once, when the child process
  * is created.
  *
  *  Arguments:

@@ -18,6 +18,8 @@
     under the License.
 */
 
+#include <sys/param.h>
+
 #include <apr_strings.h>
 #include <mpm_common.h>
 
@@ -44,9 +46,9 @@ extern mod_rivet_globals* module_globals;
 int RivetCache_DefaultSize (void)
 {
     if (ap_max_requests_per_child != 0) {
-        return  (ap_max_requests_per_child / 5);
+        return MAX(RIVET_CACHE_SIZE_MINIMUM,(ap_max_requests_per_child / 5));
     } else {
-        return 50;
+        return RIVET_CACHE_SIZE_MINIMUM;
     }
 }
 

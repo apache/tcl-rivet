@@ -21,6 +21,12 @@
 #ifndef __mod_rivet_cache_h__
 #define __mod_rivet_cache_h__
 
+/*
+ * This is the absolute minimum size of the cache, unless CacheSize is set
+ */
+
+#define RIVET_CACHE_SIZE_MINIMUM 50
+
 EXTERN int   RivetCache_DefaultSize (void);
 EXTERN void  RivetCache_Create  (apr_pool_t *p, rivet_thread_interp* interp_obj);
 EXTERN void  RivetCache_Cleanup (rivet_thread_private* private,rivet_thread_interp* rivet_interp);
