@@ -83,9 +83,6 @@ typedef struct mpm_bridge_status {
 typedef struct mpm_bridge_specific {
     rivet_thread_interp*  interp;           /* thread Tcl interpreter object        */
     bool                  keep_going;       /* thread loop controlling variable     */
-                                            /* the request_rec and TclWebRequest    *
-                                             * are copied here to be passed to a    *
-                                             * channel                              */
 } mpm_bridge_specific;
 
 enum {
@@ -177,7 +174,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
 
     private->ext = apr_pcalloc(private->pool,sizeof(mpm_bridge_specific));
     private->ext->keep_going = true;
-    //private->ext->interp = Rivet_NewVHostInterp(private->pool,w->server);
     RIVET_POKE_INTERP(private,rsc,Rivet_NewVHostInterp(private->pool,rsc->default_cache_size));
     private->ext->interp->channel = private->channel;
 
@@ -237,8 +233,6 @@ static void* APR_THREAD_FUNC request_processor (apr_thread_t *thd, void *data)
         private->r = w->r;
 
         w->ap_sts = Rivet_SendContent(private);
-
-        // if (module_globals->mpm->server_shutdown) continue;
 
         w->status = done;
         apr_thread_cond_signal(w->condition);
@@ -395,7 +389,6 @@ int LazyBridge_Request (request_rec* r,rivet_req_ctype ctype)
     if (apr_is_empty_array(array))
     {
         w = create_worker(module_globals->pool,r->server);
-        //(module_globals->mpm->vhosts[conf->idx].threads_count)++;
     }
     else
     {

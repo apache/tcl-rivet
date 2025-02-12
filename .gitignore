@@ -40,3 +40,4 @@ tests/server.conf
 tests/test.conf
 tests/uploadedjpeg.jpg
 Session.vim
+rivet/init.tcl

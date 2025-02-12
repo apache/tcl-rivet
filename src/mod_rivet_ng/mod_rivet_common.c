@@ -329,7 +329,10 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
     interp_obj->flags |= RIVET_INTERP_INITIALIZED;
 }
 
- /* -- Rivet_NewVHostInterp
+ /*
+  *-----------------------------------------------------------------------------
+  *
+  * -- Rivet_NewVHostInterp
   *
   * Returns a new rivet_thread_interp object with a new Tcl interpreter
   * configuration scripts and cache. The pool passed to Rivet_NewVHostInterp
@@ -341,6 +344,7 @@ void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
   * Returned value:
   *     a rivet_thread_interp* record object
   *
+  *-----------------------------------------------------------------------------
   */
 
 rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,int default_cache_size)
@@ -360,9 +364,9 @@ rivet_thread_interp* Rivet_NewVHostInterp(apr_pool_t *pool,int default_cache_siz
         return NULL;
     }
 
-    /* We now read from the pointers to the cache_size and cache_free conf parameters
-     * for compatibility with mod_rivet current version, but these values must become
-     * integers not pointers
+    /*
+     * Determining the default cache size of the Rivet interpreter object
+     * In case the argument default_cache_size == 0 the cache is disabled
      */
 
     if (default_cache_size < 0) {
@@ -632,7 +636,7 @@ void Rivet_CleanupRequest( request_rec *r )
  *
  * Setup an array in each interpreter to tell us things about Apache.
  * This saves us from having to do any real call to load an entire
- * environment.  This routine only gets called once, when the child process
+ * environment. This routine only gets called once, when the child process
  * is created.
  *
  *  Arguments:

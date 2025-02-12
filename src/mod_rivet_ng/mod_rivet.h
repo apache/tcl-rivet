@@ -57,21 +57,6 @@
 #define FILEDEBUGINFO
 #endif
 
-/* Configuration options  */
-
-/*
-   If you do not have a threaded Tcl, you can define this to 0.  This
-   has the effect of running Tcl Init code in the main parent init
-   handler, instead of in child init handlers.
- */
-#ifdef __MINGW32__
-#define THREADED_TCL 1
-#else
-#define THREADED_TCL 0 /* Unless you have MINGW32, modify this one! */
-#endif
-
-/* End Configuration options  */
-
 #define VAR_SRC_QUERYSTRING 1
 #define VAR_SRC_POST 		2
 #define VAR_SRC_ALL 		3
@@ -114,7 +99,7 @@ typedef struct _rivet_server_conf {
     char*       rivet_before_script;        /* script run before each page      */
     char*       rivet_after_script;         /*            after                 */
 
-    /* --------------------------------------------------------------------------- */
+    /* ------------------------------------------------------------------------ */
 
     /* This flag is used with the above directives. If any of them have changed, it gets set. */
 
