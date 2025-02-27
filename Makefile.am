@@ -30,10 +30,6 @@ install-binaries:
 	$(install_sh) -C -m 644 $(builddir)/rivet/default_request_handler.tcl $(RIVETLIB_DESTDIR)
 	$(install_sh) -C -m 644 $(shell /bin/ls $(srcdir)/rivet/rivet-tcl/*) $(RIVETLIB_DESTDIR)/rivet-tcl
 
-#cp -rv $(srcdir)/rivet/packages $(RIVETLIB_DESTDIR)/
-#-(  cd $(RIVETLIB_DESTDIR); rm -f *.la; \
-#    echo 'eval pkg_mkIndex -verbose [pwd] init.tcl [glob [file join packages * *.tcl] [file join $(RIVET_LIBS_ARCH) *[info sharedlibextension]]]' | @TCLSH_PROG@ ; )
-
 uninstall-local:
 	echo 'running target uninstall-local ($(RIVETLIB_DESTDIR))'
 	rm -f  $(RIVETLIB_DESTDIR)/init.tcl

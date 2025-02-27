@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# $Id$
-
 package provide tclrivet 0.1
 
 #load [file join [file dirname [info script]] .. .. \
