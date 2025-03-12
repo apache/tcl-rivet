@@ -327,7 +327,7 @@ AC_DEFUN([CHECK_APXS],[
 AC_DEFUN([APACHE_INCLUDES],[
   AC_ARG_WITH(
     apache_include,
-    [  --with-apache-include[=DIR]     Apache server directory],
+     [  --with-apache-include[=DIR]     Apache server directory],
      [apache_include="${with_apache_include}"] 
     ,[apache_include="${APXS_INCLUDES}"]
   )
