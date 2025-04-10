@@ -1,3 +1,6 @@
+2025-04-10 Massimo Manghi <mxmanghi@apache.org>
+	* configure.ac: defined m4 variable for rivet version.
+
 2024-11-26 Massimo Manghi <mxmanghi@apache.org>
 	* ChangeLog: reordered log entries that some past merge had misplaced
 	* VERSION: new version 3.2.7

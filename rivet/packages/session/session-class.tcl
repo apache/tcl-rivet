@@ -304,21 +304,20 @@ package require Itcl
     #  store the data in the rivet session cache
     #
     method store {packageName key data} {
-	set a(session_id) [id]
-	set a(package_) $packageName
-	set a(key_) $key
+        set a(session_id) [id]
+        set a(package_) $packageName
+        set a(key_) $key
 
-	regsub -all {\\} $data {\\\\} data
-	set a(data) $data
+        regsub -all {\\} $data {\\\\} data
+        set a(data) $data
 
-	debug "store session data, package_ '$packageName', key_ '$key', data '$data'"
-	set kf [list session_id package_ key_]
+        debug "store session data, package_ '$packageName', key_ '$key', data '$data'"
+        set kf [list session_id package_ key_]
 
-	if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
-	    debug "Failed to store $sessionCacheTable '$kf'"
-	    #parray a
-	    error [$dioObject errorinfo]
-	}
+        if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
+            debug "Failed to store $sessionCacheTable '$kf'"
+            error [$dioObject errorinfo]
+        }
     }
 
     #
@@ -326,23 +325,23 @@ package require Itcl
     #   for this session
     #
     method fetch {packageName key} {
-	set kf [list session_id package_ key_]
+        set kf [list session_id package_ key_]
 
-	set a(session_id) [id]
-	set a(package_) $packageName
-	set a(key_) $key
+        set a(session_id) [id]
+        set a(package_) $packageName
+        set a(key_) $key
 
-	set key [$dioObject makekey a $kf]
-	if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
-	    status [$dioObject errorinfo]
-	    debug "error: [$dioObject errorinfo]"
-	    debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
-	    return ""
-	}
+        set key [$dioObject makekey a $kf]
+        if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
+            status [$dioObject errorinfo]
+            debug "error: [$dioObject errorinfo]"
+            debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
+            return ""
+        }
 
-	debug "fetch session data succeeded, package_ '$packageName', key_ '$key', result '$a(data)'"
+        debug "fetch session data succeeded, package_ '$packageName', key_ '$key', result '$a(data)'"
 
-	return $a(data)
+        return $a(data)
     }
 
     #
