@@ -138,7 +138,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
     }
     else
     {
-    	Tcl_Size target_length;
+        Tcl_Size target_length;
         url_target_name = Tcl_GetStringFromObj(objv[1],&target_length);
 
         // we check the first character for a '/' (absolute path)

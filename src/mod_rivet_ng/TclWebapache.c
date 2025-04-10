@@ -800,7 +800,7 @@ char *TclWeb_StringToUtf (char *in,TclWebRequest *req)
     char *tmp;
     Tcl_DString dstr;
 
-    Tcl_DStringInit(&dstr);    
+    Tcl_DStringInit(&dstr);
     tmp = (char*) apr_pstrdup(req->req->pool,Tcl_ExternalToUtfDString(NULL,in,(signed)strlen(in),&dstr));
     Tcl_DStringFree(&dstr);
     return tmp;
