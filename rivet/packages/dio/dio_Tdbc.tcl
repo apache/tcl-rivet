@@ -27,7 +27,7 @@ namespace eval DIO {
     ::itcl::class Tdbc {
         inherit Database
 
-        private variable connector_n
+        private common   connector_n    0
         private variable connector
         private variable tdbc_connector
         private variable tdbc_arguments [list -encoding     \
@@ -36,7 +36,6 @@ namespace eval DIO {
                                               -timeout]
 
         constructor {interface_name args} {eval configure -interface $interface_name $args} {
-            set connector_n 0
             set connector   ""
 
             # I should check this one: we only accept connector

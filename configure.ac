@@ -20,7 +20,9 @@ dnl
 # so you can encode the package version directly into the source files.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rivet],[m4_esyscmd_s([cat VERSION])],[rivet-dev@tcl.apache.org])
+m4_define([rivet_VERSION],m4_esyscmd([cat VERSION | tr -d '\n']))
+
+AC_INIT([Rivet],m4_defn([rivet_VERSION]),[rivet-dev@tcl.apache.org],[rivet-]m4_defn([rivet_VERSION]))
 TEA_INIT([3.9])
 
 # we are storing here the configure command line, as recursive
@@ -327,7 +329,7 @@ AC_DEFUN([CHECK_APXS],[
 AC_DEFUN([APACHE_INCLUDES],[
   AC_ARG_WITH(
     apache_include,
-    [  --with-apache-include[=DIR]     Apache server directory],
+     [  --with-apache-include[=DIR]     Apache server directory],
      [apache_include="${with_apache_include}"] 
     ,[apache_include="${APXS_INCLUDES}"]
   )
@@ -427,9 +429,9 @@ AC_DEFUN([APU_HANDLING],[
 # Effect: If you're running Tcl < 8.5.10 we refuse to build Rivet...
 
 AX_COMPARE_VERSION([$TCL_VERSION$TCL_PATCH_LEVEL],[lt],[8.5.10],[
-    AC_MSG_ERROR([Rivet 2.1 requires Tcl > 8.5.10 (current is $TCL_VERSION$TCL_PATCH_LEVEL)])
+    AC_MSG_ERROR([Rivet m4_defn([rivet_VERSION]) requires Tcl > 8.5.10 (current is $TCL_VERSION$TCL_PATCH_LEVEL)])
 ] , [
-    AC_MSG_NOTICE([we are building Rivet with Tcl $TCL_VERSION$TCL_PATCH_LEVEL])
+    AC_MSG_NOTICE([we are building Rivet m4_defn([rivet_VERSION]) with Tcl $TCL_VERSION$TCL_PATCH_LEVEL])
 ])
 
 
