@@ -66,25 +66,53 @@ mod_rivet_la_SOURCES =  @rivet_core@/mod_rivet.c                        \
 
 mod_rivet_la_LDFLAGS = @TCL_LIB_SPEC@ @APXS_LDFLAGS@ @APR_LDFLAGS@ -module -avoid-version
 mod_rivet_la_LIBADD = @TCL_LIBS@ @APXS_LIBS@ 
-mod_rivet_la_CPPFLAGS = -I$(srcdir) -I$(srcdir)/@rivet_core@ -I$(srcdir)/@rivet_channel@ -I$(srcdir)/parser -I$(srcdir)/@apache_request@ @apache_include@ -I. @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
+mod_rivet_la_CPPFLAGS = -I$(srcdir) \
+                        -I$(srcdir)/@rivet_core@ \
+                        -I$(srcdir)/@rivet_channel@ \
+                        -I$(srcdir)/parser \
+                        -I$(srcdir)/@apache_request@ \
+                         @apache_include@ -I. @TCL_INCLUDES@ \
+                         @APXS_CPPFLAGS@ @APXS_INCLUDES@ \
+                         @APR_CPPFLAGS@ @APR_INCLUDES@ \
+                         @APU_INCLUDES@ -DSTART_TAG='"<?"' -DEND_TAG='"?>"'
 
 lib_libmpmdir = @RIVET_TCL_TARGET@/mpm
 lib_libmpm_LTLIBRARIES = rivet_worker_mpm.la rivet_prefork_mpm.la rivet_lazy_mpm.la
 
-rivet_worker_mpm_la_SOURCES = @rivet_core@/rivet_worker_mpm.c @rivet_core@/worker_prefork_common.c
+rivet_worker_mpm_la_SOURCES = @rivet_core@/rivet_worker_mpm.c \
+                              @rivet_core@/worker_prefork_common.c
 rivet_worker_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_worker_mpm_la_LIBADD  = @APXS_LIBS@
-rivet_worker_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I$(srcdir)/@apache_request@ -I$(srcdir) -I$(srcdir)/@rivet_core@
+rivet_worker_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ \
+                               @APXS_CPPFLAGS@ @APXS_INCLUDES@ \
+                               @APR_CPPFLAGS@ @APR_INCLUDES@ \
+                               @APU_INCLUDES@ \
+                              -I$(srcdir) \
+                              -I$(srcdir)/@apache_request@ \
+                              -I$(srcdir)/@rivet_core@
  
-rivet_prefork_mpm_la_SOURCES = @rivet_core@/rivet_prefork_mpm.c @rivet_core@/worker_prefork_common.c
+rivet_prefork_mpm_la_SOURCES = @rivet_core@/rivet_prefork_mpm.c \
+                               @rivet_core@/worker_prefork_common.c
 rivet_prefork_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_prefork_mpm_la_LIBADD  = @APXS_LIBS@
-rivet_prefork_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I$(srcdir)/@apache_request@ -I$(srcdir) -I$(srcdir)/@rivet_core@
+rivet_prefork_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ \
+                                @APXS_CPPFLAGS@ @APXS_INCLUDES@ \
+                                @APR_CPPFLAGS@ @APR_INCLUDES@ \
+                                @APU_INCLUDES@ \
+                               -I$(srcdir) \
+                               -I$(srcdir)/@apache_request@ \
+                               -I$(srcdir)/@rivet_core@
 
 rivet_lazy_mpm_la_SOURCES = @rivet_core@/rivet_lazy_mpm.c
 rivet_lazy_mpm_la_LDFLAGS = @TCL_STUB_LIB_SPEC@ @APXS_LDFLAGS@ -module -avoid-version
 rivet_lazy_mpm_la_LIBADD  = @APXS_LIBS@
-rivet_lazy_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ @APXS_CPPFLAGS@ @APXS_INCLUDES@ @APR_CPPFLAGS@ @APR_INCLUDES@ @APU_INCLUDES@ -I$(srcdir)/@apache_request@ -I$(srcdir) -I$(srcdir)/@rivet_core@
+rivet_lazy_mpm_la_CPPFLAGS = @apache_include@ @TCL_INCLUDES@ \
+                             @APXS_CPPFLAGS@ @APXS_INCLUDES@ \
+                             @APR_CPPFLAGS@ @APR_INCLUDES@ \
+                             @APU_INCLUDES@ \
+                            -I$(srcdir) \
+                            -I$(srcdir)/@apache_request@ \
+                            -I$(srcdir)/@rivet_core@
 
 # Removing libtool .la files from installation
 
