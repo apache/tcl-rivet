@@ -1,5 +1,5 @@
 2025-04-13 Massimo Manghi <mxmanghi@apache.org>
-    * src/Makefile.am: wrap long definitions for improved readability
+	* src/Makefile.am: wrap long definitions for improved readability
 
 2025-04-10 Massimo Manghi <mxmanghi@apache.org>
 	* configure.ac: defined m4 variable for rivet version.
