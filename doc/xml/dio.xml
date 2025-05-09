@@ -891,7 +891,8 @@
 		      to a list containing ordinary key-value pairs of fields
 		      and values from the current row. This form is naturally
 		      intepreted as dictionary where each key corresponds
-		      to a column.
+		      to a column. The result representation produced by this
+              option is naturally equivalent to the <option>-keyvalue</option>
 		   </para>
 		  </listitem>
 		</varlistentry>
