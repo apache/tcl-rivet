@@ -20,4 +20,4 @@ package ifneeded dio_Postgresql 0.1 [list source [file join $dir dio_Postgresql0
 package ifneeded dio_Postgresql 1.2 [list source [file join $dir dio_Postgresql.tcl]]
 package ifneeded dio_Sqlite 0.1 [list source [file join $dir dio_Sqlite01.tcl]]
 package ifneeded dio_Sqlite 1.2 [list source [file join $dir dio_Sqlite.tcl]]
-package ifneeded dio_Tdbc 1.2 [list source [file join $dir dio_Tdbc.tcl]]
+package ifneeded dio_Tdbc 1.2.1 [list source [file join $dir dio_Tdbc.tcl]]
