@@ -1,3 +1,7 @@
+2025-07-13 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Tdbc.tcl: fixed error in variable name made impossible
+    to actually pass TDBC specific options to a DBMS connector
+
 2025-05-05 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: Version 3.3.0. Merging tcl-novem into master after branching current
 	Tcl8.6 only development to branch 3.2. Development continues on a Tcl9 ready master branch

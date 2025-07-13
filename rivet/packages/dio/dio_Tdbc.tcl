@@ -85,7 +85,7 @@ namespace eval DIO {
         protected method handle_client_arguments {cargs} {
             set clientargs {}
             lmap {k v} $cargs {
-                if {[lsearch $k $tdbcarguments] >= 0} {
+                if {[lsearch $k $tdbc_arguments] >= 0} {
                     lappend clientargs $k $v
                 }
             }
