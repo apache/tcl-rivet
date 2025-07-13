@@ -1,6 +1,6 @@
 2025-07-13 Massimo Manghi <mxmanghi@apache.org>
     * rivet/packages/dio/dio_Tdbc.tcl: fixed error in variable name made impossible
-    to actually pass TDBC specific options to a DBMS connector
+    to actually pass TDBC specific options to a DBMS connector. Package version is bumped as 1.2.1
 
 2025-05-05 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: Version 3.3.0. Merging tcl-novem into master after branching current
