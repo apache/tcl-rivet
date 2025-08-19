@@ -327,9 +327,9 @@ proc apachetest::getallincludes { conffile } {
 	    }
 	    append data $newdata
 	    return $data
-   } else {
-	return
-   }
+    } else {
+        return
+    }
 }
 
 # apachetest::getloadmodules --

@@ -27,6 +27,11 @@
 #include <httpd.h>
 #include <tcl.h>
 
+#if TCL_MAJOR_VERSION == 8
+#define Tcl_Size int
+#endif
+
+
 /* Definition suggested in
  *
  * https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/Particular-Headers.html

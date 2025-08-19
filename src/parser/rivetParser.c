@@ -21,8 +21,6 @@
    limitations under the License.
 */
 
-/* $Id$ */
-
 /* Rivet config */
 #ifdef HAVE_CONFIG_H
 #include <rivet_config.h>
@@ -37,6 +35,8 @@
 #   undef EXTERN
 #   define EXTERN
 #endif /* EXTERN */
+
+#include "rivet.h"
 #include "rivetParser.h"
 
 int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
