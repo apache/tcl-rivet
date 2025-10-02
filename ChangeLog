@@ -1,3 +1,8 @@
+2025-10-02 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio.tcl: definining command ::rivet::lempty if not present
+	as it's extensively used but available only when running from mod_rivet (DIO
+	package version number bumped to 1.2.1)
+
 2025-08-19 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivet_types.h,src/parser/rivetParser.c: Introducting definition
 	of Tcl_Size when TCL_MAJOR_VERSION == 8 in order to provide backward compatibility
@@ -5,7 +10,8 @@
 
 2025-07-13 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: fixed error in variable name made impossible
-	to actually pass TDBC specific options to a DBMS connector. Package version is bumped to 1.2.1
+	to actually pass TDBC specific options to a DBMS connector. Package version is
+	bumped to 1.2.1
 
 2025-05-05 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: Version 3.3.0. Merging tcl-novem into master after branching current

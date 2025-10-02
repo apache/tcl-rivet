@@ -18,6 +18,22 @@ catch {package require Tclx}
 package require Itcl
 package require dio::formatters
 
+# Command ::rivet::lempty is extensively used within this class but it's
+# defined only when we run DIO from mod_rivet. We load it here for convenience
+
+if {[info commands ::rivet::lempty] == ""} {
+
+    namespace eval ::rivet {
+
+        proc lempty {list} {
+            if {[catch {llength $list} len]} { return 0 }
+            return [expr {$len == 0}]
+        }
+
+    }
+
+}
+
 ##set auto_path [linsert $auto_path 0 [file dirname [info script]]]
 
 namespace eval ::DIO {
@@ -908,4 +924,4 @@ proc handle {interface args} {
 
 } ; ## namespace eval DIO
 
-package provide DIO 1.2
+package provide DIO 1.2.1
