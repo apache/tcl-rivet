@@ -1,3 +1,9 @@
+2025-10-03 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/dio/dio_Tdbc.tcl: restricting constructor action on the set of tdbc
+      known drivers. Creating 'mariadb' and 'sqlite' aliases for mysql and sqlite3
+      respectively. Adopting a specific tdbc connector creator form when creating a
+      sqlite3 handle
+
 2025-10-02 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio.tcl: definining command ::rivet::lempty if not present
 	as it's extensively used but available only when running from mod_rivet (DIO
