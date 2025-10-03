@@ -21,7 +21,7 @@
 
 package require tdbc
 package require DIO      1.2
-package provide dio_Tdbc 1.2.1
+package provide dio_Tdbc 1.2.2
 
 namespace eval DIO {
     ::itcl::class Tdbc {
@@ -29,6 +29,7 @@ namespace eval DIO {
 
         private common   connector_n    0
         private variable connector
+        private variable connector_name
         private variable tdbc_connector
         private variable tdbc_arguments [list -encoding     \
                                               -isolation    \
@@ -43,10 +44,28 @@ namespace eval DIO {
             #puts "tdbc interface: $interface_name"
 
             set connector_name [::string tolower $interface_name]
-            if {$connector_name == "oracle"} {
-                set connector_name "odbc"
-            } elseif {$connector_name == "postgresql"} {
-                set connector_name "postgres"
+            switch $connector_name {
+                "oracle" {
+                    set connector_name "odbc"
+                } 
+                "postgresql" {
+                    set connector_name "postgres"
+                }
+                "sqlite" {
+                    set connector_name "sqlite3"
+                }
+                "mariadb" {
+                    set connector_name "mysql"
+                }
+                "sqlite3" -
+                "odbc" -
+                "postgres" -
+                "mysql" {
+                    # OK
+                }
+                default {
+                    return -code error -errorcode invalid_tdbc_driver "Invalid TDBC driver '$connector_name'"
+                }
             }
 
             set tdbc_connector "tdbc::${connector_name}"
@@ -63,7 +82,13 @@ namespace eval DIO {
         public method open {}  {
             set connector_cmd "${tdbc_connector}::connection create ${tdbc_connector}#$connector_n"
             if {$user != ""} { lappend connector_cmd -user      $user }
-            if {$db   != ""} { lappend connector_cmd -db        $db }
+            if {$db   != ""} {
+                if {$connector_name == "sqlite3"} {
+                    lappend connector_cmd $db
+                } else {
+                    lappend connector_cmd -db $db
+                }
+            }
             if {$pass != ""} { lappend connector_cmd -password  $pass }
             if {$port != ""} { lappend connector_cmd -port      $port }
             if {$host != ""} { lappend connector_cmd -host      $host }
@@ -71,7 +96,6 @@ namespace eval DIO {
             if {$clientargs != ""} { lappend connector_cmd {*}$clientargs }
 
             #puts "evaluating $connector_cmd"
-
             set connector [eval $connector_cmd]
             incr connector_n
         }
