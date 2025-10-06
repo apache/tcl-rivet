@@ -1,3 +1,6 @@
+2025-10-06 Massimo Manghi <mxmanghi@apache.org>
+	* VERSION: bumped version 3.2.7 in branch 3.2
+
 2025-10-05 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/[dio|dio_Tdbc.tcl|formatters.c]: fix missing argument
 	in field formatter call
