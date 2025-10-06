@@ -1,7 +1,7 @@
-# aida.tcl -- agnostic interface to TDBC
-
-# Copyright 2002-2004 The Apache Software Foundation
-
+# aida.tcl -- agnostic interface to database access
+#
+# Copyright 2024 The Apache Tcl Team
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,8 +15,6 @@
 # limitations under the License.
 
 package require Tcl  8.6
-package require Itcl
-
 source [file join [file dirname [info script]] sql.tcl]
 
 namespace eval ::aida {
