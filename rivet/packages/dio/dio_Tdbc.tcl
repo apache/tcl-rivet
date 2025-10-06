@@ -37,6 +37,7 @@ namespace eval DIO {
                                               -timeout]
 
         constructor {interface_name args} {eval configure -interface $interface_name $args} {
+            set connector_n 0
             set connector   ""
 
             # I should check this one: we only accept connector

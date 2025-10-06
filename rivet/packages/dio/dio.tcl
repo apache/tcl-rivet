@@ -654,7 +654,7 @@ proc handle {interface args} {
     }
 
     public method makeDBFieldValue {table_name field_name val {convert_to {}}} {
-        return [$this build_special_field $table_name $field_name $val]
+        return [$this build_special_field $table_name $field_name $val $convert_to]
     }
 
     ##
