@@ -127,21 +127,21 @@ namespace eval DIO {
             upvar 1 $arrayName row_a
 
             if {[::rivet::lempty $myTable]} { set myTable $table }
-            set vals [::list]
+            set vars [::list]
             set named_pars_l [::list]
 
             # we adopt the TDBC named parameters approach to deal with binary
             # data that may cause the SQL sanity checks to fail
 
             foreach field $fields {
-                if {![info exists array($field)]} { continue }
+                if {![info exists row_a($field)]} { continue }
                 lappend vars "$field"
 
                 # we reformat the fields evaluating through the "special fields formatter"
                 # and assign their value to the array row_a which shadows $arrayName in
                 # the caller frame
 
-                set row_a($field) [$special_fields_formatter $myTable $field $row_a($field)]
+                set row_a($field) [$this build_special_field $myTable $field $row_a($field)]
 
                 # we don't evaluate an SQL statement, we build it for evaluation by the caller
 
@@ -149,6 +149,45 @@ namespace eval DIO {
             }
 
             return "INSERT INTO $myTable ([join $vars {,}]) VALUES ([join $named_pars_l {,}])"
+        }
+
+        #
+        # insert - if we want to exploit the named parameters mechanism we
+        # need to evaluate the SQL statement in the same context where the
+        # array of key-value pairs lives. Therefore we can't rely on the 'exec' method
+        #
+
+        method insert {table arrayName} {
+            upvar 1 $arrayName row_array
+            set sql [build_insert_query row_array [::array names row_array] $table]
+
+            $this check_connector
+            set tdbc_statement [$connector prepare $sql]
+
+            # errorinfo is a public variable of the
+            # parent class Database. Not a good
+            # object design practice
+
+            if {[catch {set tdbc_result [$tdbc_statement execute]} e errorinfo]} {
+
+                # we must store also the TDBC SQL statement as it owns
+                # the TDBC results set represented by tdbc_result. Closing
+                # a tdbc::statement closes also any active tdbc::resultset
+                # owned by it
+
+                set result_obj [$this result TDBC -error 1  \
+                                                  -errorinfo [::list $errorinfo] \
+                                                  -resultid   $tdbc_result      \
+                                                  -statement  $tdbc_statement   \
+                                                  -isselect   false             \
+                                                  -fields     [::list [$tdbc_result columns]]] 
+                set errinf [$result_obj errorinfo]
+                puts "errorinfo: $errorinfo"
+                $result_obj destroy
+                return -code error "Got '$e' executing '$sql'"
+            }
+
+            return 1
         }
 
         #
