@@ -119,7 +119,7 @@ namespace eval DIO {
         #
         # build_insert_query --
         #
-        #  Override ::DIO::build_insert_query method taking advantage of
+        # Override ::DIO::build_insert_query method taking advantage of
         # the named parameters feature of TDBC SQL statements objects
         #
 
@@ -136,11 +136,19 @@ namespace eval DIO {
             foreach field $fields {
                 if {![info exists array($field)]} { continue }
                 lappend vars "$field"
+
+                # we reformat the fields evaluating through the "special fields formatter"
+                # and assign their value to the array row_a which shadows $arrayName in
+                # the caller frame
+
                 set row_a($field) [$special_fields_formatter $myTable $field $row_a($field)]
-                lappend named_pars_l ":row_a($field)"
+
+                # we don't evaluate an SQL statement, we build it for evaluation by the caller
+
+                lappend named_pars_l ":${arrayName}($field)"
             }
 
-            return "insert into $myTable ([join $vars {,}]) VALUES ([join $named_pars_l {,}])"
+            return "INSERT INTO $myTable ([join $vars {,}]) VALUES ([join $named_pars_l {,}])"
         }
 
         #
