@@ -116,6 +116,38 @@ namespace eval DIO {
             }
         }
 
+        #
+        # build_insert_query --
+        #
+        #  Override ::DIO::build_insert_query method taking advantage of
+        # the named parameters feature of TDBC SQL statements objects
+        #
+
+        protected method build_insert_query {arrayName fields {myTable ""}} {
+            upvar 1 $arrayName row_a
+
+            if {[::rivet::lempty $myTable]} { set myTable $table }
+            set vals [::list]
+            set named_pars_l [::list]
+
+            # we adopt the TDBC named parameters approach to deal with binary
+            # data that may cause the SQL sanity checks to fail
+
+            foreach field $fields {
+                if {![info exists array($field)]} { continue }
+                lappend vars "$field"
+                set row_a($field) [$special_fields_formatter $myTable $field $row_a($field)]
+                lappend named_pars_l ":row_a($field)"
+            }
+
+            return "insert into $myTable ([join $vars {,}]) VALUES ([join $named_pars_l {,}])"
+        }
+
+        #
+        # exec
+        #
+        #
+
         public method exec {sql} {
             $this check_connector
 
