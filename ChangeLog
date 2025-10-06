@@ -1,4 +1,9 @@
 2025-10-06 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Tdbc.tcl: Reimplementing also method
+    insert as named parameters requires an SQL statement to be
+    evaluated where the array of key-value pairs lives.
+
+2025-10-06 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: Preparing RC as 3.2.7 (which was correctly set on 2024-11-26)
 
 2025-10-05 Massimo Manghi <mxmanghi@apache.org>
