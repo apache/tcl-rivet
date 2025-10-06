@@ -1,5 +1,5 @@
-# aida.tcl -- agnostic interface to TDBC
-
+# aida.tcl -- agnostic interface to database access
+#
 # Copyright 2024 The Apache Tcl Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+package require TclOO
 
 namespace eval ::aida {
 

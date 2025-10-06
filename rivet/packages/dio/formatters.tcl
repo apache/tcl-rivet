@@ -21,7 +21,7 @@
 
 namespace eval ::DIO::formatters {
 
-    # ::itcl::class FieldFormatter
+    # ::itcl::class RootFormatter
     #
     # we devolve the role of special field formatter to this
     # class. By design this is more sensible with respect to
@@ -60,7 +60,7 @@ namespace eval ::DIO::formatters {
             }
         }
 
-    } ; ## ::itcl::class FieldFormatter
+    } ; ## ::itcl::class RootFormatter
 
     ::itcl::class Mysql {
         inherit RootFormatter
