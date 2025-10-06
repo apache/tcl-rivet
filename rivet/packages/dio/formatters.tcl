@@ -79,12 +79,12 @@ namespace eval ::DIO::formatters {
 
         public method NOW {field_name val convert_to} {
 
-		    # we try to be coherent with the original purpose of this method whose
-		    # goal is endow the class with a uniform way to handle timestamps. 
-		    # E.g.: Package session expects this case to return a timestamp in seconds
-		    # so that differences with timestamps returned by [clock seconds]
-		    # can be done and session expirations are computed consistently.
-		    # (Bug #53703)
+            # we try to be coherent with the original purpose of this method whose
+            # goal endows the class with a uniform way to handle timestamps. 
+            # E.g.: Package session expects this case to return a timestamp in seconds
+            # so that differences with timestamps returned by [clock seconds]
+            # can be done and session expirations are computed consistently.
+            # (Bug #53703)
 
             switch $convert_to {
                 SECS {

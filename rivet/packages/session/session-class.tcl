@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package provide Session 1.0
+package provide Session 1.0.1
 package require Itcl
 
 ::itcl::class Session {
@@ -103,9 +103,9 @@ package require Itcl
     public variable debugMode 1
 
     constructor {args} {
-	    eval configure $args
+	eval configure $args
     	$dioObject registerSpecialField $sessionTable session_update_time NOW
-	    $dioObject registerSpecialField $sessionTable session_start_time NOW
+	$dioObject registerSpecialField $sessionTable session_start_time NOW
     }
 
     method status {args} {
@@ -192,10 +192,10 @@ package require Itcl
     #
     method set_session_cookie {value} {
 	::rivet::cookie set $cookieName $value \
-	    -path $cookiePath \
-	    -minutes $cookieLifetime \
-	    -secure $cookieSecure \
-	    -HttpOnly $cookieHttpOnly
+                            -path       $cookiePath \
+                            -minutes    $cookieLifetime \
+                            -secure     $cookieSecure \
+                            -HttpOnly   $cookieHttpOnly
     }
 
     #
@@ -494,9 +494,11 @@ package require Itcl
     #
     method debug {message} {
 	if {$debugMode} {
-	    puts $debugFile "$this (debug) $message<br>"
+	    $this debug_output "$this (debug) $message" $debugFile
 	    flush $debugFile
 	}
     }
-}
 
+    method debug_output {msg args} { puts [lindex $args 0] "$msg <br>" }
+
+}
