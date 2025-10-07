@@ -1,7 +1,12 @@
+2025-10-07 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Tdbc.tcl: removing method insert from
+	class ::DIO::Tdbc, the real responsible of honoring SQL statements
+	with bound variables was method exec
+
 2025-10-06 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: Reimplementing also method
-    insert as named parameters requires an SQL statement to be
-    evaluated where the array of key-value pairs lives.
+	insert as named parameters requires an SQL statement to be
+	evaluated where the array of key-value pairs lives.
 
 2025-10-06 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: Preparing RC as 3.2.7 (which was correctly set on 2024-11-26)
