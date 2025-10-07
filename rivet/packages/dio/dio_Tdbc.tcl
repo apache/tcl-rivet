@@ -80,6 +80,8 @@ namespace eval DIO {
             if {$connector == ""} { open }
         }
 
+        public method tdbc_connector {} { return $connector }
+
         public method open {}  {
             set connector_cmd "${tdbc_connector}::connection create ${tdbc_connector}#$connector_n"
             if {$user != ""} { lappend connector_cmd -user      $user }
@@ -152,45 +154,6 @@ namespace eval DIO {
         }
 
         #
-        # insert - if we want to exploit the named parameters mechanism we
-        # need to evaluate the SQL statement in the same context where the
-        # array of key-value pairs lives. Therefore we can't rely on the 'exec' method
-        #
-
-        method insert {table arrayName} {
-            upvar 1 $arrayName row_array
-            set sql [build_insert_query row_array [::array names row_array] $table]
-
-            $this check_connector
-            set tdbc_statement [$connector prepare $sql]
-
-            # errorinfo is a public variable of the
-            # parent class Database. Not a good
-            # object design practice
-
-            if {[catch {set tdbc_result [$tdbc_statement execute]} e errorinfo]} {
-
-                # we must store also the TDBC SQL statement as it owns
-                # the TDBC results set represented by tdbc_result. Closing
-                # a tdbc::statement closes also any active tdbc::resultset
-                # owned by it
-
-                set result_obj [$this result TDBC -error 1  \
-                                                  -errorinfo [::list $errorinfo] \
-                                                  -resultid   $tdbc_result      \
-                                                  -statement  $tdbc_statement   \
-                                                  -isselect   false             \
-                                                  -fields     [::list [$tdbc_result columns]]] 
-                set errinf [$result_obj errorinfo]
-                puts "errorinfo: $errorinfo"
-                $result_obj destroy
-                return -code error "Got '$e' executing '$sql'"
-            }
-
-            return 1
-        }
-
-        #
         # exec
         #
         #
@@ -203,13 +166,12 @@ namespace eval DIO {
             if {[::string index $sql end] == ";"} {set sql [::string range $sql 0 end-1]}
             set is_select [regexp -nocase {^\(*\s*select\s+} $sql]
 
-            set tdbc_statement [$connector prepare $sql]
+            set tdbc_statement [uplevel 1 $connector prepare [::list $sql]]
 
-            # errorinfo is a public variable of the
-            # parent class Database. Not a good
-            # object design practice
+            # errorinfo is a public variable of the parent class Database.
+            # Not a good object design practice
 
-            if {[catch {set tdbc_result [$tdbc_statement execute]} errorinfo]} {
+            if {[catch {set tdbc_result [uplevel 1 $tdbc_statement execute]} errorinfo]} {
                 set result_obj [$this result TDBC -error 1 -errorinfo [::list $errorinfo] -isselect false]
             } else {
 
@@ -226,6 +188,7 @@ namespace eval DIO {
 
             return $result_obj
         }
+
     }
 
     ::itcl::class TDBCResult {
