@@ -35,35 +35,30 @@
    <refsect1>
 	<title>Description</title>
 	<para>
-	  <command>DIO</command> is designed to be a generic,
-	  object-oriented interface to SQL databases.  Its main goal
-	  is to be as generic as possible, but since not all SQL
-	  databases support the exact same syntaxes, keeping code
-	  generic between databases is left to the abilities of the
-	  programmer.  DIO simply provides a way to keep the Tcl
-	  interface generic.
+	    <command>DIO</command> is designed to be a generic, object-oriented interface to SQL databases.
+        Its main goal is to be as generic as possible, but since not all SQL databases support the exact
+        same syntaxes, keeping code generic between databases is left to the abilities of the
+	    programmer. DIO simply provides a way to keep the Tcl interface generic.
 	</para>
 	<para>
-	  <option>interface</option> - The name of the database
-	  interface. Currently supported direct interfaces are
-	  <option>Postgresql</option>, <option>Mysql</option>,
-      <option>Oracle</option> and <option>Sqlite</option>.
-      Start with version 1.2 DIO supports also the  <ulink url="https://https://core.tcl-lang.org/tdbc">TDBC</ulink>
-      interface through the <option>Tdbc</option> interfaces.
-      In this form the command requires a further argument for one of the
-      TDBC supported DBMS driver <option>mysql</option>. TDBC drivers are:
-      <option>mysql</option> (supports also MariaDB),
-      <option>odbc</option> (provides also support for <option>Oracle</option>), 
-      <option>postgresql</option> and <option>sqlite</option>
+	    <option>interface</option> - The name of the database interface. 
+        Currently supported direct interfaces are <option>Postgresql</option>, <option>Mysql</option>,
+        <option>Oracle</option> and <option>Sqlite</option>. Starting with version 1.2 DIO supports also the
+        <ulink url="https://tdbc.tcl-lang.org/">TDBC</ulink> DBMS driver series through the
+        <option>Tdbc</option> interface. In this form the command requires a further argument for one of the
+        TDBC drivers. Avaliable <ulink url="https://tdbc.tcl-lang.org/">TDBC</ulink> drivers are: 
+        <option>mysql</option> (supports also MariaDB),
+        <option>odbc</option> (provides also support for <option>Oracle</option>), 
+        <option>postgresql</option> and <option>sqlite</option>
 	</para>
-	<para>
-	  If <option><replaceable>objectName</replaceable></option> is
-	  specified, DIO creates an object of that name. If there is
-	  no <option><replaceable>objectName</replaceable></option>
-	  given, DIO will automatically generate a unique object ID
-	</para>
-      </refsect1>
-      <refsect1>
+    <para>
+      If <option><replaceable>objectName</replaceable></option> is
+      specified, DIO creates an object of that name. If there is
+      no <option><replaceable>objectName</replaceable></option>
+      given, DIO will automatically generate a unique object ID
+    </para>
+  </refsect1>
+  <refsect1>
 	<title>Options</title>
 	<variablelist>
 	  <varlistentry>
@@ -179,97 +174,100 @@
 	  </varlistentry>
 
 	</variablelist>
-      </refsect1>
-      <refsect1>
-	<title>DIO Object Commands</title>
-	<variablelist>
-	  <varlistentry>
-	    <listitem>
-	      <cmdsynopsis>
-		<arg choice="plain"><replaceable>objectName</replaceable></arg>
-		<arg>array</arg>
-		<arg><replaceable>request</replaceable></arg>
-	      </cmdsynopsis>
-	      <para>
-		Execute <option>request</option> as a SQL query and
-		create an array from the first record found.  The
-		array is set with the fields of the table and the
-		values of the record found.</para>
-	    </listitem>
-	  </varlistentry>
+    </refsect1>
+    <refsect1>
+	    <title>DIO Object Commands</title>
+	    <variablelist>
+          <varlistentry>
+            <listitem>
+              <cmdsynopsis>
+            <arg choice="plain"><replaceable>objectName</replaceable></arg>
+            <arg>array</arg>
+            <arg><replaceable>request</replaceable></arg>
+              </cmdsynopsis>
+              <para>
+            Execute <option>request</option> as a SQL query and
+            create an array from the first record found.  The
+            array is set with the fields of the table and the
+            values of the record found.</para>
+            </listitem>
+         </varlistentry>
 
-	  <varlistentry>
-	    <listitem>
-	      <cmdsynopsis>
-		<arg choice="plain"><replaceable>objectName</replaceable></arg>
-		<arg>autokey</arg>
-		<group choice="opt">
-		  <arg>value</arg>
-		  <arg>boolean</arg>
-		</group>
-	      </cmdsynopsis>
-	      <para>
-		Return the current autokey value.  If
-		<option>value</option> is specified, it sets a new
-		value for the autokey option.</para>
-	    </listitem>
-	  </varlistentry>
+         <varlistentry>
+            <listitem>
+              <cmdsynopsis>
+                <arg choice="plain"><replaceable>objectName</replaceable></arg>
+                <arg>autokey</arg>
+                <group choice="opt">
+                  <arg>value</arg>
+                  <arg>boolean</arg>
+                </group>
+              </cmdsynopsis>
+              <para>
+                Return the current autokey value.  If
+                <option>value</option> is specified, it sets a new
+                value for the autokey option.
+              </para>
+            </listitem>
+          </varlistentry>
 
-	  <varlistentry>
-	    <listitem>
-	      <cmdsynopsis>
-		<arg choice="plain"><replaceable>objectName</replaceable></arg>
-		<arg>close</arg>
-	      </cmdsynopsis>
-	      <para>	      Close the current database connection.  This command is
-		automatically called when the DIO object is destroyed.</para>
-	    </listitem>
-	  </varlistentry>
+          <varlistentry>
+            <listitem>
+              <cmdsynopsis>
+            <arg choice="plain"><replaceable>objectName</replaceable></arg>
+            <arg>close</arg>
+              </cmdsynopsis>
+              <para>	      Close the current database connection.  This command is
+            automatically called when the DIO object is destroyed.</para>
+            </listitem>
+          </varlistentry>
 
-	  <varlistentry>
-	    <listitem>
-	      <cmdsynopsis>
-		<arg choice="plain"><replaceable>objectName</replaceable></arg>
-		<arg>count</arg>
-	      </cmdsynopsis>
-	      <para>	      Return a count of the number of rows in the
-		specified (or current) table.</para>
-	    </listitem>
-	  </varlistentry>
+          <varlistentry>
+            <listitem>
+              <cmdsynopsis>
+            <arg choice="plain"><replaceable>objectName</replaceable></arg>
+            <arg>count</arg>
+              </cmdsynopsis>
+              <para>	      Return a count of the number of rows in the
+            specified (or current) table.</para>
+            </listitem>
+          </varlistentry>
 
-	  <varlistentry>
-	    <listitem>
-	      <cmdsynopsis>
-		<arg choice="plain"><replaceable>objectName</replaceable></arg>
-		<arg>db</arg>
-		<arg choice="opt"><replaceable>value</replaceable></arg>
-	      </cmdsynopsis>
-	      <para>
-		Return the current database.  If
-		<option>value</option> is specified, it sets a new
-		value for the database.  In most cases, the DIO object
-		will automatically connect to the new database when
-		this option is changed.</para>
-	    </listitem>
-	  </varlistentry>
+          <varlistentry>
+            <listitem>
+              <cmdsynopsis>
+                <arg choice="plain"><replaceable>objectName</replaceable></arg>
+                <arg>db</arg>
+                <arg choice="opt"><replaceable>value</replaceable></arg>
+              </cmdsynopsis>
+              <para>
+                Return the current database.  If
+                <option>value</option> is specified, it sets a new
+                value for the database.  In most cases, the DIO object
+                will automatically connect to the new database when
+                this option is changed.
+              </para>
+            </listitem>
+          </varlistentry>
 
-	  <varlistentry>
-	    <listitem>
-	      <cmdsynopsis>
-		<arg choice="plain"><replaceable>objectName</replaceable></arg>
-		<arg>delete</arg>
-		<arg><replaceable>key</replaceable></arg>
-		<group choice="opt">
-		  <arg>-option</arg>
-		  <arg><replaceable>option</replaceable></arg>
-		  <arg>...</arg>
-		</group>
-	      </cmdsynopsis>
-	      <para>
-		Delete a record from the database where the primary
-		key matches <option>key</option>.</para>
-	    </listitem>
-	  </varlistentry>
+          <varlistentry>
+            <listitem>
+              <cmdsynopsis>
+            <arg choice="plain"><replaceable>objectName</replaceable></arg>
+            <arg>delete</arg>
+            <arg><replaceable>key</replaceable></arg>
+            <group choice="opt">
+              <arg>-option</arg>
+              <arg><replaceable>option</replaceable></arg>
+              <arg>...</arg>
+            </group>
+              </cmdsynopsis>
+              <para>
+                Delete a record from the database where the primary
+                key matches <option>key</option>.
+              </para>
+            </listitem>
+          </varlistentry>
 
 	  <varlistentry>
 	    <listitem>
