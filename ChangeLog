@@ -1,10 +1,15 @@
+2025-10-16 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Tdbc.tcl: tdbc methods consolidation
+	into tdbc_exec, method 'fetch' reimplemented to allow
+	TDBC argument substitution
+
 2025-10-15 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/dio/dio_Tdbc.tcl: reimplementing methods
-    update, delete and insert to enable DIO Tdbc driver to handle also
-    SQL queries using the TDBC named argument substitution
-    * rivet/packages/dio/dio.tcl: better handling of the special field
-    formatter. The special fields formatter usage disables on specific
-    tables the SQL queries with named arguments substitution
+	* rivet/packages/dio/dio_Tdbc.tcl: reimplementing methods
+	update, delete and insert to enable DIO Tdbc driver to handle also
+	SQL queries using the TDBC named argument substitution
+	* rivet/packages/dio/dio.tcl: better handling of the special field
+	formatter. The special fields formatter usage disables on specific
+	tables the SQL queries with named arguments substitution
  
 2025-10-07 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: removing method insert from
