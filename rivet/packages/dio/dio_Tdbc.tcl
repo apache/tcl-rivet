@@ -20,8 +20,9 @@
 #    under the License.
 
 package require tdbc
-package require DIO      1.2
-package provide dio_Tdbc 1.2.2
+package require DIO      1.2.3
+package provide dio_Tdbc 1.2.3
+package require struct::set
 
 namespace eval DIO {
     ::itcl::class Tdbc {
@@ -69,7 +70,9 @@ namespace eval DIO {
                 }
             }
 
-            set tdbc_connector "tdbc::${connector_name}"
+            set interface $connector_name
+            $this set_field_formatter ::DIO::formatters::[::string totitle $interface]
+            set tdbc_connector "tdbc::${interface}"
 
             uplevel #0 package require ${tdbc_connector}
         }
@@ -118,39 +121,176 @@ namespace eval DIO {
             }
         }
 
+        # delete -
         #
-        # build_insert_query --
-        #
-        # Override ::DIO::build_insert_query method taking advantage of
-        # the named parameters feature of TDBC SQL statements objects
         #
 
-        protected method build_insert_query {arrayName fields {myTable ""}} {
-            upvar 1 $arrayName row_a
+        method delete {key args} {
+            table_check $args
 
-            if {[::rivet::lempty $myTable]} { set myTable $table }
-            set vars [::list]
-            set named_pars_l [::list]
-
-            # we adopt the TDBC named parameters approach to deal with binary
-            # data that may cause the SQL sanity checks to fail
-
-            foreach field $fields {
-                if {![info exists row_a($field)]} { continue }
-                lappend vars "$field"
-
-                # we reformat the fields evaluating through the "special fields formatter"
-                # and assign their value to the array row_a which shadows $arrayName in
-                # the caller frame
-
-                set row_a($field) [$this build_special_field $myTable $field $row_a($field)]
-
-                # we don't evaluate an SQL statement, we build it for evaluation by the caller
-
-                lappend named_pars_l ":${arrayName}($field)"
+            set sql "DELETE FROM $myTable"
+            set sql_values [dict create]
+            if {[$special_fields_formatter has_special_fields $table]} {
+                append sql [build_key_where_clause $myKeyfield $key]
+            } else {
+                set where_key_value_pairs [lmap field $myKeyfield {
+                    set v "${field}=:${field}"
+                }]
+                set sql "$sql WHERE [join $where_key_value_pairs { AND }]"
+                foreach field $myKeyfield k $key { dict set sql_values $field $k }
             }
 
-            return "INSERT INTO $myTable ([join $vars {,}]) VALUES ([join $named_pars_l {,}])"
+            #puts $sql
+
+            $this check_connector
+            set tdbc_statement [uplevel 1 $connector prepare [::list $sql]]
+
+            #puts "--> $sql_values"
+            if {[catch {set tdbc_result [$tdbc_statement execute $sql_values]} e errorinfo]} {
+                $tdbc_statement close
+                return -code error -errorinfo [::list $errorinfo]
+            } else {
+
+                # we must store also the TDBC SQL statement as it owns
+                # the TDBC results set represented by tdbc_result. Closing
+                # a tdbc::statement closes also any active tdbc::resultset
+                # owned by it
+
+                set result_obj [$this result TDBC -resultid   $tdbc_result      \
+                                                  -statement  $tdbc_statement   \
+                                                  -isselect   false             \
+                                                  -fields     [::list [$tdbc_result columns]]] 
+            }
+
+            # this doesn't work on postgres, you've got to use cmdRows,
+            # we need to figure out what to do with this
+
+            set numrows [$result_obj numrows]
+            $result_obj destroy
+            return $numrows
+        }
+
+
+        #
+        # update - reimplementation of the ::DIO::Database::update
+        # method that is supposed to exploit the named arguments
+        # feature of TDBC. 
+        #
+        method update {arrayName args} {
+            upvar 1 $arrayName row_a
+            $this table_check $args
+
+            # myTable is implicitly set by table_check
+            
+            $this configure -table $myTable
+            set key [makekey row_a $myKeyfield]
+
+            #puts "-> table: $table"
+            #puts "-> key: $key"
+            #puts "-> keyfield: $myKeyfield"
+
+            set sql_values [dict create {*}[::array get row_a]] 
+            set fields     [::array names row_a]
+            if {[$special_fields_formatter has_special_fields $table]} {
+
+                # the special fields formatter is fundamentally incompatible with
+                # TDBC's named arguments mechanism. We resort to the superclass method
+                # where a literal SQL statement is built
+
+                set sql     [$this build_update_query row_a $fields $table]
+                append sql  [$this build_key_where_clause $myKeyfield $key]
+
+            } else {
+
+                set set_key_value_pairs [lmap field $fields {
+                    set v "${field}=:${field}"
+                }]
+                set where_key_value_pairs [lmap field $myKeyfield {
+                    set v "${field}=:${field}"
+                }]
+
+                ::lappend where_key_value_pairs "1 = 1"
+                set sql [join [::list "UPDATE $table" \
+                                      "SET   [join $set_key_value_pairs {, }]" \
+                                      "WHERE [join $where_key_value_pairs { AND }]"] " "]
+
+            }
+
+            #puts $sql
+            $this check_connector
+            set tdbc_statement [uplevel 1 $connector prepare [::list $sql]]
+
+            #puts "--> $sql_values"
+            if {[catch {set tdbc_result [$tdbc_statement execute $sql_values]} e errorinfo]} {
+                $tdbc_statement close
+                return -code error -errorinfo [::list $errorinfo]
+            } else {
+
+                # we must store also the TDBC SQL statement as it owns
+                # the TDBC results set represented by tdbc_result. Closing
+                # a tdbc::statement closes also any active tdbc::resultset
+                # owned by it
+
+                set result_obj [$this result TDBC -resultid   $tdbc_result      \
+                                                  -statement  $tdbc_statement   \
+                                                  -isselect   false             \
+                                                  -fields     [::list [$tdbc_result columns]]] 
+            }
+
+            # this doesn't work on postgres, you've got to use cmdRows,
+            # we need to figure out what to do with this
+
+            set numrows [$result_obj numrows]
+            $result_obj destroy
+            return $numrows
+        }
+
+        #
+        # insert - 
+        #
+        # overriding method 'insert' as in case of registered special fields
+        # we have to give up with the idea of using the named arguments approach
+        #
+        method insert {table arrayName} {
+            upvar 1 $arrayName row_a
+
+            set sql_values [dict create {*}[::array get row_a]] 
+            set fields     [::array names row_a]
+            if {[$special_fields_formatter has_special_fields $table]} {
+                set sql [build_insert_query row_a [::array names row_a] $table]
+            } else {
+                set values [lmap field $fields { set v ":${field}" }]
+
+                set sql "INSERT INTO $table ([join $fields {,}]) VALUES ([join $values {,}])"
+            }
+
+            #puts $sql
+
+            $this check_connector
+            set tdbc_statement [uplevel 1 $connector prepare [::list $sql]]
+
+            if {[catch {set tdbc_result [$tdbc_statement execute $sql_values]} e errorinfo]} {
+                $tdbc_statement close
+                return -code error -errorinfo [::list $errorinfo]
+            } else {
+
+                # we must store also the TDBC SQL statement as it owns
+                # the TDBC results set represented by tdbc_result. Closing
+                # a tdbc::statement closes also any active tdbc::resultset
+                # owned by it
+
+                set result_obj [$this result TDBC -resultid   $tdbc_result      \
+                                                  -statement  $tdbc_statement   \
+                                                  -isselect   false             \
+                                                  -fields     [::list [$tdbc_result columns]]] 
+            }
+
+            # this doesn't work on postgres, you've got to use cmdRows,
+            # we need to figure out what to do with this
+
+            set numrows [$result_obj numrows]
+            $result_obj destroy
+            return $numrows
         }
 
         #
