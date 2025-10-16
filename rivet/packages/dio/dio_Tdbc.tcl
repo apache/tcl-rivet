@@ -21,8 +21,7 @@
 
 package require tdbc
 package require DIO      1.2.3
-package provide dio_Tdbc 1.2.3
-package require struct::set
+package provide dio_Tdbc 1.2.4
 
 namespace eval DIO {
     ::itcl::class Tdbc {
@@ -121,32 +120,16 @@ namespace eval DIO {
             }
         }
 
-        # delete -
-        #
-        #
-
-        method delete {key args} {
-            table_check $args
-
-            set sql "DELETE FROM $myTable"
-            set sql_values [dict create]
-            if {[$special_fields_formatter has_special_fields $table]} {
-                append sql [build_key_where_clause $myKeyfield $key]
-            } else {
-                set where_key_value_pairs [lmap field $myKeyfield {
-                    set v "${field}=:${field}"
-                }]
-                set sql "$sql WHERE [join $where_key_value_pairs { AND }]"
-                foreach field $myKeyfield k $key { dict set sql_values $field $k }
-            }
-
-            #puts $sql
+        public method tdbc_exec {sql sql_values_d {results_v ""}} {
 
             $this check_connector
-            set tdbc_statement [uplevel 1 $connector prepare [::list $sql]]
+            if {[::string index $sql end] == ";"} {set sql [::string range $sql 0 end-1]}
+
+            set is_select [regexp -nocase {^\(*\s*select\s+} $sql]
+            set tdbc_statement [$connector prepare $sql]
 
             #puts "--> $sql_values"
-            if {[catch {set tdbc_result [$tdbc_statement execute $sql_values]} e errorinfo]} {
+            if {[catch {set tdbc_result [$tdbc_statement execute $sql_values_d]} e errorinfo]} {
                 $tdbc_statement close
                 return -code error -errorinfo [::list $errorinfo]
             } else {
@@ -158,7 +141,7 @@ namespace eval DIO {
 
                 set result_obj [$this result TDBC -resultid   $tdbc_result      \
                                                   -statement  $tdbc_statement   \
-                                                  -isselect   false             \
+                                                  -isselect   $is_select        \
                                                   -fields     [::list [$tdbc_result columns]]] 
             }
 
@@ -166,8 +149,39 @@ namespace eval DIO {
             # we need to figure out what to do with this
 
             set numrows [$result_obj numrows]
-            $result_obj destroy
+            if {$is_select && ($numrows > 0) && ($results_v != "")} {
+                upvar 1 $results_v results_o
+                set results_o $result_obj
+            } else {
+                $result_obj destroy
+            }
             return $numrows
+
+        }
+
+
+        # delete -
+        #
+        #
+
+        method delete {key args} {
+            table_check $args
+
+            set sql "DELETE FROM $myTable"
+            set sql_values_d [dict create]
+            if {[$special_fields_formatter has_special_fields $table]} {
+                append sql [build_key_where_clause $myKeyfield $key]
+            } else {
+                set where_key_value_pairs [lmap field $myKeyfield {
+                    set v "${field}=:${field}"
+                }]
+                set sql "$sql WHERE [join $where_key_value_pairs { AND }]"
+                foreach field $myKeyfield k $key { dict set sql_values_d $field $k }
+            }
+
+            #puts $sql
+
+            return [$this tdbc_exec $sql $sql_values_d]
         }
 
 
@@ -189,7 +203,7 @@ namespace eval DIO {
             #puts "-> key: $key"
             #puts "-> keyfield: $myKeyfield"
 
-            set sql_values [dict create {*}[::array get row_a]] 
+            set sql_values_d [dict create {*}[::array get row_a]] 
             set fields     [::array names row_a]
             if {[$special_fields_formatter has_special_fields $table]} {
 
@@ -217,32 +231,7 @@ namespace eval DIO {
             }
 
             #puts $sql
-            $this check_connector
-            set tdbc_statement [uplevel 1 $connector prepare [::list $sql]]
-
-            #puts "--> $sql_values"
-            if {[catch {set tdbc_result [$tdbc_statement execute $sql_values]} e errorinfo]} {
-                $tdbc_statement close
-                return -code error -errorinfo [::list $errorinfo]
-            } else {
-
-                # we must store also the TDBC SQL statement as it owns
-                # the TDBC results set represented by tdbc_result. Closing
-                # a tdbc::statement closes also any active tdbc::resultset
-                # owned by it
-
-                set result_obj [$this result TDBC -resultid   $tdbc_result      \
-                                                  -statement  $tdbc_statement   \
-                                                  -isselect   false             \
-                                                  -fields     [::list [$tdbc_result columns]]] 
-            }
-
-            # this doesn't work on postgres, you've got to use cmdRows,
-            # we need to figure out what to do with this
-
-            set numrows [$result_obj numrows]
-            $result_obj destroy
-            return $numrows
+            return [$this tdbc_exec $sql $sql_values_d]
         }
 
         #
@@ -254,7 +243,7 @@ namespace eval DIO {
         method insert {table arrayName} {
             upvar 1 $arrayName row_a
 
-            set sql_values [dict create {*}[::array get row_a]] 
+            set sql_values_d [dict create {*}[::array get row_a]]
             set fields     [::array names row_a]
             if {[$special_fields_formatter has_special_fields $table]} {
                 set sql [build_insert_query row_a [::array names row_a] $table]
@@ -265,31 +254,42 @@ namespace eval DIO {
             }
 
             #puts $sql
+            #puts $sql_values_d
+            return [$this tdbc_exec $sql $sql_values_d]
 
-            $this check_connector
-            set tdbc_statement [uplevel 1 $connector prepare [::list $sql]]
+        }
 
-            if {[catch {set tdbc_result [$tdbc_statement execute $sql_values]} e errorinfo]} {
-                $tdbc_statement close
-                return -code error -errorinfo [::list $errorinfo]
+        # fetch
+        #
+        #
+
+        method fetch {key arrayName args} {
+            upvar 1 $arrayName row_a
+            table_check $args
+            key_check $myKeyfield $key
+
+            $this configure -table $myTable
+            set sql_values_d [dict create]
+            set sql "SELECT * FROM $myTable"
+            if {[$special_fields_formatter has_special_fields $table]} {
+                append sql [build_key_where_clause $myKeyfield $key]
             } else {
-
-                # we must store also the TDBC SQL statement as it owns
-                # the TDBC results set represented by tdbc_result. Closing
-                # a tdbc::statement closes also any active tdbc::resultset
-                # owned by it
-
-                set result_obj [$this result TDBC -resultid   $tdbc_result      \
-                                                  -statement  $tdbc_statement   \
-                                                  -isselect   false             \
-                                                  -fields     [::list [$tdbc_result columns]]] 
+                set where_key_value_pairs [lmap field $myKeyfield {
+                    set v "${field}=:${field}"
+                }]
+                set sql "$sql WHERE [join $where_key_value_pairs { AND }]"
+                foreach field $myKeyfield k $key { 
+                    if {$field == ""} { continue }
+                    dict set sql_values_d $field $k
+                }
             }
 
-            # this doesn't work on postgres, you've got to use cmdRows,
-            # we need to figure out what to do with this
-
-            set numrows [$result_obj numrows]
-            $result_obj destroy
+            #puts $sql
+            set numrows [$this tdbc_exec $sql $sql_values_d result_o]
+            if {$numrows > 0} {
+                $result_o next -array row_a
+                $result_o destroy
+            }
             return $numrows
         }
 
