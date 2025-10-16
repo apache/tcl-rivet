@@ -44,6 +44,17 @@ namespace eval ::DIO::formatters {
             dict set special_fields $table_name $field_name $ftype
         }
 
+        public method get_special_fields {table_name} {
+            if {[dict exists $special_fields $table_name]} {
+                return [dict keys [dict get $special_fields $table_name]
+            }
+            return ""
+        }
+
+        public method has_special_fields {table_name} {
+            return [dict exists $special_fields $table_name]
+        }
+
         public method build {table_name field_name val convert_to} {
             if {[dict exists $special_fields $table_name $field_name]} {
                 set field_type [dict get $special_fields $table_name $field_name]
