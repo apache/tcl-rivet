@@ -1,3 +1,9 @@
+2025-10-23 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/formatters.tcl: a typo slipped in and spoiled
+	for formatter class name for Posgresql connectors
+	* rivet/packages/dio/dio_Tdbc.tcl: missing increment of a connector
+	serial number
+
 2025-10-16 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: tdbc methods consolidation
 	into tdbc_exec, method 'fetch' reimplemented to allow
