@@ -1,3 +1,7 @@
+2025-10-24 Massimo Manghi <mxmanghi@apache.org>
+    * doc/rivet.xml.in: reformat and align entities definitions
+    * doc/xml/commands.xml: changed 'inspect' command definition in reference list
+
 2025-10-23 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/formatters.tcl: a typo slipped in and spoiled
 	for formatter class name for Posgresql connectors
