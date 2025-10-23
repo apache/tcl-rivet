@@ -3,6 +3,7 @@
 	for formatter class name for Posgresql connectors
 	* rivet/packages/dio/dio_Tdbc.tcl: missing increment of a connector
 	serial number
+	* VERSION: Bumped version to 3.2.8
 
 2025-10-16 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: tdbc methods consolidation
