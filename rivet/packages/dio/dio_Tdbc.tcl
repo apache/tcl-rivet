@@ -27,7 +27,7 @@ namespace eval DIO {
     ::itcl::class Tdbc {
         inherit Database
 
-        private common   connector_n    0
+        private common   connector_n
         private variable connector
         private variable connector_name
         private variable tdbc_connector
@@ -37,7 +37,7 @@ namespace eval DIO {
                                               -timeout]
 
         constructor {interface_name args} {eval configure -interface $interface_name $args} {
-            set connector_n 0
+            set connector_n -1
             set connector   ""
 
             # I should check this one: we only accept connector
@@ -85,7 +85,7 @@ namespace eval DIO {
         public method tdbc_connector {} { return $connector }
 
         public method open {}  {
-            set connector_cmd "${tdbc_connector}::connection create ${tdbc_connector}#$connector_n"
+            set connector_cmd "${tdbc_connector}::connection create ${tdbc_connector}#[incr connector_n]"
             if {$user != ""} { lappend connector_cmd -user      $user }
             if {$db   != ""} {
                 if {$connector_name == "sqlite3"} {

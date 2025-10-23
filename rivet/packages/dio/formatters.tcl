@@ -197,7 +197,7 @@ namespace eval ::DIO::formatters {
         }
     }
 
-    ::itcl::class Postgresql {
+    ::itcl::class Postgres {
         inherit RootFormatter
 
         public method DATE {field_name val convert_to} {
