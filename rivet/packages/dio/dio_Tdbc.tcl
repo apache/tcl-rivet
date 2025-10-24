@@ -27,7 +27,7 @@ namespace eval DIO {
     ::itcl::class Tdbc {
         inherit Database
 
-        private common   connector_n
+        private common   connector_n    -1
         private variable connector
         private variable connector_name
         private variable tdbc_connector
@@ -37,7 +37,6 @@ namespace eval DIO {
                                               -timeout]
 
         constructor {interface_name args} {eval configure -interface $interface_name $args} {
-            set connector_n -1
             set connector   ""
 
             # I should check this one: we only accept connector
@@ -100,7 +99,6 @@ namespace eval DIO {
 
             if {$clientargs != ""} { lappend connector_cmd {*}$clientargs }
 
-            #puts "evaluating $connector_cmd"
             set connector [eval $connector_cmd]
             incr connector_n
         }
@@ -311,7 +309,7 @@ namespace eval DIO {
             # errorinfo is a public variable of the parent class Database.
             # Not a good object design practice
 
-            if {[catch {set tdbc_result [uplevel 1 $tdbc_statement execute]} errorinfo]} {
+            if {[catch {set tdbc_result [uplevel 1 $tdbc_statement execute]} e errorinfo]} {
                 set result_obj [$this result TDBC -error 1 -errorinfo [::list $errorinfo] -isselect false]
             } else {
 
@@ -356,8 +354,8 @@ namespace eval DIO {
             Result::destroy
         }
 
-        public method current_row {} {return $rowid}
-        public method cached_results {} {return $cached_rows}
+        public method current_row {} { return $rowid }
+        public method cached_results {} { return $cached_rows }
 
         public method nextrow {} {
             if {[llength $cached_rows] == 0} {
