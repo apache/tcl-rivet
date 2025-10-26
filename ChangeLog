@@ -1,3 +1,6 @@
+2025-10-26 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Tdbc.tcl: version number updated to 1.2.5
+
 2025-10-24 Massimo Manghi <mxmanghi@apache.org>
 	* doc/rivet.xml.in: reformat and align entities definitions
 	* doc/xml/commands.xml: changed 'inspect' command definition in reference list

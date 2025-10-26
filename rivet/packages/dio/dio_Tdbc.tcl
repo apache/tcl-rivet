@@ -21,7 +21,7 @@
 
 package require tdbc
 package require DIO      1.2.3
-package provide dio_Tdbc 1.2.4
+package provide dio_Tdbc 1.2.5
 
 namespace eval DIO {
     ::itcl::class Tdbc {
