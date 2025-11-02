@@ -1,3 +1,9 @@
+2025-11-01 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/formatters.tcl: fixed misplaced comment that
+    let a switch...case constuct fail
+	* rivet/packages/session/session-class.tcl: place messages to debug
+    session update times computations
+
 2025-10-26 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: version number updated to 1.2.5
 

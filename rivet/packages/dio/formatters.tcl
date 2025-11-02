@@ -62,6 +62,7 @@ namespace eval ::DIO::formatters {
                 if {[catch {
                     set field_value [$this $field_type $field_name $val $convert_to]
                 } e einfo]} {
+                    puts "<pre>Error: $e, $einfo</pre>"
                     set field_value "'[quote $val]'"
                 }
 
@@ -162,7 +163,6 @@ namespace eval ::DIO::formatters {
         }
 
         public method NOW {field_name val convert_to} {
-            switch $convert_to {
 
             # we try to be coherent with the original purpose of this method whose
             # goal is to provide a uniform way to handle timestamps. 
@@ -171,6 +171,7 @@ namespace eval ::DIO::formatters {
             # can be done and session expirations are computed consistently.
             # (Bug #53703)
 
+            switch $convert_to {
                 SECS {
                     if {[::string compare $val "now"] == 0} {
 #                       set secs    [clock seconds]
@@ -205,26 +206,26 @@ namespace eval ::DIO::formatters {
             set my_val [clock format $secs -format {%Y-%m-%d}]
             return "'$my_val'"
         }
+
         public method DATETIME {field_name val convert_to} {
             set secs [clock scan $val]
             set my_val [clock format $secs -format {%Y-%m-%d %T}]
             return "'$my_val'"
         }
-        public method NOW {field_name val convert_to} {
-            switch $convert_to {
 
-                # we try to be coherent with the original purpose of this method whose
-                # goal is to provide a uniform way to handle timestamps. 
-                # E.g.: Package session expects this case to return a timestamp in seconds
-                # so that differences with timestamps returned by [clock seconds]
-                # can be done and session expirations are computed consistently.
-                # (Bug #53703)
+        public method NOW {field_name val convert_to} {
+
+            # we try to be coherent with the original purpose of this method whose
+            # goal is to provide a uniform way to handle timestamps. 
+            # E.g.: Package session expects this case to return a timestamp in seconds
+            # so that differences with timestamps returned by [clock seconds]
+            # can be done and session expirations are computed consistently.
+            # (Bug #53703)
+
+            switch $convert_to {
 
                 SECS {
                     if {[::string compare $val "now"] == 0} {
-#                       set secs    [clock seconds]
-#                       set my_val  [clock format $secs -format {%Y%m%d%H%M%S}]
-#                       return  $my_val
                         return [clock seconds]
                     } else {
                         return  "extract(epoch from $field_name)"
@@ -287,4 +288,4 @@ namespace eval ::DIO::formatters {
 
 }; ## namespace eval DIO
 
-package provide dio::formatters 1.0
+package provide dio::formatters 1.1
