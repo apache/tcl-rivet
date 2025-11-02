@@ -16,7 +16,7 @@
 
 catch {package require Tclx}
 package require Itcl
-package require dio::formatters
+package require dio::formatters 1.1
 
 # Command ::rivet::lempty is extensively used within this class but it's
 # defined only when we run DIO from mod_rivet. For convenience we load it
