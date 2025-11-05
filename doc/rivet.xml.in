@@ -8,7 +8,7 @@
     <!ENTITY vars.html             SYSTEM "examples-sgml/vars.html" >
     <!ENTITY vars.rvt              SYSTEM "examples-sgml/vars.rvt" >
     <!ENTITY upload.html           SYSTEM "examples-sgml/upload.html" >
-    <!ENTITY upload.rvt	           SYSTEM "examples-sgml/upload.rvt" >
+    <!ENTITY upload.rvt            SYSTEM "examples-sgml/upload.rvt" >
     <!ENTITY download.tcl          SYSTEM "examples-sgml/download.tcl" >
     <!ENTITY rivet_web_service.tcl SYSTEM "examples-sgml/rivet_web_service.tcl" >
     <!ENTITY myapp_request_handler.tcl SYSTEM "examples-sgml/myapp_request_handler.tcl" >
@@ -35,13 +35,13 @@
     <!ENTITY asciiglyphs.xml       SYSTEM "xml/asciiglyphs.xml" >
     <!ENTITY lazybridge.xml        SYSTEM "xml/lazybridge.xml" >
     <!ENTITY formbroker.xml        SYSTEM "xml/formbroker.xml" >
-    <!ENTITY version	           "@INIT_VERSION@" >
+    <!ENTITY version               "@INIT_VERSION@" >
     <!ENTITY fullversion           "@PACKAGE_VERSION@" >
-    <!ENTITY version2-series	   "2.0,2.1,2.2,2.3,2.4" >
-    <!ENTITY version2-generic	   "2.x" >
+    <!ENTITY version2-series       "2.0,2.1,2.2,2.3,2.4" >
+    <!ENTITY version2-generic      "2.x" >
     <!ENTITY version3-generic      "3.x" >
-    <!ENTITY version30		       "3.0" >
-    <!ENTITY version31		       "3.1" >
+    <!ENTITY version30             "3.0" >
+    <!ENTITY version31             "3.1" >
     <!ENTITY version32             "3.2" >
     <!ENTITY tcltk-url             "http://www.tcl.tk/" >
     <!ENTITY apache-url            "http://httpd.apache.org" >
@@ -49,56 +49,56 @@
     <!ENTITY apache-apreq          "http://httpd.apache.org/apreq/" >
     <!ENTITY rivet-download        "http://tcl.apache.org/rivet/html/download.html" >
     <!ENTITY apachedoc-vhost       "https://httpd.apache.org/docs/2.4/vhosts" >
-    <!ENTITY apachedoc-mpm	       "https://httpd.apache.org/docs/2.4/mpm.html" >
-    <!ENTITY apachedoc-prefork	   "https://httpd.apache.org/docs/2.4/mod/prefork.html" >
-    <!ENTITY apachedoc-worker	   "https://httpd.apache.org/docs/2.4/mod/worker.html" >
-    <!ENTITY apachedoc-event	   "https://httpd.apache.org/docs/2.4/mod/event.html" >
-    <!ENTITY apachedoc-winnt	   "https://httpd.apache.org/docs/2.4/mod/mpm_winnt.html" >
+    <!ENTITY apachedoc-mpm         "https://httpd.apache.org/docs/2.4/mpm.html" >
+    <!ENTITY apachedoc-prefork     "https://httpd.apache.org/docs/2.4/mod/prefork.html" >
+    <!ENTITY apachedoc-worker      "https://httpd.apache.org/docs/2.4/mod/worker.html" >
+    <!ENTITY apachedoc-event       "https://httpd.apache.org/docs/2.4/mod/event.html" >
+    <!ENTITY apachedoc-winnt       "https://httpd.apache.org/docs/2.4/mod/mpm_winnt.html" >
     <!ENTITY apachedoc-docroot     "https://httpd.apache.org/docs/2.4/mod/core.html#documentroot" >
-    <!ENTITY apachedoc-alias	   "https://httpd.apache.org/docs/2.4/mod/mod_alias.html" >
+    <!ENTITY apachedoc-alias       "https://httpd.apache.org/docs/2.4/mod/mod_alias.html" >
     <!ENTITY apachedoc-rewrite     "https://httpd.apache.org/docs/2.4/mod/mod_rewrite.html" >
     <!ENTITY apachedoc-perftuning  "https://httpd.apache.org/docs/2.4/misc/perf-tuning.html" >
 ]>
 
 <!--
-	Copyright 2002-2019 The Apache Tcl Team
+    Copyright 2002-2019 The Apache Tcl Team
 
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-	    http://www.apache.org/licenses/LICENSE-2.0
+        http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 -->
 
 <article>
-  	<articleinfo>
-    	<title>Apache Rivet &version;</title>
-    	<copyright>
-        	<year>2002-<?dbtimestamp format="Y" ?></year>
-        	<holder>Apache Software Foundation</holder>
-    	</copyright>
-    	<author>
+    <articleinfo>
+        <title>Apache Rivet &version;</title>
+        <copyright>
+            <year>2002-<?dbtimestamp format="Y" ?></year>
+            <holder>Apache Software Foundation</holder>
+        </copyright>
+        <author>
         <firstname>The Rivet Team</firstname>
         <affiliation>
-	        <orgname>The Apache Software Foundation</orgname>
-	        <address>
-	            <email>rivet-dev@tcl.apache.org</email>
-	        </address>
+            <orgname>The Apache Software Foundation</orgname>
+            <address>
+                <email>rivet-dev@tcl.apache.org</email>
+            </address>
         </affiliation>
-    	</author>
-  	</articleinfo>
+        </author>
+    </articleinfo>
 
-  	<para>
-    	This manual is released as part of Apache/Rivet &fullversion; (<?dbtimestamp format="A Y-m-d X" ?>).
-  	</para>
+    <para>
+        This manual is released as part of Apache/Rivet &fullversion; (<?dbtimestamp format="A Y-m-d X" ?>).
+    </para>
 
-	<!-- Introduction -->
+    <!-- Introduction -->
    &intro.xml;
 
     <!-- Installation -->
@@ -140,10 +140,10 @@
    &entities.xml;
     
    <!-- AsciiGlyphs -->
-	&asciiglyphs.xml; 
+    &asciiglyphs.xml; 
 
-	<!-- FormBroker -->
-	&formbroker.xml;
+    <!-- FormBroker -->
+    &formbroker.xml;
 
    <!-- Help -->
    &help.xml;
@@ -151,8 +151,8 @@
    <!-- Internals -->
    &internals.xml;
 
-	<!-- lazybridge -->
-	&lazybridge.xml;
+    <!-- lazybridge -->
+    &lazybridge.xml;
 
    <!-- Upgrade -->
    <!-- &upgrade.xml; -->
