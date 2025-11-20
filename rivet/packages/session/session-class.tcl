@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package provide Session 1.0.1
+package provide Session 1.1
 package require Itcl
 
 ::itcl::class Session {
@@ -104,7 +104,7 @@ package require Itcl
 
     constructor {args} {
 	eval configure $args
-    	$dioObject registerSpecialField $sessionTable session_update_time NOW
+        $dioObject registerSpecialField $sessionTable session_update_time NOW
 	$dioObject registerSpecialField $sessionTable session_start_time NOW
     }
 
@@ -164,6 +164,8 @@ package require Itcl
     method do_garbage_collection {} {
 	debug "do_garbage_collection: performing garbage collection"
 #	set result [$dioObject exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
+        #
+        debug "do_garbage_collection: t1: [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS] t2: [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
 	set del_cmd "delete from $sessionTable where "
 	append del_cmd [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS]
 	append del_cmd " - [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
@@ -180,6 +182,8 @@ package require Itcl
     #   performed.
     #
     method consider_garbage_collection {} {
+	debug "consider_garbage_collection: probability: $gcProbability"
+
 	if {rand() <= $gcProbability / 100.0} {
 	    do_garbage_collection
 	}
@@ -192,10 +196,10 @@ package require Itcl
     #
     method set_session_cookie {value} {
 	::rivet::cookie set $cookieName $value \
-                            -path       $cookiePath \
-                            -minutes    $cookieLifetime \
-                            -secure     $cookieSecure \
-                            -HttpOnly   $cookieHttpOnly
+	    -path $cookiePath \
+	    -minutes $cookieLifetime \
+	    -secure $cookieSecure \
+	    -HttpOnly $cookieHttpOnly
     }
 
     #
@@ -304,20 +308,21 @@ package require Itcl
     #  store the data in the rivet session cache
     #
     method store {packageName key data} {
-        set a(session_id) [id]
-        set a(package_) $packageName
-        set a(key_) $key
+	set a(session_id) [id]
+	set a(package_) $packageName
+	set a(key_) $key
 
-        regsub -all {\\} $data {\\\\} data
-        set a(data) $data
+	regsub -all {\\} $data {\\\\} data
+	set a(data) $data
 
-        debug "store session data, package_ '$packageName', key_ '$key', data '$data'"
-        set kf [list session_id package_ key_]
+	debug "store session data, package_ '$packageName', key_ '$key', data '$data'"
+	set kf [list session_id package_ key_]
 
-        if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
-            debug "Failed to store $sessionCacheTable '$kf'"
-            error [$dioObject errorinfo]
-        }
+	if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
+	    debug "Failed to store $sessionCacheTable '$kf'"
+	    #parray a
+	    error [$dioObject errorinfo]
+	}
     }
 
     #
@@ -325,23 +330,23 @@ package require Itcl
     #   for this session
     #
     method fetch {packageName key} {
-        set kf [list session_id package_ key_]
+	set kf [list session_id package_ key_]
 
-        set a(session_id) [id]
-        set a(package_) $packageName
-        set a(key_) $key
+	set a(session_id) [id]
+	set a(package_) $packageName
+	set a(key_) $key
 
-        set key [$dioObject makekey a $kf]
-        if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
-            status [$dioObject errorinfo]
-            debug "error: [$dioObject errorinfo]"
-            debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
-            return ""
-        }
+	set key [$dioObject makekey a $kf]
+	if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
+	    status [$dioObject errorinfo]
+	    debug "error: [$dioObject errorinfo]"
+	    debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
+	    return ""
+	}
 
-        debug "fetch session data succeeded, package_ '$packageName', key_ '$key', result '$a(data)'"
+	debug "fetch session data succeeded, package_ '$packageName', key_ '$key', result '$a(data)'"
 
-        return $a(data)
+	return $a(data)
     }
 
     #
@@ -494,11 +499,9 @@ package require Itcl
     #
     method debug {message} {
 	if {$debugMode} {
-	    $this debug_output "$this (debug) $message" $debugFile
+	    puts $debugFile "$this (debug) $message<br>"
 	    flush $debugFile
 	}
     }
-
-    method debug_output {msg args} { puts [lindex $args 0] "$msg <br>" }
-
 }
+
