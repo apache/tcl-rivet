@@ -38,6 +38,7 @@ namespace eval DIO {
                 [catch {package require sqlite3}]} {
 
                 return -code error "No Sqlite Tcl package available"
+
             }
             eval configure $args
         }
@@ -56,6 +57,10 @@ namespace eval DIO {
 
         method close {} {
             catch { $dbcmd close }
+        }
+
+        public method create_field_formatter {} {
+            set special_fields_formatter [::DIO::formatters::Sqlite3 ::DIO::formatters::#auto]
         }
 
         method exec {req} {

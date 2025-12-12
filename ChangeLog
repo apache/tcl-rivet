@@ -1,3 +1,8 @@
+2025-12-12 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Sqlite.tcl: add method create_field_formatter
+	to match the name of the formatter class to suite the logic adopted
+	in dio_Tdbc.tcl
+
 2025-11-20 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/formatters.tcl: The Sqlite3 field formatter class
 	must be named Sqlite3 likewise
@@ -18,7 +23,7 @@
 
 2025-10-23 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/formatters.tcl: a typo slipped in and spoiled
-	for formatter class name for Posgresql connectors
+	the formatter class name for Posgresql connectors
 	* rivet/packages/dio/dio_Tdbc.tcl: missing increment of a connector
 	serial number
 	* VERSION: Bumped version to 3.2.8
