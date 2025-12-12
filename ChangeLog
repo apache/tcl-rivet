@@ -2,6 +2,7 @@
 	* rivet/packages/dio/dio_Sqlite.tcl: add method create_field_formatter
 	to match the name of the formatter class to suite the logic adopted
 	in dio_Tdbc.tcl
+	* VERSION: New version 3.2.9
 
 2025-11-20 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/formatters.tcl: The Sqlite3 field formatter class
