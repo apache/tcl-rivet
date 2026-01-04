@@ -4027,7 +4027,7 @@ AC_DEFUN([TEA_EXPORT_CONFIG], [
 #------------------------------------------------------------------------
 
 AC_DEFUN([TEA_INSTALLER], [
-    INSTALL='$(SHELL) $(srcdir)/tclconfig/install-sh -c'
+    INSTALL='$(SHELL) $(top_srcdir)/tclconfig/install-sh -c'
     INSTALL_DATA_DIR='${INSTALL} -d -m 755'
     INSTALL_DATA='${INSTALL} -m 644'
     INSTALL_PROGRAM='${INSTALL} -m 755'
