@@ -207,11 +207,7 @@ TCL_CMD_HEADER(Rivet_LremoveObjCmd)
 }
 
 static void
-Rivet_ListObjAppendString (interp, targetList, string, length)
-    Tcl_Interp *interp;
-    Tcl_Obj    *targetList;
-    char       *string;
-    int         length;
+Rivet_ListObjAppendString (Tcl_Interp* interp,Tcl_Obj* targetList,char* string,int length)
 {
     Tcl_Obj    *elementObj;
 

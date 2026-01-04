@@ -38,6 +38,16 @@
 #include "mod_rivet.h"
 #include "TclWeb.h"
 
+
+/* In case of Tcl8.6 build we assign the sentinel value to
+   the field closeProc, which redirects the call to close2Proc */
+
+#if TCL_MAJOR_VERSION >= 9
+#  define TCL_CLOSEPROC  NULL
+#else
+#  define TCL_CLOSEPROC  TCL_CLOSE2PROC
+#endif
+
 static int
 RivetChan_InputProc(ClientData instancedata, char *buf, int toRead, int *errorCodePtr)
 {
@@ -66,21 +76,14 @@ RivetChan_OutputProc(ClientData instancedata, const char *buf, int toWrite, int 
 }
 
 static int
-RivetChan_CloseProc(ClientData instancedata, Tcl_Interp *interp)
-{
-    return 0;
-}
-
-static int
 RivetChan_Close2Proc(ClientData instancedata, Tcl_Interp *interp, int flags)
 {
     return 0;
 }
 
-
 static int
 RivetChan_SetOptionProc(ClientData instancedata,Tcl_Interp *interp,
-	      const char *optionname,const char *value)
+	                    const char *optionname,const char *value)
 {
     return TCL_OK;
 }
@@ -101,7 +104,7 @@ RivetChan_GetHandleProc(ClientData instancedata, int direction, ClientData *hand
 Tcl_ChannelType RivetChan = {
     "apache_channel",           /* typeName */
     TCL_CHANNEL_VERSION_5,      /* channel type version */
-    RivetChan_CloseProc,        /* close proc */
+    TCL_CLOSEPROC,              /* close proc */
     RivetChan_InputProc,        /* input proc */
     RivetChan_OutputProc,       /* output proc */
     NULL,                       /* seek proc - can be null */

@@ -1,3 +1,11 @@
+2026-01-04 Massimo Manghi <mxmanghi@apache.org>
+    * src/librivet/rivetList.c: modernize old style function declaration as 
+    recent compiler complain about it and it doesn't mix with code profilers
+    * src/mod_rivet_ng/rivetChannel.c: support for channel version 5
+    * src/mod_rivet_ng/rivet_types.h: move here Tcl_Size compatibility definition
+    as actual typedef definition
+    * tclconfig/tcl.m4: update tcl.m4 to latest version
+
 2025-11-20 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/formatters.tcl: The Sqlite3 field formatter class
 	must be named Sqlite3 likewise
