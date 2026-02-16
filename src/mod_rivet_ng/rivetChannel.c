@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 #include <rivet_config.h>
 #endif
+
 #include <apr_general.h>
 #include <apr_thread_proc.h>
 #include <apr_thread_cond.h>
@@ -102,21 +103,22 @@ RivetChan_GetHandleProc(ClientData instancedata, int direction, ClientData *hand
 }
 
 Tcl_ChannelType RivetChan = {
-    "apache_channel",           /* typeName */
-    TCL_CHANNEL_VERSION_5,      /* channel type version */
-    TCL_CLOSEPROC,              /* close proc */
-    RivetChan_InputProc,        /* input proc */
-    RivetChan_OutputProc,       /* output proc */
-    NULL,                       /* seek proc - can be null */
-    RivetChan_SetOptionProc,    /* set option proc - can be null */
-    NULL,                       /* get option proc - can be null */
-    RivetChan_WatchProc,        /* watch proc */
-    RivetChan_GetHandleProc,    /* get handle proc */
-    RivetChan_Close2Proc,       /* close 2 proc - can be null */
-    NULL,                       /* block mode proc - can be null */
-    NULL,                       /* flush proc - can be null */
-    NULL,                       /* handler proc - can be null */
-    NULL,                       /* wide seek proc - can be null if seekproc is*/
-    NULL,                       /* thread action proc - can be null */
-    NULL                        /* truncate proc */
+    .typeName       =   "apache_channel",
+    .version        =   TCL_CHANNEL_VERSION_5,
+    .closeProc      =   TCL_CLOSEPROC,
+    .inputProc      =   RivetChan_InputProc,
+    .outputProc     =   RivetChan_OutputProc,
+    .seekProc       =   NULL,
+    .setOptionProc  =   RivetChan_SetOptionProc,
+    .getOptionProc  =   NULL,
+    .watchProc      =   RivetChan_WatchProc,
+    .getHandleProc  =   RivetChan_GetHandleProc,
+    .close2Proc     =   RivetChan_Close2Proc,
+    .blockModeProc  =   NULL,
+    .flushProc      =   NULL,
+    .handlerProc    =   NULL,
+    .wideSeekProc   =   NULL,
+    .threadActionProc = NULL,
+    .truncateProc   =   NULL
 };
+
