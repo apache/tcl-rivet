@@ -334,4 +334,4 @@ Tcl_Obj* Rivet_CurrentServerRec (Tcl_Interp* interp, server_rec* s);
 
 #define RIVET_MPM_BRIDGE_COMPOSE(bridge) "/mpm/rivet_",bridge,"_mpm.so"
 
-#endif /* MOD_RIVET_H */
+#endif /* __mod_rivet_h__ */
