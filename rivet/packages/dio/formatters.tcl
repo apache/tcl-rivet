@@ -19,6 +19,8 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
+package require Itcl
+
 namespace eval ::DIO::formatters {
 
     # ::itcl::class RootFormatter
