@@ -1,8 +1,19 @@
+2026-03-02 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Tdbc.tcl: fix missing instance variable resultid
+
 2025-12-12 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Sqlite.tcl: add method create_field_formatter
 	to match the name of the formatter class to suite the logic adopted
 	in dio_Tdbc.tcl
 	* VERSION: New version 3.2.9
+
+2026-01-04 Massimo Manghi <mxmanghi@apache.org>
+	* src/librivet/rivetList.c: modernize old style function declaration as 
+	recent compiler complain about it and it doesn't mix with code profilers
+	* src/mod_rivet_ng/rivetChannel.c: support for channel version 5
+	* src/mod_rivet_ng/rivet_types.h: move here Tcl_Size compatibility definition
+	as actual typedef definition
+	* tclconfig/tcl.m4: update tcl.m4 to latest version
 
 2025-11-20 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/formatters.tcl: The Sqlite3 field formatter class
