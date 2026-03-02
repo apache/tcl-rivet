@@ -337,6 +337,7 @@ namespace eval DIO {
         public variable     rowid
         public variable     cached_rows
         public variable     columns
+        public variable     resultid
 
         constructor {args} { 
             eval configure  $args
