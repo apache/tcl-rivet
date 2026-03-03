@@ -47,6 +47,10 @@ namespace eval DIO {
             close
         }
 
+        public method create_field_formatter {} {
+            set special_fields_formatter [::DIO::formatters::Sqlite3 ::DIO::formatters::#auto]
+        }
+
         method open {} {
             variable ::DIO::sqlite_seq
             if {$dbcmd != ""} { return }
