@@ -1,6 +1,6 @@
 2026-03-03 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Sqlite.tcl: override method create_field_formatter
-    to match the name of the correspondig formatter class 
+	to match the name of the correspondig formatter class 
 
 2026-03-02 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: fix missing instance variable resultid
