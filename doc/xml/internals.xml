@@ -69,13 +69,13 @@
 			We designed an interface between the core of mod_rivet and its MPM bridges
 			based on a set of functions defined in the rivet_bridge_table structure. 
     	</para>
-    	<programlisting>typedef struct _mpm_bridge_table {
-    RivetBridge_ServerInit    *mpm_server_init;
-    RivetBridge_ChildInit     *mpm_child_init;
-    RivetBridge_Request       *mpm_request;
-    RivetBridge_Finalize      *mpm_finalize;
-    RivetBridge_Exit_Handler  *mpm_exit_handler;
-    RivetBridge_Thread_Interp *mpm_thread_interp;
+        <programlisting>typedef struct _mpm_bridge_table {
+    RivetBridge_ServerInit    *server_init;
+    RivetBridge_ThreadInit    *thread_init;
+    RivetBridge_Request       *request_processor;
+    RivetBridge_Finalize      *child_finalize;
+    RivetBridge_Exit_Handler  *exit_handler;
+    RivetBridge_Thread_Interp *thread_interp;
 } rivet_bridge_table;</programlisting>
 		<para>
 			<itemizedlist>
