@@ -1,3 +1,7 @@
+2026-03-10 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/worker_prefork_common.c: Possible memory leak fixed
+	in Rivet_ProcessorCleanup
+
 2026-03-03 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Sqlite.tcl: override method create_field_formatter
 	to match the name of the correspondig formatter class 
@@ -34,7 +38,8 @@
 
 2025-10-24 Massimo Manghi <mxmanghi@apache.org>
 	* doc/rivet.xml.in: reformat and align entities definitions
-	* doc/xml/commands.xml: changed 'inspect' command definition in reference list
+	* doc/xml/commands.xml: changed 'inspect' command definition in
+	reference list
 	* rivet/packages/dio/dio_Tdbc.tcl: fix wrong serial number management
 
 2025-10-23 Massimo Manghi <mxmanghi@apache.org>

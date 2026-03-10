@@ -151,11 +151,11 @@ running_scripts* Rivet_RunningScripts ( apr_pool_t* pool,
                                         running_scripts* scripts,
                                         rivet_server_conf* rivet_conf )
 {
-    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_before_script);
-    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_after_script);
-    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_error_script);
-    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,rivet_abort_script);
-    RIVET_SCRIPT_INIT (pool,scripts,rivet_conf,after_every_script);
+    RIVET_SCRIPT_INIT(pool,scripts,rivet_conf,rivet_before_script);
+    RIVET_SCRIPT_INIT(pool,scripts,rivet_conf,rivet_after_script);
+    RIVET_SCRIPT_INIT(pool,scripts,rivet_conf,rivet_error_script);
+    RIVET_SCRIPT_INIT(pool,scripts,rivet_conf,rivet_abort_script);
+    RIVET_SCRIPT_INIT(pool,scripts,rivet_conf,after_every_script);
 
     if (rivet_conf->request_handler != NULL)
     {
