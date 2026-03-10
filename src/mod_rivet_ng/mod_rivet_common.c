@@ -21,6 +21,11 @@
     under the License.
 */
 
+/* Rivet config */
+#ifdef HAVE_CONFIG_H
+#include <rivet_config.h>
+#endif
+
 #include <httpd.h>
 #include <apr_strings.h>
 #include <apr_env.h>
@@ -670,48 +675,28 @@ void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
 
     obj = Tcl_NewStringObj(ap_server_root, -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "SERVER_ROOT",
-            obj,
-            TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"server","SERVER_ROOT",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(ap_server_root_relative(pool,SERVER_CONFIG_FILE), -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "SERVER_CONF",
-            obj,
-            TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"server","SERVER_CONF",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_DIR), -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_DIR",
-            obj,
-            TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"server","RIVET_DIR",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_INIT), -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_INIT",
-            obj,
-            TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"server","RIVET_INIT",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
 #if RIVET_DISPLAY_VERSION
     obj = Tcl_NewStringObj(RIVET_VERSION, -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_VERSION",
-            obj,
-            TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"server","RIVET_VERSION",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 #endif
 
@@ -755,22 +740,13 @@ void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
 
     obj = Tcl_NewStringObj(module_globals->rivet_mpm_bridge, -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_MPM_BRIDGE",
-            obj,
-            TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"server","RIVET_MPM_BRIDGE",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(RIVET_CONFIGURE_CMD,-1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,
-            "server",
-            "RIVET_CONFIGURE_CMD",
-            obj,
-            TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"server","RIVET_CONFIGURE_CMD",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
-
 }
 
 /*

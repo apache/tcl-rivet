@@ -248,11 +248,11 @@ int PreforkBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTe
 
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    PreforkBridge_ServerInit,
-    PreforkBridge_ChildInit,
-    PreforkBridge_Request,
-    PreforkBridge_Finalize,
-    PreforkBridge_ExitHandler,
-    PreforkBridge_Interp
+    .server_init       = PreforkBridge_ServerInit,
+    .thread_init       = PreforkBridge_ChildInit,
+    .request_processor = PreforkBridge_Request,
+    .child_finalize    = PreforkBridge_Finalize,
+    .exit_handler      = PreforkBridge_ExitHandler,
+    .thread_interp     = PreforkBridge_Interp
 };
 

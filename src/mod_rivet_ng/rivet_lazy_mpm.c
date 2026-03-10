@@ -546,10 +546,10 @@ int LazyBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTemp,
 
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    LazyBridge_ServerInit,
-    LazyBridge_ChildInit,
-    LazyBridge_Request,
-    LazyBridge_Finalize,
-    LazyBridge_ExitHandler,
-    LazyBridge_Interp
+    .server_init       = LazyBridge_ServerInit,
+    .thread_init       = LazyBridge_ChildInit,
+    .request_processor = LazyBridge_Request,
+    .child_finalize    = LazyBridge_Finalize,
+    .exit_handler      = LazyBridge_ExitHandler,
+    .thread_interp     = LazyBridge_Interp
 };

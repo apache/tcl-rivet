@@ -251,11 +251,8 @@ int RivetCache_StoreScript(rivet_thread_interp* rivet_interp, Tcl_HashEntry* ent
             strcpy(rivet_interp->objCacheList[rivet_interp->cache_free], hashKey);
 
             return 0;
-
         } else {
-            /* cache full */
-
-            return 1;
+            return 1;   /* cache full */ 
         }
 
     }
