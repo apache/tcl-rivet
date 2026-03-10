@@ -778,10 +778,10 @@ int WorkerBridge_ServerInit (apr_pool_t* pPool,apr_pool_t* pLog,apr_pool_t* pTem
 
 DLLEXPORT
 RIVET_MPM_BRIDGE {
-    WorkerBridge_ServerInit,
-    WorkerBridge_ChildInit,
-    WorkerBridge_Request,
-    WorkerBridge_Finalize,
-    WorkerBridge_ExitHandler,
-    WorkerBridge_Interp
+    .server_init       = WorkerBridge_ServerInit,
+    .thread_init       = WorkerBridge_ChildInit,
+    .request_processor = WorkerBridge_Request,
+    .child_finalize    = WorkerBridge_Finalize,
+    .exit_handler      = WorkerBridge_ExitHandler,
+    .thread_interp     = WorkerBridge_Interp
 };
