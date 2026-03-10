@@ -70,7 +70,7 @@ Rivet_DuplicateVHostInterp(apr_pool_t* pool, rivet_thread_interp* source_obj)
     return interp_obj;
 }
 
-/* -- Rivet_RunChildExitScripts 
+/* -- Rivet_RunChildScripts
  *
  *
  */
@@ -156,13 +156,11 @@ void Rivet_RunChildScripts (rivet_thread_private* private,bool init)
 
 rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 {
-    server_rec*         vhost_server;
-    server_rec*         root_server = module_globals->server;
-    rivet_server_conf*  root_server_conf;
-    rivet_server_conf*  myrsc;
-    rivet_thread_interp* root_interp;
-    // void*               parentfunction;     /* this is topmost initialization script */
-    // void*               function;
+    server_rec*             vhost_server;
+    server_rec*             root_server = module_globals->server;
+    rivet_server_conf*      root_server_conf;
+    rivet_server_conf*      myrsc;
+    rivet_thread_interp*    root_interp;
 
     root_server_conf = RIVET_SERVER_CONF (root_server->module_config);
     root_interp = MPM_MasterInterp(module_globals->server);
@@ -171,9 +169,10 @@ rivet_thread_private* Rivet_VirtualHostsInterps (rivet_thread_private* private)
 
     ap_assert (root_interp != NULL);
 
-    /* The inherited interpreter has an empty cache since evalutating a server_init_script
-     * does not require parsing templates that need to be stored in it. We need to
-     * create it
+    /* The inherited interpreter has an empty cache since
+     * evalutating a server_init_script does not require
+     * parsing templates that need to be stored in it.
+     * We need to create it
      */
 
     if (root_server_conf->default_cache_size > 0) {
@@ -312,7 +311,7 @@ void Rivet_ProcessorCleanup (void *data)
 
     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, module_globals->server,
                  "Thread exiting after %d requests served (%d vhosts)",
-                                        private->req_cnt,module_globals->vhosts_count);
+                 private->req_cnt,module_globals->vhosts_count);
 
     /* We are about to delete the interpreters and release the thread channel.
      * Rivet channel is set as stdout channel of Tcl and as such is treated
@@ -332,13 +331,20 @@ void Rivet_ProcessorCleanup (void *data)
     i = 0;
     do
     {
-
         RivetCache_Cleanup(private,private->ext->interps[i]);
 
         if ((i > 0) && module_globals->separate_channels)
             Rivet_ReleaseRivetChannel(private->ext->interps[i]->interp,private->channel);
 
-        Tcl_DeleteInterp(private->ext->interps[i]->interp);
+        /* if separate_virtual_interps == 0 we are running
+         * the same interpreter instance for each vhost,
+         * thus we need to delete only the first occurrence of
+         * the interpreter but we need to release the scripts
+         * stored in Tcl_Obj instances
+         */
+        if ((i == 0) || module_globals->separate_virtual_interps) {
+            Tcl_DeleteInterp(private->ext->interps[i]->interp);
+        }
 
         /* Release interpreter scripts */
 
@@ -348,12 +354,7 @@ void Rivet_ProcessorCleanup (void *data)
 
         Rivet_ReleasePerDirScripts(private->ext->interps[i]);
 
-        /* if separate_virtual_interps == 0 we are running the same interpreter
-         * instance for each vhost, thus we can jump out of this loop after
-         * the first cycle as the only real intepreter object we have is stored
-         * in private->ext->interps[0]
-         */
 
-    } while ((++i < module_globals->vhosts_count) && module_globals->separate_virtual_interps);
+    } while (++i < module_globals->vhosts_count);
 
 }
