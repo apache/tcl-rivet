@@ -1,3 +1,7 @@
+2026-04-19 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/dio/dio_Tdbc.tcl: trimming sql command string before
+	testing the presence of a terminating ';'
+
 2026-03-10 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivet_[worker|prefork|lazy]_mpm.c: Fully expressing
 	fields in bridge structure definition

@@ -299,6 +299,8 @@ namespace eval DIO {
         public method exec {sql} {
             $this check_connector
 
+            set sql [::string trim $sql]
+
             # tdbc doesn't like ';' at the end of a SQL statement
 
             if {[::string index $sql end] == ";"} {set sql [::string range $sql 0 end-1]}
