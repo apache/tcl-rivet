@@ -1,16 +1,14 @@
 #
 # Session - Itcl object for web session management for Rivet
 #
-#
-
 # Copyright 2004 The Apache Software Foundation
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-
+#
 #	http://www.apache.org/licenses/LICENSE-2.0
-
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -196,10 +194,10 @@ package require Itcl
     #
     method set_session_cookie {value} {
 	::rivet::cookie set $cookieName $value \
-	    -path $cookiePath \
-	    -minutes $cookieLifetime \
-	    -secure $cookieSecure \
-	    -HttpOnly $cookieHttpOnly
+                            -path       $cookiePath \
+                            -minutes    $cookieLifetime \
+                            -secure     $cookieSecure \
+                            -HttpOnly   $cookieHttpOnly
     }
 
     #
@@ -499,9 +497,11 @@ package require Itcl
     #
     method debug {message} {
 	if {$debugMode} {
-	    puts $debugFile "$this (debug) $message<br>"
+	    $this debug_output "$this (debug) $message" $debugFile
 	    flush $debugFile
 	}
     }
-}
 
+    method debug_output {msg args} { puts [lindex $args 0] "$msg <br>" }
+
+}
