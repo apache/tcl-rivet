@@ -1307,7 +1307,7 @@ TCL_CMD_HEADER ( Rivet_RawPost )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_NoBody )
+TCL_CMD_HEADER (Rivet_NoBody)
 {
     rivet_thread_private*   private;
 
@@ -1342,7 +1342,7 @@ TCL_CMD_HEADER( Rivet_NoBody )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_AbortPageCmd )
+TCL_CMD_HEADER (Rivet_AbortPageCmd)
 {
     rivet_thread_private* private;
     static char *errorMessage = "Page generation terminated by abort_page directive";
@@ -1418,7 +1418,7 @@ TCL_CMD_HEADER( Rivet_AbortPageCmd )
  *
  *-----------------------------------------------------------------------------
  */
-TCL_CMD_HEADER( Rivet_AbortCodeCmd )
+TCL_CMD_HEADER (Rivet_AbortCodeCmd)
 {
     rivet_thread_private*   private;
 
@@ -1449,7 +1449,7 @@ TCL_CMD_HEADER( Rivet_AbortCodeCmd )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_EnvCmd )
+TCL_CMD_HEADER (Rivet_EnvCmd)
 {
     char*                   key;
     char*                   val;
@@ -1497,7 +1497,7 @@ TCL_CMD_HEADER( Rivet_EnvCmd )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_ExitCmd )
+TCL_CMD_HEADER (Rivet_ExitCmd)
 {
     int value;
     rivet_thread_private*   private;
@@ -1565,7 +1565,7 @@ TCL_CMD_HEADER( Rivet_ExitCmd )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
+TCL_CMD_HEADER (Rivet_VirtualFilenameCmd)
 {
     rivet_thread_private*   private;
     char*                   filename;
@@ -1578,10 +1578,10 @@ TCL_CMD_HEADER( Rivet_VirtualFilenameCmd )
         return TCL_ERROR;
     }
 
-    virtual  = Tcl_GetStringFromObj( objv[1], NULL );
-    filename = TclWeb_GetVirtualFile( private->req, virtual );
+    virtual  = Tcl_GetStringFromObj (objv[1],NULL);
+    filename = TclWeb_GetVirtualFile (private->req,virtual);
 
-    Tcl_SetObjResult(interp, Tcl_NewStringObj( filename, -1 ) );
+    Tcl_SetObjResult (interp,Tcl_NewStringObj(filename,-1));
     return TCL_OK;
 }
 

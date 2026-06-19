@@ -12,7 +12,6 @@
 #   - permanent: code   - returns any HTTP integer code. In this context
 #                         only the 3xx status codes are meaningful
 #
-#   $ Id: $
 #
 
 namespace eval ::rivet {

@@ -1184,9 +1184,9 @@ bxxb ccxxxxcc</programlisting>
 		<title>Description</title>
 	    </refsect1>
 	    <para>
-		Load the array of cookie variables into the specified
-		array name.  Uses array <option>cookies</option> by
-		default.
+            Load the array of cookie variables into the specified
+            array name.  Uses array <repleceable>cookies</repleceable> by
+            default.
 	    </para>
 	</refentry>
 		
@@ -1197,25 +1197,25 @@ bxxb ccxxxxcc</programlisting>
 	    </refnamediv>
 		
 	    <refsynopsisdiv>
-		<cmdsynopsis>
-		    <command>::rivet::load_env</command>
-		    <arg choice="opt"><replaceable>array_name</replaceable></arg>
-		</cmdsynopsis>
+            <cmdsynopsis>
+                <command>::rivet::load_env</command>
+                <arg choice="opt"><replaceable>array_name</replaceable></arg>
+            </cmdsynopsis>
 	    </refsynopsisdiv>
 
 	    <refsect1>
-		<title>Description</title>
-		<para>
-		    Load the array of environment variables into the specified
-		    array name.  Uses array <option>::request::env</option> by
-		    default.
-		</para>
-		<para>
-		    As Rivet pages are run in the <option>::request</option>
-		    namespace, it isn't necessary to qualify the array name
-		    for most uses - it's ok to access it as
-		    <option>env</option>.
-		</para>
+            <title>Description</title>
+            <para>
+                Load the array of environment variables into the specified
+                array name.  Uses array <option>::request::env</option> by
+                default.
+            </para>
+            <para>
+                As Rivet pages are run in the <option>::request</option>
+                namespace, it isn't necessary to qualify the array name
+                for most uses - it's ok to access it as
+                <option>env</option>.
+            </para>
 	    </refsect1>
 	</refentry>
 
@@ -1233,12 +1233,12 @@ bxxb ccxxxxcc</programlisting>
 	    </refsynopsisdiv>
 
 	    <refsect1>
-		<title>Description</title>
-		<para>
-		    Load the headers that come from a client request into the
-		    provided array name, or use <option>headers</option> if no
-		    name is provided.
-		</para>
+            <title>Description</title>
+            <para>
+                Load the headers that come from a client request into the
+                provided array name, or use <option>headers</option> if no
+                name is provided.
+            </para>
 	    </refsect1>
 	</refentry>
 	
