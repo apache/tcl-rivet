@@ -12,7 +12,6 @@
 #   - permanent: code   - returns any HTTP integer code. In this context
 #                         only the 3xx status codes are meaningful
 #
-#
 
 namespace eval ::rivet {
 
@@ -27,7 +26,7 @@ namespace eval ::rivet {
         }
 
         # In order to preserve compatibility 
-        # with the past we chec whether we are
+        # with the past we check whether we are
         # dealing with a boolean argument and handle
         # it accordingly 
 
