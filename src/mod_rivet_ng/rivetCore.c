@@ -199,7 +199,7 @@ TCL_CMD_HEADER( Rivet_MakeURL )
  *-----------------------------------------------------------------------------
  */
 
-TCL_CMD_HEADER( Rivet_Parse )
+TCL_CMD_HEADER(Rivet_Parse)
 {
     rivet_thread_private*   private;
     char*                   filename = 0;

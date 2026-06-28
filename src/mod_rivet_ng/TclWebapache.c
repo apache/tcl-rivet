@@ -131,7 +131,7 @@ TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp)
 
         /* we parse the content type: we are after a 'charset' parameter definition */
 
-        charset = strstr(r->content_type,"charset");
+        charset = (char *) strstr(r->content_type,"charset");
         if (charset != NULL) {
             charset = apr_pstrdup(r->pool,charset);
 

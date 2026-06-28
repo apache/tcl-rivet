@@ -25,16 +25,8 @@
 #define TCL_STORAGE_CLASS DLLEXPORT
 #endif /* BUILD_rivet */
 
-#if RIVET_CORE == mod_rivet_ng
 EXTERN int Rivet_GetRivetFile (char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp);
-#else
-EXTERN int Rivet_GetRivetFile (char *filename, int toplevel,
-                                Tcl_Obj *outbuf, Tcl_Interp *interp);
-#endif
-
 EXTERN int Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp);
-
 EXTERN int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
-
 
 #endif /* RIVETPARSER_H */

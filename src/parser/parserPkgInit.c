@@ -65,15 +65,10 @@ TCL_CMD_HEADER(Parse_Rivet)
         return TCL_ERROR;
     }
 
-#if RIVET_CORE == mod_rivet_ng
     Tcl_AppendToObj(outbuf, "namespace eval request {\n", -1);
     tclcode = Rivet_GetRivetFile(Tcl_GetString(objv[1]),outbuf,interp);
     if (tclcode == TCL_ERROR) return TCL_ERROR;
     Tcl_AppendToObj(outbuf, "\n}\n", -1);
-#else
-    tclcode = Rivet_GetRivetFile(Tcl_GetString(objv[1]),1,outbuf,interp);
-    if (tclcode == TCL_ERROR) return TCL_ERROR;
-#endif
 
     Tcl_SetObjResult(interp, outbuf);
     Tcl_DecrRefCount(outbuf);
@@ -144,7 +139,7 @@ Rivetparser_Init( Tcl_Interp *interp )
 }
 
 DLLEXPORT int
-Rivetparser_SafeInit( Tcl_Interp *interp )
+Rivetparser_SafeInit(Tcl_Interp *interp)
 {
     /* rivet::parserivet is DEFINITELY unsafe -- it takes a filename,
      * and code in safe interpreters could possibly manipulate it
@@ -166,14 +161,6 @@ Rivetparser_SafeInit( Tcl_Interp *interp )
         return TCL_ERROR;
     }
 
-/*
-    Tcl_CreateObjCommand(interp,
-                         "rivet::parserivetdata",
-                         Parse_RivetData,
-                         NULL,
-                         (Tcl_CmdDeleteProc *)NULL);
-*/
-
     RIVET_OBJ_CMD("parserivetdata",Parse_RivetData,NULL);
-    return Tcl_PkgProvide( interp, "rivetparser", "0.2" );
+    return Tcl_PkgProvide (interp,"rivetparser","0.2");
 }
