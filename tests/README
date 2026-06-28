@@ -19,7 +19,7 @@ be compiled into Apache for this to work.
 
 For example:
 
-./runtest.tcl /usr/sbin/apache -mpm prefork
+./runtests.tcl /usr/sbin/apache -mpm prefork
 
 Where to put tests/which files are which:
 ----------------------------------------
