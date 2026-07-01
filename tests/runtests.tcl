@@ -16,13 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set auto_path [linsert $auto_path 0 [file join [file dirname [info script]] apachetest]]
-set default_mpm prefork
-set httpd_args   {}
-puts stderr "runtests.tcl is running with auto_path: $auto_path"
+set auto_path       [linsert $auto_path 0 [file join [file dirname [info script]] apachetest]]
+set default_mpm     prefork
+set httpd_args      {}
+set rivetlib_path   {}
 
 proc runtests_usage {} {
-    puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver? ?-mpm <MPM module>? ?-bridge <MPM Bridge>?"
+    puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver? ?-mpm <MPM module>? ?-bridge <MPM Bridge>? -rivetlib <rivetlib-root>"
     exit 1
 }
 
@@ -33,14 +33,10 @@ proc get_httpd_version {httpd {bd broken_down_version}} {
 
 	set version_l [regexp -inline {([0-9]{1,})\.([0-9]{1,})\.([0-9]{1,})} $raw_string]
 	if {[llength $version_l]} {
-
         lassign $version_l m major minor patchlevel
         set broken_down_version [list $major $minor $patchlevel]
-
     } else {
-
         return -code error "could not identify the Apache httpd version from '$raw_string'"
-
     }
     return $m
 }
@@ -56,6 +52,7 @@ proc process_args {arguments} {
     global mpm
     global bridge
     global httpd_args
+    global rivetlib_path
 
     puts "n arguments: [llength $arguments]"
     while {[llength $arguments]} {
@@ -66,6 +63,9 @@ proc process_args {arguments} {
             }
             -bridge {
                 set arguments [lassign $arguments bridge]
+            }
+            -rivetlib {
+                set arguments [lassign $arguments rivetlib_path]
             }
             default {
                 lappend httpd_args $a
@@ -88,21 +88,25 @@ if { [llength $argv] < 1 } {
     puts "httpd_args: $httpd_args"
     puts "httpd_version: $httpd_version"
     puts "mpm: $mpm, bridge: $bridge"
-
+    if {$rivetlib_path ne {}} {
+        set auto_path [linsert $auto_path 0 $rivetlib_path]
+        puts "rivetlib_path: $rivetlib_path"
+    }
 }
 
+puts stderr "runtests.tcl is running with auto_path: $auto_path"
 puts stderr "Tests will be run against apache ${::httpd_version} version with the $mpm module and the $bridge bridge"
 
 package require apachetest
 
-if { [encoding system] eq "utf-8" } {
-    puts stderr {
-        System encoding is utf-8 - this is known to cause problems
-        with the test environment!  Continuing with tests in 5 seconds
-        using the iso8859-1 encoding.
-    }
-    after 5000
-}
+#if { [encoding system] eq "utf-8" } {
+#    puts stderr {
+#        System encoding is utf-8 - this is known to cause problems
+#        with the test environment!  Continuing with tests in 5 seconds
+#        using the iso8859-1 encoding.
+#    }
+#    after 5000
+#}
 
 if { [catch {
     apachetest::getbinname $httpd_bin
@@ -133,8 +137,8 @@ apachetest::makeconf server.conf $bridge {
         AddLanguage en .en
         AddLanguage it .it
         AddLanguage es .es
-        AddType application/x-httpd-rivet .rvt
-        AddType application/x-rivet-tcl   .tcl
+        AddType 'application/x-httpd-rivet;charset=utf-8' .rvt
+        AddType 'application/x-rivet-tcl;charset=utf-8'   .tcl
         BRIDGE
     </IfModule>
 
@@ -165,7 +169,7 @@ set env(TCLLIBPATH) [file normalize [file join [file dirname [info script]] rive
 # If 'startserver' is specified on the command line, just start up the
 # server without running tests.
 
-puts "running test with arguments: $httpd_args"
+puts stderr "running tests with arguments: $httpd_args"
 switch -exact -- [lindex $httpd_args 1] {
     startserver {
 	    apachetest::startserver

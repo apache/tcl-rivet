@@ -1,13 +1,10 @@
 <?
-
 ::rivet::load_cookies
 
-::rivet::cookie set mod rivet -expires 01-01-2003
-
-if { [ array exists cookies ] } {
-    foreach { ck } [ array names cookies ]  {
+::rivet::cookie set mod rivet -expires 01-07-2026
+if {[array exists cookies]} {
+    foreach { ck } [ array names cookies ] {
         puts "cookies($ck) = $cookies($ck)\n"
     }
 }
-
 ?>

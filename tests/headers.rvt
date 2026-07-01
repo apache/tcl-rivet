@@ -7,14 +7,10 @@
   <body>
     <h1></h1>
 
-<?
-
+<pre><?
 ::rivet::load_headers hdrs
 parray hdrs
-
-?>
-
-
+?></pre>
     <hr>
     <address><a href="mailto:davidw@dedasys.com">David N. Welton</a></address>
 <!-- Created: Tue Sep 30 17:53:28 CEST 2003 -->

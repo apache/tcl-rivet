@@ -9,4 +9,4 @@
 # full path name of this file's directory.
 
 package ifneeded apachetest 0.1 [list source [file join $dir apachetest.tcl]]
-package ifneeded http 2.4.5 [list source [file join $dir http.tcl]]
+#package ifneeded http 2.4.5 [list source [file join $dir http.tcl]]

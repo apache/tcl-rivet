@@ -3,6 +3,8 @@
 # testing ::rivet::var command for accessing urlencoded 
 # variables
 
+catch {unset match}
+
 ::tcltest::test getvariables-1.1 {GET variables} {
      set page [ ::http::geturl "${urlbase}get.rvt?foobar=goober" ]
      regexp -line {\[::rivet::var get foobar\] = goober$} [ ::http::data $page ] match
@@ -34,16 +36,16 @@
 } {[::rivet::var_qs exists xst][::rivet::var_qs exists noxst] = 1 0}
  
  ::tcltest::test getvariables-2.1 {GET variables + I18N} {
-     set page [::http::geturl "${urlbase}get.rvt?Más=Tú"]
-     regexp -line {^\[::rivet::var get Más\] = Tú$} [ ::http::data $page ] match
+     set page [::http::geturl "${urlbase}get.rvt?MÃ¡s=TÃº"]
+     regexp -line {^\[::rivet::var get MÃ¡s\] = TÃº$} [ ::http::data $page ] match
      set match
-} {[::rivet::var get Más] = Tú}
+} {[::rivet::var get MÃ¡s] = TÃº}
  
  ::tcltest::test getvariables-2.2 {GET variables + I18N + encoding} {
-     set page [::http::geturl [format "${urlbase}get.rvt?%s" [::http::formatQuery Más Tú]]]
-     regexp -line {^\[::rivet::var get Más\] = Tú$} [ ::http::data $page ] match
+     set page [::http::geturl [format "${urlbase}get.rvt?%s" [::http::formatQuery MÃ¡s TÃº]]]
+     regexp -line {^\[::rivet::var get MÃ¡s\] = TÃº$} [ ::http::data $page ] match
      set match
-} {[::rivet::var get Más] = Tú}
+} {[::rivet::var get MÃ¡s] = TÃº}
  
 ::tcltest::test getvariables-3.1 {GET multi-value variable} {
      set page [::http::geturl "${urlbase}get.rvt?lstvar1=a&lstvar1=b&lstvar1=c+d"]

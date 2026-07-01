@@ -9,7 +9,6 @@
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id$
 
 # Rough version history:
 # 1.0	Old http_get interface
@@ -22,7 +21,6 @@
 # 2.4	Added -binary option to http::geturl and charset element
 #	to the state array.
 
-package require Tcl 8.2
 # keep this in sync with pkgIndex.tcl
 # and with the install directories in Makefiles
 package provide http 2.4.5
@@ -235,38 +233,38 @@ proc http::geturl { url args } {
     # Process command options.
 
     array set state {
-	-binary		false
-	-blocksize 	8192
-	-queryblocksize 8192
-	-validate 	false
-	-headers 	{}
-	-timeout 	0
-	-type           application/x-www-form-urlencoded
-	-queryprogress	{}
-	state		header
-	meta		{}
-	coding		{}
-	currentsize	0
-	totalsize	0
-	querylength	0
-	queryoffset	0
+        -binary		false
+        -blocksize 	8192
+        -queryblocksize 8192
+        -validate 	false
+        -headers 	{}
+        -timeout 	0
+        -type           application/x-www-form-urlencoded
+        -queryprogress	{}
+        state		header
+        meta		{}
+        coding		{}
+        currentsize	0
+        totalsize	0
+        querylength	0
+        queryoffset	0
         type            text/html
         body            {}
-	status		""
-	http            ""
+        status		""
+        http            ""
     }
     # These flags have their types verified [Bug 811170]
     array set type {
-	-binary		boolean
-	-blocksize	integer
-	-queryblocksize integer
-	-validate	boolean
-	-timeout	integer
+        -binary		boolean
+        -blocksize	integer
+        -queryblocksize integer
+        -validate	boolean
+        -timeout	integer
     }	
     set state(charset)	$defaultCharset
-    set options {-binary -blocksize -channel -command -handler -headers \
-	    -progress -query -queryblocksize -querychannel -queryprogress\
-	    -validate -timeout -type}
+    set options {   -binary -blocksize -channel -command -handler -headers \
+                    -progress -query -queryblocksize -querychannel -queryprogress\
+                    -validate -timeout -type}
     set usage [join $options ", "]
     set options [string map {- ""} $options]
     set pat ^-([join $options |])$
