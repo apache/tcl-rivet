@@ -1,0 +1,6 @@
+::tcltest::test channelencoding-1.1 {response channel follows declared charset} {
+    set page [::http::geturl "${urlbase}channelencoding.rvt"]
+    set result [string trim [::http::data $page]]
+    ::http::cleanup $page
+    set result
+} utf-8
