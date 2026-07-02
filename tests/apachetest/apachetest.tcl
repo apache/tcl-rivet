@@ -54,8 +54,8 @@ proc kill {signal pid} {
     }
 }
 
-package require http
-#source [file join [file dirname [info script]] http.tcl]
+#package require http
+source [file join [file dirname [info script]] http.tcl]
 
 namespace eval apachetest {
 

@@ -1,3 +1,47 @@
+• 2026-07-03 Massimo Manghi <mxmanghi@apache.org>
+  	* src/mod_rivet_ng/TclWebapache.c: Configure the Tcl output channel
+  	from the response charset for every request.
+  	* src/mod_rivet_ng/rivetCore.c: Add -encoding support to
+  	::rivet::parse and include the selected encoding in parser cache keys.
+  	* src/parser/rivetParser.c: Add encoding-aware template loading while
+  	preserving the existing default system-encoding behavior.
+  	* tests/README: Declare UTF-8 as the encoding for textual test files.
+  	* tests/channelencoding.[rvt|test]: New test to report the active Rivet
+    output-channel encoding. Verify that the response channel follows
+  	the declared UTF-8 charset.
+  	* tests/get.rvt: Convert internationalized variable names to UTF-8.
+  	* tests/headers.test: Update expected request headers for the bundled
+  	HTTP client.
+  	* tests/hello.rvt: Convert internationalized Spanish and Japanese text
+  	to UTF-8.
+  	* tests/hello.test: Convert internationalized expectations to UTF-8.
+  	* tests/include.html: Convert the Japanese include fixture to UTF-8.
+  	* tests/include.test: Update the UTF-8 include expectation and emitted
+  	whitespace.
+  	* tests/inspect.test: Make ChildInitScript inspection checks robust
+  	against additional configuration commands.
+  	* tests/parse.rvt: Parse the included template explicitly as UTF-8.
+  	* tests/parse.test: Convert parser expectations to UTF-8, normalize the
+  	trailing newline and test explicit ISO-8859-1 input decoding.
+  	* tests/parseencoding.rvt: Exercise ::rivet::parse with an explicit
+  	ISO-8859-1 encoding.
+  	* tests/parsepackage.test: Convert parser-package expectations to
+  	UTF-8.
+  	* tests/parsestring.rvt: Read the string template explicitly as UTF-8.
+  	* tests/post.rvt: Convert internationalized POST variable names to
+  	UTF-8.
+  	* tests/post.test: Convert internationalized POST requests and
+  	expectations to UTF-8.
+  	* tests/rivet.test: Enable the complete regular test list and add the
+  	response-channel encoding test.
+  	* tests/runtests.tcl: Establish UTF-8 for the test interpreter and
+  	Rivet child interpreters, replacing the obsolete UTF-8 warning.
+  	* tests/tclfile.tcl: Convert the plain Tcl internationalized fixture
+  	to UTF-8.
+  	* tests/tclfile.test: Convert the plain Tcl file expectation to UTF-8.
+  	* doc/xml/commands.xml: Document the ::rivet::parse -encoding,
+  	-virtual and -string forms.
+
 2026-04-19 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: trimming sql command string before
 	testing the presence of a terminating ';'

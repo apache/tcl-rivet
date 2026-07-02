@@ -2,26 +2,31 @@
 ::tcltest::test inspect-1.1 {basic introspection 1.1} {
     apachetest::start { 
             -c "RivetServerConf ChildInitScript \"set init 1\"" } {} {
+        set match 0
         catch {
             set inspect_page [::http::geturl "${urlbase}inspect.tcl?p=childinit"]
-            set match [string trim [::http::data $inspect_page]]
+            set response [string trim [::http::data $inspect_page]]
             ::http::cleanup $inspect_page
+
+            set match [regexp -all {set\s+init\s+1} $response]
         }
     }
     set match
-} {set init 1}
+} 1
 
 ::tcltest::test inspect-1.2 {basic introspection 1.2} {
     apachetest::start { 
             -c "RivetServerConf ChildInitScript \"set init 1\"" } {} {
+        set match 0
         catch {
             set inspect_page [::http::geturl "${urlbase}inspect.tcl"]
-            set match [string trim [::http::data $inspect_page]]
+            set response [string trim [::http::data $inspect_page]]
             ::http::cleanup $inspect_page
+            set match [regexp -all {server {ChildInitScript {.+set\s+init\s+1}}} $response]
         }
     }
     set match
-} {server {ChildInitScript {set init 1}}}
+} 1
 
 ::tcltest::test inspect-1.3 {basic introspection 1.3} {
     file copy -force inspect.tcl /tmp/

@@ -7,8 +7,8 @@ if { [ ::rivet::var number ] > 0 } {
         puts "\[::rivet::var_post get foobar\] = [::rivet::var_post get foobar]\n"
     }
     # get/post variables 1.{2,3}
-    if { [ ::rivet::var exists Más ] } {
-        puts "\[::rivet::var get Más\] = [::rivet::var get Más]\n"
+    if { [ ::rivet::var exists MÃ¡s ] } {
+        puts "\[::rivet::var get MÃ¡s\] = [::rivet::var get MÃ¡s]\n"
     }
     if { [::rivet::var exists lstvar1] } {
         puts "\[::rivet::var get lstvar1\] = [::rivet::var get lstvar1]\n"

@@ -21,6 +21,10 @@ set default_mpm     prefork
 set httpd_args      {}
 set rivetlib_path   {}
 
+# Test scripts and textual fixtures are UTF-8 independently of the locale
+# from which the suite is started.
+encoding system utf-8
+
 proc runtests_usage {} {
     puts stderr "Usage: $::argv0 /path/to/apache/httpd ?startserver? ?-mpm <MPM module>? ?-bridge <MPM Bridge>? -rivetlib <rivetlib-root>"
     exit 1
@@ -99,15 +103,6 @@ puts stderr "Tests will be run against apache ${::httpd_version} version with th
 
 package require apachetest
 
-#if { [encoding system] eq "utf-8" } {
-#    puts stderr {
-#        System encoding is utf-8 - this is known to cause problems
-#        with the test environment!  Continuing with tests in 5 seconds
-#        using the iso8859-1 encoding.
-#    }
-#    after 5000
-#}
-
 if { [catch {
     apachetest::getbinname $httpd_bin
 } err ] } {
@@ -127,6 +122,8 @@ apachetest::need_modules [list \
 
 apachetest::makeconf server.conf $bridge {
     LoadModule rivet_module [file join $CWD .. src/.libs mod_rivet[info sharedlibextension]]
+
+    RivetServerConf ChildInitScript "encoding system utf-8"
 
     # User and Group directives removed to ease dependency of test 
     # suite from the output of command 'id' (from which

@@ -35,11 +35,10 @@ set urlbase "http://${host}:8081/"
 if {[info exists ::env(TestList)]} {
     set TestList $::env(TestList)
 } else {
-    set TestList {rivetlib.test shorthand.test headers.test cookies.test}
-    set untestList { 
-		cookies.test get.test post.test tclfile.test \
-		env.test hello.test include.test binary.test \
-		parse.test upload.test makeurl.test commands.test }
+    set TestList { rivetlib.test shorthand.test headers.test channelencoding.test cookies.test
+                   get.test post.test tclfile.test \
+                   env.test hello.test include.test binary.test \
+                   parse.test upload.test makeurl.test commands.test }
 }
 
 # Test stanzas are created by giving the test a name and a
@@ -103,4 +102,3 @@ if { $testgroup3 } {
 }
 
 ::tcltest::cleanupTests
-

@@ -12,17 +12,13 @@ set httpversion [package require http]
 # shipped with rivet. We try to test more consistently the headers
 # as they are received by mod_rivet and returned in ::rivet::load_headers 
 
-
-set result "hdrs(Accept)     = */*
-hdrs(Host)       = localhost:8081
-hdrs(User-Agent) = Tcl http client package $httpversion"
-
 ::tcltest::test headers-1.1 {load_headers test} {
-    set headers_list [list Host $host User-Agent "Tcl http client package $httpversion"]
+    set headers_list [list Host $host]
     set token [::http::geturl ${urlbase}$testfilename1 -headers $headers_list]
     set nmatches 0
     set page [::http::data $token]
-    foreach {header_name header_value} [list Host $host Accept "\\*/\\*" User-Agent "Mozilla.+Tcl http client package $httpversion"] {
+
+    foreach {header_name header_value} [list Host $host Accept "\\*/\\*" User-Agent "Tcl http client package $httpversion"] {
         set re_exp [subst {^hdrs\\($header_name\\)\\s+=\\s+$header_value\$}]
         incr nmatches [regexp -all -lineanchor $re_exp $page]
     }

@@ -1422,7 +1422,14 @@ bab</programlisting>
 	    <refsynopsisdiv>
 		<cmdsynopsis>
 		    <command>::rivet::parse</command>
+		    <arg><option>-encoding <replaceable>encoding</replaceable></option></arg>
+		    <arg><option>-virtual</option></arg>
 		    <arg><replaceable>filename</replaceable></arg>
+		</cmdsynopsis>
+		<cmdsynopsis>
+		    <command>::rivet::parse</command>
+		    <arg choice="plain"><option>-string</option></arg>
+		    <arg choice="plain"><replaceable>template_string</replaceable></arg>
 		</cmdsynopsis>
 	    </refsynopsisdiv>
 
@@ -1432,6 +1439,12 @@ bab</programlisting>
 		    Like the Tcl <command>source</command> command, but also
 		    parses for Rivet &lt;?  and ?&gt; processing tags.  Using
 		    this command, you can use one .rvt file from another.
+		    The optional <option>-encoding</option> argument selects the
+		    external character encoding used to read the file. When omitted,
+		    the Tcl system encoding is retained for compatibility. Newline
+		    translation is disabled when an explicit encoding is selected.
+		    The <option>-string</option> form accepts an existing Tcl string
+		    and therefore performs no character decoding.
 		</para>
 	    </refsect1>
 	</refentry>

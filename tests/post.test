@@ -9,16 +9,16 @@ set testfilename1 post.rvt
 } {[::rivet::var get foobar] = goober}
 
 ::tcltest::test postvariables-2.1 {POST variables + I18N} {
-    set page [ ::http::geturl "${urlbase}$testfilename1" -query Más=Tú ]
-    regexp -line {^\[::rivet::var get Más\] = Tú$} [ ::http::data $page ] match
+    set page [ ::http::geturl "${urlbase}$testfilename1" -query MÃ¡s=TÃº ]
+    regexp -line {^\[::rivet::var get MÃ¡s\] = TÃº$} [ ::http::data $page ] match
     set match
-} {[::rivet::var get Más] = Tú}
+} {[::rivet::var get MÃ¡s] = TÃº}
 
 ::tcltest::test postvariables-2.2 {POST variables + I18N + encoding} {
-    set page [ ::http::geturl "${urlbase}$testfilename1" -query [ ::http::formatQuery Más Tú ] ]
-    regexp -line {^\[::rivet::var get Más\] = Tú$} [ ::http::data $page ] match
+    set page [ ::http::geturl "${urlbase}$testfilename1" -query [ ::http::formatQuery MÃ¡s TÃº ] ]
+    regexp -line {^\[::rivet::var get MÃ¡s\] = TÃº$} [ ::http::data $page ] match
     set match
-} {[::rivet::var get Más] = Tú}
+} {[::rivet::var get MÃ¡s] = TÃº}
 
 ::tcltest::test postvariables-3.1 {POST multi-value variable} {
     set page [ ::http::geturl "${urlbase}get.rvt" -query [::http::formatQuery lstvar1 a lstvar1 b lstvar1 {c d}]]

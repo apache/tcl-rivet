@@ -6,6 +6,6 @@
 
   <body>
     <h1>Parse String Test</h1>
-    <? ::rivet::parse -string [::rivet::read_file hello.rvt] ?>
+    <? ::rivet::parse -string [::rivet::read_file hello.rvt -encoding utf-8] ?>
   </body>
 </html>

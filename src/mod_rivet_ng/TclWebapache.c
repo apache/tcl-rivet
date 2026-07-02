@@ -133,12 +133,26 @@ TclWeb_InitRequest(rivet_thread_private* private, Tcl_Interp *interp)
 
         charset = (char *) strstr(r->content_type,"charset");
         if (charset != NULL) {
+            char* charset_value;
+            Tcl_Channel outchannel;
+
             charset = apr_pstrdup(r->pool,charset);
 
             /* ther's some freedom about spaces in the AddType lines: let's strip them off */
 
             apr_collapse_spaces(charset,charset);
             req->charset = charset;
+
+            /* The response charset is also the external encoding of the
+             * Tcl output channel. Configure it for every request so a prior
+             * binary response cannot leak its channel state. */
+            charset_value = strchr(charset, '=');
+            outchannel = Tcl_GetStdChannel(TCL_STDOUT);
+            if (charset_value != NULL && outchannel != NULL &&
+                Tcl_SetChannelOption(interp, outchannel, "-encoding",
+                                     charset_value + 1) != TCL_OK) {
+                return TCL_ERROR;
+            }
         }
     }
 

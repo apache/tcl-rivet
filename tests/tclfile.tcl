@@ -1,3 +1,3 @@
 # test file for plain .tcl files
 
-puts "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!"
+puts "Â¡ Ã€ Ãˆ ÃŒ Ã’ Ã™ - El Burro Sabe MÃ¡s Que TÃº!"

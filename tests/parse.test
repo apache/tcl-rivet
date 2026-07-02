@@ -4,7 +4,7 @@ set testfilename1 parse.rvt
 
 ::tcltest::test parse-1.1 {Parse command} {
     set page [ ::http::geturl "${urlbase}$testfilename1" ]
-    ::http::data $page
+    string trimright [::http::data $page] "\n"
 } {<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
@@ -15,10 +15,10 @@ set testfilename1 parse.rvt
     <h1>Parse Test</h1>
     Hello, World
 
-¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!
+Â¡ Ã€ Ãˆ ÃŒ Ã’ Ã™ - El Burro Sabe MÃ¡s Que TÃº!
 
 
-<p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>
+<p>æ—¥æœ¬èªž (UTF-8 Japanese text)</p>
 
   </body>
 </html>}
@@ -27,7 +27,7 @@ set testfilename2 parsestring.rvt
 
 ::tcltest::test parse-1.2 {Parse command} {
     set page [ ::http::geturl "${urlbase}$testfilename2" ]
-    ::http::data $page
+    string trimright [::http::data $page] "\n"
 } {<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
@@ -38,10 +38,40 @@ set testfilename2 parsestring.rvt
     <h1>Parse String Test</h1>
     Hello, World
 
-¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!
+Â¡ Ã€ Ãˆ ÃŒ Ã’ Ã™ - El Burro Sabe MÃ¡s Que TÃº!
 
 
-<p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>
+<p>æ—¥æœ¬èªž (UTF-8 Japanese text)</p>
 
   </body>
 </html>}
+
+::tcltest::test parse-1.3 {Parse command with explicit legacy encoding} \
+    -setup {
+        set legacyFile parse-iso8859-1.tmp
+        set channel [open $legacyFile w]
+        fconfigure $channel -translation binary -encoding binary
+        puts -nonewline $channel [encoding convertto iso8859-1 {
+            <? puts -nonewline "MÃ¡s" ?>
+        }]
+        close $channel
+        unset channel
+    } \
+    -body {
+        set page [::http::geturl "${urlbase}parseencoding.rvt"]
+        set data [::http::data $page]
+        regexp {MÃ¡s} $data
+    } \
+    -cleanup {
+        if {[info exists page]} {
+            ::http::cleanup $page
+        }
+        if {[info exists channel]} {
+            close $channel
+        }
+        if {[info exists legacyFile]} {
+            file delete -force $legacyFile
+        }
+        unset -nocomplain page data channel legacyFile
+    } \
+    -result 1

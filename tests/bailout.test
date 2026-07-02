@@ -20,7 +20,7 @@
         set redirect_code [dict create {*}[read $rdfp]]
         set r1 [dict exists $redirect_code location]
         set r2 [dict exists $redirect_code error_code]
-    } 
+    }
     list $r1 $r2
 } {1 1}
 
@@ -31,11 +31,12 @@
         RivetServerConf AbortScript "set abcode \[::rivet::abort_code\]"
         RivetServerConf AbortScript "puts -nonewline \[::rivet::abort_page -exiting\]"
         RivetServerConf AbortScript "puts -nonewline \\\" \[dict get \$abcode error_code\] \[dict get \$abcode return_code\]\\\""
+        RivetServerConf AbortScript "flush stdout"
     } {
-        puts "test exit command"
         set url "${urlbase}exit.tcl"
+        #puts "test exit command (http [package require http]: $url)"
         set page [::http::geturl $url]
-        set r [::http::data $page]
+        set r    [::http::data $page]
         ::http::cleanup $page
     }
     set r
@@ -46,7 +47,7 @@
     } {
         set url "${urlbase}catch.rvt"
         set page [::http::geturl $url]
-        set r [::http::data $page]
+        set r    [::http::data $page]
         ::http::cleanup $page
     }
     set r [string trim $r]

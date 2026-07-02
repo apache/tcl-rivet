@@ -98,6 +98,13 @@ Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
 int
 Rivet_GetRivetFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
 {
+    return Rivet_GetRivetFileEncoding(filename, outbuf, interp, NULL);
+}
+
+int
+Rivet_GetRivetFileEncoding(char *filename, Tcl_Obj *outbuf,
+                           Tcl_Interp *interp, const char *encoding)
+{
     int sz = 0;
     Tcl_Obj *inbuf;
     Tcl_Channel rivetfile;
@@ -112,6 +119,17 @@ Rivet_GetRivetFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp)
         /* Don't need to adderrorinfo - Tcl_OpenFileChannel takes care
            of that for us. */
         return TCL_ERROR;
+    }
+
+    if (encoding != NULL) {
+        /* Preserve line endings while decoding the file into Tcl text. */
+        if (Tcl_SetChannelOption(interp, rivetfile,
+                                 "-translation", "binary") != TCL_OK ||
+            Tcl_SetChannelOption(interp, rivetfile,
+                                 "-encoding", encoding) != TCL_OK) {
+            Tcl_Close(interp, rivetfile);
+            return TCL_ERROR;
+        }
     }
 
     Tcl_AppendToObj(outbuf, "puts -nonewline \"", -1);
@@ -261,4 +279,3 @@ Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf)
 
     return inside;
 }
-

@@ -17,11 +17,11 @@ load [file join [pwd] .. src .libs librivetparser[info sharedlibext]]
 puts "Hello, World\n"
 
 # i18n-1.1
-puts "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!\n"
+puts "Â¡ Ã€ Ãˆ ÃŒ Ã’ Ã™ - El Burro Sabe MÃ¡s Que TÃº!\n"
 
 
 puts -nonewline "
-<p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>
+<p>æ—¥æœ¬èªž (UTF-8 Japanese text)</p>
 "
 }
 
@@ -35,11 +35,11 @@ puts -nonewline ""
 puts "Hello, World\n"
 
 # i18n-1.1
-puts "¡ À È Ì Ò Ù - El Burro Sabe Más Que Tú!\n"
+puts "Â¡ Ã€ Ãˆ ÃŒ Ã’ Ã™ - El Burro Sabe MÃ¡s Que TÃº!\n"
 
 
 puts -nonewline "
-<p>ÆüËÜ¸ì(EUC-JP Japanese text)</p>
+<p>æ—¥æœ¬èªž (UTF-8 Japanese text)</p>
 "
 
 }

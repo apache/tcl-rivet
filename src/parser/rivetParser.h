@@ -26,6 +26,8 @@
 #endif /* BUILD_rivet */
 
 EXTERN int Rivet_GetRivetFile (char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp);
+EXTERN int Rivet_GetRivetFileEncoding(char *filename, Tcl_Obj *outbuf,
+                                      Tcl_Interp *interp, const char *encoding);
 EXTERN int Rivet_GetTclFile(char *filename, Tcl_Obj *outbuf, Tcl_Interp *interp);
 EXTERN int Rivet_Parser(Tcl_Obj *outbuf, Tcl_Obj *inbuf);
 
