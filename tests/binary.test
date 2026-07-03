@@ -29,4 +29,9 @@ set binaryfile AngeloFish.jpg
     set ret
 } 1
 
-
+::tcltest::test binary-3.1 {scoped binary output restores stdout} {
+    set page [::http::geturl "${urlbase}binaryscope.tcl"]
+    set data [::http::data $page]
+    ::http::cleanup $page
+    binary encode hex $data
+} 00fffe014f4b

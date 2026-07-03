@@ -2035,6 +2035,76 @@ form_request end</programlisting>
 	   </refsect1>
 	</refentry>
 
+	<refentry id="with_binary_output">
+	    <refnamediv>
+		<refname>with_binary_output</refname>
+		<refpurpose>evaluate a script while the response channel is configured for binary output.</refpurpose>
+	    </refnamediv>
+
+	    <refsynopsisdiv>
+		<cmdsynopsis>
+		    <command>::rivet::with_binary_output</command>
+		    <arg choice="plain"><replaceable>script</replaceable></arg>
+		</cmdsynopsis>
+	    </refsynopsisdiv>
+
+	    <refsect1>
+		<title>Description</title>
+		<para>
+		    Flushes <varname>stdout</varname>, saves its channel configuration,
+		    configures it with <option>-translation binary</option>, and evaluates
+		    <replaceable>script</replaceable>. After flushing the binary output,
+		    the previous translation, encoding, and end-of-file character settings
+		    are restored. Restoration also takes place when the script returns an
+		    error or another non-standard Tcl completion code.
+		</para>
+		<para>
+		    Use this command to group multiple binary writes. Values written in the
+		    script must be byte-oriented Tcl values whose characters are in the range
+		    U+0000 through U+00FF. Text that is to form part of a binary protocol must
+		    first be converted explicitly, for example with
+		    <command>encoding convertto utf-8</command>.
+		</para>
+		<programlisting>::rivet::with_binary_output {
+    puts -nonewline stdout $headerBytes
+    puts -nonewline stdout $payloadBytes
+}</programlisting>
+	    </refsect1>
+	</refentry>
+
+	<refentry id="write_binary">
+	    <refnamediv>
+		<refname>write_binary</refname>
+		<refpurpose>write one binary value to the response channel.</refpurpose>
+	    </refnamediv>
+
+	    <refsynopsisdiv>
+		<cmdsynopsis>
+		    <command>::rivet::write_binary</command>
+		    <arg choice="plain"><replaceable>data</replaceable></arg>
+		</cmdsynopsis>
+	    </refsynopsisdiv>
+
+	    <refsect1>
+		<title>Description</title>
+		<para>
+		    Writes <replaceable>data</replaceable> to <varname>stdout</varname>
+		    without newline translation or character encoding, and without appending
+		    a newline. The previous response-channel configuration is restored before
+		    the command returns. This command is equivalent to:
+		</para>
+		<programlisting>::rivet::with_binary_output {
+    puts -nonewline stdout $data
+}</programlisting>
+		<para>
+		    The value must be byte-oriented and contain only characters in the range
+		    U+0000 through U+00FF. Use
+		    <command>::rivet::with_binary_output</command> when several consecutive
+		    binary output operations need to be grouped.
+		</para>
+	    </refsect1>
+	</refentry>
+
 	<refentry id="wrap">
 	    <refnamediv>
 		<refname>wrap</refname>

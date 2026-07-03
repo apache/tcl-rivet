@@ -457,6 +457,120 @@ TCL_CMD_HEADER(Rivet_Include)
 /*
  *-----------------------------------------------------------------------------
  *
+ * Rivet_WithBinaryOutput --
+ *
+ *      Evaluate a script with stdout configured as a binary channel.  The
+ *      channel configuration is restored before propagating the script's
+ *      completion code.  Flushes at both mode boundaries keep buffered text
+ *      and binary data from being converted using the wrong configuration.
+ *
+ *-----------------------------------------------------------------------------
+ */
+
+TCL_CMD_HEADER(Rivet_WithBinaryOutput)
+{
+    Tcl_Channel channel;
+    Tcl_DString translation;
+    Tcl_DString encoding;
+    Tcl_DString eofchar;
+    Tcl_InterpState state;
+    int code;
+    int restoreCode = TCL_OK;
+
+    if (objc != 2) {
+        Tcl_WrongNumArgs(interp, 1, objv, "script");
+        return TCL_ERROR;
+    }
+
+    channel = Tcl_GetStdChannel(TCL_STDOUT);
+    if (channel == NULL) {
+        Tcl_SetObjResult(interp, Tcl_NewStringObj("stdout is not available", -1));
+        return TCL_ERROR;
+    }
+
+    Tcl_DStringInit(&translation);
+    Tcl_DStringInit(&encoding);
+    Tcl_DStringInit(&eofchar);
+
+    if (Tcl_Flush(channel) != TCL_OK ||
+        Tcl_GetChannelOption(interp, channel, "-translation", &translation) != TCL_OK ||
+        Tcl_GetChannelOption(interp, channel, "-encoding", &encoding) != TCL_OK ||
+        Tcl_GetChannelOption(interp, channel, "-eofchar", &eofchar) != TCL_OK ||
+        Tcl_SetChannelOption(interp, channel, "-translation", "binary") != TCL_OK) {
+        Tcl_DStringFree(&translation);
+        Tcl_DStringFree(&encoding);
+        Tcl_DStringFree(&eofchar);
+        return TCL_ERROR;
+    }
+
+    code = Tcl_EvalObjEx(interp, objv[1], 0);
+    state = Tcl_SaveInterpState(interp, code);
+
+    if (Tcl_Flush(channel) != TCL_OK) {
+        restoreCode = TCL_ERROR;
+    }
+    if (Tcl_SetChannelOption(interp, channel, "-translation",
+                             Tcl_DStringValue(&translation)) != TCL_OK) {
+        restoreCode = TCL_ERROR;
+    }
+    if (Tcl_SetChannelOption(interp, channel, "-encoding",
+                             Tcl_DStringValue(&encoding)) != TCL_OK) {
+        restoreCode = TCL_ERROR;
+    }
+    if (Tcl_SetChannelOption(interp, channel, "-eofchar",
+                             Tcl_DStringValue(&eofchar)) != TCL_OK) {
+        restoreCode = TCL_ERROR;
+    }
+
+    Tcl_DStringFree(&translation);
+    Tcl_DStringFree(&encoding);
+    Tcl_DStringFree(&eofchar);
+
+    if (restoreCode != TCL_OK && code == TCL_OK) {
+        Tcl_DiscardInterpState(state);
+        return TCL_ERROR;
+    }
+    return Tcl_RestoreInterpState(interp, state);
+}
+
+/*
+ * Write one value to stdout without text encoding or newline translation.
+ * Build the equivalent of
+ *
+ *     ::rivet::with_binary_output {puts -nonewline stdout $data}
+ *
+ * as a Tcl list so the value is passed without string substitution.
+ */
+TCL_CMD_HEADER(Rivet_WriteBinary)
+{
+    Tcl_Obj *script;
+    Tcl_Obj *scopeObjv[2];
+    Tcl_Obj *scriptObjv[4];
+    int code;
+
+    if (objc != 2) {
+        Tcl_WrongNumArgs(interp, 1, objv, "data");
+        return TCL_ERROR;
+    }
+
+    scriptObjv[0] = Tcl_NewStringObj("puts", -1);
+    scriptObjv[1] = Tcl_NewStringObj("-nonewline", -1);
+    scriptObjv[2] = Tcl_NewStringObj("stdout", -1);
+    scriptObjv[3] = objv[1];
+    script = Tcl_NewListObj(4, scriptObjv);
+    Tcl_IncrRefCount(script);
+
+    scopeObjv[0] = objv[0];
+    scopeObjv[1] = script;
+    code = Rivet_WithBinaryOutput(clientData, interp, 2, scopeObjv);
+
+    Tcl_DecrRefCount(script);
+    return code;
+}
+
+/*
+ *-----------------------------------------------------------------------------
+ *
  * Rivet_Headers --
  *
  *      Command to manipulate HTTP headers from Tcl.
@@ -2217,6 +2331,8 @@ Rivet_InitCore(Tcl_Interp *interp,rivet_thread_private* private)
     RIVET_OBJ_CMD ("raw_post",Rivet_RawPost,private);
     RIVET_OBJ_CMD ("upload",Rivet_Upload,private);
     RIVET_OBJ_CMD ("include",Rivet_Include,private);
+    RIVET_OBJ_CMD ("with_binary_output",Rivet_WithBinaryOutput,private);
+    RIVET_OBJ_CMD ("write_binary",Rivet_WriteBinary,private);
     RIVET_OBJ_CMD ("parse",Rivet_Parse,private);
     RIVET_OBJ_CMD ("no_body",Rivet_NoBody,private);
     RIVET_OBJ_CMD ("env",Rivet_EnvCmd,private);
