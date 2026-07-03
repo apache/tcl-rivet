@@ -50,7 +50,7 @@ set testfilename2 parsestring.rvt
     -setup {
         set legacyFile parse-iso8859-1.tmp
         set channel [open $legacyFile w]
-        fconfigure $channel -translation binary -encoding binary
+        chan configure $channel -translation binary
         puts -nonewline $channel [encoding convertto iso8859-1 {
             <? puts -nonewline "Más" ?>
         }]

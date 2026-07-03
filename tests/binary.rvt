@@ -1,12 +1,12 @@
 <?
 ::rivet::headers type "image/jpeg"
 if { [::rivet::var exists test1] } {
-    set fl [ open AngeloFish.jpg r ]
-    fconfigure $fl -encoding binary
+    set fl [open AngeloFish.jpg r]
     fconfigure $fl -translation binary
-    fconfigure stdout -encoding binary
+    # fconfigure stdout -encoding binary (not accepted in Tcl9)
+    fconfigure stdout -translation binary
     if {$::tcl_platform(platform) eq "windows"} {
-        fconfigure stdout  -translation binary
+        fconfigure stdout -translation binary
     }
     puts -nonewline [read $fl]
     close $fl
