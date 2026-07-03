@@ -2069,7 +2069,7 @@ form_request end</programlisting>
     puts -nonewline stdout $headerBytes
     puts -nonewline stdout $payloadBytes
 }</programlisting>
-        <note>This command is not placed in export list of the <command>::rivet</command> namespace</note>
+        <note>This command is not placed in the export list of the <command>::rivet</command> namespace</note>
 	    </refsect1>
 	</refentry>
 
@@ -2103,7 +2103,7 @@ form_request end</programlisting>
 		    <command>::rivet::with_binary_output</command> when several consecutive
 		    binary output operations need to be grouped.
 		</para>
-        <note>This command is not placed in export list of the <command>::rivet</command> namespace</note>
+        <note>This command is not placed in the export list of the <command>::rivet</command> namespace</note>
 	    </refsect1>
 	</refentry>
 
