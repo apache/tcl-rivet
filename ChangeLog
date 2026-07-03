@@ -1,4 +1,4 @@
-• 2026-07-03 Massimo Manghi <mxmanghi@apache.org>
+2026-07-03 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivetCore.c: implement 1st class C level commands
 	::rivet::write_binary and ::rivet::with_binary_output for consistent
 	handling of binary output
