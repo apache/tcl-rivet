@@ -237,8 +237,7 @@ void Rivet_ReleasePerDirScripts(rivet_thread_interp* rivet_interp)
  */
 void Rivet_PerInterpInit(rivet_thread_interp* interp_obj,
 						 rivet_thread_private* private,
-						 server_rec *s,
-						 apr_pool_t *p)
+						 server_rec *s, apr_pool_t *p)
 {
     rivet_interp_globals*   globals     = NULL;
     Tcl_Obj*                auto_path   = NULL;
@@ -669,35 +668,35 @@ void Rivet_CleanupRequest( request_rec *r )
  *
  */
 
-void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
+void Rivet_InitServerVariables (Tcl_Interp *interp, apr_pool_t *pool)
 {
     int     ap_mpm_result;
     Tcl_Obj *obj;
 
     obj = Tcl_NewStringObj(ap_server_root, -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,"server","SERVER_ROOT",obj,TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"::server","SERVER_ROOT",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(ap_server_root_relative(pool,SERVER_CONFIG_FILE), -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,"server","SERVER_CONF",obj,TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"::server","SERVER_CONF",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_DIR), -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,"server","RIVET_DIR",obj,TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"::server","RIVET_DIR",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(ap_server_root_relative(pool, RIVET_INIT), -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,"server","RIVET_INIT",obj,TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"::server","RIVET_INIT",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
 #if RIVET_DISPLAY_VERSION
     obj = Tcl_NewStringObj(RIVET_VERSION, -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,"server","RIVET_VERSION",obj,TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"::server","RIVET_VERSION",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 #endif
 
@@ -716,7 +715,7 @@ void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
                 break;
         }
         Tcl_IncrRefCount(obj);
-        Tcl_SetVar2Ex(interp,"server","MPM_THREADED",obj,TCL_GLOBAL_ONLY);
+        Tcl_SetVar2Ex(interp,"::server","MPM_THREADED",obj,TCL_GLOBAL_ONLY);
         Tcl_DecrRefCount(obj);
     }
 
@@ -735,18 +734,18 @@ void Rivet_InitServerVariables( Tcl_Interp *interp, apr_pool_t *pool )
                 break;
         }
         Tcl_IncrRefCount(obj);
-        Tcl_SetVar2Ex(interp,"server","MPM_FORKED",obj,TCL_GLOBAL_ONLY);
+        Tcl_SetVar2Ex(interp,"::server","MPM_FORKED",obj,TCL_GLOBAL_ONLY);
         Tcl_DecrRefCount(obj);
     }
 
     obj = Tcl_NewStringObj(module_globals->rivet_mpm_bridge, -1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,"server","RIVET_MPM_BRIDGE",obj,TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"::server","RIVET_MPM_BRIDGE",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 
     obj = Tcl_NewStringObj(RIVET_CONFIGURE_CMD,-1);
     Tcl_IncrRefCount(obj);
-    Tcl_SetVar2Ex(interp,"server","RIVET_CONFIGURE_CMD",obj,TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,"::server","RIVET_CONFIGURE_CMD",obj,TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(obj);
 }
 

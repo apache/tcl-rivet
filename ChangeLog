@@ -1,3 +1,10 @@
+2026-07-11 Massimo Manghi <mxmanghi@apache.org>
+	* src/mod_rivet_ng/mod_rivet_common.c: Now explicitly scoping in the
+	global namespace the array 'server' that ships some information about
+	mod_rivet (legacy array inherited from early versions for Apache 1.x).
+	This is needed by the change introduced by Tcl9 in the variable name
+	resolution mechanism that doesn't lookup in the global namespace anymore
+
 2026-07-03 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivetCore.c: implement 1st class C level commands
 	::rivet::write_binary and ::rivet::with_binary_output for consistent
@@ -15,7 +22,7 @@
 	* tests/get.rvt: Convert internationalized variable names to UTF-8.
 	* tests/headers.test: Update expected request headers for the bundled HTTP client.
 	* tests/hello.rvt: Convert internationalized Spanish and Japanese text to UTF-8.
-	* tests/hello.test: Convert internationalized expectations to UTF-8.
+	* tests/hello.test: Convert internationalized expected values to UTF-8.
 	* tests/include.html: Convert the Japanese include fixture to UTF-8.
 	* tests/include.test: Update the UTF-8 include expectation and emitted whitespace.
 	* tests/inspect.test: Make ChildInitScript inspection checks robust
@@ -34,8 +41,7 @@
 	Rivet child interpreters, replacing the obsolete UTF-8 warning.
 	* tests/tclfile.tcl: Convert the plain Tcl internationalized fixture to UTF-8.
 	* tests/tclfile.test: Convert the plain Tcl file expectation to UTF-8.
-	* doc/xml/commands.xml: Document the ::rivet::parse -encoding, -virtual
-	and -string forms.
+	* doc/xml/commands.xml: Document the ::rivet::parse -encoding, -virtual and -string forms.
 
 2026-04-19 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: trimming sql command string before
@@ -44,8 +50,7 @@
 2026-03-10 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/rivet_[worker|prefork|lazy]_mpm.c: Fully expressing
 	fields in bridge structure definition
-	* src/mod_rivet_ng/mod_rivet_common.c: Reformat lines defining the
-	'server' array
+	* src/mod_rivet_ng/mod_rivet_common.c: Reformat lines defining the 'server' array
 	* src/mod_rivet_ng/worker_prefork_common.c: Possible memory leak fixed
 	in Rivet_ProcessorCleanup
 
