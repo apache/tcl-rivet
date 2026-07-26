@@ -1,3 +1,7 @@
+2026-07-26 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/entities/entities.tcl: utf-8 to entities map
+    nicely printed in tabular form
+
 2026-04-19 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl: trimming sql command string before
 	testing the presence of a terminating ';'
