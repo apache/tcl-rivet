@@ -8,6 +8,10 @@
 2026-07-30 Massimo Manghi <mxmanghi@apache.org>
 	* : released version in 'master' as 3.3.0
 
+2026-07-26 Massimo Manghi <mxmanghi@apache.org>
+    * rivet/packages/entities/entities.tcl: utf-8 to entities map
+    nicely printed in tabular form
+
 2026-07-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet_common.c: Now explicitly scoping in the
 	global namespace the array 'server' that ships some information about
