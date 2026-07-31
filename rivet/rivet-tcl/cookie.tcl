@@ -50,16 +50,16 @@ namespace eval ::rivet {
                 append cookieParams "; expires=[clock_to_rfc850_gmt $secs]"
             }
         }
-        if { [info exists params(path)] } {
+        if {[info exists params(path)]} {
             append cookieParams "; path=$params(path)"
         }
-        if { [info exists params(domain)] } {
+        if {[info exists params(domain)]} {
             append cookieParams "; domain=$params(domain)"
         }
-        if { [info exists params(secure)] && $params(secure) == 1} {
+        if {[info exists params(secure)] && $params(secure) == 1} {
             append cookieParams "; secure"
         }
-        if { [info exists params(HttpOnly)] && $params(HttpOnly)} {
+        if {[info exists params(HttpOnly)] && $params(HttpOnly)} {
             append cookieParams "; HttpOnly"
         }
 
@@ -77,48 +77,45 @@ namespace eval ::rivet {
         set badchars "\[ \t;\]"
 
         switch -- $cmd {
-        "set" {
-            set value [lindex $args 0]
-            set args  [lrange $args 1 end]
-            import_keyvalue_pairs params $args
+            "set" {
+                set value [lindex $args 0]
+                set args  [lrange $args 1 end]
+                import_keyvalue_pairs params $args
 
-            if {[regexp $badchars $name]} {
-            return -code error \
-                "name may not contain semicolons, spaces, or tabs"
+                if {[regexp $badchars $name]} {
+                return -code error \
+                    "name may not contain semicolons, spaces, or tabs"
+                }
+                if {[regexp $badchars $value]} {
+                return -code error \
+                    "value may not contain semicolons, spaces, or tabs"
+                }
+
+                set cookieKey "Set-Cookie"
+                set cookieValue "$name=$value"
+
+                append cookieValue [make_cookie_attributes params]
+
+                headers add $cookieKey $cookieValue
             }
-            if {[regexp $badchars $value]} {
-            return -code error \
-                "value may not contain semicolons, spaces, or tabs"
+            "get" {
+                ::request::global RivetCookies
+
+                if {![array exists RivetCookies]} { load_cookies RivetCookies }
+                if {![info exists RivetCookies($name)]} { return }
+                return $RivetCookies($name)
             }
-
-            set cookieKey "Set-Cookie"
-            set cookieValue "$name=$value"
-
-            append cookieValue [make_cookie_attributes params]
-
-            headers add $cookieKey $cookieValue
-        }
-
-        "get" {
-            ::request::global RivetCookies
-
-            if {![array exists RivetCookies]} { load_cookies RivetCookies }
-            if {![info exists RivetCookies($name)]} { return }
-            return $RivetCookies($name)
-        }
-
-        "delete" {
-            ## In order to delete a cookie, we just need to set a cookie
-            ## with a time that has already expired.
-            cookie set $name "" -minutes -1
-        }
-        "unset" {
-            ::request::global RivetCookies
-            if {![array exists RivetCookies]} { load_cookies RivetCookies }
-            if {![info exists RivetCookies($name)]} { return }
-            unset RivetCookies($name)
-        }
+            "delete" {
+                ## In order to delete a cookie, we just need to set a cookie
+                ## with a time that has already expired.
+                cookie set $name "" -minutes -1
+            }
+            "unset" {
+                ::request::global RivetCookies
+                if {![array exists RivetCookies]} { load_cookies RivetCookies }
+                if {![info exists RivetCookies($name)]} { return }
+                unset RivetCookies($name)
+            }
         }
     }
-
 }

@@ -35,7 +35,11 @@
         set script [::rivet::url_script]
         if {$script ne ""} {
             set ::Rivet::script $script
-            namespace eval ::request $script
+            if {[file extension $script] eq ".tcl"} {
+                uplevel #0 $script
+            } else {
+                namespace eval ::request $script
+            }
         }
 
         set script [::rivet::inspect AfterScript]

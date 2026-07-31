@@ -1,3 +1,13 @@
+2026-07-31 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/rivet-tcl/load_cookies.tcl: a cookie line separator
+	lies on the first occurence of character '=', but from that
+	position on the same character is a valid character for a
+	cookie value. Therefore command 'split' was fundamentally wrong
+	in that context
+
+2026-07-30 Massimo Manghi <mxmanghi@apache.org>
+	* : released version in 'master' as 3.3.0
+
 2026-07-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet_common.c: Now explicitly scoping in the
 	global namespace the array 'server' that ships some information about
