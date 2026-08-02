@@ -4,13 +4,17 @@
 	position on the same character is a valid character for a
 	cookie value. Therefore command 'split' was fundamentally wrong
 	in that context
+	* rivet/default_request_handler.tcl: the .tcl scripts are evaluated
+	in the global namespace. This is know to break some scripts that
+	don't have full control of their status, but this was part of
+	Rivet contract
 
 2026-07-30 Massimo Manghi <mxmanghi@apache.org>
 	* : released version in 'master' as 3.3.0
 
 2026-07-26 Massimo Manghi <mxmanghi@apache.org>
-    * rivet/packages/entities/entities.tcl: utf-8 to entities map
-    nicely printed in tabular form
+	* rivet/packages/entities/entities.tcl: utf-8 to entities map
+	nicely printed in tabular form
 
 2026-07-11 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/mod_rivet_common.c: Now explicitly scoping in the
