@@ -1,3 +1,7 @@
+2026-08-21 Massimo Manghi <mxmanghi@apache.org>
+    * src/apache-2/mod_rivet.c: almost 11 years later a patch contributed by
+    Damon Courney....
+
 2015-12-14 Massimo Manghi <mxmanghi@apache.org>
     * src/apache-2/mod_rivet.c: now exporting the ::rivet namespace during
     Tcl interpreter set up

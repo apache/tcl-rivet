@@ -101,6 +101,9 @@ static apr_status_t Rivet_ChildExit(void *data);
 
 mod_rivet_globals* rivet_module_globals = NULL;
 
+// Store a pointer to the interp within this process.
+static Tcl_Interp *main_interp = NULL;
+
 /* -- Rivet_PrintErrorMessage
  *
  * Utility function to print the error message stored in errorInfo
@@ -1005,9 +1008,16 @@ Rivet_InitHandler(apr_pool_t *pPool, apr_pool_t *pLog, apr_pool_t *pTemp, server
 
     FILEDEBUGINFO;
 
+    // Clean up any existing interp we have in this process.
+    if (main_interp != NULL) {
+        if (!Tcl_InterpDeleted (main_interp)) Tcl_DeleteInterp(main_interp);
+        main_interp = NULL;
+    }
+
     /* we create and initialize a master (server) interpreter */
 
     rsc->server_interp = Rivet_CreateTclInterp(s) ; /* root interpreter */
+    main_interp = rsc->server_interp;
 
     Rivet_PerInterpInit(s,rsc,pPool,1);
 
