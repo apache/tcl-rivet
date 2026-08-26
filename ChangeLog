@@ -1,3 +1,8 @@
+2026-08-26 Massimo Manghi <mxmanghi@apache.org>
+	* VERSION: Given the new cookies handling and restoring
+	the declared namespace scoping of .tcl scripts requires a
+	version bumping as 3.3.1
+
 2026-07-31 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/rivet-tcl/load_cookies.tcl: a cookie line separator
 	lies on the first occurence of character '=', but from that
