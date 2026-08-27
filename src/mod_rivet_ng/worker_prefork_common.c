@@ -96,8 +96,9 @@ void Rivet_RunChildScripts (rivet_thread_private* private,bool init)
         myrsc = RIVET_SERVER_CONF(vhost_server->module_config);
         rivet_interp = RIVET_PEEK_INTERP(private,myrsc);
         function = (init ? myrsc->rivet_child_init_script : myrsc->rivet_child_exit_script);
-        if (function &&
-            (vhost_server == root_server || module_globals->separate_virtual_interps || function != parentfunction))
+        if (function && (vhost_server == root_server ||
+                         module_globals->separate_virtual_interps ||
+                         function != parentfunction))
         {
             char*       errmsg = MODNAME ": Error in Child init script: %s";
             Tcl_Obj*    tcl_script_obj = Tcl_NewStringObj(function,-1);

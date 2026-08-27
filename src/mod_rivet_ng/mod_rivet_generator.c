@@ -72,9 +72,9 @@ Rivet_CheckType (request_rec *req)
     rivet_req_ctype ctype = CTYPE_NOT_HANDLED;
 
     if ( req->handler != NULL ) {
-        if (STRNEQU( req->handler, RIVET_TEMPLATE_CTYPE) ) {
+        if (STRNEQU(req->handler, RIVET_TEMPLATE_CTYPE)) {
             ctype  = RIVET_TEMPLATE;
-        } else if ( STRNEQU( req->handler, RIVET_TCLFILE_CTYPE) ) {
+        } else if (STRNEQU( req->handler, RIVET_TCLFILE_CTYPE)) {
             ctype = RIVET_TCLFILE;
         }
     }
@@ -84,6 +84,7 @@ Rivet_CheckType (request_rec *req)
 /*
  * -- Rivet_ReleaseScript
  *
+ * Tcl objects associated to configured scripts
  */
 
 static void
