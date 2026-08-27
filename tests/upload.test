@@ -36,3 +36,22 @@ set testfilename1 uploadsave.rvt
     ::http::cleanup $page
     file size uploadedjpeg.jpg
 } {42747}
+
+set testfilename1 uploadbinary.rvt
+
+::tcltest::test upload-1.3 {upload data and channel are binary safe} {
+    set bound "-----NEXT_PART_[clock seconds].[pid]"
+    set fl [open AngeloFish.jpg r]
+    fconfigure $fl -translation binary
+    set data [read $fl]
+    close $fl
+
+    set outputData "--$bound\r\nContent-Disposition: form-data; name=\"uploadtest\"; filename=\"AngeloFish.jpg\"\r\n\r\n$data\n--${bound}--"
+
+    set page [::http::geturl "${urlbase}$testfilename1" \
+		  -type "multipart/form-data; boundary=$bound" -query $outputData]
+
+    set result [string trim [::http::data $page]]
+    ::http::cleanup $page
+    set result
+} {42747 42747 1}

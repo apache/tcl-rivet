@@ -84,10 +84,6 @@ Rivet_CheckType (request_rec *req)
 /*
  * -- Rivet_ReleaseScript
  *
- *
- *
- *
- *
  */
 
 static void
@@ -218,7 +214,6 @@ Rivet_SendContent(rivet_thread_private *private)
 
         retval = DECLINED;
         goto sendcleanup;
-
     }
 
     if (private->r->finfo.filetype == 0)

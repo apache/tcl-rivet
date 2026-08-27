@@ -1,0 +1,11 @@
+<?
+set uploadData [::rivet::upload data uploadtest]
+set uploadChannel [::rivet::upload channel uploadtest]
+set channelData [read $uploadChannel]
+close $uploadChannel
+
+puts [list \
+    [string length $uploadData] \
+    [string length $channelData] \
+    [string equal $uploadData $channelData]]
+?>

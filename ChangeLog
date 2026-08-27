@@ -1,3 +1,11 @@
+2026-08-27 Massimo Manghi <mxmanghi@apache.org>
+    * src/mod_rivet_ng/TclWebapache.c: handling Tcl9 incompatile
+    -encoding binary option for upload channels. On error the channels
+    are now closed
+    * src/mod_rivet_ng/mod_rivet_common.c: defining CHDIR
+    based on build environment
+    * test/uploadbinary.rvt: add test for binary uploads
+
 2026-08-26 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: Given the new cookies handling and restoring
 	the declared namespace scoping of .tcl scripts requires a

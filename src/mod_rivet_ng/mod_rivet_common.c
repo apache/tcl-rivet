@@ -44,9 +44,13 @@
 #ifdef RIVET_HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* RIVET_HAVE_UNISTD_H */
+
 #ifdef WIN32
 #include <direct.h> // provides POSIX _chdir
-#endif /* WIN32 */
+#define CHDIR(cb)  _chdir(cb)
+#else /* WIN32 */
+#define CHDIR(cb)   chdir(cb)
+#endif /* Unix */
 
 /* Function prototypes are defined with EXTERN. Since we are in the same DLL,
  * no need to keep this extern... */
@@ -493,7 +497,7 @@ rivet_thread_private* Rivet_CreatePrivateData (void)
     ap_assert (apr_threadkey_private_get ((void **)&private,rivet_thread_key) == APR_SUCCESS);
 
     apr_thread_mutex_lock(module_globals->pool_mutex);
-    private = apr_pcalloc (module_globals->pool,sizeof(*private));
+    private = apr_pcalloc(module_globals->pool,sizeof(*private));
     apr_thread_mutex_unlock(module_globals->pool_mutex);
 
     if (apr_pool_create (&private->pool, NULL) != APR_SUCCESS)
@@ -774,19 +778,11 @@ int Rivet_chdir_file (const char *file)
 
     x = strrchr(file, '/');
     if (x == NULL) {
-#ifdef WIN32
-        chdir_retval = _chdir(file);
-#else
-        chdir_retval = chdir(file);
-#endif
+        chdir_retval = CHDIR(file);
     } else if (x - file < sizeof(chdir_buf) - 1) {
         memcpy(chdir_buf, file, x - file);
         chdir_buf[x - file] = '\0';
-#ifdef WIN32
-        chdir_retval = _chdir(chdir_buf);
-#else
-        chdir_retval = chdir(chdir_buf);
-#endif
+        chdir_retval = CHDIR(chdir_buf);
     }
 
     return chdir_retval;

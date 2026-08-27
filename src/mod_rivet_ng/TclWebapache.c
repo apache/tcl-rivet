@@ -846,10 +846,9 @@ int TclWeb_UploadChannel(char *varname, TclWebRequest *req)
     } else {
         Tcl_Obj* result;
 
+        /* Tcl 9 has no "binary" encoding; binary translation is portable. */
         if (Tcl_SetChannelOption(req->interp,chan,"-translation","binary") == TCL_ERROR) {
-            return TCL_ERROR;
-        }
-        if (Tcl_SetChannelOption(req->interp,chan,"-encoding","binary") == TCL_ERROR) {
+            (void) Tcl_Close(NULL, chan);
             return TCL_ERROR;
         }
         Tcl_RegisterChannel(req->interp,chan);
@@ -927,15 +926,7 @@ int TclWeb_UploadData(char *varname, TclWebRequest *req)
             tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s",
                                                         Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
             Tcl_AddErrorInfo(req->interp,tcl_error_msg);
-            return TCL_ERROR;
-        }
-        if (Tcl_SetChannelOption(req->interp, chan, "-encoding", "binary") == TCL_ERROR) {
-            char* tcl_error_msg;
-            int error_number = Tcl_GetErrno();
-
-            tcl_error_msg = apr_psprintf(req->req->pool,"Error setting channel option '%s': %s",
-                                                        Tcl_ErrnoId(), Tcl_ErrnoMsg(error_number));
-            Tcl_AddErrorInfo(req->interp,tcl_error_msg);
+            (void) Tcl_Close(NULL, chan);
             return TCL_ERROR;
         }
 

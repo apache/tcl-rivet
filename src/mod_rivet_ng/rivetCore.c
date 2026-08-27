@@ -199,6 +199,8 @@ TCL_CMD_HEADER( Rivet_MakeURL )
  *-----------------------------------------------------------------------------
  */
 
+#define RIVET_PARSE_USAGE "?-encoding name? ?-virtual? filename | -string template_string"
+
 TCL_CMD_HEADER(Rivet_Parse)
 {
     rivet_thread_private*   private;
@@ -206,6 +208,7 @@ TCL_CMD_HEADER(Rivet_Parse)
     apr_status_t            stat_s;
     apr_finfo_t             finfo_b;
     char*                   cache_key;
+    char*                   fnkey;
     rivet_thread_interp*    rivet_interp;
     Tcl_HashEntry*          entry  = NULL;
     Tcl_Obj*                script = NULL;
@@ -217,8 +220,7 @@ TCL_CMD_HEADER(Rivet_Parse)
 
     if (objc < 2 || objc > 5)
     {
-        Tcl_WrongNumArgs(interp, 1, objv,
-                         "?-encoding name? ?-virtual? filename | -string template_string");
+        Tcl_WrongNumArgs(interp,1,objv,RIVET_PARSE_USAGE);
         return TCL_ERROR;
     }
 
@@ -261,18 +263,14 @@ TCL_CMD_HEADER(Rivet_Parse)
 
         } else {
 
-            Tcl_WrongNumArgs(interp,1,objv,
-                             "?-encoding name? ?-virtual? filename | -string template_string");
+            Tcl_WrongNumArgs(interp,1,objv,RIVET_PARSE_USAGE);
             return TCL_ERROR;
 
         }
-
-    } else if (objc == 4 &&
-               STREQU(Tcl_GetStringFromObj(objv[1], NULL), "-encoding")) {
+    } else if (objc == 4 && STREQU(Tcl_GetStringFromObj(objv[1], NULL), "-encoding")) {
 
         encoding = Tcl_GetStringFromObj(objv[2], NULL);
         filename = Tcl_GetStringFromObj(objv[3], NULL);
-
     } else if (objc == 5 &&
                STREQU(Tcl_GetStringFromObj(objv[1], NULL), "-encoding") &&
                STREQU(Tcl_GetStringFromObj(objv[3], NULL), "-virtual")) {
@@ -282,8 +280,7 @@ TCL_CMD_HEADER(Rivet_Parse)
                                          Tcl_GetStringFromObj(objv[4], NULL));
 
     } else {
-        Tcl_WrongNumArgs(interp,1,objv,
-                         "?-encoding name? ?-virtual? filename | -string template_string");
+        Tcl_WrongNumArgs(interp,1,objv,RIVET_PARSE_USAGE);
         return TCL_ERROR;
     }
 
@@ -313,16 +310,14 @@ TCL_CMD_HEADER(Rivet_Parse)
         return TCL_ERROR;
     }
 
-    /* */
+    /* Let's incorporate the file encoding in the key */
 
-    cache_key =
-        RivetCache_MakeKey( private->pool,
-                            encoding == NULL
-                                ? filename
-                                : apr_psprintf(private->pool, "%s|encoding=%s",
-                                               filename, encoding),
-                            finfo_b.ctime,finfo_b.mtime,
-                            IS_USER_CONF(private->running_conf),0);
+    fnkey = encoding == NULL
+        ? filename
+        : apr_psprintf(private->pool, "%s|encoding=%s", filename, encoding);
+    cache_key = RivetCache_MakeKey(private->pool, fnkey,
+                                   finfo_b.ctime, finfo_b.mtime,
+                                   IS_USER_CONF(private->running_conf), 0);
 
     rivet_interp = RIVET_PEEK_INTERP(private,private->running_conf);
     entry = RivetCache_EntryLookup (rivet_interp,cache_key);
@@ -366,7 +361,6 @@ TCL_CMD_HEADER(Rivet_Parse)
         script = RivetCache_FetchScript(entry);
         return Tcl_EvalObjEx(interp,script,0);
     }
-
 }
 
 /*
