@@ -4,34 +4,29 @@
     <section>
       <title>Mailing Lists</title>
       <para>
-	The Rivet mailing list is the first place you should turn for
-	help. If you haven't found the solution to your problem in the documentation  
-	or you have a question, idea, or comment about the Rivet code itself send email to
-	<email>rivet-dev@tcl.apache.org</email>. To subscribe to the list, post email to
-	<email>rivet-dev-subscribe@tcl.apache.org</email>.
+        The Rivet mailing list is the first place you should turn for
+        help. If you haven't found the solution to your problem in the documentation  
+        or you have a question, idea, or comment about the Rivet code itself send email to
+        <email>rivet-dev@tcl.apache.org</email>. To subscribe to the list, post email to
+        <email>rivet-dev-subscribe@tcl.apache.org</email>.
       </para>
-      <para>
-	The mailing list archives are available at <ulink
-	  url="http://mail-archives.apache.org/mod_mbox/tcl-rivet-dev/" />
-      </para>
+      <para>The mailing list archives are available at <ulink url="http://mail-archives.apache.org/mod_mbox/tcl-rivet-dev/" /></para>
     </section>
 
     <section>
       <title>Newsgroup</title>
       <para>
-	The <ulink url="news:comp.lang.tcl"/> newsgroup is a good
-	place to ask about Tcl questions in general.  Rivet developers
-	also follow the newsgroup, but it's best to ask Rivet-specific
-	questions on the Rivet list.
+        The <ulink url="news:comp.lang.tcl"/> newsgroup is a good
+        place to ask about Tcl questions in general.  Rivet developers
+        also follow the newsgroup, but it's best to ask Rivet-specific
+        questions on the Rivet list.
       </para>
     </section>
 
     <section id="websites">
       <title>Web Sites</title>
-
       <para>
-	There are several web sites that cover Apache and Tcl
-	extensively.
+        There are several web sites that cover Apache and Tcl extensively.
       </para>
       <itemizedlist>
 	<listitem>
@@ -50,7 +45,7 @@
 	</listitem>
 	<listitem>
 	  <para>
-	    <ulink url="http://www.tcl.tk"/> is the canonical site
+	    <ulink url="https://www.tcl-lang.org"/> is the canonical site
 	    for Tcl information.
 	  </para>
 	</listitem>

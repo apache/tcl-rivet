@@ -40,7 +40,7 @@
                 Installing Rivet is about endowing the Apache HTTP webserver with the ability
                 of running scripts written with the Tcl programming language. 
                 Therefore the 
-                <ulink url="http://www.tcl.tk/">Tcl</ulink> language with its runtime,  
+                <ulink url="https://www.tcl-lang.org/">Tcl</ulink> language with its runtime,  
                 development libraries and shell (&ge;8.5.10 required, &ge;8.6.0 recommended) 
                 have to be installed. Building Rivet you will 
                 have to tell the scripts where the Tcl libraries are located via the
@@ -49,7 +49,7 @@
             </para>
             <para>
             	Several Tcl packages shipped with rivet need also the 
-            	<ulink url="http://core.tcl.tk/itcl/">Itcl</ulink>
+            	<ulink url="https://core.tcl-lang.org/itcl/">Itcl</ulink>
             	OOP extension of Tcl. If you need to run any of the 
             	<link href="session_package">Session</link> or <link href="dio">DIO</link>
             	packages you need to install this language extension but you don't need it

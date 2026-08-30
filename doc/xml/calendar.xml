@@ -15,15 +15,10 @@
       </para>
       <para>
       	Calendar core methods are based on the 
-      	<ulink url="http://wiki.tcl.tk/17964">cal</ulink> procedure
+		<ulink url="https://wiki.tcl-lang.org/page/cal">cal</ulink> procedure
       	written by Richard Suchenwirth and published on the 
-      	<ulink url="http://wiki.tcl.tk">Tcl Wiki</ulink>
+		<ulink url="https://wiki.tcl-lang.org/">Tcl Wiki</ulink>
       </para>
-      <note>
-        The Calendar package uses Tcl <command>dict</command> command to manage markup 
-        information. Hence either Tcl8.5 or Tcl8.4 with 
-        <ulink url="http://wiki.tcl.tk/5042">package dict</ulink> are required.   
-      </note>
    </section>
    <refentry id="calendar">
    	    <refnamediv>
