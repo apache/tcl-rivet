@@ -15,10 +15,10 @@ namespace eval ::rivet {
     proc load_cookies {{arrayName cookies}} {
         upvar 1 $arrayName cookies
 
-        set HTTP_COOKIE [env HTTP_COOKIE]
+        set HTTP_COOKIE [::rivet::env HTTP_COOKIE]
 
         foreach pair [split $HTTP_COOKIE ";"] {
-            set pair [split [string trim $pair] "="]
+            set pair [string trim $pair]
             if {$pair eq {}} {
                 continue
             }
@@ -30,7 +30,7 @@ namespace eval ::rivet {
 
             set name [string trim [string range $pair 0 $separator-1]]
             set value [string trim [string range $pair $separator+1 end]]
-            set cookies($name) [list $value]
+            set cookies($name) $value
         }
     }
 

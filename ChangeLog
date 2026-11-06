@@ -1,10 +1,15 @@
+2026-11-06 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/rivet-tcl/load_cookies.tcl: severe bug misidentified
+	cookies name,value separator
+	* tests/loadcookies.tcl: add new test for this purpose
+
 2026-08-27 Massimo Manghi <mxmanghi@apache.org>
-    * src/mod_rivet_ng/TclWebapache.c: handling Tcl9 incompatile
-    -encoding binary option for upload channels. On error the channels
-    are now closed
-    * src/mod_rivet_ng/mod_rivet_common.c: defining CHDIR
-    based on build environment
-    * test/uploadbinary.rvt: add test for binary uploads
+	* src/mod_rivet_ng/TclWebapache.c: handling Tcl9 incompatile
+	-encoding binary option for upload channels. On error the channels
+	are now closed
+	* src/mod_rivet_ng/mod_rivet_common.c: defining CHDIR
+	based on build environment
+	* test/uploadbinary.rvt: add test for binary uploads
 
 2026-08-26 Massimo Manghi <mxmanghi@apache.org>
 	* VERSION: Given the new cookies handling and restoring

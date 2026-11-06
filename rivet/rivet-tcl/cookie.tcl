@@ -1,8 +1,7 @@
-##
-## cookie [set|get] and supporting functions
-##
-## $Id$
-##
+#
+# cookie [set|get] and supporting functions
+#
+#
 
 
 namespace eval ::rivet {
