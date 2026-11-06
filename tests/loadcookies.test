@@ -1,0 +1,36 @@
+package require tcltest
+
+# Exercise the Tcl parser without requiring an Apache request environment.
+interp create cookieParser
+cookieParser eval [list source [file join [file dirname [info script]] \
+    .. rivet rivet-tcl load_cookies.tcl]]
+cookieParser eval {
+    proc ::rivet::env {name} { return $::HTTP_COOKIE }
+    proc parseCookies {header} {
+        set ::HTTP_COOKIE $header
+        ::rivet::load_cookies parsed
+        set result {}
+        foreach name [lsort [array names parsed]] {
+            lappend result $name $parsed($name)
+        }
+        return $result
+    }
+}
+
+::tcltest::test loadcookies-1.1 {Analytics and session cookies} -body {
+    cookieParser eval {
+        parseCookies {_ga_93LGZE5K05=GS2.1.s1763143361$o3$g0$t1763143361$j60$l0$h0; rivetSession=943FBDD0DCFFCE39926CE621B9525F76}
+    }
+} -result [list _ga_93LGZE5K05 \
+    {GS2.1.s1763143361$o3$g0$t1763143361$j60$l0$h0} \
+    rivetSession 943FBDD0DCFFCE39926CE621B9525F76]
+
+::tcltest::test loadcookies-1.2 {Only the first equals sign separates the value} -body {
+    cookieParser eval { parseCookies {token=abc==; expression=a=b=c} }
+} -result {expression a=b=c token abc==}
+
+::tcltest::test loadcookies-1.3 {Whitespace, empty values and malformed pairs} -body {
+    cookieParser eval { parseCookies {; missing; =ignored; empty=; foo=bar ; ;} }
+} -result {empty {} foo bar}
+
+interp delete cookieParser
