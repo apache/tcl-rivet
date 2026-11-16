@@ -60,15 +60,18 @@ set testfilename1 cookies.rvt
     } \
     -body {
         set page [::http::geturl "${urlbase}$testfilename1" \
-            -headers {Cookie "bop; foo=bar;doo=wah; shoo=be ;doooo=bee;dot=dow  "}]
-        set data [::http::data $page]
-        set matches 0
-        incr matches [regexp -line {^cookies\(foo\) = bar$} $data]
-        incr matches [regexp -line {^cookies\(doo\) = wah} $data]
-        incr matches [regexp -line {^cookies\(shoo\) = be} $data]
-        incr matches [regexp -line {^cookies\(doooo\) = bee} $data]
-        incr matches [regexp -line {^cookies\(dot\) = dow$} $data]
-        incr matches [regexp -line {^cookies\(bop\) = } $data]
+            -headers {Cookie "bop; foo=bar;doo=wah; shoo=be ;doooo=bee;dot=dow  ;bar="}]
+        set returned_data [::http::data $page]
+
+        #puts $returned_data
+        set matches {}
+        lappend matches [regexp -line {^cookies\(foo\) = bar$} $returned_data]
+        lappend matches [regexp -line {^cookies\(doo\) = wah} $returned_data]
+        lappend matches [regexp -line {^cookies\(shoo\) = be} $returned_data]
+        lappend matches [regexp -line {^cookies\(doooo\) = bee} $returned_data]
+        lappend matches [regexp -line {^cookies\(dot\) = dow$} $returned_data]
+        lappend matches [regexp -line {^cookies\(bop\) = } $returned_data]
+        lappend matches [regexp -line {^cookies\(bar\) = $} $returned_data]
     } \
     -cleanup {
         if {[info exists page]} {
@@ -76,7 +79,7 @@ set testfilename1 cookies.rvt
         }
         unset -nocomplain page data matches
     } \
-    -result 6
+    -result {1 1 1 1 1 0 1}
 
 ::tcltest::test servercookies-1.1 {Cookies from Server} \
     -setup {
