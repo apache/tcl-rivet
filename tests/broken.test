@@ -16,7 +16,7 @@ set testfilename1 broken.rvt
     (in namespace eval "::request" script line 4)
     invoked from within
 "namespace eval ::request $script"
-    ("::try" body line 12)<hr/><p>OUTPUT BUFFER:</p>puts -nonewline ""
+    ("::try" body line 15)<hr/><p>OUTPUT BUFFER:</p>puts -nonewline ""
 
 # non-existent command
 broken

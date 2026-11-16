@@ -1,3 +1,11 @@
+2026-11-16 Massimo Manghi <mxmanghi@apache.org>
+	* tests/cookies.test: as per HTTP standards we are ignoring malformed
+	cookies entries that have no '=' separator.
+	* tests/headers.test: Relaxing the regexp in order not to assume an
+	order in which headers lines are collected in the array
+	* tests/broken.test: A change in the request script modified the
+	line number in the stack trace that is matched against the output
+
 2026-11-06 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/rivet-tcl/load_cookies.tcl: severe bug misidentified
 	cookies name,value separator

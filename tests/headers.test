@@ -18,10 +18,11 @@ set httpversion [package require http]
     set nmatches 0
     set page [::http::data $token]
 
+    set nmatches {}
     foreach {header_name header_value} [list Host $host Accept "\\*/\\*" User-Agent "Tcl http client package $httpversion"] {
-        set re_exp [subst {^hdrs\\($header_name\\)\\s+=\\s+$header_value\$}]
-        incr nmatches [regexp -all -lineanchor $re_exp $page]
+        set re_exp [subst {hdrs\\($header_name\\)\\s+=\\s+$header_value\$}]
+        lappend nmatches [regexp -all -lineanchor $re_exp $page]
     }
     ::http::cleanup $token
     set nmatches
-} 3
+} {1 1 1}
