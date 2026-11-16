@@ -1,4 +1,7 @@
 2026-11-16 Massimo Manghi <mxmanghi@apache.org>
+	* src/request/apache_request.c: renamed function utf8_convert as parse_hex4.
+	Reformatting code and improved readability. Preparing the code to correctly
+	propagate errors that must be advertised as HTTP errors
 	* tests/cookies.test: as per HTTP standards we are ignoring malformed
 	cookies entries that have no '=' separator.
 	* tests/headers.test: Relaxing the regexp in order not to assume an

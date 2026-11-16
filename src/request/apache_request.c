@@ -61,7 +61,7 @@ util_read(ApacheRequest *req, const char **rbuf, int *rlen)
         }
 
         *rbuf = apr_pcalloc(r->pool, length + 1);
-	*rlen = length;
+	    *rlen = length;
 
         while ((len_read =
                     ap_get_client_block(r, buff, sizeof(buff))) > 0) {
@@ -266,26 +266,30 @@ static char x2c(const char *what)
 }
 
 
-static unsigned int utf8_convert(char *str) {
+/* 
+ * utf8_convert
+ * 
+ * converting the argument to a form like \uxxx into its
+ * corresponding integer value
+ */
+
+static unsigned int parse_hex4 (char *str) {
     long x = 0;
-    int i = 0;
-    while (i < 4 ) {
-	if ( apr_isxdigit(str[i]) != 0 ) {
-	    if( apr_isdigit(str[i]) != 0 ) {
-		x = x * 16 + str[i] - '0';
-	    }
-	    else {
-		str[i] = tolower( str[i] );
-		x = x * 16 + str[i] - 'a' + 10;
-	    }
-	}
-	else {
-	    return 0;
-	}
-	i++;
+    int  i = 0;
+    while (i < 4) {
+        if (apr_isxdigit(str[i]) != 0) {
+            if (apr_isdigit(str[i]) != 0) {
+                x = x * 16 + str[i] - '0';
+            } else {
+                str[i] = tolower(str[i]);
+                x = x * 16 + str[i] - 'a' + 10;
+            }
+        } else {
+            return 0;
+        }
+        i++;
     }
-    if(i < 3)
-	return 0;
+    if (i < 3) return 0;
     return (x);
 }
 
@@ -293,71 +297,66 @@ static int ap_unescape_url_u(char *url)
 {
     register int x, y, badesc, badpath;
 
-    badesc = 0;
+    badesc  = 0;
     badpath = 0;
     for (x = 0, y = 0; url[y]; ++x, ++y) {
-	if (url[y] != '%'){
-	    url[x] = url[y];
-	}
-	else {
-	    if(url[y + 1] == 'u' || url[y + 1] == 'U'){
-		unsigned int c = utf8_convert(&url[y + 2]);
-		y += 5;
-		if(c < 0x80){
-		    url[x] = c;
-		}
-                else if(c < 0x800) {
-                    url[x] = 0xc0 | (c >> 6);
+        unsigned int c;
+
+        if (url[y] != '%'){
+            url[x] = url[y];
+        } else {
+            if (url[y + 1] == 'u' || url[y + 1] == 'U') {
+                c = parse_hex4 (&url[y + 2]);
+                y += 5;
+                if (c < 0x80){
+                    url[x] = c;
+                } else if (c < 0x800) {
+                    url[x]   = 0xc0 | (c >> 6);
+                    url[++x] = 0x80 | (c & 0x3f);
+                } else if (c < 0x10000) {
+                    url[x]   = (0xe0 | (c >> 12));
+                    url[++x] = (0x80 | ((c >> 6) & 0x3f));
+                    url[++x] = (0x80 | (c & 0x3f));
+                } else if (c < 0x200000) {
+                    url[x]   = 0xf0 | (c >> 18);
+                    url[++x] = 0x80 | ((c >> 12) & 0x3f);
+                    url[++x] = 0x80 | ((c >> 6) & 0x3f);
+                    url[++x] = 0x80 | (c & 0x3f);
+                } else if (c < 0x4000000) {
+                    url[x]   = 0xf8 | (c >> 24);
+                    url[++x] = 0x80 | ((c >> 18) & 0x3f);
+                    url[++x] = 0x80 | ((c >> 12) & 0x3f);
+                    url[++x] = 0x80 | ((c >> 6) & 0x3f);
+                    url[++x] = 0x80 | (c & 0x3f);
+                } else if (c < 0x8000000) {
+                    url[x]   = 0xfe | (c >> 30);
+                    url[++x] = 0x80 | ((c >> 24) & 0x3f);
+                    url[++x] = 0x80 | ((c >> 18) & 0x3f);
+                    url[++x] = 0x80 | ((c >> 12) & 0x3f);
+                    url[++x] = 0x80 | ((c >> 6) & 0x3f);
                     url[++x] = 0x80 | (c & 0x3f);
                 }
-		else if(c < 0x10000){
-		    url[x] = (0xe0 | (c >> 12));
-		    url[++x] = (0x80 | ((c >> 6) & 0x3f));
-		    url[++x] = (0x80 | (c & 0x3f));
-		}
-		else if(c < 0x200000){
-		    url[x] = 0xf0 | (c >> 18);
-		    url[++x] = 0x80 | ((c >> 12) & 0x3f);
-		    url[++x] = 0x80 | ((c >> 6) & 0x3f);
-		    url[++x] = 0x80 | (c & 0x3f);
-		}
-		else if(c < 0x4000000){
-		    url[x] = 0xf8 | (c >> 24);
-		    url[++x] = 0x80 | ((c >> 18) & 0x3f);
-		    url[++x] = 0x80 | ((c >> 12) & 0x3f);
-		    url[++x] = 0x80 | ((c >> 6) & 0x3f);
-		    url[++x] = 0x80 | (c & 0x3f);
-		}
-		else if(c < 0x8000000){
-		    url[x] = 0xfe | (c >> 30);
-		    url[++x] = 0x80 | ((c >> 24) & 0x3f);
-		    url[++x] = 0x80 | ((c >> 18) & 0x3f);
-		    url[++x] = 0x80 | ((c >> 12) & 0x3f);
-		    url[++x] = 0x80 | ((c >> 6) & 0x3f);
-		    url[++x] = 0x80 | (c & 0x3f);
-		}
-	    }
-	    else {
-		if (!apr_isxdigit(url[y + 1]) || !apr_isxdigit(url[y + 2])) {
-		    badesc = 1;
-		    url[x] = '%';
-		}
-		else {
-		    url[x] = x2c(&url[y + 1]);
-		    y += 2;
-		    if (url[x] == '/' || url[x] == '\0')
-			badpath = 1;
-		}
-	    }
-	}
+            } else {
+                if (!apr_isxdigit(url[y + 1]) || !apr_isxdigit(url[y + 2])) {
+                    badesc = 1;
+                    url[x] = '%';
+                } else {
+                    url[x] = x2c(&url[y + 1]);
+                    y += 2;
+                    if (url[x] == '/' || url[x] == '\0')
+                    badpath = 1;
+                }
+            }
+        }
     }
     url[x] = '\0';
-    if (badesc)
-	return HTTP_BAD_REQUEST;
-    else if (badpath)
-	return HTTP_NOT_FOUND;
-    else
-	return OK;
+    if (badesc) {
+        return HTTP_BAD_REQUEST;
+    } else if (badpath) {
+        return HTTP_NOT_FOUND;
+    } else {
+	    return OK;
+    }
 }
 
 //static int urlword_dlm[] = {'&', ';', 0};
@@ -566,8 +565,8 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
     while (!multipart_buffer_eof(mbuff)) {
         apr_table_t* 	header = (apr_table_t*) multipart_buffer_headers(mbuff);
         const char*		cd;
-		const char*  	param = NULL;
-		const char*		filename=NULL;
+		const char*  	pname    = NULL;
+		const char*		filename = NULL;
         char 			buff[FILLUNIT];
         size_t 			blen;
 
@@ -591,19 +590,21 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
                 if (ap_ind(pair, '=')) {
                     key = ap_getword(r->pool, &pair, '=');
                     if(strcaseEQ(key, "name")) {
-                        param = ap_getword_conf(r->pool, &pair);
+                        pname = ap_getword_conf(r->pool, &pair);
                     }
                     else if(strcaseEQ(key, "filename")) {
                         filename = ap_getword_conf(r->pool, &pair);
                     }
                 }
             }
+            if (!pname) { return HTTP_BAD_REQUEST; }
             if (!filename) {
                 char *value = multipart_buffer_read_body(mbuff);
-                apr_table_add(req->parms, param, value);
+                apr_table_add(req->parms, pname, value);
                 continue;
             }
-            if (!param) continue; /* shouldn't happen, but just in case. */
+
+            /* Handling the case of a file upload*/
 
             if (req->disable_uploads) {
 #if DEBUG
@@ -612,29 +613,27 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
                 return HTTP_FORBIDDEN;
             }
 
-            apr_table_add(req->parms, param, filename);
+            apr_table_add(req->parms, pname, filename);
 
             if (upload) {
                 upload->next = ApacheUpload_new(req);
                 upload = upload->next;
-            }
-            else {
+            } else {
                 upload = ApacheUpload_new(req);
                 req->upload = upload;
             }
 
-            if (! req->upload_hook && ! ApacheRequest_tmpfile(req, upload) ) {
+            if (!req->upload_hook && !ApacheRequest_tmpfile(req, upload)) {
                 return HTTP_INTERNAL_SERVER_ERROR;
             }
 
             upload->info = header;
             upload->filename = (char*)apr_pstrdup(req->r->pool, filename);
-            upload->name = (char*)apr_pstrdup(req->r->pool, param);
+            upload->name = (char*)apr_pstrdup(req->r->pool, pname);
 
             /* mozilla empty-file (missing CRLF) hack */
             fill_buffer(mbuff);
-            if( strEQN(mbuff->buf_begin, mbuff->boundary,
-                        strlen(mbuff->boundary)) ) {
+            if (strEQN(mbuff->buf_begin, mbuff->boundary,strlen(mbuff->boundary))) {
                 r->remaining -= 2;
                 continue;
             }
