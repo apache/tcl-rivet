@@ -36,7 +36,7 @@ project(Rivet VERSION ${RIVET_VERSION} LANGUAGES C)
 # ===========================================================================
 set(with-tclsh "" CACHE FILEPATH "location of a working tclsh executable")
 set(with-tcl   "" CACHE PATH "directory containing tcl configuration (tclConfig.sh)")
-set(with-post-max 0 CACHE STRING  "BYTES Maximum size of data to be sent with a POST")
+set(with-post-max 16777216 CACHE STRING  "BYTES Maximum size of data to be sent with a POST")
 set(with-rivet-core "mod_rivet_ng" CACHE STRING "mod_rivet core directory")
 set(with-upload-dir "/tmp"         CACHE STRING "Default directory for uploads")
 option(version-display            "Display Rivet version in Apache signature" OFF)

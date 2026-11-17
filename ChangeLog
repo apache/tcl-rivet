@@ -1,5 +1,5 @@
 2026-11-17 Massimo Manghi <mxmanghi@apache.org>
-	* configure.ac: Set MAX_POST default 16777216 (1 MiB)
+	* configure.ac,cmake/CMakeList.txt: Set MAX_POST default to 16777216 (16 MiB)
 	* src/request/apache_request.c: URL encoded forms values should not
 	discarded when they have '/' characters. Removing HTTP_NOT_FOUND
 	error that was returned in some cases where the valid character %2f ('/')
@@ -26,8 +26,7 @@
 	* src/mod_rivet_ng/TclWebapache.c: handling Tcl9 incompatile
 	-encoding binary option for upload channels. On error the channels
 	are now closed
-	* src/mod_rivet_ng/mod_rivet_common.c: defining CHDIR
-	based on build environment
+	* src/mod_rivet_ng/mod_rivet_common.c: defining CHDIR based on build environment
 	* test/uploadbinary.rvt: add test for binary uploads
 
 2026-08-26 Massimo Manghi <mxmanghi@apache.org>

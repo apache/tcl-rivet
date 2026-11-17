@@ -37,7 +37,7 @@ static void req_plustospace(char *str)
     for (x=0;str[x];x++) if (str[x] == '+') str[x] = ' ';
 }
 
-static int util_read(ApacheRequest *req, const char **rbuf, int *rlen)
+static int util_read (ApacheRequest *req, const char **rbuf, int *rlen)
 {
     request_rec *r = req->r;
     int rc = OK;
@@ -58,7 +58,7 @@ static int util_read(ApacheRequest *req, const char **rbuf, int *rlen)
             return HTTP_REQUEST_ENTITY_TOO_LARGE;
         }
 
-        *rbuf = apr_pcalloc(r->pool, length + 1);
+        *rbuf = apr_pcalloc(r->pool,length + 1);
 	    *rlen = length;
 
         while ((len_read = ap_get_client_block(r,buff,sizeof(buff))) > 0) {
@@ -85,8 +85,7 @@ char *ApacheRequest_script_name(ApacheRequest *req)
     if (r->path_info && *r->path_info) {
         int path_info_start = ap_find_path_info(r->uri, r->path_info);
         tmp = (char*) apr_pstrndup(r->pool, r->uri, path_info_start);
-    }
-    else {
+    } else {
         tmp = r->uri;
     }
 

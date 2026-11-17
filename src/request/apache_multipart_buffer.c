@@ -28,6 +28,7 @@
 #include <apr_lib.h>
 #include <apr_strings.h>
 
+#include "rivet_types.h"
 #include "apache_multipart_buffer.h"
 
 /*********************** internal functions *********************/
@@ -110,6 +111,7 @@ int fill_buffer(multipart_buffer *self)
   boundaries that are only LF terminated when you use an image submit
   button in a multipart/form-data form.
  */
+
 char* next_line(multipart_buffer *self)
 {
     /* look for LF in the data */
@@ -118,25 +120,23 @@ char* next_line(multipart_buffer *self)
 
     /* LF found */
     if(ptr) {
-	/* terminate the string, remove CRLF */
-	if((ptr - line) > 0 && *(ptr-1) == '\r') *(ptr-1) = 0;
-	else *ptr = 0;
+		/* terminate the string, remove CRLF */
+		if((ptr - line) > 0 && *(ptr-1) == '\r') *(ptr-1) = 0;
+		else *ptr = 0;
 
-	/* bump the pointer */
-	self->buf_begin = ptr + 1;
-	self->bytes_in_buffer -= (int)(self->buf_begin - line);
-    }
+		/* bump the pointer */
+		self->buf_begin = ptr + 1;
+		self->bytes_in_buffer -= (int)(self->buf_begin - line);
+    } else {
+		/* no LF found */
 
-    /* no LF found */
-    else {
-	/* buffer isn't completely full, fail */
-	if(self->bytes_in_buffer < self->bufsize)
-	  return NULL;
+		/* buffer isn't completely full, fail */
+		if(self->bytes_in_buffer < self->bufsize) return NULL;
 
-	/* return entire buffer as a partial line */
-	line[self->bufsize] = 0;
-	self->buf_begin = ptr;
-	self->bytes_in_buffer = 0;
+		/* return entire buffer as a partial line */
+		line[self->bufsize] = 0;
+		self->buf_begin = ptr;
+		self->bytes_in_buffer = 0;
     }
 
     return line;
@@ -148,8 +148,8 @@ char* get_line(multipart_buffer *self)
     char* ptr = next_line(self);
 
     if(!ptr) {
-	fill_buffer(self);
-	ptr = next_line(self);
+		fill_buffer(self);
+		ptr = next_line(self);
     }
 
 #ifdef DEBUG
@@ -206,14 +206,14 @@ multipart_buffer *multipart_buffer_new(char *boundary, apr_off_t length, request
 
 /* parse headers and return them in an apache table */
 //table *multipart_buffer_headers(multipart_buffer *self)
-apr_table_t *multipart_buffer_headers(multipart_buffer *self)
+apr_table_t *multipart_buffer_headers (multipart_buffer *self)
 {
     apr_table_t *tab;
     char *line;
 
     /* didn't find boundary, abort */
 
-    if(!find_boundary(self, self->boundary)) return NULL;
+    if (!find_boundary(self, self->boundary)) return NULL;
 
     /* get lines of text, or CRLF_CRLF */
 
@@ -264,10 +264,10 @@ size_t multipart_buffer_read(multipart_buffer *self, char *buf, size_t bytes)
 		max = bound - self->buf_begin;
     } else {
 		max = self->bytes_in_buffer;
-		}
+	}
+
     /* maximum number of bytes we are reading */
     len = max < bytes-1 ? max : bytes-1;
-
 
     /* if we read any data... */
     if (len > 0) {
@@ -296,8 +296,8 @@ char *multipart_buffer_read_body(multipart_buffer *self)
 {
     char buf[FILLUNIT], *out = "";
 
-    while(multipart_buffer_read(self, buf, sizeof(buf)))
-	out = (char*) apr_pstrcat(self->r->pool, out, buf, NULL);
+    while (multipart_buffer_read(self, buf, sizeof(buf)))
+		out = (char*) apr_pstrcat(self->r->pool, out, buf, NULL);
 
 #ifdef DEBUG
     ap_log_rerror(MPB_ERROR, "multipart_buffer_read_body: '%s'", out);
@@ -307,10 +307,10 @@ char *multipart_buffer_read_body(multipart_buffer *self)
 }
 
 /* eof if we are out of bytes, or if we hit the final boundary */
-int multipart_buffer_eof(multipart_buffer *self)
+bool multipart_buffer_eof (multipart_buffer *self)
 {
-    if( (self->bytes_in_buffer == 0 && fill_buffer(self) < 1) )
-	return 1;
+    if ((self->bytes_in_buffer == 0 && fill_buffer(self) < 1))
+		return true;
     else
-	return 0;
+		return false;
 }
