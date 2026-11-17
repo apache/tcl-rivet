@@ -1,0 +1,90 @@
+# Test the legacy %uXXXX form decoder and its UTF-8 output.
+
+set unicode_url "${urlbase}unicode.tcl"
+set unicode_key "%u0076%u0061%u006C%u0075%u0065"
+set unicode_value "%u0041%u007F%u0080%u07FF%u0800%u20AC"
+set unicode_utf8_hex 417fc280dfbfe0a080e282ac
+
+::tcltest::test unicode-urlencoding-1.1 \
+    {%uXXXX GET parameters generate UTF-8} \
+    -setup {
+        unset -nocomplain page
+    } \
+    -body {
+        set page [::http::geturl \
+            "${unicode_url}?${unicode_key}=${unicode_value}" -binary true]
+        list [::http::ncode $page] [binary encode hex [::http::data $page]]
+    } \
+    -cleanup {
+        if {[info exists page]} {
+            ::http::cleanup $page
+        }
+        unset -nocomplain page
+    } \
+    -result [list 200 $unicode_utf8_hex]
+
+::tcltest::test unicode-urlencoding-1.2 \
+    {%uXXXX POST parameters generate UTF-8} \
+    -setup {
+        unset -nocomplain page
+    } \
+    -body {
+        set page [::http::geturl $unicode_url \
+            -query "${unicode_key}=${unicode_value}" -binary true]
+        list [::http::ncode $page] [binary encode hex [::http::data $page]]
+    } \
+    -cleanup {
+        if {[info exists page]} {
+            ::http::cleanup $page
+        }
+        unset -nocomplain page
+    } \
+    -result [list 200 $unicode_utf8_hex]
+
+set malformed_unicode_escapes {
+    %u12G4
+    %u123
+    %u0000
+}
+
+set test_number 0
+foreach malformed_escape $malformed_unicode_escapes {
+    incr test_number
+    ::tcltest::test unicode-urlencoding-2.$test_number \
+        "GET rejects malformed Unicode escape $malformed_escape" \
+        -setup {
+            unset -nocomplain page
+        } \
+        -body {
+            set page [::http::geturl \
+                "${unicode_url}?value=${malformed_escape}"]
+            ::http::ncode $page
+        } \
+        -cleanup {
+            if {[info exists page]} {
+                ::http::cleanup $page
+            }
+            unset -nocomplain page
+        } \
+        -result 400
+}
+
+::tcltest::test unicode-urlencoding-3.1 \
+    {POST rejects malformed Unicode escapes} \
+    -setup {
+        unset -nocomplain page
+    } \
+    -body {
+        set page [::http::geturl $unicode_url -query {value=%u12G4}]
+        ::http::ncode $page
+    } \
+    -cleanup {
+        if {[info exists page]} {
+            ::http::cleanup $page
+        }
+        unset -nocomplain page
+    } \
+    -result 400
+
+unset unicode_url unicode_key unicode_value unicode_utf8_hex
+unset malformed_unicode_escapes malformed_escape test_number

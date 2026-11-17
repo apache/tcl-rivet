@@ -37,7 +37,7 @@ if {[info exists ::env(TestList)]} {
 } else {
     set TestList { rivetlib.test shorthand.test headers.test channelencoding.test \
                    cookies.test loadcookies.test \
-                   get.test post.test tclfile.test \
+                   get.test post.test unicode.test tclfile.test \
                    env.test hello.test include.test binary.test \
                    parse.test upload.test makeurl.test commands.test }
 }

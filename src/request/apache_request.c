@@ -26,6 +26,7 @@
 #include <apr_lib.h>
 #include <apr_strings.h>
 
+#include "rivet_types.h"
 #include "apache_request.h"
 #include "apache_multipart_buffer.h"
 int fill_buffer(multipart_buffer *self); /* needed for mozilla hack */
@@ -295,10 +296,10 @@ static unsigned int parse_hex4 (char *str) {
 
 static int ap_unescape_url_u(char *url)
 {
-    register int x, y, badesc, badpath;
+    register int x, y;
+    bool badesc;
 
-    badesc  = 0;
-    badpath = 0;
+    badesc  = false;
     for (x = 0, y = 0; url[y]; ++x, ++y) {
         unsigned int c;
 
@@ -307,6 +308,10 @@ static int ap_unescape_url_u(char *url)
         } else {
             if (url[y + 1] == 'u' || url[y + 1] == 'U') {
                 c = parse_hex4 (&url[y + 2]);
+                if (c == 0) {
+                    badesc = true;
+                    break;
+                }
                 y += 5;
                 if (c < 0x80){
                     url[x] = c;
@@ -338,13 +343,19 @@ static int ap_unescape_url_u(char *url)
                 }
             } else {
                 if (!apr_isxdigit(url[y + 1]) || !apr_isxdigit(url[y + 2])) {
-                    badesc = 1;
+                    badesc = true;
                     url[x] = '%';
                 } else {
                     url[x] = x2c(&url[y + 1]);
                     y += 2;
-                    if (url[x] == '/' || url[x] == '\0')
-                    badpath = 1;
+
+                    /* we are processing the urlencoded key,
+                       value set already isolated from the base URL path */
+
+                    if (url[x] == '\0') {
+                        badesc = true;
+                        break;
+                    }
                 }
             }
         }
@@ -352,8 +363,6 @@ static int ap_unescape_url_u(char *url)
     url[x] = '\0';
     if (badesc) {
         return HTTP_BAD_REQUEST;
-    } else if (badpath) {
-        return HTTP_NOT_FOUND;
     } else {
 	    return OK;
     }
@@ -361,14 +370,14 @@ static int ap_unescape_url_u(char *url)
 
 //static int urlword_dlm[] = {'&', ';', 0};
 
-static char *my_urlword(apr_pool_t *p, const char **line)
+static char* my_urlword(apr_pool_t *p, const char **line)
 {
     char *res = NULL;
     const char *pos = *line;
     char ch;
 
-    while ( (ch = *pos) != '\0' && ch != ';' && ch != '&') {
-	++pos;
+    while ((ch = *pos) != '\0' && ch != ';' && ch != '&') {
+	    ++pos;
     }
 
     res = (char*) apr_pstrndup(p, *line, pos - *line);
@@ -384,20 +393,29 @@ static char *my_urlword(apr_pool_t *p, const char **line)
 }
 
 
-static void split_to_parms(ApacheRequest *req, const char *data)
+static int split_to_parms (ApacheRequest *req, const char *data)
 {
     request_rec *r = req->r;
     const char *val;
 
     while (*data && (val = my_urlword(r->pool, &data))) {
+        int utf_conversion_result;
         const char *key = ap_getword(r->pool, &val, '=');
 
         req_plustospace((char*)key);
-        ap_unescape_url_u((char*)key);
+        utf_conversion_result = ap_unescape_url_u((char*)key);
+        if (utf_conversion_result != OK) {
+            return utf_conversion_result;
+        }
+
         req_plustospace((char*)val);
-        ap_unescape_url_u((char*)val);
+        utf_conversion_result = ap_unescape_url_u((char*)val);
+        if (utf_conversion_result != OK) {
+            return utf_conversion_result;
+        }
         apr_table_add(req->parms, key, val);
     }
+    return OK;
 }
 
 int ApacheRequest___parse(ApacheRequest *req)
@@ -407,11 +425,15 @@ int ApacheRequest___parse(ApacheRequest *req)
     int result;
 
     if (r->args) {
-        split_to_parms(req, r->args);
+        result = split_to_parms(req, r->args);
+        if (result != OK)
+        {
+            goto parsedone;
+        }
         req->nargs = ((apr_array_header_t *)req->parms)->nelts;
     }
 
-    if ((r->method_number == M_POST) && ct && strncaseEQ(ct, MULTIPART_ENCTYPE, MULTIPART_ENCTYPE_LENGTH))
+    if ((r->method_number == M_POST) && ct && strncaseEQ(ct,MULTIPART_ENCTYPE,MULTIPART_ENCTYPE_LENGTH))
     {
         //
         //ap_log_rerror(REQ_INFO, "content-type: `%s'", ct);
@@ -423,6 +445,7 @@ int ApacheRequest___parse(ApacheRequest *req)
         result = ApacheRequest_parse_urlencoded(req);
     }
 
+parsedone:
     req->parsed = 1;
     return result;
 }
@@ -434,7 +457,7 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
 
     if (r->method_number == M_POST || r->method_number == M_PUT || r->method_number == M_DELETE) {
     	const char *data = NULL;
-	int length = 0;
+	    int length = 0;
 
     /*
         const char *type;
@@ -451,13 +474,14 @@ int ApacheRequest_parse_urlencoded(ApacheRequest *req)
     	}
 
     	if (data) {
-    	    req->raw_post = (char*) data; /* Give people a way of getting at the raw data. */
-    	    req->raw_length = length;
-    	    split_to_parms(req, data);
+           /* Give people a way of getting at the raw data. */ 
+    	    req->raw_post = (char*) data; 
+            req->raw_length = length;
+            rc = split_to_parms(req, data);
     	}
     }
 
-    return OK;
+    return rc;
 }
 
 static apr_status_t remove_tmpfile(void *data)
@@ -467,17 +491,17 @@ static apr_status_t remove_tmpfile(void *data)
 
     //TODO: fix ap_pfclose
     //if( ap_pfclose(req->r->pool, upload->fp) )
-        //TODO: fix logging apr_log_rerror
-        //apr_log_rerror(REQ_ERROR,"[libapreq] close error on '%s'", upload->tempname);
+    //TODO: fix logging apr_log_rerror
+    //apr_log_rerror(REQ_ERROR,"[libapreq] close error on '%s'", upload->tempname);
 #ifndef DEBUG
-    if( remove(upload->tempname) )
+    if (remove(upload->tempname))
     {
         //TODO: fix logging apr_log_rerror
         //apr_log_rerror(REQ_ERROR,"[libapreq] remove error on '%s'", upload->tempname);
     }
 #endif
 
-//    free(upload->tempname);
+//  free(upload->tempname);
     return 0;
 }
 
@@ -495,21 +519,21 @@ apr_file_t *ApacheRequest_tmpfile(ApacheRequest *req, ApacheUpload *upload)
     file = apr_psprintf(r->pool,"%u.XXXXXX", (unsigned int)r->request_time);
     rv = apr_temp_dir_get(&tempdir,r->pool);
     if (rv != APR_SUCCESS)  {
-	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "No temp dir!");
-	return NULL;
+        ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "No temp dir!");
+        return NULL;
     }
 	
     rv = apr_filepath_merge(&name,tempdir,file,APR_FILEPATH_NATIVE,r->pool);
     if (rv != APR_SUCCESS) {
-	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "File path error!");
-	return NULL;
+        ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "File path error!");
+        return NULL;
     }
 
     rv = apr_file_mktemp(&fp,name,0,r->pool);
     if (rv != APR_SUCCESS) {
-	char* errorBuffer = (char*) apr_palloc(r->pool,256);
-	ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "Failed to open temp file: %s",apr_strerror(rv,errorBuffer,256));
-	return NULL;
+        char* errorBuffer = (char*) apr_palloc(r->pool,256);
+        ap_log_perror(APLOG_MARK, APLOG_ERR, rv, r->pool, "Failed to open temp file: %s",apr_strerror(rv,errorBuffer,256));
+        return NULL;
     }
 
     upload->fp = fp;
@@ -540,19 +564,20 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
     }
 
     if ((length = r->remaining) > req->post_max && req->post_max > 0) {
-        ap_log_rerror(REQ_ERROR,"entity too large (%d, max=%d)",
-				(int)length,req->post_max);
+        ap_log_rerror(REQ_ERROR,"entity too large (%d, max=%d)",(int)length,req->post_max);
         return HTTP_REQUEST_ENTITY_TOO_LARGE;
     }
 
     do {
         size_t blen;
         boundary = ap_getword(r->pool, &ct, '=');
-        if (boundary == NULL)
+        if (boundary == NULL) {
             return DECLINED;
+        }
         blen = strlen(boundary);
-        if (blen == 0 || blen < strlen("boundary"))
+        if (blen == 0 || blen < strlen("boundary")) {
             return DECLINED;
+        }
         boundary += blen - strlen("boundary");
     } while (strcasecmp(boundary,"boundary") != 0);
 
@@ -587,12 +612,12 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
                 while (apr_isspace(*cd)) {
                     ++cd;
                 }
-                if (ap_ind(pair, '=')) {
-                    key = ap_getword(r->pool, &pair, '=');
-                    if(strcaseEQ(key, "name")) {
+                if (ap_ind(pair,'=')) {
+                    key = ap_getword(r->pool, &pair,'=');
+                    if(strcaseEQ(key,"name")) {
                         pname = ap_getword_conf(r->pool, &pair);
                     }
-                    else if(strcaseEQ(key, "filename")) {
+                    else if(strcaseEQ(key,"filename")) {
                         filename = ap_getword_conf(r->pool, &pair);
                     }
                 }
@@ -600,7 +625,7 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
             if (!pname) { return HTTP_BAD_REQUEST; }
             if (!filename) {
                 char *value = multipart_buffer_read_body(mbuff);
-                apr_table_add(req->parms, pname, value);
+                apr_table_add(req->parms,pname,value);
                 continue;
             }
 
@@ -613,7 +638,7 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
                 return HTTP_FORBIDDEN;
             }
 
-            apr_table_add(req->parms, pname, filename);
+            apr_table_add(req->parms,pname,filename);
 
             if (upload) {
                 upload->next = ApacheUpload_new(req);
@@ -623,22 +648,22 @@ ApacheRequest_parse_multipart(ApacheRequest *req,const char* ct)
                 req->upload = upload;
             }
 
-            if (!req->upload_hook && !ApacheRequest_tmpfile(req, upload)) {
+            if (!req->upload_hook && !ApacheRequest_tmpfile(req,upload)) {
                 return HTTP_INTERNAL_SERVER_ERROR;
             }
 
             upload->info = header;
-            upload->filename = (char*)apr_pstrdup(req->r->pool, filename);
-            upload->name = (char*)apr_pstrdup(req->r->pool, pname);
+            upload->filename = (char*)apr_pstrdup(req->r->pool,filename);
+            upload->name = (char*)apr_pstrdup(req->r->pool,pname);
 
             /* mozilla empty-file (missing CRLF) hack */
             fill_buffer(mbuff);
-            if (strEQN(mbuff->buf_begin, mbuff->boundary,strlen(mbuff->boundary))) {
+            if (strEQN(mbuff->buf_begin,mbuff->boundary,strlen(mbuff->boundary))) {
                 r->remaining -= 2;
                 continue;
             }
 
-            while ((blen = multipart_buffer_read(mbuff, buff, sizeof(buff)))) {
+            while ((blen = multipart_buffer_read(mbuff,buff,sizeof(buff)))) {
 				apr_size_t bytes_to_write = (apr_size_t) blen;
 				status = apr_file_write(upload->fp,buff,&bytes_to_write);
 				
