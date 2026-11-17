@@ -803,13 +803,13 @@ AC_DEFUN([VIRTUAL_INTERPS_SEPARATION],[
 
 # POST_MAX_SIZE (--with-post-max)
 # Maximum size of data posted by a form
-# Default: 0=unlimited
+# Default: 16777216=1MiB 
 
 AC_DEFUN([POST_MAX_SIZE],[
     AC_ARG_WITH(
     post_max,
     [  --with-post-max=BYTES Maximum size of data to be sent with a POST],,
-        with_post_max=0
+        with_post_max=16777216
     )
     
     AC_MSG_CHECKING([maximum size of a POST])

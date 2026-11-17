@@ -34,46 +34,43 @@ int fill_buffer(multipart_buffer *self); /* needed for mozilla hack */
 static void req_plustospace(char *str)
 {
     register int x;
-    for(x=0;str[x];x++) if(str[x] == '+') str[x] = ' ';
+    for (x=0;str[x];x++) if (str[x] == '+') str[x] = ' ';
 }
 
-static int
-util_read(ApacheRequest *req, const char **rbuf, int *rlen)
+static int util_read(ApacheRequest *req, const char **rbuf, int *rlen)
 {
     request_rec *r = req->r;
     int rc = OK;
 
-    if ((rc = ap_setup_client_block(r, REQUEST_CHUNKED_ERROR))) {
-        return rc;
-    }
+    rc = ap_setup_client_block (r,REQUEST_CHUNKED_ERROR);
+    if (rc != OK) { return rc; }
 
     if (ap_should_client_block(r)) {
-        char buff[HUGE_STRING_LEN];
-        int  len_read;
-		apr_off_t rpos;
-		apr_off_t rsize;
-        apr_off_t length = r->remaining;
+        char        buff[HUGE_STRING_LEN];
+        int         len_read;
+		apr_off_t   rpos;
+		apr_off_t   rsize;
+        apr_off_t   length = r->remaining;
 
 		rpos = 0;
         if (length > req->post_max && req->post_max > 0) {
-            ap_log_rerror(REQ_ERROR,"entity too large (%d, max=%d)",
-					(int)length, req->post_max);
+            ap_log_rerror (REQ_ERROR,"entity too large (%d, max=%d)",(int)length,req->post_max);
             return HTTP_REQUEST_ENTITY_TOO_LARGE;
         }
 
         *rbuf = apr_pcalloc(r->pool, length + 1);
 	    *rlen = length;
 
-        while ((len_read =
-                    ap_get_client_block(r, buff, sizeof(buff))) > 0) {
+        while ((len_read = ap_get_client_block(r,buff,sizeof(buff))) > 0) {
+
             if ((rpos + len_read) > length) {
                 rsize = length - rpos;
-            }
-            else {
+            } else {
                 rsize = len_read;
             }
             memcpy((char*)*rbuf + rpos, buff, rsize);
             rpos += rsize;
+
         }
     }
 

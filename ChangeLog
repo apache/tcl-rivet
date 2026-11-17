@@ -1,8 +1,9 @@
 2026-11-17 Massimo Manghi <mxmanghi@apache.org>
+	* configure.ac: Set MAX_POST default 16777216 (1 MiB)
 	* src/request/apache_request.c: URL encoded forms values should not
-    discarded when they have '/' characters. Removing HTTP_NOT_FOUND
-    error that was returned in some cases where the valid character %2f ('/')
-    was in either the key or value of the urlencoded form data
+	discarded when they have '/' characters. Removing HTTP_NOT_FOUND
+	error that was returned in some cases where the valid character %2f ('/')
+	was in either the key or value of the urlencoded form data
 
 2026-11-16 Massimo Manghi <mxmanghi@apache.org>
 	* src/request/apache_request.c: renamed function utf8_convert as parse_hex4.
