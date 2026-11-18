@@ -197,7 +197,7 @@ tar -xvf rivet-&fullversion;.tar.gz</programlisting>
 					<listitem>
 						<para>
 							The value to this option establishes a default for the maximum size of POST data.
-							Default: 0 (unlimited size)
+							Default: 16777216 (16 MiB)
 						</para>
 					</listitem>
 				</varlistentry>				
