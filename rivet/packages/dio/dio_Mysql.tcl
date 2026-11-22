@@ -17,8 +17,8 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-package require DIO       1.2
-package provide dio_Mysql 1.2
+package require DIO       1.2.5
+package provide dio_Mysql 1.2.5
 
 namespace eval DIO {
     ::itcl::class Mysql {
@@ -46,7 +46,7 @@ namespace eval DIO {
             close
         }
 
-        method open {} {
+        protected method open_dbms_connection {args}  {
             set command "mysqlconnect"
 
             if {![::rivet::lempty $user]} { lappend command -user $user }

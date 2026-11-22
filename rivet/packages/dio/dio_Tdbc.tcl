@@ -83,7 +83,13 @@ namespace eval DIO {
 
         public method tdbc_connector {} { return $connector }
 
-        public method open {}  {
+        # -- read_dbms_configuration
+
+        protected method read_dbms_configuration {args} {
+            
+        }
+
+        protected method open_dbms_connection {args}  {
             set connector_cmd "${tdbc_connector}::connection create ${tdbc_connector}#[incr connector_n]"
             if {$user != ""} { lappend connector_cmd -user      $user }
             if {$db   != ""} {

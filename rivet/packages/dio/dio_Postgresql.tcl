@@ -19,8 +19,8 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-package require DIO            1.2
-package provide dio_Postgresql 1.2
+package require DIO            1.2.5
+package provide dio_Postgresql 1.2.5
 
 namespace eval DIO {
     ::itcl::class Postgresql {
@@ -48,7 +48,7 @@ namespace eval DIO {
         }
     }
 
-    method open {} {
+    protected method open_dbms_connection {args}  {
         set command "pg_connect"
 
         set info ""

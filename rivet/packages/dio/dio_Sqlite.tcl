@@ -19,8 +19,8 @@
 #    specific language governing permissions and limitations
 #    under the License.
 
-package require DIO         1.2
-package provide dio_Sqlite  1.2
+package require DIO         1.2.5
+package provide dio_Sqlite  1.2.5
 
 namespace eval DIO {
     variable sqlite_seq -1
@@ -46,7 +46,7 @@ namespace eval DIO {
             close
         }
 
-        public method create_field_formatter {} {
+        protected method open_dbms_connection {args} {
             set special_fields_formatter [::DIO::formatters::Sqlite3 ::DIO::formatters::#auto]
         }
 

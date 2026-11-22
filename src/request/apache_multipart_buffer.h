@@ -22,6 +22,7 @@
 #ifndef __apache_multipart_buffer_h__
 #define __apache_multipart_buffer_h__
 
+#include "rivet_types.h"
 #include "apache_request.h"
 
 /* #define DEBUG 1 */
@@ -54,7 +55,7 @@ multipart_buffer*	multipart_buffer_new(char* boundary,apr_off_t length,request_r
 size_t				multipart_buffer_read(multipart_buffer* self,char* buf,size_t bytes);
 char*				multipart_buffer_read_body(multipart_buffer *self);
 apr_table_t*		multipart_buffer_headers(multipart_buffer *self);
-int					multipart_buffer_eof(multipart_buffer *self);
+bool				multipart_buffer_eof(multipart_buffer *self);
 
 #ifdef __cplusplus
  }

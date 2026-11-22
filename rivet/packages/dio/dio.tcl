@@ -86,6 +86,25 @@ proc handle {interface args} {
         close
     }
 
+    protected method open_dbms_connection {args} {}
+
+    # -- read_dbms_configuration
+
+    protected method read_dbms_configuration {args} {}
+
+    # -- open
+    #
+    # Open not only create a database connection but it also
+    # must inspect DBMS configuration in order to drive the
+    # behavior of methods such as 'quote' that not only depend
+    # on the DBMS but also on its configuration regarding
+    # character escaping 
+
+    public method open {args} {
+        $this open_dbms_connection {*}$args
+        $this read_dbms_configuration {*}$args
+    }
+
     #
     # result - generate a new DIO result object for the specified database
     # interface, with key-value pairs that get configured into the new
@@ -671,7 +690,6 @@ proc handle {interface args} {
     ## These are methods which should be defined by each individual database
     ## interface class.
     ##
-    method open    {args} {}
     method close   {args} {}
     method exec    {args} {}
     method nextkey {args} {}
@@ -933,4 +951,4 @@ proc handle {interface args} {
 
 } ; ## namespace eval DIO
 
-package provide DIO 1.2.3
+package provide DIO 1.2.5
