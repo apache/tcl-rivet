@@ -73,7 +73,23 @@ namespace eval DIO {
         destructor { }
 
         private method check_connector {} {
-            if {$connector == ""} { open }
+            if {$connector eq ""} { $this open }
+        }
+
+        public method open {args} {
+            if {$connector ne ""} { return }
+            return [chain {*}$args]
+        }
+
+        # Establish the connection configuration before formatting SQL values.
+        public method quote {a_string} {
+            $this check_connector
+            return [chain $a_string]
+        }
+
+        public method build_special_field {table_name field_name val {convert_to {}}} {
+            $this check_connector
+            return [chain $table_name $field_name $val $convert_to]
         }
 
         # -- add accessor methods to enhance both encapsulation and semantics
@@ -139,7 +155,7 @@ namespace eval DIO {
 
         public method close {} {
             if {$connector == ""} { return }
-            $connector close
+            catch {$connector close}
             set connector ""
         }
 

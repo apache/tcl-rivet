@@ -1,6 +1,7 @@
 2026-11-23 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl,dio.tcl.formatters.tcl: implementing for the
-	Mysql case a configuration dependent argument quoting and escaping
+	Mysql case a configuration dependent argument quoting and escaping. Base
+	such classes behavior on state awareness
 
 2026-11-17 Massimo Manghi <mxmanghi@apache.org>
 	* configure.ac,cmake/CMakeList.txt: Set MAX_POST default to 16777216 (16 MiB)

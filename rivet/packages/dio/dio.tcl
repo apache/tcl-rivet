@@ -641,6 +641,8 @@ proc handle {interface args} {
     # build_select_query style and return the result handle.
     #
     method search {args} {
+        $this open
+
         set req [eval build_select_query $args]
         return [exec $req]
     }
