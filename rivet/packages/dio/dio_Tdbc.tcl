@@ -1,23 +1,18 @@
 # tdbc.tcl -- connector for tdbc, the Tcl database abstraction layer
 #
-# Copyright 2024 The Apache Software Foundation
+# Copyright 2023-2026 The Apache Tcl Team
 #
-#    Licensed to the Apache Software Foundation (ASF) under one
-#    or more contributor license agreements.  See the NOTICE file
-#    distributed with this work for additional information
-#    regarding copyright ownership.  The ASF licenses this file
-#    to you under the Apache License, Version 2.0 (the
-#    "License"); you may not use this file except in compliance
-#    with the License.  You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#    Unless required by applicable law or agreed to in writing,
-#    software distributed under the License is distributed on an
-#    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-#    KIND, either express or implied. See the License for the
-#    specific language governing permissions and limitations
-#    under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 package require tdbc
 package require DIO      1.2.3
@@ -81,12 +76,45 @@ namespace eval DIO {
             if {$connector == ""} { open }
         }
 
+        # -- add accessor methods to enhance both encapsulation and semantics
+
         public method tdbc_connector {} { return $connector }
+        public method tdbc_connector_name {} { return $connector_name }
 
         # -- read_dbms_configuration
 
-        protected method read_dbms_configuration {args} {
-            
+        public method read_dbms_configuration {args} {
+
+            # lets collect session variables that drive the strings
+            # escaping rules
+            switch [$this tdbc_connector_name] {
+                "mysql" {
+                    set conf_stm [[$this tdbc_connector] prepare {
+                        SHOW SESSION VARIABLES WHERE Variable_name IN (
+                            'sql_mode',
+                            'character_set_client',
+                            'character_set_connection'
+                        )
+                    }]
+
+                    try {
+                        set settings [$conf_stm allrows -as lists]
+                        foreach ce $settings {
+                            lassign $ce dbpar dbval
+                            set dbms_conf($dbpar) $dbval
+                        }
+                        
+                        # dbms_conf(sql_mode) must be existing by contract
+
+                        $special_fields_formatter configure -no_backslash_escape \
+                                                [expr {"NO_BACKSLASH_ESCAPES" in [split $dbms_conf(sql_mode) ","]}]
+
+                    } finally {
+                        $conf_stm close
+                    }
+                }
+            }
+
         }
 
         protected method open_dbms_connection {args}  {

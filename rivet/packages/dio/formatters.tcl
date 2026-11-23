@@ -37,7 +37,7 @@ namespace eval ::DIO::formatters {
 
         private variable special_fields [dict create]
 
-        public proc quote {a_string} {
+        public method quote {a_string} {
             regsub -all {'} $a_string {\'} a_string
             return $a_string
         }
@@ -78,6 +78,19 @@ namespace eval ::DIO::formatters {
 
     ::itcl::class Mysql {
         inherit RootFormatter
+        private variable quote_escape_map
+
+        public variable no_backslash_escape false {
+            if {$no_backslash_escape} {
+                set quote_escape_map [list ' '']
+            } else {
+                set quote_escape_map [list \\ \\\\ ' \\']
+            }
+        }            
+
+        public method quote {a_string} {
+            return [string map $quote_escape_map $a_string]
+        }
 
         public method DATE {field_name val convert_to} {
             set secs [clock scan $val]
@@ -138,7 +151,6 @@ namespace eval ::DIO::formatters {
                 return "'[quote $val]'"
             }
         }
-
     }
 
     ::itcl::class Sqlite3 {

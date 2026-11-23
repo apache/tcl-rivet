@@ -1,12 +1,12 @@
 # dio.tcl -- implements a database abstraction layer.
 
-# Copyright 2002-2004 The Apache Software Foundation
+# Copyright 2002-2026 The Apache Tcl Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -102,13 +102,18 @@ proc handle {interface args} {
 
     public method open {args} {
         $this open_dbms_connection {*}$args
-        $this read_dbms_configuration {*}$args
+        try {
+            $this read_dbms_configuration {*}$args
+        } on error {message options} {
+            catch {$this close}
+            return -options $options $message
+        }
     }
 
     #
     # result - generate a new DIO result object for the specified database
-    # interface, with key-value pairs that get configured into the new
-    # result object.
+    #  interface, with key-value pairs that get configured into the new
+    #  result object.
     #
     protected method result {interface args} {
         return [eval uplevel \#0 ::DIO::${interface}Result \#auto $args]
@@ -118,8 +123,8 @@ proc handle {interface args} {
     # quote - given a string, return the same string with any single
     #  quote characters preceded by a backslash
     #
-    method quote {a_string} {
-        return [DIO::formatters::quote $a_string]
+    public method quote {a_string} {
+        return [$special_fields_formatter quote $a_string]
     }
 
     #
