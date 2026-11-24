@@ -1,3 +1,7 @@
+2026-11-24 Massimo Manghi <mxmanghi@apache.org>
+	* rivet/packages/session/session-class.tcl: retab to spaces and introduce 
+	'debugSink' to control output channel of debug method
+
 2026-11-23 Massimo Manghi <mxmanghi@apache.org>
 	* rivet/packages/dio/dio_Tdbc.tcl,dio.tcl.formatters.tcl: implementing for the
 	Mysql case a configuration dependent argument quoting and escaping. Base
@@ -29,8 +33,7 @@
 
 2026-08-27 Massimo Manghi <mxmanghi@apache.org>
 	* src/mod_rivet_ng/TclWebapache.c: handling Tcl9 incompatile
-	-encoding binary option for upload channels. On error the channels
-	are now closed
+	-encoding binary option for upload channels. On error the channels are now closed
 	* src/mod_rivet_ng/mod_rivet_common.c: defining CHDIR based on build environment
 	* test/uploadbinary.rvt: add test for binary uploads
 

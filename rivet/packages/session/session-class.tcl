@@ -1,13 +1,15 @@
 #
 # Session - Itcl object for web session management for Rivet
 #
+#
+
 # Copyright 2004 The Apache Software Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#	http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package provide Session 1.1
+package provide Session 1.1.1
 package require Itcl
 
 ::itcl::class Session {
@@ -100,10 +102,12 @@ package require Itcl
     # do its thing
     public variable debugMode 1
 
+    public variable debugSink debug_output
+
     constructor {args} {
-	eval configure $args
+        eval configure $args
         $dioObject registerSpecialField $sessionTable session_update_time NOW
-	$dioObject registerSpecialField $sessionTable session_start_time NOW
+        $dioObject registerSpecialField $sessionTable session_start_time NOW
     }
 
     method status {args} {
@@ -121,20 +125,20 @@ package require Itcl
     # or doesn't open successfully, returns an empty string
     #
     method get_entropy_bytes {} {
-	if {$entropyLength == 0 || $entropyFile == ""} {
-	    return ""
-	}
-	if {[catch {open $entropyFile} fp] == 1} {
-	    return ""
-	}
+        if {$entropyLength == 0 || $entropyFile == ""} {
+            return ""
+        }
+        if {[catch {open $entropyFile} fp] == 1} {
+            return ""
+        }
 
-	set entropyBytes [read $fp $entropyLength]
-	close $fp
-	if {[binary scan $entropyBytes h* data]} {
-	    debug "get_entropy_bytes: returning '$data'"
-	    return $data
-	}
-	error "software bug - binary scan behaved unexpectedly"
+        set entropyBytes [read $fp $entropyLength]
+        close $fp
+        if {[binary scan $entropyBytes h* data]} {
+            debug "get_entropy_bytes: returning '$data'"
+            return $data
+        }
+        error "software bug - binary scan behaved unexpectedly"
     }
 
     #
@@ -142,16 +146,16 @@ package require Itcl
     # as we can get our hands on.
     #
     method gen_session_id {args} {
-	package require md5
+        package require md5
 
-	# if the Apache unique ID module is installed, the environment
-	# variable UNIQUE_ID will have been set.  If not, we'll get an
-	# empty string, which won't hurt anything.
-	set uniqueID [::rivet::env UNIQUE_ID]
+        # if the Apache unique ID module is installed, the environment
+        # variable UNIQUE_ID will have been set.  If not, we'll get an
+        # empty string, which won't hurt anything.
+        set uniqueID [::rivet::env UNIQUE_ID]
 
-	set sessionIdKey "$uniqueID[clock clicks][pid]$args[clock seconds]$scrambleCode[get_entropy_bytes]"
-	debug "gen_session_id - feeding this to md5: '$sessionIdKey'"
-	return [::md5::md5 -hex -- $sessionIdKey]
+        set sessionIdKey "$uniqueID[clock clicks][pid]$args[clock seconds]$scrambleCode[get_entropy_bytes]"
+        debug "gen_session_id - feeding this to md5: '$sessionIdKey'"
+        return [::md5::md5 -hex -- $sessionIdKey]
     }
 
     #
@@ -160,17 +164,16 @@ package require Itcl
     #    deleted as well (assuming they've been defined with ON DELETE CASCADE)
     #
     method do_garbage_collection {} {
-	debug "do_garbage_collection: performing garbage collection"
-#	set result [$dioObject exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
-        #
-        debug "do_garbage_collection: t1: [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS] t2: [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
-	set del_cmd "delete from $sessionTable where "
-	append del_cmd [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS]
-	append del_cmd " - [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
-	append del_cmd " > $gcMaxLifetime"
-	debug "do_garbage_collection: > $del_cmd <"
-	set result [$dioObject exec $del_cmd]
-	$result destroy
+        debug "do_garbage_collection: performing garbage collection"
+    #   set result [$dioObject exec "delete from $sessionTable where timestamp 'now' - session_update_time > interval '$gcMaxLifetime seconds';"]
+    #   debug "do_garbage_collection: t1: [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS] t2: [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
+        set del_cmd "delete from $sessionTable where "
+        append del_cmd [$dioObject makeDBFieldValue $sessionTable session_update_time now SECS]
+        append del_cmd " - [$dioObject makeDBFieldValue $sessionTable session_update_time {} SECS]"
+        append del_cmd " > $gcMaxLifetime"
+        debug "do_garbage_collection: > $del_cmd <"
+        set result [$dioObject exec $del_cmd]
+        $result destroy
     }
 
     #
@@ -180,11 +183,11 @@ package require Itcl
     #   performed.
     #
     method consider_garbage_collection {} {
-	debug "consider_garbage_collection: probability: $gcProbability"
+        debug "consider_garbage_collection: probability: $gcProbability"
 
-	if {rand() <= $gcProbability / 100.0} {
-	    do_garbage_collection
-	}
+        if {rand() <= $gcProbability / 100.0} {
+            do_garbage_collection
+        }
     }
 
     #
@@ -193,7 +196,7 @@ package require Itcl
     #  object
     #
     method set_session_cookie {value} {
-	::rivet::cookie set $cookieName $value \
+        ::rivet::cookie set $cookieName $value \
                             -path       $cookiePath \
                             -minutes    $cookieLifetime \
                             -secure     $cookieSecure \
@@ -215,90 +218,90 @@ package require Itcl
     # occurrence.
     #
     method id {} {
-	::request::global sessionInfo
+        ::request::global sessionInfo
 
-	status ""
+        status ""
 
-	# if we already know the session ID, we're done.
-	# (i.e. we've already validated them earlier in the 
-	# handling of the current page.)
+        # if we already know the session ID, we're done.
+        # (i.e. we've already validated them earlier in the 
+        # handling of the current page.)
 
-	if {[info exists sessionInfo(sessionID)]} { 
-	    debug "id called, returning cached ID '$sessionInfo(sessionID)'"
-	    return $sessionInfo(sessionID) 
-	}
+        if {[info exists sessionInfo(sessionID)]} { 
+            debug "id called, returning cached ID '$sessionInfo(sessionID)'"
+            return $sessionInfo(sessionID) 
+        }
 
-	#
-	# see if they have a session cookie.  if they don't,
-	# set status and return.
-	#
-	set sessionCookie [::rivet::cookie get $cookieName]
-	if {$sessionCookie == ""} {
-	    # they did not have a cookie set, they are not logged in
-	    status "no_cookie"
-	    debug "id: no session cookie '$cookieName'"
-	    return ""
-	}
+        #
+        # see if they have a session cookie.  if they don't,
+        # set status and return.
+        #
+        set sessionCookie [::rivet::cookie get $cookieName]
+        if {$sessionCookie == ""} {
+            # they did not have a cookie set, they are not logged in
+            status "no_cookie"
+            debug "id: no session cookie '$cookieName'"
+            return ""
+        }
 
-	# there is a session Cookie, grab the remote address of the connection,
-	# see if our state table says he has logged into us from this
-	# address within our login timeout window and we've given him
-	# this session
+        # there is a session Cookie, grab the remote address of the connection,
+        # see if our state table says he has logged into us from this
+        # address within our login timeout window and we've given him
+        # this session
 
-	debug "id: found session cookie '$cookieName' value '$sessionCookie'"
+        debug "id: found session cookie '$cookieName' value '$sessionCookie'"
 
-	set a(session_id) $sessionCookie
-	set a(ip_address) [::rivet::env REMOTE_ADDR]
+        set a(session_id) $sessionCookie
+        set a(ip_address) [::rivet::env REMOTE_ADDR]
 
-	# see if there's a record matching the session ID cookie and
-	# IP address
-	set kf [list session_id ip_address]
-	set key [$dioObject makekey a $kf]
-	if {![$dioObject fetch $key a -table $sessionTable -keyfield $kf]} {
-	    debug "id: no entry in the session table for session '$sessionCookie' and address [::rivet::env REMOTE_ADDR]: [$dioObject errorinfo]"
-	    status "no_session"
-	    return ""
-	}
+        # see if there's a record matching the session ID cookie and
+        # IP address
+        set kf [list session_id ip_address]
+        set key [$dioObject makekey a $kf]
+        if {![$dioObject fetch $key a -table $sessionTable -keyfield $kf]} {
+            debug "id: no entry in the session table for session '$sessionCookie' and address [::rivet::env REMOTE_ADDR]: [$dioObject errorinfo]"
+            status "no_session"
+            return ""
+        }
 
-	## Carve the seconds out of the session_update_time field in the
-	# $sessionTable table.  Trim off the timezone at the end.
-	set secs [clock scan [string range $a(session_update_time) 0 18]]
+        ## Carve the seconds out of the session_update_time field in the
+        # $sessionTable table.  Trim off the timezone at the end.
+        set secs [clock scan [string range $a(session_update_time) 0 18]]
 
-	# if the session has timed out, delete the session and return -1
+        # if the session has timed out, delete the session and return -1
 
-	if {[expr $secs + $sessionLifetime] < [clock seconds]} {
-	    $dioObject delete $key -table $sessionTable -keyfield $kf
-	    debug "id: session '$sessionCookie' timed out"
-	    status "timeout"
-	    return ""
-	}
+        if {[expr $secs + $sessionLifetime] < [clock seconds]} {
+            $dioObject delete $key -table $sessionTable -keyfield $kf
+            debug "id: session '$sessionCookie' timed out"
+            status "timeout"
+            return ""
+        }
 
-	# Their session is still alive.  If the session refresh 
-	# interval time has expired, update the session update time in the 
-	# database (we don't update every time they request a page for 
-	# performance reasons)  The idea is it's been at least 15 minutes or 
-	# something like that since they've logged in, and they're still 
-	# doing stuff, so reset their session update time to now
+        # Their session is still alive.  If the session refresh 
+        # interval time has expired, update the session update time in the 
+        # database (we don't update every time they request a page for 
+        # performance reasons)  The idea is it's been at least 15 minutes or 
+        # something like that since they've logged in, and they're still 
+        # doing stuff, so reset their session update time to now
 
-	if {[expr $secs + $sessionRefreshInterval] < [clock seconds]} {
-	    debug "session '$sessionCookie' alive, refreshing session update time"
-	    set a(session_update_time) now
-	    if {![$dioObject store a -table $sessionTable -keyfield $kf]} {
-		debug "id: Failed to store $sessionTable: [$dioObject errorinfo]"
-		puts "Failed to store $sessionTable: [$dioObject errorinfo]"
-	    }
-	}
+        if {[expr $secs + $sessionRefreshInterval] < [clock seconds]} {
+            debug "session '$sessionCookie' alive, refreshing session update time"
+            set a(session_update_time) now
+            if {![$dioObject store a -table $sessionTable -keyfield $kf]} {
+            debug "id: Failed to store $sessionTable: [$dioObject errorinfo]"
+            puts "Failed to store $sessionTable: [$dioObject errorinfo]"
+            }
+        }
 
-	#
-	# THEY VALIDATED.  Cache the session ID in the sessionInfo array
-	# that will only exist for the handling of this request, set that
-	# this is not a new session (at least one previous request has been
-	# handled with this session ID) and return the session ID
-	#
-	debug "id: active session, '$a(session_id)'"
-	set sessionInfo(sessionID) $a(session_id)
-	set isNewSession 0
-	return $a(session_id)
+        #
+        # THEY VALIDATED.  Cache the session ID in the sessionInfo array
+        # that will only exist for the handling of this request, set that
+        # this is not a new session (at least one previous request has been
+        # handled with this session ID) and return the session ID
+        #
+        debug "id: active session, '$a(session_id)'"
+        set sessionInfo(sessionID) $a(session_id)
+        set isNewSession 0
+        return $a(session_id)
     }
 
     #
@@ -306,21 +309,21 @@ package require Itcl
     #  store the data in the rivet session cache
     #
     method store {packageName key data} {
-	set a(session_id) [id]
-	set a(package_) $packageName
-	set a(key_) $key
+        set a(session_id) [id]
+        set a(package_) $packageName
+        set a(key_) $key
 
-	regsub -all {\\} $data {\\\\} data
-	set a(data) $data
+        regsub -all {\\} $data {\\\\} data
+        set a(data) $data
 
-	debug "store session data, package_ '$packageName', key_ '$key', data '$data'"
-	set kf [list session_id package_ key_]
+        debug "store session data, package_ '$packageName', key_ '$key', data '$data'"
+        set kf [list session_id package_ key_]
 
-	if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
-	    debug "Failed to store $sessionCacheTable '$kf'"
-	    #parray a
-	    error [$dioObject errorinfo]
-	}
+        if {![$dioObject store a -table $sessionCacheTable -keyfield $kf]} {
+            debug "Failed to store $sessionCacheTable '$kf'"
+            #parray a
+            error [$dioObject errorinfo]
+        }
     }
 
     #
@@ -328,23 +331,23 @@ package require Itcl
     #   for this session
     #
     method fetch {packageName key} {
-	set kf [list session_id package_ key_]
+        set kf [list session_id package_ key_]
 
-	set a(session_id) [id]
-	set a(package_) $packageName
-	set a(key_) $key
+        set a(session_id) [id]
+        set a(package_) $packageName
+        set a(key_) $key
 
-	set key [$dioObject makekey a $kf]
-	if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
-	    status [$dioObject errorinfo]
-	    debug "error: [$dioObject errorinfo]"
-	    debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
-	    return ""
-	}
+        set key [$dioObject makekey a $kf]
+        if {![$dioObject fetch $key a -table $sessionCacheTable -keyfield $kf]} {
+            status [$dioObject errorinfo]
+            debug "error: [$dioObject errorinfo]"
+            debug "fetch session data failed, package_ '$packageName', key_ '$key', error '[$dioObject errorinfo]'"
+            return ""
+        }
 
-	debug "fetch session data succeeded, package_ '$packageName', key_ '$key', result '$a(data)'"
+        debug "fetch session data succeeded, package_ '$packageName', key_ '$key', result '$a(data)'"
 
-	return $a(data)
+        return $a(data)
     }
 
     #
@@ -379,7 +382,6 @@ package require Itcl
     #         when also the key value is specified only the row for that package-key pair is deleted
     #
     method clear {packageName {key ""}} {
-
         if {$key == ""} {
             set keyval      [list [$this id] $packageName]
             set keyfield    {session_id package_}
@@ -398,20 +400,19 @@ package require Itcl
     # sessions)
     #
     method delete_session {{session_id ""}} {
+        set ip_address [::rivet::env REMOTE_ADDR]
 
-	set ip_address [::rivet::env REMOTE_ADDR]
+        if {$session_id == ""} {
+            set session_id [id]
+        }
 
-	if {$session_id == ""} {
-	    set session_id [id]
-	}
+        debug "delete session $session_id"
 
-	debug "delete session $session_id"
+        set kf [list session_id ip_address]
+        $dioObject delete [list $session_id $ip_address] -table $sessionTable -keyfield $kf
 
-	set kf [list session_id ip_address]
-	$dioObject delete [list $session_id $ip_address] -table $sessionTable -keyfield $kf
-
-	## NEED TO delete saved session data here too, from the
-	# $sessionCacheTable structure.
+        ## NEED TO delete saved session data here too, from the
+        # $sessionCacheTable structure.
     }
 
     #
@@ -421,24 +422,24 @@ package require Itcl
     # returns the session_id
     #
     method create_session {} {
+        # Create their session by storing their session information in 
+        # the session table.
 
-	## Create their session by storing their session information in 
-	# the session table.
-	set a(ip_address) [::rivet::env REMOTE_ADDR]
-	set a(session_start_time) now
-	set a(session_update_time) now
+        set a(ip_address) [::rivet::env REMOTE_ADDR]
+        set a(session_start_time) now
+        set a(session_update_time) now
 
-	set a(session_id) [gen_session_id $a(ip_address)]
+        set a(session_id) [gen_session_id $a(ip_address)]
 
-	set kf [list ip_address session_id]
-	if {![$dioObject store a -table $sessionTable -keyfield $kf]} {
-	    debug "Failed to store $sessionTable: [$dioObject errorinfo]"
-	    puts "Failed to store $sessionTable: [$dioObject errorinfo]"
-	}
+        set kf [list ip_address session_id]
+        if {![$dioObject store a -table $sessionTable -keyfield $kf]} {
+            debug "Failed to store $sessionTable: [$dioObject errorinfo]"
+            puts "Failed to store $sessionTable: [$dioObject errorinfo]"
+        }
 
-	debug "create_session: ip $a(ip_address), id '$a(session_id)'"
+        debug "create_session: ip $a(ip_address), id '$a(session_id)'"
 
-	return $a(session_id)
+        return $a(session_id)
     }
 
     #
@@ -446,31 +447,31 @@ package require Itcl
     # one and drop a cookie on them.
     #
     method activate {} {
-	::request::global sessionInfo
+        ::request::global sessionInfo
 
-	debug "activate: checking out the situation"
+        debug "activate: checking out the situation"
 
-	# a small percentage of the time, try to delete stale session data
-	consider_garbage_collection
+        # a small percentage of the time, try to delete stale session data
+        consider_garbage_collection
 
-	set id [id]
-	if {$id != ""} {
-	    debug "activate: returning session id '$id'"
-	    return $id
-	}
+        set id [id]
+        if {$id != ""} {
+            debug "activate: returning session id '$id'"
+            return $id
+        }
 
-	# it's a new session, save the reason for why it's a new session,
-	# set that it's a new session, drop a session cookie on the browser
-	# that issued this request, set the session ID cache variable, and 
-	# return the cookie ID
-	set newSessionReason [status]
-	debug "activate: new session, reason '$newSessionReason'"
-	set id [create_session]
-	set isNewSession 1
-	set_session_cookie $id
-	set sessionInfo(sessionID) $id
-	debug "activate: created session '$id' and set cookie (theoretically)"
-	return $id
+        # it's a new session, save the reason for why it's a new session,
+        # set that it's a new session, drop a session cookie on the browser
+        # that issued this request, set the session ID cache variable, and 
+        # return the cookie ID
+        set newSessionReason [status]
+        debug "activate: new session, reason '$newSessionReason'"
+        set id [create_session]
+        set isNewSession 1
+        set_session_cookie $id
+        set sessionInfo(sessionID) $id
+        debug "activate: created session '$id' and set cookie (theoretically)"
+        return $id
     }
 
     #
@@ -478,7 +479,7 @@ package require Itcl
     # were one or more prior pages creating and/or using this session ID
     #
     method is_new_session {} {
-	return $isNewSession
+        return $isNewSession
     }
 
     #
@@ -489,17 +490,21 @@ package require Itcl
     # returns ""
     #
     method new_session_reason {} {
-	return $newSessionReason
+        return $newSessionReason
     }
 
     #
     # debug - output a debugging message
     #
     method debug {message} {
-	if {$debugMode} {
-	    $this debug_output "$this (debug) $message" $debugFile
-	    flush $debugFile
-	}
+        if {$debugMode} {
+            $this $debugSink "$this (debug) $message" $debugFile
+            flush $debugFile
+        }
+    }
+
+    method log_debug_msg {msg args} {
+        ::rivet::apache_log_error info "Session [$this id]: $msg"
     }
 
     method debug_output {msg args} { puts [lindex $args 0] "$msg <br>" }
